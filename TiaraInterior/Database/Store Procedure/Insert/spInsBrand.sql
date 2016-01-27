@@ -1,9 +1,9 @@
-DROP PROCEDURE IF EXISTS spInsCategory;
+DROP PROCEDURE IF EXISTS spInsBrand;
 
 DELIMITER $$
-CREATE PROCEDURE spInsCategory (
+CREATE PROCEDURE spInsBrand (
 	pID				BIGINT, 
-	pCategoryName 	VARCHAR(255), 
+	pBrandName 	VARCHAR(255), 
 	pIsEdit			INT,
     pCurrentUser	VARCHAR(255)
 )
@@ -43,17 +43,17 @@ SET State = 1;
 		INTO
 			PassValidate
 		FROM 
-			master_category
+			master_brand
 		WHERE
-			TRIM(CategoryName) = TRIM(pCategoryName)
-			AND CategoryID <> pID
+			TRIM(BrandName) = TRIM(pBrandName)
+			AND BrandID <> pID
 		LIMIT 1;
 			
 		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
 SET State = 2;
 			SELECT
 				pID AS 'ID',
-				'Kategori sudah ada' AS 'Message',
+				'Merek sudah ada' AS 'Message',
 				'' AS 'MessageDetail',
 				1 AS 'FailedFlag',
 				State AS 'State' ;
@@ -63,14 +63,14 @@ SET State = 2;
 		ELSE /*Data yang diinput valid*/
 SET State = 3;
 			IF(pIsEdit = 0)	THEN /*Tambah baru*/
-				INSERT INTO master_category
+				INSERT INTO master_brand
 				(
-					CategoryName,
+					BrandName,
 					CreatedDate,
 					CreatedBy
 				)
 				VALUES (
-					pCategoryName,
+					pBrandName,
 					NOW(),
 					pCurrentUser
 				);
@@ -78,7 +78,7 @@ SET State = 3;
 SET State = 4;			               
 				SELECT
 					pID AS 'ID',
-					'Kategori Berhasil Ditambahkan' AS 'Message',
+					'Merek Berhasil Ditambahkan' AS 'Message',
 					'' AS 'MessageDetail',
 					0 AS 'FailedFlag',
 					State AS 'State';
@@ -86,17 +86,17 @@ SET State = 4;
 			ELSE
 SET State = 5;
 				UPDATE
-					master_category
+					master_brand
 				SET
-					CategoryName = pCategoryName,
+					BrandName = pBrandName,
 					ModifiedBy = pCurrentUser
 				WHERE
-					CategoryID = pID;
+					BrandID = pID;
 					
 SET State = 6;
 				SELECT
 					pID AS 'ID',
-					'Kategori Berhasil Diubah' AS 'Message',
+					'Merek Berhasil Diubah' AS 'Message',
 					'' AS 'MessageDetail',
 					0 AS 'FailedFlag',
 					State AS 'State';

@@ -4,7 +4,7 @@ DELIMITER $$
 CREATE PROCEDURE spInsItem (
 	pID 			BIGINT, 
 	pItemName 		VARCHAR(255),
-	pCategoryID 	BIGINT,
+	pBrandID 	BIGINT,
 	pUnitID			BIGINT,
 	pReminderCount	INT,
 	pIsEdit			INT,
@@ -49,7 +49,7 @@ SET State = 1;
 			master_item
 		WHERE
 			TRIM(ItemName) = TRIM(pItemName)
-			AND CategoryID = pCategoryID
+			AND BrandID = pBrandID
 			AND ItemID <> pID
 		LIMIT 1;
 			
@@ -70,7 +70,7 @@ SET State = 3;
 				INSERT INTO master_item
 				(
 					ItemName,
-					CategoryID,
+					BrandID,
 					UnitID,
 					ReminderCount,
 					CreatedDate,
@@ -78,7 +78,7 @@ SET State = 3;
 				)
 				VALUES (
 					pItemName,
-					pCategoryID,
+					pBrandID,
 					pUnitID,
 					pReminderCount,
 					NOW(),
@@ -99,7 +99,7 @@ SET State = 5;
 				SET
 					ItemName = pItemName,
 					ReminderCount = pReminderCount,
-					CategoryID = pCategoryID,
+					BrandID = pBrandID,
 					UnitID = pUnitID,
 					ModifiedBy = pCurrentUser
 				WHERE

@@ -1,11 +1,11 @@
-DROP PROCEDURE IF EXISTS spInsProject;
+DROP PROCEDURE IF EXISTS spInsCustomer;
 
 DELIMITER $$
-CREATE PROCEDURE spInsProject (
+CREATE PROCEDURE spInsCustomer (
 	pID 			BIGINT, 
-	pProjectName 		VARCHAR(255),
-	pIsDone 	INT,
-	pRemarks	TEXT,
+	pCustomerName 		VARCHAR(255),
+	pAddress 	TEXT,
+	pTelephone	VARCHAR(255),
 	pIsEdit			INT,
     pCurrentUser	VARCHAR(255)
 )
@@ -36,7 +36,7 @@ StoredProcedure:BEGIN
 	
 	SET PassValidate = 1;
 	
-	START TRANSACTION;
+	START TRANSACTION;	
 
 SET State = 1;
 
@@ -45,17 +45,17 @@ SET State = 1;
 		INTO
 			PassValidate
 		FROM 
-			master_project
+			master_customer
 		WHERE
-			TRIM(ProjectName) = TRIM(pProjectName)
-			AND ProjectID <> pID
+			TRIM(CustomerName) = TRIM(pCustomerName)
+			AND CustomerID <> pID
 		LIMIT 1;
 			
 		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
 SET State = 2;
 			SELECT
 				pID AS 'ID',
-				'Proyek sudah ada' AS 'Message',
+				'Customer sudah ada' AS 'Message',
 				'' AS 'MessageDetail',
 				1 AS 'FailedFlag',
 				State AS 'State' ;
@@ -65,18 +65,18 @@ SET State = 2;
 		ELSE /*Data yang diinput valid*/
 SET State = 3;
 			IF(pIsEdit = 0)	THEN /*Tambah baru*/
-				INSERT INTO master_project
+				INSERT INTO master_customer
 				(
-					ProjectName,
-					IsDone,
-					Remarks,
+					CustomerName,
+					Address,
+					Telephone,
 					CreatedDate,
 					CreatedBy
 				)
 				VALUES (
-					pProjectName,
-					pIsDone,
-					pRemarks,
+					pCustomerName,
+					pAddress,
+					pTelephone,
 					NOW(),
 					pCurrentUser
 				);
@@ -84,31 +84,31 @@ SET State = 3;
 SET State = 4;			               
 				SELECT
 					pID AS 'ID',
-					'Proyek Berhasil Ditambahkan' AS 'Message',
+					'Pelanggan Berhasil Ditambahkan' AS 'Message',
 					'' AS 'MessageDetail',
 					0 AS 'FailedFlag',
-					State AS 'State';
-					
+					State AS 'State';		
 			ELSE
 SET State = 5;
 				UPDATE
-					master_project
+					master_customer
 				SET
-					ProjectName = pProjectName,
-					IsDone = pIsDone,
-					Remarks = pRemarks,
+					CustomerName = pCustomerName,
+					Address = pAddress,
+					Telephone = pTelephone,
 					ModifiedBy = pCurrentUser
 				WHERE
-					ProjectID = pID;
-		
+					CustomerID = pID;
+					
 SET State = 6;
 				SELECT
 					pID AS 'ID',
-					'Proyek Berhasil Diubah' AS 'Message',
+					'Pelanggan Berhasil Diubah' AS 'Message',
 					'' AS 'MessageDetail',
 					0 AS 'FailedFlag',
 					State AS 'State';
-			END IF;
+		
+			END IF;	
 		END IF;
 	COMMIT;
 END;
