@@ -1,0 +1,18 @@
+DROP TABLE IF EXISTS master_employee;
+
+CREATE TABLE master_employee
+(
+	EmployeeID		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	EmployeeName	VARCHAR(255) NOT NULL,
+	StartDate		DATE NULL,
+	EndDate			DATE NULL,
+	DailySalary		DOUBLE NOT NULL,
+	CreatedDate 	DATETIME NOT NULL,
+	CreatedBy 		VARCHAR(255) NOT NULL,	
+	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 		VARCHAR(255) NULL
+)ENGINE=InnoDB;
+
+
+CREATE UNIQUE INDEX EMPLOYEE_INDEX
+ON master_employee (EmployeeID);
