@@ -5,6 +5,7 @@ CREATE TABLE transaction_outgoing
 	OutgoingID 			BIGINT PRIMARY KEY AUTO_INCREMENT,
 	CustomerID			BIGINT,
 	TransactionDate 	DATETIME NOT NULL,
+	DeliveryCost		DOUBLE,
 	CreatedDate 		DATETIME NOT NULL,
 	CreatedBy 			VARCHAR(255) NOT NULL,
 	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,

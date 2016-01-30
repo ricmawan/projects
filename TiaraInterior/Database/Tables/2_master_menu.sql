@@ -44,8 +44,8 @@ VALUES
 (
 	4,
 	2,
-	'Barang',
-	'Master/Item/',
+	'Tipe',
+	'Master/Type/',
 	NULL,
 	0,
 	4

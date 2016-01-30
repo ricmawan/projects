@@ -2,15 +2,15 @@ DROP TABLE IF EXISTS master_user;
 
 CREATE TABLE master_user
 (
-	UserID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
-	UserName	VARCHAR(255) NOT NULL,
-	UserLogin 	VARCHAR(100) NOT NULL,
+	UserID 			BIGINT PRIMARY KEY AUTO_INCREMENT,
+	UserName		VARCHAR(255) NOT NULL,
+	UserLogin 		VARCHAR(100) NOT NULL,
 	UserPassword 	VARCHAR(255) NOT NULL,
-	IsLocked		BIT,
+	IsActive		BIT,
 	CreatedDate 	DATETIME NOT NULL,
-	CreatedBy 	VARCHAR(255) NOT NULL,
+	CreatedBy 		VARCHAR(255) NOT NULL,
 	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
-	ModifiedBy	VARCHAR(255) NULL
+	ModifiedBy		VARCHAR(255) NULL
 )ENGINE=InnoDB;
 
 INSERT INTO master_user
@@ -20,7 +20,7 @@ VALUES
 	'System Administrator',
 	'Admin',
 	MD5('abcdef'),
-	0,
+	1,
 	NOW(),
 	'System',
 	NULL,

@@ -2,11 +2,11 @@ DROP TABLE IF EXISTS master_groupmenu;
 
 CREATE TABLE master_groupmenu
 (
-	GroupMenuID	INT PRIMARY KEY,
+	GroupMenuID		INT PRIMARY KEY,
 	GroupMenuName 	VARCHAR(255),
-	Icon		VARCHAR(255),
-	Url		VARCHAR(255),
-	OrderNo		INT
+	Icon			VARCHAR(255),
+	Url				VARCHAR(255),
+	OrderNo			INT
 )ENGINE=InnoDB;
 
 INSERT INTO master_groupmenu
