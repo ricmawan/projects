@@ -144,7 +144,9 @@
 																	 FROM
 																		master_menu
 																	WHERE 
-																		GroupMenuID = ".$row['GroupMenuID'];
+																		GroupMenuID = ".$row['GroupMenuID']."
+																	ORDER BY
+																		OrderNo";
 																if (! $result2=mysql_query($sql2, $dbh)) {
 																	echo mysql_error();
 																	return 0;

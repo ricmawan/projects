@@ -57,7 +57,7 @@ VALUES
 	'Master/Customer/',
 	NULL,
 	0,
-	5
+	6
 ),
 (
 	6,
@@ -66,7 +66,7 @@ VALUES
 	'Master/Supplier/',
 	NULL,
 	0,
-	6
+	7
 ),
 (
 	7,
@@ -139,6 +139,15 @@ VALUES
 	NULL,
 	1,
 	4
+),
+(
+	15,
+	2,
+	'Barang',
+	'Master/Item/',
+	NULL,
+	1,
+	5
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

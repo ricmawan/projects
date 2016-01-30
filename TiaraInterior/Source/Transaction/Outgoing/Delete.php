@@ -13,12 +13,12 @@
 			try
 			{
 				//$ProjectData = explode("^", $Data[$i]);
-				$InTransactionID = mysql_real_escape_string($Data[$i]);
-				$sql = "DELETE FROM transaction_outgoingtransaction WHERE OutgoingTransactionID = $InTransactionID";
+				$IncomingTransactionID = mysql_real_escape_string($Data[$i]);
+				$sql = "DELETE FROM transaction_incomingtransaction WHERE IncomingTransactionID = $IncomingTransactionID";
 				if (! $result=mysql_query($sql, $dbh)) {
 					throw new Exception($ProjectName);
 				}
-				$MessageSuccessDelete .= "$InTransactionID, ";
+				$MessageSuccessDelete .= "$IncomingTransactionID, ";
 			}
 			catch (Exception $e)
 			{

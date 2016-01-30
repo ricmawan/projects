@@ -146,7 +146,7 @@ $(document).ready(function () {
 			});
 		}
 		else {
-			$.ajax({
+			/*$.ajax({
 				url: "./Master/Notification/",
 				type: "POST",
 				data: { },
@@ -162,7 +162,8 @@ $(document).ready(function () {
 					$("#loading").hide();
 					$.notify("Koneksi gagal", "error");
 				}
-			});
+			});*/
+			$("#loading").hide();
 		}
 		$(this).addClass("active-menu");
 	});
@@ -314,7 +315,7 @@ function convertRupiah(id, angka){
 		var angkarev = angka.toString().split('').reverse().join('');
 		for(var i = 0; i < angkarev.length; i++) if(i%3 == 0) rupiah += angkarev.substr(i,3)+',';
 		
-		console.log(rupiah);
+		//console.log(rupiah);
 		if(angkarev.length > 3) {
 			angka = rupiah.split('',rupiah.length-1).reverse().join('');
 			if(flag == 1) $("#" + id).val(angka + "." + koma);

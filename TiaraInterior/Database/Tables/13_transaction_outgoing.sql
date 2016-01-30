@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS transaction_outgoing;
 CREATE TABLE transaction_outgoing
 (
 	OutgoingID 			BIGINT PRIMARY KEY AUTO_INCREMENT,
+	OutgoingNumber		VARCHAR(100) NULL,
 	CustomerID			BIGINT,
 	TransactionDate 	DATETIME NOT NULL,
 	DeliveryCost		DOUBLE,

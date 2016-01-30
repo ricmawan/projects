@@ -64,7 +64,7 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						 <h2>Mutasi Stok</h2>
+						 <h2>Pembelian</h2>
 					</div>
 					<div class="panel-body">
 						<div class="row">
@@ -82,57 +82,6 @@
 							</div>
 						</div>
 						<br />
-						<div class="row">
-								<div class="col-md-5">
-									Kategori Barang:<br />
-									<div class="ui-widget" style="width: 100%;">
-										<select name="ddlCategory" id="ddlCategory" class="form-control" placeholder="Pilih Kategori Barang" >
-											<option value="" selected> </option>
-											<?php
-												$sql = "SELECT CategoryID, CategoryName FROM master_category";
-												if(!$result = mysql_query($sql, $dbh)) {
-													echo mysql_error();
-													return 0;
-												}
-												while($row = mysql_fetch_array($result)) {
-													echo "<option value='".$row['CategoryID']."' >".$row['CategoryName']."</option>";
-												}
-											?>
-										</select>
-									</div>
-								</div>
-								<div class="col-md-5">
-									Barang:<br />
-									<div class="ui-widget" style="width: 100%;">
-										<select name="ddlItem" id="ddlItem" class="form-control" placeholder="Pilih Barang" >
-											<option value="" categoryid="" selected> </option>
-										</select>
-										<select name="ddlHiddenItem" id="ddlHiddenItem" style="display:none;" class="form-control" placeholder="Pilih Barang" >
-											<option value="" categoryid="" selected> </option>
-											<?php
-												$sql = "SELECT 
-															MI.ItemID, 
-															MI.ItemName, 
-															MC.CategoryID, 
-															MI.Price,  
-															MC.CategoryName
-														FROM 
-															master_item MI 
-															JOIN master_category MC
-																ON MC.CategoryID = MI.CategoryID";
-												if(!$result = mysql_query($sql, $dbh)) {
-													echo mysql_error();
-													return 0;
-												}
-												while($row = mysql_fetch_array($result)) {
-													echo "<option value='".$row['ItemID']."' price='".$row['Price']."' categoryid='".$row['CategoryID']."' >".$row['CategoryName']." ".$row['ItemName']."</option>";
-												}
-											?>
-										</select>
-									</div>
-								</div>
-							</div>
-							<br />
 						<div class="row">
 							<div class="col-md-12">
 								<button class="btn btn-default" id="btnExcel" onclick="Preview();" ><i class="fa fa-file-excel-o "></i> Lihat</button>&nbsp;&nbsp;

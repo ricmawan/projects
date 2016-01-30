@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS transaction_incoming;
 CREATE TABLE transaction_incoming
 (
 	IncomingID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	IncomingNumber	VARCHAR(100) NULL,
 	SupplierID 		BIGINT,
 	TransactionDate DATETIME NOT NULL,
 	CreatedDate 	DATETIME NOT NULL,

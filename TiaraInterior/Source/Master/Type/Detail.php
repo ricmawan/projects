@@ -145,7 +145,7 @@
 							<input id="txtReminderCount" name="txtReminderCount" type="text" class="form-control" placeholder="Notifikasi Stok" required <?php echo 'value="'.$ReminderCount.'"'; ?> />
 							<br />-->
 							Harga Beli:<br />
-							<input id="txtBuyPrice" name="txtBuyPrice" type="text" class="form-control" placeholder="Harga Beli" style="text-align:right;" readonly <?php echo 'value="'.number_format($BuyPrice,2,".",",").'"'; ?> />
+							<input id="txtBuyPrice" name="txtBuyPrice" type="text" class="form-control" placeholder="Harga Beli" style="text-align:right;" <?php echo 'value="'.number_format($BuyPrice,2,".",",").'"'; ?> />
 							<br />
 							Harga Jual:<br />
 							<input id="txtSalePrice" name="txtSalePrice" type="text" class="form-control" placeholder="Harga Jual" style="text-align:right;" <?php echo 'value="'.number_format($SalePrice,2,".",",").'"'; ?> />

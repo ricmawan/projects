@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS transaction_buyreturn;
 CREATE TABLE transaction_buyreturn
 (
 	BuyReturnID 	BIGINT PRIMARY KEY AUTO_INCREMENT,
+	BuyReturnNumber	VARCHAR(100) NULL,
 	SupplierID 		BIGINT,
 	TransactionDate DATETIME NOT NULL,
 	CreatedDate 	DATETIME NOT NULL,

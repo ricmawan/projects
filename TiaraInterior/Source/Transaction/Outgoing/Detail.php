@@ -6,49 +6,47 @@
 		include "../../GetPermission.php";
 		//echo $_SERVER['REQUEST_URI'];
 		$Content = "";
-		$OutgoingTransactionID = mysql_real_escape_string($_GET['ID']);
-		$ProjectID = "";
+		$IncomingID = mysql_real_escape_string($_GET['ID']);
+		$SupplierID = "";
 		$TransactionDate = "";
 		$IsEdit = 0;
 		$rowCount = 0;
 		$Data = "";
-		if($OutgoingTransactionID != 0) {
+		if($IncomingID != 0) {
 			$IsEdit = 1;
 			//$Content = "Place the content here";
 			$sql = "SELECT
-						OT.OutgoingTransactionID,
-						OT.ProjectID,
-						DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') AS TransactionDate
-					FROM
-						transaction_outgoingtransaction OT
-					WHERE
-						OT.OutgoingTransactionID = $OutgoingTransactionID";
+					IT.IncomingID,
+					IT.SupplierID,
+					DATE_FORMAT(IT.TransactionDate, '%d-%m-%Y') AS TransactionDate
+				FROM
+					transaction_incoming IT
+				WHERE
+					IT.IncomingID = $IncomingID";
 						
 			if (! $result=mysql_query($sql, $dbh)) {
 				echo mysql_error();
 				return 0;
 			}				
 			$row=mysql_fetch_array($result);
-			$OutgoingTransactionID = $row['OutgoingTransactionID'];
-			$ProjectID = $row['ProjectID'];
+			$IncomingID = $row['IncomingID'];
+			$SupplierID = $row['SupplierID'];
 			$TransactionDate = $row['TransactionDate'];
 			
 			$sql = "SELECT
-						OTD.OutgoingTransactionDetailsID,
-						OTD.ItemID,
-						OTD.Quantity,
-						OTD.Price,
-						CONCAT(MC.CategoryName, ' ', I.ItemName) AS ItemName,
-						OTD.Remarks,
-						OTD.Name
+						ITD.IncomingDetailsID,
+						ITD.TypeID,
+						ITD.Quantity,
+						ITD.Price,
+						CONCAT(MC.BrandName, ' ', I.TypeName) AS TypeName
 					FROM
-						transaction_outgoingtransactiondetails OTD
-						JOIN master_item I
-							ON I.ItemID = OTD.ItemID
-						JOIN master_category MC
-							ON MC.CategoryID = I.CategoryID
+						transaction_incomingdetails ITD
+						JOIN master_type I
+							ON I.TypeID = ITD.TypeID
+						JOIN master_brand MB
+							ON MC.BrandID = I.BrandID
 					WHERE
-						OTD.OutgoingTransactionID = $OutgoingTransactionID";
+						ITD.IncomingID = $IncomingID";
 			if(!$result = mysql_query($sql, $dbh)) {
 				echo mysql_error();
 				return 0;
@@ -59,7 +57,7 @@
 				$Data = array();
 				while($row = mysql_fetch_array($result)) {
 					//array_push($DetailID, $row[0]);
-					array_push($Data, "'".$row['OutgoingTransactionDetailsID']."', '".$row['ItemID']."', '".$row['Quantity']."', '".$row['Price']."', '".$row['ItemName']."', '".$row['Name']."', '".$row['Remarks']."'");
+					array_push($Data, "'".$row['IncomingDetailsID']."', '".$row['TypeID']."', '".$row['Quantity']."', '".$row['Price']."', '".$row['TypeName']."'");
 				}
 				//$DetailID = implode(",", $DetailID);
 				$Data = implode("|", $Data);
@@ -137,33 +135,33 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h2><?php if($IsEdit == 0) echo "Tambah"; else echo "Ubah"; ?> Data Barang Keluar</h2>  
+						<h2><?php if($IsEdit == 0) echo "Tambah"; else echo "Ubah"; ?> Data Barang Masuk</h2>  
 					</div>
 					<div class="panel-body">
 						<form class="col-md-12" id="PostForm" method="POST" action="" >
 							<div class="row">
 								<div class="col-md-5">
 									Tanggal:<br />
-									<input id="hdnOutgoingTransactionID" name="hdnOutgoingTransactionID" type="hidden" <?php echo 'value="'.$OutgoingTransactionID.'"'; ?> />
+									<input id="hdnIncomingID" name="hdnIncomingID" type="hidden" <?php echo 'value="'.$IncomingID.'"'; ?> />
 									<input id="hdnRow" name="hdnRow" type="hidden" <?php echo 'value="'.$rowCount.'"'; ?> />
 									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
 									<input id="hdnData" name="hdnData" type="hidden" <?php echo 'value="'.$Data.'"'; ?> />
 									<input id="txtTransactionDate" style="height:34px;" name="txtTransactionDate" type="text" class="form-control DatePickerMonthYearGlobal" placeholder="Tanggal" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
 								</div>
 								<div class="col-md-5">
-									Proyek:<br />
+									Pelanggan:<br />
 									<div class="ui-widget" style="width: 100%;">
-										<select name="ddlProject" id="ddlProject" class="form-control" placeholder="Pilih Proyek" >
+										<select name="ddlSupplier" id="ddlSupplier" class="form-control" placeholder="Pilih Pelanggan" >
 											<option value="" selected> </option>
 											<?php
-												$sql = "SELECT ProjectID, ProjectName FROM master_project WHERE IsDone = 0";
+												$sql = "SELECT CustomerID, CustomerName FROM master_customer";
 												if(!$result = mysql_query($sql, $dbh)) {
 													echo mysql_error();
 													return 0;
 												}
 												while($row = mysql_fetch_array($result)) {
-													if($ProjectID == $row['ProjectID']) echo "<option selected value='".$row['ProjectID']."' >".$row['ProjectName']."</option>";
-													else echo "<option value='".$row['ProjectID']."' >".$row['ProjectName']."</option>";
+													if($SupplierID == $row['CustomerID']) echo "<option selected value='".$row['CustomerID']."' >".$row['CustomerName']."</option>";
+													else echo "<option value='".$row['CustomerID']."' >".$row['CustomerName']."</option>";
 												}
 											?>
 										</select>
@@ -173,48 +171,49 @@
 							<br />
 							<div class="row">
 								<div class="col-md-5">
-									Kategori Barang:<br />
+									Merk:<br />
 									<div class="ui-widget" style="width: 100%;">
-										<select name="ddlCategory" id="ddlCategory" class="form-control" placeholder="Pilih Kategori Barang" >
+										<select name="ddlBrand" id="ddlBrand" class="form-control" placeholder="Pilih Merek" >
 											<option value="" selected> </option>
 											<?php
-												$sql = "SELECT CategoryID, CategoryName FROM master_category";
+												$sql = "SELECT BrandID, BrandName FROM master_brand";
 												if(!$result = mysql_query($sql, $dbh)) {
 													echo mysql_error();
 													return 0;
 												}
 												while($row = mysql_fetch_array($result)) {
-													echo "<option value='".$row['CategoryID']."' >".$row['CategoryName']."</option>";
+													echo "<option value='".$row['BrandID']."' >".$row['BrandName']."</option>";
 												}
 											?>
 										</select>
 									</div>
 								</div>
 								<div class="col-md-5">
-									Barang:<br />
+									Tipe:<br />
 									<div class="ui-widget" style="width: 100%;">
-										<select name="ddlItem" id="ddlItem" class="form-control" placeholder="Pilih Barang" >
-											<option value="" categoryid="" selected> </option>
+										<select name="ddlType" id="ddlType" class="form-control" placeholder="Pilih Tipe" >
+											<option value="" brandid="" selected> </option>
 										</select>
-										<select name="ddlHiddenItem" id="ddlHiddenItem" style="display:none;" class="form-control" placeholder="Pilih Barang" >
-											<option value="" categoryid="" selected> </option>
+										<select name="ddlHiddenType" id="ddlHiddenType" style="display:none;" class="form-control" placeholder="Pilih Barang" >
+											<option value="" brandid="" selected> </option>
 											<?php
 												$sql = "SELECT 
-															MI.ItemID, 
-															MI.ItemName, 
-															MC.CategoryID, 
-															MI.Price,  
-															MC.CategoryName
+															MI.TypeID, 
+															MI.TypeName, 
+															MB.BrandID, 
+															MI.BuyPrice,
+															MI.SalePrice,
+															MB.BrandName
 														FROM 
-															master_item MI 
-															JOIN master_category MC
-																ON MC.CategoryID = MI.CategoryID";
+															master_type MI 
+															JOIN master_brand MB
+																ON MB.BrandID = MI.BrandID";
 												if(!$result = mysql_query($sql, $dbh)) {
 													echo mysql_error();
 													return 0;
 												}
 												while($row = mysql_fetch_array($result)) {
-													echo "<option value='".$row['ItemID']."' price='".$row['Price']."' categoryid='".$row['CategoryID']."' >".$row['CategoryName']." ".$row['ItemName']."</option>";
+													echo "<option value='".$row['TypeID']."' buyprice='".$row['buyPrice']."' saleprice='".$row['SalePrice']."' brandid='".$row['BrandID']."' >".$row['BrandName']." ".$row['TypeName']."</option>";
 												}
 											?>
 										</select>
@@ -222,40 +221,40 @@
 								</div>
 							</div>
 							<br />
-							<div style="max-height: 320px !important; height:100%; overflow-y: auto;">
-								<div class="col-md-12">					
+							<div style="max-height: 335px !important; height:100%; overflow-y: auto;">
+								<div class="col-md-10">					
 									<table class="table" id="datainput">
 										<thead>
 											<td>No</td>
-											<td>Nama</td>
 											<td>Nama Barang</td>
+											<td>Batch</td>
 											<td>QTY</td>
-											<td>Harga</td>
+											<td>Harga Beli</td>
+											<td>Harga Jual</td>
 											<td>Total</td>
-											<td>Keterangan</td>
 										</thead>
 										<tbody>
 											<tr id='' style='display:none;' class="num">
 												<td id='nota' name='nota' class='nota'></td>
 												<td>
-													<input type="text" id="txtName" name="txtName" class="form-control txtName" placeholder="Nama"/>
+													<input type="text" id="txtTypeName" name="txtTypeName" class="form-control txtTypeName" placeholder="Nama Barang" readonly />
+													<input type="hidden" id="hdnTypeID" name="hdnTypeID" value="0" class="hdnTypeID" />
+													<input type="hidden" id="hdnIncomingDetailsID" class="hdnIncomingDetailsID" name="hdnIncomingDetailsID" value="0" />
 												</td>
 												<td>
-													<input type="text" id="txtItemName" name="txtItemName" class="form-control txtItemName" placeholder="Nama Barang" readonly />
-													<input type="hidden" id="hdnItemID" name="hdnItemID" value="0" class="hdnItemID" />
-													<input type="hidden" id="hdnOutgoingTransactionDetailsID" class="hdnOutgoingTransactionDetailsID" name="hdnOutgoingTransactionDetailsID" value="0" />
+													<input type="text" row="" id="txtBatchNumber" name="txtBatchNumber" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control txtBatchNumber" placeholder="Batch"/>
 												</td>
 												<td>
-													<input type="text" row="" style="width: 50px;" value=1 id="txtQuantity" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control txtQuantity" placeholder="QTY"/>
+													<input type="text" row="" value=1 id="txtQuantity" style="width: 50px;" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control txtQuantity" placeholder="QTY"/>
 												</td>
 												<td>
-													<input type="text" id="txtPrice" value="0.00" name="txtPrice" style="text-align:right;" class="form-control txtPrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga"/>
+													<input type="text" id="txtBuyPrice" value="0.00" name="txtBuyPrice" style="text-align:right;" class="form-control txtBuyPrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Beli"/>
+												</td>
+												<td>
+													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;" class="form-control txtSalePrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual"/>
 												</td>
 												<td>
 													<input type="text" id="txtTotal" name="txtTotal" class="form-control txtTotal" onchange="calculate()" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" style="text-align:right;" value="0.00" placeholder="Jumlah" readonly />
-												</td>
-												<td>
-													<input type="text" id="txtRemarks" name="txtRemarks" class="form-control txtRemarks" placeholder="Keterangan"/>
 												</td>
 												<td style="vertical-align:middle;">
 													<i class="fa fa-close btnDelete" style="cursor:pointer;" acronym title="Hapus Data" onclick="DeleteRow(this.getAttribute('row'))"></i>
@@ -271,6 +270,33 @@
 						<br />
 						<div class="row">
 							<div class="col-md-2" style="text-align:right;">
+								No Nota :
+							</div>
+							<div class="col-md-2">
+								<input type="text" id="txtIncomingNumber" name="txtIncomingNumber" class="form-control" readonly />
+							</div>
+						</div>
+						<br />
+						<div class="row">
+							<div class="col-md-2" style="text-align:right;">
+								Catatan :
+							</div>
+							<div class="col-md-4">
+								<textarea id="txtAddress" name="txtAddress" class="form-control" placeholder="Catatan"></textarea>
+							</div>
+						</div>
+						<br />
+						<div class="row">
+							<div class="col-md-2" style="text-align:right;">
+								Ongkos Kirim :
+							</div>
+							<div class="col-md-2">
+								<input type="text" id="txtDeliveryCost" style="text-align:right;" value="0.00" name="txtDeliveryCost" class="form-control" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" />
+							</div>
+						</div>
+						<br />
+						<div class="row">
+							<div class="col-md-2" style="text-align:right;">
 								Grand Total :
 							</div>
 							<div class="col-md-2">
@@ -280,7 +306,9 @@
 						<br />
 						<div class="row">
 							<div class="col-md-12">
-								<button class="btn btn-default" id="btnAdd" style="display:none;" ><i class="fa fa-save "></i> Add</button>&nbsp;&nbsp;
+								<button class="btn btn-default" id="btnAdd" style="display:none;" ><i class="fa fa-save "></i> Add</button>&nbsp;&nbsp;								
+								<button class="btn btn-default" id="btnSave"  onclick="SubmitValidate();" ><i class="fa fa-print "></i> Cetak Nota</button>&nbsp;&nbsp;
+								<button class="btn btn-default" id="btnSave"  onclick="SubmitValidate();" ><i class="fa fa-print "></i> Cetak Surat Jalan</button>&nbsp;&nbsp;
 								<button class="btn btn-default" id="btnSave"  onclick="SubmitValidate();" ><i class="fa fa-save "></i> Simpan</button>&nbsp;&nbsp;
 							</div>
 						</div>
@@ -289,48 +317,51 @@
 			</div>
 		</div>
 		<script>
-			function BindItem() {
-				$("#ddlItem option").each(function() {
+			function BindType() {
+				$("#ddlType option").each(function() {
 					$(this).remove();
 				});
-				$("#ddlItem").append('<option value="" categoryid="" selected> </option>');
-				$("#ddlItem").val("");
-				$("#ddlItem").next().find("input").val("");
-				$("#ddlHiddenItem option").each(function() {
-					if($(this).attr("categoryid") == $("#ddlCategory").val() || $(this).attr("categoryid") == "") {
-						$("#ddlItem").append($(this).clone());
+				$("#ddlType").append('<option value="" brandid="" selected> </option>');
+				$("#ddlType").val("");
+				$("#ddlType").next().find("input").val("");
+				$("#ddlHiddenType option").each(function() {
+					if($(this).attr("brandid") == $("#ddlBrand").val() || $(this).attr("brandid") == "") {
+						$("#ddlType").append($(this).clone());
 					}
 				});
 			}
 			
-			function BindItemList() {
+			function BindTypeList() {
 				var i = 1;
-				var CurrentItemID = $("#ddlItem").val();
-				var CurrentPrice = $("#ddlItem option:selected").attr("price");
-				var CurrentItemName = $("#ddlItem option:selected").text();
-				//var AddFlag = 1;
-				/*for(i=1;i<=rows;i++) {
-					if($("#hdnItemID" + i).val() == CurrentItemID) {
+				var CurrentTypeID = $("#ddlType").val();
+				var CurrentBuyPrice = $("#ddlType option:selected").attr("buyprice");
+				var CurrentSalePrice = $("#ddlType option:selected").attr("saleprice");
+				var CurrentTypeName = $("#ddlType option:selected").text();
+				var rows = $("#recordnew").val();
+				var AddFlag = 1;
+				//QTY + 1 if selected item already exists
+				for(i=1;i<=rows;i++) {
+					/*if($("#hdnTypeID" + i).val() == CurrentTypeID) {
 						$("#txtQuantity" + i).val((parseFloat($("#txtQuantity" + i).val()) + 1));
 						AddFlag = 0;
-					}
-				}*/
-				//if(AddFlag == 1) {
+					}*/
+				}
+				if(AddFlag == 1) {
 					$("#btnAdd").click();
-					var i = $("#recordnew").val();
-					$("#hdnItemID" + i).val(CurrentItemID);
-					$("#txtItemName" + i).val(CurrentItemName);
-					$("#txtPrice" + i).val(returnRupiah(CurrentPrice.toString()));
+					$("#hdnTypeID" + i).val(CurrentTypeID);
+					$("#txtTypeName" + i).val(CurrentTypeName);
+					$("#txtBuyPrice" + i).val(returnRupiah(CurrentBuyPrice.toString()));
+					$("#txtSalePrice" + i).val(returnRupiah(CurrentSalePrice.toString()));
 					$("#txtQuantity" + i).val(1);
-					$("#txtTotal" + i).val(CurrentPrice);
-				//}
+					$("#txtTotal" + i).val(CurrentBuyPrice);
+				}
 				Calculate();
 			}
 			
 			function DeleteRow(row) {
 				var count = $("#datainput tbody tr").length - 1;
 				$("#num" + row).remove();
-				$("#recordnew").val((count-1));
+				$("#recordnew").val(count-1);
 				RegenerateRowNumber();
 				Calculate();
 			}
@@ -354,18 +385,18 @@
 					i++;
 				});
 				i = 0;
-				$(".hdnItemID").each(function() {
+				$(".hdnTypeID").each(function() {
 					if(i != 0) {
-						$(this).attr("id", "hdnItemID" + i);
-						$(this).attr("name", "hdnItemID" + i);
+						$(this).attr("id", "hdnTypeID" + i);
+						$(this).attr("name", "hdnTypeID" + i);
 					}
 					i++;
 				});
 				i = 0;
-				$(".hdnOutgoingTransactionDetailsID").each(function() {
+				$(".hdnIncomingDetailsID").each(function() {
 					if(i != 0) {
-						$(this).attr("id", "hdnOutgoingTransactionDetailsID" + i);
-						$(this).attr("name", "hdnOutgoingTransactionDetailsID" + i);
+						$(this).attr("id", "hdnIncomingDetailsID" + i);
+						$(this).attr("name", "hdnIncomingDetailsID" + i);
 					}
 					i++;
 				});
@@ -379,34 +410,27 @@
 					i++;
 				});
 				i = 0;
-				$(".txtPrice").each(function() {
+				$(".txtBatchNumber").each(function() {
 					if(i != 0) {
-						$(this).attr("id", "txtPrice" + i);
-						$(this).attr("name", "txtPrice" + i);
+						$(this).attr("id", "txtBatchNumber" + i);
+						$(this).attr("name", "txtBatchNumber" + i);
+						$(this).attr("row", i);
 					}
 					i++;
 				});
 				i = 0;
-				$(".txtName").each(function() {
+				$(".txtBuyPrice").each(function() {
 					if(i != 0) {
-						$(this).attr("id", "txtName" + i);
-						$(this).attr("name", "txtName" + i);
+						$(this).attr("id", "txtBuyPrice" + i);
+						$(this).attr("name", "txtBuyPrice" + i);
 					}
 					i++;
 				});
 				i = 0;
-				$(".txtRemarks").each(function() {
+				$(".txtSalePrice").each(function() {
 					if(i != 0) {
-						$(this).attr("id", "txtRemarks" + i);
-						$(this).attr("name", "txtRemarks" + i);
-					}
-					i++;
-				});
-				i = 0;
-				$(".txtItemName").each(function() {
-					if(i != 0) {
-						$(this).attr("id", "txtItemName" + i);
-						$(this).attr("name", "txtItemName" + i);
+						$(this).attr("id", "txtSalePrice" + i);
+						$(this).attr("name", "txtSalePrice" + i);
 					}
 					i++;
 				});
@@ -415,6 +439,14 @@
 					if(i != 0) {
 						$(this).attr("id", "txtTotal" + i);
 						$(this).attr("name", "txtTotal" + i);
+					}
+					i++;
+				});
+				i = 0;
+				$(".txtTypeName").each(function() {
+					if(i != 0) {
+						$(this).attr("id", "txtTypeName" + i);
+						$(this).attr("name", "txtTypeName" + i);
 					}
 					i++;
 				});
@@ -437,13 +469,13 @@
 					if(i != 0) {
 						qty = $(this).val();
 						row = $(this).attr("row");
-						price = $("#txtPrice" + row).val().replace(/\,/g, "");
+						price = $("#txtBuyPrice" + row).val().replace(/\,/g, "");
 						if(qty == "") {
 							$(this).val(1);
 							qty = 1;
 						}
 						else if(price == "") {
-							$("#txtPrice" + row).val("0.00");
+							$("#txtBuyPrice" + row).val("0.00");
 							price = 0;
 						}
 						GrandTotal += parseFloat(qty) * parseFloat(price);
@@ -455,22 +487,21 @@
 				$("#txtGrandTotal").val(returnRupiah(GrandTotal.toString()));
 			}
 			$(document).ready(function () {
-				$("#ddlCategory").combobox({
+				$("#ddlBrand").combobox({
 					select: function( event, ui ) {
-						BindItem();						
+						BindType();						
 					}
 				});
 				
-				$("#ddlProject").combobox();
-				$("#ddlItem").combobox({
+				$("#ddlSupplier").combobox();
+				$("#ddlType").combobox({
 					select: function(event, ui) {
-						BindItemList();
+						BindTypeList();
 						setTimeout(function() {
-							$("#ddlItem").next().find("input").val("");
-							$("#ddlItem").val("");
+							$("#ddlType").next().find("input").val("");
+							$("#ddlType").val("");
 						}, 0);
 					}
-					
 				});
 				$("#btnAdd").on("click", function() {
 					var count = $("#datainput tbody tr").length - 1;
@@ -495,8 +526,6 @@
 						//$(this).val($("#" + temp).val());
 					});
 					$("#datainput tbody").append($clone);
-					$("#txtName" + count).removeAttr("required");
-					$("#txtRemarks" + count).removeAttr("required");
 					//$("#txtQuantity" + count).addClass("txtQuantity");
 					$("#recordnew").val(count);
 				});
@@ -510,23 +539,23 @@
 				
 				if(parseInt($("#hdnRow").val()) > 0) {
 					var data = $("#hdnData").val();
-					var item = data.split("|");
-					var row = item.length;
+					var type = data.split("|");
+					var row = type.length;
 					var count = 0;
 					$('#datainput tbody:last > tr:not(:first)').remove();
 					for(var i=0; i<row; i++) {
 						$("#btnAdd").click();
 						count++;
 						//set values
-						var d = item[i].split("', '");
+						var d = type[i].split("', '");
 						$("#nota").text(count);
-						$("#hdnOutgoingTransactionDetailsID" + count).val(d[0].replace("'", ""));
-						$("#hdnItemID" + count).val(d[1].replace("'", ""));
+						$("#hdnIncomingDetailsID" + count).val(d[0].replace("'", ""));
+						$("#hdnTypeID" + count).val(d[1].replace("'", ""));
 						$("#txtQuantity" + count).val(d[2].replace("'", ""));
-						$("#txtPrice" + count).val(returnRupiah(d[3].replace("'", "")));
-						$("#txtItemName" + count).val(d[4].replace("'", ""));
-						$("#txtName" + count).val(d[5].replace("'", ""));
-						$("#txtRemarks" + count).val(d[6].replace("'", ""));
+						$("#txtBuyPrice" + count).val(returnRupiah(d[3].replace("'", "")));
+						$("#txtSalePrice" + count).val(returnRupiah(d[3].replace("'", "")));
+						$("#txtBatchNumber" + count).val(returnRupiah(d[3].replace("'", "")));
+						$("#txtTypeName" + count).val(d[4].replace("'", ""));
 						$("#record").val(count);
 						$("#recordnew").val(count);
 					}
@@ -549,19 +578,19 @@
 						}
 					});
 					
-					if($("#ddlProject").val() == "") {
+					/*if($("#ddlSupplier").val() == "") {
 						PassValidate = 0;
-						$("#ddlProject").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						if(FirstFocus == 0) $("#ddlProject").next().find("input").focus();
+						$("#ddlSupplier").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+						if(FirstFocus == 0) $("#ddlSupplier").next().find("input").focus();
 						FirstFocus = 1;
-					}
+					}*/
 					if(PassValidate == 0) {
 						$("html, body").animate({
 							scrollTop: 0
 						}, "slow");
 						return false;
 					}
-					else SubmitForm("./Transaction/OutgoingTransaction/Insert.php");
+					else SubmitForm("./Transaction/Incoming/Insert.php");
 				}
 			}
 		</script>

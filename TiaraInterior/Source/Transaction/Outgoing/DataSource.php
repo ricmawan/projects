@@ -6,7 +6,7 @@
 	include "../../GetPermission.php";
 
 	$where = " 1=1 ";
-	$order_by = "OT.OutgoingTransactionID";
+	$order_by = "IT.IncomingTransactionID";
 	$rows = 10;
 	$current = 1;
 	$limit_l = ($current * $rows) - ($rows);
@@ -17,14 +17,14 @@
 		$order_by = "";
 		foreach($_REQUEST['sort'] as $key => $value) {
 			if($key != 'No') $order_by .= " $key $value";
-			else $order_by = "OT.OutgoingTransactionID";
+			else $order_by = "IT.IncomingTransactionID";
 		}
 	}
 	//Handles search querystring sent from Bootgrid
 	if (ISSET($_REQUEST['searchPhrase']) )
 	{
 		$search = trim($_REQUEST['searchPhrase']);
-		$where .= " AND ( OT.OutgoingTransactionID LIKE '%".$search."%' OR MP.ProjectName LIKE '%".$search."%' OR DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' ) ";
+		$where .= " AND ( IT.IncomingTransactionID LIKE '%".$search."%' OR MS.SupplierName LIKE '%".$search."%' OR DATE_FORMAT(IT.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' ) ";
 	}
 	//Handles determines where in the paging count this result set falls in
 	if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];
@@ -37,16 +37,15 @@
 	}
 	if ($rows == -1) $limit = ""; //no limit
 	else $limit = " LIMIT $limit_l, $limit_h ";
-
 	$sql = "SELECT
 				COUNT(*) AS nRows
 			FROM
-				transaction_outgoingtransaction OT
-				JOIN master_project MP
-					ON OT.ProjectID = MP.ProjectID
+				transaction_incomingtransaction IT
+				LEFT JOIN master_supplier MS
+					ON IT.SupplierID = MS.SupplierID
 			WHERE
-				$where
-				AND MP.IsDone = 0";
+				$where";
+	
 	if (! $result = mysql_query($sql, $dbh)) {
 		echo mysql_error();
 		return 0;
@@ -54,23 +53,22 @@
 	$row = mysql_fetch_array($result);
 	$nRows = $row['nRows'];
 	$sql = "SELECT
-				OT.OutgoingTransactionID,
-				MP.ProjectName,
-				DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') AS TransactionDate,
-				IFNULL(SUM(OTD.Quantity * OTD.Price), 0) AS TotalAmount
+				IT.IncomingTransactionID,
+				MS.SupplierName,
+				DATE_FORMAT(IT.TransactionDate, '%d-%m-%Y') AS TransactionDate,
+				IFNULL(SUM(ITD.Quantity * ITD.Price), 0) AS TotalAmount
 			FROM
-				transaction_outgoingtransaction OT
-				JOIN master_project MP
-					ON OT.ProjectID = MP.ProjectID
-				LEFT JOIN transaction_outgoingtransactiondetails OTD
-					ON OTD.OutgoingTransactionID = OT.OutgoingTransactionID
+				transaction_incomingtransaction IT
+				LEFT JOIN master_supplier MS
+					ON IT.SupplierID = MS.SupplierID
+				LEFT JOIN transaction_incomingtransactiondetails ITD
+					ON ITD.IncomingTransactionID = IT.IncomingTransactionID
 			WHERE
 				$where
-				AND MP.IsDone = 0
 			GROUP BY
-				OT.OutgoingTransactionID,
-				MP.ProjectName,
-				OT.TransactionDate
+				IT.IncomingTransactionID,
+				MS.SupplierName,
+				IT.TransactionDate
 			ORDER BY 
 				$order_by
 			$limit";
@@ -83,8 +81,8 @@
 	while ($row = mysql_fetch_array($result)) {
 		$RowNumber++;
 		$row_array['RowNumber'] = $RowNumber;
-		$row_array['OutgoingTransactionID']= $row['OutgoingTransactionID'];
-		$row_array['ProjectName'] = $row['ProjectName'];
+		$row_array['IncomingTransactionID']= $row['IncomingTransactionID'];
+		$row_array['SupplierName'] = $row['SupplierName'];
 		$row_array['TotalAmount'] =  number_format($row['TotalAmount'],2,".",",");
 		$row_array['TransactionDate'] = $row['TransactionDate'];
 		array_push($return_arr, $row_array);

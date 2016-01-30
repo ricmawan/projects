@@ -17,18 +17,18 @@
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
-										<th data-column-id="OutgoingTransactionID" data-type="numeric" data-identifier="true">ID Transaksi</th>
+										<th data-column-id="OutgoingID" data-type="numeric" data-identifier="true">ID Transaksi</th>
 										<!--<th data-column-id="RowNumber" data-sortable="false" data-type="numeric">No</th>-->
 										<th data-column-id="TransactionDate" data-type="numeric">Tanggal</th>
-										<th data-column-id="ProjectName">Nama Proyek</th>
+										<th data-column-id="SupplierName">Nama Pelanggan</th>
 										<th data-column-id="TotalAmount" data-align="right">Total</th>
 										<?php if($EditFlag == true) echo '<th data-column-id="Opsi" data-formatter="commands" data-sortable="false">Opsi</th>'; ?>
 									</tr>
 								</thead>
 							</table>
 						</div>
-						<button class="btn btn-primary menu" link="./Transaction/OutgoingTransaction/Detail.php?ID=0"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
-						<?php if($DeleteFlag == true) echo '<button class="btn btn-danger" onclick="DeleteData(\'./Transaction/OutgoingTransaction/Delete.php\');" ><i class="fa fa-close"></i> Hapus</button>'; ?>
+						<button class="btn btn-primary menu" link="./Transaction/Outgoing/Detail.php?ID=0"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
+						<?php if($DeleteFlag == true) echo '<button class="btn btn-danger" onclick="DeleteData(\'./Transaction/Outgoing/Delete.php\');" ><i class="fa fa-close"></i> Hapus</button>'; ?>
 					</div>
 				</div>
 			</div>
@@ -52,7 +52,7 @@
 								refresh: "Refresh",
 								search: "Cari"
 							},
-							url: "./Transaction/OutgoingTransaction/DataSource.php",
+							url: "./Transaction/Outgoing/DataSource.php",
 							selection: true,
 							multiSelect: true,
 							rowSelect: true,
@@ -60,7 +60,7 @@
 							formatters: {
 								"commands": function(column, row)
 								{
-									return "<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingTransactionID + "\" class=\"fa fa-edit\" data-link=\"./Transaction/OutgoingTransaction/Detail.php?ID=" + row.OutgoingTransactionID + "\" acronym title=\"Ubah Data\"></i>&nbsp;";
+									return "<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-edit\" data-link=\"./Transaction/Outgoing/Detail.php?ID=" + row.OutgoingID + "\" acronym title=\"Ubah Data\"></i>&nbsp;";
 								}
 							}
 						}).on("loaded.rs.jquery.bootgrid", function()

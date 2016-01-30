@@ -17,7 +17,7 @@
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
-										<th data-column-id="IncomingTransactionID" data-type="numeric" data-identifier="true">ID Transaksi</th>
+										<th data-column-id="IncomingID" data-type="numeric" data-identifier="true">ID Transaksi</th>
 										<!--<th data-column-id="RowNumber" data-sortable="false" data-type="numeric">No</th>-->
 										<th data-column-id="TransactionDate" data-type="numeric">Tanggal</th>
 										<th data-column-id="SupplierName">Nama Supplier</th>
@@ -27,8 +27,8 @@
 								</thead>
 							</table>
 						</div>
-						<button class="btn btn-primary menu" link="./Transaction/IncomingTransaction/Detail.php?ID=0"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
-						<?php if($DeleteFlag == true) echo '<button class="btn btn-danger" onclick="DeleteData(\'./Transaction/IncomingTransaction/Delete.php\');" ><i class="fa fa-close"></i> Hapus</button>'; ?>
+						<button class="btn btn-primary menu" link="./Transaction/Incoming/Detail.php?ID=0"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
+						<?php if($DeleteFlag == true) echo '<button class="btn btn-danger" onclick="DeleteData(\'./Transaction/Incoming/Delete.php\');" ><i class="fa fa-close"></i> Hapus</button>'; ?>
 					</div>
 				</div>
 			</div>
@@ -52,7 +52,7 @@
 								refresh: "Refresh",
 								search: "Cari"
 							},
-							url: "./Transaction/IncomingTransaction/DataSource.php",
+							url: "./Transaction/Incoming/DataSource.php",
 							selection: true,
 							multiSelect: true,
 							rowSelect: true,
@@ -60,7 +60,7 @@
 							formatters: {
 								"commands": function(column, row)
 								{
-									return "<i style='cursor:pointer;' data-row-id=\"" + row.IncomingTransactionID + "\" class=\"fa fa-edit\" data-link=\"./Transaction/IncomingTransaction/Detail.php?ID=" + row.IncomingTransactionID + "\" acronym title=\"Ubah Data\"></i>&nbsp;";
+									return "<i style='cursor:pointer;' data-row-id=\"" + row.IncomingID + "\" class=\"fa fa-edit\" data-link=\"./Transaction/Incoming/Detail.php?ID=" + row.IncomingID + "\" acronym title=\"Ubah Data\"></i>&nbsp;";
 								}
 							}
 						}).on("loaded.rs.jquery.bootgrid", function()
