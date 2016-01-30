@@ -1,11 +1,11 @@
 <?php
-	if(isset($_POST['hdnItemID'])) {
+	if(isset($_POST['hdnTypeID'])) {
 		$RequestPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestPath);
 		$RequestPath = str_replace($file, "", $RequestPath);
 		include "../../GetPermission.php";
-		$ItemID = mysql_real_escape_string($_POST['hdnItemID']);
-		$ItemName = mysql_real_escape_string($_POST['txtItemName']);
+		$TypeID = mysql_real_escape_string($_POST['hdnTypeID']);
+		$TypeName = mysql_real_escape_string($_POST['txtTypeName']);
 		$BrandID = mysql_real_escape_string($_POST['ddlBrand']);
 		$ReminderCount = 0;
 		$hdnIsEdit = mysql_real_escape_string($_POST['hdnIsEdit']);
@@ -14,7 +14,7 @@
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
-		$sql = "CALL spInsItem(".$ItemID.", '".$ItemName."', '".$BrandID."', ".$UnitID.", '".$ReminderCount."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsType(".$TypeID.", '".$TypeName."', '".$BrandID."', ".$UnitID.", '".$ReminderCount."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
 		
 		if (! $result=mysql_query($sql, $dbh)) {
 			echo mysql_error();

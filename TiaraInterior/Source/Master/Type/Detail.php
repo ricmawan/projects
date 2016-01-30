@@ -6,8 +6,8 @@
 		include "../../GetPermission.php";
 		//echo $_SERVER['REQUEST_URI'];
 		$Content = "";
-		$ItemID = mysql_real_escape_string($_GET['ID']);
-		$ItemName = "";
+		$TypeID = mysql_real_escape_string($_GET['ID']);
+		$TypeName = "";
 		$BrandID = 0;
 		$UnitID = "";
 		$ReminderCount = 0;
@@ -15,29 +15,29 @@
 		$SalePrice = 0.00;
 		$IsEdit = 0;
 		
-		if($ItemID != 0) {
+		if($TypeID != 0) {
 			$IsEdit = 1;
 			//$Content = "Place the content here";
 			$sql = "SELECT
-						ItemID,
-						ItemName,
+						TypeID,
+						TypeName,
 						BrandID,
 						UnitID,
 						ReminderCount,
 						BuyPrice,
 						SalePrice
 					FROM
-						master_item
+						master_type
 					WHERE
-						ItemID = $ItemID";
+						TypeID = $TypeID";
 						
 			if (! $result=mysql_query($sql, $dbh)) {
 				echo mysql_error();
 				return 0;
 			}				
 			$row=mysql_fetch_array($result);
-			$ItemId = $row['ItemID'];
-			$ItemName = $row['ItemName'];
+			$TypeId = $row['TypeID'];
+			$TypeName = $row['TypeName'];
 			$BrandID = $row['BrandID'];
 			$UnitID = $row['UnitID'];
 			$ReminderCount = $row['ReminderCount'];
@@ -102,12 +102,12 @@
 					</div>
 					<div class="panel-body">
 						<form class="col-md-5" id="PostForm" method="POST" action="" >
-							Tipe Barang:<br />
-							<input id="hdnItemID" name="hdnItemID" type="hidden" <?php echo 'value="'.$ItemID.'"'; ?> />
+							Tipe :<br />
+							<input id="hdnTypeID" name="hdnTypeID" type="hidden" <?php echo 'value="'.$TypeID.'"'; ?> />
 							<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
 							<input id="hdnUnitID" name="hdnUnitID" type="hidden" <?php echo 'value="'.$UnitID.'"'; ?> />
 							<input id="hdnBrandID" name="hdnBrandID" type="hidden" <?php echo 'value="'.$BrandID.'"'; ?> />
-							<input id="txtItemName" name="txtItemName" type="text" class="form-control" placeholder="Nama " required <?php echo 'value="'.$ItemName.'"'; ?> />
+							<input id="txtTypeName" name="txtTypeName" type="text" class="form-control" placeholder="Tipe " required <?php echo 'value="'.$TypeName.'"'; ?> />
 							<br />
 							Merek:<br />
 							<div class="ui-widget" style="width: 100%;">
@@ -193,7 +193,7 @@
 					}, "slow");
 					return false;
 				}
-				else SubmitForm("./Master/Item/Insert.php");
+				else SubmitForm("./Master/Type/Insert.php");
 			}
 		</script>
 	</body>

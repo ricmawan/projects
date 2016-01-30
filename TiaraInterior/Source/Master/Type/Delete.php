@@ -12,14 +12,14 @@
 		for($i=0; $i<count($Data); $i++) {
 			try
 			{
-				$ItemData = explode("^", $Data[$i]);
-				$ItemID = mysql_real_escape_string($ItemData[0]);
-				$ItemName = $ItemData[1];
-				$sql = "DELETE FROM master_item WHERE ItemID = $ItemID";
+				$TypeData = explode("^", $Data[$i]);
+				$TypeID = mysql_real_escape_string($TypeData[0]);
+				$TypeName = $TypeData[1];
+				$sql = "DELETE FROM master_type WHERE TypeID = $TypeID";
 				if (! $result=mysql_query($sql, $dbh)) {
-					throw new Exception($ItemName);
+					throw new Exception($TypeName);
 				}
-				$MessageSuccessDelete .= "$ItemName, ";
+				$MessageSuccessDelete .= "$TypeName, ";
 			}
 			catch (Exception $e)
 			{
@@ -29,9 +29,9 @@
 		$MessageSuccessDelete = substr($MessageSuccessDelete, 0, -2);
 		$MessageFailedDelete = substr($MessageFailedDelete, 0, -2);
 			
-		if($MessageSuccessDelete !="") $MessageSuccess = "Barang " .$MessageSuccessDelete. " Berhasil Dihapus";
+		if($MessageSuccessDelete !="") $MessageSuccess = "Tipe " .$MessageSuccessDelete. " Berhasil Dihapus";
 		else $MessageSuccess = "";
-		if($MessageFailedDelete !="") $MessageFailed = "Barang " .$MessageFailedDelete. " Gagal Dihapus";
+		if($MessageFailedDelete !="") $MessageFailed = "Tipe " .$MessageFailedDelete. " Gagal Dihapus";
 		else $MessageFailed = "";
 		
 		echo "$MessageSuccess+$MessageFailed";

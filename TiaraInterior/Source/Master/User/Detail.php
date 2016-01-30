@@ -95,6 +95,11 @@
 									<input id="txtConfirmPassword" name="txtConfirmPassword" type="password" class="form-control" placeholder="Konfirmasi Password"   />
 								</div>
 							</div>
+							<div class="row">
+								<div class="col-md-5">
+									<br /><input type="checkbox" id="chkActive" name="chkActive" style="vertical-align: sub;" /> Aktif
+								</div>
+							</div>
 							<br />
 							<br />
 							<div class="row">

@@ -7,7 +7,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Furniture</title>
+		<title>Tiara Interior</title>
 		<link href="assets/css/bootstrap.css" rel="stylesheet" />
 		<link href="assets/css/font-awesome.css" rel="stylesheet" />
 		<link href="assets/css/jquery-ui-1.10.3.custom.min.css" rel="stylesheet" />

@@ -6,7 +6,7 @@
 	include "../../GetPermission.php";
 
 	$where = " 1=1 ";
-	$order_by = "ItemID";
+	$order_by = "TypeID";
 	$rows = 10;
 	$current = 1;
 	$limit_l = ($current * $rows) - ($rows);
@@ -17,15 +17,15 @@
 		$order_by = "";
 		foreach($_REQUEST['sort'] as $key => $value) {
 			if($key != 'No') $order_by .= " $key $value";
-			else $order_by = "MI.ItemID ASC";
+			else $order_by = "MI.TypeID ASC";
 		}
-		$order_by .= ", MI.ItemID ASC";
+		$order_by .= ", MI.TypeID ASC";
 	}
 	//Handles search querystring sent from Bootgrid
 	if (ISSET($_REQUEST['searchPhrase']) )
 	{
 		$search = trim($_REQUEST['searchPhrase']);
-		$where .= " AND ( MU.UnitName LIKE '%".$search."%' OR MI.ItemName LIKE '%".$search."%' OR MB.BrandName LIKE '%".$search."%' OR MI.ReminderCount LIKE '%".$search."%' OR MI.BuyPrice LIKE '%".$search."%' OR MI.SalePrice LIKE '%".$search."%' OR CONCAT(MB.BrandName, ' ', MI.ItemName) LIKE '%".$search."%' )";
+		$where .= " AND ( MU.UnitName LIKE '%".$search."%' OR MI.TypeName LIKE '%".$search."%' OR MB.BrandName LIKE '%".$search."%' OR MI.ReminderCount LIKE '%".$search."%' OR MI.BuyPrice LIKE '%".$search."%' OR MI.SalePrice LIKE '%".$search."%' OR CONCAT(MB.BrandName, ' ', MI.TypeName) LIKE '%".$search."%' )";
 	}
 	//Handles determines where in the paging count this result set falls in
 	if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];
@@ -42,7 +42,7 @@
 	$sql = "SELECT
 				COUNT(*) AS nRows
 			FROM
-				master_item MI
+				master_type MI
 				JOIN master_brand MB
 					ON MB.BrandID = MI.BrandID
 				JOIN master_unit MU
@@ -56,15 +56,15 @@
 	$row = mysql_fetch_array($result);
 	$nRows = $row['nRows'];
 	$sql = "SELECT
-				MI.ItemID,
-				MI.ItemName,
+				MI.TypeID,
+				MI.TypeName,
 				MB.BrandName,
 				MI.ReminderCount,
 				MI.BuyPrice,
 				MI.SalePrice,
 				MU.UnitName
 			FROM
-				master_item MI
+				master_type MI
 				JOIN master_brand MB
 					ON MB.BrandID = MI.BrandID
 				JOIN master_unit MU
@@ -72,8 +72,8 @@
 			WHERE
 				$where
 			GROUP BY
-				MI.ItemID,
-				MI.ItemName,
+				MI.TypeID,
+				MI.TypeName,
 				MB.BrandName,
 				MI.ReminderCount,
 				MI.BuyPrice,
@@ -91,9 +91,9 @@
 	while ($row = mysql_fetch_array($result)) {
 		$RowNumber++;
 		$row_array['RowNumber'] = $RowNumber;
-		$row_array['ItemIDName'] = $row['ItemID']."^".$row['ItemName'];
-		$row_array['ItemID']= $row['ItemID'];
-		$row_array['ItemName'] = $row['ItemName'];
+		$row_array['TypeIDName'] = $row['TypeID']."^".$row['TypeName'];
+		$row_array['TypeID']= $row['TypeID'];
+		$row_array['TypeName'] = $row['TypeName'];
 		$row_array['BrandName'] = $row['BrandName'];
 		$row_array['ReminderCount'] = $row['ReminderCount'];
 		//$row_array['Stock'] = $row['Stock'];
