@@ -1,9 +1,9 @@
-DROP PROCEDURE IF EXISTS spInsItem;
+DROP PROCEDURE IF EXISTS spInsType;
 
 DELIMITER $$
-CREATE PROCEDURE spInsItem (
+CREATE PROCEDURE spInsType (
 	pID 			BIGINT, 
-	pItemName 		VARCHAR(255),
+	pTypeName 		VARCHAR(255),
 	pBrandID 	BIGINT,
 	pUnitID			BIGINT,
 	pReminderCount	INT,
@@ -46,18 +46,18 @@ SET State = 1;
 		INTO
 			PassValidate
 		FROM 
-			master_item
+			master_type
 		WHERE
-			TRIM(ItemName) = TRIM(pItemName)
+			TRIM(TypeName) = TRIM(pTypeName)
 			AND BrandID = pBrandID
-			AND ItemID <> pID
+			AND TypeID <> pID
 		LIMIT 1;
 			
 		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
 SET State = 2;
 			SELECT
 				pID AS 'ID',
-				'Barang sudah ada' AS 'Message',
+				'Tipe sudah ada' AS 'Message',
 				'' AS 'MessageDetail',
 				1 AS 'FailedFlag',
 				State AS 'State' ;
@@ -67,9 +67,9 @@ SET State = 2;
 		ELSE /*Data yang diinput valid*/
 SET State = 3;
 			IF(pIsEdit = 0)	THEN /*Tambah baru*/
-				INSERT INTO master_item
+				INSERT INTO master_type
 				(
-					ItemName,
+					TypeName,
 					BrandID,
 					UnitID,
 					ReminderCount,
@@ -77,7 +77,7 @@ SET State = 3;
 					CreatedBy
 				)
 				VALUES (
-					pItemName,
+					pTypeName,
 					pBrandID,
 					pUnitID,
 					pReminderCount,
@@ -88,27 +88,27 @@ SET State = 3;
 SET State = 4;			               
 				SELECT
 					pID AS 'ID',
-					'Barang Berhasil Ditambahkan' AS 'Message',
+					'Tipe Berhasil Ditambahkan' AS 'Message',
 					'' AS 'MessageDetail',
 					0 AS 'FailedFlag',
 					State AS 'State';
 			ELSE
 SET State = 5;
 				UPDATE
-					master_item
+					master_type
 				SET
-					ItemName = pItemName,
+					TypeName = pTypeName,
 					ReminderCount = pReminderCount,
 					BrandID = pBrandID,
 					UnitID = pUnitID,
 					ModifiedBy = pCurrentUser
 				WHERE
-					ItemID = pID;
+					TypeID = pID;
 
 SET State = 6;
 				SELECT
 					pID AS 'ID',
-					'Barang Berhasil Diubah' AS 'Message',
+					'Tipe Berhasil Diubah' AS 'Message',
 					'' AS 'MessageDetail',
 					0 AS 'FailedFlag',
 					State AS 'State';
