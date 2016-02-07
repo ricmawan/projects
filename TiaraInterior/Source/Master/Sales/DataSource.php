@@ -6,7 +6,7 @@
 	include "../../GetPermission.php";
 
 	$where = " 1=1 ";
-	$order_by = "UserID";
+	$order_by = "SalesID";
 	$rows = 10;
 	$current = 1;
 	$limit_l = ($current * $rows) - ($rows);
@@ -17,14 +17,14 @@
 		$order_by = "";
 		foreach($_REQUEST['sort'] as $key => $value) {
 			if($key != 'No') $order_by .= " $key $value";
-			else $order_by = "UserID";
+			else $order_by = "SalesID";
 		}
 	}
 	//Handles search querystring sent from Bootgrid
 	if (ISSET($_REQUEST['searchPhrase']) )
 	{
 		$search = trim($_REQUEST['searchPhrase']);
-		$where .= " AND ( UserName LIKE '%".$search."%' OR UserLogin LIKE '%".$search."%' ) ";
+		$where .= " AND ( SalesName LIKE '%".$search."%' OR Address LIKE '%".$search."%' OR Telephone LIKE '%".$search."%' ) ";
 	}
 	//Handles determines where in the paging count this result set falls in
 	if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];
@@ -41,7 +41,7 @@
 	$sql = "SELECT
 				COUNT(*) AS nRows
 			FROM
-				master_user
+				master_sales
 			WHERE
 				$where";
 	if (! $result = mysql_query($sql, $dbh)) {
@@ -51,22 +51,17 @@
 	$row = mysql_fetch_array($result);
 	$nRows = $row['nRows'];
 	$sql = "SELECT
-				UserID,
-				UserName,
-				UserLogin,
-				CASE
-					WHEN IsActive = 0
-					THEN 'Tidak Aktif'
-					ELSE 'Aktif'
-				END AS Status,
-				UserPassword
+				SalesID,
+				SalesName,
+				Address,
+				Telephone
 			FROM
-				master_user
+				master_sales
 			WHERE
 				$where
 			ORDER BY 
 				$order_by
-			$limit;";
+			$limit";
 	if (! $result = mysql_query($sql, $dbh)) {
 		echo mysql_error();
 		return 0;
@@ -76,11 +71,11 @@
 	while ($row = mysql_fetch_array($result)) {
 		$RowNumber++;
 		$row_array['RowNumber'] = $RowNumber;
-		$row_array['UserIDName'] = $row['UserID']."^".$row['UserName'];
-		$row_array['UserID']= $row['UserID'];
-		$row_array['Status']= $row['Status'];
-		$row_array['UserName'] = $row['UserName'];
-		$row_array['UserLogin'] = $row['UserLogin'];
+		$row_array['SalesIDName'] = $row['SalesID']."^".$row['SalesName'];
+		$row_array['SalesID']= $row['SalesID'];
+		$row_array['SalesName'] = $row['SalesName'];
+		$row_array['Address'] = $row['Address'];
+		$row_array['Telephone'] = $row['Telephone'];
 		array_push($return_arr, $row_array);
 	}
 

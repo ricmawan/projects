@@ -8,6 +8,7 @@
 					master_user 
 				WHERE 
 					UserLogin = '".mysql_real_escape_string($_SESSION['UserLogin'])."' 
+					AND IsActive = 1
 					AND UserPassword = '".mysql_real_escape_string($_SESSION['UserPassword'])."'";
 					
 		if (! $result = mysql_query($sql, $dbh)) {

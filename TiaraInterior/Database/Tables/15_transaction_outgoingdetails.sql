@@ -8,6 +8,7 @@ CREATE TABLE transaction_outgoingdetails
 	Quantity			DOUBLE,
 	BuyPrice			DOUBLE,
 	SalePrice			DOUBLE,
+	Discount			INT,
 	BatchNumber			VARCHAR(100) NULL,
 	CreatedDate 		DATETIME NOT NULL,
 	CreatedBy 			VARCHAR(255) NOT NULL,

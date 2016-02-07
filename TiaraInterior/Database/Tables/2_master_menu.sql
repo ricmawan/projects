@@ -71,8 +71,8 @@ VALUES
 (
 	7,
 	3,
-	'Barang Masuk',
-	'Transaction/Incoming/',
+	'Stok Awal',
+	'Transaction/FirstStock/',
 	NULL,
 	0,
 	1
@@ -80,8 +80,8 @@ VALUES
 (
 	8,
 	3,
-	'Barang Keluar',
-	'Transaction/Outgoing/',
+	'Barang Masuk',
+	'Transaction/Incoming/',
 	NULL,
 	0,
 	2
@@ -89,8 +89,8 @@ VALUES
 (
 	9,
 	3,
-	'Retur Beli',
-	'Transaction/BuyReturn/',
+	'Barang Keluar',
+	'Transaction/Outgoing/',
 	NULL,
 	0,
 	3
@@ -98,14 +98,23 @@ VALUES
 (
 	10,
 	3,
-	'Retur Jual',
-	'Transaction/SaleReturn/',
+	'Retur Beli',
+	'Transaction/BuyReturn/',
 	NULL,
 	0,
 	4
 ),
 (
 	11,
+	3,
+	'Retur Jual',
+	'Transaction/SaleReturn/',
+	NULL,
+	0,
+	5
+),
+(
+	12,
 	4,
 	'Pembelian',
 	'Report/Purchase/',
@@ -114,7 +123,7 @@ VALUES
 	1
 ),
 (
-	12,
+	13,
 	4,
 	'Penjualan Per Sales',
 	'Report/SaleBySales/',
@@ -123,7 +132,7 @@ VALUES
 	2
 ),
 (
-	13,
+	14,
 	4,
 	'Penjualan Per Barang',
 	'Report/SaleByItem/',
@@ -132,7 +141,7 @@ VALUES
 	3
 ),
 (
-	14,
+	15,
 	4,
 	'Penjualan Per Customer',
 	'Report/SaleByCustomer/',
@@ -141,13 +150,22 @@ VALUES
 	4
 ),
 (
-	15,
+	16,
 	2,
 	'Barang',
 	'Master/Item/',
 	NULL,
 	1,
 	5
+),
+(
+	17,
+	2,
+	'Sales',
+	'Master/Sales/',
+	NULL,
+	0,
+	8
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

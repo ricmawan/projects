@@ -1,9 +1,9 @@
-DROP TABLE IF EXISTS master_customer;
+DROP TABLE IF EXISTS master_sales;
 
-CREATE TABLE master_customer
+CREATE TABLE master_sales
 (
-	CustomerID		BIGINT PRIMARY KEY AUTO_INCREMENT,
-	CustomerName	VARCHAR(255) NOT NULL,
+	SalesID			BIGINT PRIMARY KEY AUTO_INCREMENT,
+	SalesName		VARCHAR(255) NOT NULL,
 	Telephone 		VARCHAR(100) NOT NULL,
 	Address 		VARCHAR(255),
 	CreatedDate 	DATETIME NOT NULL,
@@ -12,5 +12,5 @@ CREATE TABLE master_customer
 	ModifiedBy 		VARCHAR(255) NULL
 )ENGINE=InnoDB;
 
-CREATE UNIQUE INDEX CUSTOMER_INDEX
-ON master_Customer (CustomerID);
+CREATE UNIQUE INDEX SALES_INDEX
+ON master_sales (SalesID);

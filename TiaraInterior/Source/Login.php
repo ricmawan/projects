@@ -10,7 +10,8 @@
 			FROM
 				master_user 
 			WHERE 
-				UserLogin = '".mysql_real_escape_string($_POST['txtUserLogin'])."' 
+				UserLogin = '".mysql_real_escape_string($_POST['txtUserLogin'])."'
+				AND IsActive = 1
 				AND UserPassword = MD5('".mysql_real_escape_string($_POST['txtPassword'])."')";
 					
 		if (! $result = mysql_query($sql, $dbh)) {

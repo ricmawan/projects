@@ -17,7 +17,7 @@
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
-										<th data-column-id="CustomerIDName" data-visible="false" data-type="numeric" data-identifier="true">CategoryID</th>
+										<th data-column-id="CustomerIDName" data-visible="false" data-type="numeric" data-identifier="true">CustomerID</th>
 										<th data-column-id="RowNumber" data-sortable="false" data-type="numeric">No</th>
 										<th data-column-id="CustomerName">Nama Pelanggan</th>
 										<th data-column-id="Address">Alamat</th>

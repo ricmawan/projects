@@ -12,32 +12,5 @@ CREATE TABLE master_supplier
 	ModifiedBy 		VARCHAR(255) NULL
 )ENGINE=InnoDB;
 
-/*INSERT INTO master_supplier
-(
-	SupplierID,
-	SupplierName,
-	Telephone,
-	Address,
-	CreatedDate,
-	CreatedBy
-)
-VALUES
-(
-	0,
-	'PT. Avian',
-	'021345',
-	'Jakarta Barat',
-	NOW(),
-	'Admin'
-),
-(
-	0,
-	'PT. Paku Payung',
-	'01353',
-	'Semarang Tengah',
-	NOW(),
-	'Admin'
-);*/
-
 CREATE UNIQUE INDEX SUPPLIER_INDEX
 ON master_supplier (SupplierID);

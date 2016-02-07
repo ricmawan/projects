@@ -17,7 +17,7 @@
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
-										<th data-column-id="TypeIDName" data-visible="false" data-type="numeric" data-identifier="true">TypeID</th>
+										<th data-column-id="TypeIDName" data-visible="false" data-type="numeric" data-identifier="true">ItemID</th>
 										<th data-column-id="RowNumber" data-sortable="false" data-type="numeric">No</th>
 										<th data-column-id="BrandName">Merek</th>
 										<th data-column-id="TypeName">Tipe</th>

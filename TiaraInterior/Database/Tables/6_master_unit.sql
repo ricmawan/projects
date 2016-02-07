@@ -10,6 +10,5 @@ CREATE TABLE master_unit
 	ModifiedBy 		VARCHAR(255) NULL
 )ENGINE=InnoDB;
 
-
 CREATE UNIQUE INDEX UNIT_INDEX
 ON master_unit (UnitID);

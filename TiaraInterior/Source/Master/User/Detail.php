@@ -13,6 +13,7 @@
 		$MenuID = "";
 		$EditMenuID = "";
 		$DeleteMenuID = "";
+		$IsActive = "";
 		
 		if($UserID != 0) {
 			$IsEdit = 1;
@@ -20,7 +21,8 @@
 			$sql = "SELECT
 					UserID,
 					UserName,
-					UserLogin					
+					UserLogin,
+					IsActive
 				FROM
 					master_user
 				WHERE
@@ -34,6 +36,7 @@
 			$UserId = $row['UserID'];
 			$UserName = $row['UserName'];
 			$UserLogin = $row['UserLogin'];
+			$IsActive = $row['IsActive'];
 			
 			$sql = "SELECT
 					RoleID,
@@ -97,7 +100,7 @@
 							</div>
 							<div class="row">
 								<div class="col-md-5">
-									<br /><input type="checkbox" id="chkActive" name="chkActive" style="vertical-align: sub;" /> Aktif
+									<br /><input type="checkbox" id="chkActive" name="chkActive" value=1 style="vertical-align: sub;" /> Aktif
 								</div>
 							</div>
 							<br />
@@ -184,6 +187,7 @@
 							<input type="hidden" name="hdnMenuID" id="hdnMenuID" <?php echo 'value="'.$MenuID.'"'; ?> />
 							<input type="hidden" name="hdnEditMenuID" id="hdnEditMenuID" <?php echo 'value="'.$EditMenuID.'"'; ?> />
 							<input type="hidden" name="hdnDeleteMenuID" id="hdnDeleteMenuID" <?php echo 'value="'.$DeleteMenuID.'"'; ?> />
+							<input type="hidden" name="hdnIsActive" id="hdnIsActive" <?php echo 'value="'.$IsActive.'"'; ?> />
 							<button type="button" class="btn btn-default" value="Simpan" onclick="SubmitValidate(this.form);" ><i class="fa fa-save"></i> Simpan</button>
 						</form>
 					</div>
@@ -195,7 +199,11 @@
 				var MenuID = $("#hdnMenuID").val().split(", ");
 				var EditMenuID = $("#hdnEditMenuID").val().split(", ");
 				var DeleteMenuID = $("#hdnDeleteMenuID").val().split(", ");
-				
+				var IsActive = $("#hdnIsActive").val();
+				if(IsActive == true) {
+					$("#chkActive").attr("checked", true);
+					$("#chkActive").prop("checked", true);
+				}
 				for (var i = 0; i < MenuID.length; i++) {
 					var MenuIDSelected = MenuID[i];
 					var EditMenuIDSelected = EditMenuID[i];

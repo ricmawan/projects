@@ -26,4 +26,3 @@ VALUES
 	NULL,
 	NULL
 );
-

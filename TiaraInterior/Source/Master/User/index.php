@@ -21,6 +21,7 @@
 										<th data-column-id="RowNumber" data-sortable="false" data-type="numeric">No</th>
 										<th data-column-id="UserName">Nama</th>
 										<th data-column-id="UserLogin">Username</th>
+										<th data-column-id="Status">Status</th>
 										<?php if($EditFlag == true) echo '<th data-column-id="Opsi" data-formatter="commands" data-sortable="false">Opsi</th>'; ?>
 									</tr>
 								</thead>

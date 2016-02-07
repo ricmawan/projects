@@ -12,6 +12,8 @@
 		$hdnEditMenuID = mysql_real_escape_string($_POST['hdnEditMenuID']);
 		$hdnDeleteMenuID = mysql_real_escape_string($_POST['hdnDeleteMenuID']);
 		$hdnIsEdit = mysql_real_escape_string($_POST['hdnIsEdit']);
+		if(ISSET($_POST['chkActive'])) $chkActive = true;
+		else $chkActive = false;
 		$Message = "Data gagal dimasukkan, cek koneksi internet dan coba lagi!";
 		$MessageDetail = "";
 		$FailedFlag = 0;
@@ -37,7 +39,7 @@
 		}
 		else $Password = MD5($Password);
 
-		$sql = "CALL spInsUser(".$UserID.", '".$UserName."', '".$UserLogin."', '".$Password."', '".$hdnMenuID."', '".$hdnEditMenuID."', '".$hdnDeleteMenuID."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsUser(".$UserID.", '".$UserName."', '".$UserLogin."', '".$Password."', '".$chkActive."', '".$hdnMenuID."', '".$hdnEditMenuID."', '".$hdnDeleteMenuID."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
 		
 		if (! $result=mysql_query($sql, $dbh)) {
 			echo mysql_error();

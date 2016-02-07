@@ -6,6 +6,7 @@ CREATE PROCEDURE spInsUser (
 	pUserName 		VARCHAR(255), 
 	pUserLogin 		VARCHAR(100),
 	pPassword 		VARCHAR(255),
+	pIsActive		BIT,
 	pMenuID 		VARCHAR(255),
 	pEditMenuID 	VARCHAR(255),
 	pDeleteMenuID	VARCHAR(255),
@@ -75,6 +76,7 @@ SET State = 3;
 					UserName,
 					UserLogin,
 					UserPassword,
+					IsActive,
 					CreatedDate,
 					CreatedBy
 				)
@@ -82,6 +84,7 @@ SET State = 3;
 					pUserName,
 					pUserLogin,
 					pPassword,
+					pIsActive,
 					NOW(),
 					pCurrentUser
 				);
@@ -102,6 +105,7 @@ SET State = 5;
 					UserName = pUserName,
 					UserLogin = pUserLogin,
 					UserPassword = pPassword,
+					IsActive = pIsActive,
 					ModifiedBy = pCurrentUser
 				WHERE
 					UserID = pID;
