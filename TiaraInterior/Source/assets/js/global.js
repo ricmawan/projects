@@ -372,7 +372,7 @@ function SubmitForm(url) {
 	$("#loading").show();
 	var PassValidate = 1;
 	var FirstFocus = 0;
-	$(".form-control").each(function() {
+	$(".form-control-custom").each(function() {
 		if($(this).hasAttr('required')) {
 			if($(this).val() == "") {
 				PassValidate = 0;

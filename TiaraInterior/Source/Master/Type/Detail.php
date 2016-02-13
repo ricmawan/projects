@@ -48,50 +48,6 @@
 ?>
 <html>
 	<head>
-		<style>
-			.custom-combobox {
-				position: relative;
-				display: inline-block;
-				width: 100%;
-			}
-			.custom-combobox-input {
-				margin: 0;
-				padding: 5px 10px;
-				display: block;
-				width: 100%;
-				height: 34px;
-				padding: 6px 12px;
-				font-size: 14px;
-				line-height: 1.42857143;
-				color: #555;
-				background-color: #fff;
-				background-image: none;
-				border: 1px solid #ccc;
-				border-radius: 4px;
-				-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-				box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-				-webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
-				-o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-				transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-			}
-			.ui-autocomplete {
-				font-family: Open Sans, sans-serif; 
-				font-size: 14px;
-			}
-			.caret {
-				display: inline-block;
-				width: 0;
-				height: 0;
-				margin-left: 2px;
-				vertical-align: middle;
-				border-top: 4px solid;
-				border-right: 4px solid transparent;
-				border-left: 4px solid transparent;
-				right: 10px;
-				top: 50%;
-				position: absolute;
-			}
-		</style>
 	</head>
 	<body>
 		<div class="row">
@@ -101,54 +57,81 @@
 						<h5><?php if($IsEdit == 0) echo "Tambah"; else echo "Ubah"; ?> Data Barang</h5>  
 					</div>
 					<div class="panel-body">
-						<form class="col-md-5" id="PostForm" method="POST" action="" >
-							Tipe :<br />
-							<input id="hdnTypeID" name="hdnTypeID" type="hidden" <?php echo 'value="'.$TypeID.'"'; ?> />
-							<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
-							<input id="hdnUnitID" name="hdnUnitID" type="hidden" <?php echo 'value="'.$UnitID.'"'; ?> />
-							<input id="hdnBrandID" name="hdnBrandID" type="hidden" <?php echo 'value="'.$BrandID.'"'; ?> />
-							<input id="txtTypeName" name="txtTypeName" type="text" class="form-control" placeholder="Tipe " required <?php echo 'value="'.$TypeName.'"'; ?> />
-							<br />
-							Merek:<br />
-							<div class="ui-widget" style="width: 100%;">
-								<select name="ddlBrand" id="ddlBrand" class="form-control" placeholder="Pilih Merek" >
-									<option value="" selected> </option>
-									<?php
-										$sql = "SELECT BrandID, BrandName FROM master_brand";
-										if(!$result = mysql_query($sql, $dbh)) {
-											echo mysql_error();
-											return 0;
-										}
-										while($row = mysql_fetch_array($result)) {
-											echo "<option value='".$row['BrandID']."' >".$row['BrandName']."</option>";
-										}
-									?>
-								</select>
+						<form class="col-md-12" id="PostForm" method="POST" action="" >
+							<div class="row">
+								<div class="col-md-2 labelColumn">
+									Tipe :
+								</div>
+								<div class="col-md-3">
+									<input id="hdnTypeID" name="hdnTypeID" type="hidden" <?php echo 'value="'.$TypeID.'"'; ?> />
+									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
+									<input id="hdnUnitID" name="hdnUnitID" type="hidden" <?php echo 'value="'.$UnitID.'"'; ?> />
+									<input id="hdnBrandID" name="hdnBrandID" type="hidden" <?php echo 'value="'.$BrandID.'"'; ?> />
+									<input id="txtTypeName" name="txtTypeName" type="text" class="form-control-custom" placeholder="Tipe " required <?php echo 'value="'.$TypeName.'"'; ?> />								
+								</div>
 							</div>
 							<br />
-							Satuan:<br />
-							<select name="ddlUnit" id="ddlUnit" class="form-control" required >
-								<option value="" selected>-pilih satuan-</option>
-								<?php
-									$sql = "SELECT UnitID, UnitName FROM master_unit";
-									if(!$result = mysql_query($sql, $dbh)) {
-										echo mysql_error();
-										return 0;
-									}
-									while($row = mysql_fetch_array($result)) {
-										echo "<option value='".$row['UnitID']."' >".$row['UnitName']."</option>";
-									}
-								?>
-							</select>
+							<div class="row">
+								<div class="col-md-2 labelColumn">
+									Merek :
+								</div>
+								<div class="col-md-3">
+									<div class="ui-widget" style="width: 100%;">
+										<select name="ddlBrand" id="ddlBrand" class="form-control-custom" placeholder="Pilih Merek" >
+											<option value="" selected> </option>
+											<?php
+												$sql = "SELECT BrandID, BrandName FROM master_brand";
+												if(!$result = mysql_query($sql, $dbh)) {
+													echo mysql_error();
+													return 0;
+												}
+												while($row = mysql_fetch_array($result)) {
+													echo "<option value='".$row['BrandID']."' >".$row['BrandName']."</option>";
+												}
+											?>
+										</select>
+									</div>
+								</div>
+							</div>
 							<br />
-							<!--Notifikasi Stok:<br />
-							<input id="txtReminderCount" name="txtReminderCount" type="text" class="form-control" placeholder="Notifikasi Stok" required <?php echo 'value="'.$ReminderCount.'"'; ?> />
-							<br />-->
-							Harga Beli:<br />
-							<input id="txtBuyPrice" name="txtBuyPrice" type="text" class="form-control" placeholder="Harga Beli" style="text-align:right;" <?php echo 'value="'.number_format($BuyPrice,2,".",",").'"'; ?> />
+							<div class="row">
+								<div class="col-md-2 labelColumn">
+									Satuan :
+								</div>
+								<div class="col-md-3">
+									<select name="ddlUnit" id="ddlUnit" class="form-control-custom" required >
+										<option value="" selected>Pilih Satuan</option>
+										<?php
+											$sql = "SELECT UnitID, UnitName FROM master_unit";
+											if(!$result = mysql_query($sql, $dbh)) {
+												echo mysql_error();
+												return 0;
+											}
+											while($row = mysql_fetch_array($result)) {
+												echo "<option value='".$row['UnitID']."' >".$row['UnitName']."</option>";
+											}
+										?>
+									</select>
+								</div>
+							</div>
 							<br />
-							Harga Jual:<br />
-							<input id="txtSalePrice" name="txtSalePrice" type="text" class="form-control" placeholder="Harga Jual" style="text-align:right;" <?php echo 'value="'.number_format($SalePrice,2,".",",").'"'; ?> />
+							<div class="row">
+								<div class="col-md-2 labelColumn">
+									Harga Beli :
+								</div>
+								<div class="col-md-3">
+									<input id="txtBuyPrice" name="txtBuyPrice" type="text" class="form-control-custom" placeholder="Harga Beli" style="text-align:right;" <?php echo 'value="'.number_format($BuyPrice,2,".",",").'"'; ?> />
+								</div>
+							</div>
+							<br />
+							<div class="row">
+								<div class="col-md-2 labelColumn">
+									Harga Jual :
+								</div>
+								<div class="col-md-3">
+									<input id="txtSalePrice" name="txtSalePrice" type="text" class="form-control-custom" placeholder="Harga Jual" style="text-align:right;" <?php echo 'value="'.number_format($SalePrice,2,".",",").'"'; ?> />
+								</div>
+							</div>
 							<br />
 							<button type="button" class="btn btn-default" value="Simpan" onclick="SubmitValidate(this.form);" ><i class="fa fa-save"></i> Simpan</button>
 						</form>
@@ -170,7 +153,7 @@
 			function SubmitValidate(form) {
 				var PassValidate = 1;
 				var FirstFocus = 0;
-				$(".form-control").each(function() {
+				$(".form-control-custom").each(function() {
 					if($(this).hasAttr('required')) {
 						if($(this).val() == "") {
 							PassValidate = 0;

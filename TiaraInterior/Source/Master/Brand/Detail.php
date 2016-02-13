@@ -40,12 +40,17 @@
 						<h5><?php if($IsEdit == 0) echo "Tambah"; else echo "Ubah"; ?> Data Merek</h5>  
 					</div>
 					<div class="panel-body">
-						<form class="col-md-5" id="PostForm" method="POST" action="" >
-							Merek:<br />
-							<input id="hdnBrandID" name="hdnBrandID" type="hidden" <?php echo 'value="'.$BrandID.'"'; ?> />
-							<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
-							<input id="txtBrandName" name="txtBrandName" type="text" class="form-control" placeholder="Merek" required   <?php echo 'value="'.$BrandName.'"'; ?> />
-							<br />
+						<form class="col-md-12" id="PostForm" method="POST" action="" >
+							<div class="row">
+								<div class="col-md-1 labelColumn">
+									Merek :
+								</div>
+								<div class="col-md-3">
+									<input id="hdnBrandID" name="hdnBrandID" type="hidden" <?php echo 'value="'.$BrandID.'"'; ?> />
+									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
+									<input id="txtBrandName" name="txtBrandName" type="text" class="form-control-custom" placeholder="Merek" required   <?php echo 'value="'.$BrandName.'"'; ?> />
+								</div>
+							</div>
 							<br />
 							<button type="button" class="btn btn-default" value="Simpan" onclick="SubmitForm('./Master/Brand/Insert.php');" ><i class="fa fa-save"></i> Simpan</button>
 						</form>

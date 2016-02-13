@@ -71,13 +71,13 @@
 							<div class="col-md-5">
 								Dari Tanggal: <br />
 								<div class="ui-widget" style="width: 100%;">
-									<input id="txtFromDate" style="height:34px;" name="txtFromDate" type="text" class="form-control DatePickerMonthYearGlobal" placeholder="Dari Tanggal" />
+									<input id="txtFromDate" style="height:34px;" name="txtFromDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Dari Tanggal" />
 								</div>
 							</div>
 							<div class="col-md-5">
 								Sampai Tanggal: <br />
 								<div class="ui-widget" style="width: 100%;">
-									<input id="txtToDate" style="height:34px;" name="txtToDate" type="text" class="form-control DatePickerMonthYearGlobal" placeholder="Sampai Tanggal" />
+									<input id="txtToDate" style="height:34px;" name="txtToDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Sampai Tanggal" />
 								</div>
 							</div>
 						</div>
@@ -129,7 +129,7 @@
 				var txtToDate = $("#txtToDate").val();
 				var PassValidate = 1;
 				var FirstFocus = 0;
-				$(".form-control").each(function() {
+				$(".form-control-custom").each(function() {
 					if($(this).hasAttr('required')) {
 						if($(this).val() == "") {
 							PassValidate = 0;
@@ -210,7 +210,7 @@
 				var txtToDate = $("#txtToDate").val();
 				var PassValidate = 1;
 				var FirstFocus = 0;
-				$(".form-control").each(function() {
+				$(".form-control-custom").each(function() {
 					if($(this).hasAttr('required')) {
 						if($(this).val() == "") {
 							PassValidate = 0;

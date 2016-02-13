@@ -125,7 +125,7 @@
 				vertical-align: top;
 				border-top: 1px solid #ddd;
 			}			
-			.form-control {
+			.form-control-custom {
 				height: 24px;
 			}
 		</style>
@@ -146,12 +146,12 @@
 									<input id="hdnRow" name="hdnRow" type="hidden" <?php echo 'value="'.$rowCount.'"'; ?> />
 									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
 									<input id="hdnData" name="hdnData" type="hidden" <?php echo 'value="'.$Data.'"'; ?> />
-									<input id="txtTransactionDate" style="height:34px;" name="txtTransactionDate" type="text" class="form-control DatePickerMonthYearGlobal" placeholder="Tanggal" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
+									<input id="txtTransactionDate" style="height:34px;" name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Tanggal" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
 								</div>
 								<div class="col-md-5">
 									Supplier:<br />
 									<div class="ui-widget" style="width: 100%;">
-										<select name="ddlSupplier" id="ddlSupplier" class="form-control" placeholder="Pilih Supplier" >
+										<select name="ddlSupplier" id="ddlSupplier" class="form-control-custom" placeholder="Pilih Supplier" >
 											<option value="" selected> </option>
 											<?php
 												$sql = "SELECT SupplierID, SupplierName FROM master_supplier";
@@ -173,7 +173,7 @@
 								<div class="col-md-5">
 									Merk:<br />
 									<div class="ui-widget" style="width: 100%;">
-										<select name="ddlBrand" id="ddlBrand" class="form-control" placeholder="Pilih Merek" >
+										<select name="ddlBrand" id="ddlBrand" class="form-control-custom" placeholder="Pilih Merek" >
 											<option value="" selected> </option>
 											<?php
 												$sql = "SELECT BrandID, BrandName FROM master_brand";
@@ -191,10 +191,10 @@
 								<div class="col-md-5">
 									Tipe:<br />
 									<div class="ui-widget" style="width: 100%;">
-										<select name="ddlType" id="ddlType" class="form-control" placeholder="Pilih Tipe" >
+										<select name="ddlType" id="ddlType" class="form-control-custom" placeholder="Pilih Tipe" >
 											<option value="" brandid="" selected> </option>
 										</select>
-										<select name="ddlHiddenType" id="ddlHiddenType" style="display:none;" class="form-control" placeholder="Pilih Barang" >
+										<select name="ddlHiddenType" id="ddlHiddenType" style="display:none;" class="form-control-custom" placeholder="Pilih Barang" >
 											<option value="" brandid="" selected> </option>
 											<?php
 												$sql = "SELECT 
@@ -238,27 +238,27 @@
 											<tr id='' style='display:none;' class="num">
 												<td id='nota' name='nota' class='nota'></td>
 												<td>
-													<input type="text" id="txtTypeName" name="txtTypeName" class="form-control txtTypeName" placeholder="Nama Barang" readonly />
+													<input type="text" id="txtTypeName" name="txtTypeName" class="form-control-custom txtTypeName" placeholder="Nama Barang" readonly />
 													<input type="hidden" id="hdnTypeID" name="hdnTypeID" value="0" class="hdnTypeID" />
 													<input type="hidden" id="hdnIncomingDetailsID" class="hdnIncomingDetailsID" name="hdnIncomingDetailsID" value="0" />
 												</td>
 												<td>
-													<input type="text" row="" id="txtBatchNumber" name="txtBatchNumber" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control txtBatchNumber" placeholder="Batch"/>
+													<input type="text" row="" id="txtBatchNumber" name="txtBatchNumber" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control-custom txtBatchNumber" placeholder="Batch"/>
 												</td>
 												<td>
-													<input type="text" row="" value=1 id="txtQuantity" style="width: 50px;" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control txtQuantity" placeholder="QTY"/>
+													<input type="text" row="" value=1 id="txtQuantity" style="width: 50px;" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control-custom txtQuantity" placeholder="QTY"/>
 												</td>
 												<td>
-													<input type="text" id="txtBuyPrice" value="0.00" name="txtBuyPrice" style="text-align:right;" class="form-control txtBuyPrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Beli"/>
+													<input type="text" id="txtBuyPrice" value="0.00" name="txtBuyPrice" style="text-align:right;" class="form-control-custom txtBuyPrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Beli"/>
 												</td>
 												<td>
-													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;" class="form-control txtSalePrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual"/>
+													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;" class="form-control-custom txtSalePrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual"/>
 												</td>
 												<td>
-													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;" class="form-control txtSalePrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual"/>
+													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;" class="form-control-custom txtSalePrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual"/>
 												</td>
 												<td>
-													<input type="text" id="txtTotal" name="txtTotal" class="form-control txtTotal" onchange="calculate()" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" style="text-align:right;" value="0.00" placeholder="Jumlah" readonly />
+													<input type="text" id="txtTotal" name="txtTotal" class="form-control-custom txtTotal" onchange="calculate()" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" style="text-align:right;" value="0.00" placeholder="Jumlah" readonly />
 												</td>
 												<td style="vertical-align:middle;">
 													<i class="fa fa-close btnDelete" style="cursor:pointer;" acronym title="Hapus Data" onclick="DeleteRow(this.getAttribute('row'))"></i>
@@ -277,7 +277,7 @@
 								No Nota :
 							</div>
 							<div class="col-md-2">
-								<input type="text" id="txtIncomingNumber" name="txtIncomingNumber" class="form-control" readonly />
+								<input type="text" id="txtIncomingNumber" name="txtIncomingNumber" class="form-control-custom" readonly />
 							</div>
 						</div>
 						<br />
@@ -286,7 +286,7 @@
 								Catatan :
 							</div>
 							<div class="col-md-4">
-								<textarea id="txtAddress" name="txtAddress" class="form-control" placeholder="Catatan"></textarea>
+								<textarea id="txtAddress" name="txtAddress" class="form-control-custom" placeholder="Catatan"></textarea>
 							</div>
 						</div>
 						<br />
@@ -295,7 +295,7 @@
 								Grand Total :
 							</div>
 							<div class="col-md-2">
-								<input type="text" id="txtGrandTotal" style="text-align:right;" value="0.00" name="txtGrandTotal" class="form-control" readonly />
+								<input type="text" id="txtGrandTotal" style="text-align:right;" value="0.00" name="txtGrandTotal" class="form-control-custom" readonly />
 							</div>
 						</div>
 						<br />
@@ -560,7 +560,7 @@
 				if($("#recordnew").val() > 0) {
 					var PassValidate = 1;
 					var FirstFocus = 0;
-					$(".form-control").each(function() {
+					$(".form-control-custom").each(function() {
 						if($(this).hasAttr('required')) {
 							if($(this).val() == "") {
 								PassValidate = 0;

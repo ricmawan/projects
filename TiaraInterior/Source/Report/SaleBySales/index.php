@@ -71,19 +71,19 @@
 							<div class="col-md-4">
 								Dari Tanggal: <br />
 								<div class="ui-widget" style="width: 100%;">
-									<input id="txtFromDate" style="height:34px;" name="txtFromDate" type="text" class="form-control DatePickerMonthYearGlobal" placeholder="Dari Tanggal" />
+									<input id="txtFromDate" style="height:34px;" name="txtFromDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Dari Tanggal" />
 								</div>
 							</div>
 							<div class="col-md-4">
 								Sampai Tanggal: <br />
 								<div class="ui-widget" style="width: 100%;">
-									<input id="txtToDate" style="height:34px;" name="txtToDate" type="text" class="form-control DatePickerMonthYearGlobal" placeholder="Sampai Tanggal" />
+									<input id="txtToDate" style="height:34px;" name="txtToDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Sampai Tanggal" />
 								</div>
 							</div>
 							<div class="col-md-4">
 								Sales:<br />
 								<div class="ui-widget" style="width: 100%;">
-									<select name="ddlSupplier" id="ddlSupplier" class="form-control" placeholder="Pilih Sales" >
+									<select name="ddlSupplier" id="ddlSupplier" class="form-control-custom" placeholder="Pilih Sales" >
 										<option value="" selected> </option>
 										<?php
 											$sql = "SELECT CustomerID, CustomerName FROM master_customer";
@@ -148,7 +148,7 @@
 				var txtToDate = $("#txtToDate").val();
 				var PassValidate = 1;
 				var FirstFocus = 0;
-				$(".form-control").each(function() {
+				$(".form-control-custom").each(function() {
 					if($(this).hasAttr('required')) {
 						if($(this).val() == "") {
 							PassValidate = 0;
@@ -229,7 +229,7 @@
 				var txtToDate = $("#txtToDate").val();
 				var PassValidate = 1;
 				var FirstFocus = 0;
-				$(".form-control").each(function() {
+				$(".form-control-custom").each(function() {
 					if($(this).hasAttr('required')) {
 						if($(this).val() == "") {
 							PassValidate = 0;

@@ -107,11 +107,11 @@
 							<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
 							<input id="hdnUnitID" name="hdnUnitID" type="hidden" <?php echo 'value="'.$UnitID.'"'; ?> />
 							<input id="hdnBrandID" name="hdnBrandID" type="hidden" <?php echo 'value="'.$BrandID.'"'; ?> />
-							<input id="txtTypeName" name="txtTypeName" type="text" class="form-control" placeholder="Tipe " required <?php echo 'value="'.$TypeName.'"'; ?> />
+							<input id="txtTypeName" name="txtTypeName" type="text" class="form-control-custom" placeholder="Tipe " required <?php echo 'value="'.$TypeName.'"'; ?> />
 							<br />
 							Merek:<br />
 							<div class="ui-widget" style="width: 100%;">
-								<select name="ddlBrand" id="ddlBrand" class="form-control" placeholder="Pilih Merek" >
+								<select name="ddlBrand" id="ddlBrand" class="form-control-custom" placeholder="Pilih Merek" >
 									<option value="" selected> </option>
 									<?php
 										$sql = "SELECT BrandID, BrandName FROM master_brand";
@@ -127,7 +127,7 @@
 							</div>
 							<br />
 							Satuan:<br />
-							<select name="ddlUnit" id="ddlUnit" class="form-control" required >
+							<select name="ddlUnit" id="ddlUnit" class="form-control-custom" required >
 								<option value="" selected>-pilih satuan-</option>
 								<?php
 									$sql = "SELECT UnitID, UnitName FROM master_unit";
@@ -142,13 +142,13 @@
 							</select>
 							<br />
 							<!--Notifikasi Stok:<br />
-							<input id="txtReminderCount" name="txtReminderCount" type="text" class="form-control" placeholder="Notifikasi Stok" required <?php echo 'value="'.$ReminderCount.'"'; ?> />
+							<input id="txtReminderCount" name="txtReminderCount" type="text" class="form-control-custom" placeholder="Notifikasi Stok" required <?php echo 'value="'.$ReminderCount.'"'; ?> />
 							<br />-->
 							Harga Beli:<br />
-							<input id="txtBuyPrice" name="txtBuyPrice" type="text" class="form-control" placeholder="Harga Beli" style="text-align:right;" <?php echo 'value="'.number_format($BuyPrice,2,".",",").'"'; ?> />
+							<input id="txtBuyPrice" name="txtBuyPrice" type="text" class="form-control-custom" placeholder="Harga Beli" style="text-align:right;" <?php echo 'value="'.number_format($BuyPrice,2,".",",").'"'; ?> />
 							<br />
 							Harga Jual:<br />
-							<input id="txtSalePrice" name="txtSalePrice" type="text" class="form-control" placeholder="Harga Jual" style="text-align:right;" <?php echo 'value="'.number_format($SalePrice,2,".",",").'"'; ?> />
+							<input id="txtSalePrice" name="txtSalePrice" type="text" class="form-control-custom" placeholder="Harga Jual" style="text-align:right;" <?php echo 'value="'.number_format($SalePrice,2,".",",").'"'; ?> />
 							<br />
 							<button type="button" class="btn btn-default" value="Simpan" onclick="SubmitValidate(this.form);" ><i class="fa fa-save"></i> Simpan</button>
 						</form>
@@ -170,7 +170,7 @@
 			function SubmitValidate(form) {
 				var PassValidate = 1;
 				var FirstFocus = 0;
-				$(".form-control").each(function() {
+				$(".form-control-custom").each(function() {
 					if($(this).hasAttr('required')) {
 						if($(this).val() == "") {
 							PassValidate = 0;

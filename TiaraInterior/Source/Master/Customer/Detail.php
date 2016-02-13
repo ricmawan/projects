@@ -51,17 +51,35 @@
 						<h5><?php if($IsEdit == 0) echo "Tambah"; else echo "Ubah"; ?> Data Pelanggan</h5>  
 					</div>
 					<div class="panel-body">
-						<form class="col-md-5" id="PostForm" method="POST" action="" >
-							Nama Pelanggan:<br />
-							<input id="hdnCustomerID" name="hdnCustomerID" type="hidden" <?php echo 'value="'.$CustomerID.'"'; ?> />
-							<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
-							<input id="txtCustomerName" name="txtCustomerName" type="text" class="form-control" placeholder="Nama pelanggan" required   <?php echo 'value="'.$CustomerName.'"'; ?> />
+						<form class="col-md-12" id="PostForm" method="POST" action="" >
+							<div class="row">
+								<div class="col-md-2 labelColumn">
+									Nama Pelanggan :
+								</div>
+								<div class="col-md-3">
+									<input id="hdnCustomerID" name="hdnCustomerID" type="hidden" <?php echo 'value="'.$CustomerID.'"'; ?> />
+								<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
+								<input id="txtCustomerName" name="txtCustomerName" type="text" class="form-control-custom" placeholder="Nama pelanggan" required   <?php echo 'value="'.$CustomerName.'"'; ?> />
+								</div>
+							</div>
 							<br />
-							Telephone:<br />
-							<input id="txtTelephone" name="txtTelephone" type="text" class="form-control" placeholder="Telephone" <?php echo 'value="'.$Telephone.'"'; ?> />
+							<div class="row">
+								<div class="col-md-2 labelColumn">
+									Telepon :
+								</div>
+								<div class="col-md-3">
+									<input id="txtTelephone" name="txtTelephone" type="text" class="form-control-custom" placeholder="Telephone" <?php echo 'value="'.$Telephone.'"'; ?> />
+								</div>
+							</div>
 							<br />
-							Alamat:<br />
-							<textarea id="txtAddress" name="txtAddress" class="form-control" placeholder="Alamat"> <?php echo $Address; ?></textarea>
+							<div class="row">
+								<div class="col-md-2 labelColumn">
+									Alamat :
+								</div>
+								<div class="col-md-4">
+									<textarea id="txtAddress" name="txtAddress" class="form-control-custom" placeholder="Alamat"> <?php echo $Address; ?></textarea>
+								</div>
+							</div>
 							<br />
 							<button type="button" class="btn btn-default" value="Simpan" onclick="SubmitForm('./Master/Customer/Insert.php');" ><i class="fa fa-save"></i> Simpan</button>
 						</form>

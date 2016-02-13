@@ -76,26 +76,34 @@
 					<div class="panel-body">
 						<form class="col-md-12" id="PostForm" method="POST" action="" >
 							<div class="row">
-								<div class="col-md-5">
-									Nama:<br />
+								<div class="col-md-1 labelColumn">
+									Nama :
 									<input id="hdnUserID" name="hdnUserID" type="hidden" <?php echo 'value="'.$UserID.'"'; ?> />
 									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
-									<input id="txtUserName" name="txtUserName" type="text" class="form-control" placeholder="Nama " required   <?php echo 'value="'.$UserName.'"'; ?> />
 								</div>
-								<div class="col-md-5">
-									Password:<br />
-									<input id="txtPassword" name="txtPassword" type="password" class="form-control" placeholder="Password" />
+								<div class="col-md-3">
+									<input id="txtUserName" name="txtUserName" type="text" class="form-control-custom" placeholder="Nama " required   <?php echo 'value="'.$UserName.'"'; ?> />
+								</div>
+								<div class="col-md-2 labelColumn">
+									Username :
+								</div>
+								<div class="col-md-3">
+									<input id="txtUserLogin" name="txtUserLogin" type="text" class="form-control-custom" placeholder="Username" required <?php echo 'value="'.$UserLogin.'"'; ?> />
 								</div>
 							</div>
 							<br />
 							<div class="row">
-								<div class="col-md-5">
-									Username:<br />
-									<input id="txtUserLogin" name="txtUserLogin" type="text" class="form-control" placeholder="Username" required <?php echo 'value="'.$UserLogin.'"'; ?> />
+								<div class="col-md-1 labelColumn">
+									Password:
 								</div>
-								<div class="col-md-5">
-									Konfirmasi Password:<br />
-									<input id="txtConfirmPassword" name="txtConfirmPassword" type="password" class="form-control" placeholder="Konfirmasi Password"   />
+								<div class="col-md-3">
+									<input id="txtPassword" name="txtPassword" type="password" class="form-control-custom" placeholder="Password" />
+								</div>
+								<div class="col-md-2 labelColumn">
+									Konfirmasi Password:
+								</div>
+								<div class="col-md-3">
+									<input id="txtConfirmPassword" name="txtConfirmPassword" type="password" class="form-control-custom" placeholder="Konfirmasi Password"   />
 								</div>
 							</div>
 							<div class="row">
@@ -250,7 +258,7 @@
 				var isedit = $("#hdnIsEdit").val();
 				var PassValidate = 1;
 				var FirstFocus = 0;
-				$(".form-control").each(function() {
+				$(".form-control-custom").each(function() {
 					if($(this).hasAttr('required')) {
 						if($(this).val() == "") {
 							PassValidate = 0;

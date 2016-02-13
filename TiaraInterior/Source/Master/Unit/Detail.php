@@ -43,12 +43,17 @@
 						<h5><?php if($IsEdit == 0) echo "Tambah"; else echo "Ubah"; ?> Data Satuan</h5>  
 					</div>
 					<div class="panel-body">
-						<form class="col-md-5" id="PostForm" method="POST" action="" >
-							Nama Satuan:<br />
-							<input id="hdnUnitID" name="hdnUnitID" type="hidden" <?php echo 'value="'.$UnitID.'"'; ?> />
-							<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
-							<input id="txtUnitName" name="txtUnitName" type="text" class="form-control" placeholder="Nama " required   <?php echo 'value="'.$UnitName.'"'; ?> />
-							<br />
+						<form class="col-md-12" id="PostForm" method="POST" action="" >
+							<div class="row">
+								<div class="col-md-1 labelColumn">
+									Satuan :
+								</div>
+								<div class="col-md-3">
+									<input id="hdnUnitID" name="hdnUnitID" type="hidden" <?php echo 'value="'.$UnitID.'"'; ?> />
+									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
+									<input id="txtUnitName" name="txtUnitName" type="text" class="form-control-custom" placeholder="Satuan" required   <?php echo 'value="'.$UnitName.'"'; ?> />
+								</div>
+							</div>
 							<br />
 							<button type="button" class="btn btn-default" value="Simpan" onclick="SubmitForm('./Master/Unit/Insert.php');" ><i class="fa fa-save"></i> Simpan</button>
 						</form>

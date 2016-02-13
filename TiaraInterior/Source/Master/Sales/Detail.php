@@ -55,13 +55,13 @@
 							Nama Sales:<br />
 							<input id="hdnSalesID" name="hdnSalesID" type="hidden" <?php echo 'value="'.$SalesID.'"'; ?> />
 							<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
-							<input id="txtSalesName" name="txtSalesName" type="text" class="form-control" placeholder="Nama pelanggan" required   <?php echo 'value="'.$SalesName.'"'; ?> />
+							<input id="txtSalesName" name="txtSalesName" type="text" class="form-control-custom" placeholder="Nama pelanggan" required   <?php echo 'value="'.$SalesName.'"'; ?> />
 							<br />
 							Telephone:<br />
-							<input id="txtTelephone" name="txtTelephone" type="text" class="form-control" placeholder="Telephone" <?php echo 'value="'.$Telephone.'"'; ?> />
+							<input id="txtTelephone" name="txtTelephone" type="text" class="form-control-custom" placeholder="Telephone" <?php echo 'value="'.$Telephone.'"'; ?> />
 							<br />
 							Alamat:<br />
-							<textarea id="txtAddress" name="txtAddress" class="form-control" placeholder="Alamat"> <?php echo $Address; ?></textarea>
+							<textarea id="txtAddress" name="txtAddress" class="form-control-custom" placeholder="Alamat"> <?php echo $Address; ?></textarea>
 							<br />
 							<button type="button" class="btn btn-default" value="Simpan" onclick="SubmitForm('./Master/Sales/Insert.php');" ><i class="fa fa-save"></i> Simpan</button>
 						</form>
