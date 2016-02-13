@@ -10,7 +10,7 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						 <h2>Master Data Satuan</h2>
+						 <h5>Master Data Satuan</h5>
 					</div>
 					<div class="panel-body">
 						<div class="table-responsive">

@@ -40,7 +40,7 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h2><?php if($IsEdit == 0) echo "Tambah"; else echo "Ubah"; ?> Data Satuan</h2>  
+						<h5><?php if($IsEdit == 0) echo "Tambah"; else echo "Ubah"; ?> Data Satuan</h5>  
 					</div>
 					<div class="panel-body">
 						<form class="col-md-5" id="PostForm" method="POST" action="" >

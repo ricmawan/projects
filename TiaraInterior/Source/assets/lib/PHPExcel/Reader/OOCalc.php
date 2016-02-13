@@ -443,7 +443,7 @@ class PHPExcel_Reader_OOCalc extends PHPExcel_Reader_Abstract implements PHPExce
 					continue;
 				}
 
-//				echo '<h2>Worksheet '.$worksheetDataAttributes['name'].'</h2>';
+//				echo '<h5>Worksheet '.$worksheetDataAttributes['name'].'</h5>';
 				// Create new Worksheet
 				$objPHPExcel->createSheet();
 				$objPHPExcel->setActiveSheetIndex($worksheetID);

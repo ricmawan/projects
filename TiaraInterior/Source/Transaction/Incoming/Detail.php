@@ -71,85 +71,40 @@
 ?>
 <html>
 	<head>
-		<style>
-			.custom-combobox {
-				position: relative;
-				display: inline-block;
-				width: 100%;
-			}
-			.custom-combobox-input {
-				margin: 0;
-				padding: 5px 10px;
-				display: block;
-				width: 100%;
-				height: 34px;
-				padding: 6px 12px;
-				font-size: 14px;
-				line-height: 1.42857143;
-				color: #555;
-				background-color: #fff;
-				background-image: none;
-				border: 1px solid #ccc;
-				border-radius: 4px;
-				-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-				box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-				-webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
-				-o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-				transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-			}
-			.ui-autocomplete {
-				font-family: Open Sans, sans-serif; 
-				font-size: 14px;
-			}
-			.caret {
-				display: inline-block;
-				width: 0;
-				height: 0;
-				margin-left: 2px;
-				vertical-align: middle;
-				border-top: 4px solid;
-				border-right: 4px solid transparent;
-				border-left: 4px solid transparent;
-				right: 10px;
-				top: 50%;
-				position: absolute;
-			}
-			.table > thead > tr > th,
-			.table > tbody > tr > th,
-			.table > tfoot > tr > th,
-			.table > thead > tr > td,
-			.table > tbody > tr > td,
-			.table > tfoot > tr > td {
-				padding: 2px 8px 2px 8px;
-				line-height: 1.42857143;
-				vertical-align: top;
-				border-top: 1px solid #ddd;
-			}			
-			.form-control {
-				height: 24px;
-			}
-		</style>
 	</head>
 	<body>
 		<div class="row">
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h2><?php if($IsEdit == 0) echo "Tambah"; else echo "Ubah"; ?> Data Barang Masuk</h2>  
+						<h5><?php if($IsEdit == 0) echo "Tambah"; else echo "Ubah"; ?> Data Barang Masuk</h5>  
 					</div>
 					<div class="panel-body">
 						<form class="col-md-12" id="PostForm" method="POST" action="" >
 							<div class="row">
-								<div class="col-md-5">
-									Tanggal:<br />
+								<div class="col-md-1 labelColumn">
+									No Nota :
+								</div>
+								<div class="col-md-3">
+									<input type="text" id="txtIncomingNumber" name="txtIncomingNumber" class="form-control" readonly />
+								</div>
+							</div>
+							<br />
+							<div class="row">
+								<div class="col-md-1 labelColumn">
+									Tanggal :
 									<input id="hdnIncomingID" name="hdnIncomingID" type="hidden" <?php echo 'value="'.$IncomingID.'"'; ?> />
 									<input id="hdnRow" name="hdnRow" type="hidden" <?php echo 'value="'.$rowCount.'"'; ?> />
 									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
 									<input id="hdnData" name="hdnData" type="hidden" <?php echo 'value="'.$Data.'"'; ?> />
-									<input id="txtTransactionDate" style="height:34px;" name="txtTransactionDate" type="text" class="form-control DatePickerMonthYearGlobal" placeholder="Tanggal" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
 								</div>
-								<div class="col-md-5">
-									Supplier:<br />
+								<div class="col-md-3">
+									<input id="txtTransactionDate" name="txtTransactionDate" type="text" class="form-control DatePickerMonthYearGlobal" placeholder="Tanggal" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
+								</div>
+								<div class="col-md-1 labelColumn">
+									Supplier :
+								</div>
+								<div class="col-md-3">
 									<div class="ui-widget" style="width: 100%;">
 										<select name="ddlSupplier" id="ddlSupplier" class="form-control" placeholder="Pilih Supplier" >
 											<option value="" selected> </option>
@@ -170,8 +125,10 @@
 							</div>
 							<br />
 							<div class="row">
-								<div class="col-md-5">
-									Merk:<br />
+								<div class="col-md-1 labelColumn">
+									Merk :
+								</div>
+								<div class="col-md-3">
 									<div class="ui-widget" style="width: 100%;">
 										<select name="ddlBrand" id="ddlBrand" class="form-control" placeholder="Pilih Merek" >
 											<option value="" selected> </option>
@@ -188,8 +145,10 @@
 										</select>
 									</div>
 								</div>
-								<div class="col-md-5">
-									Tipe:<br />
+								<div class="col-md-1 labelColumn">
+									Tipe :
+								</div>
+								<div class="col-md-3">
 									<div class="ui-widget" style="width: 100%;">
 										<select name="ddlType" id="ddlType" class="form-control" placeholder="Pilih Tipe" >
 											<option value="" brandid="" selected> </option>
@@ -221,44 +180,46 @@
 								</div>
 							</div>
 							<br />
-							<div style="max-height: 335px !important; height:100%; overflow-y: auto;">
-								<div class="col-md-10">					
+							<!--<div id="divItem" style="max-height: 250px !important; height:100%; overflow-y: auto;">-->
+								<div class="col-md-12">
+									
 									<table class="table" id="datainput">
-										<thead>
-											<td>No</td>
-											<td>Nama Barang</td>
-											<td>Batch</td>
-											<td>QTY</td>
-											<td>Harga Beli</td>
-											<td>Harga Jual</td>
-											<td>Diskon</td>
-											<td>Total</td>
+										<thead style="background-color: black;color:white;height:25px;width:100%;display:block;">
+											<td align="center" style="width:30px;">No</td>
+											<td align="center" style="width:188px;">Nama Barang</td>
+											<td align="center" style="width:79px;">Batch</td>
+											<td align="center" style="width:66px;">QTY</td>
+											<td align="center" style="width:136px;">Harga Beli</td>
+											<td align="center" style="width:136px;">Harga Jual</td>
+											<td align="center" style="width:77px;">Diskon (%)</td>
+											<td align="center" style="width:195px;">Total</td>
+											<td style="width: 26px"></td>
 										</thead>
-										<tbody>
+										<tbody style="display:block;max-height:232px;height:100%;overflow-y:auto;">
 											<tr id='' style='display:none;' class="num">
-												<td id='nota' name='nota' class='nota'></td>
-												<td>
+												<td id='nota' name='nota' class='nota' style="width:32px;vertical-align:middle;"></td>
+												<td style="width:188px;">
 													<input type="text" id="txtTypeName" name="txtTypeName" class="form-control txtTypeName" placeholder="Nama Barang" readonly />
 													<input type="hidden" id="hdnTypeID" name="hdnTypeID" value="0" class="hdnTypeID" />
 													<input type="hidden" id="hdnIncomingDetailsID" class="hdnIncomingDetailsID" name="hdnIncomingDetailsID" value="0" />
 												</td>
-												<td>
-													<input type="text" row="" id="txtBatchNumber" name="txtBatchNumber" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control txtBatchNumber" placeholder="Batch"/>
+												<td style="width:79px;">
+													<input type="text" row="" id="txtBatchNumber" style="width: 63px;" name="txtBatchNumber" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control txtBatchNumber" placeholder="Batch"/>
 												</td>
-												<td>
+												<td style="width:66px;">
 													<input type="text" row="" value=1 id="txtQuantity" style="width: 50px;" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control txtQuantity" placeholder="QTY"/>
 												</td>
-												<td>
-													<input type="text" id="txtBuyPrice" value="0.00" name="txtBuyPrice" style="text-align:right;" class="form-control txtBuyPrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Beli"/>
+												<td style="width:136px;">
+													<input type="text" id="txtBuyPrice" value="0.00" name="txtBuyPrice" style="text-align:right;width: 120px;" class="form-control txtBuyPrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Beli"/>
 												</td>
-												<td>
-													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;" class="form-control txtSalePrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual"/>
+												<td style="width:136px;">
+													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;width: 120px;" class="form-control txtSalePrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual"/>
 												</td>
-												<td>
-													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;" class="form-control txtSalePrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual"/>
+												<td style="width:77px;">
+													<input type="text" id="txtDiscount" style="width: 60px;text-align:right;" value="0" name="txtSalePrice" style="text-align:right;" onkeyup="this.value=minmax(this.value, 0, 100)" class="form-control txtDiscount" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" placeholder="Diskon"/>
 												</td>
-												<td>
-													<input type="text" id="txtTotal" name="txtTotal" class="form-control txtTotal" onchange="calculate()" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" style="text-align:right;" value="0.00" placeholder="Jumlah" readonly />
+												<td  style="width:195px;">
+													<input type="text" id="txtTotal" name="txtTotal" class="form-control txtTotal" style="text-align:right;width:175px;" value="0.00" placeholder="Jumlah" readonly />
 												</td>
 												<td style="vertical-align:middle;">
 													<i class="fa fa-close btnDelete" style="cursor:pointer;" acronym title="Hapus Data" onclick="DeleteRow(this.getAttribute('row'))"></i>
@@ -267,19 +228,10 @@
 										</tbody>
 									</table>
 								</div>
-							</div>
+							<!--</div>-->
 							<input type="hidden" id="record" name="record" value=0 />
 							<input type="hidden" id="recordnew" name="recordnew" value=0 />
 						</form>
-						<br />
-						<div class="row">
-							<div class="col-md-2" style="text-align:right;">
-								No Nota :
-							</div>
-							<div class="col-md-2">
-								<input type="text" id="txtIncomingNumber" name="txtIncomingNumber" class="form-control" readonly />
-							</div>
-						</div>
 						<br />
 						<div class="row">
 							<div class="col-md-2" style="text-align:right;">
@@ -521,6 +473,9 @@
 					$("#datainput tbody").append($clone);
 					//$("#txtQuantity" + count).addClass("txtQuantity");
 					$("#recordnew").val(count);
+					$("#datainput tbody").animate({
+						scrollTop: (25 * count)
+					}, "slow");
 				});
 				$("#btnDelete").on("click", function() {
 					var count = $("#datainput tbody tr").length - 1;

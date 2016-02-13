@@ -536,8 +536,8 @@ function minmax(value, min, max)
 {
 	if(parseInt(value) < 0 || isNaN(value)) 
 		return 0; 
-	else if(parseInt(value) > 100) 
-		return 100; 
+	else if(parseInt(value) > max) 
+		return max; 
 	else return value;
 }
 //titlebar(0);
@@ -569,7 +569,7 @@ function minmax(value, min, max)
 			value = selected.val() ? selected.text() : "",
 			placeholder = this.element.attr("placeholder");
 			wasOpen = false;
-			this.input = $( "<input style='font-family: Open Sans, sans-serif; font-size: 14px;'>" )
+			this.input = $( "<input style='font-family: Open Sans, sans-serif; font-size: 12px;'>" )
 			.appendTo( this.wrapper )
 			.val( value )
 			.attr( "title", "" )
