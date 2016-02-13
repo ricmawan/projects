@@ -486,6 +486,17 @@ h5 {
 .table > thead > tr > td,
 .table > tbody > tr > td,
 .table > tfoot > tr > td {
+	padding: 5px 8px 2px 8px;
+	line-height: 1.42857143;
+	vertical-align: top;
+	border-top: 1px solid #ddd;
+}
+#datainput > thead > tr > th,
+#datainput > tbody > tr > th,
+#datainput > tfoot > tr > th,
+#datainput > thead > tr > td,
+#datainput > tbody > tr > td,
+#datainput > tfoot > tr > td {
 	padding: 2px 8px 2px 8px;
 	line-height: 1.42857143;
 	vertical-align: top;
