@@ -68,7 +68,7 @@
 									Telepon :
 								</div>
 								<div class="col-md-3">
-									<input id="txtTelephone" name="txtTelephone" type="text" class="form-control-custom" placeholder="Telephone" <?php echo 'value="'.$Telephone.'"'; ?> />
+									<input id="txtTelephone" name="txtTelephone" type="text" class="form-control-custom" placeholder="Telepon" <?php echo 'value="'.$Telephone.'"'; ?> />
 								</div>
 							</div>
 							<br />

@@ -77,7 +77,7 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h5><?php if($IsEdit == 0) echo "Tambah"; else echo "Ubah"; ?> Data Barang Keluar</h5>  
+						<h5><?php if($IsEdit == 0) echo "Tambah"; else echo "Ubah"; ?> Data Retur Jual</h5>  
 					</div>
 					<div class="panel-body">
 						<form class="col-md-12" id="PostForm" method="POST" action="" >

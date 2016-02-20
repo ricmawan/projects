@@ -10,25 +10,24 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						 <h5>Barang Masuk</h5>
+						 <h5>Stok Awal</h5>
 					</div>
 					<div class="panel-body">
 						<div class="table-responsive">
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
-										<th data-column-id="IncomingID" data-type="numeric" data-identifier="true">ID Transaksi</th>
-										<!--<th data-column-id="RowNumber" data-sortable="false" data-type="numeric">No</th>-->
+										<th data-column-id="FirstStockID" data-visible="false" data-type="numeric" data-identifier="true">ID Transaksi</th>
+										<th data-column-id="FirstStockNumber">No Nota</th>
 										<th data-column-id="TransactionDate" data-type="numeric">Tanggal</th>
-										<th data-column-id="SupplierName">Nama Supplier</th>
 										<th data-column-id="TotalAmount" data-align="right">Total</th>
 										<?php if($EditFlag == true) echo '<th data-column-id="Opsi" data-formatter="commands" data-sortable="false">Opsi</th>'; ?>
 									</tr>
 								</thead>
 							</table>
 						</div>
-						<button class="btn btn-primary menu" link="./Transaction/Incoming/Detail.php?ID=0"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
-						<?php if($DeleteFlag == true) echo '<button class="btn btn-danger" onclick="DeleteData(\'./Transaction/Incoming/Delete.php\');" ><i class="fa fa-close"></i> Hapus</button>'; ?>
+						<button class="btn btn-primary menu" link="./Transaction/FirstStock/Detail.php?ID=0"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
+						<?php if($DeleteFlag == true) echo '<button class="btn btn-danger" onclick="DeleteData(\'./Transaction/FirstStock/Delete.php\');" ><i class="fa fa-close"></i> Hapus</button>'; ?>
 					</div>
 				</div>
 			</div>
@@ -52,7 +51,7 @@
 								refresh: "Refresh",
 								search: "Cari"
 							},
-							url: "./Transaction/Incoming/DataSource.php",
+							url: "./Transaction/FirstStock/DataSource.php",
 							selection: true,
 							multiSelect: true,
 							rowSelect: true,
@@ -60,7 +59,7 @@
 							formatters: {
 								"commands": function(column, row)
 								{
-									return "<i style='cursor:pointer;' data-row-id=\"" + row.IncomingID + "\" class=\"fa fa-edit\" data-link=\"./Transaction/Incoming/Detail.php?ID=" + row.IncomingID + "\" acronym title=\"Ubah Data\"></i>&nbsp;";
+									return "<i style='cursor:pointer;' data-row-id=\"" + row.IncomingID + "\" class=\"fa fa-edit\" data-link=\"./Transaction/FirstStock/Detail.php?ID=" + row.FirstStockID + "\" acronym title=\"Ubah Data\"></i>&nbsp;";
 								}
 							}
 						}).on("loaded.rs.jquery.bootgrid", function()

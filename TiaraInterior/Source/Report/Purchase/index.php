@@ -4,60 +4,6 @@
 ?>
 <html>
 	<head>
-		<style>
-			.custom-combobox {
-				position: relative;
-				display: inline-block;
-				width: 100%;
-			}
-			.custom-combobox-input {
-				margin: 0;
-				padding: 5px 10px;
-				display: block;
-				width: 100%;
-				height: 34px;
-				padding: 6px 12px;
-				font-size: 14px;
-				line-height: 1.42857143;
-				color: #555;
-				background-color: #fff;
-				background-image: none;
-				border: 1px solid #ccc;
-				border-radius: 4px;
-				-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-				box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-				-webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
-				-o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-				transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-			}
-			.ui-autocomplete {
-				font-family: Open Sans, sans-serif; 
-				font-size: 14px;
-			}
-			.caret {
-				display: inline-block;
-				width: 0;
-				height: 0;
-				margin-left: 2px;
-				vertical-align: middle;
-				border-top: 4px solid;
-				border-right: 4px solid transparent;
-				border-left: 4px solid transparent;
-				right: 10px;
-				top: 50%;
-				position: absolute;
-			}
-			.QTY {
-				width: 40px;
-			}
-			.Price {
-				width: 150px;
-			}
-			.actionBar {
-				display: none;
-			}
-			
-		</style>
 	</head>
 	<body>
 		<div class="row">
@@ -68,16 +14,44 @@
 					</div>
 					<div class="panel-body">
 						<div class="row">
-							<div class="col-md-5">
-								Dari Tanggal: <br />
+							<div class="col-md-1 labelColumn">
+								Supplier :
+							</div>
+							<div class="col-md-3">
 								<div class="ui-widget" style="width: 100%;">
-									<input id="txtFromDate" style="height:34px;" name="txtFromDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Dari Tanggal" />
+									<select name="ddlSupplier" id="ddlSupplier" class="form-control-custom" placeholder="Pilih Supplier" >
+										<option value="" selected> </option>
+										<?php
+											$sql = "SELECT SupplierID, SupplierName FROM master_supplier";
+											if(!$result = mysql_query($sql, $dbh)) {
+												echo mysql_error();
+												return 0;
+											}
+											while($row = mysql_fetch_array($result)) {
+												if($SupplierID == $row['SupplierID']) echo "<option selected value='".$row['SupplierID']."' >".$row['SupplierName']."</option>";
+												else echo "<option value='".$row['SupplierID']."' >".$row['SupplierName']."</option>";
+											}
+										?>
+									</select>
 								</div>
 							</div>
-							<div class="col-md-5">
-								Sampai Tanggal: <br />
+						</div>
+						<br />
+						<div class="row">
+							<div class="col-md-1 labelColumn">
+								Tanggal :
+							</div>
+							<div class="col-md-3">
 								<div class="ui-widget" style="width: 100%;">
-									<input id="txtToDate" style="height:34px;" name="txtToDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Sampai Tanggal" />
+									<input id="txtFromDate" name="txtFromDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Dari Tanggal" />
+								</div>
+							</div>
+							<div style="float:left;" class="labelColumn">
+								-
+							</div>
+							<div class="col-md-3">
+								<div class="ui-widget" style="width: 100%;">
+									<input id="txtToDate" name="txtToDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Sampai Tanggal" />
 								</div>
 							</div>
 						</div>

@@ -6,47 +6,51 @@
 		include "../../GetPermission.php";
 		//echo $_SERVER['REQUEST_URI'];
 		$Content = "";
-		$IncomingID = mysql_real_escape_string($_GET['ID']);
+		$FirstStockID = mysql_real_escape_string($_GET['ID']);
+		$FirstStockNumber = "";
 		$SupplierID = "";
 		$TransactionDate = "";
 		$IsEdit = 0;
 		$rowCount = 0;
 		$Data = "";
-		if($IncomingID != 0) {
+		if($FirstStockID != 0) {
 			$IsEdit = 1;
 			//$Content = "Place the content here";
 			$sql = "SELECT
-					IT.IncomingID,
-					IT.SupplierID,
-					DATE_FORMAT(IT.TransactionDate, '%d-%m-%Y') AS TransactionDate
+					FS.FirstStockID,
+					FS.FirstStockNumber,
+					DATE_FORMAT(FS.TransactionDate, '%d-%m-%Y') AS TransactionDate
 				FROM
-					transaction_incoming IT
+					transaction_firststock FS
 				WHERE
-					IT.IncomingID = $IncomingID";
+					FS.FirstStockID = $FirstStockID";
 						
 			if (! $result=mysql_query($sql, $dbh)) {
 				echo mysql_error();
 				return 0;
 			}				
 			$row=mysql_fetch_array($result);
-			$IncomingID = $row['IncomingID'];
-			$SupplierID = $row['SupplierID'];
+			$FirstStockID = $row['FirstStockID'];
+			$FirstStockNumber = $row['FirstStockNumber'];
 			$TransactionDate = $row['TransactionDate'];
 			
 			$sql = "SELECT
-						ITD.IncomingDetailsID,
-						ITD.TypeID,
-						ITD.Quantity,
-						ITD.Price,
-						CONCAT(MC.BrandName, ' ', I.TypeName) AS TypeName
+						FSD.FirstStockDetailsID,
+						FSD.TypeID,
+						FSD.BatchNumber,
+						FSD.Quantity,
+						FSD.BuyPrice,
+						FSD.SalePrice,
+						FSD.Discount,
+						CONCAT(MB.BrandName, ' ', I.TypeName) AS TypeName
 					FROM
-						transaction_incomingdetails ITD
+						transaction_firststockdetails FSD
 						JOIN master_type I
-							ON I.TypeID = ITD.TypeID
+							ON I.TypeID = FSD.TypeID
 						JOIN master_brand MB
-							ON MC.BrandID = I.BrandID
+							ON MB.BrandID = I.BrandID
 					WHERE
-						ITD.IncomingID = $IncomingID";
+						FSD.FirstStockID = $FirstStockID";
 			if(!$result = mysql_query($sql, $dbh)) {
 				echo mysql_error();
 				return 0;
@@ -57,7 +61,7 @@
 				$Data = array();
 				while($row = mysql_fetch_array($result)) {
 					//array_push($DetailID, $row[0]);
-					array_push($Data, "'".$row['IncomingDetailsID']."', '".$row['TypeID']."', '".$row['Quantity']."', '".$row['Price']."', '".$row['TypeName']."'");
+					array_push($Data, "'".$row['FirstStockDetailsID']."', '".$row['TypeID']."', '".$row['TypeName']."', '".$row['BatchNumber']."', '".$row['Quantity']."', '".$row['BuyPrice']."', '".$row['SalePrice']."', '".$row['Discount']."'");
 				}
 				//$DetailID = implode(",", $DetailID);
 				$Data = implode("|", $Data);
@@ -71,107 +75,40 @@
 ?>
 <html>
 	<head>
-		<style>
-			.custom-combobox {
-				position: relative;
-				display: inline-block;
-				width: 100%;
-			}
-			.custom-combobox-input {
-				margin: 0;
-				padding: 5px 10px;
-				display: block;
-				width: 100%;
-				height: 34px;
-				padding: 6px 12px;
-				font-size: 14px;
-				line-height: 1.42857143;
-				color: #555;
-				background-color: #fff;
-				background-image: none;
-				border: 1px solid #ccc;
-				border-radius: 4px;
-				-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-				box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-				-webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
-				-o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-				transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-			}
-			.ui-autocomplete {
-				font-family: Open Sans, sans-serif; 
-				font-size: 14px;
-			}
-			.caret {
-				display: inline-block;
-				width: 0;
-				height: 0;
-				margin-left: 2px;
-				vertical-align: middle;
-				border-top: 4px solid;
-				border-right: 4px solid transparent;
-				border-left: 4px solid transparent;
-				right: 10px;
-				top: 50%;
-				position: absolute;
-			}
-			.table > thead > tr > th,
-			.table > tbody > tr > th,
-			.table > tfoot > tr > th,
-			.table > thead > tr > td,
-			.table > tbody > tr > td,
-			.table > tfoot > tr > td {
-				padding: 2px 8px 2px 8px;
-				line-height: 1.42857143;
-				vertical-align: top;
-				border-top: 1px solid #ddd;
-			}			
-			.form-control-custom {
-				height: 24px;
-			}
-		</style>
 	</head>
 	<body>
 		<div class="row">
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h5><?php if($IsEdit == 0) echo "Tambah"; else echo "Ubah"; ?> Data Barang Masuk</h5>  
+						<h5><?php if($IsEdit == 0) echo "Tambah"; else echo "Ubah"; ?> Data Stok Awal</h5>  
 					</div>
 					<div class="panel-body">
 						<form class="col-md-12" id="PostForm" method="POST" action="" >
 							<div class="row">
-								<div class="col-md-5">
-									Tanggal:<br />
-									<input id="hdnIncomingID" name="hdnIncomingID" type="hidden" <?php echo 'value="'.$IncomingID.'"'; ?> />
+								<div class="col-md-1 labelColumn">
+									Tanggal :
+									<input id="hdnFirstStockID" name="hdnFirstStockID" type="hidden" <?php echo 'value="'.$FirstStockID.'"'; ?> />
 									<input id="hdnRow" name="hdnRow" type="hidden" <?php echo 'value="'.$rowCount.'"'; ?> />
 									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
 									<input id="hdnData" name="hdnData" type="hidden" <?php echo 'value="'.$Data.'"'; ?> />
-									<input id="txtTransactionDate" style="height:34px;" name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Tanggal" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
 								</div>
-								<div class="col-md-5">
-									Supplier:<br />
-									<div class="ui-widget" style="width: 100%;">
-										<select name="ddlSupplier" id="ddlSupplier" class="form-control-custom" placeholder="Pilih Supplier" >
-											<option value="" selected> </option>
-											<?php
-												$sql = "SELECT SupplierID, SupplierName FROM master_supplier";
-												if(!$result = mysql_query($sql, $dbh)) {
-													echo mysql_error();
-													return 0;
-												}
-												while($row = mysql_fetch_array($result)) {
-													if($SupplierID == $row['SupplierID']) echo "<option selected value='".$row['SupplierID']."' >".$row['SupplierName']."</option>";
-													else echo "<option value='".$row['SupplierID']."' >".$row['SupplierName']."</option>";
-												}
-											?>
-										</select>
-									</div>
+								<div class="col-md-3">
+									<input id="txtTransactionDate" name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Tanggal" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
+								</div>
+								<div class="col-md-1 labelColumn">
+									No Nota :
+								</div>
+								<div class="col-md-3">
+									<input type="text" id="txtFirstStockNumber" name="txtFirstStockNumber" class="form-control-custom" readonly <?php echo 'value="'.$FirstStockNumber.'"'; ?> />
 								</div>
 							</div>
 							<br />
 							<div class="row">
-								<div class="col-md-5">
-									Merk:<br />
+								<div class="col-md-1 labelColumn">
+									Merk :
+								</div>
+								<div class="col-md-3">
 									<div class="ui-widget" style="width: 100%;">
 										<select name="ddlBrand" id="ddlBrand" class="form-control-custom" placeholder="Pilih Merek" >
 											<option value="" selected> </option>
@@ -188,8 +125,10 @@
 										</select>
 									</div>
 								</div>
-								<div class="col-md-5">
-									Tipe:<br />
+								<div class="col-md-1 labelColumn">
+									Tipe :
+								</div>
+								<div class="col-md-3">
 									<div class="ui-widget" style="width: 100%;">
 										<select name="ddlType" id="ddlType" class="form-control-custom" placeholder="Pilih Tipe" >
 											<option value="" brandid="" selected> </option>
@@ -221,44 +160,45 @@
 								</div>
 							</div>
 							<br />
-							<div style="max-height: 335px !important; height:100%; overflow-y: auto;">
-								<div class="col-md-10">					
+							<div class="row">
+								<div class="col-md-12">
 									<table class="table" id="datainput">
-										<thead>
-											<td>No</td>
-											<td>Nama Barang</td>
-											<td>Batch</td>
-											<td>QTY</td>
-											<td>Harga Beli</td>
-											<td>Harga Jual</td>
-											<td>Diskon</td>
-											<td>Total</td>
+										<thead style="background-color: black;color:white;height:25px;width:100%;display:block;">
+											<td align="center" style="width:30px;">No</td>
+											<td align="center" style="width:188px;">Nama Barang</td>
+											<td align="center" style="width:79px;">Batch</td>
+											<td align="center" style="width:66px;">QTY</td>
+											<td align="center" style="width:136px;">Harga Beli</td>
+											<td align="center" style="width:136px;">Harga Jual</td>
+											<td align="center" style="width:77px;">Diskon (%)</td>
+											<td align="center" style="width:195px;">Total</td>
+											<td style="width: 26px"></td>
 										</thead>
-										<tbody>
+										<tbody style="display:block;max-height:232px;height:100%;overflow-y:auto;">
 											<tr id='' style='display:none;' class="num">
-												<td id='nota' name='nota' class='nota'></td>
-												<td>
+												<td id='nota' name='nota' class='nota' style="width:32px;vertical-align:middle;"></td>
+												<td style="width:188px;">
 													<input type="text" id="txtTypeName" name="txtTypeName" class="form-control-custom txtTypeName" placeholder="Nama Barang" readonly />
 													<input type="hidden" id="hdnTypeID" name="hdnTypeID" value="0" class="hdnTypeID" />
-													<input type="hidden" id="hdnIncomingDetailsID" class="hdnIncomingDetailsID" name="hdnIncomingDetailsID" value="0" />
+													<input type="hidden" id="hdnFirstStockDetailsID" class="hdnFirstStockDetailsID" name="hdnFirstStockDetailsID" value="0" />
 												</td>
-												<td>
-													<input type="text" row="" id="txtBatchNumber" name="txtBatchNumber" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control-custom txtBatchNumber" placeholder="Batch"/>
+												<td style="width:79px;">
+													<input type="text" row="" id="txtBatchNumber" style="width: 63px;" name="txtBatchNumber" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control-custom txtBatchNumber" placeholder="Batch"/>
 												</td>
-												<td>
+												<td style="width:66px;">
 													<input type="text" row="" value=1 id="txtQuantity" style="width: 50px;" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control-custom txtQuantity" placeholder="QTY"/>
 												</td>
-												<td>
-													<input type="text" id="txtBuyPrice" value="0.00" name="txtBuyPrice" style="text-align:right;" class="form-control-custom txtBuyPrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Beli"/>
+												<td style="width:136px;">
+													<input type="text" id="txtBuyPrice" value="0.00" name="txtBuyPrice" style="text-align:right;width: 120px;" class="form-control-custom txtBuyPrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Beli"/>
 												</td>
-												<td>
-													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;" class="form-control-custom txtSalePrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual"/>
+												<td style="width:136px;">
+													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;width: 120px;" class="form-control-custom txtSalePrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual"/>
 												</td>
-												<td>
-													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;" class="form-control-custom txtSalePrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual"/>
+												<td style="width:77px;">
+													<input type="text" id="txtDiscount" style="width: 60px;text-align:right;" value="0" name="txtDiscount" style="text-align:right;" onkeyup="this.value=minmax(this.value, 0, 100)" class="form-control-custom txtDiscount" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" placeholder="Diskon"/>
 												</td>
-												<td>
-													<input type="text" id="txtTotal" name="txtTotal" class="form-control-custom txtTotal" onchange="calculate()" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" style="text-align:right;" value="0.00" placeholder="Jumlah" readonly />
+												<td  style="width:195px;">
+													<input type="text" id="txtTotal" name="txtTotal" class="form-control-custom txtTotal" style="text-align:right;width:175px;" value="0.00" placeholder="Jumlah" readonly />
 												</td>
 												<td style="vertical-align:middle;">
 													<i class="fa fa-close btnDelete" style="cursor:pointer;" acronym title="Hapus Data" onclick="DeleteRow(this.getAttribute('row'))"></i>
@@ -270,34 +210,25 @@
 							</div>
 							<input type="hidden" id="record" name="record" value=0 />
 							<input type="hidden" id="recordnew" name="recordnew" value=0 />
+							<br />
+							<div class="row">
+								<div class="col-md-2">
+									Grand Total :
+								</div>
+								<div class="col-md-2">
+									<input type="text" id="txtGrandTotal" style="text-align:right;" value="0.00" name="txtGrandTotal" class="form-control-custom" readonly />
+								</div>
+							</div>
+							<br />
+							<div class="row">
+								<div class="col-md-2">
+									Catatan :
+								</div>
+								<div class="col-md-4">
+									<textarea id="txtAddress" name="txtAddress" class="form-control-custom" placeholder="Catatan"></textarea>
+								</div>
+							</div>
 						</form>
-						<br />
-						<div class="row">
-							<div class="col-md-2" style="text-align:right;">
-								No Nota :
-							</div>
-							<div class="col-md-2">
-								<input type="text" id="txtIncomingNumber" name="txtIncomingNumber" class="form-control-custom" readonly />
-							</div>
-						</div>
-						<br />
-						<div class="row">
-							<div class="col-md-2" style="text-align:right;">
-								Catatan :
-							</div>
-							<div class="col-md-4">
-								<textarea id="txtAddress" name="txtAddress" class="form-control-custom" placeholder="Catatan"></textarea>
-							</div>
-						</div>
-						<br />
-						<div class="row">
-							<div class="col-md-2" style="text-align:right;">
-								Grand Total :
-							</div>
-							<div class="col-md-2">
-								<input type="text" id="txtGrandTotal" style="text-align:right;" value="0.00" name="txtGrandTotal" class="form-control-custom" readonly />
-							</div>
-						</div>
 						<br />
 						<div class="row">
 							<div class="col-md-12">
@@ -386,10 +317,10 @@
 					i++;
 				});
 				i = 0;
-				$(".hdnIncomingDetailsID").each(function() {
+				$(".hdnFirstStockDetailsID").each(function() {
 					if(i != 0) {
-						$(this).attr("id", "hdnIncomingDetailsID" + i);
-						$(this).attr("name", "hdnIncomingDetailsID" + i);
+						$(this).attr("id", "hdnFirstStockDetailsID" + i);
+						$(this).attr("name", "hdnFirstStockDetailsID" + i);
 					}
 					i++;
 				});
@@ -450,6 +381,14 @@
 					}
 					i++;
 				});
+				i = 0;
+				$(".txtDiscount").each(function() {
+					if(i != 0) {
+						$(this).attr("id", "txtDiscount" + i);
+						$(this).attr("name", "txtDiscount" + i);
+					}
+					i++;
+				});
 			}
 			function Calculate() {
 				var Total = 0;
@@ -457,12 +396,14 @@
 				var row = 0;
 				var qty = 1;
 				var price = 0;
+				var disc = 0;
 				var i = 0;
 				$(".txtQuantity").each(function() {
 					if(i != 0) {
 						qty = $(this).val();
 						row = $(this).attr("row");
 						price = $("#txtBuyPrice" + row).val().replace(/\,/g, "");
+						disc = $("#txtDiscount" + row).val();
 						if(qty == "") {
 							$(this).val(1);
 							qty = 1;
@@ -471,6 +412,7 @@
 							$("#txtBuyPrice" + row).val("0.00");
 							price = 0;
 						}
+						price = price - ((price * disc)/ 100);
 						GrandTotal += parseFloat(qty) * parseFloat(price);
 						Total = parseFloat(qty) * parseFloat(price);
 						$("#txtTotal" + row).val(returnRupiah(Total.toString()));
@@ -521,6 +463,9 @@
 					$("#datainput tbody").append($clone);
 					//$("#txtQuantity" + count).addClass("txtQuantity");
 					$("#recordnew").val(count);
+					$("#datainput tbody").animate({
+						scrollTop: (25 * count)
+					}, "slow");
 				});
 				$("#btnDelete").on("click", function() {
 					var count = $("#datainput tbody tr").length - 1;
@@ -542,13 +487,14 @@
 						//set values
 						var d = type[i].split("', '");
 						$("#nota").text(count);
-						$("#hdnIncomingDetailsID" + count).val(d[0].replace("'", ""));
+						$("#hdnFirstStockDetailsID" + count).val(d[0].replace("'", ""));
 						$("#hdnTypeID" + count).val(d[1].replace("'", ""));
-						$("#txtQuantity" + count).val(d[2].replace("'", ""));
-						$("#txtBuyPrice" + count).val(returnRupiah(d[3].replace("'", "")));
-						$("#txtSalePrice" + count).val(returnRupiah(d[3].replace("'", "")));
-						$("#txtBatchNumber" + count).val(returnRupiah(d[3].replace("'", "")));
-						$("#txtTypeName" + count).val(d[4].replace("'", ""));
+						$("#txtTypeName" + count).val(d[2].replace("'", ""));
+						$("#txtBatchNumber" + count).val(d[3].replace("'", ""));
+						$("#txtQuantity" + count).val(d[4].replace("'", ""));
+						$("#txtBuyPrice" + count).val(returnRupiah(d[5].replace("'", "")));
+						$("#txtSalePrice" + count).val(returnRupiah(d[6].replace("'", "")));
+						$("#txtDiscount" + count).val(d[7].replace("'", ""));
 						$("#record").val(count);
 						$("#recordnew").val(count);
 					}
@@ -583,7 +529,7 @@
 						}, "slow");
 						return false;
 					}
-					else SubmitForm("./Transaction/Incoming/Insert.php");
+					else SubmitForm("./Transaction/FirstStock/Insert.php");
 				}
 			}
 		</script>

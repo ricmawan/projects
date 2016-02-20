@@ -6,7 +6,7 @@
 	include "../../GetPermission.php";
 
 	$where = " 1=1 ";
-	$order_by = "IT.IncomingTransactionID";
+	$order_by = "FS.FirstStockID";
 	$rows = 10;
 	$current = 1;
 	$limit_l = ($current * $rows) - ($rows);
@@ -17,14 +17,14 @@
 		$order_by = "";
 		foreach($_REQUEST['sort'] as $key => $value) {
 			if($key != 'No') $order_by .= " $key $value";
-			else $order_by = "IT.IncomingTransactionID";
+			else $order_by = "FS.FirstStockID";
 		}
 	}
 	//Handles search querystring sent from Bootgrid
 	if (ISSET($_REQUEST['searchPhrase']) )
 	{
 		$search = trim($_REQUEST['searchPhrase']);
-		$where .= " AND ( IT.IncomingTransactionID LIKE '%".$search."%' OR MS.SupplierName LIKE '%".$search."%' OR DATE_FORMAT(IT.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' ) ";
+		$where .= " AND ( FS.FirstStockID LIKE '%".$search."%' OR FS.FirstStockNumber LIKE '%".$search."%' OR DATE_FORMAT(FS.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' ) ";
 	}
 	//Handles determines where in the paging count this result set falls in
 	if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];
@@ -40,9 +40,7 @@
 	$sql = "SELECT
 				COUNT(*) AS nRows
 			FROM
-				transaction_incomingtransaction IT
-				LEFT JOIN master_supplier MS
-					ON IT.SupplierID = MS.SupplierID
+				transaction_firststock FS
 			WHERE
 				$where";
 	
@@ -53,22 +51,20 @@
 	$row = mysql_fetch_array($result);
 	$nRows = $row['nRows'];
 	$sql = "SELECT
-				IT.IncomingTransactionID,
-				MS.SupplierName,
-				DATE_FORMAT(IT.TransactionDate, '%d-%m-%Y') AS TransactionDate,
-				IFNULL(SUM(ITD.Quantity * ITD.Price), 0) AS TotalAmount
+				FS.FirstStockID,
+				FS.FirstStockNumber,
+				DATE_FORMAT(FS.TransactionDate, '%d-%m-%Y') AS TransactionDate,
+				IFNULL(SUM(FSD.Quantity * (FSD.BuyPrice - ((FSD.BuyPrice * FSD.Discount)/100))), 0) AS TotalAmount
 			FROM
-				transaction_incomingtransaction IT
-				LEFT JOIN master_supplier MS
-					ON IT.SupplierID = MS.SupplierID
-				LEFT JOIN transaction_incomingtransactiondetails ITD
-					ON ITD.IncomingTransactionID = IT.IncomingTransactionID
+				transaction_firststock FS
+				LEFT JOIN transaction_firststockdetails FSD
+					ON FSD.FirstStockID = FS.FirstStockID
 			WHERE
 				$where
 			GROUP BY
-				IT.IncomingTransactionID,
-				MS.SupplierName,
-				IT.TransactionDate
+				FS.FirstStockID,
+				FS.FirstStockNumber,
+				FS.TransactionDate
 			ORDER BY 
 				$order_by
 			$limit";
@@ -81,8 +77,8 @@
 	while ($row = mysql_fetch_array($result)) {
 		$RowNumber++;
 		$row_array['RowNumber'] = $RowNumber;
-		$row_array['IncomingTransactionID']= $row['IncomingTransactionID'];
-		$row_array['SupplierName'] = $row['SupplierName'];
+		$row_array['FirstStockID']= $row['FirstStockID'];
+		$row_array['FirstStockNumber'] = $row['FirstStockNumber'];
 		$row_array['TotalAmount'] =  number_format($row['TotalAmount'],2,".",",");
 		$row_array['TransactionDate'] = $row['TransactionDate'];
 		array_push($return_arr, $row_array);
