@@ -17,11 +17,12 @@
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
-										<th data-column-id="BuyReturnID" data-type="numeric" data-identifier="true">ID Transaksi</th>
-										<!--<th data-column-id="RowNumber" data-sortable="false" data-type="numeric">No</th>-->
+										<th data-column-id="BuyReturnID" data-type="numeric" data-visible="false" data-identifier="true">ID Transaksi</th>
+										<th data-column-id="BuyReturnNumber">No Nota</th>
 										<th data-column-id="TransactionDate" data-type="numeric">Tanggal</th>
 										<th data-column-id="SupplierName">Nama Supplier</th>
 										<th data-column-id="TotalAmount" data-align="right">Total</th>
+										<th data-column-id="Remarks">Catatan</th>
 										<?php if($EditFlag == true) echo '<th data-column-id="Opsi" data-formatter="commands" data-sortable="false">Opsi</th>'; ?>
 									</tr>
 								</thead>

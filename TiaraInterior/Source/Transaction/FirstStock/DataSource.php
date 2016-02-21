@@ -24,7 +24,7 @@
 	if (ISSET($_REQUEST['searchPhrase']) )
 	{
 		$search = trim($_REQUEST['searchPhrase']);
-		$where .= " AND ( FS.FirstStockID LIKE '%".$search."%' OR FS.FirstStockNumber LIKE '%".$search."%' OR DATE_FORMAT(FS.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' ) ";
+		$where .= " AND ( FS.FirstStockID LIKE '%".$search."%' OR FS.Remarks LIKE '%".$search."%' OR FS.FirstStockNumber LIKE '%".$search."%' OR DATE_FORMAT(FS.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' ) ";
 	}
 	//Handles determines where in the paging count this result set falls in
 	if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];
@@ -54,7 +54,8 @@
 				FS.FirstStockID,
 				FS.FirstStockNumber,
 				DATE_FORMAT(FS.TransactionDate, '%d-%m-%Y') AS TransactionDate,
-				IFNULL(SUM(FSD.Quantity * (FSD.BuyPrice - ((FSD.BuyPrice * FSD.Discount)/100))), 0) AS TotalAmount
+				IFNULL(SUM(FSD.Quantity * (FSD.BuyPrice - ((FSD.BuyPrice * FSD.Discount)/100))), 0) AS TotalAmount,
+				FS.Remarks
 			FROM
 				transaction_firststock FS
 				LEFT JOIN transaction_firststockdetails FSD
@@ -64,7 +65,8 @@
 			GROUP BY
 				FS.FirstStockID,
 				FS.FirstStockNumber,
-				FS.TransactionDate
+				FS.TransactionDate,
+				FS.Remarks
 			ORDER BY 
 				$order_by
 			$limit";
@@ -81,6 +83,7 @@
 		$row_array['FirstStockNumber'] = $row['FirstStockNumber'];
 		$row_array['TotalAmount'] =  number_format($row['TotalAmount'],2,".",",");
 		$row_array['TransactionDate'] = $row['TransactionDate'];
+		$row_array['Remarks'] = $row['Remarks'];
 		array_push($return_arr, $row_array);
 	}
 

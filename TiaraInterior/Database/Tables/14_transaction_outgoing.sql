@@ -8,6 +8,7 @@ CREATE TABLE transaction_outgoing
 	SalesID				BIGINT,
 	TransactionDate 	DATETIME NOT NULL,
 	DeliveryCost		DOUBLE,
+	Remarks				TEXT,
 	CreatedDate 		DATETIME NOT NULL,
 	CreatedBy 			VARCHAR(255) NOT NULL,
 	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,

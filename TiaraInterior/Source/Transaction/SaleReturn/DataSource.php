@@ -6,7 +6,7 @@
 	include "../../GetPermission.php";
 
 	$where = " 1=1 ";
-	$order_by = "IT.IncomingTransactionID";
+	$order_by = "SR.SaleReturnID";
 	$rows = 10;
 	$current = 1;
 	$limit_l = ($current * $rows) - ($rows);
@@ -17,14 +17,14 @@
 		$order_by = "";
 		foreach($_REQUEST['sort'] as $key => $value) {
 			if($key != 'No') $order_by .= " $key $value";
-			else $order_by = "IT.IncomingTransactionID";
+			else $order_by = "SR.SaleReturnID";
 		}
 	}
 	//Handles search querystring sent from Bootgrid
 	if (ISSET($_REQUEST['searchPhrase']) )
 	{
 		$search = trim($_REQUEST['searchPhrase']);
-		$where .= " AND ( IT.IncomingTransactionID LIKE '%".$search."%' OR MS.SupplierName LIKE '%".$search."%' OR DATE_FORMAT(IT.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' ) ";
+		$where .= " AND ( SR.SaleReturnID LIKE '%".$search."%' OR SR.Remarks LIKE '%".$search."%' OR SR.SaleReturnNumber LIKE '%".$search."%' OR MC.CustomerName LIKE '%".$search."%' OR DATE_FORMAT(SR.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' ) ";
 	}
 	//Handles determines where in the paging count this result set falls in
 	if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];
@@ -40,9 +40,7 @@
 	$sql = "SELECT
 				COUNT(*) AS nRows
 			FROM
-				transaction_incomingtransaction IT
-				LEFT JOIN master_supplier MS
-					ON IT.SupplierID = MS.SupplierID
+				transaction_salereturn SR
 			WHERE
 				$where";
 	
@@ -53,22 +51,26 @@
 	$row = mysql_fetch_array($result);
 	$nRows = $row['nRows'];
 	$sql = "SELECT
-				IT.IncomingTransactionID,
-				MS.SupplierName,
-				DATE_FORMAT(IT.TransactionDate, '%d-%m-%Y') AS TransactionDate,
-				IFNULL(SUM(ITD.Quantity * ITD.Price), 0) AS TotalAmount
+				SR.SaleReturnID,
+				MC.CustomerName,
+				DATE_FORMAT(SR.TransactionDate, '%d-%m-%Y') AS TransactionDate,
+				IFNULL(SUM(ITD.Quantity * ITD.Price), 0) AS TotalAmount,
+				SR.Remarks,
+				SR.SaleReturnNumber
 			FROM
-				transaction_incomingtransaction IT
-				LEFT JOIN master_supplier MS
-					ON IT.SupplierID = MS.SupplierID
-				LEFT JOIN transaction_incomingtransactiondetails ITD
-					ON ITD.IncomingTransactionID = IT.IncomingTransactionID
+				transaction_salereturn SR
+				LEFT JOIN master_customer MC
+					ON SR.CustomerID = MS.CustomerID
+				LEFT JOIN transaction_salereturndetails SRD
+					ON SRD.SaleReturnID = SR.SaleReturnID
 			WHERE
 				$where
 			GROUP BY
-				IT.IncomingTransactionID,
+				SR.SaleReturnID,
 				MS.SupplierName,
-				IT.TransactionDate
+				SR.TransactionDate,
+				SR.Remarks,
+				SR.SaleReturnNumber
 			ORDER BY 
 				$order_by
 			$limit";
@@ -81,10 +83,12 @@
 	while ($row = mysql_fetch_array($result)) {
 		$RowNumber++;
 		$row_array['RowNumber'] = $RowNumber;
-		$row_array['IncomingTransactionID']= $row['IncomingTransactionID'];
-		$row_array['SupplierName'] = $row['SupplierName'];
+		$row_array['SaleReturnID'] = $row['SaleReturnID'];
+		$row_array['SaleReturnNumber'] = $row['SaleReturnNumber'];
+		$row_array['CustomerName'] = $row['CustomerName'];
 		$row_array['TotalAmount'] =  number_format($row['TotalAmount'],2,".",",");
 		$row_array['TransactionDate'] = $row['TransactionDate'];
+		$row_array['Remarks'] = $row['Remarks'];
 		array_push($return_arr, $row_array);
 	}
 

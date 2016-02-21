@@ -6,47 +6,56 @@
 		include "../../GetPermission.php";
 		//echo $_SERVER['REQUEST_URI'];
 		$Content = "";
-		$IncomingID = mysql_real_escape_string($_GET['ID']);
-		$SupplierID = "";
+		$OutgoingID = mysql_real_escape_string($_GET['ID']);
+		$SalesID = "";
+		$CustomerID = "";
 		$TransactionDate = "";
+		$OutgoingNumber = "";
+		$Remarks = "";
 		$IsEdit = 0;
 		$rowCount = 0;
 		$Data = "";
-		if($IncomingID != 0) {
+		if($OutgoingID != 0) {
 			$IsEdit = 1;
 			//$Content = "Place the content here";
 			$sql = "SELECT
-					IT.IncomingID,
-					IT.SupplierID,
-					DATE_FORMAT(IT.TransactionDate, '%d-%m-%Y') AS TransactionDate
+					OT.OutgoingID,
+					OT.OutgoingNumber,
+					OT.SalesID,
+					OT.CustomerID,
+					OT.Remarks,
+					DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') AS TransactionDate
 				FROM
-					transaction_incoming IT
+					transaction_outgoing IT
 				WHERE
-					IT.IncomingID = $IncomingID";
+					OT.OutgoingID = $OutgoingID";
 						
 			if (! $result=mysql_query($sql, $dbh)) {
 				echo mysql_error();
 				return 0;
 			}				
 			$row=mysql_fetch_array($result);
-			$IncomingID = $row['IncomingID'];
+			$OutgoingID = $row['OutgoingID'];
+			$OutgoingNumber = $row['OutgoingNumber'];
 			$SupplierID = $row['SupplierID'];
+			$Remarks = $row['Remarks'];
 			$TransactionDate = $row['TransactionDate'];
 			
 			$sql = "SELECT
-						ITD.IncomingDetailsID,
-						ITD.TypeID,
-						ITD.Quantity,
-						ITD.Price,
+						OTD.OutgoingDetailsID,
+						OTD.TypeID,
+						OTD.Quantity,
+						OTD.BuyPrice,
+						OTD.SalePrice,
 						CONCAT(MC.BrandName, ' ', I.TypeName) AS TypeName
 					FROM
-						transaction_incomingdetails ITD
+						transaction_outgoingdetails OTD
 						JOIN master_type I
-							ON I.TypeID = ITD.TypeID
+							ON I.TypeID = OTD.TypeID
 						JOIN master_brand MB
 							ON MC.BrandID = I.BrandID
 					WHERE
-						ITD.IncomingID = $IncomingID";
+						OTD.OutgoingID = $OutgoingID";
 			if(!$result = mysql_query($sql, $dbh)) {
 				echo mysql_error();
 				return 0;
@@ -57,7 +66,7 @@
 				$Data = array();
 				while($row = mysql_fetch_array($result)) {
 					//array_push($DetailID, $row[0]);
-					array_push($Data, "'".$row['IncomingDetailsID']."', '".$row['TypeID']."', '".$row['Quantity']."', '".$row['Price']."', '".$row['TypeName']."'");
+					array_push($Data, "'".$row['IncomingDetailsID']."', '".$row['TypeID']."', '".$row['TypeName']."', '".$row['BatchNumber']."', '".$row['Quantity']."', '".$row['BuyPrice']."', '".$row['SalePrice']."', '".$row['Discount']."'");
 				}
 				//$DetailID = implode(",", $DetailID);
 				$Data = implode("|", $Data);
@@ -86,14 +95,35 @@
 									No Nota :
 								</div>
 								<div class="col-md-3">
-									<input type="text" id="txtIncomingNumber" name="txtIncomingNumber" class="form-control-custom" readonly />
+									<input type="text" id="txtIncomingNumber" name="txtIncomingNumber" class="form-control-custom" readonly <?php echo 'value="'.$OutgoingNumber.'"'; ?> />
+								</div>
+								<div class="col-md-1 labelColumn">
+									Sales:
+								</div>
+								<div class="col-md-3">
+									<div class="ui-widget" style="width: 100%;">
+										<select name="ddlSales" id="ddlSales" class="form-control-custom" placeholder="Pilih Sales" >
+											<option value="" selected> </option>
+											<?php
+												$sql = "SELECT SalesID, SalesName FROM master_sales";
+												if(!$result = mysql_query($sql, $dbh)) {
+													echo mysql_error();
+													return 0;
+												}
+												while($row = mysql_fetch_array($result)) {
+													if($SalesID == $row['SalesID']) echo "<option selected value='".$row['SalesID']."' >".$row['SalesName']."</option>";
+													else echo "<option value='".$row['SalesID']."' >".$row['SalesName']."</option>";
+												}
+											?>
+										</select>
+									</div>
 								</div>
 							</div>
 							<br />
 							<div class="row">
 								<div class="col-md-1 labelColumn">
 									Tanggal :
-									<input id="hdnIncomingID" name="hdnIncomingID" type="hidden" <?php echo 'value="'.$IncomingID.'"'; ?> />
+									<input id="hdnOutgoingID" name="hdnOutgoingID" type="hidden" <?php echo 'value="'.$OutgoingID.'"'; ?> />
 									<input id="hdnRow" name="hdnRow" type="hidden" <?php echo 'value="'.$rowCount.'"'; ?> />
 									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
 									<input id="hdnData" name="hdnData" type="hidden" <?php echo 'value="'.$Data.'"'; ?> />
@@ -115,7 +145,7 @@
 													return 0;
 												}
 												while($row = mysql_fetch_array($result)) {
-													if($SupplierID == $row['CustomerID']) echo "<option selected value='".$row['CustomerID']."' >".$row['CustomerName']."</option>";
+													if($CustomerID == $row['CustomerID']) echo "<option selected value='".$row['CustomerID']."' >".$row['CustomerName']."</option>";
 													else echo "<option value='".$row['CustomerID']."' >".$row['CustomerName']."</option>";
 												}
 											?>
@@ -126,7 +156,7 @@
 							<br />
 							<div class="row">
 								<div class="col-md-1 labelColumn">
-									Merk :
+									Merek :
 								</div>
 								<div class="col-md-3">
 									<div class="ui-widget" style="width: 100%;">
@@ -180,7 +210,7 @@
 								</div>
 							</div>
 							<br />
-							<!--<div id="divItem" style="max-height: 250px !important; height:100%; overflow-y: auto;">-->
+							<div class="row">
 								<div class="col-md-12">
 									
 									<table class="table" id="datainput">
@@ -200,7 +230,8 @@
 												<td style="width:188px;">
 													<input type="text" id="txtTypeName" name="txtTypeName" class="form-control-custom txtTypeName" placeholder="Nama Barang" readonly />
 													<input type="hidden" id="hdnTypeID" name="hdnTypeID" value="0" class="hdnTypeID" />
-													<input type="hidden" id="hdnIncomingDetailsID" class="hdnIncomingDetailsID" name="hdnIncomingDetailsID" value="0" />
+													<input type="hidden" id="hdnOutgoingDetailsID" class="hdnOutgoingDetailsID" name="hdnOutgoingDetailsID" value="0" />
+													<input type="hidden" id="hdnBuyPrice" name="hdnBuyPrice" class="hdnBuyPrice" value=0 />
 												</td>
 												<td style="width:79px;">
 													<input type="text" row="" id="txtBatchNumber" style="width: 63px;" name="txtBatchNumber" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control-custom txtBatchNumber" placeholder="Batch"/>
@@ -224,7 +255,7 @@
 										</tbody>
 									</table>
 								</div>
-							<!--</div>-->
+							</div>
 							<input type="hidden" id="record" name="record" value=0 />
 							<input type="hidden" id="recordnew" name="recordnew" value=0 />
 							<br />
@@ -233,7 +264,7 @@
 									Ongkos Kirim :
 								</div>
 								<div class="col-md-3">
-									<input type="text" id="txtDeliveryCost" style="text-align:right;" value="0.00" name="txtDeliveryCost" class="form-control-custom" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" />
+									<input type="text" id="txtDeliveryCost" style="text-align:right;" <?php echo 'value="'.number_format($DeliveryCost,2,".",",").'"'; ?> name="txtDeliveryCost" class="form-control-custom" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" />
 								</div>
 							</div>
 							<br />
@@ -251,7 +282,7 @@
 									Catatan :
 								</div>
 								<div class="col-md-4">
-									<textarea id="txtAddress" name="txtAddress" class="form-control-custom" placeholder="Catatan"></textarea>
+									<textarea id="txtAddress" name="txtAddress" class="form-control-custom" placeholder="Catatan"><?php echo $Remarks; ?></textarea>
 								</div>
 							</div>
 							<br />
@@ -303,7 +334,7 @@
 					$("#btnAdd").click();
 					$("#hdnTypeID" + i).val(CurrentTypeID);
 					$("#txtTypeName" + i).val(CurrentTypeName);
-					$("#txtSalePrice" + i).val(returnRupiah(CurrentSalePrice.toString()));
+					$("#hdnBuyPrice" + i).val(returnRupiah(CurrentSalePrice.toString()));
 					$("#txtSalePrice" + i).val(returnRupiah(CurrentSalePrice.toString()));
 					$("#txtQuantity" + i).val(1);
 					$("#txtTotal" + i).val(CurrentBuyPrice);
@@ -346,10 +377,10 @@
 					i++;
 				});
 				i = 0;
-				$(".hdnIncomingDetailsID").each(function() {
+				$(".hdnOutgoingDetailsID").each(function() {
 					if(i != 0) {
-						$(this).attr("id", "hdnIncomingDetailsID" + i);
-						$(this).attr("name", "hdnIncomingDetailsID" + i);
+						$(this).attr("id", "hdnOutgoingDetailsID" + i);
+						$(this).attr("name", "hdnOutgoingDetailsID" + i);
 					}
 					i++;
 				});
@@ -380,6 +411,14 @@
 					i++;
 				});
 				i = 0;
+				$(".hdnBuyPrice").each(function() {
+					if(i != 0) {
+						$(this).attr("id", "hdnBuyPrice" + i);
+						$(this).attr("name", "hdnBuyPrice" + i);
+					}
+					i++;
+				});
+				i = 0;
 				$(".txtTotal").each(function() {
 					if(i != 0) {
 						$(this).attr("id", "txtTotal" + i);
@@ -402,6 +441,14 @@
 					}
 					i++;
 				});
+				i = 0;
+				$(".txtDiscount").each(function() {
+					if(i != 0) {
+						$(this).attr("id", "txtDiscount" + i);
+						$(this).attr("name", "txtDiscount" + i);
+					}
+					i++;
+				});
 			}
 			function Calculate() {
 				var Total = 0;
@@ -409,26 +456,35 @@
 				var row = 0;
 				var qty = 1;
 				var price = 0;
+				var disc = 0;
 				var i = 0;
+				var deliveryCost = 0;
 				$(".txtQuantity").each(function() {
 					if(i != 0) {
 						qty = $(this).val();
 						row = $(this).attr("row");
-						//price = $("#txtBuyPrice" + row).val().replace(/\,/g, "");
+						price = $("#txtSalePrice" + row).val().replace(/\,/g, "");
+						disc = $("#txtDiscount" + row).val();
 						if(qty == "") {
 							$(this).val(1);
 							qty = 1;
 						}
 						else if(price == "") {
-							//$("#txtBuyPrice" + row).val("0.00");
+							$("#txtSalePrice" + row).val("0.00");
 							price = 0;
 						}
+						price = price - ((price * disc)/ 100);
 						GrandTotal += parseFloat(qty) * parseFloat(price);
 						Total = parseFloat(qty) * parseFloat(price);
 						$("#txtTotal" + row).val(returnRupiah(Total.toString()));
 					}
 					i++;
 				});
+				if ($("#txtDeliveryCost").val() == "") {
+					$("#txtDeliveryCost").val(0);
+					deliveryCost = 0;
+				}
+				GrandT += deliveryCost;
 				$("#txtGrandTotal").val(returnRupiah(GrandTotal.toString()));
 			}
 			$(document).ready(function () {
@@ -438,7 +494,8 @@
 					}
 				});
 				
-				$("#ddlSupplier").combobox();
+				$("#ddlSales").combobox();
+				$("#ddlCustomer").combobox();
 				$("#ddlType").combobox({
 					select: function(event, ui) {
 						BindTypeList();
@@ -497,12 +554,14 @@
 						//set values
 						var d = type[i].split("', '");
 						$("#nota").text(count);
-						$("#hdnIncomingDetailsID" + count).val(d[0].replace("'", ""));
+						$("#hdnOutgoingDetailsID" + count).val(d[0].replace("'", ""));
 						$("#hdnTypeID" + count).val(d[1].replace("'", ""));
-						$("#txtQuantity" + count).val(d[2].replace("'", ""));
-						$("#txtSalePrice" + count).val(returnRupiah(d[3].replace("'", "")));
-						$("#txtBatchNumber" + count).val(returnRupiah(d[3].replace("'", "")));
-						$("#txtTypeName" + count).val(d[4].replace("'", ""));
+						$("#txtTypeName" + count).val(d[2].replace("'", ""));
+						$("#txtBatchNumber" + count).val(d[3].replace("'", ""));
+						$("#txtQuantity" + count).val(d[4].replace("'", ""));
+						$("#hdnBuyPrice" + count).val(d[5].replace("'", ""));
+						$("#txtSalePrice" + count).val(returnRupiah(d[6].replace("'", "")));
+						$("#txtDiscount" + count).val(d[7].replace("'", ""));
 						$("#record").val(count);
 						$("#recordnew").val(count);
 					}
@@ -525,19 +584,25 @@
 						}
 					});
 					
-					/*if($("#ddlSupplier").val() == "") {
+					if($("#ddlSales").val() == "") {
 						PassValidate = 0;
-						$("#ddlSupplier").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						if(FirstFocus == 0) $("#ddlSupplier").next().find("input").focus();
+						$("#ddlSales").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+						if(FirstFocus == 0) $("#ddlSales").next().find("input").focus();
 						FirstFocus = 1;
-					}*/
+					}
+					if($("#ddlCustomer").val() == "") {
+						PassValidate = 0;
+						$("#ddlCustomer").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+						if(FirstFocus == 0) $("#ddlCustomer").next().find("input").focus();
+						FirstFocus = 1;
+					}
 					if(PassValidate == 0) {
 						$("html, body").animate({
 							scrollTop: 0
 						}, "slow");
 						return false;
 					}
-					else SubmitForm("./Transaction/Incoming/Insert.php");
+					else SubmitForm("./Transaction/Outgoing/Insert.php");
 				}
 			}
 		</script>

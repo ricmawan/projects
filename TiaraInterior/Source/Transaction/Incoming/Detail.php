@@ -7,7 +7,9 @@
 		//echo $_SERVER['REQUEST_URI'];
 		$Content = "";
 		$IncomingID = mysql_real_escape_string($_GET['ID']);
+		$IncomingNumber = "";
 		$SupplierID = "";
+		$Remarks = "";
 		$TransactionDate = "";
 		$IsEdit = 0;
 		$rowCount = 0;
@@ -18,7 +20,9 @@
 			$sql = "SELECT
 					IT.IncomingID,
 					IT.SupplierID,
+					IT.IncomingNumber,
 					DATE_FORMAT(IT.TransactionDate, '%d-%m-%Y') AS TransactionDate
+					IT.Remarks
 				FROM
 					transaction_incoming IT
 				WHERE
@@ -30,15 +34,20 @@
 			}				
 			$row=mysql_fetch_array($result);
 			$IncomingID = $row['IncomingID'];
+			$IncomingNumber = $row['IncomingNumber'];
 			$SupplierID = $row['SupplierID'];
+			$Remarks = $row['Remarks'];
 			$TransactionDate = $row['TransactionDate'];
 			
 			$sql = "SELECT
 						ITD.IncomingDetailsID,
 						ITD.TypeID,
 						ITD.Quantity,
-						ITD.Price,
-						CONCAT(MC.BrandName, ' ', I.TypeName) AS TypeName
+						ITD.BuyPrice,
+						ITD.SalePrice,
+						CONCAT(MC.BrandName, ' ', I.TypeName) AS TypeName,
+						ITD.BatchNumber,
+						ITD.Discount
 					FROM
 						transaction_incomingdetails ITD
 						JOIN master_type I
@@ -57,7 +66,7 @@
 				$Data = array();
 				while($row = mysql_fetch_array($result)) {
 					//array_push($DetailID, $row[0]);
-					array_push($Data, "'".$row['IncomingDetailsID']."', '".$row['TypeID']."', '".$row['Quantity']."', '".$row['Price']."', '".$row['TypeName']."'");
+					array_push($Data, "'".$row['IncomingDetailsID']."', '".$row['TypeID']."', '".$row['TypeName']."', '".$row['BatchNumber']."', '".$row['Quantity']."', '".$row['BuyPrice']."', '".$row['SalePrice']."', '".$row['Discount']."'");
 				}
 				//$DetailID = implode(",", $DetailID);
 				$Data = implode("|", $Data);
@@ -86,7 +95,7 @@
 									No Nota :
 								</div>
 								<div class="col-md-3">
-									<input type="text" id="txtIncomingNumber" name="txtIncomingNumber" class="form-control-custom" readonly />
+									<input type="text" id="txtIncomingNumber" name="txtIncomingNumber" class="form-control-custom" readonly <?php echo 'value="'.$IncomingNumber.'"'; ?> />
 								</div>
 							</div>
 							<br />
@@ -126,7 +135,7 @@
 							<br />
 							<div class="row">
 								<div class="col-md-1 labelColumn">
-									Merk :
+									Merek :
 								</div>
 								<div class="col-md-3">
 									<div class="ui-widget" style="width: 100%;">
@@ -180,7 +189,7 @@
 								</div>
 							</div>
 							<br />
-							<!--<div id="divItem" style="max-height: 250px !important; height:100%; overflow-y: auto;">-->
+							<div class="row" >
 								<div class="col-md-12">
 									
 									<table class="table" id="datainput">
@@ -228,7 +237,7 @@
 										</tbody>
 									</table>
 								</div>
-							<!--</div>-->
+							</div>
 							<input type="hidden" id="record" name="record" value=0 />
 							<input type="hidden" id="recordnew" name="recordnew" value=0 />
 							<br />
@@ -246,7 +255,7 @@
 									Catatan :
 								</div>
 								<div class="col-md-4">
-									<textarea id="txtAddress" name="txtAddress" class="form-control-custom" placeholder="Catatan"></textarea>
+									<textarea id="txtRemarks" name="txtRemarks" class="form-control-custom" placeholder="Catatan"><?php echo $Remarks; ?></textarea>
 								</div>
 							</div>
 						</form>
@@ -402,6 +411,14 @@
 					}
 					i++;
 				});
+				i = 0;
+				$(".txtDiscount").each(function() {
+					if(i != 0) {
+						$(this).attr("id", "txtDiscount" + i);
+						$(this).attr("name", "txtDiscount" + i);
+					}
+					i++;
+				});
 			}
 			function Calculate() {
 				var Total = 0;
@@ -409,12 +426,14 @@
 				var row = 0;
 				var qty = 1;
 				var price = 0;
+				var disc = 0;
 				var i = 0;
 				$(".txtQuantity").each(function() {
 					if(i != 0) {
 						qty = $(this).val();
 						row = $(this).attr("row");
 						price = $("#txtBuyPrice" + row).val().replace(/\,/g, "");
+						disc = $("#txtDiscount" + row).val();
 						if(qty == "") {
 							$(this).val(1);
 							qty = 1;
@@ -423,6 +442,7 @@
 							$("#txtBuyPrice" + row).val("0.00");
 							price = 0;
 						}
+						price = price - ((price * disc)/ 100);
 						GrandTotal += parseFloat(qty) * parseFloat(price);
 						Total = parseFloat(qty) * parseFloat(price);
 						$("#txtTotal" + row).val(returnRupiah(Total.toString()));
@@ -499,11 +519,12 @@
 						$("#nota").text(count);
 						$("#hdnIncomingDetailsID" + count).val(d[0].replace("'", ""));
 						$("#hdnTypeID" + count).val(d[1].replace("'", ""));
-						$("#txtQuantity" + count).val(d[2].replace("'", ""));
-						$("#txtBuyPrice" + count).val(returnRupiah(d[3].replace("'", "")));
-						$("#txtSalePrice" + count).val(returnRupiah(d[3].replace("'", "")));
-						$("#txtBatchNumber" + count).val(returnRupiah(d[3].replace("'", "")));
-						$("#txtTypeName" + count).val(d[4].replace("'", ""));
+						$("#txtTypeName" + count).val(d[2].replace("'", ""));
+						$("#txtBatchNumber" + count).val(d[3].replace("'", ""));
+						$("#txtQuantity" + count).val(d[4].replace("'", ""));
+						$("#txtBuyPrice" + count).val(returnRupiah(d[5].replace("'", "")));
+						$("#txtSalePrice" + count).val(returnRupiah(d[6].replace("'", "")));
+						$("#txtDiscount" + count).val(d[7].replace("'", ""));
 						$("#record").val(count);
 						$("#recordnew").val(count);
 					}
@@ -526,12 +547,12 @@
 						}
 					});
 					
-					/*if($("#ddlSupplier").val() == "") {
+					if($("#ddlSupplier").val() == "") {
 						PassValidate = 0;
 						$("#ddlSupplier").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 						if(FirstFocus == 0) $("#ddlSupplier").next().find("input").focus();
 						FirstFocus = 1;
-					}*/
+					}
 					if(PassValidate == 0) {
 						$("html, body").animate({
 							scrollTop: 0

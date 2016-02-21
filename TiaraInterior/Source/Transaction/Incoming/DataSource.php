@@ -6,7 +6,7 @@
 	include "../../GetPermission.php";
 
 	$where = " 1=1 ";
-	$order_by = "IT.IncomingTransactionID";
+	$order_by = "IT.IncomingID";
 	$rows = 10;
 	$current = 1;
 	$limit_l = ($current * $rows) - ($rows);
@@ -24,7 +24,7 @@
 	if (ISSET($_REQUEST['searchPhrase']) )
 	{
 		$search = trim($_REQUEST['searchPhrase']);
-		$where .= " AND ( IT.IncomingTransactionID LIKE '%".$search."%' OR MS.SupplierName LIKE '%".$search."%' OR DATE_FORMAT(IT.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' ) ";
+		$where .= " AND ( IT.IncomingID LIKE '%".$search."%' OR IT.Remarks LIKE '%".$search."%' OR IT.IncomingNumber LIKE '%".$search."%' OR MS.SupplierName LIKE '%".$search."%' OR DATE_FORMAT(IT.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' ) ";
 	}
 	//Handles determines where in the paging count this result set falls in
 	if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];
@@ -40,7 +40,7 @@
 	$sql = "SELECT
 				COUNT(*) AS nRows
 			FROM
-				transaction_incomingtransaction IT
+				transaction_incoming IT
 				LEFT JOIN master_supplier MS
 					ON IT.SupplierID = MS.SupplierID
 			WHERE
@@ -53,22 +53,25 @@
 	$row = mysql_fetch_array($result);
 	$nRows = $row['nRows'];
 	$sql = "SELECT
-				IT.IncomingTransactionID,
+				IT.IncomingID,
+				IT.IncomingNumber,
 				MS.SupplierName,
 				DATE_FORMAT(IT.TransactionDate, '%d-%m-%Y') AS TransactionDate,
-				IFNULL(SUM(ITD.Quantity * ITD.Price), 0) AS TotalAmount
+				IFNULL(SUM(ITD.Quantity * ITD.Price), 0) AS TotalAmount,
+				IT.Remarks
 			FROM
 				transaction_incomingtransaction IT
 				LEFT JOIN master_supplier MS
 					ON IT.SupplierID = MS.SupplierID
-				LEFT JOIN transaction_incomingtransactiondetails ITD
+				LEFT JOIN transaction_incomingdetails ITD
 					ON ITD.IncomingTransactionID = IT.IncomingTransactionID
 			WHERE
 				$where
 			GROUP BY
 				IT.IncomingTransactionID,
 				MS.SupplierName,
-				IT.TransactionDate
+				IT.TransactionDate,
+				IT.Remarks
 			ORDER BY 
 				$order_by
 			$limit";
@@ -81,10 +84,12 @@
 	while ($row = mysql_fetch_array($result)) {
 		$RowNumber++;
 		$row_array['RowNumber'] = $RowNumber;
-		$row_array['IncomingTransactionID']= $row['IncomingTransactionID'];
+		$row_array['IncomingID']= $row['IncomingID'];
+		$row_array['IncomingNumber']= $row['IncomingNumber'];
 		$row_array['SupplierName'] = $row['SupplierName'];
 		$row_array['TotalAmount'] =  number_format($row['TotalAmount'],2,".",",");
 		$row_array['TransactionDate'] = $row['TransactionDate'];
+		$row_array['Remarks'] = $row['Remarks'];
 		array_push($return_arr, $row_array);
 	}
 

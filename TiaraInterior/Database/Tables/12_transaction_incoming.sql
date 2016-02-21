@@ -6,6 +6,7 @@ CREATE TABLE transaction_incoming
 	IncomingNumber	VARCHAR(100) NULL,
 	SupplierID 		BIGINT,
 	TransactionDate DATETIME NOT NULL,
+	Remarks			TEXT,
 	CreatedDate 	DATETIME NOT NULL,
 	CreatedBy 		VARCHAR(255) NOT NULL,
 	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,

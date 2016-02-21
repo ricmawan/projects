@@ -1,17 +1,20 @@
 <?php
-	if(isset($_POST['hdnIncomingTransactionID'])) {
+	if(isset($_POST['hdnOutgoingID'])) {
 		$RequestPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestPath);
 		$RequestPath = str_replace($file, "", $RequestPath);
 		include "../../GetPermission.php";
 		$Record = $_POST['record'];
 		$RecordNew = $_POST['recordnew'];
-		$ID = mysql_real_escape_string($_POST['hdnIncomingTransactionID']);
+		$ID = mysql_real_escape_string($_POST['hdnOutgoingID']);
 		$TransactionDate = explode('-', $_POST['txtTransactionDate']);
 		$_POST['txtTransactionDate'] = "$TransactionDate[2]-$TransactionDate[1]-$TransactionDate[0]"; 
 		$TransactionDate = $_POST['txtTransactionDate'];
-		$SupplierID = mysql_real_escape_string($_POST['ddlSupplier']);
+		$SalesID = mysql_real_escape_string($_POST['ddlSales']);
+		$CustomerID = mysql_real_escape_string($_POST['ddlCustomer']);
 		$hdnIsEdit = mysql_real_escape_string($_POST['hdnIsEdit']);
+		$txtRemarks = mysql_real_escape_string($_POST['txtRemarks']);
+		$txtDeliveryCost = str_replace(",", "", $_POST['txtDeliveryCost']);
 		$State = 1;
 		mysql_query("START TRANSACTION", $dbh);
 		mysql_query("SET autocommit=0", $dbh);
@@ -20,23 +23,29 @@
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		for($i=1;$i<=$RecordNew;$i++) {
-			$DetailID .= $_POST['hdnIncomingTransactionDetailsID'.$i].",";
+			$DetailsID .= mysql_real_escape_string($_POST['hdnOutgoingDetailsID'.$i]).",";
 		}
 		$DetailID = substr($DetailID, 0, -1);
 		//echo $DetailID;
 		if($hdnIsEdit == 0) {
 			$State = 1;
-			$sql = "INSERT INTO transaction_incomingtransaction
+			$sql = "INSERT INTO transaction_outgoing
 					(
-						SupplierID,
+						SalesID,
+						CustomerID,
 						TransactionDate,
+						DeliveryCost,
+						Remarks,
 						CreatedDate,
 						CreatedBy
 					)
 					VALUES
 					(
-						'".$SupplierID."',
+						".$SalesID.",
+						".$CustomerID.",
 						'".$TransactionDate."',
+						".$DeliveryCost.",
+						'".$txtRemarks."',
 						NOW(),
 						'".$_SESSION['UserLogin']."'
 					)";
@@ -44,13 +53,16 @@
 		
 		else {
 			$State = 2;
-			$sql = "UPDATE transaction_incomingtransaction
+			$sql = "UPDATE transaction_outgoing
 					SET
-						SupplierID = '".$SupplierID."',
+						SalesID = ".$SalesID.",
+						CustomerID = ".$CustomerID.",
+						DeliveryCost = ".$DeliveryCost.",
+						Remarks = '".$txtRemarks."',
 						TransactionDate = '".$TransactionDate."',
 						ModifiedBy = '".$_SESSION['UserLogin']."'
 					WHERE
-						IncomingTransactionID = $ID";
+						OutgoingID = $ID";
 		}
 		
 
@@ -64,9 +76,9 @@
 		}
 		if($hdnIsEdit == 0) {
 			$sql = "SELECT
-						MAX(IncomingTransactionID) AS IncomingTransactionID
+						MAX(OutgoingID) AS OutgoingID
 					FROM 
-						transaction_incomingtransaction";
+						transaction_outgoing";
 		
 			if (! $result = mysql_query($sql, $dbh)) {
 				$Message = "Terjadi Kesalahan Sistem";
@@ -78,15 +90,15 @@
 			}
 			
 			$row = mysql_fetch_array($result);
-			$ID = $row['IncomingTransactionID'];
+			$ID = $row['OutgoingID'];
 		}
 		$State = 3;
 		$sql = "DELETE 
 				FROM 
-					transaction_incomingtransactiondetails 
+					transaction_outgoingdetails 
 				WHERE
-					IncomingTransactionDetailsID NOT IN($DetailID)			 
-					AND IncomingTransactionID = $ID";
+					OutgoingDetailsID NOT IN($DetailsID)			 
+					AND OutgoingID = $ID";
 
 		if (! $result = mysql_query($sql, $dbh)) {
 			$Message = "Terjadi Kesalahan Sistem";
@@ -97,23 +109,29 @@
 			return 0;
 		}
 		for($j=1;$j<=$RecordNew;$j++) {
-			if($_POST['hdnIncomingTransactionDetailsID'.$j] == "0") {
+			if($_POST['hdnOutgoingDetailsID'.$j] == "0") {
 				$State = 4;
-				$sql = "INSERT INTO transaction_incomingtransactiondetails
+				$sql = "INSERT INTO transaction_outgoingdetails
 						(
-							IncomingTransactionID,
-							ItemID,
+							OutgoingID,
+							TypeID,
 							Quantity,
-							Price,
+							BuyPrice,
+							SalePrice,
+							Discount,
+							BatchNumber,
 							CreatedDate,
 							CreatedBy
 						)
 						VALUES
 						(
 							".$ID.",
-							".$_POST['hdnItemID'.$j].",
-							".$_POST['txtQuantity'.$j].",
-							".str_replace(",", "", $_POST['txtPrice'.$j]).",
+							".mysql_real_escape_string($_POST['hdnTypeID'.$j]).",
+							".mysql_real_escape_string($_POST['txtQuantity'.$j]).",
+							".str_replace(",", "", $_POST['txtBuyPrice'.$j]).",
+							".str_replace(",", "", $_POST['txtSalePrice'.$j]).",
+							".mysql_real_escape_string($_POST['txtDiscount'.$j]).",
+							'".mysql_real_escape_string($_POST['txtBatchNumber'.$j])."',
 							NOW(),
 							'".$_SESSION['UserLogin']."'
 						)";
@@ -121,14 +139,17 @@
 			else {
 				$State = 5;
 				$sql = "UPDATE 
-							transaction_incomingtransactiondetails
+							transaction_outgoingdetails
 						SET
-							ItemID = ".$_POST['hdnItemID'.$j].",
-							Quantity = ".$_POST['txtQuantity'.$j].",
-							Price = ".str_replace(",", "", $_POST['txtPrice'.$j]).",
+							TypeID = ".mysql_real_escape_string($_POST['hdnTypeID'.$j]).",
+							Quantity = ".mysql_real_escape_string($_POST['txtQuantity'.$j]).",
+							BuyPrice = ".str_replace(",", "", $_POST['txtBuyPrice'.$j]).",
+							SalePrice = ".str_replace(",", "", $_POST['txtSalePrice'.$j]).",
+							Discount = ".mysql_real_escape_string($_POST['txtDiscount'.$j]).",
+							BatchNumber = '".mysql_real_escape_string($_POST['txtBatchNumber'.$j])."',
 							ModifiedBy = '".$_SESSION['UserLogin']."'
 						WHERE
-							IncomingTransactionDetailsID = ".$_POST['hdnIncomingTransactionDetailsID'.$j];
+							OutgoingDetailsID = ".$_POST['hdnOutgoingDetailsID'.$j];
 			}
 
 			if (! $result = mysql_query($sql, $dbh)) {
@@ -140,7 +161,7 @@
 				return 0;
 			}
 
-			$sql = "UPDATE 
+			/*$sql = "UPDATE 
 						master_item
 					SET
 						Price = ".str_replace(",", "", $_POST['txtPrice'.$j]).",
@@ -155,7 +176,7 @@
 				echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
 				mysql_query("ROLLBACK", $dbh);
 				return 0;
-			}
+			}*/
 		}
 		echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
 		mysql_query("COMMIT", $dbh);

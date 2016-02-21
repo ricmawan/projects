@@ -7,10 +7,12 @@
 		$Record = $_POST['record'];
 		$RecordNew = $_POST['recordnew'];
 		$ID = mysql_real_escape_string($_POST['hdnFirstStockID']);
+		$SupplierID = mysql_real_escape_string($_POST['ddlSupplier']);
 		$TransactionDate = explode('-', mysql_real_escape_string($_POST['txtTransactionDate']));
 		$TransactionDate = "$TransactionDate[2]-$TransactionDate[1]-$TransactionDate[0]";
 		$FirstStockNumber = mysql_real_escape_string($_POST['txtFirstStockNumber']);
 		$hdnIsEdit = mysql_real_escape_string($_POST['hdnIsEdit']);
+		$txtRemarks = mysql_real_escape_string($_POST['txtRemarks']);
 		$State = 1;
 		mysql_query("START TRANSACTION", $dbh);
 		mysql_query("SET autocommit=0", $dbh);
@@ -19,7 +21,7 @@
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		for($i=1;$i<=$RecordNew;$i++) {
-			$DetailsID .= $_POST['hdnFirstStockDetailsID'.$i].",";
+			$DetailsID .= mysql_real_escape_string($_POST['hdnFirstStockDetailsID'.$i]).",";
 		}
 		$DetailsID = substr($DetailsID, 0, -1);
 		//echo $DetailID;
@@ -27,15 +29,19 @@
 			$State = 1;
 			$sql = "INSERT INTO transaction_firststock
 					(
+						SupplierID,
 						FirstStockNumber,
 						TransactionDate,
+						Remarks,
 						CreatedDate,
 						CreatedBy
 					)
 					VALUES
 					(
+						".$SupplierID.",
 						'".$FirstStockNumber."',
-						'".$TransactionDate."',
+						'".$TransactionDate."',,
+						'".$txtRemarks."',
 						NOW(),
 						'".$_SESSION['UserLogin']."'
 					)";
@@ -45,8 +51,10 @@
 			$State = 2;
 			$sql = "UPDATE transaction_firststock
 					SET
+						SupplierID = ".$SupplierID.",
 						FirstStockNumber = '".$FirstStockNumber."',
 						TransactionDate = '".$TransactionDate."',
+						Remarks = '".$txtRemarks."',
 						ModifiedBy = '".$_SESSION['UserLogin']."'
 					WHERE
 						FirstStockID = $ID";
@@ -113,12 +121,12 @@
 						VALUES
 						(
 							".$ID.",
-							".$_POST['hdnTypeID'.$j].",
-							".$_POST['txtQuantity'.$j].",
+							".mysql_real_escape_string($_POST['hdnTypeID'.$j]).",
+							".mysql_real_escape_string($_POST['txtQuantity'.$j]).",
 							".str_replace(",", "", $_POST['txtBuyPrice'.$j]).",
 							".str_replace(",", "", $_POST['txtSalePrice'.$j]).",
-							".$_POST['txtDiscount'.$j].",
-							'".$_POST['txtBatchNumber'.$j]."',
+							".mysql_real_escape_string($_POST['txtDiscount'.$j]).",
+							'".mysql_real_escape_string($_POST['txtBatchNumber'.$j])."',
 							NOW(),
 							'".$_SESSION['UserLogin']."'
 						)";
@@ -128,15 +136,15 @@
 				$sql = "UPDATE 
 							transaction_firststockdetails
 						SET
-							TypeID = ".$_POST['hdnTypeID'.$j].",
-							Quantity = ".$_POST['txtQuantity'.$j].",
+							TypeID = ".mysql_real_escape_string($_POST['hdnTypeID'.$j]).",
+							Quantity = ".mysql_real_escape_string($_POST['txtQuantity'.$j]).",
 							BuyPrice = ".str_replace(",", "", $_POST['txtBuyPrice'.$j]).",
 							SalePrice = ".str_replace(",", "", $_POST['txtSalePrice'.$j]).",
-							Discount = ".$_POST['txtDiscount'.$j].",
-							BatchNumber = '".$_POST['txtBatchNumber'.$j]."',
+							Discount = ".mysql_real_escape_string($_POST['txtDiscount'.$j]).",
+							BatchNumber = '".mysql_real_escape_string($_POST['txtBatchNumber'.$j])."',
 							ModifiedBy = '".$_SESSION['UserLogin']."'
 						WHERE
-							FirstStockDetailsID = ".$_POST['hdnFirstStockDetailsID'.$j];
+							FirstStockDetailsID = ".mysql_real_escape_string($_POST['hdnFirstStockDetailsID'.$j]);
 			}
 
 			if (! $result = mysql_query($sql, $dbh)) {
@@ -155,7 +163,7 @@
 						SalePrice = ".str_replace(",", "", $_POST['txtSalePrice'.$j]).",
 						ModifiedBy = '".$_SESSION['UserLogin']."'
 					WHERE
-						TypeID = ".$_POST['hdnTypeID'.$j];
+						TypeID = ".mysql_real_escape_string($_POST['hdnTypeID'.$j]);
 						
 			if (! $result = mysql_query($sql, $dbh)) {
 				$Message = "Terjadi Kesalahan Sistem";

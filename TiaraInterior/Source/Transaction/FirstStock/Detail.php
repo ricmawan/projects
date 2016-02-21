@@ -10,6 +10,7 @@
 		$FirstStockNumber = "";
 		$SupplierID = "";
 		$TransactionDate = "";
+		$Remarks = "";
 		$IsEdit = 0;
 		$rowCount = 0;
 		$Data = "";
@@ -19,7 +20,8 @@
 			$sql = "SELECT
 					FS.FirstStockID,
 					FS.FirstStockNumber,
-					DATE_FORMAT(FS.TransactionDate, '%d-%m-%Y') AS TransactionDate
+					DATE_FORMAT(FS.TransactionDate, '%d-%m-%Y') AS TransactionDate,
+					FS.Remarks
 				FROM
 					transaction_firststock FS
 				WHERE
@@ -32,6 +34,7 @@
 			$row=mysql_fetch_array($result);
 			$FirstStockID = $row['FirstStockID'];
 			$FirstStockNumber = $row['FirstStockNumber'];
+			$Remarks = $row['Remarks'];
 			$TransactionDate = $row['TransactionDate'];
 			
 			$sql = "SELECT
@@ -106,7 +109,7 @@
 							<br />
 							<div class="row">
 								<div class="col-md-1 labelColumn">
-									Merk :
+									Merek :
 								</div>
 								<div class="col-md-3">
 									<div class="ui-widget" style="width: 100%;">
@@ -225,7 +228,7 @@
 									Catatan :
 								</div>
 								<div class="col-md-4">
-									<textarea id="txtAddress" name="txtAddress" class="form-control-custom" placeholder="Catatan"></textarea>
+									<textarea id="txtRemarks" name="txtRemarks" class="form-control-custom" placeholder="Catatan"><?php echo $Remarks; ?></textarea>
 								</div>
 							</div>
 						</form>

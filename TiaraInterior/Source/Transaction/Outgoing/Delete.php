@@ -13,12 +13,12 @@
 			try
 			{
 				//$ProjectData = explode("^", $Data[$i]);
-				$IncomingTransactionID = mysql_real_escape_string($Data[$i]);
-				$sql = "DELETE FROM transaction_incomingtransaction WHERE IncomingTransactionID = $IncomingTransactionID";
+				$OutgoingID = mysql_real_escape_string($Data[$i]);
+				$sql = "DELETE FROM transaction_outgoing WHERE OutgoingID = $OutgoingID";
 				if (! $result=mysql_query($sql, $dbh)) {
 					throw new Exception($ProjectName);
 				}
-				$MessageSuccessDelete .= "$IncomingTransactionID, ";
+				$MessageSuccessDelete .= "$OutgoingID, ";
 			}
 			catch (Exception $e)
 			{
@@ -28,9 +28,9 @@
 		$MessageSuccessDelete = substr($MessageSuccessDelete, 0, -2);
 		$MessageFailedDelete = substr($MessageFailedDelete, 0, -2);
 			
-		if($MessageSuccessDelete !="") $MessageSuccess = "ID Transaksi " .$MessageSuccessDelete. " Berhasil Dihapus";
+		if($MessageSuccessDelete !="") $MessageSuccess = "No Nota " .$MessageSuccessDelete. " Berhasil Dihapus";
 		else $MessageSuccess = "";
-		if($MessageFailedDelete !="") $MessageFailed = "ID Transaksi " .$MessageFailedDelete. " Gagal Dihapus";
+		if($MessageFailedDelete !="") $MessageFailed = "No Nota " .$MessageFailedDelete. " Gagal Dihapus";
 		else $MessageFailed = "";
 		
 		echo "$MessageSuccess+$MessageFailed";

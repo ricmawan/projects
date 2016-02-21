@@ -6,47 +6,53 @@
 		include "../../GetPermission.php";
 		//echo $_SERVER['REQUEST_URI'];
 		$Content = "";
-		$IncomingID = mysql_real_escape_string($_GET['ID']);
+		$SaleReturnID = mysql_real_escape_string($_GET['ID']);
 		$SupplierID = "";
+		$SaleReturnNumber = "";
+		$Remarks = "";
 		$TransactionDate = "";
 		$IsEdit = 0;
 		$rowCount = 0;
 		$Data = "";
-		if($IncomingID != 0) {
+		if($SaleReturnID != 0) {
 			$IsEdit = 1;
 			//$Content = "Place the content here";
 			$sql = "SELECT
-					IT.IncomingID,
-					IT.SupplierID,
-					DATE_FORMAT(IT.TransactionDate, '%d-%m-%Y') AS TransactionDate
+					SR.SaleReturnID,
+					SR.SaleReturnNumber,
+					SR.Remarks,
+					SR.SupplierID,
+					DATE_FORMAT(SR.TransactionDate, '%d-%m-%Y') AS TransactionDate
 				FROM
-					transaction_incoming IT
+					transaction_salereturn IT
 				WHERE
-					IT.IncomingID = $IncomingID";
+					SR.SaleReturnID = $SaleReturnID";
 						
 			if (! $result=mysql_query($sql, $dbh)) {
 				echo mysql_error();
 				return 0;
 			}				
 			$row=mysql_fetch_array($result);
-			$IncomingID = $row['IncomingID'];
+			$SaleReturnID = $row['SaleReturnID'];
 			$SupplierID = $row['SupplierID'];
+			$SupplierNumber = $row['SupplierNumber'];
+			$Remarks = $row['Remarks'];
 			$TransactionDate = $row['TransactionDate'];
 			
 			$sql = "SELECT
-						ITD.IncomingDetailsID,
-						ITD.TypeID,
-						ITD.Quantity,
-						ITD.Price,
+						SRD.SaleReturnDetailsID,
+						SRD.TypeID,
+						SRD.Quantity,
+						SRD.Price,
 						CONCAT(MC.BrandName, ' ', I.TypeName) AS TypeName
 					FROM
-						transaction_incomingdetails ITD
+						transaction_salereturndetails SRD
 						JOIN master_type I
-							ON I.TypeID = ITD.TypeID
+							ON I.TypeID = SRD.TypeID
 						JOIN master_brand MB
 							ON MC.BrandID = I.BrandID
 					WHERE
-						ITD.IncomingID = $IncomingID";
+						SRD.SaleReturnID = $SaleReturnID";
 			if(!$result = mysql_query($sql, $dbh)) {
 				echo mysql_error();
 				return 0;
@@ -57,7 +63,7 @@
 				$Data = array();
 				while($row = mysql_fetch_array($result)) {
 					//array_push($DetailID, $row[0]);
-					array_push($Data, "'".$row['IncomingDetailsID']."', '".$row['TypeID']."', '".$row['Quantity']."', '".$row['Price']."', '".$row['TypeName']."'");
+					array_push($Data, "'".$row['SaleReturnDetailsID']."', '".$row['TypeID']."', '".$row['TypeName']."', '".$row['BatchNumber']."', '".$row['Quantity']."', '".$row['BuyPrice']."', '".$row['SalePrice']."', '".$row['Discount']."'");
 				}
 				//$DetailID = implode(",", $DetailID);
 				$Data = implode("|", $Data);
@@ -86,14 +92,14 @@
 									No Nota :
 								</div>
 								<div class="col-md-3">
-									<input type="text" id="txtIncomingNumber" name="txtIncomingNumber" class="form-control-custom" readonly />
+									<input type="text" id="txtSaleReturnNumber" name="txtSaleReturnNumber" class="form-control-custom" readonly <?php echo 'value="'.$OutgoingNumber.'"'; ?> />
 								</div>
 							</div>
 							<br />
 							<div class="row">
 								<div class="col-md-1 labelColumn">
 									Tanggal :
-									<input id="hdnIncomingID" name="hdnIncomingID" type="hidden" <?php echo 'value="'.$IncomingID.'"'; ?> />
+									<input id="hdnSaleReturnID" name="hdnSaleReturnID" type="hidden" <?php echo 'value="'.$SaleReturnID.'"'; ?> />
 									<input id="hdnRow" name="hdnRow" type="hidden" <?php echo 'value="'.$rowCount.'"'; ?> />
 									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
 									<input id="hdnData" name="hdnData" type="hidden" <?php echo 'value="'.$Data.'"'; ?> />
@@ -126,7 +132,7 @@
 							<br />
 							<div class="row">
 								<div class="col-md-1 labelColumn">
-									Merk :
+									Merek :
 								</div>
 								<div class="col-md-3">
 									<div class="ui-widget" style="width: 100%;">
@@ -180,7 +186,7 @@
 								</div>
 							</div>
 							<br />
-							<!--<div id="divItem" style="max-height: 250px !important; height:100%; overflow-y: auto;">-->
+							<div class="row">
 								<div class="col-md-12">
 									
 									<table class="table" id="datainput">
@@ -200,7 +206,8 @@
 												<td style="width:188px;">
 													<input type="text" id="txtTypeName" name="txtTypeName" class="form-control-custom txtTypeName" placeholder="Nama Barang" readonly />
 													<input type="hidden" id="hdnTypeID" name="hdnTypeID" value="0" class="hdnTypeID" />
-													<input type="hidden" id="hdnIncomingDetailsID" class="hdnIncomingDetailsID" name="hdnIncomingDetailsID" value="0" />
+													<input type="hidden" id="hdnSaleReturnDetailsID" class="hdnSaleReturnDetailsID" name="hdnSaleReturnDetailsID" value="0" />
+													<input type="hidden" id="hdnBuyPrice" class="hdnBuyPrice" name="hdnBuyPrice" value="0" />
 												</td>
 												<td style="width:79px;">
 													<input type="text" row="" id="txtBatchNumber" style="width: 63px;" name="txtBatchNumber" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control-custom txtBatchNumber" placeholder="Batch"/>
@@ -224,7 +231,7 @@
 										</tbody>
 									</table>
 								</div>
-							<!--</div>-->
+							</div>
 							<input type="hidden" id="record" name="record" value=0 />
 							<input type="hidden" id="recordnew" name="recordnew" value=0 >
 							<br />
@@ -242,7 +249,7 @@
 									Catatan :
 								</div>
 								<div class="col-md-4">
-									<textarea id="txtAddress" name="txtAddress" class="form-control-custom" placeholder="Catatan"></textarea>
+									<textarea id="txtAddress" name="txtAddress" class="form-control-custom" placeholder="Catatan"><?php echo $Remarks; ?></textarea>
 								</div>
 							</div>
 							<br />
@@ -292,7 +299,7 @@
 					$("#btnAdd").click();
 					$("#hdnTypeID" + i).val(CurrentTypeID);
 					$("#txtTypeName" + i).val(CurrentTypeName);
-					$("#txtSalePrice" + i).val(returnRupiah(CurrentSalePrice.toString()));
+					$("#hdnBuyPrice" + i).val(returnRupiah(CurrentBuyPrice.toString()));
 					$("#txtSalePrice" + i).val(returnRupiah(CurrentSalePrice.toString()));
 					$("#txtQuantity" + i).val(1);
 					$("#txtTotal" + i).val(CurrentBuyPrice);
@@ -335,10 +342,10 @@
 					i++;
 				});
 				i = 0;
-				$(".hdnIncomingDetailsID").each(function() {
+				$(".hdnSaleReturnDetailsID").each(function() {
 					if(i != 0) {
-						$(this).attr("id", "hdnIncomingDetailsID" + i);
-						$(this).attr("name", "hdnIncomingDetailsID" + i);
+						$(this).attr("id", "hdnSaleReturnDetailsID" + i);
+						$(this).attr("name", "hdnSaleReturnDetailsID" + i);
 					}
 					i++;
 				});
@@ -357,6 +364,14 @@
 						$(this).attr("id", "txtBatchNumber" + i);
 						$(this).attr("name", "txtBatchNumber" + i);
 						$(this).attr("row", i);
+					}
+					i++;
+				});
+				i = 0;
+				$(".hdnBuyPrice").each(function() {
+					if(i != 0) {
+						$(this).attr("id", "hdnBuyPrice" + i);
+						$(this).attr("name", "hdnBuyPrice" + i);
 					}
 					i++;
 				});
@@ -426,8 +441,8 @@
 						BindType();						
 					}
 				});
-				
-				$("#ddlSupplier").combobox();
+
+				$("#ddlCustomer").combobox();
 				$("#ddlType").combobox({
 					select: function(event, ui) {
 						BindTypeList();
@@ -486,12 +501,14 @@
 						//set values
 						var d = type[i].split("', '");
 						$("#nota").text(count);
-						$("#hdnIncomingDetailsID" + count).val(d[0].replace("'", ""));
+						$("#hdnSaleReturnDetailsID" + count).val(d[0].replace("'", ""));
 						$("#hdnTypeID" + count).val(d[1].replace("'", ""));
-						$("#txtQuantity" + count).val(d[2].replace("'", ""));
-						$("#txtSalePrice" + count).val(returnRupiah(d[3].replace("'", "")));
-						$("#txtBatchNumber" + count).val(returnRupiah(d[3].replace("'", "")));
-						$("#txtTypeName" + count).val(d[4].replace("'", ""));
+						$("#txtTypeName" + count).val(d[2].replace("'", ""));
+						$("#txtBatchNumber" + count).val(d[3].replace("'", ""));
+						$("#txtQuantity" + count).val(d[4].replace("'", ""));
+						$("#hdnBuyPrice" + count).val(d[5].replace("'", ""));
+						$("#txtSalePrice" + count).val(returnRupiah(d[6].replace("'", "")));
+						$("#txtDiscount" + count).val(d[7].replace("'", ""));
 						$("#record").val(count);
 						$("#recordnew").val(count);
 					}
@@ -514,19 +531,19 @@
 						}
 					});
 					
-					/*if($("#ddlSupplier").val() == "") {
+					if($("#ddlCustomer").val() == "") {
 						PassValidate = 0;
-						$("#ddlSupplier").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						if(FirstFocus == 0) $("#ddlSupplier").next().find("input").focus();
+						$("#ddlCustomer").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+						if(FirstFocus == 0) $("#ddlCustomer").next().find("input").focus();
 						FirstFocus = 1;
-					}*/
+					}
 					if(PassValidate == 0) {
 						$("html, body").animate({
 							scrollTop: 0
 						}, "slow");
 						return false;
 					}
-					else SubmitForm("./Transaction/Incoming/Insert.php");
+					else SubmitForm("./Transaction/SaleReturn/Insert.php");
 				}
 			}
 		</script>

@@ -5,6 +5,7 @@ CREATE TABLE transaction_salereturn
 	SaleReturnID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
 	CustomerID			BIGINT,
 	TransactionDate 	DATETIME NOT NULL,
+	Remarks				TEXT,
 	CreatedDate 		DATETIME NOT NULL,
 	CreatedBy 			VARCHAR(255) NOT NULL,
 	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
