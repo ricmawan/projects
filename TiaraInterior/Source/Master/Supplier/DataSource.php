@@ -24,7 +24,7 @@
 	if (ISSET($_REQUEST['searchPhrase']) )
 	{
 		$search = trim($_REQUEST['searchPhrase']);
-		$where .= " AND ( SupplierName LIKE '%".$search."%' OR Address LIKE '%".$search."%' OR Telephone LIKE '%".$search."%' ) ";
+		$where .= " AND ( SupplierName LIKE '%".$search."%' OR City LIKE '%".$search."%' OR Address LIKE '%".$search."%' OR Telephone LIKE '%".$search."%' ) ";
 	}
 	//Handles determines where in the paging count this result set falls in
 	if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];
@@ -54,6 +54,7 @@
 				SupplierID,
 				SupplierName,
 				Address,
+				City,
 				Telephone
 			FROM
 				master_supplier
@@ -75,6 +76,7 @@
 		$row_array['SupplierID']= $row['SupplierID'];
 		$row_array['SupplierName'] = $row['SupplierName'];
 		$row_array['Address'] = $row['Address'];
+		$row_array['City'] = $row['City'];
 		$row_array['Telephone'] = $row['Telephone'];
 		array_push($return_arr, $row_array);
 	}

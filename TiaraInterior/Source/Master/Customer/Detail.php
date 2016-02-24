@@ -7,6 +7,7 @@
 		$CustomerID = mysql_real_escape_string($_GET['ID']);
 		$CustomerName = "";
 		$Address = "";
+		$City = "";
 		$Telephone = "";
 		$IsEdit = 0;
 		
@@ -17,6 +18,7 @@
 						CustomerID,
 						CustomerName,
 						Address,
+						City,
 						Telephone
 					FROM
 						master_customer
@@ -31,6 +33,7 @@
 			$CustomerID = $row['CustomerID'];
 			$CustomerName = $row['CustomerName'];
 			$Address = $row['Address'];
+			$City = $row['City'];
 			$Telephone = $row['Telephone'];
 		}
 	}
@@ -76,10 +79,20 @@
 								<div class="col-md-2 labelColumn">
 									Alamat :
 								</div>
-								<div class="col-md-4">
+								<div class="col-md-3">
 									<textarea id="txtAddress" name="txtAddress" class="form-control-custom" placeholder="Alamat"> <?php echo $Address; ?></textarea>
 								</div>
 							</div>
+							<br />
+							<div class="row">
+								<div class="col-md-2 labelColumn">
+									Kota :
+								</div>
+								<div class="col-md-3">
+									<input id="txtCity" name="txtCity" type="text" class="form-control-custom" placeholder="Kota" <?php echo 'value="'.$City.'"'; ?> />
+								</div>
+							</div>
+
 							<br />
 							<button type="button" class="btn btn-default" value="Simpan" onclick="SubmitForm('./Master/Customer/Insert.php');" ><i class="fa fa-save"></i> Simpan</button>
 						</form>

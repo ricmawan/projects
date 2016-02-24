@@ -3,9 +3,10 @@ DROP PROCEDURE IF EXISTS spInsSupplier;
 DELIMITER $$
 CREATE PROCEDURE spInsSupplier (
 	pID 			BIGINT, 
-	pSupplierName 		VARCHAR(255),
-	pAddress 	TEXT,
-	pTelephone	VARCHAR(255),
+	pSupplierName 	VARCHAR(255),
+	pAddress		TEXT,
+	pCity			VARCHAR(100),
+	pTelephone		VARCHAR(255),
 	pIsEdit			INT,
     pCurrentUser	VARCHAR(255)
 )
@@ -48,6 +49,8 @@ SET State = 1;
 			master_supplier
 		WHERE
 			TRIM(SupplierName) = TRIM(pSupplierName)
+			AND TRIM(Address) = TRIM(pAddress)
+			AND TRIM(City) = TRIM(pCity)
 			AND SupplierID <> pID
 		LIMIT 1;
 			
@@ -69,6 +72,7 @@ SET State = 3;
 				(
 					SupplierName,
 					Address,
+					City,
 					Telephone,
 					CreatedDate,
 					CreatedBy
@@ -76,6 +80,7 @@ SET State = 3;
 				VALUES (
 					pSupplierName,
 					pAddress,
+					pCity,
 					pTelephone,
 					NOW(),
 					pCurrentUser
@@ -95,6 +100,7 @@ SET State = 5;
 				SET
 					SupplierName = pSupplierName,
 					Address = pAddress,
+					City = pCity,
 					Telephone = pTelephone,
 					ModifiedBy = pCurrentUser
 				WHERE

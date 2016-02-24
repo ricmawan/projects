@@ -92,7 +92,7 @@
 									No Nota :
 								</div>
 								<div class="col-md-3">
-									<input type="text" id="txtIncomingNumber" name="txtIncomingNumber" class="form-control-custom" readonly <?php echo 'value="'.$IncomingNumber.'"'; ?> />
+									<input type="text" id="txtBuyReturnNumber" name="txtBuyReturnNumber" class="form-control-custom" readonly <?php echo 'value="'.$BuyReturnNumber.'"'; ?> />
 								</div>
 							</div>
 							<br />
@@ -178,7 +178,7 @@
 													return 0;
 												}
 												while($row = mysql_fetch_array($result)) {
-													echo "<option value='".$row['TypeID']."' buyprice='".$row['buyPrice']."' saleprice='".$row['SalePrice']."' brandid='".$row['BrandID']."' >".$row['BrandName']." ".$row['TypeName']."</option>";
+													echo "<option value='".$row['TypeID']."' buyprice='".$row['BuyPrice']."' saleprice='".$row['SalePrice']."' brandid='".$row['BrandID']."' >".$row['BrandName']." ".$row['TypeName']."</option>";
 												}
 											?>
 										</select>

@@ -6,6 +6,7 @@ CREATE TABLE master_customer
 	CustomerName	VARCHAR(255) NOT NULL,
 	Telephone 		VARCHAR(100) NOT NULL,
 	Address 		VARCHAR(255),
+	City			VARCHAR(100),
 	CreatedDate 	DATETIME NOT NULL,
 	CreatedBy 		VARCHAR(255) NOT NULL,
 	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,

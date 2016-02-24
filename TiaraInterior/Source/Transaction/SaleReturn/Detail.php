@@ -35,7 +35,7 @@
 			$row=mysql_fetch_array($result);
 			$SaleReturnID = $row['SaleReturnID'];
 			$SupplierID = $row['SupplierID'];
-			$SupplierNumber = $row['SupplierNumber'];
+			$SaleReturnNumber = $row['SaleReturnNumber'];
 			$Remarks = $row['Remarks'];
 			$TransactionDate = $row['TransactionDate'];
 			
@@ -92,7 +92,7 @@
 									No Nota :
 								</div>
 								<div class="col-md-3">
-									<input type="text" id="txtSaleReturnNumber" name="txtSaleReturnNumber" class="form-control-custom" readonly <?php echo 'value="'.$OutgoingNumber.'"'; ?> />
+									<input type="text" id="txtSaleReturnNumber" name="txtSaleReturnNumber" class="form-control-custom" readonly <?php echo 'value="'.$SaleReturnNumber.'"'; ?> />
 								</div>
 							</div>
 							<br />
@@ -178,7 +178,7 @@
 													return 0;
 												}
 												while($row = mysql_fetch_array($result)) {
-													echo "<option value='".$row['TypeID']."' buyprice='".$row['buyPrice']."' saleprice='".$row['SalePrice']."' brandid='".$row['BrandID']."' >".$row['BrandName']." ".$row['TypeName']."</option>";
+													echo "<option value='".$row['TypeID']."' buyprice='".$row['BuyPrice']."' saleprice='".$row['SalePrice']."' brandid='".$row['BrandID']."' >".$row['BrandName']." ".$row['TypeName']."</option>";
 												}
 											?>
 										</select>

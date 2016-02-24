@@ -7,6 +7,7 @@
 		$SupplierID = mysql_real_escape_string($_GET['ID']);
 		$SupplierName = "";
 		$Address = "";
+		$City = "";
 		$Telephone = "";
 		$IsEdit = 0;
 		
@@ -17,6 +18,7 @@
 					SupplierID,
 					SupplierName,
 					Address,
+					City,
 					Telephone
 				FROM
 					master_supplier
@@ -31,6 +33,7 @@
 			$SupplierId = $row['SupplierID'];
 			$SupplierName = $row['SupplierName'];
 			$Address = $row['Address'];
+			$City = $row['City'];
 			$Telephone = $row['Telephone'];
 		}
 	}
@@ -76,8 +79,17 @@
 								<div class="col-md-2 labelColumn">
 									Alamat :
 								</div>
-								<div class="col-md-4">
+								<div class="col-md-3">
 									<textarea id="txtAddress" name="txtAddress" class="form-control-custom" placeholder="Alamat"> <?php echo $Address; ?></textarea>
+								</div>
+							</div>
+							<br />
+							<div class="row">
+								<div class="col-md-2 labelColumn">
+									Kota :
+								</div>
+								<div class="col-md-3">
+									<input id="txtCity" name="txtCity" type="text" class="form-control-custom" placeholder="Kota" <?php echo 'value="'.$City.'"'; ?> />
 								</div>
 							</div>
 							<br />

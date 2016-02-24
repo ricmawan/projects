@@ -4,9 +4,11 @@ DELIMITER $$
 CREATE PROCEDURE spInsType (
 	pID 			BIGINT, 
 	pTypeName 		VARCHAR(255),
-	pBrandID 	BIGINT,
+	pBrandID 		BIGINT,
 	pUnitID			BIGINT,
 	pReminderCount	INT,
+	pBuyPrice		DOUBLE,
+	pSalePrice		DOUBLE,
 	pIsEdit			INT,
     pCurrentUser	VARCHAR(255)
 )
@@ -73,6 +75,8 @@ SET State = 3;
 					BrandID,
 					UnitID,
 					ReminderCount,
+					BuyPrice,
+					SalePrice,
 					CreatedDate,
 					CreatedBy
 				)
@@ -81,6 +85,8 @@ SET State = 3;
 					pBrandID,
 					pUnitID,
 					pReminderCount,
+					pBuyPrice,
+					pSalePrice,
 					NOW(),
 					pCurrentUser
 				);
@@ -101,6 +107,8 @@ SET State = 5;
 					ReminderCount = pReminderCount,
 					BrandID = pBrandID,
 					UnitID = pUnitID,
+					BuyPrice = pBuyPrice,
+					SalePrice = pSalePrice,
 					ModifiedBy = pCurrentUser
 				WHERE
 					TypeID = pID;

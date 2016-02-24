@@ -14,6 +14,7 @@
 		$Remarks = "";
 		$IsEdit = 0;
 		$rowCount = 0;
+		$DeliveryCost = 0.00;
 		$Data = "";
 		if($OutgoingID != 0) {
 			$IsEdit = 1;
@@ -24,6 +25,7 @@
 					OT.SalesID,
 					OT.CustomerID,
 					OT.Remarks,
+					OT.DeliveryCost,
 					DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') AS TransactionDate
 				FROM
 					transaction_outgoing IT
@@ -39,6 +41,7 @@
 			$OutgoingNumber = $row['OutgoingNumber'];
 			$SupplierID = $row['SupplierID'];
 			$Remarks = $row['Remarks'];
+			$DeliveryCost = number_format($DeliveryCost,2,".",",");
 			$TransactionDate = $row['TransactionDate'];
 			
 			$sql = "SELECT
@@ -202,7 +205,7 @@
 													return 0;
 												}
 												while($row = mysql_fetch_array($result)) {
-													echo "<option value='".$row['TypeID']."' buyprice='".$row['buyPrice']."' saleprice='".$row['SalePrice']."' brandid='".$row['BrandID']."' >".$row['BrandName']." ".$row['TypeName']."</option>";
+													echo "<option value='".$row['TypeID']."' buyprice='".$row['BuyPrice']."' saleprice='".$row['SalePrice']."' brandid='".$row['BrandID']."' >".$row['BrandName']." ".$row['TypeName']."</option>";
 												}
 											?>
 										</select>

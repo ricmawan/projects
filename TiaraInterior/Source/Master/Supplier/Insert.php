@@ -8,12 +8,13 @@
 		$Telephone = mysql_real_escape_string($_POST['txtTelephone']);
 		$SupplierName = mysql_real_escape_string($_POST['txtSupplierName']);
 		$Address = mysql_real_escape_string($_POST['txtAddress']);
+		$City = mysql_real_escape_string($_POST['txtCity']);
 		$hdnIsEdit = mysql_real_escape_string($_POST['hdnIsEdit']);
 		$Message = "Data gagal dimasukkan, cek koneksi internet dan coba lagi!";
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
-		$sql = "CALL spInsSupplier(".$SupplierID.", '".$SupplierName."', '".$Address."', '".$Telephone."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsSupplier(".$SupplierID.", '".$SupplierName."', '".$Address."', '".$City."', '".$Telephone."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
 		
 		if (! $result=mysql_query($sql, $dbh)) {
 			echo mysql_error();

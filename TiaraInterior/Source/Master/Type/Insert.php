@@ -10,11 +10,13 @@
 		$ReminderCount = 0;
 		$hdnIsEdit = mysql_real_escape_string($_POST['hdnIsEdit']);
 		$UnitID = mysql_real_escape_string($_POST['ddlUnit']);
+		$SalePrice = str_replace(",", "", $_POST['txtSalePrice']);
+		$BuyPrice = str_replace(",", "", $_POST['txtBuyPrice']);
 		$Message = "Data gagal dimasukkan, cek koneksi internet dan coba lagi!";
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
-		$sql = "CALL spInsType(".$TypeID.", '".$TypeName."', '".$BrandID."', ".$UnitID.", '".$ReminderCount."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsType(".$TypeID.", '".$TypeName."', '".$BrandID."', ".$UnitID.", '".$ReminderCount."', ".$BuyPrice.", ".$SalePrice.", ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
 		
 		if (! $result=mysql_query($sql, $dbh)) {
 			echo mysql_error();

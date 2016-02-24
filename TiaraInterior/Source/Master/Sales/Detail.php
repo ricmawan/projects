@@ -76,7 +76,7 @@
 								<div class="col-md-2 labelColumn">
 									Alamat :
 								</div>
-								<div class="col-md-4">
+								<div class="col-md-3">
 									<textarea id="txtAddress" name="txtAddress" class="form-control-custom" placeholder="Alamat"> <?php echo $Address; ?></textarea>
 								</div>
 							</div>
