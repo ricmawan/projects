@@ -17,7 +17,7 @@
 		$order_by = "";
 		foreach($_REQUEST['sort'] as $key => $value) {
 			if($key != 'No') $order_by .= " $key $value";
-			else $order_by = "IT.IncomingTransactionID";
+			else $order_by = "IT.IncomingID";
 		}
 	}
 	//Handles search querystring sent from Bootgrid
@@ -57,18 +57,18 @@
 				IT.IncomingNumber,
 				MS.SupplierName,
 				DATE_FORMAT(IT.TransactionDate, '%d-%m-%Y') AS TransactionDate,
-				IFNULL(SUM(ITD.Quantity * ITD.Price), 0) AS TotalAmount,
+				IFNULL(SUM(ITD.Quantity * (ITD.BuyPrice - ((ITD.BuyPrice * ITD.Discount)/100))), 0) AS TotalAmount,
 				IT.Remarks
 			FROM
-				transaction_incomingtransaction IT
+				transaction_incoming IT
 				LEFT JOIN master_supplier MS
 					ON IT.SupplierID = MS.SupplierID
 				LEFT JOIN transaction_incomingdetails ITD
-					ON ITD.IncomingTransactionID = IT.IncomingTransactionID
+					ON ITD.IncomingID = IT.IncomingID
 			WHERE
 				$where
 			GROUP BY
-				IT.IncomingTransactionID,
+				IT.IncomingID,
 				MS.SupplierName,
 				IT.TransactionDate,
 				IT.Remarks
@@ -84,7 +84,7 @@
 	while ($row = mysql_fetch_array($result)) {
 		$RowNumber++;
 		$row_array['RowNumber'] = $RowNumber;
-		$row_array['IncomingID']= $row['IncomingID'];
+		$row_array['IncomingID']= $row['IncomingNumber'];
 		$row_array['IncomingNumber']= $row['IncomingNumber'];
 		$row_array['SupplierName'] = $row['SupplierName'];
 		$row_array['TotalAmount'] =  number_format($row['TotalAmount'],2,".",",");

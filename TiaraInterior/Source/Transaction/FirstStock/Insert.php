@@ -7,7 +7,7 @@
 		$Record = $_POST['record'];
 		$RecordNew = $_POST['recordnew'];
 		$ID = mysql_real_escape_string($_POST['hdnFirstStockID']);
-		$SupplierID = mysql_real_escape_string($_POST['ddlSupplier']);
+		//$SupplierID = mysql_real_escape_string($_POST['ddlSupplier']);
 		$TransactionDate = explode('-', mysql_real_escape_string($_POST['txtTransactionDate']));
 		$TransactionDate = "$TransactionDate[2]-$TransactionDate[1]-$TransactionDate[0]";
 		$FirstStockNumber = mysql_real_escape_string($_POST['txtFirstStockNumber']);
@@ -29,7 +29,6 @@
 			$State = 1;
 			$sql = "INSERT INTO transaction_firststock
 					(
-						SupplierID,
 						FirstStockNumber,
 						TransactionDate,
 						Remarks,
@@ -38,9 +37,8 @@
 					)
 					VALUES
 					(
-						".$SupplierID.",
 						'".$FirstStockNumber."',
-						'".$TransactionDate."',,
+						'".$TransactionDate."',
 						'".$txtRemarks."',
 						NOW(),
 						'".$_SESSION['UserLogin']."'
@@ -51,7 +49,6 @@
 			$State = 2;
 			$sql = "UPDATE transaction_firststock
 					SET
-						SupplierID = ".$SupplierID.",
 						FirstStockNumber = '".$FirstStockNumber."',
 						TransactionDate = '".$TransactionDate."',
 						Remarks = '".$txtRemarks."',
@@ -70,6 +67,36 @@
 			return 0;
 		}
 		if($hdnIsEdit == 0) {
+			$State = 3;
+			$sql = "INSERT INTO transaction_invoicenumber
+					(
+						InvoiceNumberType,
+						InvoiceDate,
+						InvoiceNumber,
+						DeleteFlag,
+						CreatedDate,
+						CreatedBy
+					)
+					VALUES
+					(
+						'SA',
+						'".$TransactionDate."',
+						'".$FirstStockNumber."',
+						'0',
+						NOW(),
+						'".$_SESSION['UserLogin']."'
+					)";
+					
+			if (! $result = mysql_query($sql, $dbh)) {
+				$Message = "Terjadi Kesalahan Sistem";
+				$MessageDetail = mysql_error();
+				$FailedFlag = 1;
+				echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
+				mysql_query("ROLLBACK", $dbh);
+				return 0;
+			}
+			
+			$State = 4;
 			$sql = "SELECT
 						MAX(FirstStockID) AS FirstStockID
 					FROM 
@@ -87,7 +114,8 @@
 			$row = mysql_fetch_array($result);
 			$ID = $row['FirstStockID'];
 		}
-		$State = 3;
+				
+		$State = 5;
 		$sql = "DELETE 
 				FROM 
 					transaction_firststockdetails 
@@ -105,7 +133,7 @@
 		}
 		for($j=1;$j<=$RecordNew;$j++) {
 			if($_POST['hdnFirstStockDetailsID'.$j] == "0") {
-				$State = 4;
+				$State = 6;
 				$sql = "INSERT INTO transaction_firststockdetails
 						(
 							FirstStockID,
@@ -132,7 +160,7 @@
 						)";
 			}
 			else {
-				$State = 5;
+				$State = 7;
 				$sql = "UPDATE 
 							transaction_firststockdetails
 						SET
@@ -155,11 +183,11 @@
 				mysql_query("ROLLBACK", $dbh);
 				return 0;
 			}
-
+			$State = 8;
 			$sql = "UPDATE 
 						master_type
 					SET
-						BuyPrice = ".str_replace(",", "", $_POST['txtBuyPrice'.$j]).",
+						BuyPrice = ".(str_replace(",", "", $_POST['txtBuyPrice'.$j]) - ((str_replace(",", "", $_POST['txtBuyPrice'.$j]) * mysql_real_escape_string($_POST['txtDiscount'.$j]))/100)).",
 						SalePrice = ".str_replace(",", "", $_POST['txtSalePrice'.$j]).",
 						ModifiedBy = '".$_SESSION['UserLogin']."'
 					WHERE

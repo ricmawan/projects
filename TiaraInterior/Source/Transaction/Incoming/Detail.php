@@ -21,7 +21,7 @@
 					IT.IncomingID,
 					IT.SupplierID,
 					IT.IncomingNumber,
-					DATE_FORMAT(IT.TransactionDate, '%d-%m-%Y') AS TransactionDate
+					DATE_FORMAT(IT.TransactionDate, '%d-%m-%Y') AS TransactionDate,
 					IT.Remarks
 				FROM
 					transaction_incoming IT
@@ -45,7 +45,7 @@
 						ITD.Quantity,
 						ITD.BuyPrice,
 						ITD.SalePrice,
-						CONCAT(MC.BrandName, ' ', I.TypeName) AS TypeName,
+						CONCAT(MB.BrandName, ' ', I.TypeName) AS TypeName,
 						ITD.BatchNumber,
 						ITD.Discount
 					FROM
@@ -53,7 +53,7 @@
 						JOIN master_type I
 							ON I.TypeID = ITD.TypeID
 						JOIN master_brand MB
-							ON MC.BrandID = I.BrandID
+							ON MB.BrandID = I.BrandID
 					WHERE
 						ITD.IncomingID = $IncomingID";
 			if(!$result = mysql_query($sql, $dbh)) {
@@ -108,7 +108,7 @@
 									<input id="hdnData" name="hdnData" type="hidden" <?php echo 'value="'.$Data.'"'; ?> />
 								</div>
 								<div class="col-md-3">
-									<input id="txtTransactionDate" name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Tanggal" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
+									<input id="txtTransactionDate" name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" onchange="GetInvoiceNumber(this.value);" placeholder="Tanggal" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
 								</div>
 								<div class="col-md-1 labelColumn">
 									Supplier :
@@ -193,7 +193,7 @@
 								<div class="col-md-12">
 									
 									<table class="table" id="datainput">
-										<thead style="background-color: black;color:white;height:25px;width:100%;display:block;">
+										<thead style="background-color: black;color:white;height:25px;width:935px;display:block;">
 											<td align="center" style="width:30px;">No</td>
 											<td align="center" style="width:188px;">Nama Barang</td>
 											<td align="center" style="width:79px;">Batch</td>
@@ -225,7 +225,7 @@
 													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;width: 120px;" class="form-control-custom txtSalePrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual"/>
 												</td>
 												<td style="width:77px;">
-													<input type="text" id="txtDiscount" style="width: 60px;text-align:right;" value="0" name="txtSalePrice" style="text-align:right;" onkeyup="this.value=minmax(this.value, 0, 100)" class="form-control-custom txtDiscount" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" placeholder="Diskon"/>
+													<input type="text" id="txtDiscount" style="width: 60px;text-align:right;" value="0" name="txtDiscount" style="text-align:right;" onkeyup="this.value=minmax(this.value, 0, 100)" class="form-control-custom txtDiscount" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" placeholder="Diskon"/>
 												</td>
 												<td  style="width:195px;">
 													<input type="text" id="txtTotal" name="txtTotal" class="form-control-custom txtTotal" style="text-align:right;width:175px;" value="0.00" placeholder="Jumlah" readonly />
@@ -561,6 +561,29 @@
 					}
 					else SubmitForm("./Transaction/Incoming/Insert.php");
 				}
+			}
+			
+			function GetInvoiceNumber(SelectedDate)
+			{
+				$.ajax({
+					url: "./Transaction/FirstStock/GetInvoiceNumber.php",
+					type: "POST",
+					data: { SelectedDate : SelectedDate, InvoiceNumberType : "TB"},
+					dataType: "json",
+					success: function(data) {
+						if(data.FailedFlag == '0') {
+							$("#txtIncomingNumber").val(data.InvoiceNumber);
+						}
+						else {
+							$("#loading").hide();
+							$.notify(data.Message, "error");					
+						}
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Terjadi kesalahan sistem!", "error");
+					}
+				});
 			}
 		</script>
 	</body>

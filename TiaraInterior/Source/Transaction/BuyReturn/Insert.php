@@ -70,6 +70,36 @@
 			return 0;
 		}
 		if($hdnIsEdit == 0) {
+			$State = 3;
+			$sql = "INSERT INTO transaction_invoicenumber
+					(
+						InvoiceNumberType,
+						InvoiceDate,
+						InvoiceNumber,
+						DeleteFlag,
+						CreatedDate,
+						CreatedBy
+					)
+					VALUES
+					(
+						'RB',
+						'".$TransactionDate."',
+						'".$BuyReturnNumber."',
+						'0',
+						NOW(),
+						'".$_SESSION['UserLogin']."'
+					)";
+					
+			if (! $result = mysql_query($sql, $dbh)) {
+				$Message = "Terjadi Kesalahan Sistem";
+				$MessageDetail = mysql_error();
+				$FailedFlag = 1;
+				echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
+				mysql_query("ROLLBACK", $dbh);
+				return 0;
+			}
+			
+			$State = 4;
 			$sql = "SELECT
 						MAX(BuyReturnID) AS BuyReturnID
 					FROM 
@@ -87,7 +117,7 @@
 			$row = mysql_fetch_array($result);
 			$ID = $row['BuyReturnID'];
 		}
-		$State = 3;
+		$State = 5;
 		$sql = "DELETE 
 				FROM 
 					transaction_buyreturndetails 
@@ -105,7 +135,7 @@
 		}
 		for($j=1;$j<=$RecordNew;$j++) {
 			if($_POST['hdnBuyReturnDetailsID'.$j] == "0") {
-				$State = 4;
+				$State = 6;
 				$sql = "INSERT INTO transaction_buyreturndetails
 						(
 							BuyReturnID,
@@ -128,7 +158,7 @@
 						)";
 			}
 			else {
-				$State = 5;
+				$State = 7;
 				$sql = "UPDATE 
 							transaction_buyreturndetails
 						SET
@@ -175,7 +205,7 @@
 	
 	function returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State) {
 		$data = array(
-			"Id" => $ID, 
+			"ID" => $ID, 
 			"Message" => $Message,
 			"MessageDetail" => $MessageDetail,
 			"FailedFlag" => $FailedFlag,

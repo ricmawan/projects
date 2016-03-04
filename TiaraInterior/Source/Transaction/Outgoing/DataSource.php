@@ -40,7 +40,11 @@
 	$sql = "SELECT
 				COUNT(*) AS nRows
 			FROM
-				transaction.outgoing IT
+				transaction_outgoing OT
+				JOIN master_sales MS
+					ON OT.SalesID = MS.SalesID
+				JOIN master_customer MC
+					ON OT.CustomerID = MC.CustomerID
 			WHERE
 				$where";
 	
@@ -52,19 +56,20 @@
 	$nRows = $row['nRows'];
 	$sql = "SELECT
 				OT.OutgoingID,
+				OT.OutgoingNumber,
 				MS.SalesName,
 				MC.CustomerName,
 				DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') AS TransactionDate,
-				IFNULL(SUM(ITD.Quantity * ITD.Price), 0) AS TotalAmount,
+				IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - ((OTD.SalePrice * OTD.Discount)/100))), 0) AS TotalAmount,
 				OT.Remarks
 			FROM
-				transaction.outgoing IT
+				transaction_outgoing OT
 				JOIN master_sales MS
 					ON OT.SalesID = MS.SalesID
 				JOIN master_customer MC
 					ON OT.CustomerID = MC.CustomerID
-				LEFT JOIN transaction.outgoingdetails ITD
-					ON ITD.OutgoingID = OT.OutgoingID
+				LEFT JOIN transaction_outgoingdetails OTD
+					ON OTD.OutgoingID = OT.OutgoingID
 			WHERE
 				$where
 			GROUP BY
@@ -85,7 +90,7 @@
 	while ($row = mysql_fetch_array($result)) {
 		$RowNumber++;
 		$row_array['RowNumber'] = $RowNumber;
-		$row_array['OutgoingID']= $row['OutgoingID'];
+		$row_array['OutgoingID']= $row['OutgoingNumber'];
 		$row_array['OutgoingNumber']= $row['OutgoingNumber'];
 		$row_array['SalesName'] = $row['SalesName'];
 		$row_array['CustomerName'] = $row['CustomerName'];

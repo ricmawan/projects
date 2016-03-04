@@ -17,16 +17,14 @@
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
-										<th data-column-id="TypeIDName" data-visible="false" data-type="numeric" data-identifier="true">ItemID</th>
 										<th data-column-id="RowNumber" data-sortable="false" data-type="numeric">No</th>
 										<th data-column-id="BrandName">Merek</th>
 										<th data-column-id="TypeName">Tipe</th>
 										<th data-column-id="UnitName">Nama Satuan</th>
-										<th data-column-id="Batch">Batch</th>
-										<th data-column-id="Stok">Stok</th>
+										<th data-column-id="BatchNumber">Batch</th>
+										<th data-column-id="Stock">Stok</th>
 										<th data-column-id="BuyPrice" data-align="right">Harga Beli</th>
 										<th data-column-id="SalePrice" data-align="right">Harga Jual</th>
-										<!--<?php if($EditFlag == true) echo '<th data-column-id="Opsi" data-formatter="commands" data-sortable="false">Opsi</th>'; ?>-->
 									</tr>
 								</thead>
 							</table>
@@ -56,17 +54,11 @@
 								refresh: "Refresh",
 								search: "Cari"
 							},
-							url: "./Master/Type/DataSource.php",
+							url: "./Master/Item/DataSource.php",
 							selection: true,
-							multiSelect: true,
+							multiSelect: false,
 							rowSelect: true,
-							keepSelection: true,
-							formatters: {
-								"commands": function(column, row)
-								{
-									return "<i style='cursor:pointer;' data-row-id=\"" + row.TypeID + "\" class=\"fa fa-edit\" data-link=\"./Master/Type/Detail.php?ID=" + row.TypeID + "\" acronym title=\"Ubah Data\"></i>&nbsp;";
-								}
-							}
+							keepSelection: true
 						}).on("loaded.rs.jquery.bootgrid", function()
 						{
 							/* Executes after data is loaded and rendered */

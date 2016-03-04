@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS transaction_salereturn;
 CREATE TABLE transaction_salereturn
 (
 	SaleReturnID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	SaleReturnNumber	VARCHAR(100) NULL,
 	CustomerID			BIGINT,
 	TransactionDate 	DATETIME NOT NULL,
 	Remarks				TEXT,

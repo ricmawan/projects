@@ -14,9 +14,9 @@
 			{
 				//$ProjectData = explode("^", $Data[$i]);
 				$IncomingID = mysql_real_escape_string($Data[$i]);
-				$sql = "DELETE FROM transaction_incoming WHERE IncomingID = $IncomingID";
+				$sql = "DELETE FROM transaction_incoming WHERE IncomingNumber = '".$IncomingID."'";
 				if (! $result=mysql_query($sql, $dbh)) {
-					throw new Exception($ProjectName);
+					throw new Exception($FirstStockID);
 				}
 				$MessageSuccessDelete .= "$IncomingID, ";
 			}

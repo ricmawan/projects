@@ -41,6 +41,8 @@
 				COUNT(*) AS nRows
 			FROM
 				transaction_buyreturn BR
+				LEFT JOIN master_supplier MS
+					ON BR.SupplierID = MS.SupplierID
 			WHERE
 				$where";
 	
@@ -54,7 +56,7 @@
 				BR.BuyReturnID,
 				MS.SupplierName,
 				DATE_FORMAT(BR.TransactionDate, '%d-%m-%Y') AS TransactionDate,
-				IFNULL(SUM(ITD.Quantity * ITD.Price), 0) AS TotalAmount,
+				IFNULL(SUM(BRD.Quantity * BRD.BuyPrice), 0) AS TotalAmount,
 				BR.Remarks,
 				BR.BuyReturnNumber
 			FROM
@@ -62,7 +64,7 @@
 				LEFT JOIN master_supplier MS
 					ON BR.SupplierID = MS.SupplierID
 				LEFT JOIN transaction_buyreturndetails BRD
-					ON ITD.BuyReturnID = BR.BuyReturnID
+					ON BRD.BuyReturnID = BR.BuyReturnID
 			WHERE
 				$where
 			GROUP BY
@@ -83,7 +85,7 @@
 	while ($row = mysql_fetch_array($result)) {
 		$RowNumber++;
 		$row_array['RowNumber'] = $RowNumber;
-		$row_array['BuyReturnID']= $row['BuyReturnID'];
+		$row_array['BuyReturnID']= $row['BuyReturnNumber'];
 		$row_array['BuyReturnNumber']= $row['BuyReturnNumber'];
 		$row_array['SupplierName'] = $row['SupplierName'];
 		$row_array['TotalAmount'] =  number_format($row['TotalAmount'],2,".",",");

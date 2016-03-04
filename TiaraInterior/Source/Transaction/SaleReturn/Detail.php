@@ -7,7 +7,7 @@
 		//echo $_SERVER['REQUEST_URI'];
 		$Content = "";
 		$SaleReturnID = mysql_real_escape_string($_GET['ID']);
-		$SupplierID = "";
+		$CustomerID = "";
 		$SaleReturnNumber = "";
 		$Remarks = "";
 		$TransactionDate = "";
@@ -21,10 +21,10 @@
 					SR.SaleReturnID,
 					SR.SaleReturnNumber,
 					SR.Remarks,
-					SR.SupplierID,
+					SR.CustomerID,
 					DATE_FORMAT(SR.TransactionDate, '%d-%m-%Y') AS TransactionDate
 				FROM
-					transaction_salereturn IT
+					transaction_salereturn SR
 				WHERE
 					SR.SaleReturnID = $SaleReturnID";
 						
@@ -34,7 +34,7 @@
 			}				
 			$row=mysql_fetch_array($result);
 			$SaleReturnID = $row['SaleReturnID'];
-			$SupplierID = $row['SupplierID'];
+			$CustomerID = $row['CustomerID'];
 			$SaleReturnNumber = $row['SaleReturnNumber'];
 			$Remarks = $row['Remarks'];
 			$TransactionDate = $row['TransactionDate'];
@@ -43,14 +43,15 @@
 						SRD.SaleReturnDetailsID,
 						SRD.TypeID,
 						SRD.Quantity,
-						SRD.Price,
-						CONCAT(MC.BrandName, ' ', I.TypeName) AS TypeName
+						SRD.SalePrice,
+						SRD.BatchNumber,
+						CONCAT(MB.BrandName, ' ', MT.TypeName) AS TypeName
 					FROM
 						transaction_salereturndetails SRD
-						JOIN master_type I
-							ON I.TypeID = SRD.TypeID
+						JOIN master_type MT
+							ON MT.TypeID = SRD.TypeID
 						JOIN master_brand MB
-							ON MC.BrandID = I.BrandID
+							ON MB.BrandID = MT.BrandID
 					WHERE
 						SRD.SaleReturnID = $SaleReturnID";
 			if(!$result = mysql_query($sql, $dbh)) {
@@ -63,7 +64,7 @@
 				$Data = array();
 				while($row = mysql_fetch_array($result)) {
 					//array_push($DetailID, $row[0]);
-					array_push($Data, "'".$row['SaleReturnDetailsID']."', '".$row['TypeID']."', '".$row['TypeName']."', '".$row['BatchNumber']."', '".$row['Quantity']."', '".$row['BuyPrice']."', '".$row['SalePrice']."', '".$row['Discount']."'");
+					array_push($Data, "'".$row['SaleReturnDetailsID']."', '".$row['TypeID']."', '".$row['TypeName']."', '".$row['BatchNumber']."', '".$row['Quantity']."', '".$row['SalePrice']."'");
 				}
 				//$DetailID = implode(",", $DetailID);
 				$Data = implode("|", $Data);
@@ -105,14 +106,14 @@
 									<input id="hdnData" name="hdnData" type="hidden" <?php echo 'value="'.$Data.'"'; ?> />
 								</div>
 								<div class="col-md-3">
-									<input id="txtTransactionDate" name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Tanggal" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
+									<input id="txtTransactionDate" name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" onchange="GetInvoiceNumber(this.value);" placeholder="Tanggal" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
 								</div>
 								<div class="col-md-1 labelColumn">
 									Pelanggan:
 								</div>
 								<div class="col-md-3">
 									<div class="ui-widget" style="width: 100%;">
-										<select name="ddlSupplier" id="ddlSupplier" class="form-control-custom" placeholder="Pilih Pelanggan" >
+										<select name="ddlCustomer" id="ddlCustomer" class="form-control-custom" placeholder="Pilih Pelanggan" >
 											<option value="" selected> </option>
 											<?php
 												$sql = "SELECT CustomerID, CustomerName FROM master_customer";
@@ -121,7 +122,7 @@
 													return 0;
 												}
 												while($row = mysql_fetch_array($result)) {
-													if($SupplierID == $row['CustomerID']) echo "<option selected value='".$row['CustomerID']."' >".$row['CustomerName']."</option>";
+													if($CustomerID == $row['CustomerID']) echo "<option selected value='".$row['CustomerID']."' >".$row['CustomerName']."</option>";
 													else echo "<option value='".$row['CustomerID']."' >".$row['CustomerName']."</option>";
 												}
 											?>
@@ -190,26 +191,26 @@
 								<div class="col-md-12">
 									
 									<table class="table" id="datainput">
-										<thead style="background-color: black;color:white;height:25px;width:100%;display:block;">
+										<thead style="background-color: black;color:white;height:25px;width:725px;display:block;">
 											<td align="center" style="width:30px;">No</td>
-											<td align="center" style="width:188px;">Nama Barang</td>
-											<td align="center" style="width:79px;">Batch</td>
+											<td align="center" style="width:190px;">Nama Barang</td>
+											<td align="center" style="width:80px;">Batch</td>
 											<td align="center" style="width:66px;">QTY</td>											
 											<td align="center" style="width:136px;">Harga Jual</td>
-											<td align="center" style="width:77px;">Diskon (%)</td>
+											<!--<td align="center" style="width:77px;">Diskon (%)</td>-->
 											<td align="center" style="width:195px;">Total</td>
 											<td style="width: 26px"></td>
 										</thead>
 										<tbody style="display:block;max-height:232px;height:100%;overflow-y:auto;">
 											<tr id='' style='display:none;' class="num">
 												<td id='nota' name='nota' class='nota' style="width:32px;vertical-align:middle;"></td>
-												<td style="width:188px;">
+												<td style="width:190px;">
 													<input type="text" id="txtTypeName" name="txtTypeName" class="form-control-custom txtTypeName" placeholder="Nama Barang" readonly />
 													<input type="hidden" id="hdnTypeID" name="hdnTypeID" value="0" class="hdnTypeID" />
 													<input type="hidden" id="hdnSaleReturnDetailsID" class="hdnSaleReturnDetailsID" name="hdnSaleReturnDetailsID" value="0" />
 													<input type="hidden" id="hdnBuyPrice" class="hdnBuyPrice" name="hdnBuyPrice" value="0" />
 												</td>
-												<td style="width:79px;">
+												<td style="width:80px;">
 													<input type="text" row="" id="txtBatchNumber" style="width: 63px;" name="txtBatchNumber" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control-custom txtBatchNumber" placeholder="Batch"/>
 												</td>
 												<td style="width:66px;">
@@ -218,9 +219,9 @@
 												<td style="width:136px;">
 													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;width: 120px;" class="form-control-custom txtSalePrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual"/>
 												</td>
-												<td style="width:77px;">
+												<!--<td style="width:77px;">
 													<input type="text" id="txtDiscount" style="width: 60px;text-align:right;" value="0" name="txtSalePrice" style="text-align:right;" onkeyup="this.value=minmax(this.value, 0, 100)" class="form-control-custom txtDiscount" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" placeholder="Diskon"/>
-												</td>
+												</td>-->
 												<td  style="width:195px;">
 													<input type="text" id="txtTotal" name="txtTotal" class="form-control-custom txtTotal" style="text-align:right;width:175px;" value="0.00" placeholder="Jumlah" readonly />
 												</td>
@@ -249,7 +250,7 @@
 									Catatan :
 								</div>
 								<div class="col-md-4">
-									<textarea id="txtAddress" name="txtAddress" class="form-control-custom" placeholder="Catatan"><?php echo $Remarks; ?></textarea>
+									<textarea id="txtRemarks" name="txtRemarks" class="form-control-custom" placeholder="Catatan"><?php echo $Remarks; ?></textarea>
 								</div>
 							</div>
 							<br />
@@ -283,7 +284,7 @@
 			function BindTypeList() {
 				var i = 1;
 				var CurrentTypeID = $("#ddlType").val();
-				var CurrentBuyPrice = $("#ddlType option:selected").attr("buyprice");
+				//var CurrentBuyPrice = $("#ddlType option:selected").attr("buyprice");
 				var CurrentSalePrice = $("#ddlType option:selected").attr("saleprice");
 				var CurrentTypeName = $("#ddlType option:selected").text();
 				var rows = $("#recordnew").val();
@@ -299,10 +300,10 @@
 					$("#btnAdd").click();
 					$("#hdnTypeID" + i).val(CurrentTypeID);
 					$("#txtTypeName" + i).val(CurrentTypeName);
-					$("#hdnBuyPrice" + i).val(returnRupiah(CurrentBuyPrice.toString()));
+					//$("#hdnBuyPrice" + i).val(returnRupiah(CurrentBuyPrice.toString()));
 					$("#txtSalePrice" + i).val(returnRupiah(CurrentSalePrice.toString()));
 					$("#txtQuantity" + i).val(1);
-					$("#txtTotal" + i).val(CurrentBuyPrice);
+					$("#txtTotal" + i).val(CurrentSalePrice);
 				}
 				Calculate();
 			}
@@ -368,14 +369,6 @@
 					i++;
 				});
 				i = 0;
-				$(".hdnBuyPrice").each(function() {
-					if(i != 0) {
-						$(this).attr("id", "hdnBuyPrice" + i);
-						$(this).attr("name", "hdnBuyPrice" + i);
-					}
-					i++;
-				});
-				i = 0;
 				$(".txtSalePrice").each(function() {
 					if(i != 0) {
 						$(this).attr("id", "txtSalePrice" + i);
@@ -418,13 +411,13 @@
 					if(i != 0) {
 						qty = $(this).val();
 						row = $(this).attr("row");
-						//price = $("#txtBuyPrice" + row).val().replace(/\,/g, "");
+						price = $("#txtSalePrice" + row).val().replace(/\,/g, "");
 						if(qty == "") {
 							$(this).val(1);
 							qty = 1;
 						}
 						else if(price == "") {
-							//$("#txtBuyPrice" + row).val("0.00");
+							$("#txtSalePrice" + row).val("0.00");
 							price = 0;
 						}
 						GrandTotal += parseFloat(qty) * parseFloat(price);
@@ -506,9 +499,7 @@
 						$("#txtTypeName" + count).val(d[2].replace("'", ""));
 						$("#txtBatchNumber" + count).val(d[3].replace("'", ""));
 						$("#txtQuantity" + count).val(d[4].replace("'", ""));
-						$("#hdnBuyPrice" + count).val(d[5].replace("'", ""));
-						$("#txtSalePrice" + count).val(returnRupiah(d[6].replace("'", "")));
-						$("#txtDiscount" + count).val(d[7].replace("'", ""));
+						$("#txtSalePrice" + count).val(returnRupiah(d[5].replace("'", "")));
 						$("#record").val(count);
 						$("#recordnew").val(count);
 					}
@@ -545,6 +536,29 @@
 					}
 					else SubmitForm("./Transaction/SaleReturn/Insert.php");
 				}
+			}
+			
+			function GetInvoiceNumber(SelectedDate)
+			{
+				$.ajax({
+					url: "./Transaction/FirstStock/GetInvoiceNumber.php",
+					type: "POST",
+					data: { SelectedDate : SelectedDate, InvoiceNumberType : "RJ"},
+					dataType: "json",
+					success: function(data) {
+						if(data.FailedFlag == '0') {
+							$("#txtSaleReturnNumber").val(data.InvoiceNumber);
+						}
+						else {
+							$("#loading").hide();
+							$.notify(data.Message, "error");					
+						}
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Terjadi kesalahan sistem!", "error");
+					}
+				});
 			}
 		</script>
 	</body>

@@ -79,7 +79,7 @@
 	while ($row = mysql_fetch_array($result)) {
 		$RowNumber++;
 		$row_array['RowNumber'] = $RowNumber;
-		$row_array['FirstStockID']= $row['FirstStockID'];
+		$row_array['FirstStockID']= $row['FirstStockNumber'];
 		$row_array['FirstStockNumber'] = $row['FirstStockNumber'];
 		$row_array['TotalAmount'] =  number_format($row['TotalAmount'],2,".",",");
 		$row_array['TransactionDate'] = $row['TransactionDate'];

@@ -14,9 +14,9 @@
 			{
 				//$ProjectData = explode("^", $Data[$i]);
 				$BuyReturnID = mysql_real_escape_string($Data[$i]);
-				$sql = "DELETE FROM transaction_buyreturn WHERE BuyReturnID = $BuyReturnID";
+				$sql = "DELETE FROM transaction_buyreturn WHERE BuyReturnNumber = '".$BuyReturnID."'";
 				if (! $result=mysql_query($sql, $dbh)) {
-					throw new Exception($ProjectName);
+					throw new Exception($FirstStockID);
 				}
 				$MessageSuccessDelete .= "$BuyReturnID, ";
 			}

@@ -14,9 +14,10 @@
 			{
 				//$ProjectData = explode("^", $Data[$i]);
 				$FirstStockID = mysql_real_escape_string($Data[$i]);
-				$sql = "DELETE FROM transaction_firststock WHERE FirstStockID = $FirstStockID";
+				$sql = "DELETE FROM transaction_firststock WHERE FirstStockNumber = '".$FirstStockID."'";
 				if (! $result=mysql_query($sql, $dbh)) {
-					throw new Exception($ProjectName);
+					echo mysql_error();
+					throw new Exception($FirstStockID);
 				}
 				$MessageSuccessDelete .= "$FirstStockID, ";
 			}

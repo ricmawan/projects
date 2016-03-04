@@ -1,3 +1,4 @@
+
 <?php
 	if(isset($_GET['ID'])) {
 		$RequestPath = "$_SERVER[REQUEST_URI]";
@@ -44,13 +45,14 @@
 						BRD.TypeID,
 						BRD.Quantity,
 						BRD.BuyPrice,
-						CONCAT(MC.BrandName, ' ', I.TypeName) AS TypeName
+						BRD.BatchNumber,
+						CONCAT(MB.BrandName, ' ', I.TypeName) AS TypeName
 					FROM
 						transaction_buyreturndetails BRD
 						JOIN master_type I
 							ON I.TypeID = BRD.TypeID
 						JOIN master_brand MB
-							ON MC.BrandID = I.BrandID
+							ON MB.BrandID = I.BrandID
 					WHERE
 						BRD.BuyReturnID = $BuyReturnID";
 			if(!$result = mysql_query($sql, $dbh)) {
@@ -105,7 +107,7 @@
 									<input id="hdnData" name="hdnData" type="hidden" <?php echo 'value="'.$Data.'"'; ?> />
 								</div>
 								<div class="col-md-3">
-									<input id="txtTransactionDate" name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Tanggal" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
+									<input id="txtTransactionDate" name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" onchange="GetInvoiceNumber(this.value);" placeholder="Tanggal" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
 								</div>
 								<div class="col-md-1 labelColumn">
 									Supplier :
@@ -186,14 +188,14 @@
 								</div>
 							</div>
 							<br />
-							<!--<div id="divItem" style="max-height: 250px !important; height:100%; overflow-y: auto;">-->
+							<div class="row" >
 								<div class="col-md-12">
 									
 									<table class="table" id="datainput">
-										<thead style="background-color: black;color:white;height:25px;width:100%;display:block;">
+										<thead style="background-color: black;color:white;height:25px;width:725px;display:block;">
 											<td align="center" style="width:30px;">No</td>
-											<td align="center" style="width:188px;">Nama Barang</td>
-											<td align="center" style="width:79px;">Batch</td>
+											<td align="center" style="width:190px;">Nama Barang</td>
+											<td align="center" style="width:80px;">Batch</td>
 											<td align="center" style="width:66px;">QTY</td>
 											<td align="center" style="width:136px;">Harga Beli</td>
 											<td align="center" style="width:195px;">Total</td>
@@ -202,12 +204,12 @@
 										<tbody style="display:block;max-height:232px;height:100%;overflow-y:auto;">
 											<tr id='' style='display:none;' class="num">
 												<td id='nota' name='nota' class='nota' style="width:32px;vertical-align:middle;"></td>
-												<td style="width:188px;">
+												<td style="width:190px;">
 													<input type="text" id="txtTypeName" name="txtTypeName" class="form-control-custom txtTypeName" placeholder="Nama Barang" readonly />
 													<input type="hidden" id="hdnTypeID" name="hdnTypeID" value="0" class="hdnTypeID" />
 													<input type="hidden" id="hdnBuyReturnDetailsID" class="hdnBuyReturnDetailsID" name="hdnBuyReturnDetailsID" value="0" />
 												</td>
-												<td style="width:79px;">
+												<td style="width:80px;">
 													<input type="text" row="" id="txtBatchNumber" style="width: 63px;" name="txtBatchNumber" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control-custom txtBatchNumber" placeholder="Batch"/>
 												</td>
 												<td style="width:66px;">
@@ -226,7 +228,7 @@
 										</tbody>
 									</table>
 								</div>
-							<!--</div>-->
+							</div>
 							<input type="hidden" id="record" name="record" value=0 />
 							<input type="hidden" id="recordnew" name="recordnew" value=0 />
 							<br />
@@ -244,7 +246,7 @@
 									Catatan :
 								</div>
 								<div class="col-md-4">
-									<textarea id="txtAddress" name="txtAddress" class="form-control-custom" placeholder="Catatan"><?php echo $Remarks; ?></textarea>
+									<textarea id="txtRemarks" name="txtRemarks" class="form-control-custom" placeholder="Catatan"><?php echo $Remarks; ?></textarea>
 								</div>
 							</div>
 						</form>
@@ -536,8 +538,53 @@
 						}, "slow");
 						return false;
 					}
-					else SubmitForm("./Transaction/BuyReturn/Insert.php");
+					else {
+						$.ajax({
+							url: "./Transaction/BuyReturn/Insert.php",
+							type: "POST",
+							data: $("#PostForm").serialize(),
+							dataType: "json",
+							success: function(data) {
+								if(data.FailedFlag == '0') {
+									$.notify(data.Message, "success");
+									$("#hdnBuyReturnID").val(data.ID);
+									$("#hdnIsEdit").val(1);
+								}
+								else {
+									$("#loading").hide();
+									$.notify(data.Message, "error");					
+								}
+							},
+							error: function(data) {
+								$("#loading").hide();
+								$.notify("Terjadi kesalahan sistem!", "error");
+							}
+						});
+					}
 				}
+			}
+			
+			function GetInvoiceNumber(SelectedDate)
+			{
+				$.ajax({
+					url: "./Transaction/FirstStock/GetInvoiceNumber.php",
+					type: "POST",
+					data: { SelectedDate : SelectedDate, InvoiceNumberType : "RB"},
+					dataType: "json",
+					success: function(data) {
+						if(data.FailedFlag == '0') {
+							$("#txtBuyReturnNumber").val(data.InvoiceNumber);
+						}
+						else {
+							$("#loading").hide();
+							$.notify(data.Message, "error");					
+						}
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Terjadi kesalahan sistem!", "error");
+					}
+				});
 			}
 		</script>
 	</body>

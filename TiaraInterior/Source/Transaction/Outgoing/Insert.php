@@ -14,23 +14,25 @@
 		$CustomerID = mysql_real_escape_string($_POST['ddlCustomer']);
 		$hdnIsEdit = mysql_real_escape_string($_POST['hdnIsEdit']);
 		$txtRemarks = mysql_real_escape_string($_POST['txtRemarks']);
+		$OutgoingNumber = mysql_real_escape_string($_POST['txtOutgoingNumber']);
 		$txtDeliveryCost = str_replace(",", "", $_POST['txtDeliveryCost']);
 		$State = 1;
 		mysql_query("START TRANSACTION", $dbh);
 		mysql_query("SET autocommit=0", $dbh);
-		$DetailID = "";
+		$DetailsID = "";
 		$Message = "Data Berhasil Disimpan";
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		for($i=1;$i<=$RecordNew;$i++) {
 			$DetailsID .= mysql_real_escape_string($_POST['hdnOutgoingDetailsID'.$i]).",";
 		}
-		$DetailID = substr($DetailID, 0, -1);
+		$DetailsID = substr($DetailsID, 0, -1);
 		//echo $DetailID;
 		if($hdnIsEdit == 0) {
 			$State = 1;
 			$sql = "INSERT INTO transaction_outgoing
 					(
+						OutgoingNumber,
 						SalesID,
 						CustomerID,
 						TransactionDate,
@@ -41,10 +43,11 @@
 					)
 					VALUES
 					(
+						'".$OutgoingNumber."',
 						".$SalesID.",
 						".$CustomerID.",
 						'".$TransactionDate."',
-						".$DeliveryCost.",
+						".$txtDeliveryCost.",
 						'".$txtRemarks."',
 						NOW(),
 						'".$_SESSION['UserLogin']."'
@@ -55,9 +58,10 @@
 			$State = 2;
 			$sql = "UPDATE transaction_outgoing
 					SET
+						OutgoingNumber = '".$OutgoingNumber."',
 						SalesID = ".$SalesID.",
 						CustomerID = ".$CustomerID.",
-						DeliveryCost = ".$DeliveryCost.",
+						DeliveryCost = ".$txtDeliveryCost.",
 						Remarks = '".$txtRemarks."',
 						TransactionDate = '".$TransactionDate."',
 						ModifiedBy = '".$_SESSION['UserLogin']."'
@@ -75,6 +79,36 @@
 			return 0;
 		}
 		if($hdnIsEdit == 0) {
+			$State = 3;
+			$sql = "INSERT INTO transaction_invoicenumber
+					(
+						InvoiceNumberType,
+						InvoiceDate,
+						InvoiceNumber,
+						DeleteFlag,
+						CreatedDate,
+						CreatedBy
+					)
+					VALUES
+					(
+						'TJ',
+						'".$TransactionDate."',
+						'".$OutgoingNumber."',
+						'0',
+						NOW(),
+						'".$_SESSION['UserLogin']."'
+					)";
+					
+			if (! $result = mysql_query($sql, $dbh)) {
+				$Message = "Terjadi Kesalahan Sistem";
+				$MessageDetail = mysql_error();
+				$FailedFlag = 1;
+				echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
+				mysql_query("ROLLBACK", $dbh);
+				return 0;
+			}
+			
+			$State = 4;
 			$sql = "SELECT
 						MAX(OutgoingID) AS OutgoingID
 					FROM 
@@ -92,7 +126,7 @@
 			$row = mysql_fetch_array($result);
 			$ID = $row['OutgoingID'];
 		}
-		$State = 3;
+		$State = 5;
 		$sql = "DELETE 
 				FROM 
 					transaction_outgoingdetails 
@@ -110,7 +144,7 @@
 		}
 		for($j=1;$j<=$RecordNew;$j++) {
 			if($_POST['hdnOutgoingDetailsID'.$j] == "0") {
-				$State = 4;
+				$State = 6;
 				$sql = "INSERT INTO transaction_outgoingdetails
 						(
 							OutgoingID,
@@ -128,7 +162,7 @@
 							".$ID.",
 							".mysql_real_escape_string($_POST['hdnTypeID'.$j]).",
 							".mysql_real_escape_string($_POST['txtQuantity'.$j]).",
-							".str_replace(",", "", $_POST['txtBuyPrice'.$j]).",
+							".str_replace(",", "", $_POST['hdnBuyPrice'.$j]).",
 							".str_replace(",", "", $_POST['txtSalePrice'.$j]).",
 							".mysql_real_escape_string($_POST['txtDiscount'.$j]).",
 							'".mysql_real_escape_string($_POST['txtBatchNumber'.$j])."',
@@ -137,13 +171,13 @@
 						)";
 			}
 			else {
-				$State = 5;
+				$State = 7;
 				$sql = "UPDATE 
 							transaction_outgoingdetails
 						SET
 							TypeID = ".mysql_real_escape_string($_POST['hdnTypeID'.$j]).",
 							Quantity = ".mysql_real_escape_string($_POST['txtQuantity'.$j]).",
-							BuyPrice = ".str_replace(",", "", $_POST['txtBuyPrice'.$j]).",
+							BuyPrice = ".str_replace(",", "", $_POST['hdnBuyPrice'.$j]).",
 							SalePrice = ".str_replace(",", "", $_POST['txtSalePrice'.$j]).",
 							Discount = ".mysql_real_escape_string($_POST['txtDiscount'.$j]).",
 							BatchNumber = '".mysql_real_escape_string($_POST['txtBatchNumber'.$j])."',
@@ -185,7 +219,7 @@
 	
 	function returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State) {
 		$data = array(
-			"Id" => $ID, 
+			"ID" => $ID, 
 			"Message" => $Message,
 			"MessageDetail" => $MessageDetail,
 			"FailedFlag" => $FailedFlag,
