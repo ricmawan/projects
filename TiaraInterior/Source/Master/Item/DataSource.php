@@ -52,33 +52,34 @@
 					SELECT
 						TypeID,
 						TRIM(BatchNumber) BatchNumber,
-						(BuyPrice - ((BuyPrice * Discount )/100)) BuyPrice,
-						SalePrice,
-						SUM(Quantity) Quantity
+						SUM(SA.Quantity) Quantity
 					FROM
-						transaction_firststockdetails
-					GROUP BY
-						TypeID,
-						BatchNumber,
-						BuyPrice,
-						SalePrice,
-						Discount
-				)FS
-					ON FS.TypeID = MT.TypeID
-				LEFT JOIN
-				(
-					SELECT
-						TypeID,
-						TRIM(BatchNumber) BatchNumber,
-						SUM(Quantity) Quantity
-					FROM
-						transaction_incomingdetails
+					(
+						SELECT
+							TypeID,
+							TRIM(BatchNumber) BatchNumber,
+							SUM(Quantity) Quantity
+						FROM
+							transaction_firststockdetails
+						GROUP BY
+							TypeID,
+							BatchNumber
+						UNION
+						SELECT
+							TypeID,
+							TRIM(BatchNumber) BatchNumber,
+							SUM(Quantity) Quantity
+						FROM
+							transaction_incomingdetails
+						GROUP BY
+							TypeID,
+							BatchNumber
+					)SA
 					GROUP BY
 						TypeID,
 						BatchNumber
-				)TI
-					ON TI.TypeID = MT.TypeID
-					AND TI.BatchNumber = FS.BatchNumber
+				)FS
+					ON FS.TypeID = MT.TypeID
 				LEFT JOIN
 				(
 					SELECT
@@ -134,8 +135,8 @@
 				MT.TypeName,
 				MB.BrandName,
 				FS.BatchNumber,
-				MT.BuyPrice,
-				MT.SalePrice,
+				IFNULL(FS.BuyPrice, MT.BuyPrice) BuyPrice,
+				IFNULL(FS.SalePrice, MT.SalePrice) SalePrice,
 				(IFNULL(FS.Quantity, 0) - IFNULL(TOD.Quantity, 0) - IFNULL(BR.Quantity, 0) + IFNULL(SR.Quantity, 0)) Stock,
 				MU.UnitName
 			FROM
@@ -149,13 +150,17 @@
 					SELECT
 						TypeID,
 						TRIM(BatchNumber) BatchNumber,
-						SUM(SA.Quantity) Quantity
+						SUM(SA.Quantity) Quantity,
+						BuyPrice,
+						SalePrice
 					FROM
 					(
 						SELECT
 							TypeID,
 							TRIM(BatchNumber) BatchNumber,
-							SUM(Quantity) Quantity
+							SUM(Quantity) Quantity,
+							BuyPrice,
+							SalePrice
 						FROM
 							transaction_firststockdetails
 						GROUP BY
@@ -165,7 +170,9 @@
 						SELECT
 							TypeID,
 							TRIM(BatchNumber) BatchNumber,
-							SUM(Quantity) Quantity
+							SUM(Quantity) Quantity,
+							BuyPrice,
+							SalePrice
 						FROM
 							transaction_incomingdetails
 						GROUP BY

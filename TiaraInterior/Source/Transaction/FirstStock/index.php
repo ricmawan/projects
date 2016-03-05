@@ -17,7 +17,7 @@
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
-										<th data-column-id="FirstStockID" data-visible="false" data-type="numeric" data-identifier="true">ID Transaksi</th>
+										<th data-column-id="FirstStockIDNo" data-visible="false" data-type="numeric" data-identifier="true">ID Transaksi</th>
 										<th data-column-id="FirstStockNumber">No Nota</th>
 										<th data-column-id="TransactionDate" data-type="numeric">Tanggal</th>
 										<th data-column-id="TotalAmount" data-align="right">Total</th>

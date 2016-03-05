@@ -53,7 +53,7 @@
 						OTD.SalePrice,
 						OTD.BatchNumber,
 						OTD.Discount,
-						CONCAT(MB.BrandName, ' ', I.TypeName) AS TypeName
+						CONCAT(MB.BrandName, ' ', I.TypeName, ' - ', OTD.BatchNumber) AS TypeName
 					FROM
 						transaction_outgoingdetails OTD
 						JOIN master_type I
@@ -189,29 +189,6 @@
 										<select name="ddlType" id="ddlType" class="form-control-custom" placeholder="Pilih Tipe" >
 											<option value="" brandid="" selected> </option>
 										</select>
-										<select name="ddlHiddenType" id="ddlHiddenType" style="display:none;" class="form-control-custom" placeholder="Pilih Barang" >
-											<option value="" brandid="" selected> </option>
-											<?php
-												$sql = "SELECT 
-															MI.TypeID, 
-															MI.TypeName, 
-															MB.BrandID, 
-															MI.BuyPrice,
-															MI.SalePrice,
-															MB.BrandName
-														FROM 
-															master_type MI 
-															JOIN master_brand MB
-																ON MB.BrandID = MI.BrandID";
-												if(!$result = mysql_query($sql, $dbh)) {
-													echo mysql_error();
-													return 0;
-												}
-												while($row = mysql_fetch_array($result)) {
-													echo "<option value='".$row['TypeID']."' buyprice='".$row['BuyPrice']."' saleprice='".$row['SalePrice']."' brandid='".$row['BrandID']."' >".$row['BrandName']." ".$row['TypeName']." - 001</option>";
-												}
-											?>
-										</select>
 									</div>
 								</div>
 							</div>
@@ -220,10 +197,9 @@
 								<div class="col-md-12">
 									
 									<table class="table" id="datainput">
-										<thead style="background-color: black;color:white;height:25px;width:800px;display:block;">
+										<thead style="background-color: black;color:white;height:25px;width:720px;display:block;">
 											<td align="center" style="width:30px;">No</td>
 											<td align="center" style="width:188px;">Nama Barang</td>
-											<td align="center" style="width:80px;">Batch</td>
 											<td align="center" style="width:66px;">QTY</td>											
 											<td align="center" style="width:136px;">Harga Jual</td>
 											<td align="center" style="width:77px;">Diskon (%)</td>
@@ -238,12 +214,11 @@
 													<input type="hidden" id="hdnTypeID" name="hdnTypeID" value="0" class="hdnTypeID" />
 													<input type="hidden" id="hdnOutgoingDetailsID" class="hdnOutgoingDetailsID" name="hdnOutgoingDetailsID" value="0" />
 													<input type="hidden" id="hdnBuyPrice" name="hdnBuyPrice" class="hdnBuyPrice" value=0 />
-												</td>
-												<td style="width:80px;">
-													<input type="text" row="" id="txtBatchNumber" style="width: 63px;" name="txtBatchNumber" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control-custom txtBatchNumber" placeholder="Batch"/>
+													<input type="hidden" id="hdnBatchNumber" name="hdnBatchNumber" class="hdnBatchNumber" value="" />
+													<input type="hidden" id="hdnStock" name="hdnStock" class="hdnStock" value="" />
 												</td>
 												<td style="width:66px;">
-													<input type="text" row="" value=1 id="txtQuantity" style="width: 50px;" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control-custom txtQuantity" placeholder="QTY"/>
+													<input type="text" row="" value=1 id="txtQuantity" style="width: 50px;" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="ValidateQty(this.getAttribute('row'));" class="form-control-custom txtQuantity" placeholder="QTY"/>
 												</td>
 												<td style="width:136px;">
 													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;width: 120px;" class="form-control-custom txtSalePrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual"/>
@@ -314,9 +289,19 @@
 				$("#ddlType").append('<option value="" brandid="" selected> </option>');
 				$("#ddlType").val("");
 				$("#ddlType").next().find("input").val("");
-				$("#ddlHiddenType option").each(function() {
-					if($(this).attr("brandid") == $("#ddlBrand").val() || $(this).attr("brandid") == "") {
-						$("#ddlType").append($(this).clone());
+				$.ajax({
+					url: "./Transaction/Outgoing/GetAvailableType.php",
+					type: "POST",
+					data: { BrandID : $("#ddlBrand").val() },
+					dataType: "json",
+					success: function(data) {
+						$.each(data, function(key, value) {
+							$("#ddlType").append("<option value='" + value.TypeID + "' buyprice='" + value.BuyPrice + "' saleprice='" + value.SalePrice + "' stock='" + value.Stock + "' batchnumber='" + value.BatchNumber + "' brandid='" + value.BrandID + "' >" + value.BrandName + " " + value.TypeName + " - " + value.BatchNumber + "</option>");
+						});
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Terjadi kesalahan sistem!", "error");
 					}
 				});
 			}
@@ -326,21 +311,31 @@
 				var CurrentTypeID = $("#ddlType").val();
 				var CurrentBuyPrice = $("#ddlType option:selected").attr("buyprice");
 				var CurrentSalePrice = $("#ddlType option:selected").attr("saleprice");
+				var CurrentBatchNumber = $("#ddlType option:selected").attr("batchnumber");
+				var CurrentStock = $("#ddlType option:selected").attr("stock");
 				var CurrentTypeName = $("#ddlType option:selected").text();
 				var rows = $("#recordnew").val();
 				var AddFlag = 1;
 				//QTY + 1 if selected item already exists
 				for(i=1;i<=rows;i++) {
-					/*if($("#hdnTypeID" + i).val() == CurrentTypeID) {
-						$("#txtQuantity" + i).val((parseFloat($("#txtQuantity" + i).val()) + 1));
+					if($("#hdnTypeID" + i).val() == CurrentTypeID && $("#hdnBatchNumber" + i).val() == CurrentBatchNumber) {
+						if((parseInt($("#txtQuantity" + i).val()) + 1) > CurrentStock) {
+							$.notify("Sisa stok yang ada : " +CurrentStock, "error");
+							$("#txtQuantity" + i).val(CurrentStock);
+						}
+						else {
+							$("#txtQuantity" + i).val((parseInt($("#txtQuantity" + i).val()) + 1));
+						}
 						AddFlag = 0;
-					}*/
+					}
 				}
 				if(AddFlag == 1) {
 					$("#btnAdd").click();
 					$("#hdnTypeID" + i).val(CurrentTypeID);
 					$("#txtTypeName" + i).val(CurrentTypeName);
 					$("#hdnBuyPrice" + i).val(returnRupiah(CurrentSalePrice.toString()));
+					$("#hdnBatchNumber" + i).val(CurrentBatchNumber.toString());
+					$("#hdnStock" + i).val(CurrentStock.toString());
 					$("#txtSalePrice" + i).val(returnRupiah(CurrentSalePrice.toString()));
 					$("#txtQuantity" + i).val(1);
 					$("#txtTotal" + i).val(CurrentBuyPrice);
@@ -383,6 +378,14 @@
 					i++;
 				});
 				i = 0;
+				$(".hdnStock").each(function() {
+					if(i != 0) {
+						$(this).attr("id", "hdnStock" + i);
+						$(this).attr("name", "hdnStock" + i);
+					}
+					i++;
+				});
+				i = 0;
 				$(".hdnOutgoingDetailsID").each(function() {
 					if(i != 0) {
 						$(this).attr("id", "hdnOutgoingDetailsID" + i);
@@ -400,10 +403,10 @@
 					i++;
 				});
 				i = 0;
-				$(".txtBatchNumber").each(function() {
+				$(".hdnBatchNumber").each(function() {
 					if(i != 0) {
-						$(this).attr("id", "txtBatchNumber" + i);
-						$(this).attr("name", "txtBatchNumber" + i);
+						$(this).attr("id", "hdnBatchNumber" + i);
+						$(this).attr("name", "hdnBatchNumber" + i);
 						$(this).attr("row", i);
 					}
 					i++;
@@ -563,7 +566,7 @@
 						$("#hdnOutgoingDetailsID" + count).val(d[0].replace("'", ""));
 						$("#hdnTypeID" + count).val(d[1].replace("'", ""));
 						$("#txtTypeName" + count).val(d[2].replace("'", ""));
-						$("#txtBatchNumber" + count).val(d[3].replace("'", ""));
+						$("#hdnBatchNumber" + count).val(d[3].replace("'", ""));
 						$("#txtQuantity" + count).val(d[4].replace("'", ""));
 						$("#hdnBuyPrice" + count).val(d[5].replace("'", ""));
 						$("#txtSalePrice" + count).val(returnRupiah(d[6].replace("'", "")));
@@ -660,6 +663,15 @@
 				}
 			}
 			
+			function ValidateQty(row) {
+				var currentQty = $("#txtQuantity" + row).val();
+				var currentStock = $("#hdnStock" +  row).val();
+				if(parseInt(currentQty) > parseInt(currentStock)) {
+					$.notify("Sisa stok yang ada : " + currentStock, "error");
+					$("#txtQuantity" + row).val(currentStock);
+				}
+				Calculate();
+			}
 			function GetInvoiceNumber(SelectedDate)
 			{
 				$.ajax({

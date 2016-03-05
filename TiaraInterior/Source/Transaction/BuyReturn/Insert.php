@@ -152,7 +152,7 @@
 							".mysql_real_escape_string($_POST['hdnTypeID'.$j]).",
 							".mysql_real_escape_string($_POST['txtQuantity'.$j]).",
 							".str_replace(",", "", $_POST['txtBuyPrice'.$j]).",
-							'".mysql_real_escape_string($_POST['txtBatchNumber'.$j])."',
+							'".mysql_real_escape_string($_POST['hdnBatchNumber'.$j])."',
 							NOW(),
 							'".$_SESSION['UserLogin']."'
 						)";
@@ -165,7 +165,7 @@
 							TypeID = ".mysql_real_escape_string($_POST['hdnTypeID'.$j]).",
 							Quantity = ".mysql_real_escape_string($_POST['txtQuantity'.$j]).",
 							BuyPrice = ".str_replace(",", "", $_POST['txtBuyPrice'.$j]).",
-							BatchNumber = '".mysql_real_escape_string($_POST['txtBatchNumber'.$j])."',
+							BatchNumber = '".mysql_real_escape_string($_POST['hdnBatchNumber'.$j])."',
 							ModifiedBy = '".$_SESSION['UserLogin']."'
 						WHERE
 							BuyReturnDetailsID = ".mysql_real_escape_string($_POST['hdnBuyReturnDetailsID'.$j]);

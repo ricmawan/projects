@@ -12,13 +12,14 @@
 		for($i=0; $i<count($Data); $i++) {
 			try
 			{
-				//$ProjectData = explode("^", $Data[$i]);
-				$BuyReturnID = mysql_real_escape_string($Data[$i]);
-				$sql = "DELETE FROM transaction_buyreturn WHERE BuyReturnNumber = '".$BuyReturnID."'";
+				$BuyReturnData = explode("^", mysql_real_escape_string($Data[$i]));
+				$BuyReturnID = $BuyReturnData[0];
+				$BuyReturnNumber = $BuyReturnData[1];
+				$sql = "DELETE FROM transaction_buyreturn WHERE BuyReturnID = '".$BuyReturnID."'";
 				if (! $result=mysql_query($sql, $dbh)) {
-					throw new Exception($FirstStockID);
+					throw new Exception($BuyReturnNumber);
 				}
-				$MessageSuccessDelete .= "$BuyReturnID, ";
+				$MessageSuccessDelete .= "$BuyReturnNumber, ";
 			}
 			catch (Exception $e)
 			{

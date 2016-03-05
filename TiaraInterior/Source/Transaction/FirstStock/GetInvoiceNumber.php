@@ -30,7 +30,6 @@
 		$row = mysql_fetch_array($result);
 		$InvoiceNumber = $row['InvoiceNumber'];
 		echo returnstate($InvoiceNumber, $Message, $MessageDetail, $FailedFlag, $State);
-		mysql_query("COMMIT", $dbh);
 		return 0;
 	}
 	

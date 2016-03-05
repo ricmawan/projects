@@ -85,7 +85,8 @@
 	while ($row = mysql_fetch_array($result)) {
 		$RowNumber++;
 		$row_array['RowNumber'] = $RowNumber;
-		$row_array['BuyReturnID']= $row['BuyReturnNumber'];
+		$row_array['BuyReturnIDNo']= $row['BuyReturnID']."^".$row['BuyReturnNumber'];
+		$row_array['BuyReturnID']= $row['BuyReturnID'];
 		$row_array['BuyReturnNumber']= $row['BuyReturnNumber'];
 		$row_array['SupplierName'] = $row['SupplierName'];
 		$row_array['TotalAmount'] =  number_format($row['TotalAmount'],2,".",",");

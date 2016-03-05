@@ -17,7 +17,7 @@
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
-										<th data-column-id="IncomingID" data-type="numeric" data-visible="false" data-identifier="true">ID Transaksi</th>
+										<th data-column-id="IncomingIDNo" data-type="numeric" data-visible="false" data-identifier="true">ID Transaksi</th>
 										<th data-column-id="IncomingNumber">No Nota</th>
 										<th data-column-id="TransactionDate" data-type="numeric">Tanggal</th>
 										<th data-column-id="SupplierName">Nama Supplier</th>

@@ -12,13 +12,14 @@
 		for($i=0; $i<count($Data); $i++) {
 			try
 			{
-				//$ProjectData = explode("^", $Data[$i]);
-				$OutgoingID = mysql_real_escape_string($Data[$i]);
-				$sql = "DELETE FROM transaction_outgoing WHERE OutgoingNumber = '".$OutgoingID."'";
+				$OutgoingData = explode("^", mysql_real_escape_string($Data[$i]));
+				$OutgoingID = $OutgoingData[0];
+				$OutgoingNumber = $OutgoingData[1];
+				$sql = "DELETE FROM transaction_outgoing WHERE OutgoingID = '".$OutgoingID."'";
 				if (! $result=mysql_query($sql, $dbh)) {
-					throw new Exception($FirstStockID);
+					throw new Exception($OutgoingNumber);
 				}
-				$MessageSuccessDelete .= "$OutgoingID, ";
+				$MessageSuccessDelete .= "$OutgoingNumber, ";
 			}
 			catch (Exception $e)
 			{

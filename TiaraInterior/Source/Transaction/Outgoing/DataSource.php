@@ -90,7 +90,8 @@
 	while ($row = mysql_fetch_array($result)) {
 		$RowNumber++;
 		$row_array['RowNumber'] = $RowNumber;
-		$row_array['OutgoingID']= $row['OutgoingNumber'];
+		$row_array['OutgoingIDNo']= $row['OutgoingID']."^".$row['OutgoingNumber'];
+		$row_array['OutgoingID']= $row['OutgoingID'];
 		$row_array['OutgoingNumber']= $row['OutgoingNumber'];
 		$row_array['SalesName'] = $row['SalesName'];
 		$row_array['CustomerName'] = $row['CustomerName'];

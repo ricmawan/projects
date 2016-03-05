@@ -46,7 +46,7 @@
 						BRD.Quantity,
 						BRD.BuyPrice,
 						BRD.BatchNumber,
-						CONCAT(MB.BrandName, ' ', I.TypeName) AS TypeName
+						CONCAT(MB.BrandName, ' ', I.TypeName, ' - ', BRD.BatchNumber) AS TypeName
 					FROM
 						transaction_buyreturndetails BRD
 						JOIN master_type I
@@ -192,12 +192,11 @@
 								<div class="col-md-12">
 									
 									<table class="table" id="datainput">
-										<thead style="background-color: black;color:white;height:25px;width:725px;display:block;">
+										<thead style="background-color: black;color:white;height:25px;width:615px;display:block;">
 											<td align="center" style="width:30px;">No</td>
 											<td align="center" style="width:190px;">Nama Barang</td>
-											<td align="center" style="width:80px;">Batch</td>
-											<td align="center" style="width:66px;">QTY</td>
-											<td align="center" style="width:136px;">Harga Beli</td>
+											<td align="center" style="width:65px;">QTY</td>
+											<td align="center" style="width:135px;">Harga Beli</td>
 											<td align="center" style="width:195px;">Total</td>
 											<td style="width: 26px"></td>
 										</thead>
@@ -208,14 +207,13 @@
 													<input type="text" id="txtTypeName" name="txtTypeName" class="form-control-custom txtTypeName" placeholder="Nama Barang" readonly />
 													<input type="hidden" id="hdnTypeID" name="hdnTypeID" value="0" class="hdnTypeID" />
 													<input type="hidden" id="hdnBuyReturnDetailsID" class="hdnBuyReturnDetailsID" name="hdnBuyReturnDetailsID" value="0" />
+													<input type="hidden" id="hdnBatchNumber" name="hdnBatchNumber" class="hdnBatchNumber" value="" />
+													<input type="hidden" id="hdnStock" name="hdnStock" class="hdnStock" value="" />
 												</td>
-												<td style="width:80px;">
-													<input type="text" row="" id="txtBatchNumber" style="width: 63px;" name="txtBatchNumber" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control-custom txtBatchNumber" placeholder="Batch"/>
+												<td style="width:65px;">
+													<input type="text" row="" value=1 id="txtQuantity" style="width: 50px;" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="ValidateQty(this.getAttribute('row'));" class="form-control-custom txtQuantity" placeholder="QTY"/>
 												</td>
-												<td style="width:66px;">
-													<input type="text" row="" value=1 id="txtQuantity" style="width: 50px;" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control-custom txtQuantity" placeholder="QTY"/>
-												</td>
-												<td style="width:136px;">
+												<td style="width:135px;">
 													<input type="text" id="txtBuyPrice" value="0.00" name="txtBuyPrice" style="text-align:right;width: 120px;" class="form-control-custom txtBuyPrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Beli"/>
 												</td>
 												<td  style="width:195px;">
@@ -270,9 +268,19 @@
 				$("#ddlType").append('<option value="" brandid="" selected> </option>');
 				$("#ddlType").val("");
 				$("#ddlType").next().find("input").val("");
-				$("#ddlHiddenType option").each(function() {
-					if($(this).attr("brandid") == $("#ddlBrand").val() || $(this).attr("brandid") == "") {
-						$("#ddlType").append($(this).clone());
+				$.ajax({
+					url: "./Transaction/Outgoing/GetAvailableType.php",
+					type: "POST",
+					data: { BrandID : $("#ddlBrand").val() },
+					dataType: "json",
+					success: function(data) {
+						$.each(data, function(key, value) {
+							$("#ddlType").append("<option value='" + value.TypeID + "' buyprice='" + value.BuyPrice + "' saleprice='" + value.SalePrice + "' stock='" + value.Stock + "' batchnumber='" + value.BatchNumber + "' brandid='" + value.BrandID + "' >" + value.BrandName + " " + value.TypeName + " - " + value.BatchNumber + "</option>");
+						});
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Terjadi kesalahan sistem!", "error");
 					}
 				});
 			}
@@ -282,15 +290,23 @@
 				var CurrentTypeID = $("#ddlType").val();
 				var CurrentBuyPrice = $("#ddlType option:selected").attr("buyprice");
 				//var CurrentSalePrice = $("#ddlType option:selected").attr("saleprice");
+				var CurrentBatchNumber = $("#ddlType option:selected").attr("batchnumber");
+				var CurrentStock = $("#ddlType option:selected").attr("stock");
 				var CurrentTypeName = $("#ddlType option:selected").text();
 				var rows = $("#recordnew").val();
 				var AddFlag = 1;
 				//QTY + 1 if selected item already exists
 				for(i=1;i<=rows;i++) {
-					/*if($("#hdnTypeID" + i).val() == CurrentTypeID) {
-						$("#txtQuantity" + i).val((parseFloat($("#txtQuantity" + i).val()) + 1));
+					if($("#hdnTypeID" + i).val() == CurrentTypeID && $("#hdnBatchNumber" + i).val() == CurrentBatchNumber) {
+						if((parseInt($("#txtQuantity" + i).val()) + 1) > CurrentStock) {
+							$.notify("Sisa stok yang ada : " +CurrentStock, "error");
+							$("#txtQuantity" + i).val(CurrentStock);
+						}
+						else {
+							$("#txtQuantity" + i).val((parseInt($("#txtQuantity" + i).val()) + 1));
+						}
 						AddFlag = 0;
-					}*/
+					}
 				}
 				if(AddFlag == 1) {
 					$("#btnAdd").click();
@@ -298,6 +314,8 @@
 					$("#txtTypeName" + i).val(CurrentTypeName);
 					$("#txtBuyPrice" + i).val(returnRupiah(CurrentBuyPrice.toString()));
 					//$("#txtSalePrice" + i).val(returnRupiah(CurrentSalePrice.toString()));
+					$("#hdnBatchNumber" + i).val(CurrentBatchNumber.toString());
+					$("#hdnStock" + i).val(CurrentStock.toString());
 					$("#txtQuantity" + i).val(1);
 					$("#txtTotal" + i).val(CurrentBuyPrice);
 				}
@@ -339,6 +357,14 @@
 					i++;
 				});
 				i = 0;
+				$(".hdnStock").each(function() {
+					if(i != 0) {
+						$(this).attr("id", "hdnStock" + i);
+						$(this).attr("name", "hdnStock" + i);
+					}
+					i++;
+				});
+				i = 0;
 				$(".hdnBuyReturnDetailsID").each(function() {
 					if(i != 0) {
 						$(this).attr("id", "hdnBuyReturnDetailsID" + i);
@@ -356,10 +382,10 @@
 					i++;
 				});
 				i = 0;
-				$(".txtBatchNumber").each(function() {
+				$(".hdnBatchNumber").each(function() {
 					if(i != 0) {
-						$(this).attr("id", "txtBatchNumber" + i);
-						$(this).attr("name", "txtBatchNumber" + i);
+						$(this).attr("id", "hdnBatchNumber" + i);
+						$(this).attr("name", "hdnBatchNumber" + i);
 						$(this).attr("row", i);
 					}
 					i++;
@@ -372,14 +398,6 @@
 					}
 					i++;
 				});
-				/*i = 0;
-				$(".txtSalePrice").each(function() {
-					if(i != 0) {
-						$(this).attr("id", "txtSalePrice" + i);
-						$(this).attr("name", "txtSalePrice" + i);
-					}
-					i++;
-				});*/
 				i = 0;
 				$(".txtTotal").each(function() {
 					if(i != 0) {
@@ -501,7 +519,7 @@
 						$("#hdnBuyReturnDetailsID" + count).val(d[0].replace("'", ""));
 						$("#hdnTypeID" + count).val(d[1].replace("'", ""));
 						$("#txtTypeName" + count).val(d[2].replace("'", ""));
-						$("#txtBatchNumber" + count).val(d[3].replace("'", ""));
+						$("#hdnBatchNumber" + count).val(d[3].replace("'", ""));
 						$("#txtQuantity" + count).val(d[4].replace("'", ""));
 						$("#txtBuyPrice" + count).val(returnRupiah(d[5].replace("'", "")));
 						$("#record").val(count);
@@ -563,7 +581,15 @@
 					}
 				}
 			}
-			
+			function ValidateQty(row) {
+				var currentQty = $("#txtQuantity" + row).val();
+				var currentStock = $("#hdnStock" +  row).val();
+				if(parseInt(currentQty) > parseInt(currentStock)) {
+					$.notify("Sisa stok yang ada : " + currentStock, "error");
+					$("#txtQuantity" + row).val(currentStock);
+				}
+				Calculate();
+			}
 			function GetInvoiceNumber(SelectedDate)
 			{
 				$.ajax({

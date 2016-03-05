@@ -12,14 +12,15 @@
 		for($i=0; $i<count($Data); $i++) {
 			try
 			{
-				//$ProjectData = explode("^", $Data[$i]);
-				$FirstStockID = mysql_real_escape_string($Data[$i]);
-				$sql = "DELETE FROM transaction_firststock WHERE FirstStockNumber = '".$FirstStockID."'";
+				$FirstStockData = explode("^", mysql_real_escape_string($Data[$i]));
+				$FirstStockID = $FirstStockData[0];
+				$FirstStockNumber = $FirstStockData[1];
+				$sql = "DELETE FROM transaction_firststock WHERE FirstStockID = '".$FirstStockID."'";
 				if (! $result=mysql_query($sql, $dbh)) {
 					echo mysql_error();
-					throw new Exception($FirstStockID);
+					throw new Exception($FirstStockNumber);
 				}
-				$MessageSuccessDelete .= "$FirstStockID, ";
+				$MessageSuccessDelete .= "$FirstStockNumber, ";
 			}
 			catch (Exception $e)
 			{

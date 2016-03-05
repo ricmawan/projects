@@ -165,7 +165,7 @@
 							".str_replace(",", "", $_POST['hdnBuyPrice'.$j]).",
 							".str_replace(",", "", $_POST['txtSalePrice'.$j]).",
 							".mysql_real_escape_string($_POST['txtDiscount'.$j]).",
-							'".mysql_real_escape_string($_POST['txtBatchNumber'.$j])."',
+							'".mysql_real_escape_string($_POST['hdnBatchNumber'.$j])."',
 							NOW(),
 							'".$_SESSION['UserLogin']."'
 						)";
@@ -180,7 +180,7 @@
 							BuyPrice = ".str_replace(",", "", $_POST['hdnBuyPrice'.$j]).",
 							SalePrice = ".str_replace(",", "", $_POST['txtSalePrice'.$j]).",
 							Discount = ".mysql_real_escape_string($_POST['txtDiscount'.$j]).",
-							BatchNumber = '".mysql_real_escape_string($_POST['txtBatchNumber'.$j])."',
+							BatchNumber = '".mysql_real_escape_string($_POST['hdnBatchNumber'.$j])."',
 							ModifiedBy = '".$_SESSION['UserLogin']."'
 						WHERE
 							OutgoingDetailsID = ".$_POST['hdnOutgoingDetailsID'.$j];
