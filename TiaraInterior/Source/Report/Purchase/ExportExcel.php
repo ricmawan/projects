@@ -1,28 +1,12 @@
 <?php
-	if(ISSET($_GET['ItemID'])) {
+	if(ISSET($_GET['SupplierID'])) {
 		$RequestPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestPath);
 		$RequestPath = str_replace($file, "", $RequestPath);	
 		include "../../GetPermission.php";
 		//echo $_SERVER['REQUEST_URI'];
-		$ItemID = mysql_real_escape_string($_GET['ItemID']);
-		$sql = "SELECT
-					I.ItemID,
-					CONCAT(C.CategoryName, ' ', I.ItemName) AS ItemName
-				FROM
-					master_item I
-					JOIN master_category C
-						ON C.CategoryID = I.CategoryID
-				WHERE
-					I.ItemID = $ItemID";
-						
-		if (! $result = mysql_query($sql, $dbh)) {
-			echo mysql_error();
-			return 0;
-		}
-		$row = mysql_fetch_array($result);
-		$ItemName = $row['ItemName'];
-		
+		$SupplierID = mysql_real_escape_string($_GET['SupplierID']);
+				
 		if($_GET['txtFromDate'] == "") {
 			$txtFromDate = "2000-01-01";
 			$FromDate = "01-01-2000";
@@ -62,14 +46,14 @@
 		// Set document properties
 		$objPHPExcel->getProperties()->setCreator($_SESSION['UserLogin'])
 									 ->setLastModifiedBy($_SESSION['UserLogin'])
-									 ->setTitle("Laporan Mutasi Stok ".$ItemName)
+									 ->setTitle("Laporan Pembelian")
 									 ->setSubject("Laporan")
-									 ->setDescription("Laporan Mutasi Stok ".$ItemName)
+									 ->setDescription("Laporan Pembelian")
 									 ->setKeywords("Generate By PHPExcel")
 									 ->setCategory("Laporan");
 		//Header
 		$objPHPExcel->setActiveSheetIndex(0)
-					->setCellValue('A1', "LAPORAN MUTASI STOK ".strtoupper($ItemName));
+					->setCellValue('A1', "LAPORAN PEMBELIAN ");
 		
 		$objPHPExcel->getActiveSheet()->getStyle('A1')->getAlignment()->setWrapText(true);
 		
@@ -81,142 +65,40 @@
 		//set color
 		//$objPHPExcel->getFont()->setColor( new PHPExcel_Style_Color( PHPExcel_Style_Color::COLOR_DARKGREEN ) );
 		$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "No");
-		$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, "Tanggal");
-		$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, "Nama");
-		$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, "Masuk");
-		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Keluar");
-		$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, "Harga");
-		$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, "Stok");
-		$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, "Keterangan");
+		$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, "No Nota");
+		$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, "Tanggal");
+		$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, "Nama Supplier");
+		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Total");
+		$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, "Keterangan");
 		$rowExcel++;
 		
 		mysql_query("SET @row:=0;", $dbh);
 		$sql = "SELECT
-					DATE_FORMAT('".$txtFromDate."', '%d%b%y') AS TransactionDate,
-					'".$txtFromDate."' AS OrderDate,
-					'' AS Name,
-					DATA.Incoming,
-					DATA.Outgoing,
-					SUM(DATA.Stock) AS Stock,
-					0 AS Price,
-					'Stok Awal' AS Remarks,
-					1 AS UnionLevel
+					DATE_FORMAT(TI.TransactionDate, '%d%b%y') AS TransactionDate,
+					MS.SupplierName AS SupplierName,
+					TI.IncomingNumber,
+					TI.Remarks,
+					IFNULL(SUM(TID.Quantity * (TID.BuyPrice - ((TID.BuyPrice * TID.Discount)/100))), 0) AS Total
 				FROM
-					(
-						SELECT
-							'-' AS TransactionDate,
-							'-' AS Incoming,
-							'-' AS Outgoing,
-							SUM(ITD.Quantity) AS Stock
-						FROM
-							transaction_incomingtransactiondetails ITD
-							JOIN transaction_incomingtransaction IT
-								ON IT.IncomingTransactionID = ITD.IncomingTransactionID
-						WHERE
-							ITD.ItemID = ".$ItemID."
-							AND IT.TransactionDate < '".$txtFromDate."'
-						GROUP BY
-							ITD.ItemID
-						UNION ALL
-						SELECT
-							OT.TransactionDate,
-							'-',
-							'-',
-							-SUM(OTD.Quantity) AS Quantity
-						FROM
-							transaction_outgoingtransactiondetails OTD
-							JOIN transaction_outgoingtransaction OT
-								ON OT.OutgoingTransactionID = OTD.OutgoingTransactionID
-						WHERE
-							OTD.ItemID = ".$ItemID."
-							AND OT.TransactionDate < '".$txtFromDate."'
-						GROUP BY
-							OTD.ItemID
-						UNION ALL
-						SELECT
-							RT.TransactionDate,
-							'-',
-							'-',
-							SUM(RT.Quantity) AS Quantity
-						FROM
-							transaction_returntransaction RT
-						WHERE
-							RT.ItemID = ".$ItemID."
-							AND RT.TransactionDate < '".$txtFromDate."'
-						GROUP BY
-							RT.ItemID
-					)DATA
-				UNION ALL
-				SELECT
-					DATE_FORMAT(DATA.TransactionDate, '%d%b%y') AS TransactionDate,
-					DATA.TransactionDate AS OrderDate,
-					DATA.Name,
-					DATA.Incoming,
-					DATA.Outgoing,
-					0,
-					DATA.Price,
-					DATA.Remarks,
-					DATA.UnionLevel
-				FROM
-					(
-						SELECT
-							IT.TransactionDate AS TransactionDate,
-							ITD.Quantity AS Incoming,
-							0 AS Outgoing,
-							'' AS Name,
-							ITD.Price,
-							MS.SupplierName AS Remarks,
-							1 AS UnionLevel
-						FROM
-							transaction_incomingtransactiondetails ITD
-							JOIN transaction_incomingtransaction IT
-								ON IT.IncomingTransactionID = ITD.IncomingTransactionID
-							LEFT JOIN master_supplier MS
-								ON MS.SupplierID = IT.SupplierID
-						WHERE
-							ITD.ItemID = ".$ItemID."
-							AND IT.TransactionDate >= '".$txtFromDate."'
-							AND IT.TransactionDate <= '".$txtToDate."'
-						UNION ALL
-						SELECT
-							OT.TransactionDate,
-							0,
-							OTD.Quantity,
-							OTD.Name,
-							OTD.Price,
-							MP.ProjectName,
-							2 AS UnionLevel
-						FROM
-							transaction_outgoingtransactiondetails OTD
-							JOIN transaction_outgoingtransaction OT
-								ON OT.OutgoingTransactionID = OTD.OutgoingTransactionID
-							JOIN master_project MP
-								ON MP.ProjectID = OT.ProjectID
-						WHERE
-							OTD.ItemID = ".$ItemID."
-							AND OT.TransactionDate >= '".$txtFromDate."'
-							AND OT.TransactionDate <= '".$txtToDate."'
-						UNION ALL
-						SELECT
-							RT.TransactionDate,
-							RT.Quantity AS Quantity,
-							0,
-							'',
-							RT.Price,
-							CONCAT('Retur ', MP.ProjectName) AS Remarks,
-							3 AS UnionLevel
-						FROM
-							transaction_returntransaction RT
-							JOIN master_project MP
-								ON MP.ProjectID = RT.ProjectID
-						WHERE
-							RT.ItemID = ".$ItemID."
-							AND RT.TransactionDate >= '".$txtFromDate."'
-							AND RT.TransactionDate <= '".$txtToDate."'
-					)DATA
+					transaction_incoming TI
+					JOIN master_supplier MS
+						ON MS.SupplierID = TI.SupplierID
+					LEFT JOIN transaction_incomingdetails TID
+						ON TID.IncomingID = TI.IncomingID
+				WHERE
+					TI.TransactionDate >= '".$txtFromDate."'
+					AND TI.TransactionDate <= '".$txtToDate."'
+					AND CASE
+							WHEN ".$SupplierID." = 0
+							THEN MS.SupplierID
+							ELSE ".$SupplierID."
+						END = MS.SupplierID
+				GROUP BY
+					TI.IncomingNumber,
+					TI.TransactionDate,
+					MS.SupplierName
 				ORDER BY	
-					OrderDate ASC,
-					UnionLevel ASC";
+					TransactionDate ASC";
 					
 		if (! $result = mysql_query($sql, $dbh)) {
 			echo mysql_error();
@@ -225,31 +107,29 @@
 		$RowNumber = 1;
 		$Stock = 0;
 		while($row = mysql_fetch_array($result)) {
-			if($row['Incoming'] == "-" && $row['Outgoing'] == "-") $Stock += $row['Stock'];
-			else $Stock += $row['Incoming'] - $row['Outgoing'];
 			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $RowNumber);
-			$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['TransactionDate']);
-			$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['Name']);
-			$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row['Incoming']);
-			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, $row['Outgoing']);
-			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['Price']);
-			$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, $Stock);
-			$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, $row['Remarks']);
+			$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['IncomingNumber']);
+			$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['TransactionDate']);
+			$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row['SupplierName']);
+			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, $row['Total']);
+			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['Remarks']);
 			$RowNumber++;
 			$rowExcel++;
 		}
-		$objPHPExcel->getActiveSheet()->getStyle("F5:F".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-			
-		
+		$objPHPExcel->getActiveSheet()->getStyle("E5:E".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "=SUM(E5:E".($rowExcel-1).")");
+		$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Grand Total");
+		$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":D".$rowExcel);
+		$rowExcel++;
 		//merge title
-		$objPHPExcel->getActiveSheet()->mergeCells("A1:H2");
-		$objPHPExcel->getActiveSheet()->getStyle("A4:H4")->getFont()->setBold(true);
-		$objPHPExcel->getActiveSheet()->getStyle("A1:H2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-		$objPHPExcel->getActiveSheet()->getStyle("A4:H4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('c4bd97');
+		$objPHPExcel->getActiveSheet()->mergeCells("A1:F2");
+		$objPHPExcel->getActiveSheet()->getStyle("A4:F4")->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle("A1:F2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$objPHPExcel->getActiveSheet()->getStyle("A4:F4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('c4bd97');
 
 		//set all width 
 		$fromCol='A';
-		$toCol= 'I';
+		$toCol= 'G';
 		for($j = $fromCol; $j !== $toCol; $j++) {
 			//$calculatedWidth = $objPHPExcel->getActiveSheet()->getColumnDimension($i)->getWidth();
 			$objPHPExcel->getActiveSheet()->getColumnDimension($j)->setAutoSize(true);
@@ -261,9 +141,9 @@
 			  )
 			)
 		);		
-		$objPHPExcel->getActiveSheet()->getStyle("A4:H".($rowExcel-1))->applyFromArray($styleArray);		
+		$objPHPExcel->getActiveSheet()->getStyle("A4:F".($rowExcel-1))->applyFromArray($styleArray);		
 
-		$title = "Laporan Mutasi Stok $ItemName $FromDate - $ToDate";
+		$title = "Laporan Pembelian $FromDate - $ToDate";
 		// Rename worksheet
 		//$objPHPExcel->getActiveSheet()->setTitle($title);
 		// Set active sheet index to the first sheet, so Excel opens this as the first sheet
