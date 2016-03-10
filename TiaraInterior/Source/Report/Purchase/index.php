@@ -33,8 +33,7 @@
 												return 0;
 											}
 											while($row = mysql_fetch_array($result)) {
-												if($SupplierID == $row['SupplierID']) echo "<option selected value='".$row['SupplierID']."' >".$row['SupplierName']."</option>";
-												else echo "<option value='".$row['SupplierID']."' >".$row['SupplierName']."</option>";
+												echo "<option value='".$row['SupplierID']."' >".$row['SupplierName']."</option>";
 											}
 										?>
 									</select>

@@ -125,8 +125,8 @@ VALUES
 (
 	13,
 	4,
-	'Penjualan Per Sales',
-	'Report/SaleBySales/',
+	'Penjualan',
+	'Report/Selling/',
 	NULL,
 	1,
 	2
@@ -142,15 +142,6 @@ VALUES
 ),
 (
 	15,
-	4,
-	'Penjualan Per Customer',
-	'Report/SaleByCustomer/',
-	NULL,
-	1,
-	4
-),
-(
-	16,
 	2,
 	'Barang',
 	'Master/Item/',
@@ -159,13 +150,40 @@ VALUES
 	5
 ),
 (
-	17,
+	16,
 	2,
 	'Sales',
 	'Master/Sales/',
 	NULL,
 	0,
 	8
+),
+(
+	17,
+	5,
+	'Bakcup Database',
+	'Tools/BackupDB/',
+	NULL,
+	0,
+	1
+),
+(
+	18,
+	5,
+	'Restore Database',
+	'Tools/RestoreDB/',
+	NULL,
+	0,
+	2
+),
+(
+	19,
+	5,
+	'Reset',
+	'Tools/Reset/',
+	NULL,
+	0,
+	3
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

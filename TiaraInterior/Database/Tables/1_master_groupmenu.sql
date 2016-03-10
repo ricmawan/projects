@@ -38,6 +38,13 @@ VALUES
 	'fa fa-line-chart fa-3x',
 	NULL,
 	4
+),
+(
+	5,
+	'Tools',
+	'fa fa-cogs fa-3x',
+	NULL,
+	5
 );
 
 CREATE UNIQUE INDEX GROUPMENU_INDEX
