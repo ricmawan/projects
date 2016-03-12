@@ -145,7 +145,8 @@
 						},
 						labels: {
 							all: "Semua Data",
-							infos: "Menampilkan {{ctx.start}} sampai {{ctx.end}} dari {{ctx.total}} data",
+							//infos: "Menampilkan {{ctx.start}} sampai {{ctx.end}} dari {{ctx.total}} data",
+							infos: "Menampilkan {{ctx.total}} data",
 							loading: "Loading...",
 							noResults: "Tidak Ada Data Yang Ditemukan!",
 							refresh: "Refresh",

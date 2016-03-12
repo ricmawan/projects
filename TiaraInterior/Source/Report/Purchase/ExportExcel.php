@@ -53,7 +53,7 @@
 									 ->setCategory("Laporan");
 		//Header
 		$objPHPExcel->setActiveSheetIndex(0)
-					->setCellValue('A1', "LAPORAN PEMBELIAN ");
+					->setCellValue('A1', "LAPORAN PEMBELIAN");
 		
 		$objPHPExcel->getActiveSheet()->getStyle('A1')->getAlignment()->setWrapText(true);
 		

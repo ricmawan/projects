@@ -20,7 +20,7 @@
 					<div class="panel-body">
 						<div class="row">
 							<div class="col-md-1 labelColumn">
-								Pelanggan :
+								Pelanggan:
 							</div>
 							<div class="col-md-3">
 								<div class="ui-widget" style="width: 100%;">
@@ -39,8 +39,11 @@
 									</select>
 								</div>
 							</div>
+						</div>
+						<br />
+						<div class="row">
 							<div class="col-md-1 labelColumn">
-								Sales :
+								Sales:
 							</div>
 							<div class="col-md-3">
 								<div class="ui-widget" style="width: 100%;">
@@ -94,7 +97,7 @@
 								<thead>				
 									<tr>
 										<th data-column-id="RowNumber" data-sortable="false" data-type="numeric" >No</th>
-										<th data-column-id="IncomingNumber" data-sortable="false" data-type="numeric" >No Nota</th>
+										<th data-column-id="OutgoingNumber" data-sortable="false" data-type="numeric" >No Nota</th>
 										<th data-column-id="TransactionDate" >Tanggal</th>
 										<th data-column-id="SalesName">Nama Sales</th>
 										<th data-column-id="CustomerName">Nama Pelanggan</th>
@@ -173,7 +176,8 @@
 						},
 						labels: {
 							all: "Semua Data",
-							infos: "Menampilkan {{ctx.start}} sampai {{ctx.end}} dari {{ctx.total}} data",
+							//infos: "Menampilkan {{ctx.start}} sampai {{ctx.end}} dari {{ctx.total}} data",
+							infos: "Menampilkan {{ctx.total}} data",
 							loading: "Loading...",
 							noResults: "Tidak Ada Data Yang Ditemukan!",
 							refresh: "Refresh",

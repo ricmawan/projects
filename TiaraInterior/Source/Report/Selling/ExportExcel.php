@@ -1,26 +1,33 @@
 <?php
-	if(ISSET($_GET['ProjectID'])) {
+	if(ISSET($_GET['SalesID']) && ISSET($_GET['CustomerID'])) {
 		$RequestPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestPath);
 		$RequestPath = str_replace($file, "", $RequestPath);	
 		include "../../GetPermission.php";
 		//echo $_SERVER['REQUEST_URI'];
-		$ID = mysql_real_escape_string($_GET['ProjectID']);
-		$sql = "SELECT
-					ProjectID,
-					ProjectName
-				FROM
-					master_project P
-				WHERE
-					P.ProjectID = $ID";
-						
-		if (! $result = mysql_query($sql, $dbh)) {
-			echo mysql_error();
-			return 0;
+		$SalesID = mysql_real_escape_string($_GET['SalesID']);
+		$CustomerID = mysql_real_escape_string($_GET['CustomerID']);
+				
+		if($_GET['txtFromDate'] == "") {
+			$txtFromDate = "2000-01-01";
+			$FromDate = "01-01-2000";
 		}
-		$row = mysql_fetch_array($result);
-		global $ProjectName;
-		$ProjectName = $row['ProjectName'];
+		else {
+			$FromDate = $_GET['txtFromDate'];
+			$txtFromDate = explode('-', mysql_real_escape_string($_GET['txtFromDate']));
+			$_GET['txtFromDate'] = "$txtFromDate[2]-$txtFromDate[1]-$txtFromDate[0]"; 
+			$txtFromDate = $_GET['txtFromDate'];
+		}
+		if($_GET['txtToDate'] == "") {
+			$txtToDate = date("Y-m-d");
+			$ToDate = date("d-m-Y");
+		}
+		else {
+			$ToDate = $_GET['txtToDate'];
+			$txtToDate = explode('-', mysql_real_escape_string($_GET['txtToDate']));
+			$_GET['txtToDate'] = "$txtToDate[2]-$txtToDate[1]-$txtToDate[0]"; 
+			$txtToDate = $_GET['txtToDate'];
+		}
 
 		error_reporting(E_ALL);
 		ini_set('display_errors', TRUE);
@@ -40,14 +47,14 @@
 		// Set document properties
 		$objPHPExcel->getProperties()->setCreator($_SESSION['UserLogin'])
 									 ->setLastModifiedBy($_SESSION['UserLogin'])
-									 ->setTitle("Laporan Proyek ".$ProjectName)
+									 ->setTitle("Laporan Penjualan")
 									 ->setSubject("Laporan")
-									 ->setDescription("Laporan Proyek ".$ProjectName)
+									 ->setDescription("Laporan Penjualan")
 									 ->setKeywords("Generate By PHPExcel")
 									 ->setCategory("Laporan");
 		//Header
 		$objPHPExcel->setActiveSheetIndex(0)
-					->setCellValue('A1', "LAPORAN PROYEK ".strtoupper($ProjectName));
+					->setCellValue('A1', "LAPORAN PENJUALAN");
 		
 		$objPHPExcel->getActiveSheet()->getStyle('A1')->getAlignment()->setWrapText(true);
 		
@@ -59,147 +66,82 @@
 		//set color
 		//$objPHPExcel->getFont()->setColor( new PHPExcel_Style_Color( PHPExcel_Style_Color::COLOR_DARKGREEN ) );
 		$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "No");
-		$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, "Tanggal");
-		$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, "Nama");
-		$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, "Bahan");
-		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "QTY");
-		$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, "Satuan");
-		$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, "Harga");
-		$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, "Debit");
-		$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, "Kredit");
-		$objPHPExcel->getActiveSheet()->setCellValue("J".$rowExcel, "Saldo");
-		$objPHPExcel->getActiveSheet()->setCellValue("K".$rowExcel, "Keterangan");
+		$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, "No Nota");
+		$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, "Tanggal");
+		$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, "Nama Sales");
+		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Nama Pelanggan");
+		$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, "Total");
+		$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, "Keterangan");
 		$rowExcel++;
 		
-		mysql_query("SET @Balance:=0;", $dbh);
-					
+		mysql_query("SET @row:=0;", $dbh);
 		$sql = "SELECT
-					DATE_FORMAT(DATA.TransactionDate, '%d-%m-%Y') AS TransactionDate,
-					DATA.Name,
-					DATA.ItemName,
-					DATA.Quantity,
-					DATA.UnitName,
-					DATA.Price,
-					DATA.Debit,
-					DATA.Credit,
-					@Balance:= @Balance + DATA.Debit - DATA.Credit AS Balance,
-					DATA.Remarks
+					DATE_FORMAT(OT.TransactionDate, '%d%b%y') AS TransactionDate,
+					MS.SalesName,
+					MC.CustomerName,
+					OT.OutgoingNumber,
+					OT.Remarks,
+					IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))), 0) AS Total
 				FROM
-					(
-						SELECT
-							PP.ProjectTransactionDate AS TransactionDate,
-							'' AS Name,
-							'' AS ItemName,
-							'' AS Quantity,
-							'' AS UnitName,
-							'' AS Price,
-							PP.Amount AS Debit,
-							'-' AS Credit,
-							CONCAT('Pembayaran ', PP.Remarks) AS Remarks,
-							1 AS UnionLevel
-						FROM
-							transaction_projectpayment PP
-						WHERE
-							PP.ProjectID = $ID
-						UNION ALL
-						SELECT
-							OT.TransactionDate,
-							OTD.Name,
-							CONCAT(MC.CategoryName, ' ', I.ItemName) AS ItemName, 
-							OTD.Quantity,
-							U.UnitName,
-							OTD.Price,
-							'-' AS Debit,
-							(OTD.Quantity * OTD.Price) AS Credit,
-							OTD.Remarks,
-							2 AS UnionLevel
-						FROM
-							transaction_outgoingtransaction OT
-							JOIN transaction_outgoingtransactiondetails OTD
-								ON OT.OutgoingTransactionID = OTD.OutgoingTransactionID
-							JOIN master_item I
-								ON I.ItemID = OTD.ItemID
-							JOIN master_category MC
-								ON MC.CategoryID = I.CategoryID
-							JOIN master_unit U
-								ON U.UnitID = I.UnitID
-						WHERE
-							OT.ProjectID = $ID
-						UNION ALL
-						SELECT
-							RT.TransactionDate,
-							'',
-							CONCAT(MC.CategoryName, ' ', I.ItemName) AS ItemName, 
-							RT.Quantity,
-							U.UnitName,
-							RT.Price,
-							(RT.Quantity * RT.Price) AS Debit,
-							'-' AS Credit,
-							'Retur' AS Remarks,
-							3 AS UnionLevel
-						FROM
-							transaction_returntransaction RT
-							JOIN master_item I
-								ON I.ItemID = RT.ItemID
-							JOIN master_category MC
-								ON MC.CategoryID = I.CategoryID
-							JOIN master_unit U
-								ON U.UnitID = I.UnitID
-						WHERE
-							RT.ProjectID = $ID
-						UNION ALL
-						SELECT
-							PT.ProjectTransactionDate,
-							'',
-							'',
-							'',
-							'',
-							'',
-							'-' AS Debit,
-							PT.Amount AS Credit,
-							CONCAT('Operasional ', PT.Remarks),
-							4 AS UnionLevel
-						FROM
-							transaction_projecttransaction PT
-						WHERE
-							PT.ProjectID = $ID
-					)DATA
-				ORDER BY
-					DATA.TransactionDate,
-					DATA.UnionLevel";
+					transaction_outgoing OT
+					JOIN master_sales MS
+						ON MS.SalesID = OT.SalesID
+					JOIN master_customer MC
+						ON MC.CustomerID = OT.CustomerID
+					LEFT JOIN transaction_outgoingdetails TOD
+						ON TOD.OutgoingID = OT.OutgoingID
+				WHERE
+					OT.TransactionDate >= '".$txtFromDate."'
+					AND OT.TransactionDate <= '".$txtToDate."'
+					AND CASE
+							WHEN ".$SalesID." = 0
+							THEN MS.SalesID
+							ELSE ".$SalesID."
+						END = MS.SalesID
+					AND CASE
+							WHEN ".$CustomerID." = 0
+							THEN MC.CustomerID
+							ELSE ".$CustomerID."
+						END = MC.CustomerID
+				GROUP BY
+					OT.OutgoingNumber,
+					OT.TransactionDate,
+					MS.SalesName,
+					MC.CustomerName
+				ORDER BY	
+					OT.TransactionDate ASC";
 					
 		if (! $result = mysql_query($sql, $dbh)) {
 			echo mysql_error();
 			return 0;
 		}
 		$RowNumber = 1;
+		$Stock = 0;
 		while($row = mysql_fetch_array($result)) {
 			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $RowNumber);
-			$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['TransactionDate']);
-			$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['Name']);
-			$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row['ItemName']);
-			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, $row['Quantity']);
-			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['UnitName']);
-			$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, $row['Price']);
-			$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, $row['Debit']);
-			$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, $row['Credit']);
-			$objPHPExcel->getActiveSheet()->setCellValue("J".$rowExcel, $row['Balance']);
-			$objPHPExcel->getActiveSheet()->setCellValue("K".$rowExcel, $row['Remarks']);
+			$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['OutgoingNumber']);
+			$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['TransactionDate']);
+			$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row['SalesName']);
+			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, $row['CustomerName']);
+			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['Total']);
+			$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, $row['Remarks']);
 			$RowNumber++;
 			$rowExcel++;
 		}
-		$objPHPExcel->getActiveSheet()->getStyle("G5:J".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-			
-		
+		$objPHPExcel->getActiveSheet()->getStyle("F5:F".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+		$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, "=SUM(F5:F".($rowExcel-1).")");
+		$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Grand Total");
+		$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":E".$rowExcel);
+		$rowExcel++;
 		//merge title
-		$objPHPExcel->getActiveSheet()->mergeCells("A1:K2");
-		$objPHPExcel->getActiveSheet()->getStyle("A4:K4")->getFont()->setBold(true);
-		$objPHPExcel->getActiveSheet()->getStyle("A1:K2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-		$objPHPExcel->getActiveSheet()->getStyle("A4:K4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('c4bd97');
+		$objPHPExcel->getActiveSheet()->mergeCells("A1:G2");
+		$objPHPExcel->getActiveSheet()->getStyle("A4:G4")->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle("A1:G2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$objPHPExcel->getActiveSheet()->getStyle("A4:G4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('c4bd97');
 
 		//set all width 
 		$fromCol='A';
-		$toCol= 'L';
+		$toCol= 'H';
 		for($j = $fromCol; $j !== $toCol; $j++) {
 			//$calculatedWidth = $objPHPExcel->getActiveSheet()->getColumnDimension($i)->getWidth();
 			$objPHPExcel->getActiveSheet()->getColumnDimension($j)->setAutoSize(true);
@@ -211,9 +153,9 @@
 			  )
 			)
 		);		
-		$objPHPExcel->getActiveSheet()->getStyle("A4:K".($rowExcel-1))->applyFromArray($styleArray);		
+		$objPHPExcel->getActiveSheet()->getStyle("A4:G".($rowExcel-1))->applyFromArray($styleArray);		
 
-		$title = "Laporan Proyek $ProjectName";
+		$title = "Laporan Penjualan $FromDate - $ToDate";
 		// Rename worksheet
 		//$objPHPExcel->getActiveSheet()->setTitle($title);
 		// Set active sheet index to the first sheet, so Excel opens this as the first sheet

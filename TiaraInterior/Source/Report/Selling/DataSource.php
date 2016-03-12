@@ -1,13 +1,34 @@
 <?php
-	if(ISSET($_GET['ProjectID'])) {
+	if(ISSET($_GET['SalesID']) && ISSET($_GET['CustomerID'])) {
 		header('Content-Type: application/json');
 		$RequestPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestPath);
 		$RequestPath = str_replace($file, "", $RequestPath);
 		include "../../GetPermission.php";
-		$ID = mysql_real_escape_string($_GET['ProjectID']);
+		date_default_timezone_set("Asia/Jakarta");
+		$SalesID = mysql_real_escape_string($_GET['SalesID']);
+		$CustomerID = mysql_real_escape_string($_GET['CustomerID']);
+		if($_GET['txtFromDate'] == "") {
+			$txtFromDate = "2000-01-01";
+		}
+		else {
+			$txtFromDate = explode('-', mysql_real_escape_string($_GET['txtFromDate']));
+			$_GET['txtFromDate'] = "$txtFromDate[2]-$txtFromDate[1]-$txtFromDate[0]"; 
+			$txtFromDate = $_GET['txtFromDate'];
+		}
+		if($_GET['txtToDate'] == "") {
+			$txtToDate = date("Y-m-d");
+		}
+		else {
+			$txtToDate = explode('-', mysql_real_escape_string($_GET['txtToDate']));
+			$_GET['txtToDate'] = "$txtToDate[2]-$txtToDate[1]-$txtToDate[0]"; 
+			$txtToDate = $_GET['txtToDate'];
+		}
+		
+		//echo $txtFromDate;
+		//echo $txtToDate;
 		$where = " 1=1 ";
-		$order_by = "DATA.TransactionDate";
+		$order_by = "";
 		$rows = 10;
 		$current = 1;
 		$limit_l = ($current * $rows) - ($rows);
@@ -18,14 +39,14 @@
 			$order_by = "";
 			foreach($_REQUEST['sort'] as $key => $value) {
 				if($key != 'No') $order_by .= " $key $value";
-				else $order_by = "DATE_FORMAT(DATA.TransactionDate, '%d-%m-%Y') ASC";
+				else $order_by = "DATE_FORMAT(TO.TransactionDate, '%d-%m-%Y') ASC";
 			}
 		}
 		//Handles search querystring sent from Bootgrid
 		if (ISSET($_REQUEST['searchPhrase']) )
 		{
 			$search = trim($_REQUEST['searchPhrase']);
-			$where .= " AND ( DATE_FORMAT(DATA.TransactionDate, '%d%b%y') LIKE '%".$search."%' OR DATA.Name LIKE '%".$search."%' OR DATA.ItemName LIKE '%".$search."%' OR DATA.Quantity LIKE '%".$search."%' OR DATA.UnitName LIKE '%".$search."%' OR DATA.Price LIKE '%".$search."%' OR DATA.Debit LIKE '%".$search."%' OR DATA.Credit LIKE '%".$search."%' OR DATA.Remarks LIKE '%".$search."%' )";
+			//$where .= " AND ( DATE_FORMAT(DATA.TransactionDate, '%d%b%y') LIKE '%".$search."%' OR DATA.Name LIKE '%".$search."%' OR DATA.ItemName LIKE '%".$search."%' OR DATA.Quantity LIKE '%".$search."%' OR DATA.UnitName LIKE '%".$search."%' OR DATA.Price LIKE '%".$search."%' OR DATA.Debit LIKE '%".$search."%' OR DATA.Credit LIKE '%".$search."%' OR DATA.Remarks LIKE '%".$search."%' )";
 		}
 		//Handles determines where in the paging count this result set falls in
 		if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];
@@ -36,107 +57,41 @@
 			$limit_l = ($current * $rows) - ($rows);
 			$limit_h = $rows ;
 		}
-		if ($rows == -1) $limit = ""; //no limit
-		else $limit = " LIMIT $limit_l, $limit_h ";
-		mysql_query("SET @Balance:=0;", $dbh);
-		mysql_query("SET @row:=0;", $dbh);
 		$sql = "SELECT
-					DATE_FORMAT(DATA.TransactionDate, '%d%b%y') AS TransactionDate,
-					DATA.Name,
-					DATA.ItemName,
-					DATA.Quantity,
-					DATA.UnitName,
-					DATA.Price,
-					DATA.Debit,
-					DATA.Credit,
-					@Balance:= @Balance + DATA.Debit - DATA.Credit AS Balance,
-					DATA.Remarks
+					OT.OutgoingNumber,
+					DATE_FORMAT(OT.TransactionDate, '%d%b%y') AS TransactionDate,
+					MS.SalesName,
+					MC.CustomerName,
+					IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))), 0) AS Total,
+					OT.Remarks
 				FROM
-					(
-						SELECT
-							PP.ProjectTransactionDate AS TransactionDate,
-							'' AS Name,
-							'' AS ItemName,
-							'' AS Quantity,
-							'' AS UnitName,
-							'' AS Price,
-							PP.Amount AS Debit,
-							'-' AS Credit,
-							CONCAT('Pembayaran ', PP.Remarks) AS Remarks,
-							1 AS UnionLevel
-						FROM
-							transaction_projectpayment PP
-						WHERE
-							PP.ProjectID = $ID
-						UNION ALL
-						SELECT
-							OT.TransactionDate,
-							OTD.Name,
-							CONCAT(MC.CategoryName, ' ', I.ItemName) AS ItemName, 
-							OTD.Quantity,
-							U.UnitName,
-							OTD.Price,
-							'-' AS Debit,
-							(OTD.Quantity * OTD.Price) AS Credit,
-							OTD.Remarks,
-							2 AS UnionLevel
-						FROM
-							transaction_outgoingtransaction OT
-							JOIN transaction_outgoingtransactiondetails OTD
-								ON OT.OutgoingTransactionID = OTD.OutgoingTransactionID
-							JOIN master_item I
-								ON I.ItemID = OTD.ItemID
-							JOIN master_category MC
-								ON MC.CategoryID = I.CategoryID
-							JOIN master_unit U
-								ON U.UnitID = I.UnitID
-						WHERE
-							OT.ProjectID = $ID
-						UNION ALL
-						SELECT
-							RT.TransactionDate,
-							'',
-							CONCAT(MC.CategoryName, ' ', I.ItemName) AS ItemName, 
-							RT.Quantity,
-							U.UnitName,
-							RT.Price,
-							(RT.Quantity * RT.Price) AS Debit,
-							'-' AS Credit,
-							'Retur' AS Remarks,
-							3 AS UnionLevel
-						FROM
-							transaction_returntransaction RT
-							JOIN master_item I
-								ON I.ItemID = RT.ItemID
-							JOIN master_category MC
-								ON MC.CategoryID = I.CategoryID
-							JOIN master_unit U
-								ON U.UnitID = I.UnitID
-						WHERE
-							RT.ProjectID = $ID
-						UNION ALL
-						SELECT
-							PT.ProjectTransactionDate,
-							'',
-							'',
-							'',
-							'',
-							'',
-							'-' AS Debit,
-							PT.Amount AS Credit,
-							CONCAT('Operasional ', PT.Remarks),
-							4 AS UnionLevel
-						FROM
-							transaction_projecttransaction PT
-						WHERE
-							PT.ProjectID = $ID
-					)DATA
+					transaction_outgoing OT
+					JOIN master_sales MS
+						ON MS.SalesID = OT.SalesID
+					JOIN master_customer MC
+						ON MC.CustomerID = OT.CustomerID
+					LEFT JOIN transaction_outgoingdetails TOD
+						ON TOD.OutgoingID = OT.OutgoingID
 				WHERE
-					$where
-				ORDER BY 
-					$order_by,
-					DATA.TransactionDate,
-					DATA.UnionLevel";
+					OT.TransactionDate >= '".$txtFromDate."'
+					AND OT.TransactionDate <= '".$txtToDate."'
+					AND CASE
+							WHEN ".$SalesID." = 0
+							THEN MS.SalesID
+							ELSE ".$SalesID."
+						END = MS.SalesID
+					AND CASE
+							WHEN ".$CustomerID." = 0
+							THEN MC.CustomerID
+							ELSE ".$CustomerID."
+						END = MC.CustomerID
+				GROUP BY
+					OT.OutgoingNumber,
+					OT.TransactionDate,
+					MS.SalesName,
+					MC.CustomerName
+				ORDER BY	
+					OT.TransactionDate ASC";
 		
 		if (! $result = mysql_query($sql, $dbh)) {
 			echo mysql_error();
@@ -144,33 +99,25 @@
 		}
 		$nRows = mysql_num_rows($result);		
 		$return_arr = array();
-		$RowNumber = 0;
 		//$nRows = mysql_num_rows($result);
+		$Stock = 0;
+		$RowNumber = 0;
+		$GrandTotal = 0;
 		while ($row = mysql_fetch_array($result)) {
 			$RowNumber++;
-			$Debit = "-";
-			if($row['Debit'] != "-") $Debit = number_format($row['Debit'],2,".",",");
-			$Credit = "-";
-			if($row['Credit'] != "-") $Credit = number_format($row['Credit'],2,".",",");
-			$Balance = "-";
-			if($row['Balance'] != "-") $Balance = number_format($row['Balance'],2,".",",");
-			$Price = "-";
-			if($row['Price'] != "") $Price = number_format($row['Price'],2,".",",");
 			$row_array['RowNumber'] = $RowNumber;
+			$row_array['OutgoingNumber']= $row['OutgoingNumber'];
 			$row_array['TransactionDate'] = $row['TransactionDate'];
-			$row_array['Name']= $row['Name'];
-			$row_array['ItemName'] = $row['ItemName'];
-			$row_array['Quantity'] = $row['Quantity'];
-			$row_array['UnitName'] = $row['UnitName'];
-			$row_array['Price'] = $Price;
-			$row_array['Debit'] = $Debit;
-			$row_array['Credit'] = $Credit;
-			$row_array['Balance'] = $Balance;
+			$row_array['SalesName'] = $row['SalesName'];
+			$row_array['CustomerName'] = $row['CustomerName'];
+			$row_array['Total'] = number_format($row['Total'],2,".",",");
 			$row_array['Remarks'] = $row['Remarks'];
+			$GrandTotal += $row['Total'];
 			array_push($return_arr, $row_array);
 		}
 
 		$json = json_encode($return_arr);
-		echo "{ \"current\": $current, \"rowCount\":$rows, \"rows\": ".$json.", \"total\": $nRows }";
+		$GrandTotal = number_format($GrandTotal,2,".",",");
+		echo "{ \"current\": $current, \"rowCount\":$rows, \"rows\": ".$json.", \"total\": $nRows, \"GrandTotal\": \"$GrandTotal\" }";
 	}
 ?>

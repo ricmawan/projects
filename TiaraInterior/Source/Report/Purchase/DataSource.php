@@ -38,7 +38,7 @@
 			$order_by = "";
 			foreach($_REQUEST['sort'] as $key => $value) {
 				if($key != 'No') $order_by .= " $key $value";
-				else $order_by = "DATE_FORMAT(DATA.TransactionDate, '%d-%m-%Y') ASC";
+				else $order_by = "DATE_FORMAT(TI.TransactionDate, '%d-%m-%Y') ASC";
 			}
 		}
 		//Handles search querystring sent from Bootgrid
@@ -82,7 +82,7 @@
 					TI.TransactionDate,
 					MS.SupplierName
 				ORDER BY	
-					TransactionDate ASC";
+					TI.TransactionDate ASC";
 		
 		if (! $result = mysql_query($sql, $dbh)) {
 			echo mysql_error();

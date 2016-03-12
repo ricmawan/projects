@@ -197,7 +197,7 @@ function Redirect(link) {
 		});
 	}
 	else {
-		$.ajax({
+		/*$.ajax({
 			url: "./Master/Notification/",
 			type: "POST",
 			data: { },
@@ -213,7 +213,8 @@ function Redirect(link) {
 				$("#loading").hide();
 				$.notify("Koneksi gagal", "error");
 			}
-		});
+		});*/
+		$("#loading").hide();
 	}
 }
 function Reload() {
@@ -239,7 +240,7 @@ function Reload() {
 		});
 	}
 	else {
-		$.ajax({
+		/*$.ajax({
 			url: "./Master/Notification/",
 			type: "POST",
 			data: { },
@@ -255,7 +256,7 @@ function Reload() {
 				$("#loading").hide();
 				$.notify("Koneksi gagal", "error");
 			}
-		});
+		});*/
 		$("#loading").hide();
 	}
 }
@@ -683,3 +684,11 @@ function minmax(value, min, max)
 		}
 	});
 })( jQuery );
+
+$.extend($.ui.autocomplete.prototype.options, {
+	open: function(event, ui) {
+		$(this).autocomplete("widget").css({
+            "width": ($(this).width() + "px")
+        });
+    }
+});
