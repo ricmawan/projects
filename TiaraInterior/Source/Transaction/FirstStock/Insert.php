@@ -82,7 +82,7 @@
 						'SA',
 						'".$TransactionDate."',
 						'".$FirstStockNumber."',
-						'0',
+						0,
 						NOW(),
 						'".$_SESSION['UserLogin']."'
 					)";

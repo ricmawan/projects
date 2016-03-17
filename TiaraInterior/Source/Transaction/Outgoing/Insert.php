@@ -94,7 +94,7 @@
 						'TJ',
 						'".$TransactionDate."',
 						'".$OutgoingNumber."',
-						'0',
+						0,
 						NOW(),
 						'".$_SESSION['UserLogin']."'
 					)";

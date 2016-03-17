@@ -29,9 +29,9 @@
 		$MessageSuccessDelete = substr($MessageSuccessDelete, 0, -2);
 		$MessageFailedDelete = substr($MessageFailedDelete, 0, -2);
 			
-		if($MessageSuccessDelete !="") $MessageSuccess = "Tipe " .$MessageSuccessDelete. " Berhasil Dihapus";
+		if($MessageSuccessDelete !="") $MessageSuccess = $MessageSuccessDelete. " Berhasil Dihapus";
 		else $MessageSuccess = "";
-		if($MessageFailedDelete !="") $MessageFailed = "Tipe " .$MessageFailedDelete. " Gagal Dihapus";
+		if($MessageFailedDelete !="") $MessageFailed = $MessageFailedDelete. " Gagal Dihapus";
 		else $MessageFailed = "";
 		
 		echo "$MessageSuccess+$MessageFailed";

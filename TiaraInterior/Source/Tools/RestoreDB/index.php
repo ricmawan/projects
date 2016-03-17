@@ -4,33 +4,43 @@
 ?>
 <html>
 	<head>
+		<script src="assets/js/jquery.form.js"></script>
 	</head>
 	<body>
 		<div class="row">
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						 <h5>Master Data Barang</h5>
+						 <h5>Restore Dabase</h5>
 					</div>
 					<div class="panel-body">
-						<div class="table-responsive">
-							<table id="grid-data" class="table table-striped table-bordered table-hover" >
-								<thead>				
-									<tr>
-										<th data-column-id="RowNumber" data-sortable="false" data-type="numeric">No</th>
-										<th data-column-id="BrandName">Merek</th>
-										<th data-column-id="TypeName">Tipe</th>
-										<th data-column-id="UnitName">Nama Satuan</th>
-										<th data-column-id="BatchNumber">Batch</th>
-										<th data-column-id="Stock">Stok</th>
-										<th data-column-id="BuyPrice" data-align="right">Harga Beli</th>
-										<th data-column-id="SalePrice" data-align="right">Harga Jual</th>
-									</tr>
-								</thead>
-							</table>
-						</div>
-						<!--<button class="btn btn-primary menu" link="./Master/Type/Detail.php?ID=0"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
-						<?php if($DeleteFlag == true) echo '<button class="btn btn-danger" onclick="DeleteData(\'./Master/Type/Delete.php\');" ><i class="fa fa-close"></i> Hapus</button>'; ?>-->
+						<form id="PostForm" method="POST" enctype="multipart/form-data" action="./Tools/RestoreDB/Restore.php" >
+							<div id="output" style="display:none;"></div>
+							<input type="radio" id="RestoreMethod1" style="display:none;" name="RestoreMethod" value=1 checked> <!--Pilih Dari Riwayat Backup:-->
+							<div class="table-responsive">
+								<table id="grid-data" class="table table-striped table-bordered table-hover" >
+									<thead>				
+										<tr>
+											<th data-column-id="BackupHistoryID" data-visible="false" data-type="numeric" data-identifier="true">BackupHistoryID</th>
+											<th data-column-id="RowNumber" data-sortable="false" data-type="numeric">No</th>
+											<th data-column-id="BackupDate">Tanggal</th>
+											<th data-column-id="FileName" >Nama File</th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+							<br />
+							<!--<div class="row">
+								<div class="col-md-2">
+									<input type="radio" id="RestoreMethod2" name="RestoreMethod" value=2> atau upload:
+								</div>
+								<div class="col-md-3">
+									<input type="file" class="form-control" name="uploadfile" id="uploadfile" accept=".sql, application/sql" disabled />
+								</div>
+							</div>-->
+						</form>
+						<br />
+						<button class="btn btn-primary" onclick="Restore();"><i class="fa fa-download"></i> Restore</button>&nbsp;
 					</div>
 				</div>
 			</div>
@@ -54,20 +64,76 @@
 								refresh: "Refresh",
 								search: "Cari"
 							},
-							url: "./Master/Item/DataSource.php",
+							url: "./Tools/RestoreDB/DataSource.php",
 							selection: true,
 							multiSelect: false,
 							rowSelect: true,
 							keepSelection: true
-						}).on("loaded.rs.jquery.bootgrid", function()
-						{
-							/* Executes after data is loaded and rendered */
-							grid.find(".fa-edit").on("click", function(e)
-							{
-								Redirect($(this).data("link"));
-							});
 						});
+				
+				$("input:radio[name=RestoreMethod]").change(function() {
+					if($("#RestoreMethod1").prop("checked")) {
+						$("#uploadfile").attr("disabled", true);
+						$("input:checkbox[name=select]").prop("disabled", false);
+						$("input:checkbox[name=select]").attr("disabled", false);
+					}
+					else {
+						$("#uploadfile").attr("disabled", false);
+						$("input:checkbox[name=select]").prop("disabled", true);
+						$("input:checkbox[name=select]").attr("disabled", true);
+					}
+				});
+				
+				var options = { 
+					target: "#output",   // target element(s) to be updated with server response 
+					success: afterSuccess,  // post-submit callback 
+					resetForm: false// reset the form after successful submit 
+				};
+				$("#inputProgress").submit(function() { 
+					$(this).ajaxSubmit(options);  			
+					// always return false to prevent standard browser submit and page navigation 
+					return false; 
+				}); 
+				function afterSuccess()
+				{
+					$("#loading").hide();
+					var response = $("#output").html();
+					var detail = response.split("|");
+					if(detail[3] == "0") {
+						$.notify(detail[1], "success");
+					}
+					else $.notify(detail[1], "warn");
+				}
 			});
+			
+			function Restore() {
+				var ask=confirm("Apakah anda yakin ingin mengembalikan data dari file yang dipilih?");
+				if(ask==true) {
+					$("#loading").show();
+					/*form = $("#PostForm");
+					form.submit();*/
+					$.ajax({
+						url: "./Tools/RestoreDB/Restore.php",
+						type: "POST",
+						data: $("#PostForm").serialize(),
+						dataType: "json",
+						success: function(data) {
+							if(data.FailedFlag == '0') {
+								$("#loading").hide();
+								$.notify(data.Message, "success");
+							}
+							else {
+								$("#loading").hide();
+								$.notify(data.Message, "error");					
+							}
+						},
+						error: function(data) {
+							$("#loading").hide();
+							$.notify("Terjadi kesalahan sistem!", "error");
+						}
+					});
+				}
+			}
 		</script>
 	</body>
 </html>

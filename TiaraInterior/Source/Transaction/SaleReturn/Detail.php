@@ -546,7 +546,7 @@
 			function GetInvoiceNumber(SelectedDate)
 			{
 				$.ajax({
-					url: "./Transaction/FirstStock/GetInvoiceNumber.php",
+					url: "./Transaction/SaleReturn/GetInvoiceNumber.php",
 					type: "POST",
 					data: { SelectedDate : SelectedDate, InvoiceNumberType : "RJ"},
 					dataType: "json",

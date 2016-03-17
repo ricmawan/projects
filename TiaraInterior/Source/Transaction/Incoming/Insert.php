@@ -85,7 +85,7 @@
 						'TB',
 						'".$TransactionDate."',
 						'".$IncomingNumber."',
-						'0',
+						0,
 						NOW(),
 						'".$_SESSION['UserLogin']."'
 					)";

@@ -27,13 +27,13 @@
 									<select name="ddlCustomer" id="ddlCustomer" class="form-control-custom" placeholder="Pilih Pelanggan" >
 										<option value=0 selected>-Pilih Semua Pelanggan-</option>
 										<?php
-											$sql = "SELECT CustomerID, CustomerName FROM master_customer";
+											$sql = "SELECT CustomerID, CustomerName, Address FROM master_customer";
 											if(!$result = mysql_query($sql, $dbh)) {
 												echo mysql_error();
 												return 0;
 											}
 											while($row = mysql_fetch_array($result)) {
-												echo "<option value='".$row['CustomerID']."' >".$row['CustomerName']."</option>";
+												echo "<option value='".$row['CustomerID']."' >".$row['CustomerName']." - ".$row['Address']."</option>";
 											}
 										?>
 									</select>
@@ -85,8 +85,8 @@
 						<br />
 						<div class="row">
 							<div class="col-md-12">
-								<button class="btn btn-default" id="btnExcel" onclick="Preview();" ><i class="fa fa-file-excel-o "></i> Lihat</button>&nbsp;&nbsp;
-								<button class="btn btn-default" id="btnExcel" onclick="ExportExcel();" ><i class="fa fa-file-excel-o "></i> Eksport Excel</button>&nbsp;&nbsp;
+								<button class="btn btn-info" id="btnView" onclick="Preview();" ><i class="fa fa-list"></i> Lihat</button>&nbsp;&nbsp;
+								<button class="btn btn-success" id="btnExcel" onclick="ExportExcel();" ><i class="fa fa-file-excel-o "></i> Eksport Excel</button>&nbsp;&nbsp;
 							</div>
 						</div>
 						<br />

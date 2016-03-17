@@ -20,7 +20,7 @@
 				FROM
 					transaction_invoicenumber TIN
 				WHERE
-					TIN.InvoiceNumberType = 'SA'
+					TIN.InvoiceNumberType = 'RB'
 					AND TIN.DeleteFlag = 0
 					AND MINUTE(TIMEDIFF(NOW(), TIN.CreatedDate)) > 60
 					AND	NOT EXISTS
@@ -28,9 +28,9 @@
 							SELECT
 								1
 							FROM
-								transaction_firststock FS
+								transaction_buyreturn BR
 							WHERE
-								TRIM(FS.FirstStockNumber) = TRIM(TIN.InvoiceNumber)
+								TRIM(BR.BuyReturnNumber) = TRIM(TIN.InvoiceNumber)
 						)";
 		if (! $result = mysql_query($sql, $dbh)) {
 			$Message = "Terjadi Kesalahan Sistem";
@@ -72,7 +72,7 @@
 				)
 				VALUES
 				(
-					'SA',
+					'RB',
 					'".$SelectedDate."',
 					'".$InvoiceNumber."',
 					0,

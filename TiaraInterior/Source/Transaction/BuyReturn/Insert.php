@@ -85,7 +85,7 @@
 						'RB',
 						'".$TransactionDate."',
 						'".$BuyReturnNumber."',
-						'0',
+						0,
 						NOW(),
 						'".$_SESSION['UserLogin']."'
 					)";

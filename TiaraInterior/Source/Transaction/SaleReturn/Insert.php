@@ -85,8 +85,8 @@
 					(
 						'TB',
 						'".$TransactionDate."',
-						'".$IncomingNumber."',
-						'0',
+						'".$SaleReturnNumber."',
+						0,
 						NOW(),
 						'".$_SESSION['UserLogin']."'
 					)";
@@ -153,7 +153,7 @@
 							".mysql_real_escape_string($_POST['hdnTypeID'.$j]).",
 							".mysql_real_escape_string($_POST['txtQuantity'.$j]).",
 							".str_replace(",", "", $_POST['txtSalePrice'.$j]).",
-							'".mysql_real_escape_string($_POST['txtBatchNumber'.$j])."',
+							'".mysql_real_escape_string($_POST['hdnBatchNumber'.$j])."',
 							NOW(),
 							'".$_SESSION['UserLogin']."'
 						)";
@@ -166,7 +166,7 @@
 							TypeID = ".mysql_real_escape_string($_POST['hdnTypeID'.$j]).",
 							Quantity = ".mysql_real_escape_string($_POST['txtQuantity'.$j]).",
 							SalePrice = ".str_replace(",", "", $_POST['txtSalePrice'.$j]).",
-							BatchNumber = '".mysql_real_escape_string($_POST['txtBatchNumber'.$j])."',
+							BatchNumber = '".mysql_real_escape_string($_POST['hdnBatchNumber'.$j])."',
 							ModifiedBy = '".$_SESSION['UserLogin']."'
 						WHERE
 							SaleReturnDetailsID = ".$_POST['hdnSaleReturnDetailsID'.$j];

@@ -10,32 +10,55 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						 <h5>Master Data Barang</h5>
+						 <h5>Riwayat Backup</h5>
 					</div>
 					<div class="panel-body">
 						<div class="table-responsive">
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
-										<th data-column-id="RowNumber" data-sortable="false" data-type="numeric">No</th>
-										<th data-column-id="BrandName">Merek</th>
-										<th data-column-id="TypeName">Tipe</th>
-										<th data-column-id="UnitName">Nama Satuan</th>
-										<th data-column-id="BatchNumber">Batch</th>
-										<th data-column-id="Stock">Stok</th>
-										<th data-column-id="BuyPrice" data-align="right">Harga Beli</th>
-										<th data-column-id="SalePrice" data-align="right">Harga Jual</th>
+										<th data-column-id="RowNumber" data-sortable="false" data-type="numeric" data-identifier="true">No</th>
+										<th data-column-id="BackupDate">Tanggal</th>
+										<th data-column-id="FileName" data-formatter="commands">Nama File</th>
 									</tr>
 								</thead>
 							</table>
 						</div>
-						<!--<button class="btn btn-primary menu" link="./Master/Type/Detail.php?ID=0"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
-						<?php if($DeleteFlag == true) echo '<button class="btn btn-danger" onclick="DeleteData(\'./Master/Type/Delete.php\');" ><i class="fa fa-close"></i> Hapus</button>'; ?>-->
+						<br />
+						<button class="btn btn-primary" onclick="DoBackUp();"><i class="fa fa-download"></i> Backup</button>&nbsp;
 					</div>
 				</div>
 			</div>
 		</div>
 		<script>
+			function DoBackUp() {
+				$("#loading").show();
+				$.ajax({
+					url: "./Tools/BackupDB/Backup.php",
+					type: "POST",
+					data: "",
+					dataType: "json",
+					success: function(data) {
+						if(data.FailedFlag == '0') {
+							$.notify(data.Message, "success");
+							$("html, body").animate({
+								scrollTop: 0
+							}, "slow");
+							$("#grid-data").bootgrid('reload');
+							$("#loading").hide();
+						}
+						else {
+							$("#loading").hide();
+							$.notify(data.Message, "error");
+						}
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Koneksi gagal", "error");
+				
+					}
+				});
+			}
 			$(document).ready(function() {
 				var grid = $("#grid-data").bootgrid({
 							ajax: true,
@@ -54,18 +77,17 @@
 								refresh: "Refresh",
 								search: "Cari"
 							},
-							url: "./Master/Item/DataSource.php",
+							url: "./Tools/BackupDB/DataSource.php",
 							selection: true,
 							multiSelect: false,
 							rowSelect: true,
-							keepSelection: true
-						}).on("loaded.rs.jquery.bootgrid", function()
-						{
-							/* Executes after data is loaded and rendered */
-							grid.find(".fa-edit").on("click", function(e)
-							{
-								Redirect($(this).data("link"));
-							});
+							keepSelection: true,
+							formatters: {
+								"commands": function(column, row)
+								{
+									return "<a href=\"" + row.FilePath + "\" download >" + row.FileName + "</a>";
+								}
+							}
 						});
 			});
 		</script>

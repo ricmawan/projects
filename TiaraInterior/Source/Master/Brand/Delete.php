@@ -12,9 +12,9 @@
 		for($i=0; $i<count($Data); $i++) {
 			try
 			{
-				$CategoryData = explode("^", $Data[$i]);
-				$CategoryID = mysql_real_escape_string($CategoryData[0]);
-				$CategoryName = $CategoryData[1];
+				$BrandData = explode("^", $Data[$i]);
+				$BrandID = mysql_real_escape_string($BrandData[0]);
+				$BrandName = $BrandData[1];
 				$sql = "DELETE FROM master_brand WHERE BrandID = $BrandID";
 				if (! $result=mysql_query($sql, $dbh)) {
 					throw new Exception($BrandName);

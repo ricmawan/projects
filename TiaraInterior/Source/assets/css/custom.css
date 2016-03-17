@@ -552,7 +552,7 @@ textarea.form-control-custom {
 	max-height: 227.5px;
 	overflow-y: auto;
 	width: auto !important;
-	min-width: 230px;
+	min-width: 240px;
 	overflow-x: hidden;
 }
 .ui-menu .ui-menu-item {

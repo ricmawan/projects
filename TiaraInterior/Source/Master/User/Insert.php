@@ -25,13 +25,16 @@
 		
 		if($Password == "") {
 			$sql = "SELECT 
-					UserPassword
-				FROM
-					master_user
-				WHERE
-					UserID = ".$UserID."";
+						UserPassword
+					FROM
+						master_user
+					WHERE
+						UserID = ".$UserID."";
 			if (! $result=mysql_query($sql, $dbh)) {
-				echo mysql_error();
+				$Message = "Terjadi Kesalahan Sistem";
+				$MessageDetail = mysql_error();
+				$FailedFlag = 1;
+				echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
 				return 0;
 			}
 			$row = mysql_fetch_array($result);
@@ -42,7 +45,10 @@
 		$sql = "CALL spInsUser(".$UserID.", '".$UserName."', '".$UserLogin."', '".$Password."', '".$chkActive."', '".$hdnMenuID."', '".$hdnEditMenuID."', '".$hdnDeleteMenuID."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
 		
 		if (! $result=mysql_query($sql, $dbh)) {
-			echo mysql_error();
+			$Message = "Terjadi Kesalahan Sistem";
+			$MessageDetail = mysql_error();
+			$FailedFlag = 1;
+			echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}				
 		$row=mysql_fetch_array($result);

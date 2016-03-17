@@ -19,7 +19,10 @@
 		$sql = "CALL spInsType(".$TypeID.", '".$TypeName."', '".$BrandID."', ".$UnitID.", '".$ReminderCount."', ".$BuyPrice.", ".$SalePrice.", ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
 		
 		if (! $result=mysql_query($sql, $dbh)) {
-			echo mysql_error();
+			$Message = "Terjadi Kesalahan Sistem";
+			$MessageDetail = mysql_error();
+			$FailedFlag = 1;
+			echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}				
 		$row=mysql_fetch_array($result);

@@ -6,7 +6,7 @@
 	include "../../GetPermission.php";
 
 	$where = " 1=1 ";
-	$order_by = "TypeID";
+	$order_by = "BackupHistoryID";
 	$rows = 10;
 	$current = 1;
 	$limit_l = ($current * $rows) - ($rows);
@@ -17,15 +17,14 @@
 		$order_by = "";
 		foreach($_REQUEST['sort'] as $key => $value) {
 			if($key != 'No') $order_by .= " $key $value";
-			else $order_by = "MI.TypeID ASC";
+			else $order_by = "BrandID";
 		}
-		$order_by .= ", MI.TypeID ASC";
 	}
 	//Handles search querystring sent from Bootgrid
 	if (ISSET($_REQUEST['searchPhrase']) )
 	{
 		$search = trim($_REQUEST['searchPhrase']);
-		$where .= " AND ( MU.UnitName LIKE '%".$search."%' OR MI.TypeName LIKE '%".$search."%' OR MB.BrandName LIKE '%".$search."%' OR MI.ReminderCount LIKE '%".$search."%' OR MI.BuyPrice LIKE '%".$search."%' OR MI.SalePrice LIKE '%".$search."%' OR CONCAT(MB.BrandName, ' ', MI.TypeName) LIKE '%".$search."%' )";
+		$where .= " AND ( DATE_FORMAT(BackupDate, '%d-%m-%Y') LIKE '%".$search."%' OR FilePath LIKE '%".$search."%' ) ";
 	}
 	//Handles determines where in the paging count this result set falls in
 	if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];
@@ -38,15 +37,11 @@
 	}
 	if ($rows == -1) $limit = ""; //no limit
 	else $limit = " LIMIT $limit_l, $limit_h ";
-	//echo "$limit_l $limit_h";
+	
 	$sql = "SELECT
 				COUNT(*) AS nRows
 			FROM
-				master_type MI
-				JOIN master_brand MB
-					ON MB.BrandID = MI.BrandID
-				JOIN master_unit MU
-					ON MU.UnitID = MI.UnitID
+				backup_history
 			WHERE
 				$where";
 	if (! $result = mysql_query($sql, $dbh)) {
@@ -56,32 +51,17 @@
 	$row = mysql_fetch_array($result);
 	$nRows = $row['nRows'];
 	$sql = "SELECT
-				MI.TypeID,
-				MI.TypeName,
-				MB.BrandName,
-				MI.ReminderCount,
-				MI.BuyPrice,
-				MI.SalePrice,
-				MU.UnitName
+				BackupHistoryID,
+				DATE_FORMAT(BackupDate, '%d-%m-%Y') BackupDate,
+				FilePath
 			FROM
-				master_type MI
-				JOIN master_brand MB
-					ON MB.BrandID = MI.BrandID
-				JOIN master_unit MU
-					ON MU.UnitID = MI.UnitID
+				backup_history
 			WHERE
 				$where
-			GROUP BY
-				MI.TypeID,
-				MI.TypeName,
-				MB.BrandName,
-				MI.ReminderCount,
-				MI.BuyPrice,
-				MI.SalePrice,
-				MU.UnitName
 			ORDER BY 
 				$order_by
-			$limit";
+				$limit";
+	
 	if (! $result = mysql_query($sql, $dbh)) {
 		echo mysql_error();
 		return 0;
@@ -91,18 +71,13 @@
 	while ($row = mysql_fetch_array($result)) {
 		$RowNumber++;
 		$row_array['RowNumber'] = $RowNumber;
-		$row_array['TypeIDName'] = $row['TypeID']."^Merek ".$row['BrandName']." tipe ".$row['TypeName'];
-		$row_array['TypeID']= $row['TypeID'];
-		$row_array['TypeName'] = $row['TypeName'];
-		$row_array['BrandName'] = $row['BrandName'];
-		$row_array['ReminderCount'] = $row['ReminderCount'];
-		//$row_array['Stock'] = $row['Stock'];
-		$row_array['UnitName'] = $row['UnitName'];
-		$row_array['BuyPrice'] = number_format($row['BuyPrice'],2,".",",");
-		$row_array['SalePrice'] = number_format($row['SalePrice'],2,".",",");
+		$row_array['BackupHistoryID'] = (Integer)$row['BackupHistoryID'];
+		$row_array['BackupDate'] = $row['BackupDate'];
+		$row_array['FilePath']= $APPLICATION_PATH.$row['FilePath'];
+		$row_array['FileName']= basename($row['FilePath'], '.sql');
 		array_push($return_arr, $row_array);
 	}
+
 	$json = json_encode($return_arr);
 	echo "{ \"current\": $current, \"rowCount\":$rows, \"rows\": ".$json.", \"total\": $nRows }";
-	
 ?>
