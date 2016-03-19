@@ -4,6 +4,7 @@ DELIMITER $$
 CREATE PROCEDURE spInsSales (
 	pID 			BIGINT, 
 	pSalesName 		VARCHAR(255),
+	pAlias			VARCHAR(4),
 	pAddress 		TEXT,
 	pTelephone		VARCHAR(255),
 	pIsEdit			INT,
@@ -48,6 +49,7 @@ SET State = 1;
 			master_sales
 		WHERE
 			TRIM(SalesName) = TRIM(pSalesName)
+			AND TRIM(Alias) = TRIM(pAlias)
 			AND SalesID <> pID
 		LIMIT 1;
 			
@@ -68,6 +70,7 @@ SET State = 3;
 				INSERT INTO master_sales
 				(
 					SalesName,
+					Alias,
 					Address,
 					Telephone,
 					CreatedDate,
@@ -75,6 +78,7 @@ SET State = 3;
 				)
 				VALUES (
 					pSalesName,
+					pAlias,
 					pAddress,
 					pTelephone,
 					NOW(),
@@ -94,6 +98,7 @@ SET State = 5;
 					master_sales
 				SET
 					SalesName = pSalesName,
+					Alias = pAlias,
 					Address = pAddress,
 					Telephone = pTelephone,
 					ModifiedBy = pCurrentUser

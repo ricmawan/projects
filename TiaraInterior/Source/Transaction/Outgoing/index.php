@@ -22,7 +22,9 @@
 										<th data-column-id="TransactionDate" data-type="numeric">Tanggal</th>
 										<th data-column-id="CustomerName">Nama Pelanggan</th>
 										<th data-column-id="SalesName">Nama Sales</th>
-										<th data-column-id="TotalAmount" data-align="right">Total</th>
+										<th data-column-id="DeliveryCost" data-align="right">Ongkos Kirim</th>
+										<th data-column-id="SubTotal" data-align="right">Sub Total</th>
+										<th data-column-id="Total" data-align="right">Total</th>
 										<th data-column-id="Remarks">Catatan</th>
 										<?php if($EditFlag == true) echo '<th data-column-id="Opsi" data-formatter="commands" data-sortable="false">Opsi</th>'; ?>
 									</tr>

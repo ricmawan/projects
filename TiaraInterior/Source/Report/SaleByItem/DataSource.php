@@ -60,7 +60,7 @@
 		mysql_query("SET @row:=0;", $dbh);
 		$sql = "SELECT
 					OT.OutgoingNumber,
-					DATE_FORMAT(OT.TransactionDate, '%d%b%y') AS TransactionDate,
+					DATE_FORMAT(OT.TransactionDate, '%d/%c%/%y') AS TransactionDate,
 					MS.SalesName,
 					MC.CustomerName,
 					MB.BrandName,
@@ -106,8 +106,54 @@
 					TOD.Quantity,
 					TOD.SalePrice,
 					OT.Remarks
+				UNION ALL
+				SELECT
+					SR.SaleReturnNumber,
+					DATE_FORMAT(SR.TransactionDate, '%d/%c%/%y') AS TransactionDate,
+					'',
+					MC.CustomerName,
+					MB.BrandName,
+					MT.TypeName,
+					SRD.BatchNumber,
+					SRD.Quantity,
+					SRD.SalePrice,
+					-IFNULL(SUM(SRD.Quantity * SRD.SalePrice), 0) AS Total,
+					SR.Remarks
+				FROM
+					transaction_salereturn SR
+					JOIN master_customer MC
+						ON MC.CustomerID = SR.CustomerID
+					LEFT JOIN transaction_salereturndetails SRD
+						ON SRD.SaleReturnID = SR.SaleReturnID
+					LEFT JOIN master_type MT
+						ON MT.TypeID = SRD.TypeID
+					LEFT JOIN master_brand MB
+						ON MB.BrandID = MT.BrandID
+				WHERE
+					SR.TransactionDate >= '".$txtFromDate."'
+					AND SR.TransactionDate <= '".$txtToDate."'
+					AND CASE
+							WHEN ".$BrandID." = 0
+							THEN MB.BrandID
+							ELSE ".$BrandID."
+						END = MB.BrandID
+					AND CASE
+							WHEN ".$TypeID." = 0
+							THEN MT.TypeID
+							ELSE ".$TypeID."
+						END = MT.TypeID
+				GROUP BY
+					SR.TransactionDate,
+					MC.CustomerName,
+					MB.BrandName,
+					SR.SaleReturnNumber,
+					MT.TypeName,
+					SRD.BatchNumber,
+					SRD.Quantity,
+					SRD.SalePrice,
+					SR.Remarks
 				ORDER BY	
-					OT.TransactionDate ASC";
+					TransactionDate ASC";
 		
 		if (! $result = mysql_query($sql, $dbh)) {
 			echo mysql_error();

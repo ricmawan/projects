@@ -62,7 +62,7 @@
 								<div class="col-md-3">
 									<input id="hdnCustomerID" name="hdnCustomerID" type="hidden" <?php echo 'value="'.$CustomerID.'"'; ?> />
 								<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
-								<input id="txtCustomerName" name="txtCustomerName" type="text" class="form-control-custom" placeholder="Nama pelanggan" required   <?php echo 'value="'.$CustomerName.'"'; ?> />
+								<input id="txtCustomerName" maxlength=30 name="txtCustomerName" type="text" class="form-control-custom" placeholder="Nama pelanggan" required   <?php echo 'value="'.$CustomerName.'"'; ?> />
 								</div>
 							</div>
 							<br />
@@ -89,7 +89,7 @@
 									Kota :
 								</div>
 								<div class="col-md-3">
-									<input id="txtCity" name="txtCity" type="text" class="form-control-custom" placeholder="Kota" <?php echo 'value="'.$City.'"'; ?> />
+									<input id="txtCity" maxlength=30 name="txtCity" type="text" class="form-control-custom" placeholder="Kota" <?php echo 'value="'.$City.'"'; ?> />
 								</div>
 							</div>
 

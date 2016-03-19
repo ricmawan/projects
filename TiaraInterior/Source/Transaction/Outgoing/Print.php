@@ -5,69 +5,109 @@
 		$file = basename($RequestPath);
 		$RequestPath = str_replace($file, "", $RequestPath);
 		include "../../GetPermission.php";
+		$ID = mysql_real_escape_string($_POST['hdnOutgoingID']);
 		$tanggal = date('d') . "-" . date('m') . "-" . date('Y');
 		/*$tmpdir = sys_get_temp_dir();   # ambil direktori temporary untuk simpan file.
 		$file =  tempnam($tmpdir, 'ctk');  # nama file temporary yang akan dicetak*/
 		$file =  "Print.txt";  # nama file temporary yang akan dicetak
 		$handle = fopen($file, 'w');
-		$condensed = Chr(27) . Chr(33) . Chr(8);
+		$Message = "Nota Berhasil Dicetak";
+		$MessageDetail = "";
+		$FailedFlag = 0;
+		$State = 1;
+		// 137 column 30 row
 		$bold1 = Chr(27) . Chr(69);
 		$bold0 = Chr(27) . Chr(70);
-		$initialized = chr(27).chr(64);
+		$double1 = Chr(27) . Chr(87) . Chr(49);
+		$double0 = Chr(27) . Chr(87) . Chr(48);
+		$initialized = Chr(27) . Chr(64). Chr(27) . Chr(67) . Chr(30);
 		$condensed1 = chr(15);
 		$condensed0 = chr(18);
-		$underline1 = chr(27) . chr(45) . chr(49);
-		$underline0 = chr(27) . chr(45) . chr(48);
-		$italic1 = chr(27) . chr(52);
-		$italic0 = chr(27) . chr(53);
+		$underline1 = Chr(27) . Chr(45) . Chr(49);
+		$underline0 = Chr(27) . Chr(45) . Chr(48);
+		$italic1 = Chr(27) . Chr(52);
+		$italic0 = Chr(27) . Chr(53);
 		
-		$double = chr(27) . chr(87) . chr(49);
-		$Id = $_POST['hdnId'];
-		$RecordNew = $_POST['recordnew'];
-		$No = "";
-		$Data  = $initialized.$double;
-		$Data .= $condensed1;
-		$spaceCount = 80;
-		$space = "";
-		for($i = 0; $i< $spaceCount; $i++) {
-			$space .= " ";
+		$sql = "SELECT
+					OT.OutgoingNumber,
+					MC.CustomerName,
+					MC.City,
+					DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y) TransactionDate,
+					UPPER(MS.Alias) Alias,
+					OT.Remarks
+				FROM
+					transaction_outgoing OT
+					JOIN master_customer MC
+						ON MC.CustomerID = OT.CustomerID
+					JOIN master_sales MS
+						ON MS.SalesID = OT.SalesID
+				WHERE
+					OT.OutgoingID = ".$ID;
+		
+		if (! $result = mysql_query($sql, $dbh)) {
+			$Message = "Terjadi Kesalahan Sistem";
+			$MessageDetail = mysql_error();
+			$FailedFlag = 1;
+			echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
+			return 0;
 		}
-		$Data .= $space . "Tgl : " .$tanggal. "\n";
-		$spaceCount = 60;
-		$space = "";
-		for($i = 0; $i< $spaceCount; $i++) {
-			$space .= " ";
-		}
-		$Data .= $space ."Kepada Yth.    ";
-		$Data .= "KARYA INDAH WALPAPER\n";
-		$spaceCount = 64;
-		$space = "";
-		for($i = 0; $i< $spaceCount; $i++) {
-			$space .= " ";
-		}
-		$Data .= $space . "TITI BUMI BARAT NO .40\n";
-		$Data .= $space . "(GODEAN KM 4,5)\n";
+		$row=mysql_fetch_array($result);
+		$OutgoingNumber = $row['OutgoingNumber'];
+		$CustomerName = $row['CustomerName'];
+		$City = $row['City'];
+		$TransactionDate = $row['TransactionDate'];
+		$Alias = $row['Alias'];
+		$Remarks = $row['Remarks'];
 		
-		$Data .= "Nopo  :\n";
-		$Data .= "Sales : TR\n";
-		$Data .= "Tgl Jatuh Tempo : " .$tanggal;
+		$Data  = $initialized;
+		$Data .= fnSpace(64) . "Tgl : " .$TransactionDate. "\n"; //16 
+		$Data .= fnSpace(37) ."Kepada Yth.  "; //13
+		$Data .= $CustomerName."\n"; //max 50
+		$Data .= fnSpace(50) . $City."\n";
+		$Data .= "   Sales           : ".$Alias."\n";
+		$Data .= "   Tgl Jatuh Tempo : " .$tanggal; //28
+		$Data .= fnSpace(7) . $bold1 . $double1 ."INVOICE\n". $double0 . $bold0;
 		
-		$spaceCount = 35;
-		$space = "";
-		for($i = 0; $i< $spaceCount; $i++) {
-			$space .= " ";
-		}
-		
-		
-		$Data .= $space.$condensed."INVOICE".$condensed1;
-		
-		
-		
+		$Data .= "Kami kirim pesanan anda dlm keadaan baik, barang-barang sbb:"
+		$Data .= fnSpace(10) . "No : ".$OutgoingNumber."\n";
+		$Data .= "--------------------------------------------------------------------------------";
+		$Data .= "   Qty          Nama Barang                 Lot  Harga Satuan  Diskon         Total";
+		$Data .= "--------------------------------------------------------------------------------";
+		$Data .= "   2,00 m lari  MAESTRO 646 XTC             522    155,000.00  15.500(10%)  201,500";
+		$Data .= "2,00 m lari  MAESTRO 646 XTC             522    155,000.00  15.500(10%)  201,500";
+		$Data .= "2,00 m lari  MAESTRO 646 XTC             522    155,000.00  15.500(10%)  201,500";
+		$Data .= "2,00 m lari  MAESTRO 646 XTC             522    155,000.00  15.500(10%)  201,500";
+		$Data .= "2,00 m lari  MAESTRO 646 XTC             522    155,000.00  15.500(10%)  201,500";
+		$Data .= "2,00 m lari  MAESTRO 646 XTC             522    155,000.00  15.500(10%)  201,500";
+		$Data .= "2,00 m lari  MAESTRO 646 XTC             522    155,000.00  15.500(10%)  201,500";
+		$Data .= "2,00 m lari  MAESTRO 646 XTC             522    155,000.00  15.500(10%)  201,500";
+		$Data .= "--------------------------------------------------------------------------------";
+		//qty 11 karakter, nama barang 25 karakter, lot 3 karakter, harga satuan Diskon Total
 		fwrite($handle, $Data);
 		fclose($handle);
 		//copy($file, $PRINTER_IP.$SHARE_PRINTER_NAME);  # Lakukan cetak
 		//exec("lp -d epson ".$file);  # Lakukan cetak
 		//unlink($file);
+		echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
+	}
+	
+	function returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State) {
+		$data = array(
+			"ID" => $ID, 
+			"Message" => $Message,
+			"MessageDetail" => $MessageDetail,
+			"FailedFlag" => $FailedFlag,
+			"State" => $State
+		);
+		return json_encode($data);
+	
+	}
+	function fnSpace($loop) {
+		$space = "";
+		for($i = 0; $i< $loop; $i++) {
+			$space .= " ";
+		}
+		return $space;
 	}
 	function terbilang($angka)
 	{

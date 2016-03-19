@@ -24,7 +24,7 @@
 	if (ISSET($_REQUEST['searchPhrase']) )
 	{
 		$search = trim($_REQUEST['searchPhrase']);
-		$where .= " AND ( OT.OutgoingID LIKE '%".$search."%' OR OT.Remarks LIKE '%".$search."%' OR MC.CustomerName LIKE '%".$search."%' OR MS.SalesName LIKE '%".$search."%' OR DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' ) ";
+		$where .= " AND ( OT.OutgoingNumber LIKE '%".$search."%' OR OT.Remarks LIKE '%".$search."%' OR MC.CustomerName LIKE '%".$search."%' OR MS.SalesName LIKE '%".$search."%' OR DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' ) ";
 	}
 	//Handles determines where in the paging count this result set falls in
 	if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];
@@ -60,7 +60,9 @@
 				MS.SalesName,
 				MC.CustomerName,
 				DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') AS TransactionDate,
-				IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - ((OTD.SalePrice * OTD.Discount)/100))), 0) AS TotalAmount,
+				IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - ((OTD.SalePrice * OTD.Discount)/100))), 0) AS SubTotal,
+				IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - ((OTD.SalePrice * OTD.Discount)/100))), 0) + OT.DeliveryCost AS Total,
+				OT.DeliveryCost,
 				OT.Remarks
 			FROM
 				transaction_outgoing OT
@@ -95,7 +97,9 @@
 		$row_array['OutgoingNumber']= $row['OutgoingNumber'];
 		$row_array['SalesName'] = $row['SalesName'];
 		$row_array['CustomerName'] = $row['CustomerName'];
-		$row_array['TotalAmount'] =  number_format($row['TotalAmount'],2,".",",");
+		$row_array['DeliveryCost'] =  number_format($row['DeliveryCost'],2,".",",");
+		$row_array['SubTotal'] =  number_format($row['SubTotal'],2,".",",");
+		$row_array['Total'] =  number_format($row['Total'],2,".",",");
 		$row_array['TransactionDate'] = $row['TransactionDate'];
 		$row_array['Remarks'] = $row['Remarks'];
 		array_push($return_arr, $row_array);

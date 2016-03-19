@@ -95,7 +95,7 @@
 									No Nota :
 								</div>
 								<div class="col-md-3">
-									<input type="text" id="txtIncomingNumber" name="txtIncomingNumber" class="form-control-custom" readonly <?php echo 'value="'.$IncomingNumber.'"'; ?> />
+									<input type="text" id="txtIncomingNumber" name="txtIncomingNumber" class="form-control-custom" required <?php echo 'value="'.$IncomingNumber.'"'; ?> />
 								</div>
 							</div>
 							<br />
@@ -108,7 +108,7 @@
 									<input id="hdnData" name="hdnData" type="hidden" <?php echo 'value="'.$Data.'"'; ?> />
 								</div>
 								<div class="col-md-3">
-									<input id="txtTransactionDate" name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" onchange="GetInvoiceNumber(this.value);" placeholder="Tanggal" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
+									<input id="txtTransactionDate" name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Tanggal" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
 								</div>
 								<div class="col-md-1 labelColumn">
 									Supplier :
@@ -561,29 +561,6 @@
 					}
 					else SubmitForm("./Transaction/Incoming/Insert.php");
 				}
-			}
-			
-			function GetInvoiceNumber(SelectedDate)
-			{
-				$.ajax({
-					url: "./Transaction/FirstStock/GetInvoiceNumber.php",
-					type: "POST",
-					data: { SelectedDate : SelectedDate, InvoiceNumberType : "TB"},
-					dataType: "json",
-					success: function(data) {
-						if(data.FailedFlag == '0') {
-							$("#txtIncomingNumber").val(data.InvoiceNumber);
-						}
-						else {
-							$("#loading").hide();
-							$.notify(data.Message, "error");					
-						}
-					},
-					error: function(data) {
-						$("#loading").hide();
-						$.notify("Terjadi kesalahan sistem!", "error");
-					}
-				});
 			}
 		</script>
 	</body>

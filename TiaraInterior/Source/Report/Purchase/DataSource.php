@@ -58,7 +58,7 @@
 		}
 		mysql_query("SET @row:=0;", $dbh);
 		$sql = "SELECT
-					DATE_FORMAT(TI.TransactionDate, '%d%b%y') AS TransactionDate,
+					DATE_FORMAT(TI.TransactionDate, '%d/%c/%y') AS TransactionDate,
 					MS.SupplierName AS SupplierName,
 					TI.IncomingNumber,
 					TI.Remarks,
@@ -81,8 +81,33 @@
 					TI.IncomingNumber,
 					TI.TransactionDate,
 					MS.SupplierName
+				UNION ALL
+				SELECT
+					DATE_FORMAT(BR.TransactionDate, '%d/%c/%y') AS TransactionDate,
+					MS.SupplierName AS SupplierName,
+					BR.BuyReturnNumber,
+					BR.Remarks,
+					-IFNULL(SUM(BRD.Quantity * BRD.BuyPrice), 0) AS Total
+				FROM
+					transaction_buyreturn BR
+					JOIN master_supplier MS
+						ON MS.SupplierID = BR.SupplierID
+					LEFT JOIN transaction_buyreturndetails BRD
+						ON BRD.BuyReturnID = BR.BuyReturnID
+				WHERE
+					BR.TransactionDate >= '".$txtFromDate."'
+					AND BR.TransactionDate <= '".$txtToDate."'
+					AND CASE
+							WHEN ".$SupplierID." = 0
+							THEN MS.SupplierID
+							ELSE ".$SupplierID."
+						END = MS.SupplierID
+				GROUP BY
+					BR.BuyReturnNumber,
+					BR.TransactionDate,
+					MS.SupplierName
 				ORDER BY	
-					TI.TransactionDate ASC";
+					TransactionDate ASC";
 		
 		if (! $result = mysql_query($sql, $dbh)) {
 			echo mysql_error();

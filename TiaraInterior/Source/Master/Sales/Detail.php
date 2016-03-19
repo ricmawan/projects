@@ -8,6 +8,7 @@
 		$SalesName = "";
 		$Address = "";
 		$Telephone = "";
+		$Alias = "";
 		$IsEdit = 0;
 		
 		if($SalesID != 0) {
@@ -15,6 +16,7 @@
 			//$Content = "Place the content here";
 			$sql = "SELECT
 						SalesID,
+						Alias,
 						SalesName,
 						Address,
 						Telephone
@@ -32,6 +34,7 @@
 			$SalesName = $row['SalesName'];
 			$Address = $row['Address'];
 			$Telephone = $row['Telephone'];
+			$Alias = $row['Alias'];
 		}
 	}
 ?>
@@ -60,6 +63,15 @@
 									<input id="hdnSalesID" name="hdnSalesID" type="hidden" <?php echo 'value="'.$SalesID.'"'; ?> />
 								<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
 								<input id="txtSalesName" name="txtSalesName" type="text" class="form-control-custom" placeholder="Nama Sales" required   <?php echo 'value="'.$SalesName.'"'; ?> />							
+								</div>
+							</div>
+							<br />
+							<div class="row">
+								<div class="col-md-2 labelColumn">
+									Nama Inisial :
+								</div>
+								<div class="col-md-3">
+									<input id="txtAlias" maxlength=4 name="txtAlias" type="text" class="form-control-custom" placeholder="Nama Inisial" required   <?php echo 'value="'.$Alias.'"'; ?> />							
 								</div>
 							</div>
 							<br />

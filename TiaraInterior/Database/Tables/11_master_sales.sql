@@ -4,6 +4,7 @@ CREATE TABLE master_sales
 (
 	SalesID			BIGINT PRIMARY KEY AUTO_INCREMENT,
 	SalesName		VARCHAR(255) NOT NULL,
+	Alias			VARCHAR(4) NOT NULL,
 	Telephone 		VARCHAR(100) NOT NULL,
 	Address 		VARCHAR(255),
 	CreatedDate 	DATETIME NOT NULL,

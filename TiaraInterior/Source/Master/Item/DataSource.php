@@ -17,15 +17,14 @@
 		$order_by = "";
 		foreach($_REQUEST['sort'] as $key => $value) {
 			if($key != 'No') $order_by .= " $key $value";
-			else $order_by = "MT.TypeID ASC";
+			else $order_by = "MB.BrandName ASC, MT.TypeName, FS.BatchNumber";
 		}
-		$order_by .= ", MT.TypeID ASC";
 	}
 	//Handles search querystring sent from Bootgrid
 	if (ISSET($_REQUEST['searchPhrase']) )
 	{
 		$search = trim($_REQUEST['searchPhrase']);
-		$where .= " AND ( MU.UnitName LIKE '%".$search."%' OR MT.TypeName LIKE '%".$search."%' OR MB.BrandName LIKE '%".$search."%' OR MT.BuyPrice LIKE '%".$search."%' OR MT.SalePrice LIKE '%".$search."%' OR CONCAT(MB.BrandName, ' ', MT.TypeName) LIKE '%".$search."%' )";
+		$where .= " AND ( FS.BatchNumber LIKE '%".$search."%' OR MU.UnitName LIKE '%".$search."%' OR MT.TypeName LIKE '%".$search."%' OR MB.BrandName LIKE '%".$search."%' OR MT.BuyPrice LIKE '%".$search."%' OR MT.SalePrice LIKE '%".$search."%' OR CONCAT(MB.BrandName, ' ', MT.TypeName) LIKE '%".$search."%' )";
 	}
 	//Handles determines where in the paging count this result set falls in
 	if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];
@@ -159,25 +158,37 @@
 							TypeID,
 							TRIM(BatchNumber) BatchNumber,
 							SUM(Quantity) Quantity,
-							BuyPrice,
-							SalePrice
+							(BuyPrice - ((BuyPrice * Discount) / 100)) BuyPrice,
+							SalePrice,
+							CreatedDate
 						FROM
 							transaction_firststockdetails
 						GROUP BY
 							TypeID,
-							BatchNumber
+							BatchNumber,
+							BuyPrice,
+							SalePrice,
+							CreatedDate,
+							Discount
 						UNION
 						SELECT
 							TypeID,
 							TRIM(BatchNumber) BatchNumber,
 							SUM(Quantity) Quantity,
-							BuyPrice,
-							SalePrice
+							(BuyPrice - ((BuyPrice * Discount) / 100)) BuyPrice,
+							SalePrice,
+							CreatedDate
 						FROM
 							transaction_incomingdetails
 						GROUP BY
 							TypeID,
-							BatchNumber
+							BatchNumber,
+							BuyPrice,
+							SalePrice,
+							CreatedDate,
+							Discount
+						ORDER BY
+							CreatedDate DESC
 					)SA
 					GROUP BY
 						TypeID,

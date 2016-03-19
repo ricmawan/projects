@@ -81,7 +81,7 @@
 		
 		$sql = "SELECT
 					OT.OutgoingNumber,
-					DATE_FORMAT(OT.TransactionDate, '%d%b%y') AS TransactionDate,
+					DATE_FORMAT(OT.TransactionDate, '%d/%c/%y') AS TransactionDate,
 					MS.SalesName,
 					MC.CustomerName,
 					MB.BrandName,
@@ -143,7 +143,7 @@
 			$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row['SalesName']);
 			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, $row['CustomerName']);
 			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['BrandName']);
-			$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, $row['TypeName']);
+			$objPHPExcel->getActiveSheet()->setCellValueExplicit("G".$rowExcel, $row['TypeName'], PHPExcel_Cell_DataType::TYPE_STRING);
 			$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, $row['BatchNumber']);
 			$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, $row['Quantity']);
 			$objPHPExcel->getActiveSheet()->setCellValue("J".$rowExcel, $row['SalePrice']);
@@ -152,7 +152,7 @@
 			$RowNumber++;
 			$rowExcel++;
 		}
-		$objPHPExcel->getActiveSheet()->getStyle("K5:K".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+		$objPHPExcel->getActiveSheet()->getStyle("J5:K".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 		$objPHPExcel->getActiveSheet()->setCellValue("K".$rowExcel, "=SUM(K5:K".($rowExcel-1).")");
 		$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Grand Total");
 		$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":J".$rowExcel);

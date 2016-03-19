@@ -70,18 +70,22 @@
 		$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, "Tanggal");
 		$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, "Nama Sales");
 		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Nama Pelanggan");
-		$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, "Total");
-		$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, "Keterangan");
+		$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, "Ongkos Kirim");
+		$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, "Sub Total");
+		$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, "Total");
+		$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, "Keterangan");
 		$rowExcel++;
 		
 		mysql_query("SET @row:=0;", $dbh);
 		$sql = "SELECT
-					DATE_FORMAT(OT.TransactionDate, '%d%b%y') AS TransactionDate,
+					OT.OutgoingNumber,
+					DATE_FORMAT(OT.TransactionDate, '%d/%c/%y') AS TransactionDate,
 					MS.SalesName,
 					MC.CustomerName,
-					OT.OutgoingNumber,
-					OT.Remarks,
-					IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))), 0) AS Total
+					OT.DeliveryCost,
+					IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))), 0) AS SubTotal,
+					IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))), 0) + OT.DeliveryCost AS Total,
+					OT.Remarks
 				FROM
 					transaction_outgoing OT
 					JOIN master_sales MS
@@ -108,8 +112,36 @@
 					OT.TransactionDate,
 					MS.SalesName,
 					MC.CustomerName
+				UNION
+				SELECT
+					SR.SaleReturnNumber,
+					DATE_FORMAT(SR.TransactionDate, '%d/%c/%y') AS TransactionDate,
+					'',
+					MC.CustomerName,
+					0,
+					-IFNULL(SUM(SRD.Quantity * SRD.SalePrice), 0) AS SubTotal,
+					-IFNULL(SUM(SRD.Quantity * SRD.SalePrice), 0) AS Total,
+					SR.Remarks
+				FROM
+					transaction_salereturn SR
+					JOIN master_customer MC
+						ON MC.CustomerID = SR.CustomerID
+					LEFT JOIN transaction_salereturndetails SRD
+						ON SRD.SaleReturnID = SR.SaleReturnID
+				WHERE
+					SR.TransactionDate >= '".$txtFromDate."'
+					AND SR.TransactionDate <= '".$txtToDate."'					
+					AND CASE
+							WHEN ".$CustomerID." = 0
+							THEN MC.CustomerID
+							ELSE ".$CustomerID."
+						END = MC.CustomerID
+				GROUP BY
+					SR.SaleReturnNumber,
+					SR.TransactionDate,
+					MC.CustomerName
 				ORDER BY	
-					OT.TransactionDate ASC";
+					TransactionDate ASC";
 					
 		if (! $result = mysql_query($sql, $dbh)) {
 			echo mysql_error();
@@ -123,25 +155,27 @@
 			$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['TransactionDate']);
 			$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row['SalesName']);
 			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, $row['CustomerName']);
-			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['Total']);
-			$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, $row['Remarks']);
+			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['DeliveryCost']);
+			$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, $row['SubTotal']);
+			$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, $row['Total']);
+			$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, $row['Remarks']);
 			$RowNumber++;
 			$rowExcel++;
 		}
-		$objPHPExcel->getActiveSheet()->getStyle("F5:F".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-		$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, "=SUM(F5:F".($rowExcel-1).")");
+		$objPHPExcel->getActiveSheet()->getStyle("F5:H".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+		$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, "=SUM(H5:H".($rowExcel-1).")");
 		$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Grand Total");
-		$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":E".$rowExcel);
+		$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":G".$rowExcel);
 		$rowExcel++;
 		//merge title
-		$objPHPExcel->getActiveSheet()->mergeCells("A1:G2");
-		$objPHPExcel->getActiveSheet()->getStyle("A4:G4")->getFont()->setBold(true);
-		$objPHPExcel->getActiveSheet()->getStyle("A1:G2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-		$objPHPExcel->getActiveSheet()->getStyle("A4:G4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('c4bd97');
+		$objPHPExcel->getActiveSheet()->mergeCells("A1:I2");
+		$objPHPExcel->getActiveSheet()->getStyle("A4:I4")->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle("A1:I2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$objPHPExcel->getActiveSheet()->getStyle("A4:I4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('c4bd97');
 
 		//set all width 
 		$fromCol='A';
-		$toCol= 'H';
+		$toCol= 'J';
 		for($j = $fromCol; $j !== $toCol; $j++) {
 			//$calculatedWidth = $objPHPExcel->getActiveSheet()->getColumnDimension($i)->getWidth();
 			$objPHPExcel->getActiveSheet()->getColumnDimension($j)->setAutoSize(true);
@@ -153,7 +187,7 @@
 			  )
 			)
 		);		
-		$objPHPExcel->getActiveSheet()->getStyle("A4:G".($rowExcel-1))->applyFromArray($styleArray);		
+		$objPHPExcel->getActiveSheet()->getStyle("A4:I".($rowExcel-1))->applyFromArray($styleArray);		
 
 		$title = "Laporan Penjualan $FromDate - $ToDate";
 		// Rename worksheet

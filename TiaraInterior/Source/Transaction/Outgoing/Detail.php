@@ -42,7 +42,7 @@
 			$SalesID = $row['SalesID'];
 			$CustomerID = $row['CustomerID'];
 			$Remarks = $row['Remarks'];
-			$DeliveryCost = number_format($DeliveryCost,2,".",",");
+			$DeliveryCost = $row['DeliveryCost'];
 			$TransactionDate = $row['TransactionDate'];
 			
 			$sql = "SELECT
@@ -493,7 +493,10 @@
 					$("#txtDeliveryCost").val(0);
 					deliveryCost = 0;
 				}
-				GrandTotal += deliveryCost;
+				else {
+					deliveryCost = $("#txtDeliveryCost").val().replace(/\,/g, "");
+				}
+				GrandTotal += parseFloat(deliveryCost);
 				$("#txtGrandTotal").val(returnRupiah(GrandTotal.toString()));
 			}
 			$(document).ready(function () {
@@ -517,31 +520,36 @@
 				$("#btnAdd").on("click", function() {
 					var count = $("#datainput tbody tr").length - 1;
 					count++;
-					var $clone = $("#datainput tbody tr:first").clone();
-					$clone.find("#nota").text(count);
-					$clone.find("#nota").attr("id", "nota" + count);
-					$clone.find("#nota").attr("name", "nota" + count);
-					$clone.removeAttr("style");
-					$clone.attr({
-						id: "num" + count,
-						name: "num" + count
-					});
-					$clone.find("input, select, i").each(function(){
-						//var temp = $(this).attr("id") + (count - 1);
-						$(this).attr({
-							id: $(this).attr("id") + count,
-							name: $(this).attr("name") + count,
-							row: count,
-							required: ""
-						});				
-						//$(this).val($("#" + temp).val());
-					});
-					$("#datainput tbody").append($clone);
-					//$("#txtQuantity" + count).addClass("txtQuantity");
-					$("#recordnew").val(count);
-					$("#datainput tbody").animate({
-						scrollTop: (25 * count)
-					}, "slow");
+					if(count <= 8) {
+						var $clone = $("#datainput tbody tr:first").clone();
+						$clone.find("#nota").text(count);
+						$clone.find("#nota").attr("id", "nota" + count);
+						$clone.find("#nota").attr("name", "nota" + count);
+						$clone.removeAttr("style");
+						$clone.attr({
+							id: "num" + count,
+							name: "num" + count
+						});
+						$clone.find("input, select, i").each(function(){
+							//var temp = $(this).attr("id") + (count - 1);
+							$(this).attr({
+								id: $(this).attr("id") + count,
+								name: $(this).attr("name") + count,
+								row: count,
+								required: ""
+							});				
+							//$(this).val($("#" + temp).val());
+						});
+						$("#datainput tbody").append($clone);
+						//$("#txtQuantity" + count).addClass("txtQuantity");
+						$("#recordnew").val(count);
+						$("#datainput tbody").animate({
+							scrollTop: (25 * count)
+						}, "slow");
+					}
+					else {
+						$.notify("Jumlah barang melebihi maksimal!", "error");
+					}
 				});
 				$("#btnDelete").on("click", function() {
 					var count = $("#datainput tbody tr").length - 1;
@@ -578,18 +586,18 @@
 				}
 			});
 			function PrintInvoice() {
-				/*if($("#hdnOutgoingID").val() == 0) {
+				if($("#hdnOutgoingID").val() == 0) {
 					$.notify("Tekan Simpan terlebih dahulu!", "error");
 					return false;
 				}
-				else {*/
+				else {
 					var ID = $("#hdnId").val();
 					$("#loading").show();
 					$.ajax({
 						url: "./Transaction/Outgoing/Print.php",
 						type: "POST",
 						data: $("#PostForm").serialize(),
-						dataType: "html",
+						dataType: "json",
 						success: function(data) {
 							$("html, body").animate({
 								scrollTop: 0
@@ -602,7 +610,7 @@
 					
 						}
 					});
-				//}
+				}
 			}
 			function SubmitValidate() {
 				if($("#recordnew").val() > 0) {

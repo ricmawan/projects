@@ -59,10 +59,12 @@
 		}
 		$sql = "SELECT
 					OT.OutgoingNumber,
-					DATE_FORMAT(OT.TransactionDate, '%d%b%y') AS TransactionDate,
+					DATE_FORMAT(OT.TransactionDate, '%d/%c/%y') AS TransactionDate,
 					MS.SalesName,
 					MC.CustomerName,
-					IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))), 0) AS Total,
+					OT.DeliveryCost,
+					IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))), 0) AS SubTotal,
+					IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))), 0) + OT.DeliveryCost AS Total,
 					OT.Remarks
 				FROM
 					transaction_outgoing OT
@@ -90,8 +92,36 @@
 					OT.TransactionDate,
 					MS.SalesName,
 					MC.CustomerName
+				UNION
+				SELECT
+					SR.SaleReturnNumber,
+					DATE_FORMAT(SR.TransactionDate, '%d/%c/%y') AS TransactionDate,
+					'',
+					MC.CustomerName,
+					0,
+					-IFNULL(SUM(SRD.Quantity * SRD.SalePrice), 0) AS SubTotal,
+					-IFNULL(SUM(SRD.Quantity * SRD.SalePrice), 0) AS Total,
+					SR.Remarks
+				FROM
+					transaction_salereturn SR
+					JOIN master_customer MC
+						ON MC.CustomerID = SR.CustomerID
+					LEFT JOIN transaction_salereturndetails SRD
+						ON SRD.SaleReturnID = SR.SaleReturnID
+				WHERE
+					SR.TransactionDate >= '".$txtFromDate."'
+					AND SR.TransactionDate <= '".$txtToDate."'					
+					AND CASE
+							WHEN ".$CustomerID." = 0
+							THEN MC.CustomerID
+							ELSE ".$CustomerID."
+						END = MC.CustomerID
+				GROUP BY
+					SR.SaleReturnNumber,
+					SR.TransactionDate,
+					MC.CustomerName
 				ORDER BY	
-					OT.TransactionDate ASC";
+					TransactionDate ASC";
 		
 		if (! $result = mysql_query($sql, $dbh)) {
 			echo mysql_error();
@@ -110,6 +140,8 @@
 			$row_array['TransactionDate'] = $row['TransactionDate'];
 			$row_array['SalesName'] = $row['SalesName'];
 			$row_array['CustomerName'] = $row['CustomerName'];
+			$row_array['DeliveryCost'] = number_format($row['DeliveryCost'],2,".",",");
+			$row_array['SubTotal'] = number_format($row['SubTotal'],2,".",",");
 			$row_array['Total'] = number_format($row['Total'],2,".",",");
 			$row_array['Remarks'] = $row['Remarks'];
 			$GrandTotal += $row['Total'];

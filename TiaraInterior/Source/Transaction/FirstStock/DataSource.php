@@ -24,7 +24,7 @@
 	if (ISSET($_REQUEST['searchPhrase']) )
 	{
 		$search = trim($_REQUEST['searchPhrase']);
-		$where .= " AND ( FS.FirstStockID LIKE '%".$search."%' OR FS.Remarks LIKE '%".$search."%' OR FS.FirstStockNumber LIKE '%".$search."%' OR DATE_FORMAT(FS.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' ) ";
+		$where .= " AND ( FS.Remarks LIKE '%".$search."%' OR FS.FirstStockNumber LIKE '%".$search."%' OR DATE_FORMAT(FS.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' ) ";
 	}
 	//Handles determines where in the paging count this result set falls in
 	if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];

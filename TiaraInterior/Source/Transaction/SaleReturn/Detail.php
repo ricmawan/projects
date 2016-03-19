@@ -229,6 +229,7 @@
 						<br />
 						<div class="row">
 							<div class="col-md-12">
+								<button class="btn btn-default" id="btnInvoice"  onclick="PrintInvoice();" ><i class="fa fa-print "></i> Cetak Nota</button>&nbsp;&nbsp;
 								<button class="btn btn-default" id="btnAdd" style="display:none;" ><i class="fa fa-save "></i> Add</button>&nbsp;&nbsp;								
 								<button class="btn btn-default" id="btnSave"  onclick="SubmitValidate();" ><i class="fa fa-save "></i> Simpan</button>&nbsp;&nbsp;
 							</div>
@@ -538,7 +539,7 @@
 				var currentQty = $("#txtQuantity" + row).val();
 				var currentStock = $("#hdnStock" +  row).val();
 				if(parseInt(currentQty) > parseInt(currentStock)) {
-					$.notify("Sisa stok yang ada : " + currentStock, "error");
+					$.notify("Stok yang terjual hanya : " + currentStock, "error");
 					$("#txtQuantity" + row).val(currentStock);
 				}
 				Calculate();
