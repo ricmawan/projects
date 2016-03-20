@@ -191,8 +191,8 @@
 							<div class="row" >
 								<div class="col-md-12">
 									
-									<table class="table" id="datainput">
-										<thead style="background-color: black;color:white;height:25px;width:615px;display:block;">
+									<table class="table" style="width:auto;" id="datainput">
+										<thead style="background-color: black;color:white;height:25px;width:645px;display:block;">
 											<td align="center" style="width:30px;">No</td>
 											<td align="center" style="width:190px;">Nama Barang</td>
 											<td align="center" style="width:65px;">QTY</td>
@@ -252,7 +252,7 @@
 						<div class="row">
 							<div class="col-md-12">
 								<button class="btn btn-default" id="btnAdd" style="display:none;" ><i class="fa fa-save "></i> Add</button>&nbsp;&nbsp;
-								<button class="btn btn-default" id="btnSave"  onclick="SubmitValidate();" ><i class="fa fa-print "></i> Cetak Nota</button>&nbsp;&nbsp;
+								<button class="btn btn-default" id="btnPrintInvoice"  onclick="PrintInvoice();" ><i class="fa fa-print "></i> Cetak Nota</button>&nbsp;&nbsp;
 								<button class="btn btn-default" id="btnSave"  onclick="SubmitValidate();" ><i class="fa fa-save "></i> Simpan</button>&nbsp;&nbsp;
 							</div>
 						</div>
@@ -470,31 +470,38 @@
 				$("#btnAdd").on("click", function() {
 					var count = $("#datainput tbody tr").length - 1;
 					count++;
-					var $clone = $("#datainput tbody tr:first").clone();
-					$clone.find("#nota").text(count);
-					$clone.find("#nota").attr("id", "nota" + count);
-					$clone.find("#nota").attr("name", "nota" + count);
-					$clone.removeAttr("style");
-					$clone.attr({
-						id: "num" + count,
-						name: "num" + count
-					});
-					$clone.find("input, select, i").each(function(){
-						//var temp = $(this).attr("id") + (count - 1);
-						$(this).attr({
-							id: $(this).attr("id") + count,
-							name: $(this).attr("name") + count,
-							row: count,
-							required: ""
-						});				
-						//$(this).val($("#" + temp).val());
-					});
-					$("#datainput tbody").append($clone);
-					//$("#txtQuantity" + count).addClass("txtQuantity");
-					$("#recordnew").val(count);
-					$("#datainput tbody").animate({
-						scrollTop: (25 * count)
-					}, "slow");
+					if(count <= 10) {
+						var $clone = $("#datainput tbody tr:first").clone();
+						$clone.find("#nota").text(count);
+						$clone.find("#nota").attr("id", "nota" + count);
+						$clone.find("#nota").attr("name", "nota" + count);
+						$clone.removeAttr("style");
+						$clone.attr({
+							id: "num" + count,
+							name: "num" + count
+						});
+						$clone.find("input, select, i").each(function(){
+							//var temp = $(this).attr("id") + (count - 1);
+							$(this).attr({
+								id: $(this).attr("id") + count,
+								name: $(this).attr("name") + count,
+								row: count,
+								required: ""
+							});				
+							//$(this).val($("#" + temp).val());
+						});
+						$("#datainput tbody").append($clone);
+						//$("#txtQuantity" + count).addClass("txtQuantity");
+						$("#recordnew").val(count);
+						if($("#hdnIsEdit").val() == 0 ) {
+							$("#datainput tbody").animate({
+								scrollTop: (25 * count)
+							}, "slow");
+						}
+					}
+					else {
+						$.notify("Jumlah barang melebihi maksimal!", "error");
+					}
 				});
 				$("#btnDelete").on("click", function() {
 					var count = $("#datainput tbody tr").length - 1;
@@ -528,6 +535,33 @@
 					Calculate();
 				}
 			});
+			
+			function PrintInvoice() {
+				if($("#hdnBuyReturnID").val() == 0) {
+					$.notify("Tekan Simpan terlebih dahulu!", "error");
+					return false;
+				}
+				else {
+					$("#loading").show();
+					$.ajax({
+						url: "./Transaction/BuyReturn/PrintInvoice.php",
+						type: "POST",
+						data: $("#PostForm").serialize(),
+						dataType: "json",
+						success: function(data) {
+							$("html, body").animate({
+								scrollTop: 0
+							}, "slow");
+							$("#loading").hide();
+						},
+						error: function(data) {
+							$("#loading").hide();
+							$.notify("Koneksi gagal", "error");
+					
+						}
+					});
+				}
+			}
 			
 			function SubmitValidate() {
 				if($("#recordnew").val() > 0) {

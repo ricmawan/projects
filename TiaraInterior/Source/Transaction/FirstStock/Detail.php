@@ -165,7 +165,7 @@
 							<br />
 							<div class="row">
 								<div class="col-md-12">
-									<table class="table" id="datainput">
+									<table class="table" style="width:auto;" id="datainput">
 										<thead style="background-color: black;color:white;height:25px;width:935px;display:block;">
 											<td align="center" style="width:30px;">No</td>
 											<td align="center" style="width:188px;">Nama Barang</td>

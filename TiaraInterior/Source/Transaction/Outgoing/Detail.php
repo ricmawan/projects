@@ -196,7 +196,7 @@
 							<div class="row">
 								<div class="col-md-12">
 									
-									<table class="table" id="datainput">
+									<table class="table" style="width:auto;" id="datainput">
 										<thead style="background-color: black;color:white;height:25px;width:720px;display:block;">
 											<td align="center" style="width:30px;">No</td>
 											<td align="center" style="width:188px;">Nama Barang</td>
@@ -272,8 +272,8 @@
 						<div class="row">
 							<div class="col-md-12">
 								<button class="btn btn-default" id="btnAdd" style="display:none;" ><i class="fa fa-save "></i> Add</button>&nbsp;&nbsp;								
-								<button class="btn btn-default" id="btnInvoice"  onclick="PrintInvoice();" ><i class="fa fa-print "></i> Cetak Nota</button>&nbsp;&nbsp;
-								<button class="btn btn-default" id="btnSave"  onclick="SubmitValidate();" ><i class="fa fa-print "></i> Cetak Surat Jalan</button>&nbsp;&nbsp;
+								<button class="btn btn-default" id="btnPrintInvoice"  onclick="PrintInvoice();" ><i class="fa fa-print "></i> Cetak Nota</button>&nbsp;&nbsp;
+								<button class="btn btn-default" id="btnPrintShipment"  onclick="PrintShipment();" ><i class="fa fa-print "></i> Cetak Surat Jalan</button>&nbsp;&nbsp;
 								<button class="btn btn-default" id="btnSave"  onclick="SubmitValidate();" ><i class="fa fa-save "></i> Simpan</button>&nbsp;&nbsp;
 							</div>
 						</div>
@@ -520,7 +520,7 @@
 				$("#btnAdd").on("click", function() {
 					var count = $("#datainput tbody tr").length - 1;
 					count++;
-					if(count <= 8) {
+					if(count <= 10) {
 						var $clone = $("#datainput tbody tr:first").clone();
 						$clone.find("#nota").text(count);
 						$clone.find("#nota").attr("id", "nota" + count);
@@ -543,9 +543,11 @@
 						$("#datainput tbody").append($clone);
 						//$("#txtQuantity" + count).addClass("txtQuantity");
 						$("#recordnew").val(count);
-						$("#datainput tbody").animate({
-							scrollTop: (25 * count)
-						}, "slow");
+						if($("#hdnIsEdit").val() == 0 ) {
+							$("#datainput tbody").animate({
+								scrollTop: (25 * count)
+							}, "slow");
+						}						
 					}
 					else {
 						$.notify("Jumlah barang melebihi maksimal!", "error");
@@ -591,10 +593,9 @@
 					return false;
 				}
 				else {
-					var ID = $("#hdnId").val();
 					$("#loading").show();
 					$.ajax({
-						url: "./Transaction/Outgoing/Print.php",
+						url: "./Transaction/Outgoing/PrintInvoice.php",
 						type: "POST",
 						data: $("#PostForm").serialize(),
 						dataType: "json",
@@ -612,6 +613,34 @@
 					});
 				}
 			}
+			
+			function PrintShipment() {
+				if($("#hdnOutgoingID").val() == 0) {
+					$.notify("Tekan Simpan terlebih dahulu!", "error");
+					return false;
+				}
+				else {
+					var ID = $("#hdnId").val();
+					$("#loading").show();
+					$.ajax({
+						url: "./Transaction/Outgoing/PrintShipment.php",
+						type: "POST",
+						data: $("#PostForm").serialize(),
+						dataType: "json",
+						success: function(data) {
+							$("html, body").animate({
+								scrollTop: 0
+							}, "slow");
+							$("#loading").hide();
+						},
+						error: function(data) {
+							$("#loading").hide();
+							$.notify("Koneksi gagal", "error");
+						}
+					});
+				}
+			}
+			
 			function SubmitValidate() {
 				if($("#recordnew").val() > 0) {
 					var PassValidate = 1;

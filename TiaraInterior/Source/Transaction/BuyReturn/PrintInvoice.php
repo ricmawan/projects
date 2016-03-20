@@ -1,15 +1,15 @@
 <?php
 	//http://www.lprng.com/RESOURCES/PPD/epson.htm
-	if(isset($_POST['hdnOutgoingID'])) {
+	if(isset($_POST['hdnBuyReturnID'])) {
 		$RequestPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestPath);
 		$RequestPath = str_replace($file, "", $RequestPath);
 		include "../../GetPermission.php";
-		$ID = mysql_real_escape_string($_POST['hdnOutgoingID']);
+		$ID = mysql_real_escape_string($_POST['hdnBuyReturnID']);
 		$tanggal = date('d') . "-" . date('m') . "-" . date('Y');
 		/*$tmpdir = sys_get_temp_dir();   # ambil direktori temporary untuk simpan file.
 		$file =  tempnam($tmpdir, 'ctk');  # nama file temporary yang akan dicetak*/
-		$file =  "Print.txt";  # nama file temporary yang akan dicetak
+		$file =  "PrintInvoice.txt";  # nama file temporary yang akan dicetak
 		$handle = fopen($file, 'w');
 		$Message = "Nota Berhasil Dicetak";
 		$MessageDetail = "";
@@ -20,7 +20,7 @@
 		$bold0 = Chr(27) . Chr(70);
 		$double1 = Chr(27) . Chr(87) . Chr(49);
 		$double0 = Chr(27) . Chr(87) . Chr(48);
-		$initialized = Chr(27) . Chr(64). Chr(27) . Chr(67) . Chr(30);
+		$initialized = Chr(27) . Chr(64). Chr(27) . Chr(67) . Chr(44);
 		$condensed1 = chr(15);
 		$condensed0 = chr(18);
 		$underline1 = Chr(27) . Chr(45) . Chr(49);
@@ -29,20 +29,17 @@
 		$italic0 = Chr(27) . Chr(53);
 		
 		$sql = "SELECT
-					OT.OutgoingNumber,
-					MC.CustomerName,
-					MC.City,
-					DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y) TransactionDate,
-					UPPER(MS.Alias) Alias,
-					OT.Remarks
+					BR.BuyReturnNumber,
+					MS.SupplierName,
+					MS.City,
+					DATE_FORMAT(BR.TransactionDate, '%d-%m-%Y') TransactionDate,
+					BR.Remarks
 				FROM
-					transaction_outgoing OT
-					JOIN master_customer MC
-						ON MC.CustomerID = OT.CustomerID
-					JOIN master_sales MS
-						ON MS.SalesID = OT.SalesID
+					transaction_buyreturn BR
+					JOIN master_supplier MS
+						ON MS.SupplierID = BR.SupplierID
 				WHERE
-					OT.OutgoingID = ".$ID;
+					BR.BuyReturnID = ".$ID;
 		
 		if (! $result = mysql_query($sql, $dbh)) {
 			$Message = "Terjadi Kesalahan Sistem";
@@ -52,40 +49,76 @@
 			return 0;
 		}
 		$row=mysql_fetch_array($result);
-		$OutgoingNumber = $row['OutgoingNumber'];
-		$CustomerName = $row['CustomerName'];
+		$BuyReturnNumber = $row['BuyReturnNumber'];
+		$SupplierName = $row['SupplierName'];
 		$City = $row['City'];
 		$TransactionDate = $row['TransactionDate'];
-		$Alias = $row['Alias'];
 		$Remarks = $row['Remarks'];
 		
-		$Data  = $initialized;
-		$Data .= fnSpace(64) . "Tgl : " .$TransactionDate. "\n"; //16 
-		$Data .= fnSpace(37) ."Kepada Yth.  "; //13
-		$Data .= $CustomerName."\n"; //max 50
-		$Data .= fnSpace(50) . $City."\n";
-		$Data .= "   Sales           : ".$Alias."\n";
-		$Data .= "   Tgl Jatuh Tempo : " .$tanggal; //28
-		$Data .= fnSpace(7) . $bold1 . $double1 ."INVOICE\n". $double0 . $bold0;
+		$Data  = $initialized . $condensed1;
+		//$Data .= fnSpace(121) . "Tgl : " .$TransactionDate. "\n"; //16 
+		$Data .= "   Kepada Yth.  " . $condensed0; //13
+		$Data .= $SupplierName . $condensed1 . fnSpace(105 - strlen($SupplierName)) . "Tgl : ". $TransactionDate . "\n"; //max 30
+		$Data .= fnSpace(16) . $condensed0 . $City."\n".$condensed0;
+		$Data .= fnSpace(42) . $bold1 . $double1 . $italic1 . "RETUR BELI\n" . $italic0 . $double0 . $bold0 . $condensed1;
 		
-		$Data .= "Kami kirim pesanan anda dlm keadaan baik, barang-barang sbb:"
-		$Data .= fnSpace(10) . "No : ".$OutgoingNumber."\n";
-		$Data .= "--------------------------------------------------------------------------------";
-		$Data .= "   Qty          Nama Barang                 Lot  Harga Satuan  Diskon         Total";
-		$Data .= "--------------------------------------------------------------------------------";
-		$Data .= "   2,00 m lari  MAESTRO 646 XTC             522    155,000.00  15.500(10%)  201,500";
-		$Data .= "2,00 m lari  MAESTRO 646 XTC             522    155,000.00  15.500(10%)  201,500";
-		$Data .= "2,00 m lari  MAESTRO 646 XTC             522    155,000.00  15.500(10%)  201,500";
-		$Data .= "2,00 m lari  MAESTRO 646 XTC             522    155,000.00  15.500(10%)  201,500";
-		$Data .= "2,00 m lari  MAESTRO 646 XTC             522    155,000.00  15.500(10%)  201,500";
-		$Data .= "2,00 m lari  MAESTRO 646 XTC             522    155,000.00  15.500(10%)  201,500";
-		$Data .= "2,00 m lari  MAESTRO 646 XTC             522    155,000.00  15.500(10%)  201,500";
-		$Data .= "2,00 m lari  MAESTRO 646 XTC             522    155,000.00  15.500(10%)  201,500";
-		$Data .= "--------------------------------------------------------------------------------";
-		//qty 11 karakter, nama barang 25 karakter, lot 3 karakter, harga satuan Diskon Total
+		$Data .= "   Kami retur barang-barang sbb:";
+		$Data .= fnSpace(88) . "No : ".$BuyReturnNumber."\n";
+		$sql = "SELECT
+					BRD.Quantity,
+					MU.UnitName,
+					CONCAT(MB.BrandName, ' ', MT.TypeName) ItemName,
+					BRD.BatchNumber,
+					BRD.BuyPrice,
+					IFNULL((BRD.Quantity * BRD.BuyPrice), 0) Total
+				FROM
+					transaction_buyreturndetails BRD
+					JOIN master_type MT
+						ON MT.TypeID = BRD.TypeID
+					JOIN master_unit MU
+						ON MU.UnitID = MT.UnitID
+					JOIN master_brand MB
+						ON MB.BrandID = MT.BrandID
+				WHERE
+					BRD.BuyReturnID = ".$ID;
+		
+		if (! $result = mysql_query($sql, $dbh)) {
+			$Message = "Terjadi Kesalahan Sistem";
+			$MessageDetail = mysql_error();
+			$FailedFlag = 1;
+			echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
+			return 0;
+		}
+		$GrandTotal = 0;
+		$Data .= "_________________________________________________________________________________________________________________________________________\n";
+		$Data .= "|        Qty        |                     Nama Barang                     |    Lot    |     Harga Satuan     |            Total         |\n";
+		$Data .= "¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯\n";
+		
+		while($row=mysql_fetch_array($result)) {
+			//Qty
+			$Data .= "|  " . fnSpace(8 - strlen($row['Quantity'])) . $row['Quantity'] . " " . $row['UnitName'] . fnSpace(6 - strlen($row['UnitName'])) . "  |  ";
+			//ItemName
+			$Data .= $row['ItemName'] . fnSpace(49 - strlen($row['ItemName'])) . "  |  ";
+			//BatchNumber
+			$Data .= fnSpace(7 - strlen($row['BatchNumber'])) . $row['BatchNumber'] . "  |  ";
+			//Harga Satuan
+			$Data .= fnSpace(18 - strlen(number_format($row['BuyPrice'],2,".",","))) . number_format($row['BuyPrice'],2,".",",") . "  |  ";
+			//Diskon
+			//$Data .= fnSpace(9 - strlen(number_format($row['DiscountAmount'], 0, ".", ",")) - strlen($row['Discount'])) . number_format($row['DiscountAmount'], 0, ".", ",") . "(" . $row['Discount'] . "%)  |  ";
+			//Total
+			$Data .= fnSpace(22 - strlen(number_format($row['Total'],2,".",","))) . number_format($row['Total'],2,".",",") . "  |\n";
+			$GrandTotal += $row['Total'];
+		}
+		//$Data .= "|    2,00 m lari  |  MAESTRO 646 XTC                                  |    522  |      155,000.00  |   15.500(10%)  |   100,201,500.00  |\n";
+		$Data .= "¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯\n";
+		$Data .= "   Catatan   : " . $Remarks . fnSpace(75) ."Jml Retur              Rp.   " . fnSpace(15 - strlen(number_format($GrandTotal,2,".",","))) . number_format($GrandTotal,2,".",",") . "\n";
+		$Data .= "   Terbilang : " . trim(strtoupper(Terbilang($GrandTotal))) . " RUPIAH\n";
+		$Data .= "_________________________________________________________________________________________________________________________________________\n";
+		$Data .= "   Penerima,". fnSpace(50) ."Checker,". fnSpace(50) ."Hormat Kami,\n\n\n";
+		$Data .= fnSpace(115) . fnSpace(ceil((22 - strlen($_SESSION['UserLogin']))/2)). $_SESSION['UserLogin'] . Chr(12);
 		fwrite($handle, $Data);
 		fclose($handle);
-		//copy($file, $PRINTER_IP.$SHARE_PRINTER_NAME);  # Lakukan cetak
+		//copy($file, $SHARED_PRINTER_ADDRESS); 
 		//exec("lp -d epson ".$file);  # Lakukan cetak
 		//unlink($file);
 		echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
