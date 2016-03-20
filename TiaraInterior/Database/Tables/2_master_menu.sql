@@ -146,7 +146,7 @@ VALUES
 	'Barang',
 	'Master/Item/',
 	NULL,
-	1,
+	0,
 	5
 ),
 (
@@ -183,6 +183,15 @@ VALUES
 	'Tools/Reset/',
 	NULL,
 	0,
+	3
+),
+(
+	20,
+	4,
+	'Penjualan Per Pelanggan',
+	'Report/SaleByCustomer/',
+	NULL,
+	1,
 	3
 );
 
