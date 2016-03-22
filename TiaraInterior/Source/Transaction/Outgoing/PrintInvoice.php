@@ -66,7 +66,7 @@
 		$Data .= fnSpace(89) . $condensed0 . $City."\n".$condensed1;
 		$Data .= "   Sales           : ".$Alias;
 		$Data .= fnSpace(31 - strlen($Alias)) . $bold1 . $double1 ."INVOICE". $double0 . $bold0 . $condensed1 ."\n";
-		$Data .= "   Tgl Jatuh Tempo : " .$tanggal . $condensed1; //28
+		$Data .= "   Tgl Jatuh Tempo : " .$tanggal . "\n"; //28
 		//$Data .= fnSpace(22) . $bold1 . $double1 ."INVOICE\n". $double0 . $bold0 . $condensed1;
 		
 		$Data .= "   Kami kirim pesanan anda dlm keadaan baik, barang-barang sbb:";

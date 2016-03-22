@@ -1,7 +1,8 @@
 @C,   Tgl : 17-03-2016                                                         Kepada Yth.  Bejo
                                                                                          Semarang
    Sales           : BUDI                           EW1INVOICEW0F
-   Tgl Jatuh Tempo : 23-03-2016   Kami kirim pesanan anda dlm keadaan baik, barang-barang sbb:                                                         No : TJ-170316001
+   Tgl Jatuh Tempo : 23-03-2016
+   Kami kirim pesanan anda dlm keadaan baik, barang-barang sbb:                                                         No : TJ-170316001
 -----------------------------------------------------------------------------------------------------------------------------------------
 |       Qty       |                    Nama Barang                    |   Lot   |   Harga Satuan   |     Diskon     |       Total       |
 -----------------------------------------------------------------------------------------------------------------------------------------
