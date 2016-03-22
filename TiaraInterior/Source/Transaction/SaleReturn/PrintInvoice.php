@@ -118,7 +118,7 @@
 		$Data .= fnSpace(115) . fnSpace(ceil((22 - strlen($_SESSION['UserLogin']))/2)). $_SESSION['UserLogin'] . Chr(12);
 		fwrite($handle, $Data);
 		fclose($handle);
-		copy($file, $SHARED_PRINTER_ADDRESS); 
+		//copy($file, $SHARED_PRINTER_ADDRESS); 
 		//exec("lp -d epson ".$file);  # Lakukan cetak
 		//unlink($file);
 		echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);

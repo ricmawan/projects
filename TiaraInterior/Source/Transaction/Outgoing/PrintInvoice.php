@@ -64,9 +64,10 @@
 		$Data .= fnSpace(57) ."Kepada Yth.  ".$condensed0; //13
 		$Data .= $CustomerName."\n".$condensed1; //max 30
 		$Data .= fnSpace(89) . $condensed0 . $City."\n".$condensed1;
-		$Data .= "   Sales           : ".$Alias."\n";
+		$Data .= "   Sales           : ".$Alias;
+		$Data .= fnSpace(31 - strlen($Alias)) . $bold1 . $double1 ."INVOICE". $double0 . $bold0 . $condensed1 ."\n";
 		$Data .= "   Tgl Jatuh Tempo : " .$tanggal . $condensed1; //28
-		$Data .= fnSpace(22) . $bold1 . $double1 ."INVOICE\n". $double0 . $bold0 . $condensed1;
+		//$Data .= fnSpace(22) . $bold1 . $double1 ."INVOICE\n". $double0 . $bold0 . $condensed1;
 		
 		$Data .= "   Kami kirim pesanan anda dlm keadaan baik, barang-barang sbb:";
 		$Data .= fnSpace(57) . "No : ".$OutgoingNumber."\n";

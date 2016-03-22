@@ -68,10 +68,10 @@
 		$Data .= fnSpace(37) ."Kepada Yth.  ".$condensed0; //13
 		$Data .= $CustomerName."\n" . $condensed1; //max 30
 		$Data .= fnSpace(69) . $condensed0 . str_replace("\n", "\n" . $condensed1 . fnSpace(69) . $condensed0, $Address) . "\n" . $condensed1;
-		$Data .= fnSpace(69) . $condensed0 . $City."\n".$condensed1;
+		$Data .= fnSpace(42) . $bold1 . $double1 ."SURAT JALAN". $double0 . $bold0;
+		$Data .= fnSpace(5) . $condensed0 . $City."\n".$condensed1;
 		$Data .= "   Sales           : ".$Alias;
-		$Data .= fnSpace(17) . $bold1 . $double1 ."SURAT JALAN". $double0 . $bold0;
-		$Data .= fnSpace(5) . $condensed0 . "Ph " . $Telephone . "\n" . $condensed1;
+		$Data .= fnSpace(44) . $condensed0 . "Ph " . $Telephone . "\n" . $condensed1;
 		
 		$Data .= "   Kami kirim pesanan anda dlm keadaan baik, barang-barang sbb:";
 		$Data .= fnSpace(57) . "No : ".$OutgoingNumber."\n";
