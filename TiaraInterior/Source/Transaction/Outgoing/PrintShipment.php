@@ -70,8 +70,8 @@
 		$Data .= fnSpace(69) . $condensed0 . str_replace("\n", "\n" . $condensed1 . fnSpace(69) . $condensed0, $Address) . "\n" . $condensed1;
 		$Data .= fnSpace(69) . $condensed0 . $City."\n".$condensed1;
 		$Data .= "   Sales           : ".$Alias;
-		$Data .= fnSpace(17) . $bold1 . $double1 ."SURAT JALAN". $double0 . $bold0 . $condensed1;
-		$Data .= fnSpace(5) . $condensed0 . "Ph " . $Telephone . "\n";
+		$Data .= fnSpace(17) . $bold1 . $double1 ."SURAT JALAN". $double0 . $bold0;
+		$Data .= fnSpace(5) . $condensed0 . "Ph " . $Telephone . "\n" . $condensed1;
 		
 		$Data .= "   Kami kirim pesanan anda dlm keadaan baik, barang-barang sbb:";
 		$Data .= fnSpace(57) . "No : ".$OutgoingNumber."\n";
@@ -83,7 +83,8 @@
 					TOD.SalePrice,
 					((TOD.SalePrice * TOD.Discount)/100) DiscountAmount,
 					TOD.Discount,
-					IFNULL(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100)), 0) Total
+					IFNULL(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100)), 0) Total,
+					TOD.Remarks
 				FROM
 					transaction_outgoingdetails TOD
 					JOIN master_type MT
@@ -104,7 +105,7 @@
 		}
 		$GrandTotal = 0;
 		$Data .= "-----------------------------------------------------------------------------------------------------------------------------------------\n";
-		$Data .= "|       Qty       |                    Nama Barang                    |   Lot   |                                                       |\n";
+		$Data .= "|       Qty       |                    Nama Barang                    |   Lot   |                       Keterangan                      |\n";
 		$Data .= "-----------------------------------------------------------------------------------------------------------------------------------------\n";
 		
 		while($row=mysql_fetch_array($result)) {
@@ -113,7 +114,9 @@
 			//ItemName
 			$Data .= $row['ItemName'] . fnSpace(47 - strlen($row['ItemName'])) . "  |  ";
 			//BatchNumber
-			$Data .= fnSpace(5 - strlen($row['BatchNumber'])) . $row['BatchNumber'] . "  |" . fnSpace(55) ."|\n";
+			$Data .= fnSpace(5 - strlen($row['BatchNumber'])) . $row['BatchNumber'] . "  |  ";
+			//Remarks
+			$Data .= $row['Remarks'] . fnSpace(51 - strlen($row['Remarks'])) . "  |\n";
 			//Harga Satuan
 			//$Data .= fnSpace(14 - strlen(number_format($row['SalePrice'],2,".",","))) . number_format($row['SalePrice'],2,".",",") . "  |  ";
 			//Diskon

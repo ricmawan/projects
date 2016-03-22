@@ -56,11 +56,11 @@
 		$Remarks = $row['Remarks'];
 		
 		$Data  = $initialized . $condensed1;
-		//$Data .= fnSpace(121) . "Tgl : " .$TransactionDate. "\n"; //16 
+		$Data .= fnSpace(121) . "Tgl : " .$TransactionDate. "\n"; //16 
 		$Data .= "   Kepada Yth.  " . $condensed0; //13
-		$Data .= $SupplierName . $condensed1 . fnSpace(105 - strlen($SupplierName)) . "Tgl : ". $TransactionDate . "\n"; //max 30
+		$Data .= $SupplierName . $condensed1 . "\n"; //max 30
 		$Data .= fnSpace(16) . $condensed0 . $City."\n".$condensed0;
-		$Data .= fnSpace(42) . $bold1 . $double1 . $italic1 . "RETUR BELI\n" . $italic0 . $double0 . $bold0 . $condensed1;
+		$Data .= fnSpace(27) . $bold1 . $double1 . $italic1 . "RETUR BELI\n" . $italic0 . $double0 . $bold0 . $condensed1;
 		
 		$Data .= "   Kami retur barang-barang sbb:";
 		$Data .= fnSpace(88) . "No : ".$BuyReturnNumber."\n";
@@ -92,7 +92,7 @@
 		$GrandTotal = 0;
 		$Data .= "_________________________________________________________________________________________________________________________________________\n";
 		$Data .= "|        Qty        |                     Nama Barang                     |    Lot    |     Harga Satuan     |            Total         |\n";
-		$Data .= "¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯\n";
+		$Data .= "_________________________________________________________________________________________________________________________________________\n";
 		
 		while($row=mysql_fetch_array($result)) {
 			//Qty
@@ -110,7 +110,7 @@
 			$GrandTotal += $row['Total'];
 		}
 		//$Data .= "|    2,00 m lari  |  MAESTRO 646 XTC                                  |    522  |      155,000.00  |   15.500(10%)  |   100,201,500.00  |\n";
-		$Data .= "¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯\n";
+		$Data .= "_________________________________________________________________________________________________________________________________________\n";
 		$Data .= "   Catatan   : " . $Remarks . fnSpace(75) ."Jml Retur              Rp.   " . fnSpace(15 - strlen(number_format($GrandTotal,2,".",","))) . number_format($GrandTotal,2,".",",") . "\n";
 		$Data .= "   Terbilang : " . trim(strtoupper(Terbilang($GrandTotal))) . " RUPIAH\n";
 		$Data .= "_________________________________________________________________________________________________________________________________________\n";
@@ -118,7 +118,7 @@
 		$Data .= fnSpace(115) . fnSpace(ceil((22 - strlen($_SESSION['UserLogin']))/2)). $_SESSION['UserLogin'] . Chr(12);
 		fwrite($handle, $Data);
 		fclose($handle);
-		//copy($file, $SHARED_PRINTER_ADDRESS); 
+		copy($file, $SHARED_PRINTER_ADDRESS); 
 		//exec("lp -d epson ".$file);  # Lakukan cetak
 		//unlink($file);
 		echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);

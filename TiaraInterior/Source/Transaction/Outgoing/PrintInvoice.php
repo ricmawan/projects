@@ -66,7 +66,7 @@
 		$Data .= fnSpace(89) . $condensed0 . $City."\n".$condensed1;
 		$Data .= "   Sales           : ".$Alias."\n";
 		$Data .= "   Tgl Jatuh Tempo : " .$tanggal . $condensed1; //28
-		$Data .= fnSpace(12) . $bold1 . $double1 ."INVOICE\n". $double0 . $bold0 . $condensed1;
+		$Data .= fnSpace(22) . $bold1 . $double1 ."INVOICE\n". $double0 . $bold0 . $condensed1;
 		
 		$Data .= "   Kami kirim pesanan anda dlm keadaan baik, barang-barang sbb:";
 		$Data .= fnSpace(57) . "No : ".$OutgoingNumber."\n";
@@ -128,7 +128,7 @@
 		$Data .=  $bold1 . "Barang yang sudah dibeli tidak dapat ditukar/dikembalikan" . Chr(12);
 		fwrite($handle, $Data);
 		fclose($handle);
-		//copy($file, $SHARED_PRINTER_ADDRESS); 
+		copy($file, $SHARED_PRINTER_ADDRESS); 
 		//exec("lp -d epson ".$file);  # Lakukan cetak
 		//unlink($file);
 		echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);

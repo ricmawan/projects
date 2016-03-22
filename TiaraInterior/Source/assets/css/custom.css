@@ -561,6 +561,10 @@ textarea.form-control-custom {
 .ui-menu .ui-menu-item a {
 	padding-right: 20px;
 }
+
+.nav li a {
+    padding: 10px 12px 10px 37px;
+}
 /*==============================================
     MEDIA QUERIES     
     =============================================*/

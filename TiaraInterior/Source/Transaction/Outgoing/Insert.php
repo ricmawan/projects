@@ -154,6 +154,7 @@
 							SalePrice,
 							Discount,
 							BatchNumber,
+							Remarks,
 							CreatedDate,
 							CreatedBy
 						)
@@ -165,6 +166,7 @@
 							".str_replace(",", "", $_POST['hdnBuyPrice'.$j]).",
 							".str_replace(",", "", $_POST['txtSalePrice'.$j]).",
 							".mysql_real_escape_string($_POST['txtDiscount'.$j]).",
+							".mysql_real_escape_string($_POST['txtRemarksDetail'.$j]).",
 							'".mysql_real_escape_string($_POST['hdnBatchNumber'.$j])."',
 							NOW(),
 							'".$_SESSION['UserLogin']."'
@@ -181,6 +183,7 @@
 							SalePrice = ".str_replace(",", "", $_POST['txtSalePrice'.$j]).",
 							Discount = ".mysql_real_escape_string($_POST['txtDiscount'.$j]).",
 							BatchNumber = '".mysql_real_escape_string($_POST['hdnBatchNumber'.$j])."',
+							Remarks = '".mysql_real_escape_string($_POST['txtRemarksDetail'.$j])."',
 							ModifiedBy = '".$_SESSION['UserLogin']."'
 						WHERE
 							OutgoingDetailsID = ".$_POST['hdnOutgoingDetailsID'.$j];

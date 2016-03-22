@@ -10,7 +10,7 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						 <h5>Riwayat Backup</h5>
+						 <h5>Backup Database</h5>
 					</div>
 					<div class="panel-body">
 						<div class="table-responsive">

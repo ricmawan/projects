@@ -10,6 +10,7 @@ CREATE TABLE transaction_outgoingdetails
 	SalePrice			DOUBLE,
 	Discount			INT,
 	BatchNumber			VARCHAR(100) NULL,
+	Remarks				TEXT,
 	CreatedDate 		DATETIME NOT NULL,
 	CreatedBy 			VARCHAR(255) NOT NULL,
 	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,

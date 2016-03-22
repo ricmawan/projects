@@ -2,13 +2,13 @@
                                                                      Jalan Pekunden Tengah No 1108
                                                                      (Wingko Babat Pak Moel)
                                                                      Semarang
-   Sales           : BUDI                 EW1SURAT JALANW0F     Ph 20983091
-   Kami kirim pesanan anda dlm keadaan baik, barang-barang sbb:                                                No : TJ-170316001
+   Sales           : BUDI                 EW1SURAT JALANW0F     Ph 20983091
+   Kami kirim pesanan anda dlm keadaan baik, barang-barang sbb:                                                         No : TJ-170316001
 -----------------------------------------------------------------------------------------------------------------------------------------
-|       Qty       |                    Nama Barang                    |   Lot   |                                                       |
+|       Qty       |                    Nama Barang                    |   Lot   |                       Keterangan                      |
 -----------------------------------------------------------------------------------------------------------------------------------------
-|       2 Roll    |  Eurowall 001                                     |    125  |                                                       |
-|       5 Roll    |  Eurowall 001                                     |    123  |                                                       |
+|       2 Roll    |  Eurowall 001                                     |    125  |  test                                                 |
+|       5 Roll    |  Eurowall 001                                     |    123  |  lha kamu kok mau nyoba kolom keterangan tu apa-apa   |
 |      16 Roll    |  Eurowall 001                                     |    135  |                                                       |
 |       6 Roll    |  Eurowall 001                                     |    212  |                                                       |
 |       3 Roll    |  Eurowall 001                                     |    213  |                                                       |
@@ -22,5 +22,5 @@ ________________________________________________________________________________
    Penerima,                                                  Checker,                                                  Hormat Kami,
 
 
-                                                                                                                            BUDI
+                                                                                                                            Admin
 EBarang yang sudah dibeli tidak dapat ditukar/dikembalikan

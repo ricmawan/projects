@@ -1,5 +1,5 @@
 <?php
-	if(ISSET($_GET['SalesID']) && ISSET($_GET['CustomerID'])) {
+	if(ISSET($_GET['CustomerID'])) {
 		header('Content-Type: application/json');
 		$RequestPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestPath);
@@ -59,8 +59,6 @@
 		$sql = "SELECT
 					OT.OutgoingNumber,
 					DATE_FORMAT(OT.TransactionDate, '%d/%c/%y') AS TransactionDate,
-					MS.SalesName,
-					MC.CustomerName,
 					OT.DeliveryCost,
 					IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))), 0) AS SubTotal,
 					IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))), 0) + OT.DeliveryCost AS Total,
@@ -90,8 +88,6 @@
 				SELECT
 					SR.SaleReturnNumber,
 					DATE_FORMAT(SR.TransactionDate, '%d/%c/%y') AS TransactionDate,
-					'',
-					MC.CustomerName,
 					0,
 					-IFNULL(SUM(SRD.Quantity * SRD.SalePrice), 0) AS SubTotal,
 					-IFNULL(SUM(SRD.Quantity * SRD.SalePrice), 0) AS Total,
@@ -132,8 +128,6 @@
 			$row_array['RowNumber'] = $RowNumber;
 			$row_array['OutgoingNumber']= $row['OutgoingNumber'];
 			$row_array['TransactionDate'] = $row['TransactionDate'];
-			$row_array['SalesName'] = $row['SalesName'];
-			$row_array['CustomerName'] = $row['CustomerName'];
 			$row_array['DeliveryCost'] = number_format($row['DeliveryCost'],2,".",",");
 			$row_array['SubTotal'] = number_format($row['SubTotal'],2,".",",");
 			$row_array['Total'] = number_format($row['Total'],2,".",",");

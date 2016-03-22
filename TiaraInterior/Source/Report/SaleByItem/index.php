@@ -15,7 +15,7 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						 <h5>Penjualan</h5>
+						 <h5>Penjualan Per Barang</h5>
 					</div>
 					<div class="panel-body">
 						<div class="row">

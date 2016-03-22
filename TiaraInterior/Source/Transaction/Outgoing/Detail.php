@@ -53,7 +53,8 @@
 						OTD.SalePrice,
 						OTD.BatchNumber,
 						OTD.Discount,
-						CONCAT(MB.BrandName, ' ', I.TypeName, ' - ', OTD.BatchNumber) AS TypeName
+						CONCAT(MB.BrandName, ' ', I.TypeName, ' - ', OTD.BatchNumber) AS TypeName,
+						OTD.Remarks
 					FROM
 						transaction_outgoingdetails OTD
 						JOIN master_type I
@@ -72,7 +73,7 @@
 				$Data = array();
 				while($row = mysql_fetch_array($result)) {
 					//array_push($DetailID, $row[0]);
-					array_push($Data, "'".$row['OutgoingDetailsID']."', '".$row['TypeID']."', '".$row['TypeName']."', '".$row['BatchNumber']."', '".$row['Quantity']."', '".$row['BuyPrice']."', '".$row['SalePrice']."', '".$row['Discount']."'");
+					array_push($Data, "'".$row['OutgoingDetailsID']."', '".$row['TypeID']."', '".$row['TypeName']."', '".$row['BatchNumber']."', '".$row['Quantity']."', '".$row['BuyPrice']."', '".$row['SalePrice']."', '".$row['Discount']."', '".$row['Remarks']."'");
 				}
 				//$DetailID = implode(",", $DetailID);
 				$Data = implode("|", $Data);
@@ -197,13 +198,14 @@
 								<div class="col-md-12">
 									
 									<table class="table" style="width:auto;" id="datainput">
-										<thead style="background-color: black;color:white;height:25px;width:720px;display:block;">
+										<thead style="background-color: black;color:white;height:25px;width:970px;display:block;">
 											<td align="center" style="width:30px;">No</td>
 											<td align="center" style="width:188px;">Nama Barang</td>
 											<td align="center" style="width:66px;">QTY</td>											
 											<td align="center" style="width:136px;">Harga Jual</td>
 											<td align="center" style="width:77px;">Diskon (%)</td>
 											<td align="center" style="width:195px;">Total</td>
+											<td align="center" style="width:250px;">Keterangan</td>
 											<td style="width: 26px"></td>
 										</thead>
 										<tbody style="display:block;max-height:172px;height:100%;overflow-y:auto;">
@@ -218,7 +220,7 @@
 													<input type="hidden" id="hdnStock" name="hdnStock" class="hdnStock" value="" />
 												</td>
 												<td style="width:66px;">
-													<input type="text" row="" value=1 id="txtQuantity" style="width: 50px;" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="ValidateQty(this.getAttribute('row'));" class="form-control-custom txtQuantity" placeholder="QTY"/>
+													<input type="text" row="" value=1 id="txtQuantity" style="text-align:right;width: 50px;" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="ValidateQty(this.getAttribute('row'));" class="form-control-custom txtQuantity" placeholder="QTY"/>
 												</td>
 												<td style="width:136px;">
 													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;width: 120px;" class="form-control-custom txtSalePrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual"/>
@@ -228,6 +230,9 @@
 												</td>
 												<td  style="width:195px;">
 													<input type="text" id="txtTotal" name="txtTotal" class="form-control-custom txtTotal" style="text-align:right;width:175px;" value="0.00" placeholder="Jumlah" readonly />
+												</td>
+												<td  style="width:250px;">
+													<input type="text" id="txtRemarksDetail" name="txtRemarksDetail" class="form-control-custom txtRemarksDetail" style="width:235px;" placeholder="Keterangan" maxlength=50 />
 												</td>
 												<td style="vertical-align:middle;">
 													<i class="fa fa-close btnDelete" style="cursor:pointer;" acronym title="Hapus Data" onclick="DeleteRow(this.getAttribute('row'))"></i>
@@ -458,6 +463,14 @@
 					}
 					i++;
 				});
+				i = 0;
+				$(".txtRemarksDetail").each(function() {
+					if(i != 0) {
+						$(this).attr("id", "txtRemarksDetail" + i);
+						$(this).attr("name", "txtRemarksDetail" + i);
+					}
+					i++;
+				});
 			}
 			function Calculate() {
 				var Total = 0;
@@ -541,7 +554,7 @@
 							//$(this).val($("#" + temp).val());
 						});
 						$("#datainput tbody").append($clone);
-						//$("#txtQuantity" + count).addClass("txtQuantity");
+						$("#txtRemarksDetail" + count).removeAttr("required");
 						$("#recordnew").val(count);
 						if($("#hdnIsEdit").val() == 0 ) {
 							$("#datainput tbody").animate({
@@ -581,6 +594,7 @@
 						$("#hdnBuyPrice" + count).val(d[5].replace("'", ""));
 						$("#txtSalePrice" + count).val(returnRupiah(d[6].replace("'", "")));
 						$("#txtDiscount" + count).val(d[7].replace("'", ""));
+						$("#txtRemarksDetail" + count).val(d[8].replace("'", ""));
 						$("#record").val(count);
 						$("#recordnew").val(count);
 					}

@@ -76,8 +76,6 @@
 										<th data-column-id="RowNumber" data-sortable="false" data-type="numeric" >No</th>
 										<th data-column-id="OutgoingNumber" data-sortable="false" data-type="numeric" >No Nota</th>
 										<th data-column-id="TransactionDate" >Tanggal</th>
-										<th data-column-id="SalesName">Nama Sales</th>
-										<th data-column-id="CustomerName">Nama Pelanggan</th>
 										<th data-column-id="DeliveryCost" data-align="right">Ongkos Kirim</th>
 										<th data-column-id="SubTotal" data-align="right">Sub Total</th>
 										<th data-column-id="Total" data-align="right">Total</th>
@@ -204,7 +202,7 @@
 				}
 				else {
 					$("#loading").show();
-					$("#excelDownload").attr("src", "Report/Selling/ExportExcel.php?&CustomerID=" + CustomerID + "&txtFromDate=" + txtFromDate + "&txtToDate=" + txtToDate);
+					$("#excelDownload").attr("src", "Report/SaleByCustomer/ExportExcel.php?CustomerID=" + CustomerID + "&txtFromDate=" + txtFromDate + "&txtToDate=" + txtToDate);
 					$("#loading").hide();
 				}
 			}
