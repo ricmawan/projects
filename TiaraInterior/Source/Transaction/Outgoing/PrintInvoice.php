@@ -20,7 +20,7 @@
 		$bold0 = Chr(27) . Chr(70);
 		$double1 = Chr(27) . Chr(87) . Chr(49);
 		$double0 = Chr(27) . Chr(87) . Chr(48);
-		$initialized = Chr(27) . Chr(64). Chr(27) . Chr(67) . Chr(44);
+		$initialized = Chr(27) . Chr(64). Chr(27) . Chr(67) . Chr(33);
 		$condensed1 = chr(15);
 		$condensed0 = chr(18);
 		$underline1 = Chr(27) . Chr(45) . Chr(49);
@@ -69,8 +69,8 @@
 		$Data .= "   Tgl Jatuh Tempo : " .$tanggal . "\n"; //28
 		//$Data .= fnSpace(22) . $bold1 . $double1 ."INVOICE\n". $double0 . $bold0 . $condensed1;
 		
-		$Data .= "   Kami kirim pesanan anda dlm keadaan baik, barang-barang sbb:";
-		$Data .= fnSpace(57) . "No : ".$OutgoingNumber."\n";
+		$Data .= "   Kami kirim pesanan anda dalam keadaan baik, barang-barang sbb:";
+		$Data .= fnSpace(55) . "No : ".$OutgoingNumber."\n";
 		$sql = "SELECT
 					TOD.Quantity,
 					MU.UnitName,
@@ -100,16 +100,16 @@
 		}
 		$GrandTotal = 0;
 		$Data .= "-----------------------------------------------------------------------------------------------------------------------------------------\n";
-		$Data .= "|       Qty       |                    Nama Barang                    |   Lot   |   Harga Satuan   |     Diskon     |       Total       |\n";
+		$Data .= "|       Qty       |                 Nama Barang                  |      Lot     |   Harga Satuan   |     Diskon     |       Total       |\n";
 		$Data .= "-----------------------------------------------------------------------------------------------------------------------------------------\n";
 		
 		while($row=mysql_fetch_array($result)) {
 			//Qty
 			$Data .= "|  " . fnSpace(6 - strlen($row['Quantity'])) . $row['Quantity'] . " " . $row['UnitName'] . fnSpace(6 - strlen($row['UnitName'])) . "  |  ";
 			//ItemName
-			$Data .= $row['ItemName'] . fnSpace(47 - strlen($row['ItemName'])) . "  |  ";
+			$Data .= $row['ItemName'] . fnSpace(42 - strlen($row['ItemName'])) . "  |  ";
 			//BatchNumber
-			$Data .= fnSpace(5 - strlen($row['BatchNumber'])) . $row['BatchNumber'] . "  |  ";
+			$Data .= fnSpace(10 - strlen($row['BatchNumber'])) . $row['BatchNumber'] . "  |  ";
 			//Harga Satuan
 			$Data .= fnSpace(14 - strlen(number_format($row['SalePrice'],2,".",","))) . number_format($row['SalePrice'],2,".",",") . "  |  ";
 			//Diskon

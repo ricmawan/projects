@@ -20,7 +20,7 @@
 		$bold0 = Chr(27) . Chr(70);
 		$double1 = Chr(27) . Chr(87) . Chr(49);
 		$double0 = Chr(27) . Chr(87) . Chr(48);
-		$initialized = Chr(27) . Chr(64). Chr(27) . Chr(67) . Chr(44);
+		$initialized = Chr(27) . Chr(64). Chr(27) . Chr(67) . Chr(33);
 		$condensed1 = chr(15);
 		$condensed0 = chr(18);
 		$underline1 = Chr(27) . Chr(45) . Chr(49);
@@ -73,8 +73,8 @@
 		$Data .= "   Sales           : ".$Alias;
 		$Data .= fnSpace(44) . $condensed0 . "Ph " . $Telephone . "\n" . $condensed1;
 		
-		$Data .= "   Kami kirim pesanan anda dlm keadaan baik, barang-barang sbb:";
-		$Data .= fnSpace(57) . "No : ".$OutgoingNumber."\n";
+		$Data .= "   Kami kirim pesanan anda dalam keadaan baik, barang-barang sbb:";
+		$Data .= fnSpace(55) . "No : ".$OutgoingNumber."\n";
 		$sql = "SELECT
 					TOD.Quantity,
 					MU.UnitName,
@@ -105,16 +105,16 @@
 		}
 		$GrandTotal = 0;
 		$Data .= "-----------------------------------------------------------------------------------------------------------------------------------------\n";
-		$Data .= "|       Qty       |                    Nama Barang                    |   Lot   |                       Keterangan                      |\n";
+		$Data .= "|       Qty       |                 Nama Barang                  |      Lot     |                       Keterangan                      |\n";
 		$Data .= "-----------------------------------------------------------------------------------------------------------------------------------------\n";
 		
 		while($row=mysql_fetch_array($result)) {
 			//Qty
 			$Data .= "|  " . fnSpace(6 - strlen($row['Quantity'])) . $row['Quantity'] . " " . $row['UnitName'] . fnSpace(6 - strlen($row['UnitName'])) . "  |  ";
 			//ItemName
-			$Data .= $row['ItemName'] . fnSpace(47 - strlen($row['ItemName'])) . "  |  ";
+			$Data .= $row['ItemName'] . fnSpace(42 - strlen($row['ItemName'])) . "  |  ";
 			//BatchNumber
-			$Data .= fnSpace(5 - strlen($row['BatchNumber'])) . $row['BatchNumber'] . "  |  ";
+			$Data .= fnSpace(10 - strlen($row['BatchNumber'])) . $row['BatchNumber'] . "  |  ";
 			//Remarks
 			$Data .= $row['Remarks'] . fnSpace(51 - strlen($row['Remarks'])) . "  |\n";
 			//Harga Satuan
@@ -136,7 +136,7 @@
 		$Data .=  $bold1 . "Barang yang sudah dibeli tidak dapat ditukar/dikembalikan" . Chr(12);
 		fwrite($handle, $Data);
 		fclose($handle);
-		//copy($file, $SHARED_PRINTER_ADDRESS); 
+		copy($file, $SHARED_PRINTER_ADDRESS); 
 		//exec("lp -d epson ".$file);  # Lakukan cetak
 		//unlink($file);
 		echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);

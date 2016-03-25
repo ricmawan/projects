@@ -20,7 +20,7 @@
 		$bold0 = Chr(27) . Chr(70);
 		$double1 = Chr(27) . Chr(87) . Chr(49);
 		$double0 = Chr(27) . Chr(87) . Chr(48);
-		$initialized = Chr(27) . Chr(64). Chr(27) . Chr(67) . Chr(44);
+		$initialized = Chr(27) . Chr(64). Chr(27) . Chr(67) . Chr(33);
 		$condensed1 = chr(15);
 		$condensed0 = chr(18);
 		$underline1 = Chr(27) . Chr(45) . Chr(49);
@@ -91,16 +91,16 @@
 		}
 		$GrandTotal = 0;
 		$Data .= "_________________________________________________________________________________________________________________________________________\n";
-		$Data .= "|        Qty        |                     Nama Barang                     |    Lot    |     Harga Satuan     |            Total         |\n";
+		$Data .= "|        Qty        |                   Nama Barang                    |      Lot     |     Harga Satuan     |            Total         |\n";
 		$Data .= "_________________________________________________________________________________________________________________________________________\n";
 		
 		while($row=mysql_fetch_array($result)) {
 			//Qty
 			$Data .= "|  " . fnSpace(8 - strlen($row['Quantity'])) . $row['Quantity'] . " " . $row['UnitName'] . fnSpace(6 - strlen($row['UnitName'])) . "  |  ";
 			//ItemName
-			$Data .= $row['ItemName'] . fnSpace(49 - strlen($row['ItemName'])) . "  |  ";
+			$Data .= $row['ItemName'] . fnSpace(46 - strlen($row['ItemName'])) . "  |  ";
 			//BatchNumber
-			$Data .= fnSpace(7 - strlen($row['BatchNumber'])) . $row['BatchNumber'] . "  |  ";
+			$Data .= fnSpace(10 - strlen($row['BatchNumber'])) . $row['BatchNumber'] . "  |  ";
 			//Harga Satuan
 			$Data .= fnSpace(18 - strlen(number_format($row['BuyPrice'],2,".",","))) . number_format($row['BuyPrice'],2,".",",") . "  |  ";
 			//Diskon
