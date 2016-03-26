@@ -10,12 +10,14 @@
 		$City = "";
 		$Telephone = "";
 		$IsEdit = 0;
+		$SalesID = 0;
 		
 		if($CustomerID != 0) {
 			$IsEdit = 1;
 			//$Content = "Place the content here";
 			$sql = "SELECT
 						CustomerID,
+						SalesID,
 						CustomerName,
 						Address,
 						City,
@@ -35,6 +37,7 @@
 			$Address = $row['Address'];
 			$City = $row['City'];
 			$Telephone = $row['Telephone'];
+			$SalesID = $row['SalesID'];
 		}
 	}
 ?>
@@ -92,13 +95,68 @@
 									<input id="txtCity" maxlength=30 name="txtCity" type="text" class="form-control-custom" placeholder="Kota" <?php echo 'value="'.$City.'"'; ?> />
 								</div>
 							</div>
-
 							<br />
-							<button type="button" class="btn btn-default" value="Simpan" onclick="SubmitForm('./Master/Customer/Insert.php');" ><i class="fa fa-save"></i> Simpan</button>
+							<div class="row">
+								<div class="col-md-2 labelColumn">
+									Sales :
+								</div>
+								<div class="col-md-3">
+									<div class="ui-widget" style="width: 100%;">
+										<select name="ddlSales" id="ddlSales" class="form-control-custom" placeholder="Pilih Sales" >
+											<option value="" selected> </option>
+											<?php
+												$sql = "SELECT SalesID, SalesName FROM master_sales";
+												if(!$result = mysql_query($sql, $dbh)) {
+													echo mysql_error();
+													return 0;
+												}
+												while($row = mysql_fetch_array($result)) {
+													if($SalesID == $row['SalesID']) echo "<option selected value='".$row['SalesID']."' >".$row['SalesName']."</option>";
+													else echo "<option value='".$row['SalesID']."' >".$row['SalesName']."</option>";
+												}
+											?>
+										</select>
+									</div>
+								</div>
+							</div>
+							<br />
+							<button type="button" class="btn btn-default" value="Simpan" onclick="SubmitValidate();" ><i class="fa fa-save"></i> Simpan</button>
 						</form>
 					</div>
 				</div>
 			</div>
 		</div>
+		<script>
+			function SubmitValidate() {
+				var PassValidate = 1;
+				var FirstFocus = 0;
+				$(".form-control-custom").each(function() {
+					if($(this).hasAttr('required')) {
+						if($(this).val() == "") {
+							PassValidate = 0;
+							$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+							if(FirstFocus == 0) $(this).focus();
+							FirstFocus = 1;
+						}
+					}
+				});
+				
+				if($("#ddlSales").val() == "") {
+					PassValidate = 0;
+					$("#ddlSales").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+					if(FirstFocus == 0) $("#ddlSales").next().find("input").focus();
+					FirstFocus = 1;
+				}
+				if(PassValidate == 0) {
+						$("html, body").animate({
+							scrollTop: 0
+						}, "slow");
+						return false;
+					}
+					else {
+						SubmitForm('./Master/Customer/Insert.php')
+					}
+			}
+		</script>
 	</body>
 </html>

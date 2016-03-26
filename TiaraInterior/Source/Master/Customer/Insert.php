@@ -5,6 +5,7 @@
 		$RequestPath = str_replace($file, "", $RequestPath);
 		include "../../GetPermission.php";
 		$CustomerID = mysql_real_escape_string($_POST['hdnCustomerID']);
+		$SalesID = mysql_real_escape_string($_POST['ddlSales']);
 		$Telephone = mysql_real_escape_string($_POST['txtTelephone']);
 		$CustomerName = mysql_real_escape_string($_POST['txtCustomerName']);
 		$Address = mysql_real_escape_string($_POST['txtAddress']);
@@ -14,7 +15,7 @@
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
-		$sql = "CALL spInsCustomer(".$CustomerID.", '".$CustomerName."', '".$Address."', '".$City."', '".$Telephone."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsCustomer(".$CustomerID.", ".$SalesID.", '".$CustomerName."', '".$Address."', '".$City."', '".$Telephone."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
 		
 		if (! $result=mysql_query($sql, $dbh)) {
 			$Message = "Terjadi Kesalahan Sistem";

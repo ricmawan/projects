@@ -13,6 +13,15 @@ CREATE TABLE master_menu
 )ENGINE=InnoDB;
 
 INSERT INTO master_menu
+(
+	MenuID,
+	GroupMenuID,
+	MenuName,
+	URL,
+	Icon,
+	IsReport,
+	OrderNo    
+)
 VALUES
 (
 	1,
@@ -193,6 +202,24 @@ VALUES
 	NULL,
 	1,
 	3
+),
+(
+	21,
+	3,
+	'Penyesuaian Stok',
+	'Transaction/StockOpname/',
+	NULL,
+	0,
+	5
+),
+(
+	22,
+	3,
+	'Booking',
+	'Transaction/Booking/',
+	NULL,
+	0,
+	6
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

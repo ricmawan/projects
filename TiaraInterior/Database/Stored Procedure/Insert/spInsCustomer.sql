@@ -2,7 +2,8 @@ DROP PROCEDURE IF EXISTS spInsCustomer;
 
 DELIMITER $$
 CREATE PROCEDURE spInsCustomer (
-	pID 			BIGINT, 
+	pID 			BIGINT,
+	pSalesID		BIGINT,
 	pCustomerName 	VARCHAR(255),
 	pAddress 		TEXT,
 	pCity			VARCHAR(100),
@@ -71,6 +72,7 @@ SET State = 3;
 				INSERT INTO master_customer
 				(
 					CustomerName,
+					SalesID,
 					Address,
 					City,
 					Telephone,
@@ -79,6 +81,7 @@ SET State = 3;
 				)
 				VALUES (
 					pCustomerName,
+					pSalesID,
 					pAddress,
 					pCity,
 					pTelephone,
@@ -99,6 +102,7 @@ SET State = 5;
 					master_customer
 				SET
 					CustomerName = pCustomerName,
+					SalesID = pSalesID,
 					Address = pAddress,
 					City = pCity,
 					Telephone = pTelephone,

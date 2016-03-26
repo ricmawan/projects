@@ -9,6 +9,7 @@ CREATE TABLE transaction_incomingdetails
 	BuyPrice			DOUBLE,
 	SalePrice			DOUBLE,
 	Discount			INT,
+	IsPercentage		BIT,
 	BatchNumber			VARCHAR(100) NULL,
 	CreatedDate 		DATETIME NOT NULL,
 	CreatedBy 			VARCHAR(255) NOT NULL,

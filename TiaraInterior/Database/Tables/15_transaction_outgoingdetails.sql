@@ -9,6 +9,7 @@ CREATE TABLE transaction_outgoingdetails
 	BuyPrice			DOUBLE,
 	SalePrice			DOUBLE,
 	Discount			INT,
+	IsPercentage		BIT,
 	BatchNumber			VARCHAR(100) NULL,
 	Remarks				TEXT,
 	CreatedDate 		DATETIME NOT NULL,

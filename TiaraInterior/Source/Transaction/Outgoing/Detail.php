@@ -104,7 +104,7 @@
 								<div class="col-md-3">
 									<input type="text" id="txtOutgoingNumber" name="txtOutgoingNumber" class="form-control-custom" readonly <?php echo 'value="'.$OutgoingNumber.'"'; ?> />
 								</div>
-								<div class="col-md-1 labelColumn">
+								<!--<div class="col-md-1 labelColumn">
 									Sales:
 								</div>
 								<div class="col-md-3">
@@ -124,7 +124,7 @@
 											?>
 										</select>
 									</div>
-								</div>
+								</div>-->
 							</div>
 							<br />
 							<div class="row">
