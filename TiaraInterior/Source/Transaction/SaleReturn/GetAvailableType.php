@@ -2,6 +2,7 @@
 	if(isset($_POST['BrandID'])) {
 		include "../../DBConfig.php";
 		$BrandID = mysql_real_escape_string($_POST['BrandID']);
+		$CustomerID = mysql_real_escape_string($_POST['CustomerID']);
 		$State = 1;
 		$Message = "Data Berhasil Disimpan";
 		$MessageDetail = "";
@@ -30,7 +31,11 @@
 							TRIM(BatchNumber) BatchNumber,
 							SUM(Quantity) Quantity
 						FROM
-							transaction_outgoingdetails
+							transaction_outgoing OT
+							JOIN transaction_outgoingdetails OTD
+								ON OT.OutgoingID = OTD.OutgoingID
+						WHERE
+							OT.CustomerID = ".$CustomerID."
 						GROUP BY
 							TypeID,
 							BatchNumber

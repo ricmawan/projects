@@ -68,7 +68,17 @@
 					TOD.BatchNumber,
 					TOD.Quantity,
 					TOD.SalePrice,
-					IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))), 0) AS Total,
+					CASE
+						WHEN TOD.IsPercentage = 1
+						THEN CONCAT(TOD.Discount, '%')
+						ELSE TOD.Discount
+					END AS Discount,
+					TOD.IsPercentage,
+					CASE
+						WHEN TOD.IsPercentage = 1
+						THEN IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))), 0)
+						ELSE IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - TOD.Discount)), 0)
+					END AS Total,
 					OT.Remarks
 				FROM
 					transaction_outgoing OT
@@ -117,7 +127,17 @@
 					SRD.BatchNumber,
 					SRD.Quantity,
 					SRD.SalePrice,
-					-IFNULL(SUM(SRD.Quantity * SRD.SalePrice), 0) AS Total,
+					CASE
+						WHEN SRD.IsPercentage = 1
+						THEN CONCAT(SRD.Discount, '%')
+						ELSE SRD.Discount
+					END AS Discount,
+					SRD.IsPercentage,
+					-CASE
+						WHEN SRD.IsPercentage = 1
+						THEN IFNULL(SUM(SRD.Quantity * (SRD.SalePrice - ((SRD.SalePrice * SRD.Discount)/100))), 0)
+						ELSE IFNULL(SUM(SRD.Quantity * (SRD.SalePrice - SRD.Discount)), 0)
+					 END AS Total,
 					SR.Remarks
 				FROM
 					transaction_salereturn SR
@@ -176,6 +196,8 @@
 			$row_array['BrandName'] = $row['BrandName'];
 			$row_array['BatchNumber'] = $row['BatchNumber'];
 			$row_array['Quantity'] = $row['Quantity'];
+			if($row['IsPercentage'] == true) $row_array['Discount'] = $row['Discount'];
+			else $row_array['Discount'] = number_format($row['Discount'],2,".",",");
 			$row_array['SalePrice'] = number_format($row['SalePrice'],2,".",",");
 			$row_array['Total'] = number_format($row['Total'],2,".",",");
 			$row_array['Remarks'] = $row['Remarks'];

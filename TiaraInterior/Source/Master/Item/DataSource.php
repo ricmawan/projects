@@ -159,7 +159,7 @@
 							TRIM(BatchNumber) BatchNumber,
 							SUM(Quantity) Quantity,
 							CASE
-								WHEN IsPercentage = 10
+								WHEN IsPercentage = 1
 								THEN (BuyPrice - ((BuyPrice * Discount) / 100))
 								ELSE (BuyPrice - Discount)
 							END AS BuyPrice,
@@ -180,7 +180,7 @@
 							TRIM(BatchNumber) BatchNumber,
 							SUM(Quantity) Quantity,
 							CASE
-								WHEN IsPercentage = 10
+								WHEN IsPercentage = 1
 								THEN (BuyPrice - ((BuyPrice * Discount) / 100))
 								ELSE (BuyPrice - Discount)
 							END AS BuyPrice,

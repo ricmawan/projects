@@ -194,7 +194,7 @@
 								<div class="col-md-12">
 									
 									<table class="table" style="width:auto;" id="datainput">
-										<thead style="background-color: black;color:white;height:25px;width:750px;display:block;">
+										<thead style="background-color: black;color:white;height:25px;width:778px;display:block;">
 											<td align="center" style="width:30px;">No</td>
 											<td align="center" style="width:180px;">Nama Barang</td>
 											<td align="center" style="width:75px;">QTY</td>

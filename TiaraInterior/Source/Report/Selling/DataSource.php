@@ -63,8 +63,16 @@
 					MS.SalesName,
 					MC.CustomerName,
 					OT.DeliveryCost,
-					IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))), 0) AS SubTotal,
-					IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))), 0) + OT.DeliveryCost AS Total,
+					CASE
+						WHEN TOD.IsPercentage = 1
+						THEN IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))), 0)
+						ELSE IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - TOD.Discount)), 0)
+					END AS SubTotal,
+					CASE
+						WHEN TOD.IsPercentage = 1
+						THEN IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))), 0)
+						ELSE IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - TOD.Discount)), 0)
+					END + OT.DeliveryCost AS Total,
 					OT.Remarks
 				FROM
 					transaction_outgoing OT
@@ -99,8 +107,16 @@
 					'',
 					MC.CustomerName,
 					0,
-					-IFNULL(SUM(SRD.Quantity * SRD.SalePrice), 0) AS SubTotal,
-					-IFNULL(SUM(SRD.Quantity * SRD.SalePrice), 0) AS Total,
+					-CASE
+						WHEN SRD.IsPercentage = 1
+						THEN IFNULL(SUM(SRD.Quantity * (SRD.SalePrice - ((SRD.SalePrice * SRD.Discount)/100))), 0)
+						ELSE IFNULL(SUM(SRD.Quantity * (SRD.SalePrice - SRD.Discount)), 0)
+					END AS SubTotal,
+					-CASE
+						WHEN SRD.IsPercentage = 1
+						THEN IFNULL(SUM(SRD.Quantity * (SRD.SalePrice - ((SRD.SalePrice * SRD.Discount)/100))), 0)
+						ELSE IFNULL(SUM(SRD.Quantity * (SRD.SalePrice - SRD.Discount)), 0)
+					END AS Total,
 					SR.Remarks
 				FROM
 					transaction_salereturn SR

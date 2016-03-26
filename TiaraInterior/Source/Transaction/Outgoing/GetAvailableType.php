@@ -13,8 +13,8 @@
 					MB.BrandID,
 					MB.BrandName,
 					FS.BatchNumber,
-					MT.BuyPrice,
-					MT.SalePrice,
+					IFNULL(FS.BuyPrice, MT.BuyPrice) BuyPrice,
+					IFNULL(FS.SalePrice, MT.SalePrice) SalePrice,
 					(IFNULL(FS.Quantity, 0) - IFNULL(TOD.Quantity, 0) - IFNULL(BR.Quantity, 0) + IFNULL(SR.Quantity, 0)) Stock,
 					MU.UnitName
 				FROM
@@ -28,28 +28,54 @@
 						SELECT
 							TypeID,
 							TRIM(BatchNumber) BatchNumber,
-							SUM(SA.Quantity) Quantity
+							SUM(SA.Quantity) Quantity,
+							BuyPrice,
+							SalePrice
 						FROM
 						(
 							SELECT
 								TypeID,
 								TRIM(BatchNumber) BatchNumber,
-								SUM(Quantity) Quantity
+								SUM(Quantity) Quantity,
+								CASE
+									WHEN IsPercentage = 1
+									THEN (BuyPrice - ((BuyPrice * Discount) / 100))
+									ELSE (BuyPrice - Discount)
+								END AS BuyPrice,
+								SalePrice,
+								CreatedDate
 							FROM
 								transaction_firststockdetails
 							GROUP BY
 								TypeID,
-								BatchNumber
+								BatchNumber,
+								BuyPrice,
+								SalePrice,
+								CreatedDate,
+								Discount
 							UNION
 							SELECT
 								TypeID,
 								TRIM(BatchNumber) BatchNumber,
-								SUM(Quantity) Quantity
+								SUM(Quantity) Quantity,
+								CASE
+									WHEN IsPercentage = 1
+									THEN (BuyPrice - ((BuyPrice * Discount) / 100))
+									ELSE (BuyPrice - Discount)
+								END AS BuyPrice,
+								SalePrice,
+								CreatedDate
 							FROM
 								transaction_incomingdetails
 							GROUP BY
 								TypeID,
-								BatchNumber
+								BatchNumber,
+								BuyPrice,
+								SalePrice,
+								CreatedDate,
+								Discount
+							ORDER BY
+								CreatedDate DESC
 						)SA
 						GROUP BY
 							TypeID,

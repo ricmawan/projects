@@ -62,7 +62,11 @@
 					MS.SupplierName AS SupplierName,
 					TI.IncomingNumber,
 					TI.Remarks,
-					IFNULL(SUM(TID.Quantity * (TID.BuyPrice - ((TID.BuyPrice * TID.Discount)/100))), 0) AS Total
+					CASE
+						WHEN TID.IsPercentage = 1
+						THEN IFNULL(SUM(TID.Quantity * (TID.BuyPrice - ((TID.BuyPrice * TID.Discount)/100))), 0) 
+						ELSE IFNULL(SUM(TID.Quantity * (TID.BuyPrice - TID.Discount)), 0)
+					END AS Total
 				FROM
 					transaction_incoming TI
 					JOIN master_supplier MS
@@ -87,7 +91,11 @@
 					MS.SupplierName AS SupplierName,
 					BR.BuyReturnNumber,
 					BR.Remarks,
-					-IFNULL(SUM(BRD.Quantity * BRD.BuyPrice), 0) AS Total
+					-CASE
+						WHEN BRD.IsPercentage = 1
+						THEN IFNULL(SUM(BRD.Quantity * (BRD.BuyPrice - ((BRD.BuyPrice * BRD.Discount)/100))), 0) 
+						ELSE IFNULL(SUM(BRD.Quantity * (BRD.BuyPrice - BRD.Discount)), 0)
+					 END  AS Total
 				FROM
 					transaction_buyreturn BR
 					JOIN master_supplier MS

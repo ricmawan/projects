@@ -170,7 +170,7 @@
 								<div class="col-md-12">
 									
 									<table class="table" style="width:auto;" id="datainput">
-										<thead style="background-color: black;color:white;height:25px;width:750px;display:block;">
+										<thead style="background-color: black;color:white;height:25px;width:778px;display:block;">
 											<td align="center" style="width:30px;">No</td>
 											<td align="center" style="width:180px;">Nama Barang</td>
 											<td align="center" style="width:75px;">QTY</td>											
@@ -244,28 +244,61 @@
 			</div>
 		</div>
 		<script>
+			function BindTypeFromCustomer() {
+				if($("#ddlBrand").val() != "") {
+					$("#ddlType option").each(function() {
+						$(this).remove();
+					});
+					$("#ddlType").append('<option value="" brandid="" selected> </option>');
+					$("#ddlType").val("");
+					$("#ddlType").next().find("input").val("");
+					$.ajax({
+						url: "./Transaction/SaleReturn/GetAvailableType.php",
+						type: "POST",
+						data: { BrandID : $("#ddlBrand").val(), CustomerID : $("#ddlCustomer").val() },
+						dataType: "json",
+						success: function(data) {
+							$.each(data, function(key, value) {
+								$("#ddlType").append("<option value='" + value.TypeID + "' buyprice='" + value.BuyPrice + "' saleprice='" + value.SalePrice + "' stock='" + value.Stock + "' batchnumber='" + value.BatchNumber + "' brandid='" + value.BrandID + "' >" + value.BrandName + " " + value.TypeName + " - " + value.BatchNumber + "</option>");
+							});
+						},
+						error: function(data) {
+							$("#loading").hide();
+							$.notify("Terjadi kesalahan sistem!", "error");
+						}
+					});
+				}
+			}
+			
 			function BindType() {
-				$("#ddlType option").each(function() {
-					$(this).remove();
-				});
-				$("#ddlType").append('<option value="" brandid="" selected> </option>');
-				$("#ddlType").val("");
-				$("#ddlType").next().find("input").val("");
-				$.ajax({
-					url: "./Transaction/SaleReturn/GetAvailableType.php",
-					type: "POST",
-					data: { BrandID : $("#ddlBrand").val() },
-					dataType: "json",
-					success: function(data) {
-						$.each(data, function(key, value) {
-							$("#ddlType").append("<option value='" + value.TypeID + "' buyprice='" + value.BuyPrice + "' saleprice='" + value.SalePrice + "' stock='" + value.Stock + "' batchnumber='" + value.BatchNumber + "' brandid='" + value.BrandID + "' >" + value.BrandName + " " + value.TypeName + " - " + value.BatchNumber + "</option>");
-						});
-					},
-					error: function(data) {
-						$("#loading").hide();
-						$.notify("Terjadi kesalahan sistem!", "error");
-					}
-				});
+				if($("#ddlCustomer").val() == "") {
+					$("#ddlCustomer").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+					$("#ddlCustomer").next().find("input").focus();
+					//$("#ddlBrand").val("");
+				}
+				else {
+					$("#ddlType option").each(function() {
+						$(this).remove();
+					});
+					$("#ddlType").append('<option value="" brandid="" selected> </option>');
+					$("#ddlType").val("");
+					$("#ddlType").next().find("input").val("");
+					$.ajax({
+						url: "./Transaction/SaleReturn/GetAvailableType.php",
+						type: "POST",
+						data: { BrandID : $("#ddlBrand").val(), CustomerID : $("#ddlCustomer").val() },
+						dataType: "json",
+						success: function(data) {
+							$.each(data, function(key, value) {
+								$("#ddlType").append("<option value='" + value.TypeID + "' buyprice='" + value.BuyPrice + "' saleprice='" + value.SalePrice + "' stock='" + value.Stock + "' batchnumber='" + value.BatchNumber + "' brandid='" + value.BrandID + "' >" + value.BrandName + " " + value.TypeName + " - " + value.BatchNumber + "</option>");
+							});
+						},
+						error: function(data) {
+							$("#loading").hide();
+							$.notify("Terjadi kesalahan sistem!", "error");
+						}
+					});
+				}
 			}
 			
 			function BindTypeList() {
@@ -466,7 +499,11 @@
 					}
 				});
 
-				$("#ddlCustomer").combobox();
+				$("#ddlCustomer").combobox({
+					select: function( event, ui ) {
+						BindTypeFromCustomer();						
+					}
+				});
 				$("#ddlType").combobox({
 					select: function(event, ui) {
 						BindTypeList();
