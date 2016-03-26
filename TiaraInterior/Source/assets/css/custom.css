@@ -355,7 +355,7 @@ font-weight: 700;
 	width:15px;
 	height:1px;
 	background:#ff0000;
-	top:12px;
+	top:15px;
 }
 .nav-second-level > li > a:after,
 .nav-third-level > li > a:after {
@@ -563,7 +563,7 @@ textarea.form-control-custom {
 }
 
 .nav li a {
-    padding: 5px 12px 5px 37px;
+    padding: 7px 12px 7px 37px;
 }
 /*==============================================
     MEDIA QUERIES     
