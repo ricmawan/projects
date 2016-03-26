@@ -6,7 +6,7 @@
 	include "../../GetPermission.php";
 
 	$where = " 1=1 ";
-	$order_by = "BR.BuyReturnID";
+	$order_by = "BR.BuyReturnID DESC";
 	$rows = 10;
 	$current = 1;
 	$limit_l = ($current * $rows) - ($rows);
@@ -17,7 +17,7 @@
 		$order_by = "";
 		foreach($_REQUEST['sort'] as $key => $value) {
 			if($key != 'No') $order_by .= " $key $value";
-			else $order_by = "BR.BuyReturnID";
+			else $order_by = "BR.BuyReturnID DESC";
 		}
 	}
 	//Handles search querystring sent from Bootgrid
@@ -56,7 +56,11 @@
 				BR.BuyReturnID,
 				MS.SupplierName,
 				DATE_FORMAT(BR.TransactionDate, '%d-%m-%Y') AS TransactionDate,
-				IFNULL(SUM(BRD.Quantity * BRD.BuyPrice), 0) AS TotalAmount,
+				CASE
+					WHEN BRD.IsPercentage = 1
+					THEN IFNULL(SUM(BRD.Quantity * (BRD.BuyPrice - ((BRD.BuyPrice * BRD.Discount)/100))), 0)
+					ELSE IFNULL(SUM(BRD.Quantity * (BRD.BuyPrice - BRD.Discount)), 0)
+				END AS TotalAmount,
 				BR.Remarks,
 				BR.BuyReturnNumber
 			FROM

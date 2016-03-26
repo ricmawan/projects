@@ -24,7 +24,11 @@
 	if (ISSET($_REQUEST['searchPhrase']) )
 	{
 		$search = trim($_REQUEST['searchPhrase']);
-		$where .= " AND ( UserName LIKE '%".$search."%' OR UserLogin LIKE '%".$search."%' ) ";
+		$where .= " AND ( UserName LIKE '%".$search."%' OR UserLogin LIKE '%".$search."%' OR CASE
+																								WHEN IsActive = 0
+																								THEN 'Tidak Aktif'
+																								ELSE 'Aktif'
+																							 END LIKE '%".$search."%'																							 ) ";
 	}
 	//Handles determines where in the paging count this result set falls in
 	if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];

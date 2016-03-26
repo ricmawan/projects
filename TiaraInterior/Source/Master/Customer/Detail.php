@@ -71,6 +71,30 @@
 							<br />
 							<div class="row">
 								<div class="col-md-2 labelColumn">
+									Sales :
+								</div>
+								<div class="col-md-3">
+									<div class="ui-widget" style="width: 100%;">
+										<select name="ddlSales" id="ddlSales" class="form-control-custom" placeholder="Pilih Sales" >
+											<option value="" selected> </option>
+											<?php
+												$sql = "SELECT SalesID, SalesName FROM master_sales";
+												if(!$result = mysql_query($sql, $dbh)) {
+													echo mysql_error();
+													return 0;
+												}
+												while($row = mysql_fetch_array($result)) {
+													if($SalesID == $row['SalesID']) echo "<option selected value='".$row['SalesID']."' >".$row['SalesName']."</option>";
+													else echo "<option value='".$row['SalesID']."' >".$row['SalesName']."</option>";
+												}
+											?>
+										</select>
+									</div>
+								</div>
+							</div>
+							<br />
+							<div class="row">
+								<div class="col-md-2 labelColumn">
 									Telepon :
 								</div>
 								<div class="col-md-3">
@@ -96,30 +120,6 @@
 								</div>
 							</div>
 							<br />
-							<div class="row">
-								<div class="col-md-2 labelColumn">
-									Sales :
-								</div>
-								<div class="col-md-3">
-									<div class="ui-widget" style="width: 100%;">
-										<select name="ddlSales" id="ddlSales" class="form-control-custom" placeholder="Pilih Sales" >
-											<option value="" selected> </option>
-											<?php
-												$sql = "SELECT SalesID, SalesName FROM master_sales";
-												if(!$result = mysql_query($sql, $dbh)) {
-													echo mysql_error();
-													return 0;
-												}
-												while($row = mysql_fetch_array($result)) {
-													if($SalesID == $row['SalesID']) echo "<option selected value='".$row['SalesID']."' >".$row['SalesName']."</option>";
-													else echo "<option value='".$row['SalesID']."' >".$row['SalesName']."</option>";
-												}
-											?>
-										</select>
-									</div>
-								</div>
-							</div>
-							<br />
 							<button type="button" class="btn btn-default" value="Simpan" onclick="SubmitValidate();" ><i class="fa fa-save"></i> Simpan</button>
 						</form>
 					</div>
@@ -127,6 +127,10 @@
 			</div>
 		</div>
 		<script>
+			$(document).ready(function() {
+				$("#ddlSales").combobox();
+			});
+			
 			function SubmitValidate() {
 				var PassValidate = 1;
 				var FirstFocus = 0;

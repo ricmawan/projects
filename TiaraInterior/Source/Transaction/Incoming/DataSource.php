@@ -6,7 +6,7 @@
 	include "../../GetPermission.php";
 
 	$where = " 1=1 ";
-	$order_by = "IT.IncomingID";
+	$order_by = "IT.IncomingID DESC";
 	$rows = 10;
 	$current = 1;
 	$limit_l = ($current * $rows) - ($rows);
@@ -17,7 +17,7 @@
 		$order_by = "";
 		foreach($_REQUEST['sort'] as $key => $value) {
 			if($key != 'No') $order_by .= " $key $value";
-			else $order_by = "IT.IncomingID";
+			else $order_by = "IT.IncomingID DESC";
 		}
 	}
 	//Handles search querystring sent from Bootgrid
@@ -57,7 +57,11 @@
 				IT.IncomingNumber,
 				MS.SupplierName,
 				DATE_FORMAT(IT.TransactionDate, '%d-%m-%Y') AS TransactionDate,
-				IFNULL(SUM(ITD.Quantity * (ITD.BuyPrice - ((ITD.BuyPrice * ITD.Discount)/100))), 0) AS TotalAmount,
+				CASE
+					WHEN ITD.IsPercentage = 1
+					THEN IFNULL(SUM(ITD.Quantity * (ITD.BuyPrice - ((ITD.BuyPrice * ITD.Discount)/100))), 0) 
+					ELSE IFNULL(SUM(ITD.Quantity * (ITD.BuyPrice - ITD.Discount)), 0)
+				END AS TotalAmount,
 				IT.Remarks
 			FROM
 				transaction_incoming IT

@@ -6,7 +6,7 @@
 	include "../../GetPermission.php";
 
 	$where = " 1=1 ";
-	$order_by = "FS.FirstStockID";
+	$order_by = "FS.FirstStockID DESC";
 	$rows = 10;
 	$current = 1;
 	$limit_l = ($current * $rows) - ($rows);
@@ -17,7 +17,7 @@
 		$order_by = "";
 		foreach($_REQUEST['sort'] as $key => $value) {
 			if($key != 'No') $order_by .= " $key $value";
-			else $order_by = "FS.FirstStockID";
+			else $order_by = "FS.FirstStockID DESC";
 		}
 	}
 	//Handles search querystring sent from Bootgrid
@@ -54,7 +54,11 @@
 				FS.FirstStockID,
 				FS.FirstStockNumber,
 				DATE_FORMAT(FS.TransactionDate, '%d-%m-%Y') AS TransactionDate,
-				IFNULL(SUM(FSD.Quantity * (FSD.BuyPrice - ((FSD.BuyPrice * FSD.Discount)/100))), 0) AS TotalAmount,
+				CASE
+					WHEN FSD.IsPercentage = 1
+					THEN IFNULL(SUM(FSD.Quantity * (FSD.BuyPrice - ((FSD.BuyPrice * FSD.Discount)/100))), 0) 
+					ELSE IFNULL(SUM(FSD.Quantity * (FSD.BuyPrice - FSD.Discount)), 0)
+				END AS TotalAmount,
 				FS.Remarks
 			FROM
 				transaction_firststock FS

@@ -7,7 +7,7 @@ CREATE TABLE transaction_salereturndetails
 	TypeID 				BIGINT NOT NULL,
 	Quantity			DOUBLE,
 	SalePrice			DOUBLE,
-	Discount			INT,
+	Discount			DOUBLE,
 	IsPercentage		BIT,
 	BatchNumber			VARCHAR(100) NULL,
 	CreatedDate 		DATETIME NOT NULL,

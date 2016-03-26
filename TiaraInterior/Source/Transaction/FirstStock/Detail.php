@@ -45,6 +45,7 @@
 						FSD.BuyPrice,
 						FSD.SalePrice,
 						FSD.Discount,
+						FSD.IsPercentage,
 						CONCAT(MB.BrandName, ' ', I.TypeName) AS TypeName
 					FROM
 						transaction_firststockdetails FSD
@@ -64,7 +65,7 @@
 				$Data = array();
 				while($row = mysql_fetch_array($result)) {
 					//array_push($DetailID, $row[0]);
-					array_push($Data, "'".$row['FirstStockDetailsID']."', '".$row['TypeID']."', '".$row['TypeName']."', '".$row['BatchNumber']."', '".$row['Quantity']."', '".$row['BuyPrice']."', '".$row['SalePrice']."', '".$row['Discount']."'");
+					array_push($Data, "'".$row['FirstStockDetailsID']."', '".$row['TypeID']."', '".$row['TypeName']."', '".$row['BatchNumber']."', '".$row['Quantity']."', '".$row['BuyPrice']."', '".$row['SalePrice']."', '".$row['Discount']."', '".$row['IsPercentage']."'");
 				}
 				//$DetailID = implode(",", $DetailID);
 				$Data = implode("|", $Data);
@@ -166,42 +167,42 @@
 							<div class="row">
 								<div class="col-md-12">
 									<table class="table" style="width:auto;" id="datainput">
-										<thead style="background-color: black;color:white;height:25px;width:935px;display:block;">
+										<thead style="background-color: black;color:white;height:25px;width:1000px;display:block;">
 											<td align="center" style="width:30px;">No</td>
-											<td align="center" style="width:188px;">Nama Barang</td>
-											<td align="center" style="width:79px;">Batch</td>
-											<td align="center" style="width:66px;">QTY</td>
-											<td align="center" style="width:136px;">Harga Beli</td>
-											<td align="center" style="width:136px;">Harga Jual</td>
-											<td align="center" style="width:77px;">Diskon (%)</td>
-											<td align="center" style="width:195px;">Total</td>
+											<td align="center" style="width:180px;">Nama Barang</td>
+											<td align="center" style="width:120px;">Batch</td>
+											<td align="center" style="width:75px;">QTY</td>
+											<td align="center" style="width:135px;">Harga Beli</td>
+											<td align="center" style="width:135px;">Harga Jual</td>
+											<td align="center" style="width:155px;">Diskon</td>
+											<td align="center" style="width:170px;">Total</td>
 											<td style="width: 26px"></td>
 										</thead>
 										<tbody style="display:block;max-height:232px;height:100%;overflow-y:auto;">
 											<tr id='' style='display:none;' class="num">
-												<td id='nota' name='nota' class='nota' style="width:32px;vertical-align:middle;"></td>
-												<td style="width:188px;">
+												<td id='nota' name='nota' class='nota' style="width:30px;vertical-align:middle;"></td>
+												<td style="width:180px;">
 													<input type="text" id="txtTypeName" name="txtTypeName" class="form-control-custom txtTypeName" placeholder="Nama Barang" readonly />
 													<input type="hidden" id="hdnTypeID" name="hdnTypeID" value="0" class="hdnTypeID" />
 													<input type="hidden" id="hdnFirstStockDetailsID" class="hdnFirstStockDetailsID" name="hdnFirstStockDetailsID" value="0" />
 												</td>
-												<td style="width:79px;">
-													<input type="text" row="" id="txtBatchNumber" style="width: 63px;" name="txtBatchNumber" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control-custom txtBatchNumber" placeholder="Batch"/>
+												<td style="width:120px;">
+													<input type="text" row="" maxlength=10 id="txtBatchNumber" name="txtBatchNumber" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control-custom txtBatchNumber" placeholder="Batch" />
 												</td>
-												<td style="width:66px;">
-													<input type="text" row="" value=1 id="txtQuantity" style="text-align:right;width: 50px;" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control-custom txtQuantity" placeholder="QTY"/>
+												<td style="width:75px;">
+													<input type="text" row="" value=1 id="txtQuantity" style="text-align:right;" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control-custom txtQuantity" placeholder="QTY" />
 												</td>
-												<td style="width:136px;">
-													<input type="text" id="txtBuyPrice" value="0.00" name="txtBuyPrice" style="text-align:right;width: 120px;" class="form-control-custom txtBuyPrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Beli"/>
+												<td style="width:125px;">
+													<input type="text" id="txtBuyPrice" value="0.00" name="txtBuyPrice" style="text-align:right;" class="form-control-custom txtBuyPrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Beli" />
 												</td>
-												<td style="width:136px;">
-													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;width: 120px;" class="form-control-custom txtSalePrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual"/>
+												<td style="width:125px;">
+													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;" class="form-control-custom txtSalePrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual" />
 												</td>
-												<td style="width:77px;">
-													<input type="text" id="txtDiscount" style="width: 60px;text-align:right;" value="0" name="txtDiscount" style="text-align:right;" onkeyup="this.value=minmax(this.value, 0, 100)" class="form-control-custom txtDiscount" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" placeholder="Diskon"/>
+												<td style="width:155px;">
+													<input type="text" id="txtDiscount" style="display:inline-block;width: 90px;text-align:right;" value="0" name="txtDiscount" style="text-align:right;" class="form-control-custom txtDiscount" onchange="ValidateDiscount(this.getAttribute('row'))" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" placeholder="Diskon" /> &nbsp; <input type="checkbox" name="chkIsPercentage" id="chkIsPercentage" style="margin-top:2px;vertical-align:sub;" onchange="ValidateDiscount(this.getAttribute('row'))" value=1 checked class="chkIsPercentage" /> (%)
 												</td>
-												<td  style="width:195px;">
-													<input type="text" id="txtTotal" name="txtTotal" class="form-control-custom txtTotal" style="text-align:right;width:175px;" value="0.00" placeholder="Jumlah" readonly />
+												<td  style="width:170px;">
+													<input type="text" id="txtTotal" name="txtTotal" class="form-control-custom txtTotal" style="text-align:right;" value="0.00" placeholder="Jumlah" readonly />
 												</td>
 												<td style="vertical-align:middle;">
 													<i class="fa fa-close btnDelete" style="cursor:pointer;" acronym title="Hapus Data" onclick="DeleteRow(this.getAttribute('row'))"></i>
@@ -392,6 +393,14 @@
 					}
 					i++;
 				});
+				i = 0;
+				$(".chkIsPercentage").each(function() {
+					if(i != 0) {
+						$(this).attr("id", "chkIsPercentage" + i);
+						$(this).attr("name", "chkIsPercentage" + i);
+					}
+					i++;
+				});
 			}
 			function Calculate() {
 				var Total = 0;
@@ -400,13 +409,15 @@
 				var qty = 1;
 				var price = 0;
 				var disc = 0;
+				var isPercentage = 0;
 				var i = 0;
 				$(".txtQuantity").each(function() {
 					if(i != 0) {
 						qty = $(this).val();
 						row = $(this).attr("row");
 						price = $("#txtBuyPrice" + row).val().replace(/\,/g, "");
-						disc = $("#txtDiscount" + row).val();
+						disc = $("#txtDiscount" + row).val().replace(/\,/g, "");
+						isPercentage = $("#chkIsPercentage" + row).prop('checked');
 						if(qty == "") {
 							$(this).val(1);
 							qty = 1;
@@ -415,7 +426,12 @@
 							$("#txtBuyPrice" + row).val("0.00");
 							price = 0;
 						}
-						price = price - ((price * disc)/ 100);
+						if(isPercentage == true) {
+							price = price - ((price * disc)/ 100);
+						}
+						else {
+							price = price - disc;
+						}
 						GrandTotal += parseFloat(qty) * parseFloat(price);
 						Total = parseFloat(qty) * parseFloat(price);
 						$("#txtTotal" + row).val(returnRupiah(Total.toString()));
@@ -424,6 +440,19 @@
 				});
 				$("#txtGrandTotal").val(returnRupiah(GrandTotal.toString()));
 			}
+			
+			function ValidateDiscount(row) {
+				var IsPercentage = $("#chkIsPercentage" + row).prop('checked');
+				var Discount = $("#txtDiscount" + row);
+				if(IsPercentage == true) {
+					Discount.val(minmax(Discount.val().replace(/\,/g, "").replace(/\.00/g, ""), 0, 100));
+				}
+				else {
+					convertRupiah("txtDiscount" + row, Discount.val());
+				}
+				Calculate();
+			}
+			
 			$(document).ready(function () {
 				$("#ddlBrand").combobox({
 					select: function( event, ui ) {
@@ -497,7 +526,16 @@
 						$("#txtQuantity" + count).val(d[4].replace("'", ""));
 						$("#txtBuyPrice" + count).val(returnRupiah(d[5].replace("'", "")));
 						$("#txtSalePrice" + count).val(returnRupiah(d[6].replace("'", "")));
-						$("#txtDiscount" + count).val(d[7].replace("'", ""));
+						if(d[8].replace("'", "") == true) {
+							$("#txtDiscount" + count).val(d[7].replace("'", ""));
+							$("#chkIsPercentage" + count).attr("checked", true);
+							$("#chkIsPercentage" + count).prop("checked", true);
+						}
+						else {
+							$("#txtDiscount" + count).val(returnRupiah(d[7].replace("'", "")));
+							$("#chkIsPercentage" + count).attr("checked", false);
+							$("#chkIsPercentage" + count).prop("checked", false);
+						}
 						$("#record").val(count);
 						$("#recordnew").val(count);
 					}

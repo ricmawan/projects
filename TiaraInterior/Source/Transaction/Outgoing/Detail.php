@@ -54,6 +54,7 @@
 						OTD.BatchNumber,
 						OTD.Discount,
 						CONCAT(MB.BrandName, ' ', I.TypeName, ' - ', OTD.BatchNumber) AS TypeName,
+						OTD.IsPercentage,
 						OTD.Remarks
 					FROM
 						transaction_outgoingdetails OTD
@@ -73,7 +74,7 @@
 				$Data = array();
 				while($row = mysql_fetch_array($result)) {
 					//array_push($DetailID, $row[0]);
-					array_push($Data, "'".$row['OutgoingDetailsID']."', '".$row['TypeID']."', '".$row['TypeName']."', '".$row['BatchNumber']."', '".$row['Quantity']."', '".$row['BuyPrice']."', '".$row['SalePrice']."', '".$row['Discount']."', '".$row['Remarks']."'");
+					array_push($Data, "'".$row['OutgoingDetailsID']."', '".$row['TypeID']."', '".$row['TypeName']."', '".$row['BatchNumber']."', '".$row['Quantity']."', '".$row['BuyPrice']."', '".$row['SalePrice']."', '".$row['Discount']."', '".$row['Remarks']."', '".$row['IsPercentage']."'");
 				}
 				//$DetailID = implode(",", $DetailID);
 				$Data = implode("|", $Data);
@@ -131,6 +132,7 @@
 								<div class="col-md-1 labelColumn">
 									Tanggal :
 									<input id="hdnOutgoingID" name="hdnOutgoingID" type="hidden" <?php echo 'value="'.$OutgoingID.'"'; ?> />
+									<input id="hdnSalesID" name="hdnSalesID" type="hidden" <?php echo 'value="'.$SalesID.'"'; ?> />
 									<input id="hdnRow" name="hdnRow" type="hidden" <?php echo 'value="'.$rowCount.'"'; ?> />
 									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
 									<input id="hdnData" name="hdnData" type="hidden" <?php echo 'value="'.$Data.'"'; ?> />
@@ -146,14 +148,14 @@
 										<select name="ddlCustomer" id="ddlCustomer" class="form-control-custom" placeholder="Pilih Pelanggan" >
 											<option value="" selected> </option>
 											<?php
-												$sql = "SELECT CustomerID, CustomerName, Address FROM master_customer";
+												$sql = "SELECT CustomerID, CustomerName, Address, SalesID FROM master_customer";
 												if(!$result = mysql_query($sql, $dbh)) {
 													echo mysql_error();
 													return 0;
 												}
 												while($row = mysql_fetch_array($result)) {
-													if($CustomerID == $row['CustomerID']) echo "<option selected value='".$row['CustomerID']."' >".$row['CustomerName']." - ".$row['Address']."</option>";
-													else echo "<option value='".$row['CustomerID']."' >".$row['CustomerName']." - ".$row['Address']."</option>";
+													if($CustomerID == $row['CustomerID']) echo "<option selected value='".$row['CustomerID']."' salesid='".$row['SalesID']."' >".$row['CustomerName']." - ".$row['Address']."</option>";
+													else echo "<option value='".$row['CustomerID']."' salesid='".$row['SalesID']."' >".$row['CustomerName']." - ".$row['Address']."</option>";
 												}
 											?>
 										</select>
@@ -198,20 +200,20 @@
 								<div class="col-md-12">
 									
 									<table class="table" style="width:auto;" id="datainput">
-										<thead style="background-color: black;color:white;height:25px;width:970px;display:block;">
+										<thead style="background-color: black;color:white;height:25px;width:1020px;display:block;">
 											<td align="center" style="width:30px;">No</td>
-											<td align="center" style="width:188px;">Nama Barang</td>
-											<td align="center" style="width:66px;">QTY</td>											
-											<td align="center" style="width:136px;">Harga Jual</td>
-											<td align="center" style="width:77px;">Diskon (%)</td>
-											<td align="center" style="width:195px;">Total</td>
+											<td align="center" style="width:180px;">Nama Barang</td>
+											<td align="center" style="width:75px;">QTY</td>
+											<td align="center" style="width:135px;">Harga Jual</td>
+											<td align="center" style="width:155px;">Diskon</td>
+											<td align="center" style="width:170px;">Total</td>
 											<td align="center" style="width:250px;">Keterangan</td>
 											<td style="width: 26px"></td>
 										</thead>
 										<tbody style="display:block;max-height:172px;height:100%;overflow-y:auto;">
 											<tr id='' style='display:none;' class="num">
-												<td id='nota' name='nota' class='nota' style="width:32px;vertical-align:middle;"></td>
-												<td style="width:188px;">
+												<td id='nota' name='nota' class='nota' style="width:30px;vertical-align:middle;"></td>
+												<td style="width:180px;">
 													<input type="text" id="txtTypeName" name="txtTypeName" class="form-control-custom txtTypeName" placeholder="Nama Barang" readonly />
 													<input type="hidden" id="hdnTypeID" name="hdnTypeID" value="0" class="hdnTypeID" />
 													<input type="hidden" id="hdnOutgoingDetailsID" class="hdnOutgoingDetailsID" name="hdnOutgoingDetailsID" value="0" />
@@ -219,17 +221,17 @@
 													<input type="hidden" id="hdnBatchNumber" name="hdnBatchNumber" class="hdnBatchNumber" value="" />
 													<input type="hidden" id="hdnStock" name="hdnStock" class="hdnStock" value="" />
 												</td>
-												<td style="width:66px;">
-													<input type="text" row="" value=1 id="txtQuantity" style="text-align:right;width: 50px;" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="ValidateQty(this.getAttribute('row'));" class="form-control-custom txtQuantity" placeholder="QTY"/>
+												<td style="width:75px;">
+													<input type="text" row="" value=1 id="txtQuantity" style="text-align:right;" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="ValidateQty(this.getAttribute('row'));" class="form-control-custom txtQuantity" placeholder="QTY"/>
 												</td>
-												<td style="width:136px;">
-													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;width: 120px;" class="form-control-custom txtSalePrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual"/>
+												<td style="width:135px;">
+													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;" class="form-control-custom txtSalePrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual"/>
 												</td>
-												<td style="width:77px;">
-													<input type="text" id="txtDiscount" style="width: 60px;text-align:right;" value="0" name="txtDiscount" style="text-align:right;" onkeyup="this.value=minmax(this.value, 0, 100)" class="form-control-custom txtDiscount" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" placeholder="Diskon"/>
+												<td style="width:155px;">
+													<input type="text" id="txtDiscount" style="display:inline-block;width: 90px;text-align:right;" value="0" name="txtDiscount" style="text-align:right;" class="form-control-custom txtDiscount" onchange="ValidateDiscount(this.getAttribute('row'))" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" placeholder="Diskon" /> &nbsp; <input type="checkbox" name="chkIsPercentage" id="chkIsPercentage" style="margin-top:2px;vertical-align:sub;" onchange="ValidateDiscount(this.getAttribute('row'))" value=1 checked class="chkIsPercentage" /> (%)
 												</td>
-												<td  style="width:195px;">
-													<input type="text" id="txtTotal" name="txtTotal" class="form-control-custom txtTotal" style="text-align:right;width:175px;" value="0.00" placeholder="Jumlah" readonly />
+												<td  style="width:170px;">
+													<input type="text" id="txtTotal" name="txtTotal" class="form-control-custom txtTotal" style="text-align:right;" value="0.00" placeholder="Jumlah" readonly />
 												</td>
 												<td  style="width:250px;">
 													<input type="text" id="txtRemarksDetail" name="txtRemarksDetail" class="form-control-custom txtRemarksDetail" style="width:235px;" placeholder="Keterangan" maxlength=50 />
@@ -287,6 +289,10 @@
 			</div>
 		</div>
 		<script>
+			function BindSales() {
+				$("#hdnSalesID").val($("#ddlCustomer option:selected").attr("salesid"));
+			}
+			
 			function BindType() {
 				$("#ddlType option").each(function() {
 					$(this).remove();
@@ -338,12 +344,12 @@
 					$("#btnAdd").click();
 					$("#hdnTypeID" + i).val(CurrentTypeID);
 					$("#txtTypeName" + i).val(CurrentTypeName);
-					$("#hdnBuyPrice" + i).val(returnRupiah(CurrentSalePrice.toString()));
+					$("#hdnBuyPrice" + i).val(returnRupiah(CurrentBuyPrice.toString()));
 					$("#hdnBatchNumber" + i).val(CurrentBatchNumber.toString());
 					$("#hdnStock" + i).val(CurrentStock.toString());
 					$("#txtSalePrice" + i).val(returnRupiah(CurrentSalePrice.toString()));
 					$("#txtQuantity" + i).val(1);
-					$("#txtTotal" + i).val(CurrentBuyPrice);
+					$("#txtTotal" + i).val(CurrentSalePrice);
 				}
 				Calculate();
 			}
@@ -471,7 +477,16 @@
 					}
 					i++;
 				});
+				i = 0;
+				$(".chkIsPercentage").each(function() {
+					if(i != 0) {
+						$(this).attr("id", "chkIsPercentage" + i);
+						$(this).attr("name", "chkIsPercentage" + i);
+					}
+					i++;
+				});
 			}
+			
 			function Calculate() {
 				var Total = 0;
 				GrandTotal = 0;
@@ -479,6 +494,7 @@
 				var qty = 1;
 				var price = 0;
 				var disc = 0;
+				var isPercentage = 0;
 				var i = 0;
 				var deliveryCost = 0;
 				$(".txtQuantity").each(function() {
@@ -486,7 +502,8 @@
 						qty = $(this).val();
 						row = $(this).attr("row");
 						price = $("#txtSalePrice" + row).val().replace(/\,/g, "");
-						disc = $("#txtDiscount" + row).val();
+						disc = $("#txtDiscount" + row).val().replace(/\,/g, "");
+						isPercentage = $("#chkIsPercentage" + row).prop('checked');
 						if(qty == "") {
 							$(this).val(1);
 							qty = 1;
@@ -495,7 +512,12 @@
 							$("#txtSalePrice" + row).val("0.00");
 							price = 0;
 						}
-						price = price - ((price * disc)/ 100);
+						if(isPercentage == true) {
+							price = price - ((price * disc)/ 100);
+						}
+						else {
+							price = price - disc;
+						}
 						GrandTotal += parseFloat(qty) * parseFloat(price);
 						Total = parseFloat(qty) * parseFloat(price);
 						$("#txtTotal" + row).val(returnRupiah(Total.toString()));
@@ -512,6 +534,19 @@
 				GrandTotal += parseFloat(deliveryCost);
 				$("#txtGrandTotal").val(returnRupiah(GrandTotal.toString()));
 			}
+			
+			function ValidateDiscount(row) {
+				var IsPercentage = $("#chkIsPercentage" + row).prop('checked');
+				var Discount = $("#txtDiscount" + row);
+				if(IsPercentage == true) {
+					Discount.val(minmax(Discount.val().replace(/\,/g, "").replace(/\.00/g, ""), 0, 100));
+				}
+				else {
+					convertRupiah("txtDiscount" + row, Discount.val());
+				}
+				Calculate();
+			}
+			
 			$(document).ready(function () {
 				$("#ddlBrand").combobox({
 					select: function( event, ui ) {
@@ -519,8 +554,12 @@
 					}
 				});
 				
-				$("#ddlSales").combobox();
-				$("#ddlCustomer").combobox();
+				//$("#ddlSales").combobox();
+				$("#ddlCustomer").combobox({
+					select: function( event, ui ) {
+						BindSales();						
+					}
+				});
 				$("#ddlType").combobox({
 					select: function(event, ui) {
 						BindTypeList();
@@ -593,14 +632,25 @@
 						$("#txtQuantity" + count).val(d[4].replace("'", ""));
 						$("#hdnBuyPrice" + count).val(d[5].replace("'", ""));
 						$("#txtSalePrice" + count).val(returnRupiah(d[6].replace("'", "")));
-						$("#txtDiscount" + count).val(d[7].replace("'", ""));
 						$("#txtRemarksDetail" + count).val(d[8].replace("'", ""));
+						
+						if(d[9].replace("'", "") == true) {
+							$("#txtDiscount" + count).val(d[7].replace("'", ""));
+							$("#chkIsPercentage" + count).attr("checked", true);
+							$("#chkIsPercentage" + count).prop("checked", true);
+						}
+						else {
+							$("#txtDiscount" + count).val(returnRupiah(d[7].replace("'", "")));
+							$("#chkIsPercentage" + count).attr("checked", false);
+							$("#chkIsPercentage" + count).prop("checked", false);
+						}
 						$("#record").val(count);
 						$("#recordnew").val(count);
 					}
 					Calculate();
 				}
 			});
+			
 			function PrintInvoice() {
 				if($("#hdnOutgoingID").val() == 0) {
 					$.notify("Tekan Simpan terlebih dahulu!", "error");

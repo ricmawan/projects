@@ -220,6 +220,15 @@ VALUES
 	NULL,
 	0,
 	6
+),
+(
+	23,
+	3,
+	'Pembatalan',
+	'Transaction/Cancellation/',
+	NULL,
+	0,
+	6
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

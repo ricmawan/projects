@@ -342,7 +342,7 @@ font-weight: 700;
 .sidebar-collapse .nav > li > a:hover,
 .sidebar-collapse .nav > li > a:focus {
 	
-	background:#0A0A0A;
+	background:grey;
 	outline:0;
 }
 
@@ -355,7 +355,7 @@ font-weight: 700;
 	width:15px;
 	height:1px;
 	background:#ff0000;
-	top:20px;
+	top:12px;
 }
 .nav-second-level > li > a:after,
 .nav-third-level > li > a:after {
@@ -563,7 +563,7 @@ textarea.form-control-custom {
 }
 
 .nav li a {
-    padding: 10px 12px 10px 37px;
+    padding: 5px 12px 5px 37px;
 }
 /*==============================================
     MEDIA QUERIES     

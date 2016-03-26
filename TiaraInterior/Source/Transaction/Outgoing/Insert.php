@@ -10,7 +10,7 @@
 		$TransactionDate = explode('-', $_POST['txtTransactionDate']);
 		$_POST['txtTransactionDate'] = "$TransactionDate[2]-$TransactionDate[1]-$TransactionDate[0]"; 
 		$TransactionDate = $_POST['txtTransactionDate'];
-		$SalesID = mysql_real_escape_string($_POST['ddlSales']);
+		$SalesID = mysql_real_escape_string($_POST['hdnSalesID']);
 		$CustomerID = mysql_real_escape_string($_POST['ddlCustomer']);
 		$hdnIsEdit = mysql_real_escape_string($_POST['hdnIsEdit']);
 		$txtRemarks = mysql_real_escape_string($_POST['txtRemarks']);
@@ -143,6 +143,12 @@
 			return 0;
 		}
 		for($j=1;$j<=$RecordNew;$j++) {
+			if(ISSET($_POST['chkIsPercentage'.$j])) {
+				$chkIsPercentage = true;
+			}
+			else {
+				$chkIsPercentage = false;
+			}
 			if($_POST['hdnOutgoingDetailsID'.$j] == "0") {
 				$State = 6;
 				$sql = "INSERT INTO transaction_outgoingdetails
@@ -153,6 +159,7 @@
 							BuyPrice,
 							SalePrice,
 							Discount,
+							IsPercentage,
 							BatchNumber,
 							Remarks,
 							CreatedDate,
@@ -165,9 +172,10 @@
 							".mysql_real_escape_string($_POST['txtQuantity'.$j]).",
 							".str_replace(",", "", $_POST['hdnBuyPrice'.$j]).",
 							".str_replace(",", "", $_POST['txtSalePrice'.$j]).",
-							".mysql_real_escape_string($_POST['txtDiscount'.$j]).",
-							".mysql_real_escape_string($_POST['txtRemarksDetail'.$j]).",
+							".str_replace(",", "", $_POST['txtDiscount'.$j]).",
+							'".$chkIsPercentage."',
 							'".mysql_real_escape_string($_POST['hdnBatchNumber'.$j])."',
+							'".mysql_real_escape_string($_POST['txtRemarksDetail'.$j])."',
 							NOW(),
 							'".$_SESSION['UserLogin']."'
 						)";
@@ -181,7 +189,8 @@
 							Quantity = ".mysql_real_escape_string($_POST['txtQuantity'.$j]).",
 							BuyPrice = ".str_replace(",", "", $_POST['hdnBuyPrice'.$j]).",
 							SalePrice = ".str_replace(",", "", $_POST['txtSalePrice'.$j]).",
-							Discount = ".mysql_real_escape_string($_POST['txtDiscount'.$j]).",
+							Discount = ".str_replace(",", "", $_POST['txtDiscount'.$j]).",
+							IsPercentage = '".$chkIsPercentage."',
 							BatchNumber = '".mysql_real_escape_string($_POST['hdnBatchNumber'.$j])."',
 							Remarks = '".mysql_real_escape_string($_POST['txtRemarksDetail'.$j])."',
 							ModifiedBy = '".$_SESSION['UserLogin']."'

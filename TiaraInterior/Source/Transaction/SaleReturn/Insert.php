@@ -135,6 +135,12 @@
 			return 0;
 		}
 		for($j=1;$j<=$RecordNew;$j++) {
+			if(ISSET($_POST['chkIsPercentage'.$j])) {
+				$chkIsPercentage = true;
+			}
+			else {
+				$chkIsPercentage = false;
+			}
 			if($_POST['hdnSaleReturnDetailsID'.$j] == "0") {
 				$State = 6;
 				$sql = "INSERT INTO transaction_salereturndetails
@@ -143,6 +149,8 @@
 							TypeID,
 							Quantity,
 							SalePrice,
+							Discount,
+							IsPercentage,
 							BatchNumber,
 							CreatedDate,
 							CreatedBy
@@ -153,6 +161,8 @@
 							".mysql_real_escape_string($_POST['hdnTypeID'.$j]).",
 							".mysql_real_escape_string($_POST['txtQuantity'.$j]).",
 							".str_replace(",", "", $_POST['txtSalePrice'.$j]).",
+							".str_replace(",", "", $_POST['txtDiscount'.$j]).",
+							'".$chkIsPercentage."',
 							'".mysql_real_escape_string($_POST['hdnBatchNumber'.$j])."',
 							NOW(),
 							'".$_SESSION['UserLogin']."'
@@ -166,6 +176,8 @@
 							TypeID = ".mysql_real_escape_string($_POST['hdnTypeID'.$j]).",
 							Quantity = ".mysql_real_escape_string($_POST['txtQuantity'.$j]).",
 							SalePrice = ".str_replace(",", "", $_POST['txtSalePrice'.$j]).",
+							Discount = ".str_replace(",", "", $_POST['txtDiscount'.$j]).",
+							IsPercentage = '".$chkIsPercentage."',
 							BatchNumber = '".mysql_real_escape_string($_POST['hdnBatchNumber'.$j])."',
 							ModifiedBy = '".$_SESSION['UserLogin']."'
 						WHERE

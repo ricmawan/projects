@@ -134,6 +134,12 @@
 			return 0;
 		}
 		for($j=1;$j<=$RecordNew;$j++) {
+			if(ISSET($_POST['chkIsPercentage'.$j])) {
+				$chkIsPercentage = true;
+			}
+			else {
+				$chkIsPercentage = false;
+			}
 			if($_POST['hdnIncomingDetailsID'.$j] == "0") {
 				$State = 6;
 				$sql = "INSERT INTO transaction_incomingdetails
@@ -145,6 +151,7 @@
 							SalePrice,
 							Discount,
 							BatchNumber,
+							IsPercentage,
 							CreatedDate,
 							CreatedBy
 						)
@@ -155,8 +162,9 @@
 							".mysql_real_escape_string($_POST['txtQuantity'.$j]).",
 							".str_replace(",", "", $_POST['txtBuyPrice'.$j]).",
 							".str_replace(",", "", $_POST['txtSalePrice'.$j]).",
-							".mysql_real_escape_string($_POST['txtDiscount'.$j]).",
+							".str_replace(",", "", $_POST['txtDiscount'.$j]).",
 							'".mysql_real_escape_string($_POST['txtBatchNumber'.$j])."',
+							'".$chkIsPercentage."',
 							NOW(),
 							'".$_SESSION['UserLogin']."'
 						)";
@@ -170,8 +178,9 @@
 							Quantity = ".mysql_real_escape_string($_POST['txtQuantity'.$j]).",
 							BuyPrice = ".str_replace(",", "", $_POST['txtBuyPrice'.$j]).",
 							SalePrice = ".str_replace(",", "", $_POST['txtSalePrice'.$j]).",
-							Discount = ".mysql_real_escape_string($_POST['txtDiscount'.$j]).",
+							Discount = ".str_replace(",", "", $_POST['txtDiscount'.$j]).",
 							BatchNumber = '".mysql_real_escape_string($_POST['txtBatchNumber'.$j])."',
+							IsPercentage = '".$chkIsPercentage."',
 							ModifiedBy = '".$_SESSION['UserLogin']."'
 						WHERE
 							IncomingDetailsID = ".mysql_real_escape_string($_POST['hdnIncomingDetailsID'.$j]);
@@ -187,10 +196,16 @@
 			}
 
 			$State = 8;
+			if($chkIsPercentage == true) {
+				$BuyPrice = (str_replace(",", "", $_POST['txtBuyPrice'.$j]) - ((str_replace(",", "", $_POST['txtBuyPrice'.$j]) * mysql_real_escape_string($_POST['txtDiscount'.$j]))/100));
+			}
+			else {
+				$BuyPrice = (str_replace(",", "", $_POST['txtBuyPrice'.$j]) - str_replace(",", "", $_POST['txtDiscount'.$j]) );
+			}
 			$sql = "UPDATE 
 						master_type
 					SET
-						BuyPrice = ".(str_replace(",", "", $_POST['txtBuyPrice'.$j]) - ((str_replace(",", "", $_POST['txtBuyPrice'.$j]) * mysql_real_escape_string($_POST['txtDiscount'.$j]))/100)).",
+						BuyPrice = ".$BuyPrice.",
 						SalePrice = ".str_replace(",", "", $_POST['txtSalePrice'.$j]).",
 						ModifiedBy = '".$_SESSION['UserLogin']."'
 					WHERE
@@ -212,7 +227,7 @@
 	
 	function returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State) {
 		$data = array(
-			"Id" => $ID, 
+			"ID" => $ID, 
 			"Message" => $Message,
 			"MessageDetail" => $MessageDetail,
 			"FailedFlag" => $FailedFlag,

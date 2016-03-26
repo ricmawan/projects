@@ -20,6 +20,7 @@
 										<th data-column-id="CustomerIDName" data-visible="false" data-type="numeric" data-identifier="true">CustomerID</th>
 										<th data-column-id="RowNumber" data-sortable="false" data-type="numeric">No</th>
 										<th data-column-id="CustomerName">Nama Pelanggan</th>
+										<th data-column-id="SalesName">Nama Sales</th>
 										<th data-column-id="Address">Alamat</th>
 										<th data-column-id="City">Kota</th>
 										<th data-column-id="Telephone">Telepon</th>

@@ -158,7 +158,11 @@
 							TypeID,
 							TRIM(BatchNumber) BatchNumber,
 							SUM(Quantity) Quantity,
-							(BuyPrice - ((BuyPrice * Discount) / 100)) BuyPrice,
+							CASE
+								WHEN IsPercentage = 10
+								THEN (BuyPrice - ((BuyPrice * Discount) / 100))
+								ELSE (BuyPrice - Discount)
+							END AS BuyPrice,
 							SalePrice,
 							CreatedDate
 						FROM
@@ -175,7 +179,11 @@
 							TypeID,
 							TRIM(BatchNumber) BatchNumber,
 							SUM(Quantity) Quantity,
-							(BuyPrice - ((BuyPrice * Discount) / 100)) BuyPrice,
+							CASE
+								WHEN IsPercentage = 10
+								THEN (BuyPrice - ((BuyPrice * Discount) / 100))
+								ELSE (BuyPrice - Discount)
+							END AS BuyPrice,
 							SalePrice,
 							CreatedDate
 						FROM

@@ -8,7 +8,7 @@ CREATE TABLE transaction_firststockdetails
 	Quantity			DOUBLE,
 	BuyPrice			DOUBLE,
 	SalePrice			DOUBLE,
-	Discount			INT,
+	Discount			DOUBLE,
 	IsPercentage		BIT,
 	BatchNumber			VARCHAR(100) NULL,
 	CreatedDate 		DATETIME NOT NULL,

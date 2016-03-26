@@ -6,7 +6,7 @@
 	include "../../GetPermission.php";
 
 	$where = " 1=1 ";
-	$order_by = "OT.OutgoingID";
+	$order_by = "OT.OutgoingID DESC";
 	$rows = 10;
 	$current = 1;
 	$limit_l = ($current * $rows) - ($rows);
@@ -17,7 +17,7 @@
 		$order_by = "";
 		foreach($_REQUEST['sort'] as $key => $value) {
 			if($key != 'No') $order_by .= " $key $value";
-			else $order_by = "OT.OutgoingID";
+			else $order_by = "OT.OutgoingID DESC";
 		}
 	}
 	//Handles search querystring sent from Bootgrid
@@ -60,8 +60,16 @@
 				MS.SalesName,
 				MC.CustomerName,
 				DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') AS TransactionDate,
-				IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - ((OTD.SalePrice * OTD.Discount)/100))), 0) AS SubTotal,
-				IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - ((OTD.SalePrice * OTD.Discount)/100))), 0) + OT.DeliveryCost AS Total,
+				CASE
+					WHEN OTD.IsPercentage = 1
+					THEN IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - ((OTD.SalePrice * OTD.Discount)/100))), 0)
+					ELSE IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - OTD.Discount)), 0)
+				END AS SubTotal,
+				CASE
+					WHEN OTD.IsPercentage = 1
+					THEN IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - ((OTD.SalePrice * OTD.Discount)/100))), 0)
+					ELSE IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - OTD.Discount)), 0)
+				END + OT.DeliveryCost AS Total,
 				OT.DeliveryCost,
 				OT.Remarks
 			FROM
