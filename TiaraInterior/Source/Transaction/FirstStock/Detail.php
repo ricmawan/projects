@@ -187,7 +187,7 @@
 													<input type="hidden" id="hdnFirstStockDetailsID" class="hdnFirstStockDetailsID" name="hdnFirstStockDetailsID" value="0" />
 												</td>
 												<td style="width:120px;">
-													<input type="text" row="" maxlength=10 id="txtBatchNumber" name="txtBatchNumber" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control-custom txtBatchNumber" placeholder="Batch" />
+													<input type="text" row="" maxlength=10 id="txtBatchNumber" name="txtBatchNumber" class="form-control-custom txtBatchNumber" placeholder="Batch" />
 												</td>
 												<td style="width:75px;">
 													<input type="text" row="" value=1 id="txtQuantity" style="text-align:right;" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control-custom txtQuantity" placeholder="QTY" />

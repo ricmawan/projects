@@ -565,6 +565,54 @@ textarea.form-control-custom {
 .nav li a {
     padding: 8px 12px 8px 37px;
 }
+
+th[data-column-id="RowNumber"]{
+	width: 75px;
+}
+
+th[data-column-id="Opsi"] {
+	width: 45px;
+}
+
+th[data-column-id="FirstStockNumber"] {
+	width: 100px;
+}
+
+th[data-column-id="OutgoingNumber"] {
+	width: 100px;
+}
+
+th[data-column-id="BuyReturnNumber"] {
+	width: 100px;
+}
+
+th[data-column-id="SaleReturnNumber"] {
+	width: 100px;
+}
+
+th[data-column-id="IncomingNumber"] {
+	width: 150px;
+}
+
+th[data-column-id="TransactionDate"] {
+	width: 85px;
+}
+
+th[data-column-id="TotalAmount"] {
+	width: 150px;
+}
+
+th[data-column-id="Total"] {
+	width: 150px;
+}
+
+th[data-column-id="SubTotal"] {
+	width: 150px;
+}
+
+th[data-column-id="DeliveryCost"] {
+	width: 115px;
+}
 /*==============================================
     MEDIA QUERIES     
     =============================================*/
