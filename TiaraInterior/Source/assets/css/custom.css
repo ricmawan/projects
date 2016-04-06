@@ -567,7 +567,7 @@ textarea.form-control-custom {
 }
 
 th[data-column-id="RowNumber"]{
-	width: 75px;
+	width: 70px;
 }
 
 th[data-column-id="Opsi"] {
@@ -612,6 +612,30 @@ th[data-column-id="SubTotal"] {
 
 th[data-column-id="DeliveryCost"] {
 	width: 115px;
+}
+
+th[data-column-id="SupplierName"] {
+	width: 200px;
+}
+
+th[data-column-id="CustomerName"] {
+	width: 150px;
+}
+
+th[data-column-id="SalesName"] {
+	width: 150px;
+}
+
+th[data-column-id="DeletedBy"] {
+	width: 150px;
+}
+
+th[data-column-id="Telephone"] {
+	width: 100px;
+}
+
+th[data-column-id="City	"] {
+	width: 80px;
 }
 /*==============================================
     MEDIA QUERIES     

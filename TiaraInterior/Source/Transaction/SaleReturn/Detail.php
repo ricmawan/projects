@@ -170,7 +170,7 @@
 								<div class="col-md-12">
 									
 									<table class="table" style="width:auto;" id="datainput">
-										<thead style="background-color: black;color:white;height:25px;width:778px;display:block;">
+										<thead style="background-color: black;color:white;height:25px;width:828px;display:block;">
 											<td align="center" style="width:30px;">No</td>
 											<td align="center" style="width:180px;">Nama Barang</td>
 											<td align="center" style="width:75px;">QTY</td>											
@@ -182,7 +182,7 @@
 										<tbody style="display:block;max-height:232px;height:100%;overflow-y:auto;">
 											<tr id='' style='display:none;' class="num">
 												<td id='nota' name='nota' class='nota' style="width:30px;vertical-align:middle;"></td>
-												<td style="width:180px;">
+												<td style="width:230px;">
 													<input type="text" id="txtTypeName" name="txtTypeName" class="form-control-custom txtTypeName" placeholder="Nama Barang" readonly />
 													<input type="hidden" id="hdnTypeID" name="hdnTypeID" value="0" class="hdnTypeID" />
 													<input type="hidden" id="hdnSaleReturnDetailsID" class="hdnSaleReturnDetailsID" name="hdnSaleReturnDetailsID" value="0" />

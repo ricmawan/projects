@@ -9,6 +9,7 @@ CREATE TABLE transaction_outgoing
 	TransactionDate 	DATETIME NOT NULL,
 	DeliveryCost		DOUBLE,
 	Remarks				TEXT,
+	IsCancelled			BIT,
 	CreatedDate 		DATETIME NOT NULL,
 	CreatedBy 			VARCHAR(255) NOT NULL,
 	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,

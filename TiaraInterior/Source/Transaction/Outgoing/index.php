@@ -17,13 +17,13 @@
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
-										<th data-column-id="OutgoingIDNo" data-type="numeric" data-visible="false" data-identifier="true">ID Transaksi</th>
+										<th data-column-id="CancellationIDNo" data-type="numeric" data-visible="false" data-identifier="true">ID Transaksi</th>
 										<th data-column-id="OutgoingNumber">No Nota</th>
 										<th data-column-id="TransactionDate" data-type="numeric">Tanggal</th>
 										<th data-column-id="CustomerName">Nama Pelanggan</th>
-										<th data-column-id="SalesName">Nama Sales</th>
+										<!--<th data-column-id="SalesName">Nama Sales</th>-->
 										<th data-column-id="DeliveryCost" data-align="right">Ongkos Kirim</th>
-										<th data-column-id="SubTotal" data-align="right">Sub Total</th>
+										<!--<th data-column-id="SubTotal" data-align="right">Sub Total</th>-->
 										<th data-column-id="Total" data-align="right">Total</th>
 										<th data-column-id="Remarks">Catatan</th>
 										<?php if($EditFlag == true) echo '<th data-column-id="Opsi" data-formatter="commands" data-sortable="false">Opsi</th>'; ?>

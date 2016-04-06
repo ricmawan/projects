@@ -202,18 +202,18 @@
 									<table class="table" style="width:auto;" id="datainput">
 										<thead style="background-color: black;color:white;height:25px;width:1020px;display:block;">
 											<td align="center" style="width:30px;">No</td>
-											<td align="center" style="width:180px;">Nama Barang</td>
-											<td align="center" style="width:75px;">QTY</td>
+											<td align="center" style="width:230px;">Nama Barang</td>
+											<td align="center" style="width:55px;">QTY</td>
 											<td align="center" style="width:135px;">Harga Jual</td>
 											<td align="center" style="width:155px;">Diskon</td>
 											<td align="center" style="width:170px;">Total</td>
-											<td align="center" style="width:250px;">Keterangan</td>
+											<td align="center" style="width:200px;">Keterangan</td>
 											<td style="width: 26px"></td>
 										</thead>
 										<tbody style="display:block;max-height:172px;height:100%;overflow-y:auto;">
 											<tr id='' style='display:none;' class="num">
 												<td id='nota' name='nota' class='nota' style="width:30px;vertical-align:middle;"></td>
-												<td style="width:180px;">
+												<td style="width:230px;">
 													<input type="text" id="txtTypeName" name="txtTypeName" class="form-control-custom txtTypeName" placeholder="Nama Barang" readonly />
 													<input type="hidden" id="hdnTypeID" name="hdnTypeID" value="0" class="hdnTypeID" />
 													<input type="hidden" id="hdnOutgoingDetailsID" class="hdnOutgoingDetailsID" name="hdnOutgoingDetailsID" value="0" />
@@ -221,7 +221,7 @@
 													<input type="hidden" id="hdnBatchNumber" name="hdnBatchNumber" class="hdnBatchNumber" value="" />
 													<input type="hidden" id="hdnStock" name="hdnStock" class="hdnStock" value="" />
 												</td>
-												<td style="width:75px;">
+												<td style="width:55px;">
 													<input type="text" row="" value=1 id="txtQuantity" style="text-align:right;" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="ValidateQty(this.getAttribute('row'));" class="form-control-custom txtQuantity" placeholder="QTY"/>
 												</td>
 												<td style="width:135px;">
@@ -233,7 +233,7 @@
 												<td  style="width:170px;">
 													<input type="text" id="txtTotal" name="txtTotal" class="form-control-custom txtTotal" style="text-align:right;" value="0.00" placeholder="Jumlah" readonly />
 												</td>
-												<td  style="width:250px;">
+												<td  style="width:200px;">
 													<input type="text" id="txtRemarksDetail" name="txtRemarksDetail" class="form-control-custom txtRemarksDetail" style="width:235px;" placeholder="Keterangan" maxlength=50 />
 												</td>
 												<td style="vertical-align:middle;">
