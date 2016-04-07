@@ -8,7 +8,13 @@
 		$RecordNew = $_POST['recordnew'];
 		$ID = mysql_real_escape_string($_POST['hdnBookingID']);
 		$TransactionDate = explode('-', $_POST['txtTransactionDate']);
-		$_POST['txtTransactionDate'] = "$TransactionDate[2]-$TransactionDate[1]-$TransactionDate[0]"; 
+		$_POST['txtTransactionDate'] = "$TransactionDate[2]-$TransactionDate[1]-$TransactionDate[0]";
+		if($_POST['txtDueDate'] == "") $DueDate = "";
+		else {
+			$DueDate = explode('-', $_POST['txtDueDate']);
+			$_POST['txtDueDate'] = "$DueDate[2]-$DueDate[1]-$DueDate[0]";
+			$DueDate = $_POST['txtDueDate'];
+		}
 		$TransactionDate = $_POST['txtTransactionDate'];
 		$SalesID = mysql_real_escape_string($_POST['hdnSalesID']);
 		$CustomerID = mysql_real_escape_string($_POST['ddlCustomer']);
@@ -35,6 +41,8 @@
 						SalesID,
 						CustomerID,
 						TransactionDate,
+						DueDate,
+						BookingStatusID,
 						Remarks,
 						CreatedDate,
 						CreatedBy
@@ -45,6 +53,8 @@
 						".$SalesID.",
 						".$CustomerID.",
 						'".$TransactionDate."',
+						'".$DueDate."',
+						1,
 						'".$txtRemarks."',
 						NOW(),
 						'".$_SESSION['UserLogin']."'
@@ -61,6 +71,7 @@
 						DeliveryCost = ".$txtDeliveryCost.",
 						Remarks = '".$txtRemarks."',
 						TransactionDate = '".$TransactionDate."',
+						DueDate = '".$DueDate."',
 						ModifiedBy = '".$_SESSION['UserLogin']."'
 					WHERE
 						BookingID = $ID";

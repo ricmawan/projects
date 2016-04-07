@@ -575,19 +575,23 @@ th[data-column-id="Opsi"] {
 }
 
 th[data-column-id="FirstStockNumber"] {
-	width: 100px;
+	width: 110px;
 }
 
 th[data-column-id="OutgoingNumber"] {
-	width: 100px;
+	width: 110px;
+}
+
+th[data-column-id="BookingNumber"] {
+	width: 110px;
 }
 
 th[data-column-id="BuyReturnNumber"] {
-	width: 100px;
+	width: 110px;
 }
 
 th[data-column-id="SaleReturnNumber"] {
-	width: 100px;
+	width: 110px;
 }
 
 th[data-column-id="IncomingNumber"] {

@@ -25,7 +25,7 @@
 						OT.OutgoingNumber,
 						OT.Remarks,
 						OT.DeliveryCost,
-						MC.CustomerName,
+						CONCAT(MC.CustomerName, ' - ', MC.Address) CustomerName,
 						DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') AS TransactionDate
 					FROM
 						transaction_cancellation TC
@@ -34,13 +34,14 @@
 						JOIN master_customer MC
 							ON MC.CustomerID = OT.CustomerID
 					WHERE
-						OT.OutgoingID = $OutgoingID";
+						TC.CancellationID = $CancellationID";
 						
 			if (! $result=mysql_query($sql, $dbh)) {
 				echo mysql_error();
 				return 0;
 			}				
 			$row=mysql_fetch_array($result);
+			$CancellationID = $row['CancellationID'];
 			$OutgoingID = $row['OutgoingID'];
 			$OutgoingNumber = $row['OutgoingNumber'];
 			$Remarks = $row['Remarks'];
@@ -67,6 +68,7 @@
 							ON MB.BrandID = I.BrandID
 					WHERE
 						OTD.OutgoingID = $OutgoingID";
+						
 			if(!$result = mysql_query($sql, $dbh)) {
 				echo mysql_error();
 				return 0;
@@ -129,18 +131,19 @@
 								<div class="col-md-1 labelColumn">
 									Tanggal :
 									<input id="hdnOutgoingID" name="hdnOutgoingID" type="hidden" <?php echo 'value="'.$OutgoingID.'"'; ?> />
+									<input id="hdnCancellationID" name="hdnCancellationID" type="hidden" <?php echo 'value="'.$CancellationID.'"'; ?> />
 									<input id="hdnRow" name="hdnRow" type="hidden" <?php echo 'value="'.$rowCount.'"'; ?> />
 									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
 									<input id="hdnData" name="hdnData" type="hidden" <?php echo 'value="'.$Data.'"'; ?> />
 								</div>
 								<div class="col-md-3">
-									<input id="txtTransactionDate" readonly name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" onchange="GetInvoiceNumber(this.value);" placeholder="Tanggal" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
+									<input id="txtTransactionDate" disabled name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Tanggal" <?php echo 'value="'.$TransactionDate.'"'; ?>/>
 								</div>
 								<div class="col-md-1 labelColumn">
 									Pelanggan:
 								</div>
 								<div class="col-md-3">
-									<input id="txtCustomerName" readonly name="txtCustomerName" type="text" class="form-control-custom" placeholder="Pelanggan" required <?php echo 'value="'.$CustomerName.'"'; ?>/>
+									<input id="txtCustomerName" readonly name="txtCustomerName" type="text" class="form-control-custom" placeholder="Pelanggan" <?php echo 'value="'.$CustomerName.'"'; ?>/>
 								</div>
 							</div>
 							<br />
@@ -150,17 +153,17 @@
 									<table class="table" style="width:auto;" id="datainput">
 										<thead style="background-color: black;color:white;height:25px;width:1020px;display:block;">
 											<td align="center" style="width:30px;">No</td>
-											<td align="center" style="width:180px;">Nama Barang</td>
+											<td align="center" style="width:230px;">Nama Barang</td>
 											<td align="center" style="width:75px;">QTY</td>
 											<td align="center" style="width:135px;">Harga Jual</td>
 											<td align="center" style="width:155px;">Diskon</td>
 											<td align="center" style="width:170px;">Total</td>
-											<td align="center" style="width:250px;">Keterangan</td>
+											<td align="center" style="width:200px;">Keterangan</td>
 										</thead>
 										<tbody style="display:block;max-height:172px;height:100%;overflow-y:auto;">
 											<tr id='' style='display:none;' class="num">
 												<td id='nota' name='nota' class='nota' style="width:30px;vertical-align:middle;"></td>
-												<td style="width:180px;">
+												<td style="width:230px;">
 													<input type="text" id="txtTypeName" name="txtTypeName" class="form-control-custom txtTypeName" placeholder="Nama Barang" readonly />
 													<input type="hidden" id="hdnTypeID" name="hdnTypeID" value="0" class="hdnTypeID" />
 													<input type="hidden" id="hdnOutgoingDetailsID" class="hdnOutgoingDetailsID" name="hdnOutgoingDetailsID" value="0" />
@@ -175,12 +178,12 @@
 													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;" class="form-control-custom" placeholder="Harga Jual" readonly />
 												</td>
 												<td style="width:155px;">
-													<input type="text" id="txtDiscount" style="display:inline-block;width: 90px;text-align:right;" value="0" name="txtDiscount" style="text-align:right;" class="form-control-custom" placeholder="Diskon"  readonly /> &nbsp; <input type="checkbox" name="chkIsPercentage" id="chkIsPercentage" style="margin-top:2px;vertical-align:sub;" value=1 checked class="chkIsPercentage" readonly /> (%)
+													<input type="text" id="txtDiscount" style="display:inline-block;width: 90px;text-align:right;" value="0" name="txtDiscount" style="text-align:right;" class="form-control-custom" placeholder="Diskon"  readonly /> &nbsp; <input type="checkbox" name="chkIsPercentage" id="chkIsPercentage" style="margin-top:2px;vertical-align:sub;" value=1 checked class="chkIsPercentage" disabled /> (%)
 												</td>
 												<td  style="width:170px;">
 													<input type="text" id="txtTotal" name="txtTotal" class="form-control-custom" style="text-align:right;" value="0.00" placeholder="Jumlah" readonly />
 												</td>
-												<td  style="width:250px;">
+												<td  style="width:200px;">
 													<input type="text" id="txtRemarksDetail" name="txtRemarksDetail" class="form-control-custom" style="width:235px;" placeholder="Keterangan" readonly />
 												</td>
 											</tr>
@@ -214,7 +217,7 @@
 									Catatan :
 								</div>
 								<div class="col-md-4">
-									<textarea id="txtRemarks" name="txtRemarks" class="form-control-custom" placeholder="Catatan" readonly ><?php echo $Remarks; ?></textarea>
+									<textarea id="txtRemarks" name="txtRemarks" class="form-control-custom" placeholder="Catatan" ><?php echo $Remarks; ?></textarea>
 								</div>
 							</div>
 							<br />
@@ -280,7 +283,53 @@
 			}
 			
 			function LoadOutgoingDetails() {
-				
+				var currentOutgoingID = $("#ddlOutgoing").val();
+				$("#hdnOutgoingID").val(currentOutgoingID);
+				$.ajax({
+					url: "./Transaction/Cancellation/GetOutgoingDetails.php",
+					type: "POST",
+					data: { OutgoingID : currentOutgoingID },
+					dataType: "json",
+					success: function(data) {
+						var count = 0;
+						$('#datainput tbody:last > tr:not(:first)').remove();
+						$("#txtTransactionDate").val(data[0].TransactionDate);
+						$("#txtDeliveryCost").val(returnRupiah(data[0].DeliveryCost));
+						$("#txtCustomerName").val(data[0].CustomerName);
+						for(var i = 0; i < data.length; i++) {
+							$("#btnAdd").click();
+							count++;
+							//set values
+							$("#nota").text(count);
+							$("#hdnOutgoingDetailsID" + count).val(data[i].OutgoingDetailsID);
+							$("#hdnTypeID" + count).val(data[i].TypeID);
+							$("#txtTypeName" + count).val(data[i].TypeName);
+							$("#hdnBatchNumber" + count).val(data[i].BatchNumber);
+							$("#txtQuantity" + count).val(data[i].Quantity);
+							$("#hdnBuyPrice" + count).val(data[i].BuyPrice);
+							$("#txtSalePrice" + count).val(returnRupiah(data[i].SalePrice));
+							$("#txtRemarksDetail" + count).val(data[i].Remarks);
+							
+							if(data[i].IsPercentage == true) {
+								$("#txtDiscount" + count).val(data[i].Discount);
+								$("#chkIsPercentage" + count).attr("checked", true);
+								$("#chkIsPercentage" + count).prop("checked", true);
+							}
+							else {
+								$("#txtDiscount" + count).val(returnRupiah(data[i].Discount));
+								$("#chkIsPercentage" + count).attr("checked", false);
+								$("#chkIsPercentage" + count).prop("checked", false);
+							}
+							$("#record").val(count);
+							$("#recordnew").val(count);
+						}
+						Calculate();
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Terjadi kesalahan sistem!", "error");
+					}
+				});
 			}
 			$(document).ready(function () {
 				$("#ddlOutgoing").combobox({
@@ -378,13 +427,6 @@
 						}
 					});
 					
-					if($("#ddlSales").val() == "") {
-						PassValidate = 0;
-						$("#ddlSales").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						if(FirstFocus == 0) $("#ddlSales").next().find("input").focus();
-						FirstFocus = 1;
-					}
-					
 					if(PassValidate == 0) {
 						$("html, body").animate({
 							scrollTop: 0
@@ -393,7 +435,7 @@
 					}
 					else {
 						$.ajax({
-							url: "./Transaction/Outgoing/Insert.php",
+							url: "./Transaction/Cancellation/Insert.php",
 							type: "POST",
 							data: $("#PostForm").serialize(),
 							dataType: "json",

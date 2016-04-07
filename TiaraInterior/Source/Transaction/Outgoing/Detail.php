@@ -720,12 +720,6 @@
 						}
 					});
 					
-					if($("#ddlSales").val() == "") {
-						PassValidate = 0;
-						$("#ddlSales").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						if(FirstFocus == 0) $("#ddlSales").next().find("input").focus();
-						FirstFocus = 1;
-					}
 					if($("#ddlCustomer").val() == "") {
 						PassValidate = 0;
 						$("#ddlCustomer").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });

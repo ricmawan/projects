@@ -100,21 +100,12 @@
 						<form class="col-md-12" id="PostForm" method="POST" action="" > 
 							<div class="row">
 								<div class="col-md-1 labelColumn">
-									Tanggal :
+									Merek :
 									<input id="hdnOutgoingID" name="hdnOutgoingID" type="hidden" <?php echo 'value="'.$OutgoingID.'"'; ?> />
 									<input id="hdnSalesID" name="hdnSalesID" type="hidden" <?php echo 'value="'.$SalesID.'"'; ?> />
 									<input id="hdnRow" name="hdnRow" type="hidden" <?php echo 'value="'.$rowCount.'"'; ?> />
 									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
 									<input id="hdnData" name="hdnData" type="hidden" <?php echo 'value="'.$Data.'"'; ?> />
-								</div>
-								<div class="col-md-3">
-									<input id="txtTransactionDate" name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" onchange="GetInvoiceNumber(this.value);" placeholder="Tanggal" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
-								</div>
-							</div>
-							<br />
-							<div class="row">
-								<div class="col-md-1 labelColumn">
-									Merek :
 								</div>
 								<div class="col-md-3">
 									<div class="ui-widget" style="width: 100%;">
@@ -643,6 +634,7 @@
 			}
 			
 			function SubmitValidate() {
+				console.log("test");
 				if($("#recordnew").val() > 0) {
 					var PassValidate = 1;
 					var FirstFocus = 0;

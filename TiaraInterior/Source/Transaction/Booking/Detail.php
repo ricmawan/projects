@@ -10,6 +10,7 @@
 		$SalesID = "";
 		$CustomerID = "";
 		$TransactionDate = "";
+		$DueDate = "";
 		$BookingNumber = "";
 		$Remarks = "";
 		$IsEdit = 0;
@@ -25,6 +26,13 @@
 						BO.SalesID,
 						BO.CustomerID,
 						BO.Remarks,
+						CASE
+							WHEN BO.BookingStatusID = 1
+							THEN 'Belum Selesai'
+							WHEN BO.BookingStatusID = 2
+							THEN 'Sudah Selesai'
+							ELSE 'Sudah Jatuh Tempo'
+						END,
 						DATE_FORMAT(BO.TransactionDate, '%d-%m-%Y') AS TransactionDate
 					FROM
 						transaction_booking BO
@@ -143,7 +151,7 @@
 									Tempo :
 								</div>
 								<div class="col-md-3">
-									<input id="txtTransactionDate" name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" onchange="GetInvoiceNumber(this.value);" placeholder="Tempo" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
+									<input id="txtDueDate" name="txtDueDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Tempo" <?php echo 'value="'.$DueDate.'"'; ?>/>
 								</div>
 							</div>
 							<br />
@@ -191,13 +199,13 @@
 											<td align="center" style="width:135px;">Harga Jual</td>
 											<td align="center" style="width:155px;">Diskon</td>
 											<td align="center" style="width:170px;">Total</td>
-											<td align="center" style="width:250px;">Keterangan</td>
+											<td align="center" style="width:200px;">Keterangan</td>
 											<td style="width: 26px"></td>
 										</thead>
 										<tbody style="display:block;max-height:172px;height:100%;overflow-y:auto;">
 											<tr id='' style='display:none;' class="num">
 												<td id='nota' name='nota' class='nota' style="width:30px;vertical-align:middle;"></td>
-												<td style="width:180px;">
+												<td style="width:230px;">
 													<input type="text" id="txtTypeName" name="txtTypeName" class="form-control-custom txtTypeName" placeholder="Nama Barang" readonly />
 													<input type="hidden" id="hdnTypeID" name="hdnTypeID" value="0" class="hdnTypeID" />
 													<input type="hidden" id="hdnBookingDetailsID" class="hdnBookingDetailsID" name="hdnBookingDetailsID" value="0" />
@@ -217,7 +225,7 @@
 												<td  style="width:170px;">
 													<input type="text" id="txtTotal" name="txtTotal" class="form-control-custom txtTotal" style="text-align:right;" value="0.00" placeholder="Jumlah" readonly />
 												</td>
-												<td  style="width:250px;">
+												<td  style="width:200px;">
 													<input type="text" id="txtRemarksDetail" name="txtRemarksDetail" class="form-control-custom txtRemarksDetail" style="width:235px;" placeholder="Keterangan" maxlength=50 />
 												</td>
 												<td style="vertical-align:middle;">
@@ -644,6 +652,25 @@
 						if(FirstFocus == 0) $("#ddlCustomer").next().find("input").focus();
 						FirstFocus = 1;
 					}
+					if($("#txtDueDate").val() != "") {
+						if($("#txtTransactionDate").val() == "") {
+							PassValidate = 0;
+							$("#txtTransactionDate").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+							if(FirstFocus == 0) $("#txtTransactionDate").next().find("input").focus();
+							FirstFocus = 1;
+						}
+						var FromDate = $("#txtTransactionDate").val().split("-");
+						FromDate = new Date(FromDate[1] + "-" + FromDate[0] + "-" + FromDate[2]);
+						var ToDate = $("#txtDueDate").val().split("-");
+						ToDate = new Date(ToDate[1] + "-" + ToDate[0] + "-" + ToDate[2]);
+						if(FromDate > ToDate) {
+							$("#txtDueDate").notify("Tanggal jatuh tempo harus lebih besar dari tanggal transaksi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+							PassValidate = 0;
+							if(FirstFocus == 0) $("#txtDueDate").focus();
+							FirstFocus = 1;
+						}
+						
+					}
 					if(PassValidate == 0) {
 						$("html, body").animate({
 							scrollTop: 0
@@ -665,6 +692,7 @@
 				}
 				Calculate();
 			}
+			
 			function GetInvoiceNumber(SelectedDate)
 			{
 				$.ajax({

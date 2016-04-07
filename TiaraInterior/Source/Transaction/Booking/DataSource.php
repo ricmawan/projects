@@ -96,6 +96,7 @@
 		$row_array['RowNumber'] = $RowNumber;
 		$row_array['BookingIDNo']= $row['BookingID']."^".$row['BookingNumber'];
 		$row_array['BookingNumber']= $row['BookingNumber'];
+		$row_array['BookingID']= $row['BookingID'];
 		$row_array['SalesName'] = $row['SalesName'];
 		$row_array['CustomerName'] = $row['CustomerName'];
 		$row_array['Total'] =  number_format($row['Total'],2,".",",");
