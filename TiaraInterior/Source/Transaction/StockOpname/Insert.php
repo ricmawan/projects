@@ -1,21 +1,14 @@
 <?php
-	if(isset($_POST['hdnOutgoingID'])) {
+	if(isset($_POST['hdnStockOpnameID'])) {
 		$RequestPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestPath);
 		$RequestPath = str_replace($file, "", $RequestPath);
 		include "../../GetPermission.php";
 		$Record = $_POST['record'];
 		$RecordNew = $_POST['recordnew'];
-		$ID = mysql_real_escape_string($_POST['hdnOutgoingID']);
-		$TransactionDate = explode('-', $_POST['txtTransactionDate']);
-		$_POST['txtTransactionDate'] = "$TransactionDate[2]-$TransactionDate[1]-$TransactionDate[0]"; 
-		$TransactionDate = $_POST['txtTransactionDate'];
-		$SalesID = mysql_real_escape_string($_POST['hdnSalesID']);
-		$CustomerID = mysql_real_escape_string($_POST['ddlCustomer']);
+		$ID = mysql_real_escape_string($_POST['hdnStockOpnameID']);
 		$hdnIsEdit = mysql_real_escape_string($_POST['hdnIsEdit']);
 		$txtRemarks = mysql_real_escape_string($_POST['txtRemarks']);
-		$OutgoingNumber = mysql_real_escape_string($_POST['txtOutgoingNumber']);
-		$txtDeliveryCost = str_replace(",", "", $_POST['txtDeliveryCost']);
 		$State = 1;
 		mysql_query("START TRANSACTION", $dbh);
 		mysql_query("SET autocommit=0", $dbh);
@@ -24,30 +17,22 @@
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		for($i=1;$i<=$RecordNew;$i++) {
-			$DetailsID .= mysql_real_escape_string($_POST['hdnOutgoingDetailsID'.$i]).",";
+			$DetailsID .= mysql_real_escape_string($_POST['hdnStockOpnameDetailsID'.$i]).",";
 		}
 		$DetailsID = substr($DetailsID, 0, -1);
 		//echo $DetailID;
 		if($hdnIsEdit == 0) {
 			$State = 1;
-			$sql = "INSERT INTO transaction_outgoing
+			$sql = "INSERT INTO transaction_stockopname
 					(
-						OutgoingNumber,
-						SalesID,
-						CustomerID,
 						TransactionDate,
-						DeliveryCost,
 						Remarks,
 						CreatedDate,
 						CreatedBy
 					)
 					VALUES
 					(
-						'".$OutgoingNumber."',
-						".$SalesID.",
-						".$CustomerID.",
-						'".$TransactionDate."',
-						".$txtDeliveryCost.",
+						NOW(),
 						'".$txtRemarks."',
 						NOW(),
 						'".$_SESSION['UserLogin']."'
@@ -56,17 +41,12 @@
 		
 		else {
 			$State = 2;
-			$sql = "UPDATE transaction_outgoing
+			$sql = "UPDATE transaction_stockopname
 					SET
-						OutgoingNumber = '".$OutgoingNumber."',
-						SalesID = ".$SalesID.",
-						CustomerID = ".$CustomerID.",
-						DeliveryCost = ".$txtDeliveryCost.",
 						Remarks = '".$txtRemarks."',
-						TransactionDate = '".$TransactionDate."',
 						ModifiedBy = '".$_SESSION['UserLogin']."'
 					WHERE
-						OutgoingID = $ID";
+						StockOpnameID = $ID";
 		}
 		
 
@@ -80,39 +60,10 @@
 		}
 		if($hdnIsEdit == 0) {
 			$State = 3;
-			$sql = "INSERT INTO transaction_invoicenumber
-					(
-						InvoiceNumberType,
-						InvoiceDate,
-						InvoiceNumber,
-						DeleteFlag,
-						CreatedDate,
-						CreatedBy
-					)
-					VALUES
-					(
-						'TJ',
-						'".$TransactionDate."',
-						'".$OutgoingNumber."',
-						0,
-						NOW(),
-						'".$_SESSION['UserLogin']."'
-					)";
-					
-			if (! $result = mysql_query($sql, $dbh)) {
-				$Message = "Terjadi Kesalahan Sistem";
-				$MessageDetail = mysql_error();
-				$FailedFlag = 1;
-				echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
-				mysql_query("ROLLBACK", $dbh);
-				return 0;
-			}
-			
-			$State = 4;
 			$sql = "SELECT
-						MAX(OutgoingID) AS OutgoingID
+						MAX(StockOpnameID) AS StockOpnameID
 					FROM 
-						transaction_outgoing";
+						transaction_stockopname";
 		
 			if (! $result = mysql_query($sql, $dbh)) {
 				$Message = "Terjadi Kesalahan Sistem";
@@ -124,15 +75,15 @@
 			}
 			
 			$row = mysql_fetch_array($result);
-			$ID = $row['OutgoingID'];
+			$ID = $row['StockOpnameID'];
 		}
 		$State = 5;
 		$sql = "DELETE 
 				FROM 
-					transaction_outgoingdetails 
+					transaction_stockopnamedetails
 				WHERE
-					OutgoingDetailsID NOT IN($DetailsID)			 
-					AND OutgoingID = $ID";
+					StockOpnameDetailsID NOT IN($DetailsID)			 
+					AND StockOpnameID = $ID";
 
 		if (! $result = mysql_query($sql, $dbh)) {
 			$Message = "Terjadi Kesalahan Sistem";
@@ -143,25 +94,17 @@
 			return 0;
 		}
 		for($j=1;$j<=$RecordNew;$j++) {
-			if(ISSET($_POST['chkIsPercentage'.$j])) {
-				$chkIsPercentage = true;
-			}
-			else {
-				$chkIsPercentage = false;
-			}
-			if($_POST['hdnOutgoingDetailsID'.$j] == "0") {
+			if($_POST['hdnStockOpnameDetailsID'.$j] == "0") {
 				$State = 6;
-				$sql = "INSERT INTO transaction_outgoingdetails
+				$sql = "INSERT INTO transaction_stockopnamedetails
 						(
-							OutgoingID,
+							StockOpnameID,
 							TypeID,
-							Quantity,
+							FromQty,
+							ToQty,
 							BuyPrice,
 							SalePrice,
-							Discount,
-							IsPercentage,
 							BatchNumber,
-							Remarks,
 							CreatedDate,
 							CreatedBy
 						)
@@ -170,12 +113,10 @@
 							".$ID.",
 							".mysql_real_escape_string($_POST['hdnTypeID'.$j]).",
 							".mysql_real_escape_string($_POST['txtQuantity'.$j]).",
-							".str_replace(",", "", $_POST['hdnBuyPrice'.$j]).",
+							".mysql_real_escape_string($_POST['txtAdjustment'.$j]).",
+							".str_replace(",", "", $_POST['txtBuyPrice'.$j]).",
 							".str_replace(",", "", $_POST['txtSalePrice'.$j]).",
-							".str_replace(",", "", $_POST['txtDiscount'.$j]).",
-							'".$chkIsPercentage."',
 							'".mysql_real_escape_string($_POST['hdnBatchNumber'.$j])."',
-							'".mysql_real_escape_string($_POST['txtRemarksDetail'.$j])."',
 							NOW(),
 							'".$_SESSION['UserLogin']."'
 						)";
@@ -183,19 +124,17 @@
 			else {
 				$State = 7;
 				$sql = "UPDATE 
-							transaction_outgoingdetails
+							transaction_stockopnamedetails
 						SET
 							TypeID = ".mysql_real_escape_string($_POST['hdnTypeID'.$j]).",
-							Quantity = ".mysql_real_escape_string($_POST['txtQuantity'.$j]).",
-							BuyPrice = ".str_replace(",", "", $_POST['hdnBuyPrice'.$j]).",
+							FromQty = ".mysql_real_escape_string($_POST['txtQuantity'.$j]).",
+							ToQty = ".mysql_real_escape_string($_POST['txtAdjustment'.$j]).",
+							BuyPrice = ".str_replace(",", "", $_POST['txtBuyPrice'.$j]).",
 							SalePrice = ".str_replace(",", "", $_POST['txtSalePrice'.$j]).",
-							Discount = ".str_replace(",", "", $_POST['txtDiscount'.$j]).",
-							IsPercentage = '".$chkIsPercentage."',
 							BatchNumber = '".mysql_real_escape_string($_POST['hdnBatchNumber'.$j])."',
-							Remarks = '".mysql_real_escape_string($_POST['txtRemarksDetail'.$j])."',
 							ModifiedBy = '".$_SESSION['UserLogin']."'
 						WHERE
-							OutgoingDetailsID = ".$_POST['hdnOutgoingDetailsID'.$j];
+							StockOpnameDetailsID = ".$_POST['hdnStockOpnameDetailsID'.$j];
 			}
 
 			if (! $result = mysql_query($sql, $dbh)) {
@@ -206,23 +145,6 @@
 				mysql_query("ROLLBACK", $dbh);
 				return 0;
 			}
-
-			/*$sql = "UPDATE 
-						master_item
-					SET
-						Price = ".str_replace(",", "", $_POST['txtPrice'.$j]).",
-						ModifiedBy = '".$_SESSION['UserLogin']."'
-					WHERE
-						ItemID = ".$_POST['hdnItemID'.$j];
-						
-			if (! $result = mysql_query($sql, $dbh)) {
-				$Message = "Terjadi Kesalahan Sistem";
-				$MessageDetail = mysql_error();
-				$FailedFlag = 1;
-				echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
-				mysql_query("ROLLBACK", $dbh);
-				return 0;
-			}*/
 		}
 		echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
 		mysql_query("COMMIT", $dbh);

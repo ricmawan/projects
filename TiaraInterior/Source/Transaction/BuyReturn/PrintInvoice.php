@@ -70,7 +70,11 @@
 					CONCAT(MB.BrandName, ' ', MT.TypeName) ItemName,
 					BRD.BatchNumber,
 					BRD.BuyPrice,
-					IFNULL((BRD.Quantity * BRD.BuyPrice), 0) Total
+					CASE
+						WHEN BRD.IsPercentage = 1
+						THEN IFNULL(SUM(BRD.Quantity * (BRD.BuyPrice - ((BRD.BuyPrice * BRD.Discount)/100))), 0)
+						ELSE IFNULL(SUM(BRD.Quantity * (BRD.BuyPrice - BRD.Discount)), 0)
+					END AS Total
 				FROM
 					transaction_buyreturndetails BRD
 					JOIN master_type MT

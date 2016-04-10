@@ -38,6 +38,7 @@
 						TransactionDate,
 						DeliveryCost,
 						Remarks,
+						IsCancelled,
 						CreatedDate,
 						CreatedBy
 					)
@@ -49,6 +50,7 @@
 						'".$TransactionDate."',
 						".$txtDeliveryCost.",
 						'".$txtRemarks."',
+						0,
 						NOW(),
 						'".$_SESSION['UserLogin']."'
 					)";

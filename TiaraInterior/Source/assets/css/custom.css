@@ -602,6 +602,10 @@ th[data-column-id="TransactionDate"] {
 	width: 85px;
 }
 
+th[data-column-id="DueDate"] {
+	width: 85px;
+}
+
 th[data-column-id="TotalAmount"] {
 	width: 150px;
 }

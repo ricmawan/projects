@@ -229,6 +229,15 @@ VALUES
 	NULL,
 	0,
 	6
+),
+(
+	24,
+	4,
+	'Stok',
+	'Report/Stock/',
+	NULL,
+	1,
+	6
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

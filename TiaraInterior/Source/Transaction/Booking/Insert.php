@@ -9,7 +9,7 @@
 		$ID = mysql_real_escape_string($_POST['hdnBookingID']);
 		$TransactionDate = explode('-', $_POST['txtTransactionDate']);
 		$_POST['txtTransactionDate'] = "$TransactionDate[2]-$TransactionDate[1]-$TransactionDate[0]";
-		if($_POST['txtDueDate'] == "") $DueDate = "";
+		if($_POST['txtDueDate'] == "") $DueDate = NULL;
 		else {
 			$DueDate = explode('-', $_POST['txtDueDate']);
 			$_POST['txtDueDate'] = "$DueDate[2]-$DueDate[1]-$DueDate[0]";
@@ -68,7 +68,6 @@
 						BookingNumber = '".$BookingNumber."',
 						SalesID = ".$SalesID.",
 						CustomerID = ".$CustomerID.",
-						DeliveryCost = ".$txtDeliveryCost.",
 						Remarks = '".$txtRemarks."',
 						TransactionDate = '".$TransactionDate."',
 						DueDate = '".$DueDate."',

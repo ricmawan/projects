@@ -12,27 +12,20 @@
 		$TransactionDate = "";
 		$DueDate = "";
 		$BookingNumber = "";
+		$BookingStatusID = "";
 		$Remarks = "";
 		$IsEdit = 0;
 		$rowCount = 0;
-		$DeliveryCost = 0.00;
 		$Data = "";
 		if($BookingID != 0) {
 			$IsEdit = 1;
-			//$Content = "Place the content here";
 			$sql = "SELECT
 						BO.BookingID,
 						BO.BookingNumber,
 						BO.SalesID,
 						BO.CustomerID,
 						BO.Remarks,
-						CASE
-							WHEN BO.BookingStatusID = 1
-							THEN 'Belum Selesai'
-							WHEN BO.BookingStatusID = 2
-							THEN 'Sudah Selesai'
-							ELSE 'Sudah Jatuh Tempo'
-						END,
+						BO.BookingStatusID,
 						DATE_FORMAT(BO.TransactionDate, '%d-%m-%Y') AS TransactionDate
 					FROM
 						transaction_booking BO
@@ -45,11 +38,11 @@
 			}				
 			$row=mysql_fetch_array($result);
 			$BookingID = $row['BookingID'];
+			$BookingStatusID = $row['BookingStatusID'];
 			$BookingNumber = $row['BookingNumber'];
 			$SalesID = $row['SalesID'];
 			$CustomerID = $row['CustomerID'];
 			$Remarks = $row['Remarks'];
-			$DeliveryCost = $row['DeliveryCost'];
 			$TransactionDate = $row['TransactionDate'];
 			
 			$sql = "SELECT
@@ -139,6 +132,7 @@
 								<div class="col-md-1 labelColumn">
 									Tanggal :
 									<input id="hdnBookingID" name="hdnBookingID" type="hidden" <?php echo 'value="'.$BookingID.'"'; ?> />
+									<input id="hdnBookingStatusID" name="hdnBookingStatusID" type="hidden" <?php echo 'value="'.$BookingStatusID.'"'; ?> />
 									<input id="hdnSalesID" name="hdnSalesID" type="hidden" <?php echo 'value="'.$SalesID.'"'; ?> />
 									<input id="hdnRow" name="hdnRow" type="hidden" <?php echo 'value="'.$rowCount.'"'; ?> />
 									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
@@ -262,7 +256,7 @@
 						<div class="row">
 							<div class="col-md-12">
 								<button class="btn btn-default" id="btnAdd" style="display:none;" ><i class="fa fa-save "></i> Add</button>&nbsp;&nbsp;								
-								<button class="btn btn-default" id="btnComplete"  onclick="SubmitValidate();" ><i class="fa fa-check "></i> Selesai</button>&nbsp;&nbsp;
+								<button class="btn btn-default" id="btnComplete"  onclick="FinishBooking();" ><i class="fa fa-check "></i> Selesai</button>&nbsp;&nbsp;
 								<button class="btn btn-default" id="btnSave"  onclick="SubmitValidate();" ><i class="fa fa-save "></i> Simpan</button>&nbsp;&nbsp;
 							</div>
 						</div>
@@ -522,6 +516,12 @@
 			}
 			
 			$(document).ready(function () {
+				if($("#hdnIsEdit").val() == "0" || $("#hdnBookingStatusID").val() == "2" || $("#hdnBookingStatusID").val() == "3") {
+					$("#btnComplete").attr("disabled", "disabled");
+				}
+				if($("#hdnBookingStatusID").val() == "2" || $("#hdnBookingStatusID").val() == "3") {
+					$("#btnSave").attr("disabled", "disabled");
+				}
 				$("#ddlBrand").combobox({
 					select: function( event, ui ) {
 						BindType();						
@@ -714,6 +714,10 @@
 						$.notify("Terjadi kesalahan sistem!", "error");
 					}
 				});
+			}
+			
+			function FinishBooking() {
+				SubmitForm("./Transaction/Booking/Finish.php");
 			}
 		</script>
 	</body>

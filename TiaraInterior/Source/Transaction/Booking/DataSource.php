@@ -61,6 +61,19 @@
 				MC.CustomerName,
 				DATE_FORMAT(BO.TransactionDate, '%d-%m-%Y') AS TransactionDate,
 				CASE
+					WHEN BO.DueDate = '0000-00-00 00:00:00' 
+					THEN ''
+					ELSE DATE_FORMAT(BO.DueDate, '%d-%m-%Y')
+				END AS DueDate,
+				CASE
+					WHEN BO.BookingStatusID = 1
+					THEN 'Belum Selesai'
+					WHEN BO.BookingStatusID = 2
+					THEN 'Selesai'
+					WHEN BO.BookingStatusID = 3
+					THEN 'Jatuh Tempo'
+				END BookingStatus,
+				CASE
 					WHEN BOD.IsPercentage = 1
 					THEN IFNULL(SUM(BOD.Quantity * (BOD.SalePrice - ((BOD.SalePrice * BOD.Discount)/100))), 0)
 					ELSE IFNULL(SUM(BOD.Quantity * (BOD.SalePrice - BOD.Discount)), 0)
@@ -97,10 +110,12 @@
 		$row_array['BookingIDNo']= $row['BookingID']."^".$row['BookingNumber'];
 		$row_array['BookingNumber']= $row['BookingNumber'];
 		$row_array['BookingID']= $row['BookingID'];
+		$row_array['BookingStatus']= $row['BookingStatus'];
 		$row_array['SalesName'] = $row['SalesName'];
 		$row_array['CustomerName'] = $row['CustomerName'];
 		$row_array['Total'] =  number_format($row['Total'],2,".",",");
 		$row_array['TransactionDate'] = $row['TransactionDate'];
+		$row_array['DueDate'] = $row['DueDate'];
 		$row_array['Remarks'] = $row['Remarks'];
 		array_push($return_arr, $row_array);
 	}

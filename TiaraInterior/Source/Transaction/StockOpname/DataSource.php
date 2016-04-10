@@ -6,7 +6,7 @@
 	include "../../GetPermission.php";
 
 	$where = " 1=1 ";
-	$order_by = "OT.OutgoingID DESC";
+	$order_by = "SO.StockOpnameID DESC";
 	$rows = 10;
 	$current = 1;
 	$limit_l = ($current * $rows) - ($rows);
@@ -24,7 +24,7 @@
 	if (ISSET($_REQUEST['searchPhrase']) )
 	{
 		$search = trim($_REQUEST['searchPhrase']);
-		$where .= " AND ( OT.OutgoingNumber LIKE '%".$search."%' OR OT.Remarks LIKE '%".$search."%' OR MC.CustomerName LIKE '%".$search."%' OR MS.SalesName LIKE '%".$search."%' OR DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' ) ";
+		$where .= " AND ( SO.Remarks LIKE '%".$search."%' OR DATE_FORMAT(SO.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' ) ";
 	}
 	//Handles determines where in the paging count this result set falls in
 	if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];
@@ -40,11 +40,7 @@
 	$sql = "SELECT
 				COUNT(*) AS nRows
 			FROM
-				transaction_outgoing OT
-				JOIN master_sales MS
-					ON OT.SalesID = MS.SalesID
-				JOIN master_customer MC
-					ON OT.CustomerID = MC.CustomerID
+				transaction_stockopname SO
 			WHERE
 				$where";
 	
@@ -55,39 +51,24 @@
 	$row = mysql_fetch_array($result);
 	$nRows = $row['nRows'];
 	$sql = "SELECT
-				OT.OutgoingID,
-				OT.OutgoingNumber,
-				MS.SalesName,
-				MC.CustomerName,
-				DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') AS TransactionDate,
+				SO.StockOpnameID,
+				DATE_FORMAT(SO.TransactionDate, '%d-%m-%Y') AS TransactionDate,
 				CASE
-					WHEN OTD.IsPercentage = 1
-					THEN IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - ((OTD.SalePrice * OTD.Discount)/100))), 0)
-					ELSE IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - OTD.Discount)), 0)
-				END AS SubTotal,
-				CASE
-					WHEN OTD.IsPercentage = 1
-					THEN IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - ((OTD.SalePrice * OTD.Discount)/100))), 0)
-					ELSE IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - OTD.Discount)), 0)
-				END + OT.DeliveryCost AS Total,
-				OT.DeliveryCost,
-				OT.Remarks
+					WHEN SOD.FromQty > SOD.ToQty
+					THEN (SOD.FromQty - SOD.ToQty) * SOD.SalePrice
+					ELSE (SOD.ToQty - SOD.FromQty) * SOD.BuyPrice
+				END Total,
+				SO.Remarks
 			FROM
-				transaction_outgoing OT
-				JOIN master_sales MS
-					ON OT.SalesID = MS.SalesID
-				JOIN master_customer MC
-					ON OT.CustomerID = MC.CustomerID
-				LEFT JOIN transaction_outgoingdetails OTD
-					ON OTD.OutgoingID = OT.OutgoingID
+				transaction_stockopname SO
+				LEFT JOIN transaction_stockopnamedetails SOD
+					ON SO.StockOpnameID = SOD.StockOpnameID
 			WHERE
 				$where
 			GROUP BY
-				OT.OutgoingID,
-				MS.SalesName,
-				MC.CustomerName,
-				OT.Remarks,
-				OT.TransactionDate
+				SO.StockOpnameID,
+				SO.Remarks,
+				SO.TransactionDate
 			ORDER BY 
 				$order_by
 			$limit";
@@ -100,13 +81,7 @@
 	while ($row = mysql_fetch_array($result)) {
 		$RowNumber++;
 		$row_array['RowNumber'] = $RowNumber;
-		$row_array['OutgoingIDNo']= $row['OutgoingID']."^".$row['OutgoingNumber'];
-		$row_array['OutgoingID']= $row['OutgoingID'];
-		$row_array['OutgoingNumber']= $row['OutgoingNumber'];
-		$row_array['SalesName'] = $row['SalesName'];
-		$row_array['CustomerName'] = $row['CustomerName'];
-		$row_array['DeliveryCost'] =  number_format($row['DeliveryCost'],2,".",",");
-		$row_array['SubTotal'] =  number_format($row['SubTotal'],2,".",",");
+		$row_array['StockOpnameID']= $row['StockOpnameID'];
 		$row_array['Total'] =  number_format($row['Total'],2,".",",");
 		$row_array['TransactionDate'] = $row['TransactionDate'];
 		$row_array['Remarks'] = $row['Remarks'];

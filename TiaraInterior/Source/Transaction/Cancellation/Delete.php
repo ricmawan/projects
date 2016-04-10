@@ -12,14 +12,27 @@
 		for($i=0; $i<count($Data); $i++) {
 			try
 			{
-				$OutgoingData = explode("^", mysql_real_escape_string($Data[$i]));
-				$OutgoingID = $OutgoingData[0];
-				$OutgoingNumber = $OutgoingData[1];
-				$sql = "DELETE FROM transaction_outgoing WHERE OutgoingID = '".$OutgoingID."'";
+				$CancellationData = explode("^", mysql_real_escape_string($Data[$i]));
+				$CancellationID = $CancellationData[0];
+				$CancellationNumber = $CancellationData[1];
+				$sql = "UPDATE 
+							transaction_outgoing OT
+							JOIN transaction_cancellation TC
+								ON TC.OutgoingID = OT.OutgoingID
+						SET
+							IsCancelled = 0
+						WHERE
+							TC.CancellationID = '".$CancellationID."'";
 				if (! $result=mysql_query($sql, $dbh)) {
-					throw new Exception($OutgoingNumber);
+					//throw new Exception($CancellationNumber);
+					echo mysql_error();
 				}
-				$MessageSuccessDelete .= "$OutgoingNumber, ";
+				
+				$sql = "DELETE FROM transaction_cancellation WHERE CancellationID = '".$CancellationID."'";
+				if (! $result=mysql_query($sql, $dbh)) {
+					throw new Exception($CancellationNumber);
+				}
+				$MessageSuccessDelete .= "$CancellationNumber, ";
 			}
 			catch (Exception $e)
 			{
@@ -29,9 +42,9 @@
 		$MessageSuccessDelete = substr($MessageSuccessDelete, 0, -2);
 		$MessageFailedDelete = substr($MessageFailedDelete, 0, -2);
 			
-		if($MessageSuccessDelete !="") $MessageSuccess = "No Nota " .$MessageSuccessDelete. " Berhasil Dihapus";
+		if($MessageSuccessDelete !="") $MessageSuccess = "ID " .$MessageSuccessDelete. " Berhasil Dihapus";
 		else $MessageSuccess = "";
-		if($MessageFailedDelete !="") $MessageFailed = "No Nota " .$MessageFailedDelete. " Gagal Dihapus";
+		if($MessageFailedDelete !="") $MessageFailed = "ID " .$MessageFailedDelete. " Gagal Dihapus";
 		else $MessageFailed = "";
 		
 		echo "$MessageSuccess+$MessageFailed";

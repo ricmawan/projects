@@ -6,64 +6,47 @@
 		include "../../GetPermission.php";
 		//echo $_SERVER['REQUEST_URI'];
 		$Content = "";
-		$OutgoingID = mysql_real_escape_string($_GET['ID']);
-		$SalesID = "";
-		$CustomerID = "";
-		$TransactionDate = "";
-		$OutgoingNumber = "";
+		$StockOpnameID = mysql_real_escape_string($_GET['ID']);
 		$Remarks = "";
 		$IsEdit = 0;
 		$rowCount = 0;
-		$DeliveryCost = 0.00;
 		$Data = "";
-		if($OutgoingID != 0) {
+		if($StockOpnameID != 0) {
 			$IsEdit = 1;
 			//$Content = "Place the content here";
 			$sql = "SELECT
-					OT.OutgoingID,
-					OT.OutgoingNumber,
-					OT.SalesID,
-					OT.CustomerID,
-					OT.Remarks,
-					OT.DeliveryCost,
-					DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') AS TransactionDate
+					SO.StockOpnameID,
+					SO.Remarks
 				FROM
-					transaction_outgoing OT
+					transaction_stockopname SO
 				WHERE
-					OT.OutgoingID = $OutgoingID";
+					SO.StockOpnameID = $StockOpnameID";
 						
 			if (! $result=mysql_query($sql, $dbh)) {
 				echo mysql_error();
 				return 0;
 			}				
 			$row=mysql_fetch_array($result);
-			$OutgoingID = $row['OutgoingID'];
-			$OutgoingNumber = $row['OutgoingNumber'];
-			$SalesID = $row['SalesID'];
-			$CustomerID = $row['CustomerID'];
+			$StockOpnameID = $row['StockOpnameID'];
 			$Remarks = $row['Remarks'];
-			$DeliveryCost = $row['DeliveryCost'];
-			$TransactionDate = $row['TransactionDate'];
 			
 			$sql = "SELECT
-						OTD.OutgoingDetailsID,
-						OTD.TypeID,
-						OTD.Quantity,
-						OTD.BuyPrice,
-						OTD.SalePrice,
-						OTD.BatchNumber,
-						OTD.Discount,
-						CONCAT(MB.BrandName, ' ', I.TypeName, ' - ', OTD.BatchNumber) AS TypeName,
-						OTD.IsPercentage,
-						OTD.Remarks
+						SOD.StockOpnameDetailsID,
+						SOD.TypeID,
+						SOD.FromQty,
+						SOD.ToQty,
+						SOD.BuyPrice,
+						SOD.SalePrice,
+						SOD.BatchNumber,
+						CONCAT(MB.BrandName, ' ', I.TypeName, ' - ', SOD.BatchNumber) AS TypeName
 					FROM
-						transaction_outgoingdetails OTD
+						transaction_stockopnamedetails SOD
 						JOIN master_type I
-							ON I.TypeID = OTD.TypeID
+							ON I.TypeID = SOD.TypeID
 						JOIN master_brand MB
 							ON MB.BrandID = I.BrandID
 					WHERE
-						OTD.OutgoingID = $OutgoingID";
+						SOD.StockOpnameID = $StockOpnameID";
 			if(!$result = mysql_query($sql, $dbh)) {
 				echo mysql_error();
 				return 0;
@@ -74,7 +57,7 @@
 				$Data = array();
 				while($row = mysql_fetch_array($result)) {
 					//array_push($DetailID, $row[0]);
-					array_push($Data, "'".$row['OutgoingDetailsID']."', '".$row['TypeID']."', '".$row['TypeName']."', '".$row['BatchNumber']."', '".$row['Quantity']."', '".$row['BuyPrice']."', '".$row['SalePrice']."', '".$row['Discount']."', '".$row['Remarks']."', '".$row['IsPercentage']."'");
+					array_push($Data, "'".$row['StockOpnameDetailsID']."', '".$row['TypeID']."', '".$row['TypeName']."', '".$row['BatchNumber']."', '".$row['FromQty']."', '".$row['ToQty']."', '".$row['BuyPrice']."', '".$row['SalePrice']."'");
 				}
 				//$DetailID = implode(",", $DetailID);
 				$Data = implode("|", $Data);
@@ -101,8 +84,7 @@
 							<div class="row">
 								<div class="col-md-1 labelColumn">
 									Merek :
-									<input id="hdnOutgoingID" name="hdnOutgoingID" type="hidden" <?php echo 'value="'.$OutgoingID.'"'; ?> />
-									<input id="hdnSalesID" name="hdnSalesID" type="hidden" <?php echo 'value="'.$SalesID.'"'; ?> />
+									<input id="hdnStockOpnameID" name="hdnStockOpnameID" type="hidden" <?php echo 'value="'.$StockOpnameID.'"'; ?> />
 									<input id="hdnRow" name="hdnRow" type="hidden" <?php echo 'value="'.$rowCount.'"'; ?> />
 									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
 									<input id="hdnData" name="hdnData" type="hidden" <?php echo 'value="'.$Data.'"'; ?> />
@@ -156,15 +138,14 @@
 												<td style="width:230px;">
 													<input type="text" id="txtTypeName" name="txtTypeName" class="form-control-custom txtTypeName" placeholder="Nama Barang" readonly />
 													<input type="hidden" id="hdnTypeID" name="hdnTypeID" value="0" class="hdnTypeID" />
-													<input type="hidden" id="hdnOutgoingDetailsID" class="hdnOutgoingDetailsID" name="hdnOutgoingDetailsID" value="0" />
+													<input type="hidden" id="hdnStockOpnameDetailsID" class="hdnStockOpnameDetailsID" name="hdnStockOpnameDetailsID" value="0" />
 													<input type="hidden" id="hdnBatchNumber" name="hdnBatchNumber" class="hdnBatchNumber" value="" />
-													<input type="hidden" id="hdnStock" name="hdnStock" class="hdnStock" value="" />
 												</td>
 												<td style="width:75px;">
-													<input type="text" row="" value=1 id="txtQuantity" style="text-align:right;" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="ValidateQty(this.getAttribute('row'));" class="form-control-custom txtQuantity" placeholder="QTY" readonly />
+													<input type="text" row="" value=1 id="txtQuantity" style="text-align:right;" name="txtQuantity" class="form-control-custom txtQuantity" placeholder="QTY" readonly />
 												</td>
 												<td style="width:85px;">
-													<input type="text" row="" value=1 id="txtAdjustment" style="text-align:right;" name="txtAdjustment" onkeypress="return isNumberKey(event)" onchange="ValidateQty(this.getAttribute('row'));" class="form-control-custom txtAdjustment" placeholder="QTY" />
+													<input type="text" row="" value=1 id="txtAdjustment" style="text-align:right;" name="txtAdjustment" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control-custom txtAdjustment" placeholder="Penyesuaian" />
 												</td>
 												<td style="width:135px;">
 													<input type="text" id="txtBuyPrice" value="0.00" name="txtBuyPrice" style="text-align:right;" class="form-control-custom txtBuyPrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Beli"/>
@@ -217,10 +198,6 @@
 			</div>
 		</div>
 		<script>
-			function BindSales() {
-				$("#hdnSalesID").val($("#ddlCustomer option:selected").attr("salesid"));
-			}
-			
 			function BindType() {
 				$("#ddlType option").each(function() {
 					$(this).remove();
@@ -276,7 +253,7 @@
 					$("#hdnBatchNumber" + i).val(CurrentBatchNumber.toString());
 					$("#hdnStock" + i).val(CurrentStock.toString());
 					$("#txtSalePrice" + i).val(returnRupiah(CurrentSalePrice.toString()));
-					$("#txtQuantity" + i).val(1);
+					$("#txtQuantity" + i).val(CurrentStock);
 					$("#txtTotal" + i).val(CurrentSalePrice);
 				}
 				Calculate();
@@ -325,10 +302,10 @@
 					i++;
 				});
 				i = 0;
-				$(".hdnOutgoingDetailsID").each(function() {
+				$(".hdnStockOpnameDetailsID").each(function() {
 					if(i != 0) {
-						$(this).attr("id", "hdnOutgoingDetailsID" + i);
-						$(this).attr("name", "hdnOutgoingDetailsID" + i);
+						$(this).attr("id", "hdnStockOpnameDetailsID" + i);
+						$(this).attr("name", "hdnStockOpnameDetailsID" + i);
 					}
 					i++;
 				});
@@ -425,13 +402,11 @@
 				var isPercentage = 0;
 				var i = 0;
 				var deliveryCost = 0;
-				$(".txtQuantity").each(function() {
+				$(".txtAdjustment").each(function() {
 					if(i != 0) {
 						qty = $(this).val();
 						row = $(this).attr("row");
 						price = $("#txtSalePrice" + row).val().replace(/\,/g, "");
-						disc = $("#txtDiscount" + row).val().replace(/\,/g, "");
-						isPercentage = $("#chkIsPercentage" + row).prop('checked');
 						if(qty == "") {
 							$(this).val(1);
 							qty = 1;
@@ -440,39 +415,13 @@
 							$("#txtSalePrice" + row).val("0.00");
 							price = 0;
 						}
-						if(isPercentage == true) {
-							price = price - ((price * disc)/ 100);
-						}
-						else {
-							price = price - disc;
-						}
 						GrandTotal += parseFloat(qty) * parseFloat(price);
 						Total = parseFloat(qty) * parseFloat(price);
 						$("#txtTotal" + row).val(returnRupiah(Total.toString()));
 					}
 					i++;
 				});
-				if ($("#txtDeliveryCost").val() == "") {
-					$("#txtDeliveryCost").val(0);
-					deliveryCost = 0;
-				}
-				else {
-					deliveryCost = $("#txtDeliveryCost").val().replace(/\,/g, "");
-				}
-				GrandTotal += parseFloat(deliveryCost);
 				$("#txtGrandTotal").val(returnRupiah(GrandTotal.toString()));
-			}
-			
-			function ValidateDiscount(row) {
-				var IsPercentage = $("#chkIsPercentage" + row).prop('checked');
-				var Discount = $("#txtDiscount" + row);
-				if(IsPercentage == true) {
-					Discount.val(minmax(Discount.val().replace(/\,/g, "").replace(/\.00/g, ""), 0, 100));
-				}
-				else {
-					convertRupiah("txtDiscount" + row, Discount.val());
-				}
-				Calculate();
 			}
 			
 			$(document).ready(function () {
@@ -482,12 +431,6 @@
 					}
 				});
 				
-				//$("#ddlSales").combobox();
-				$("#ddlCustomer").combobox({
-					select: function( event, ui ) {
-						BindSales();						
-					}
-				});
 				$("#ddlType").combobox({
 					select: function(event, ui) {
 						BindTypeList();
@@ -553,25 +496,15 @@
 						//set values
 						var d = type[i].split("', '");
 						$("#nota").text(count);
-						$("#hdnOutgoingDetailsID" + count).val(d[0].replace("'", ""));
+						$("#hdnStockOpnameDetailsID" + count).val(d[0].replace("'", ""));
 						$("#hdnTypeID" + count).val(d[1].replace("'", ""));
 						$("#txtTypeName" + count).val(d[2].replace("'", ""));
 						$("#hdnBatchNumber" + count).val(d[3].replace("'", ""));
 						$("#txtQuantity" + count).val(d[4].replace("'", ""));
-						$("#hdnBuyPrice" + count).val(d[5].replace("'", ""));
-						$("#txtSalePrice" + count).val(returnRupiah(d[6].replace("'", "")));
-						$("#txtRemarksDetail" + count).val(d[8].replace("'", ""));
+						$("#txtAdjustment" + count).val(d[5].replace("'", ""));
+						$("#txtBuyPrice" + count).val(returnRupiah(d[6].replace("'", "")));
+						$("#txtSalePrice" + count).val(returnRupiah(d[7].replace("'", "")));
 						
-						if(d[9].replace("'", "") == true) {
-							$("#txtDiscount" + count).val(d[7].replace("'", ""));
-							$("#chkIsPercentage" + count).attr("checked", true);
-							$("#chkIsPercentage" + count).prop("checked", true);
-						}
-						else {
-							$("#txtDiscount" + count).val(returnRupiah(d[7].replace("'", "")));
-							$("#chkIsPercentage" + count).attr("checked", false);
-							$("#chkIsPercentage" + count).prop("checked", false);
-						}
 						$("#record").val(count);
 						$("#recordnew").val(count);
 					}
@@ -579,62 +512,7 @@
 				}
 			});
 			
-			function PrintInvoice() {
-				if($("#hdnOutgoingID").val() == 0) {
-					$.notify("Tekan Simpan terlebih dahulu!", "error");
-					return false;
-				}
-				else {
-					$("#loading").show();
-					$.ajax({
-						url: "./Transaction/Outgoing/PrintInvoice.php",
-						type: "POST",
-						data: $("#PostForm").serialize(),
-						dataType: "json",
-						success: function(data) {
-							$("html, body").animate({
-								scrollTop: 0
-							}, "slow");
-							$("#loading").hide();
-						},
-						error: function(data) {
-							$("#loading").hide();
-							$.notify("Koneksi gagal", "error");
-					
-						}
-					});
-				}
-			}
-			
-			function PrintShipment() {
-				if($("#hdnOutgoingID").val() == 0) {
-					$.notify("Tekan Simpan terlebih dahulu!", "error");
-					return false;
-				}
-				else {
-					var ID = $("#hdnId").val();
-					$("#loading").show();
-					$.ajax({
-						url: "./Transaction/Outgoing/PrintShipment.php",
-						type: "POST",
-						data: $("#PostForm").serialize(),
-						dataType: "json",
-						success: function(data) {
-							$("html, body").animate({
-								scrollTop: 0
-							}, "slow");
-							$("#loading").hide();
-						},
-						error: function(data) {
-							$("#loading").hide();
-							$.notify("Koneksi gagal", "error");
-						}
-					});
-				}
-			}
-			
 			function SubmitValidate() {
-				console.log("test");
 				if($("#recordnew").val() > 0) {
 					var PassValidate = 1;
 					var FirstFocus = 0;
@@ -649,18 +527,6 @@
 						}
 					});
 					
-					if($("#ddlSales").val() == "") {
-						PassValidate = 0;
-						$("#ddlSales").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						if(FirstFocus == 0) $("#ddlSales").next().find("input").focus();
-						FirstFocus = 1;
-					}
-					if($("#ddlCustomer").val() == "") {
-						PassValidate = 0;
-						$("#ddlCustomer").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						if(FirstFocus == 0) $("#ddlCustomer").next().find("input").focus();
-						FirstFocus = 1;
-					}
 					if(PassValidate == 0) {
 						$("html, body").animate({
 							scrollTop: 0
@@ -668,61 +534,9 @@
 						return false;
 					}
 					else {
-						$.ajax({
-							url: "./Transaction/Outgoing/Insert.php",
-							type: "POST",
-							data: $("#PostForm").serialize(),
-							dataType: "json",
-							success: function(data) {
-								if(data.FailedFlag == '0') {
-									$.notify(data.Message, "success");
-									$("#hdnOutgoingID").val(data.ID);
-									$("#hdnIsEdit").val(1);
-								}
-								else {
-									$("#loading").hide();
-									$.notify(data.Message, "error");					
-								}
-							},
-							error: function(data) {
-								$("#loading").hide();
-								$.notify("Terjadi kesalahan sistem!", "error");
-							}
-						});
+						SubmitForm("./Transaction/StockOpname/Insert.php");
 					}
 				}
-			}
-			
-			function ValidateQty(row) {
-				var currentQty = $("#txtQuantity" + row).val();
-				var currentStock = $("#hdnStock" +  row).val();
-				if(parseInt(currentQty) > parseInt(currentStock)) {
-					$.notify("Sisa stok yang ada : " + currentStock, "error");
-					$("#txtQuantity" + row).val(currentStock);
-				}
-				Calculate();
-			}
-			function GetInvoiceNumber(SelectedDate)
-			{
-				$.ajax({
-					url: "./Transaction/Outgoing/GetInvoiceNumber.php",
-					type: "POST",
-					data: { SelectedDate : SelectedDate, InvoiceNumberType : "TJ"},
-					dataType: "json",
-					success: function(data) {
-						if(data.FailedFlag == '0') {
-							$("#txtOutgoingNumber").val(data.InvoiceNumber);
-						}
-						else {
-							$("#loading").hide();
-							$.notify(data.Message, "error");					
-						}
-					},
-					error: function(data) {
-						$("#loading").hide();
-						$.notify("Terjadi kesalahan sistem!", "error");
-					}
-				});
 			}
 		</script>
 	</body>

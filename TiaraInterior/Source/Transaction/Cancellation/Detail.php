@@ -112,7 +112,7 @@
 										<select name="ddlOutgoing" id="ddlOutgoing" class="form-control-custom" placeholder="Pilih Nota" >
 											<option value="" selected> </option>
 											<?php
-												$sql = "SELECT OutgoingID, OutgoingNumber FROM transaction_outgoing OT";
+												$sql = "SELECT OutgoingID, OutgoingNumber FROM transaction_outgoing OT WHERE IsCancelled = 0";
 												if(!$result = mysql_query($sql, $dbh)) {
 													echo mysql_error();
 													return 0;
@@ -434,27 +434,7 @@
 						return false;
 					}
 					else {
-						$.ajax({
-							url: "./Transaction/Cancellation/Insert.php",
-							type: "POST",
-							data: $("#PostForm").serialize(),
-							dataType: "json",
-							success: function(data) {
-								if(data.FailedFlag == '0') {
-									$.notify(data.Message, "success");
-									$("#hdnOutgoingID").val(data.ID);
-									$("#hdnIsEdit").val(1);
-								}
-								else {
-									$("#loading").hide();
-									$.notify(data.Message, "error");					
-								}
-							},
-							error: function(data) {
-								$("#loading").hide();
-								$.notify("Terjadi kesalahan sistem!", "error");
-							}
-						});
+						SubmitForm("./Transaction/Cancellation/Insert.php");
 					}
 				}
 			}

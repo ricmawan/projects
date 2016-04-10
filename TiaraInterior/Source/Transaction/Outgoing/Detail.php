@@ -203,7 +203,7 @@
 										<thead style="background-color: black;color:white;height:25px;width:1020px;display:block;">
 											<td align="center" style="width:30px;">No</td>
 											<td align="center" style="width:230px;">Nama Barang</td>
-											<td align="center" style="width:55px;">QTY</td>
+											<td align="center" style="width:75px;">QTY</td>
 											<td align="center" style="width:135px;">Harga Jual</td>
 											<td align="center" style="width:155px;">Diskon</td>
 											<td align="center" style="width:170px;">Total</td>
@@ -221,7 +221,7 @@
 													<input type="hidden" id="hdnBatchNumber" name="hdnBatchNumber" class="hdnBatchNumber" value="" />
 													<input type="hidden" id="hdnStock" name="hdnStock" class="hdnStock" value="" />
 												</td>
-												<td style="width:55px;">
+												<td style="width:75px;">
 													<input type="text" row="" value=1 id="txtQuantity" style="text-align:right;" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="ValidateQty(this.getAttribute('row'));" class="form-control-custom txtQuantity" placeholder="QTY"/>
 												</td>
 												<td style="width:135px;">

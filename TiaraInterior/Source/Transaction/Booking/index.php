@@ -20,7 +20,9 @@
 										<th data-column-id="BookingIDNo" data-type="numeric" data-visible="false" data-identifier="true">ID Transaksi</th>
 										<th data-column-id="BookingNumber">No Nota</th>
 										<th data-column-id="TransactionDate" data-type="numeric">Tanggal</th>
+										<th data-column-id="DueDate" data-type="numeric">Tempo</th>
 										<th data-column-id="CustomerName">Nama Pelanggan</th>
+										<th data-column-id="BookingStatus">Status</th>
 										<!--<th data-column-id="SalesName">Nama Sales</th>-->
 										<th data-column-id="Total" data-align="right">Total</th>
 										<th data-column-id="Remarks">Catatan</th>

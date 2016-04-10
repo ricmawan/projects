@@ -105,7 +105,8 @@
 	while ($row = mysql_fetch_array($result)) {
 		$RowNumber++;
 		$row_array['RowNumber'] = $RowNumber;
-		$row_array['OutgoingIDNo']= $row['CancellationID']."^".$row['OutgoingNumber'];
+		$row_array['CancellationIDNo']= $row['CancellationID']."^".$row['OutgoingNumber'];
+		$row_array['CancellationID'] = $row['CancellationID'];
 		$row_array['OutgoingNumber']= $row['OutgoingNumber'];
 		$row_array['SalesName'] = $row['SalesName'];
 		$row_array['CustomerName'] = $row['CustomerName'];

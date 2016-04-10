@@ -12,14 +12,12 @@
 		for($i=0; $i<count($Data); $i++) {
 			try
 			{
-				$OutgoingData = explode("^", mysql_real_escape_string($Data[$i]));
-				$OutgoingID = $OutgoingData[0];
-				$OutgoingNumber = $OutgoingData[1];
-				$sql = "DELETE FROM transaction_outgoing WHERE OutgoingID = '".$OutgoingID."'";
+				$StockOpnameID = mysql_real_escape_string($Data[$i]);
+				$sql = "DELETE FROM transaction_stockopname WHERE StockOpnameID = '".$StockOpnameID."'";
 				if (! $result=mysql_query($sql, $dbh)) {
 					throw new Exception($OutgoingNumber);
 				}
-				$MessageSuccessDelete .= "$OutgoingNumber, ";
+				$MessageSuccessDelete .= "joss";
 			}
 			catch (Exception $e)
 			{
@@ -29,9 +27,9 @@
 		$MessageSuccessDelete = substr($MessageSuccessDelete, 0, -2);
 		$MessageFailedDelete = substr($MessageFailedDelete, 0, -2);
 			
-		if($MessageSuccessDelete !="") $MessageSuccess = "No Nota " .$MessageSuccessDelete. " Berhasil Dihapus";
+		if($MessageSuccessDelete !="") $MessageSuccess = "Data Berhasil Dihapus";
 		else $MessageSuccess = "";
-		if($MessageFailedDelete !="") $MessageFailed = "No Nota " .$MessageFailedDelete. " Gagal Dihapus";
+		if($MessageFailedDelete !="") $MessageFailed = "Data Gagal Dihapus";
 		else $MessageFailed = "";
 		
 		echo "$MessageSuccess+$MessageFailed";

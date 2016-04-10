@@ -91,8 +91,8 @@
 						
 			$sql = "UPDATE transaction_cancellation
 					SET
-						DeletedBy = ".$_SESSION['UserID']",
-						OutgoingID = ".OutgoingID.",
+						DeletedBy = ".$_SESSION['UserID'].",
+						OutgoingID = ".$OutgoingID.",
 						TransactionDate = NOW(),
 						ModifiedBy = '".$_SESSION['UserLogin']."'
 					WHERE

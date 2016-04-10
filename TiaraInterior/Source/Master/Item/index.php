@@ -22,7 +22,7 @@
 										<th data-column-id="TypeName">Tipe</th>
 										<th data-column-id="UnitName">Nama Satuan</th>
 										<th data-column-id="BatchNumber">Batch</th>
-										<th data-column-id="Stock">Stok</th>
+										<th data-column-id="Stock" data-align="right">Stok</th>
 										<th data-column-id="BuyPrice" data-align="right">Harga Beli</th>
 										<th data-column-id="SalePrice" data-align="right">Harga Jual</th>
 									</tr>

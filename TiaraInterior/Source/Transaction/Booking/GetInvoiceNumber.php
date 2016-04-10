@@ -43,7 +43,7 @@
 		
 		$State = 2;
 		$sql = "SELECT
-					CONCAT('".$InvoiceNumberType."-', '".$Date."', RIGHT(CONCAT('0000', COUNT(1) + 1), 3)) AS InvoiceNumber
+					CONCAT('".$InvoiceNumberType."-', '".$Date."', RIGHT(CONCAT('000', COUNT(1) + 1), 3)) AS InvoiceNumber
 				FROM 
 					transaction_invoicenumber
 				WHERE

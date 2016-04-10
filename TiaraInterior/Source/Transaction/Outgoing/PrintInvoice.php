@@ -77,9 +77,17 @@
 					CONCAT(MB.BrandName, ' ', MT.TypeName) ItemName,
 					TOD.BatchNumber,
 					TOD.SalePrice,
-					((TOD.SalePrice * TOD.Discount)/100) DiscountAmount,
+					CASE
+						WHEN TOD.IsPercentage = 1
+						THEN TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100)
+						ELSE (TOD.SalePrice - TOD.Discount)
+					END DiscountAmount,
 					TOD.Discount,
-					IFNULL(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100)), 0) Total
+					CASE
+						WHEN TOD.IsPercentage = 1
+						THEN IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))), 0)
+						ELSE IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - TOD.Discount)), 0)
+					END Total
 				FROM
 					transaction_outgoingdetails TOD
 					JOIN master_type MT

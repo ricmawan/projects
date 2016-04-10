@@ -36,6 +36,7 @@
 								ON OT.OutgoingID = OTD.OutgoingID
 						WHERE
 							OT.CustomerID = ".$CustomerID."
+							AND OT.IsCancelled = 0
 						GROUP BY
 							TypeID,
 							BatchNumber

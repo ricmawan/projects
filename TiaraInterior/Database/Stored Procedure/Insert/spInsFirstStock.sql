@@ -75,7 +75,7 @@ SET State = 3;
 		SELECT
 			pFirstStockID,
 			MT.TypeID,
-			(IFNULL(FS.Quantity, 0) - IFNULL(TOD.Quantity, 0) - IFNULL(BR.Quantity, 0) + IFNULL(SR.Quantity, 0)),
+			(IFNULL(FS.Quantity, 0) - IFNULL(TOD.Quantity, 0) - IFNULL(BR.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(BO.Quantity, 0) + IFNULL(SO.Quantity, 0)),
 			IFNULL(FS.BuyPrice, MT.BuyPrice) BuyPrice,
 			IFNULL(FS.SalePrice, MT.SalePrice) SalePrice,
 			FS.Discount,
@@ -136,14 +136,18 @@ SET State = 3;
 			LEFT JOIN
 			(
 				SELECT
-					TypeID,
-					TRIM(BatchNumber) BatchNumber,
-					SUM(Quantity) Quantity
+					OTD.TypeID,
+					TRIM(OTD.BatchNumber) BatchNumber,
+					SUM(OTD.Quantity) Quantity
 				FROM
-					transaction_outgoingdetails
+					transaction_outgoingdetails OTD
+					JOIN transaction_outgoing OT
+						ON OT.OutgoingID = OTD.OutgoingID
+				WHERE
+					OT.IsCancelled = 0
 				GROUP BY
-					TypeID,
-					BatchNumber
+					OTD.TypeID,
+					OTD.BatchNumber
 			)TOD
 				ON TOD.TypeID = MT.TypeID
 				AND TOD.BatchNumber = FS.BatchNumber
@@ -175,8 +179,48 @@ SET State = 3;
 			)SR
 				ON SR.TypeID = MT.TypeID
 				AND SR.BatchNumber = FS.BatchNumber
+			LEFT JOIN
+			(
+				SELECT
+					BOD.TypeID,
+					TRIM(BOD.BatchNumber) BatchNumber,
+					SUM(BOD.Quantity) Quantity
+				FROM
+					transaction_booking BO
+					JOIN transaction_bookingdetails BOD
+						ON BO.BookingID = BOD.BookingID
+				WHERE
+					BO.BookingStatusID = 1
+				GROUP BY
+					BOD.TypeID,
+					BOD.BatchNumber
+			)BO
+				ON BO.TypeID = MT.TypeID
+				AND BO.BatchNumber = FS.BatchNumber
+			LEFT JOIN
+			(
+				SELECT
+					SOD.TypeID,
+					TRIM(SOD.BatchNumber) BatchNumber,
+					SUM(
+							CASE
+								WHEN SOD.FromQty > SOD.ToQty
+								THEN -(SOD.FromQty - SOD.ToQty)
+								ELSE (SOD.ToQty - SOD.FromQty)
+							END
+						) Quantity
+				FROM
+					transaction_stockopname SO
+					JOIN transaction_stockopnamedetails SOD
+						ON SO.StockOpnameID = SOD.StockOpnameID
+				GROUP BY
+					SOD.TypeID,
+					SOD.BatchNumber
+			)SO
+				ON SO.TypeID = MT.TypeID
+				AND SO.BatchNumber = FS.BatchNumber
 		WHERE
-			(IFNULL(FS.Quantity, 0) - IFNULL(TOD.Quantity, 0) - IFNULL(BR.Quantity, 0) + IFNULL(SR.Quantity, 0)) > 0;
+			(IFNULL(FS.Quantity, 0) - IFNULL(TOD.Quantity, 0) - IFNULL(BR.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(BO.Quantity, 0) + IFNULL(SO.Quantity, 0)) > 0;
 			
 SET State = 4;
 		DELETE FROM transaction_firststock WHERE TransactionDate < CurrentDate;
