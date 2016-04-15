@@ -73,11 +73,11 @@
 					WHEN BO.BookingStatusID = 3
 					THEN 'Jatuh Tempo'
 				END BookingStatus,
-				CASE
-					WHEN BOD.IsPercentage = 1
-					THEN IFNULL(SUM(BOD.Quantity * (BOD.SalePrice - ((BOD.SalePrice * BOD.Discount)/100))), 0)
-					ELSE IFNULL(SUM(BOD.Quantity * (BOD.SalePrice - BOD.Discount)), 0)
-				END AS Total,
+				IFNULL(SUM(CASE
+								WHEN BOD.IsPercentage = 1
+								THEN BOD.Quantity * (BOD.SalePrice - ((BOD.SalePrice * BOD.Discount)/100))
+								ELSE BOD.Quantity * (BOD.SalePrice - BOD.Discount)
+							END), 0) AS Total,
 				BO.Remarks
 			FROM
 				transaction_booking BO

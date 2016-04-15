@@ -53,15 +53,162 @@
 						BOD.SalePrice,
 						BOD.BatchNumber,
 						BOD.Discount,
-						CONCAT(MB.BrandName, ' ', I.TypeName, ' - ', BOD.BatchNumber) AS TypeName,
+						CONCAT(MB.BrandName, ' ', MT.TypeName, ' - ', BOD.BatchNumber) AS TypeName,
 						BOD.IsPercentage,
-						BOD.Remarks
+						BOD.Remarks,
+						BOD.Quantity + (IFNULL(FS.Quantity, 0) - IFNULL(TOD.Quantity, 0) - IFNULL(BR.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(BO.Quantity, 0) + IFNULL(SO.Quantity, 0)) Stock
 					FROM
 						transaction_bookingdetails BOD
-						JOIN master_type I
-							ON I.TypeID = BOD.TypeID
+						JOIN master_type MT
+							ON MT.TypeID = BOD.TypeID
 						JOIN master_brand MB
-							ON MB.BrandID = I.BrandID
+							ON MB.BrandID = MT.BrandID
+						LEFT JOIN
+						(
+							SELECT
+								TypeID,
+								TRIM(BatchNumber) BatchNumber,
+								SUM(SA.Quantity) Quantity,
+								BuyPrice,
+								SalePrice
+							FROM
+							(
+								SELECT
+									TypeID,
+									TRIM(BatchNumber) BatchNumber,
+									SUM(Quantity) Quantity,
+									CASE
+										WHEN IsPercentage = 1
+										THEN (BuyPrice - ((BuyPrice * Discount) / 100))
+										ELSE (BuyPrice - Discount)
+									END AS BuyPrice,
+									SalePrice,
+									CreatedDate
+								FROM
+									transaction_firststockdetails
+								GROUP BY
+									TypeID,
+									BatchNumber,
+									BuyPrice,
+									SalePrice,
+									CreatedDate,
+									Discount
+								UNION
+								SELECT
+									TypeID,
+									TRIM(BatchNumber) BatchNumber,
+									SUM(Quantity) Quantity,
+									CASE
+										WHEN IsPercentage = 1
+										THEN (BuyPrice - ((BuyPrice * Discount) / 100))
+										ELSE (BuyPrice - Discount)
+									END AS BuyPrice,
+									SalePrice,
+									CreatedDate
+								FROM
+									transaction_incomingdetails
+								GROUP BY
+									TypeID,
+									BatchNumber,
+									BuyPrice,
+									SalePrice,
+									CreatedDate,
+									Discount
+								ORDER BY
+									CreatedDate DESC
+							)SA
+							GROUP BY
+								TypeID,
+								BatchNumber
+						)FS
+							ON FS.TypeID = MT.TypeID
+							AND FS.BatchNumber = BOD.BatchNumber
+						LEFT JOIN
+						(
+							SELECT
+								OTD.TypeID,
+								TRIM(OTD.BatchNumber) BatchNumber,
+								SUM(OTD.Quantity) Quantity
+							FROM
+								transaction_outgoingdetails OTD
+								JOIN transaction_outgoing OT
+									ON OT.OutgoingID = OTD.OutgoingID
+							WHERE
+								OT.IsCancelled = 0
+							GROUP BY
+								OTD.TypeID,
+								OTD.BatchNumber
+						)TOD
+							ON TOD.TypeID = MT.TypeID
+							AND TOD.BatchNumber = FS.BatchNumber
+						LEFT JOIN
+						(
+							SELECT
+								TypeID,
+								TRIM(BatchNumber) BatchNumber,
+								SUM(Quantity) Quantity
+							FROM
+								transaction_buyreturndetails
+							GROUP BY
+								TypeID,
+								BatchNumber
+						)BR
+							ON BR.TypeID = MT.TypeID
+							AND BR.BatchNumber = FS.BatchNumber
+						LEFT JOIN
+						(
+							SELECT
+								TypeID,
+								TRIM(BatchNumber) BatchNumber,
+								SUM(Quantity) Quantity
+							FROM
+								transaction_salereturndetails
+							GROUP BY
+								TypeID,
+								BatchNumber
+						)SR
+							ON SR.TypeID = MT.TypeID
+							AND SR.BatchNumber = FS.BatchNumber
+						LEFT JOIN
+						(
+							SELECT
+								BOD.TypeID,
+								TRIM(BOD.BatchNumber) BatchNumber,
+								SUM(BOD.Quantity) Quantity
+							FROM
+								transaction_booking BO
+								JOIN transaction_bookingdetails BOD
+									ON BO.BookingID = BOD.BookingID
+							WHERE
+								BO.BookingStatusID = 1
+							GROUP BY
+								BOD.TypeID,
+								BOD.BatchNumber
+						)BO
+							ON BO.TypeID = MT.TypeID
+							AND BO.BatchNumber = FS.BatchNumber
+						LEFT JOIN
+						(
+							SELECT
+								SOD.TypeID,
+								TRIM(SOD.BatchNumber) BatchNumber,
+								SUM(
+										CASE
+											WHEN SOD.FromQty > SOD.ToQty
+											THEN -(SOD.FromQty - SOD.ToQty)
+											ELSE (SOD.ToQty - SOD.FromQty)
+										END
+									) Quantity
+							FROM
+								transaction_stockopname SO
+								JOIN transaction_stockopnamedetails SOD
+									ON SO.StockOpnameID = SOD.StockOpnameID
+							GROUP BY
+								SOD.TypeID,
+								SOD.BatchNumber
+						)SO
+							ON SO.TypeID = MT.TypeID
+							AND SO.BatchNumber = FS.BatchNumber
 					WHERE
 						BOD.BookingID = $BookingID";
 			if(!$result = mysql_query($sql, $dbh)) {
@@ -74,7 +221,7 @@
 				$Data = array();
 				while($row = mysql_fetch_array($result)) {
 					//array_push($DetailID, $row[0]);
-					array_push($Data, "'".$row['BookingDetailsID']."', '".$row['TypeID']."', '".$row['TypeName']."', '".$row['BatchNumber']."', '".$row['Quantity']."', '".$row['BuyPrice']."', '".$row['SalePrice']."', '".$row['Discount']."', '".$row['Remarks']."', '".$row['IsPercentage']."'");
+					array_push($Data, "'".$row['BookingDetailsID']."', '".$row['TypeID']."', '".$row['TypeName']."', '".$row['BatchNumber']."', '".$row['Quantity']."', '".$row['BuyPrice']."', '".$row['SalePrice']."', '".$row['Discount']."', '".$row['Remarks']."', '".$row['IsPercentage']."', '".$row['Stock']."'");
 				}
 				//$DetailID = implode(",", $DetailID);
 				$Data = implode("|", $Data);
@@ -188,7 +335,7 @@
 									<table class="table" style="width:auto;" id="datainput">
 										<thead style="background-color: black;color:white;height:25px;width:1020px;display:block;">
 											<td align="center" style="width:30px;">No</td>
-											<td align="center" style="width:180px;">Nama Barang</td>
+											<td align="center" style="width:230px;">Nama Barang</td>
 											<td align="center" style="width:75px;">QTY</td>
 											<td align="center" style="width:135px;">Harga Jual</td>
 											<td align="center" style="width:155px;">Diskon</td>
@@ -220,7 +367,7 @@
 													<input type="text" id="txtTotal" name="txtTotal" class="form-control-custom txtTotal" style="text-align:right;" value="0.00" placeholder="Jumlah" readonly />
 												</td>
 												<td  style="width:200px;">
-													<input type="text" id="txtRemarksDetail" name="txtRemarksDetail" class="form-control-custom txtRemarksDetail" style="width:235px;" placeholder="Keterangan" maxlength=50 />
+													<input type="text" id="txtRemarksDetail" name="txtRemarksDetail" class="form-control-custom txtRemarksDetail" placeholder="Keterangan" maxlength=50 />
 												</td>
 												<td style="vertical-align:middle;">
 													<i class="fa fa-close btnDelete" style="cursor:pointer;" acronym title="Hapus Data" onclick="DeleteRow(this.getAttribute('row'))"></i>
@@ -607,6 +754,7 @@
 						$("#hdnBuyPrice" + count).val(d[5].replace("'", ""));
 						$("#txtSalePrice" + count).val(returnRupiah(d[6].replace("'", "")));
 						$("#txtRemarksDetail" + count).val(d[8].replace("'", ""));
+						$("#hdnStock" + count).val(d[10].replace("'", ""));
 						
 						if(d[9].replace("'", "") == true) {
 							$("#txtDiscount" + count).val(d[7].replace("'", ""));

@@ -78,11 +78,11 @@
 					MS.SupplierName AS SupplierName,
 					TI.IncomingNumber,
 					TI.Remarks,
-					CASE
-						WHEN TID.IsPercentage = 1
-						THEN IFNULL(SUM(TID.Quantity * (TID.BuyPrice - ((TID.BuyPrice * TID.Discount)/100))), 0) 
-						ELSE IFNULL(SUM(TID.Quantity * (TID.BuyPrice - TID.Discount)), 0)
-					END AS Total
+					IFNULL(SUM(CASE
+									WHEN TID.IsPercentage = 1
+									THEN TID.Quantity * (TID.BuyPrice - ((TID.BuyPrice * TID.Discount)/100))
+									ELSE TID.Quantity * (TID.BuyPrice - TID.Discount)
+								END), 0) AS Total
 				FROM
 					transaction_incoming TI
 					JOIN master_supplier MS
@@ -107,11 +107,11 @@
 					MS.SupplierName AS SupplierName,
 					BR.BuyReturnNumber,
 					BR.Remarks,
-					-CASE
+					-IFNULL(SUM(CASE
 						WHEN BRD.IsPercentage = 1
-						THEN IFNULL(SUM(BRD.Quantity * (BRD.BuyPrice - ((BRD.BuyPrice * BRD.Discount)/100))), 0) 
-						ELSE IFNULL(SUM(BRD.Quantity * (BRD.BuyPrice - BRD.Discount)), 0)
-					 END AS Total
+						THEN BRD.Quantity * (BRD.BuyPrice - ((BRD.BuyPrice * BRD.Discount)/100)) 
+						ELSE BRD.Quantity * (BRD.BuyPrice - BRD.Discount)
+					 END), 0) AS Total
 				FROM
 					transaction_buyreturn BR
 					JOIN master_supplier MS
@@ -150,6 +150,7 @@
 			$rowExcel++;
 		}
 		$objPHPExcel->getActiveSheet()->getStyle("E5:E".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+		$objPHPExcel->getActiveSheet()->getStyle("B5:B".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
 		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "=SUM(E5:E".($rowExcel-1).")");
 		$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Grand Total");
 		$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":D".$rowExcel);

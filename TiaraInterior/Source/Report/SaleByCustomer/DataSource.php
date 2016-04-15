@@ -60,16 +60,16 @@
 					OT.OutgoingNumber,
 					DATE_FORMAT(OT.TransactionDate, '%d/%c/%y') AS TransactionDate,
 					OT.DeliveryCost,
-					CASE
+					IFNULL(SUM(CASE
 						WHEN TOD.IsPercentage = 1
-						THEN IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))), 0)
-						ELSE IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - TOD.Discount)), 0)
-					END AS SubTotal,
-					CASE
+						THEN TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))
+						ELSE TOD.Quantity * (TOD.SalePrice - TOD.Discount)
+					END), 0) AS SubTotal,
+					IFNULL(SUM(CASE
 						WHEN TOD.IsPercentage = 1
-						THEN IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))), 0)
-						ELSE IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - TOD.Discount)), 0)
-					END + OT.DeliveryCost AS Total,
+						THEN TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))
+						ELSE TOD.Quantity * (TOD.SalePrice - TOD.Discount)
+					END), 0) + OT.DeliveryCost AS Total,
 					OT.Remarks
 				FROM
 					transaction_outgoing OT
@@ -97,16 +97,16 @@
 					SR.SaleReturnNumber,
 					DATE_FORMAT(SR.TransactionDate, '%d/%c/%y') AS TransactionDate,
 					0,
-					-CASE
+					-IFNULL(SUM(CASE
 						WHEN SRD.IsPercentage = 1
-						THEN IFNULL(SUM(SRD.Quantity * (SRD.SalePrice - ((SRD.SalePrice * SRD.Discount)/100))), 0)
-						ELSE IFNULL(SUM(SRD.Quantity * (SRD.SalePrice - SRD.Discount)), 0)
-					END AS SubTotal,
-					-CASE
+						THEN SRD.Quantity * (SRD.SalePrice - ((SRD.SalePrice * SRD.Discount)/100))
+						ELSE SRD.Quantity * (SRD.SalePrice - SRD.Discount)
+					END), 0) AS SubTotal,
+					-IFNULL(SUM(CASE
 						WHEN SRD.IsPercentage = 1
-						THEN IFNULL(SUM(SRD.Quantity * (SRD.SalePrice - ((SRD.SalePrice * SRD.Discount)/100))), 0)
-						ELSE IFNULL(SUM(SRD.Quantity * (SRD.SalePrice - SRD.Discount)), 0)
-					END AS Total,
+						THEN SRD.Quantity * (SRD.SalePrice - ((SRD.SalePrice * SRD.Discount)/100))
+						ELSE SRD.Quantity * (SRD.SalePrice - SRD.Discount)
+					END), 0) AS Total,
 					SR.Remarks
 				FROM
 					transaction_salereturn SR

@@ -75,13 +75,14 @@
 		$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, "Batch");
 		$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, "Qty");
 		$objPHPExcel->getActiveSheet()->setCellValue("J".$rowExcel, "Harga jual");
-		$objPHPExcel->getActiveSheet()->setCellValue("K".$rowExcel, "Total");
-		$objPHPExcel->getActiveSheet()->setCellValue("L".$rowExcel, "Keterangan");
+		$objPHPExcel->getActiveSheet()->setCellValue("K".$rowExcel, "Diskon");
+		$objPHPExcel->getActiveSheet()->setCellValue("L".$rowExcel, "Total");
+		$objPHPExcel->getActiveSheet()->setCellValue("M".$rowExcel, "Keterangan");
 		$rowExcel++;
 		
 		$sql = "SELECT
 					OT.OutgoingNumber,
-					DATE_FORMAT(OT.TransactionDate, '%d/%c/%y') AS TransactionDate,
+					DATE_FORMAT(OT.TransactionDate, '%d/%c%/%y') AS TransactionDate,
 					MS.SalesName,
 					MC.CustomerName,
 					MB.BrandName,
@@ -89,7 +90,22 @@
 					TOD.BatchNumber,
 					TOD.Quantity,
 					TOD.SalePrice,
-					IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))), 0) AS Total,
+					CASE
+						WHEN TOD.IsPercentage = 1
+						THEN (TOD.SalePrice * TOD.Discount)/100
+						ELSE TOD.Discount
+					END DiscountAmount,
+					CASE
+						WHEN TOD.IsPercentage = 1 AND TOD.Discount <> 0
+						THEN CONCAT('(', TOD.Discount, '%)')
+						ELSE ''
+					END Discount,
+					TOD.IsPercentage,
+					CASE
+						WHEN TOD.IsPercentage = 1
+						THEN IFNULL(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100)), 0)
+						ELSE IFNULL(TOD.Quantity * (TOD.SalePrice - TOD.Discount), 0)
+					END AS Total,
 					OT.Remarks
 				FROM
 					transaction_outgoing OT
@@ -127,8 +143,69 @@
 					TOD.Quantity,
 					TOD.SalePrice,
 					OT.Remarks
+				UNION ALL
+				SELECT
+					SR.SaleReturnNumber,
+					DATE_FORMAT(SR.TransactionDate, '%d/%c%/%y') AS TransactionDate,
+					'',
+					MC.CustomerName,
+					MB.BrandName,
+					MT.TypeName,
+					SRD.BatchNumber,
+					SRD.Quantity,
+					SRD.SalePrice,
+					CASE
+						WHEN SRD.IsPercentage = 1
+						THEN (SRD.SalePrice * SRD.Discount)/100
+						ELSE SRD.Discount
+					END DiscountAmount,
+					CASE
+						WHEN SRD.IsPercentage = 1 AND SRD.Discount <> 0
+						THEN CONCAT('(', SRD.Discount, '%)')
+						ELSE ''
+					END Discount,
+					SRD.IsPercentage,
+					-CASE
+						WHEN SRD.IsPercentage = 1
+						THEN IFNULL(SRD.Quantity * (SRD.SalePrice - ((SRD.SalePrice * SRD.Discount)/100)), 0)
+						ELSE IFNULL(SRD.Quantity * (SRD.SalePrice - SRD.Discount), 0)
+					 END AS Total,
+					SR.Remarks
+				FROM
+					transaction_salereturn SR
+					JOIN master_customer MC
+						ON MC.CustomerID = SR.CustomerID
+					LEFT JOIN transaction_salereturndetails SRD
+						ON SRD.SaleReturnID = SR.SaleReturnID
+					LEFT JOIN master_type MT
+						ON MT.TypeID = SRD.TypeID
+					LEFT JOIN master_brand MB
+						ON MB.BrandID = MT.BrandID
+				WHERE
+					SR.TransactionDate >= '".$txtFromDate."'
+					AND SR.TransactionDate <= '".$txtToDate."'
+					AND CASE
+							WHEN ".$BrandID." = 0
+							THEN MB.BrandID
+							ELSE ".$BrandID."
+						END = MB.BrandID
+					AND CASE
+							WHEN ".$TypeID." = 0
+							THEN MT.TypeID
+							ELSE ".$TypeID."
+						END = MT.TypeID
+				GROUP BY
+					SR.TransactionDate,
+					MC.CustomerName,
+					MB.BrandName,
+					SR.SaleReturnNumber,
+					MT.TypeName,
+					SRD.BatchNumber,
+					SRD.Quantity,
+					SRD.SalePrice,
+					SR.Remarks
 				ORDER BY	
-					OT.TransactionDate ASC";
+					TransactionDate ASC";
 					
 		if (! $result = mysql_query($sql, $dbh)) {
 			echo mysql_error();
@@ -147,25 +224,28 @@
 			$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, $row['BatchNumber']);
 			$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, $row['Quantity']);
 			$objPHPExcel->getActiveSheet()->setCellValue("J".$rowExcel, $row['SalePrice']);
-			$objPHPExcel->getActiveSheet()->setCellValue("K".$rowExcel, $row['Total']);
-			$objPHPExcel->getActiveSheet()->setCellValue("L".$rowExcel, $row['Remarks']);
+			$objPHPExcel->getActiveSheet()->setCellValue("K".$rowExcel, number_format($row['DiscountAmount'],2,".",",").$row['Discount']);
+			$objPHPExcel->getActiveSheet()->setCellValue("L".$rowExcel, $row['Total']);
+			$objPHPExcel->getActiveSheet()->setCellValue("M".$rowExcel, $row['Remarks']);
 			$RowNumber++;
 			$rowExcel++;
 		}
-		$objPHPExcel->getActiveSheet()->getStyle("J5:K".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-		$objPHPExcel->getActiveSheet()->setCellValue("K".$rowExcel, "=SUM(K5:K".($rowExcel-1).")");
+		$objPHPExcel->getActiveSheet()->getStyle("J5:J".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+		$objPHPExcel->getActiveSheet()->getStyle("K5:K".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
+		$objPHPExcel->getActiveSheet()->getStyle("L5:L".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+		$objPHPExcel->getActiveSheet()->setCellValue("L".$rowExcel, "=SUM(L5:L".($rowExcel-1).")");
 		$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Grand Total");
-		$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":J".$rowExcel);
+		$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":K".$rowExcel);
 		$rowExcel++;
 		//merge title
-		$objPHPExcel->getActiveSheet()->mergeCells("A1:L2");
-		$objPHPExcel->getActiveSheet()->getStyle("A4:L4")->getFont()->setBold(true);
-		$objPHPExcel->getActiveSheet()->getStyle("A1:L2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-		$objPHPExcel->getActiveSheet()->getStyle("A4:L4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('c4bd97');
+		$objPHPExcel->getActiveSheet()->mergeCells("A1:M2");
+		$objPHPExcel->getActiveSheet()->getStyle("A4:M4")->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle("A1:M2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$objPHPExcel->getActiveSheet()->getStyle("A4:M4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('c4bd97');
 
 		//set all width 
 		$fromCol='A';
-		$toCol= 'M';
+		$toCol= 'N';
 		for($j = $fromCol; $j !== $toCol; $j++) {
 			//$calculatedWidth = $objPHPExcel->getActiveSheet()->getColumnDimension($i)->getWidth();
 			$objPHPExcel->getActiveSheet()->getColumnDimension($j)->setAutoSize(true);
@@ -177,7 +257,7 @@
 			  )
 			)
 		);		
-		$objPHPExcel->getActiveSheet()->getStyle("A4:L".($rowExcel-1))->applyFromArray($styleArray);		
+		$objPHPExcel->getActiveSheet()->getStyle("A4:M".($rowExcel-1))->applyFromArray($styleArray);		
 
 		$title = "Laporan Penjualan Per Barang $FromDate - $ToDate";
 		// Rename worksheet

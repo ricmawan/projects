@@ -83,7 +83,7 @@
 						ELSE TOD.Discount
 					END DiscountAmount,
 					CASE
-						WHEN TOD.IsPercentage = 1
+						WHEN TOD.IsPercentage = 1 AND TOD.Discount <> 0
 						THEN CONCAT('(', TOD.Discount, '%)')
 						ELSE ''
 					END Discount,

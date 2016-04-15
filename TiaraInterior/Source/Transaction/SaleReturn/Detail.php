@@ -170,9 +170,9 @@
 								<div class="col-md-12">
 									
 									<table class="table" style="width:auto;" id="datainput">
-										<thead style="background-color: black;color:white;height:25px;width:828px;display:block;">
+										<thead style="background-color: black;color:white;height:25px;width:826px;display:block;">
 											<td align="center" style="width:30px;">No</td>
-											<td align="center" style="width:180px;">Nama Barang</td>
+											<td align="center" style="width:230px;">Nama Barang</td>
 											<td align="center" style="width:75px;">QTY</td>											
 											<td align="center" style="width:135px;">Harga Jual</td>
 											<td align="center" style="width:155px;">Diskon</td>
@@ -199,7 +199,7 @@
 													<input type="text" id="txtDiscount" style="display:inline-block;width: 90px;text-align:right;" value="0" name="txtDiscount" style="text-align:right;" class="form-control-custom txtDiscount" onchange="ValidateDiscount(this.getAttribute('row'))" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" placeholder="Diskon" /> &nbsp; <input type="checkbox" name="chkIsPercentage" id="chkIsPercentage" style="margin-top:2px;vertical-align:sub;" onchange="ValidateDiscount(this.getAttribute('row'))" value=1 checked class="chkIsPercentage" /> (%)
 												</td>
 												<td  style="width:175px;">
-													<input type="text" id="txtTotal" name="txtTotal" class="form-control-custom txtTotal" style="text-align:right;width:175px;" value="0.00" placeholder="Jumlah" readonly />
+													<input type="text" id="txtTotal" name="txtTotal" class="form-control-custom txtTotal" style="text-align:right;" value="0.00" placeholder="Jumlah" readonly />
 												</td>
 												<td style="vertical-align:middle;">
 													<i class="fa fa-close btnDelete" style="cursor:pointer;" acronym title="Hapus Data" onclick="DeleteRow(this.getAttribute('row'))"></i>

@@ -116,7 +116,7 @@
 										<th data-column-id="BrandName">Merek</th>
 										<th data-column-id="TypeName">Tipe</th>
 										<th data-column-id="BatchNumber">Batch</th>
-										<th data-column-id="Quantity">Qty</th>
+										<th data-column-id="Quantity" data-align="right">Qty</th>
 										<th data-column-id="SalePrice" data-align="right">Harga Jual</th>
 										<th data-column-id="Discount" data-align="right">Diskon</th>
 										<th data-column-id="Total" data-align="right">Total</th>

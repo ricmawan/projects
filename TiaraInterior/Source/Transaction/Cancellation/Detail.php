@@ -151,7 +151,7 @@
 								<div class="col-md-12">
 									
 									<table class="table" style="width:auto;" id="datainput">
-										<thead style="background-color: black;color:white;height:25px;width:1020px;display:block;">
+										<thead style="background-color: black;color:white;height:25px;width:995px;display:block;">
 											<td align="center" style="width:30px;">No</td>
 											<td align="center" style="width:230px;">Nama Barang</td>
 											<td align="center" style="width:75px;">QTY</td>
@@ -184,7 +184,7 @@
 													<input type="text" id="txtTotal" name="txtTotal" class="form-control-custom" style="text-align:right;" value="0.00" placeholder="Jumlah" readonly />
 												</td>
 												<td  style="width:200px;">
-													<input type="text" id="txtRemarksDetail" name="txtRemarksDetail" class="form-control-custom" style="width:235px;" placeholder="Keterangan" readonly />
+													<input type="text" id="txtRemarksDetail" name="txtRemarksDetail" class="form-control-custom" placeholder="Keterangan" readonly />
 												</td>
 											</tr>
 										</tbody>
