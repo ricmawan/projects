@@ -53,11 +53,11 @@
 	$sql = "SELECT
 				SO.StockOpnameID,
 				DATE_FORMAT(SO.TransactionDate, '%d-%m-%Y') AS TransactionDate,
-				CASE
-					WHEN SOD.FromQty > SOD.ToQty
-					THEN (SOD.FromQty - SOD.ToQty) * SOD.SalePrice
-					ELSE (SOD.ToQty - SOD.FromQty) * SOD.BuyPrice
-				END Total,
+				IFNULL(SUM(CASE
+								WHEN SOD.FromQty > SOD.ToQty
+								THEN (SOD.FromQty - SOD.ToQty) * SOD.SalePrice
+								ELSE -(SOD.ToQty - SOD.FromQty) * SOD.BuyPrice
+							END), 0) Total,
 				SO.Remarks
 			FROM
 				transaction_stockopname SO

@@ -1,23 +1,16 @@
-@C,                                                                                                                         Tgl : 13-03-2016
+@C!                                                                                                                         Tgl : 15-04-2016
    Kepada Yth.  CV. WallPaper
                 Semarang
                            EW14RETUR BELI
-5W0F   Kami retur barang-barang sbb:                                                                                        No : RB-130316001
+5W0F   Kami retur barang-barang sbb:                                                                                        No : RB-150416002
 _________________________________________________________________________________________________________________________________________
-|        Qty        |                     Nama Barang                     |    Lot    |     Harga Satuan     |            Total         |
+|      Qty      |                Nama Barang                 |     Lot    |    Harga Satuan   |       Diskon      |        Total        |
 _________________________________________________________________________________________________________________________________________
-|        13 Roll    |  Eurowall 001                                       |      123  |           17,100.00  |              222,300.00  |
-|         1 Roll    |  Eurowall 001                                       |      125  |           17,100.00  |               17,100.00  |
-|         1 Roll    |  Eurowall 001                                       |      135  |           17,100.00  |               17,100.00  |
-|         1 Roll    |  Eurowall 001                                       |      213  |           17,100.00  |               17,100.00  |
-|         1 Roll    |  Eurowall 001                                       |      212  |           17,100.00  |               17,100.00  |
-|         1 Roll    |  Eurowall 002                                       |      100  |           25,000.00  |               25,000.00  |
-|         1 Roll    |  Eurowall 002                                       |       12  |           25,000.00  |               25,000.00  |
-|         1 m       |  MAESTRO 003                                        |      100  |           22,500.00  |               22,500.00  |
-|         1 m       |  MAESTRO 003                                        |      101  |           22,500.00  |               22,500.00  |
+|     10 m      | MAESTRO 003                                |        123 |         18,225.00 |        182.25(1%) |          180,427.50 |
+|      1 m      | MAESTRO 003                                |        124 |         19,000.00 |            100.00 |           18,900.00 |
 _________________________________________________________________________________________________________________________________________
-   Catatan   :                                                                            Jml Retur              Rp.        385,700.00
-   Terbilang : TIGA RATUS DELAPAN PULUH LIMA RIBU TUJUH RATUS RUPIAH
+   Catatan   :                                                                            Jml Retur             Rp.          199,327.50
+   Terbilang : SERATUS SEMBILAN PULUH SEMBILAN RIBU TIGA RATUS DUA PULUH TUJUH RUPIAH
 _________________________________________________________________________________________________________________________________________
    Penerima,                                                  Checker,                                                  Hormat Kami,
 

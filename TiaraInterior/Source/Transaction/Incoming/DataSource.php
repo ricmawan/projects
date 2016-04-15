@@ -57,11 +57,11 @@
 				IT.IncomingNumber,
 				MS.SupplierName,
 				DATE_FORMAT(IT.TransactionDate, '%d-%m-%Y') AS TransactionDate,
-				CASE
-					WHEN ITD.IsPercentage = 1
-					THEN IFNULL(SUM(ITD.Quantity * (ITD.BuyPrice - ((ITD.BuyPrice * ITD.Discount)/100))), 0) 
-					ELSE IFNULL(SUM(ITD.Quantity * (ITD.BuyPrice - ITD.Discount)), 0)
-				END AS TotalAmount,
+				IFNULL(SUM(CASE
+								WHEN ITD.IsPercentage = 1
+								THEN ITD.Quantity * (ITD.BuyPrice - ((ITD.BuyPrice * ITD.Discount)/100))
+								ELSE ITD.Quantity * (ITD.BuyPrice - ITD.Discount)
+							END), 0) AS TotalAmount,
 				IT.Remarks
 			FROM
 				transaction_incoming IT

@@ -1,21 +1,14 @@
-@C!   Tgl : 17-03-2016                                     Kepada Yth.  Bejo
+@C!   Tgl : 16-04-2016                                     Kepada Yth.  Bejo
                                                                      Jalan Pekunden Tengah No 1108
                                                                      (Wingko Babat Pak Moel)
                                           EW1SURAT JALANW0F     Semarang
    Sales           : BUDI                                            Ph 20983091
-   Kami kirim pesanan anda dlm keadaan baik, barang-barang sbb:                                                         No : TJ-170316001
+   Kami kirim pesanan anda dalam keadaan baik, barang-barang sbb:                                                       No : TJ-160416001
 -----------------------------------------------------------------------------------------------------------------------------------------
-|       Qty       |                    Nama Barang                    |   Lot   |                       Keterangan                      |
+|      Qty      |                Nama Barang                 |     Lot    |                          Keterangan                         |
 -----------------------------------------------------------------------------------------------------------------------------------------
-|       2 Roll    |  Eurowall 001                                     |    125  |  test                                                 |
-|       5 Roll    |  Eurowall 001                                     |    123  |  lha kamu kok mau nyoba kolom keterangan tu apa-apa   |
-|      16 Roll    |  Eurowall 001                                     |    135  |                                                       |
-|       6 Roll    |  Eurowall 001                                     |    212  |                                                       |
-|       3 Roll    |  Eurowall 001                                     |    213  |                                                       |
-|       1 Roll    |  Eurowall 002                                     |    100  |                                                       |
-|       1 Roll    |  Eurowall 002                                     |     12  |                                                       |
-|       4 m       |  MAESTRO 003                                      |    100  |                                                       |
-|       5 m       |  MAESTRO 003                                      |    101  |                                                       |
+|      1 Roll   | Eurowall 001                               |        112 |                                                             |
+|     10 m      | MAESTRO 003                                |        123 |                                                             |
 -----------------------------------------------------------------------------------------------------------------------------------------
    Catatan   : 
 _________________________________________________________________________________________________________________________________________

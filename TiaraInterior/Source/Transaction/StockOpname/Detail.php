@@ -397,26 +397,47 @@
 				GrandTotal = 0;
 				var row = 0;
 				var qty = 1;
-				var price = 0;
+				var adjustment = 1;
+				var buyprice = 0;
+				var saleprice = 0;
 				var disc = 0;
 				var isPercentage = 0;
 				var i = 0;
 				var deliveryCost = 0;
 				$(".txtAdjustment").each(function() {
 					if(i != 0) {
-						qty = $(this).val();
+						adjustment = $(this).val();
 						row = $(this).attr("row");
-						price = $("#txtSalePrice" + row).val().replace(/\,/g, "");
-						if(qty == "") {
+						qty = $("#txtQuantity" + row).val();
+						saleprice = $("#txtSalePrice" + row).val().replace(/\,/g, "");
+						buyprice = $("#txtBuyPrice" + row).val().replace(/\,/g, "");
+						if(adjustment == "") {
+							$(this).val(1);
+							adjustment = 1;
+						}
+						if(adjustment == "") {
 							$(this).val(1);
 							qty = 1;
 						}
-						else if(price == "") {
+						if(saleprice == "") {
 							$("#txtSalePrice" + row).val("0.00");
-							price = 0;
+							saleprice = 0;
 						}
-						GrandTotal += parseFloat(qty) * parseFloat(price);
-						Total = parseFloat(qty) * parseFloat(price);
+						if(buyprice == "") {
+							$("#txtBuyPrice" + row).val("0.00");
+							buyprice = 0;
+						}
+						
+						if(parseFloat(qty) > parseFloat(adjustment)) {
+							GrandTotal += (parseFloat(qty) - parseFloat(adjustment)) * parseFloat(saleprice);
+							Total = (parseFloat(qty) - parseFloat(adjustment)) * parseFloat(saleprice);
+						}
+						else {
+							GrandTotal += -(parseFloat(adjustment) - parseFloat(qty)) * parseFloat(buyprice); 
+							Total = -(parseFloat(adjustment) - parseFloat(qty)) * parseFloat(buyprice);
+						}
+						//GrandTotal += parseFloat(qty) * parseFloat(price);
+						//Total = parseFloat(qty) * parseFloat(price);
 						$("#txtTotal" + row).val(returnRupiah(Total.toString()));
 					}
 					i++;

@@ -70,7 +70,21 @@
 					CONCAT(MB.BrandName, ' ', MT.TypeName) ItemName,
 					SRD.BatchNumber,
 					SRD.SalePrice,
-					IFNULL((SRD.Quantity * SRD.SalePrice), 0) Total
+					CASE
+						WHEN SRD.IsPercentage = 1
+						THEN (SRD.SalePrice * SRD.Discount)/100
+						ELSE SRD.Discount
+					END DiscountAmount,
+					CASE
+						WHEN SRD.IsPercentage = 1
+						THEN CONCAT('(', SRD.Discount, '%)')
+						ELSE ''
+					END Discount,
+					CASE
+						WHEN SRD.IsPercentage = 1
+						THEN SRD.Quantity * (SRD.SalePrice - ((SRD.SalePrice * SRD.Discount)/100))
+						ELSE SRD.Quantity * (SRD.SalePrice - SRD.Discount)
+					END Total
 				FROM
 					transaction_salereturndetails SRD
 					JOIN master_type MT
@@ -91,27 +105,27 @@
 		}
 		$GrandTotal = 0;
 		$Data .= "_________________________________________________________________________________________________________________________________________\n";
-		$Data .= "|        Qty        |                   Nama Barang                    |      Lot     |     Harga Satuan     |            Total         |\n";
+		$Data .= "|      Qty      |                Nama Barang                 |     Lot    |    Harga Satuan   |       Diskon      |        Total        |\n";
 		$Data .= "_________________________________________________________________________________________________________________________________________\n";
 		
 		while($row=mysql_fetch_array($result)) {
 			//Qty
-			$Data .= "|  " . fnSpace(8 - strlen($row['Quantity'])) . $row['Quantity'] . " " . $row['UnitName'] . fnSpace(6 - strlen($row['UnitName'])) . "  |  ";
+			$Data .= "| " . fnSpace(6 - strlen($row['Quantity'])) . $row['Quantity'] . " " . $row['UnitName'] . fnSpace(6 - strlen($row['UnitName'])) . " | ";
 			//ItemName
-			$Data .= $row['ItemName'] . fnSpace(46 - strlen($row['ItemName'])) . "  |  ";
+			$Data .= $row['ItemName'] . fnSpace(42 - strlen($row['ItemName'])) . " | ";
 			//BatchNumber
-			$Data .= fnSpace(10 - strlen($row['BatchNumber'])) . $row['BatchNumber'] . "  |  ";
+			$Data .= fnSpace(10 - strlen($row['BatchNumber'])) . $row['BatchNumber'] . " | ";
 			//Harga Satuan
-			$Data .= fnSpace(18 - strlen(number_format($row['SalePrice'],2,".",","))) . number_format($row['SalePrice'],2,".",",") . "  |  ";
+			$Data .= fnSpace(17 - strlen(number_format($row['SalePrice'],2,".",","))) . number_format($row['SalePrice'],2,".",",") . " | ";
 			//Diskon
-			//$Data .= fnSpace(9 - strlen(number_format($row['DiscountAmount'], 0, ".", ",")) - strlen($row['Discount'])) . number_format($row['DiscountAmount'], 0, ".", ",") . "(" . $row['Discount'] . "%)  |  ";
+			$Data .= fnSpace(17 - strlen(number_format($row['DiscountAmount'], 2, ".", ",")) - strlen($row['Discount'])) . number_format($row['DiscountAmount'], 2, ".", ",") . $row['Discount'] . " | ";
 			//Total
-			$Data .= fnSpace(22 - strlen(number_format($row['Total'],2,".",","))) . number_format($row['Total'],2,".",",") . "  |\n";
+			$Data .= fnSpace(19 - strlen(number_format($row['Total'],2,".",","))) . number_format($row['Total'],2,".",",") . " |\n";
 			$GrandTotal += $row['Total'];
 		}
 		//$Data .= "|    2,00 m lari  |  MAESTRO 646 XTC                                  |    522  |      155,000.00  |   15.500(10%)  |   100,201,500.00  |\n";
 		$Data .= "_________________________________________________________________________________________________________________________________________\n";
-		$Data .= "   Catatan   : " . $Remarks . fnSpace(75) ."Jml Retur              Rp.   " . fnSpace(15 - strlen(number_format($GrandTotal,2,".",","))) . number_format($GrandTotal,2,".",",") . "\n";
+		$Data .= "   Catatan   : " . $Remarks . fnSpace(75) ."Jml Retur             Rp. " . fnSpace(19 - strlen(number_format($GrandTotal,2,".",","))) . number_format($GrandTotal,2,".",",") . "\n";
 		$Data .= "   Terbilang : " . trim(strtoupper(Terbilang($GrandTotal))) . " RUPIAH\n";
 		$Data .= "_________________________________________________________________________________________________________________________________________\n";
 		$Data .= "   Penerima,". fnSpace(50) ."Checker,". fnSpace(50) ."Hormat Kami,\n\n\n";

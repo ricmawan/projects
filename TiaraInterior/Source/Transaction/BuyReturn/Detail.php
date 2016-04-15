@@ -48,13 +48,160 @@
 						BRD.BatchNumber,
 						BRD.Discount,
 						BRD.IsPercentage,
-						CONCAT(MB.BrandName, ' ', I.TypeName, ' - ', BRD.BatchNumber) AS TypeName
+						CONCAT(MB.BrandName, ' ', MT.TypeName, ' - ', BRD.BatchNumber) AS TypeName,
+						BRD.Quantity + (IFNULL(FS.Quantity, 0) - IFNULL(TOD.Quantity, 0) - IFNULL(BR.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(BO.Quantity, 0) + IFNULL(SO.Quantity, 0)) Stock
 					FROM
 						transaction_buyreturndetails BRD
-						JOIN master_type I
-							ON I.TypeID = BRD.TypeID
+						JOIN master_type MT
+							ON MT.TypeID = BRD.TypeID
 						JOIN master_brand MB
-							ON MB.BrandID = I.BrandID
+							ON MB.BrandID = MT.BrandID
+						LEFT JOIN
+						(
+							SELECT
+								TypeID,
+								TRIM(BatchNumber) BatchNumber,
+								SUM(SA.Quantity) Quantity,
+								BuyPrice,
+								SalePrice
+							FROM
+							(
+								SELECT
+									TypeID,
+									TRIM(BatchNumber) BatchNumber,
+									SUM(Quantity) Quantity,
+									CASE
+										WHEN IsPercentage = 1
+										THEN (BuyPrice - ((BuyPrice * Discount) / 100))
+										ELSE (BuyPrice - Discount)
+									END AS BuyPrice,
+									SalePrice,
+									CreatedDate
+								FROM
+									transaction_firststockdetails
+								GROUP BY
+									TypeID,
+									BatchNumber,
+									BuyPrice,
+									SalePrice,
+									CreatedDate,
+									Discount
+								UNION
+								SELECT
+									TypeID,
+									TRIM(BatchNumber) BatchNumber,
+									SUM(Quantity) Quantity,
+									CASE
+										WHEN IsPercentage = 1
+										THEN (BuyPrice - ((BuyPrice * Discount) / 100))
+										ELSE (BuyPrice - Discount)
+									END AS BuyPrice,
+									SalePrice,
+									CreatedDate
+								FROM
+									transaction_incomingdetails
+								GROUP BY
+									TypeID,
+									BatchNumber,
+									BuyPrice,
+									SalePrice,
+									CreatedDate,
+									Discount
+								ORDER BY
+									CreatedDate DESC
+							)SA
+							GROUP BY
+								TypeID,
+								BatchNumber
+						)FS
+							ON FS.TypeID = MT.TypeID
+							AND FS.BatchNumber = BRD.BatchNumber
+						LEFT JOIN
+						(
+							SELECT
+								OTD.TypeID,
+								TRIM(OTD.BatchNumber) BatchNumber,
+								SUM(OTD.Quantity) Quantity
+							FROM
+								transaction_outgoingdetails OTD
+								JOIN transaction_outgoing OT
+									ON OT.OutgoingID = OTD.OutgoingID
+							WHERE
+								OT.IsCancelled = 0
+							GROUP BY
+								OTD.TypeID,
+								OTD.BatchNumber
+						)TOD
+							ON TOD.TypeID = MT.TypeID
+							AND TOD.BatchNumber = FS.BatchNumber
+						LEFT JOIN
+						(
+							SELECT
+								TypeID,
+								TRIM(BatchNumber) BatchNumber,
+								SUM(Quantity) Quantity
+							FROM
+								transaction_buyreturndetails
+							GROUP BY
+								TypeID,
+								BatchNumber
+						)BR
+							ON BR.TypeID = MT.TypeID
+							AND BR.BatchNumber = FS.BatchNumber
+						LEFT JOIN
+						(
+							SELECT
+								TypeID,
+								TRIM(BatchNumber) BatchNumber,
+								SUM(Quantity) Quantity
+							FROM
+								transaction_salereturndetails
+							GROUP BY
+								TypeID,
+								BatchNumber
+						)SR
+							ON SR.TypeID = MT.TypeID
+							AND SR.BatchNumber = FS.BatchNumber
+						LEFT JOIN
+						(
+							SELECT
+								BOD.TypeID,
+								TRIM(BOD.BatchNumber) BatchNumber,
+								SUM(BOD.Quantity) Quantity
+							FROM
+								transaction_booking BO
+								JOIN transaction_bookingdetails BOD
+									ON BO.BookingID = BOD.BookingID
+							WHERE
+								BO.BookingStatusID = 1
+							GROUP BY
+								BOD.TypeID,
+								BOD.BatchNumber
+						)BO
+							ON BO.TypeID = MT.TypeID
+							AND BO.BatchNumber = FS.BatchNumber
+						LEFT JOIN
+						(
+							SELECT
+								SOD.TypeID,
+								TRIM(SOD.BatchNumber) BatchNumber,
+								SUM(
+										CASE
+											WHEN SOD.FromQty > SOD.ToQty
+											THEN -(SOD.FromQty - SOD.ToQty)
+											ELSE (SOD.ToQty - SOD.FromQty)
+										END
+									) Quantity
+							FROM
+								transaction_stockopname SO
+								JOIN transaction_stockopnamedetails SOD
+									ON SO.StockOpnameID = SOD.StockOpnameID
+							GROUP BY
+								SOD.TypeID,
+								SOD.BatchNumber
+						)SO
+							ON SO.TypeID = MT.TypeID
+							AND SO.BatchNumber = FS.BatchNumber
 					WHERE
 						BRD.BuyReturnID = $BuyReturnID";
 			if(!$result = mysql_query($sql, $dbh)) {
@@ -67,7 +214,7 @@
 				$Data = array();
 				while($row = mysql_fetch_array($result)) {
 					//array_push($DetailID, $row[0]);
-					array_push($Data, "'".$row['BuyReturnDetailsID']."', '".$row['TypeID']."', '".$row['TypeName']."', '".$row['BatchNumber']."', '".$row['Quantity']."', '".$row['BuyPrice']."', '".$row['Discount']."', '".$row['IsPercentage']."'");
+					array_push($Data, "'".$row['BuyReturnDetailsID']."', '".$row['TypeID']."', '".$row['TypeName']."', '".$row['BatchNumber']."', '".$row['Quantity']."', '".$row['BuyPrice']."', '".$row['Discount']."', '".$row['IsPercentage']."', '".$row['Stock']."'");
 				}
 				//$DetailID = implode(",", $DetailID);
 				$Data = implode("|", $Data);
@@ -275,7 +422,7 @@
 				$("#ddlType").val("");
 				$("#ddlType").next().find("input").val("");
 				$.ajax({
-					url: "./Transaction/Outgoing/GetAvailableType.php",
+					url: "./Transaction/BuyReturn/GetAvailableType.php",
 					type: "POST",
 					data: { BrandID : $("#ddlBrand").val() },
 					dataType: "json",
@@ -573,8 +720,9 @@
 						$("#hdnTypeID" + count).val(d[1].replace("'", ""));
 						$("#txtTypeName" + count).val(d[2].replace("'", ""));
 						$("#hdnBatchNumber" + count).val(d[3].replace("'", ""));
-						$("#txtQuantity" + count).val(d[4].replace("'", ""));
-						$("#txtBuyPrice" + count).val(returnRupiah(d[5].replace("'", "")));
+						$("#txtQuantity" + count).val(d[4].replace("'", ""));						
+						$("#txtBuyPrice" + count).val(returnRupiah(d[5].replace("'", "")));						
+						$("#hdnStock" + count).val(d[8].replace("'", ""));
 						if(d[7].replace("'", "") == true) {
 							$("#txtDiscount" + count).val(d[6].replace("'", ""));
 							$("#chkIsPercentage" + count).attr("checked", true);

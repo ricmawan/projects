@@ -1,24 +1,17 @@
-@C!   Tgl : 17-03-2016                                                         Kepada Yth.  Bejo
+@C!   Tgl : 16-04-2016                                                         Kepada Yth.  Bejo
                                                                                          Semarang
    Sales           : BUDI                           EW1INVOICEW0F
-   Tgl Jatuh Tempo : 25-03-2016
-   Kami kirim pesanan anda dlm keadaan baik, barang-barang sbb:                                                         No : TJ-170316001
+   Tgl Jatuh Tempo : 15-04-2016
+   Kami kirim pesanan anda dalam keadaan baik, barang-barang sbb:                                                       No : TJ-160416001
 -----------------------------------------------------------------------------------------------------------------------------------------
-|       Qty       |                    Nama Barang                    |   Lot   |   Harga Satuan   |     Diskon     |       Total       |
+|      Qty      |                Nama Barang                 |     Lot    |    Harga Satuan   |       Diskon      |        Total        |
 -----------------------------------------------------------------------------------------------------------------------------------------
-|       2 Roll    |  Eurowall 001                                     |    125  |       27,000.00  |         0(0%)  |        54,000.00  |
-|       5 Roll    |  Eurowall 001                                     |    123  |       27,000.00  |         0(0%)  |       135,000.00  |
-|      16 Roll    |  Eurowall 001                                     |    135  |       27,000.00  |         0(0%)  |       432,000.00  |
-|       6 Roll    |  Eurowall 001                                     |    212  |       27,000.00  |         0(0%)  |       162,000.00  |
-|       3 Roll    |  Eurowall 001                                     |    213  |       27,000.00  |         0(0%)  |        81,000.00  |
-|       1 Roll    |  Eurowall 002                                     |    100  |       35,000.00  |         0(0%)  |        35,000.00  |
-|       1 Roll    |  Eurowall 002                                     |     12  |       35,000.00  |         0(0%)  |        35,000.00  |
-|       4 m       |  MAESTRO 003                                      |    100  |       35,000.00  |         0(0%)  |       140,000.00  |
-|       5 m       |  MAESTRO 003                                      |    101  |       35,000.00  |         0(0%)  |       175,000.00  |
+|      1 Roll   | Eurowall 001                               |        112 |         27,000.00 |             1,000 |           26,000.00 |
+|     10 m      | MAESTRO 003                                |        123 |         35,000.00 |        3,500(10%) |          315,000.00 |
 |---------------------------------------------------------------------------------------------------------------------------------------|
-   Catatan   :                                                                            Jml Pembelian          Rp.      1,249,000.00
-   Kredit    : Rp. 1,249,000.00
-   Terbilang : SATU JUTA DUA RATUS EMPAT PULUH SEMBILAN RIBU RUPIAH
+   Catatan   :                                                                            Jml Pembelian         Rp.          341,000.00
+   Kredit    : Rp. 341,000.00
+   Terbilang : TIGA RATUS EMPAT PULUH SATU RIBU RUPIAH
 _________________________________________________________________________________________________________________________________________
    Penerima,                                                  Checker,                                                  Hormat Kami,
 

@@ -6,7 +6,7 @@
 	include "../../GetPermission.php";
 
 	$where = " 1=1 ";
-	$order_by = "MT.TypeID";
+	$order_by = "3, 2, 7";
 	$rows = 10;
 	$current = 1;
 	$limit_l = ($current * $rows) - ($rows);
@@ -51,28 +51,54 @@
 					SELECT
 						TypeID,
 						TRIM(BatchNumber) BatchNumber,
-						SUM(SA.Quantity) Quantity
+						SUM(SA.Quantity) Quantity,
+						BuyPrice,
+						SalePrice
 					FROM
 					(
 						SELECT
 							TypeID,
 							TRIM(BatchNumber) BatchNumber,
-							SUM(Quantity) Quantity
+							SUM(Quantity) Quantity,
+							CASE
+								WHEN IsPercentage = 1
+								THEN (BuyPrice - ((BuyPrice * Discount) / 100))
+								ELSE (BuyPrice - Discount)
+							END AS BuyPrice,
+							SalePrice,
+							CreatedDate
 						FROM
 							transaction_firststockdetails
 						GROUP BY
 							TypeID,
-							BatchNumber
+							BatchNumber,
+							BuyPrice,
+							SalePrice,
+							CreatedDate,
+							Discount
 						UNION
 						SELECT
 							TypeID,
 							TRIM(BatchNumber) BatchNumber,
-							SUM(Quantity) Quantity
+							SUM(Quantity) Quantity,
+							CASE
+								WHEN IsPercentage = 1
+								THEN (BuyPrice - ((BuyPrice * Discount) / 100))
+								ELSE (BuyPrice - Discount)
+							END AS BuyPrice,
+							SalePrice,
+							CreatedDate
 						FROM
 							transaction_incomingdetails
 						GROUP BY
 							TypeID,
-							BatchNumber
+							BatchNumber,
+							BuyPrice,
+							SalePrice,
+							CreatedDate,
+							Discount
+						ORDER BY
+							CreatedDate DESC
 					)SA
 					GROUP BY
 						TypeID,
@@ -92,8 +118,8 @@
 					WHERE
 						OT.IsCancelled = 0
 					GROUP BY
-						TypeID,
-						BatchNumber
+						OTD.TypeID,
+						OTD.BatchNumber
 				)TOD
 					ON TOD.TypeID = MT.TypeID
 					AND TOD.BatchNumber = FS.BatchNumber
@@ -143,6 +169,28 @@
 				)BO
 					ON BO.TypeID = MT.TypeID
 					AND BO.BatchNumber = FS.BatchNumber
+				LEFT JOIN
+				(
+					SELECT
+						SOD.TypeID,
+						TRIM(SOD.BatchNumber) BatchNumber,
+						SUM(
+								CASE
+									WHEN SOD.FromQty > SOD.ToQty
+									THEN -(SOD.FromQty - SOD.ToQty)
+									ELSE (SOD.ToQty - SOD.FromQty)
+								END
+							) Quantity
+					FROM
+						transaction_stockopname SO
+						JOIN transaction_stockopnamedetails SOD
+							ON SO.StockOpnameID = SOD.StockOpnameID
+					GROUP BY
+						SOD.TypeID,
+						SOD.BatchNumber
+				)SO
+					ON SO.TypeID = MT.TypeID
+					AND SO.BatchNumber = FS.BatchNumber
 			WHERE
 				$where";
 	if (! $result = mysql_query($sql, $dbh)) {

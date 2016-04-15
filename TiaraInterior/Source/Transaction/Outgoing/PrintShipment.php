@@ -80,10 +80,6 @@
 					MU.UnitName,
 					CONCAT(MB.BrandName, ' ', MT.TypeName) ItemName,
 					TOD.BatchNumber,
-					TOD.SalePrice,
-					((TOD.SalePrice * TOD.Discount)/100) DiscountAmount,
-					TOD.Discount,
-					IFNULL(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100)), 0) Total,
 					TOD.Remarks
 				FROM
 					transaction_outgoingdetails TOD
@@ -105,18 +101,18 @@
 		}
 		$GrandTotal = 0;
 		$Data .= "-----------------------------------------------------------------------------------------------------------------------------------------\n";
-		$Data .= "|       Qty       |                 Nama Barang                  |      Lot     |                       Keterangan                      |\n";
+		$Data .= "|      Qty      |                Nama Barang                 |     Lot    |                          Keterangan                         |\n";
 		$Data .= "-----------------------------------------------------------------------------------------------------------------------------------------\n";
 		
 		while($row=mysql_fetch_array($result)) {
 			//Qty
-			$Data .= "|  " . fnSpace(6 - strlen($row['Quantity'])) . $row['Quantity'] . " " . $row['UnitName'] . fnSpace(6 - strlen($row['UnitName'])) . "  |  ";
+			$Data .= "| " . fnSpace(6 - strlen($row['Quantity'])) . $row['Quantity'] . " " . $row['UnitName'] . fnSpace(6 - strlen($row['UnitName'])) . " | ";
 			//ItemName
-			$Data .= $row['ItemName'] . fnSpace(42 - strlen($row['ItemName'])) . "  |  ";
+			$Data .= $row['ItemName'] . fnSpace(42 - strlen($row['ItemName'])) . " | ";
 			//BatchNumber
-			$Data .= fnSpace(10 - strlen($row['BatchNumber'])) . $row['BatchNumber'] . "  |  ";
+			$Data .= fnSpace(10 - strlen($row['BatchNumber'])) . $row['BatchNumber'] . " | ";
 			//Remarks
-			$Data .= $row['Remarks'] . fnSpace(51 - strlen($row['Remarks'])) . "  |\n";
+			$Data .= $row['Remarks'] . fnSpace(59 - strlen($row['Remarks'])) . " |\n";
 			//Harga Satuan
 			//$Data .= fnSpace(14 - strlen(number_format($row['SalePrice'],2,".",","))) . number_format($row['SalePrice'],2,".",",") . "  |  ";
 			//Diskon

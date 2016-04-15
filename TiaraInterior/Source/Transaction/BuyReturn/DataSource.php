@@ -56,11 +56,11 @@
 				BR.BuyReturnID,
 				MS.SupplierName,
 				DATE_FORMAT(BR.TransactionDate, '%d-%m-%Y') AS TransactionDate,
-				CASE
-					WHEN BRD.IsPercentage = 1
-					THEN IFNULL(SUM(BRD.Quantity * (BRD.BuyPrice - ((BRD.BuyPrice * BRD.Discount)/100))), 0)
-					ELSE IFNULL(SUM(BRD.Quantity * (BRD.BuyPrice - BRD.Discount)), 0)
-				END AS TotalAmount,
+				IFNULL(SUM(CASE
+								WHEN BRD.IsPercentage = 1
+								THEN BRD.Quantity * (BRD.BuyPrice - ((BRD.BuyPrice * BRD.Discount)/100))
+								ELSE BRD.Quantity * (BRD.BuyPrice - BRD.Discount)
+							END), 0) AS TotalAmount,
 				BR.Remarks,
 				BR.BuyReturnNumber
 			FROM

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 	SESSION_START();
 	include "DBConfig.php";
 	if(ISSET($_SESSION['UserLogin']) && ISSET($_SESSION['UserPassword'])) {

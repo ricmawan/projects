@@ -54,11 +54,11 @@
 				FS.FirstStockID,
 				FS.FirstStockNumber,
 				DATE_FORMAT(FS.TransactionDate, '%d-%m-%Y') AS TransactionDate,
-				CASE
-					WHEN FSD.IsPercentage = 1
-					THEN IFNULL(SUM(FSD.Quantity * (FSD.BuyPrice - ((FSD.BuyPrice * FSD.Discount)/100))), 0) 
-					ELSE IFNULL(SUM(FSD.Quantity * (FSD.BuyPrice - FSD.Discount)), 0)
-				END AS TotalAmount,
+				IFNULL(SUM(CASE
+								WHEN FSD.IsPercentage = 1
+								THEN FSD.Quantity * (FSD.BuyPrice - ((FSD.BuyPrice * FSD.Discount)/100)) 
+								ELSE FSD.Quantity * (FSD.BuyPrice - FSD.Discount)
+							END), 0) AS TotalAmount,
 				FS.Remarks
 			FROM
 				transaction_firststock FS

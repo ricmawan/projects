@@ -79,14 +79,18 @@
 					TOD.SalePrice,
 					CASE
 						WHEN TOD.IsPercentage = 1
-						THEN TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100)
-						ELSE (TOD.SalePrice - TOD.Discount)
+						THEN (TOD.SalePrice * TOD.Discount)/100
+						ELSE TOD.Discount
 					END DiscountAmount,
-					TOD.Discount,
 					CASE
 						WHEN TOD.IsPercentage = 1
-						THEN IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))), 0)
-						ELSE IFNULL(SUM(TOD.Quantity * (TOD.SalePrice - TOD.Discount)), 0)
+						THEN CONCAT('(', TOD.Discount, '%)')
+						ELSE ''
+					END Discount,
+					CASE
+						WHEN TOD.IsPercentage = 1
+						THEN TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))
+						ELSE TOD.Quantity * (TOD.SalePrice - TOD.Discount)
 					END Total
 				FROM
 					transaction_outgoingdetails TOD
@@ -108,27 +112,27 @@
 		}
 		$GrandTotal = 0;
 		$Data .= "-----------------------------------------------------------------------------------------------------------------------------------------\n";
-		$Data .= "|       Qty       |                 Nama Barang                  |      Lot     |   Harga Satuan   |     Diskon     |       Total       |\n";
+		$Data .= "|      Qty      |                Nama Barang                 |     Lot    |    Harga Satuan   |       Diskon      |        Total        |\n";
 		$Data .= "-----------------------------------------------------------------------------------------------------------------------------------------\n";
 		
 		while($row=mysql_fetch_array($result)) {
 			//Qty
-			$Data .= "|  " . fnSpace(6 - strlen($row['Quantity'])) . $row['Quantity'] . " " . $row['UnitName'] . fnSpace(6 - strlen($row['UnitName'])) . "  |  ";
+			$Data .= "| " . fnSpace(6 - strlen($row['Quantity'])) . $row['Quantity'] . " " . $row['UnitName'] . fnSpace(6 - strlen($row['UnitName'])) . " | ";
 			//ItemName
-			$Data .= $row['ItemName'] . fnSpace(42 - strlen($row['ItemName'])) . "  |  ";
+			$Data .= $row['ItemName'] . fnSpace(42 - strlen($row['ItemName'])) . " | ";
 			//BatchNumber
-			$Data .= fnSpace(10 - strlen($row['BatchNumber'])) . $row['BatchNumber'] . "  |  ";
+			$Data .= fnSpace(10 - strlen($row['BatchNumber'])) . $row['BatchNumber'] . " | ";
 			//Harga Satuan
-			$Data .= fnSpace(14 - strlen(number_format($row['SalePrice'],2,".",","))) . number_format($row['SalePrice'],2,".",",") . "  |  ";
+			$Data .= fnSpace(17 - strlen(number_format($row['SalePrice'],2,".",","))) . number_format($row['SalePrice'],2,".",",") . " | ";
 			//Diskon
-			$Data .= fnSpace(9 - strlen(number_format($row['DiscountAmount'], 0, ".", ",")) - strlen($row['Discount'])) . number_format($row['DiscountAmount'], 0, ".", ",") . "(" . $row['Discount'] . "%)  |  ";
+			$Data .= fnSpace(17 - strlen(number_format($row['DiscountAmount'], 2, ".", ",")) - strlen($row['Discount'])) . number_format($row['DiscountAmount'], 2, ".", ",") . $row['Discount'] . " | ";
 			//Total
-			$Data .= fnSpace(15 - strlen(number_format($row['Total'],2,".",","))) . number_format($row['Total'],2,".",",") . "  |\n";
+			$Data .= fnSpace(19 - strlen(number_format($row['Total'],2,".",","))) . number_format($row['Total'],2,".",",") . " |\n";
 			$GrandTotal += $row['Total'];
 		}
 		//$Data .= "|    2,00 m lari  |  MAESTRO 646 XTC                                  |    522  |      155,000.00  |   15.500(10%)  |   100,201,500.00  |\n";
 		$Data .= "|---------------------------------------------------------------------------------------------------------------------------------------|\n";
-		$Data .= "   Catatan   : " . $Remarks . fnSpace(75) ."Jml Pembelian          Rp.   " . fnSpace(15 - strlen(number_format($GrandTotal,2,".",","))) . number_format($GrandTotal,2,".",",") . "\n";
+		$Data .= "   Catatan   : " . $Remarks . fnSpace(75) ."Jml Pembelian         Rp. " . fnSpace(19 - strlen(number_format($GrandTotal,2,".",","))) . number_format($GrandTotal,2,".",",") . "\n";
 		$Data .= "   Kredit    : Rp. " . number_format($GrandTotal,2,".",",") . "\n";
 		$Data .= "   Terbilang : " . trim(strtoupper(Terbilang($GrandTotal))) . " RUPIAH\n";
 		$Data .= "_________________________________________________________________________________________________________________________________________\n";
@@ -137,7 +141,7 @@
 		$Data .=  $bold1 . "Barang yang sudah dibeli tidak dapat ditukar/dikembalikan" . Chr(12);
 		fwrite($handle, $Data);
 		fclose($handle);
-		copy($file, $SHARED_PRINTER_ADDRESS); 
+		//copy($file, $SHARED_PRINTER_ADDRESS); 
 		//exec("lp -d epson ".$file);  # Lakukan cetak
 		//unlink($file);
 		echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);

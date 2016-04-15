@@ -60,16 +60,16 @@
 				MS.SalesName,
 				MC.CustomerName,
 				DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') AS TransactionDate,
-				CASE
-					WHEN OTD.IsPercentage = 1
-					THEN IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - ((OTD.SalePrice * OTD.Discount)/100))), 0)
-					ELSE IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - OTD.Discount)), 0)
-				END AS SubTotal,
-				CASE
-					WHEN OTD.IsPercentage = 1
-					THEN IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - ((OTD.SalePrice * OTD.Discount)/100))), 0)
-					ELSE IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - OTD.Discount)), 0)
-				END + OT.DeliveryCost AS Total,
+				IFNULL(SUM(CASE
+								WHEN OTD.IsPercentage = 1
+								THEN OTD.Quantity * (OTD.SalePrice - ((OTD.SalePrice * OTD.Discount)/100))
+								ELSE OTD.Quantity * (OTD.SalePrice - OTD.Discount)
+							END), 0) AS SubTotal,
+				IFNULL(SUM(CASE
+								WHEN OTD.IsPercentage = 1
+								THEN OTD.Quantity * (OTD.SalePrice - ((OTD.SalePrice * OTD.Discount)/100))
+								ELSE OTD.Quantity * (OTD.SalePrice - OTD.Discount)
+							END), 0) + OT.DeliveryCost AS Total,
 				OT.DeliveryCost,
 				OT.Remarks
 			FROM

@@ -1,6 +1,18 @@
 <?php
 	$RequestPath = "$_SERVER[REQUEST_URI]";
 	include "../../GetPermission.php";
+	
+	$sql = "UPDATE transaction_booking
+			SET
+				BookingStatusID = 3
+			WHERE
+				NOW() > DueDate
+				AND DueDate <> '0000-00-00 00:00:00'";
+	
+	if (! $result = mysql_query($sql, $dbh)) {
+		echo mysql_error();
+		return 0;
+	}
 ?>
 <html>
 	<head>

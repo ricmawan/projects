@@ -16,7 +16,7 @@
 					TOD.BatchNumber,
 					MT.BuyPrice,
 					MT.SalePrice,
-					IFNULL(TOD.Quantity, 0) Stock,
+					IFNULL(TOD.Quantity, 0) - IFNULL(SR.Quantity, 0) Stock,
 					MU.UnitName
 				FROM
 					master_type MT
@@ -42,9 +42,27 @@
 							BatchNumber
 					)TOD
 						ON TOD.TypeID = MT.TypeID
+					LEFT JOIN
+					(
+						SELECT
+							SRD.TypeID,
+							TRIM(SRD.BatchNumber) BatchNumber,
+							SUM(SRD.Quantity) Quantity
+						FROM
+							transaction_salereturn SR
+							JOIN transaction_salereturndetails SRD
+								ON SR.SaleReturnID = SRD.SaleReturnID
+						WHERE
+							SR.CustomerID = ".$CustomerID."
+						GROUP BY
+							SRD.TypeID,
+							SRD.BatchNumber
+					)SR
+						ON SR.TypeID = MT.TypeID
+						AND SR.BatchNumber = TOD.BatchNumber
 				WHERE
 					MB.BrandID = ".$BrandID."
-					AND IFNULL(TOD.Quantity, 0) > 0";
+					AND IFNULL(TOD.Quantity, 0) - IFNULL(SR.Quantity, 0) > 0";
 		
 		if (! $result = mysql_query($sql, $dbh)) {
 			$Message = "Terjadi Kesalahan Sistem";
