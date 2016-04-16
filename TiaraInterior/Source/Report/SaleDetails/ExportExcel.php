@@ -46,14 +46,14 @@
 		// Set document properties
 		$objPHPExcel->getProperties()->setCreator($_SESSION['UserLogin'])
 									 ->setLastModifiedBy($_SESSION['UserLogin'])
-									 ->setTitle("Laporan Penjualan")
+									 ->setTitle("Laporan Rinci Penjualan")
 									 ->setSubject("Laporan")
-									 ->setDescription("Laporan Penjualan")
+									 ->setDescription("Laporan Rinci Penjualan")
 									 ->setKeywords("Generate By PHPExcel")
 									 ->setCategory("Laporan");
 		//Header
 		$objPHPExcel->setActiveSheetIndex(0)
-					->setCellValue('A1', "LAPORAN PENJUALAN");
+					->setCellValue('A1', "LAPORAN RINCI PENJUALAN");
 		
 		$objPHPExcel->getActiveSheet()->getStyle('A1')->getAlignment()->setWrapText(true);
 		
@@ -83,7 +83,7 @@
 					DATE_FORMAT(OT.TransactionDate, '%d/%c/%y') AS TransactionDate,
 					MC.CustomerName,
 					MC.City,
-					TOD.BatchNumber,
+					CONCAT(MB.BrandName, ' ', MT.TypeName, ' - ', TOD.BatchNumber) ItemName,
 					TOD.Quantity,
 					TOD.SalePrice,
 					CASE
@@ -106,11 +106,15 @@
 					transaction_outgoing OT
 					JOIN master_customer MC
 						ON MC.CustomerID = OT.CustomerID
-					LEFT JOIN transaction_outgoingdetails TOD
+					JOIN transaction_outgoingdetails TOD
 						ON TOD.OutgoingID = OT.OutgoingID
+					JOIN master_type MT
+						ON MT.TypeID = TOD.TypeID
+					JOIN master_brand MB
+						ON MB.BrandID = MT.BrandID
 				WHERE
-					OT.TransactionDate >= '".$txtFromDate."'
-					AND OT.TransactionDate <= '".$txtToDate."'
+					CAST(OT.TransactionDate AS DATE) >= '".$txtFromDate."'
+					AND CAST(OT.TransactionDate AS DATE) <= '".$txtToDate."'
 					AND OT.IsCancelled = 0
 					AND CASE
 							WHEN ".$CustomerID." = 0
@@ -123,7 +127,7 @@
 					DATE_FORMAT(SR.TransactionDate, '%d/%c/%y') AS TransactionDate,
 					MC.CustomerName,
 					MC.City,
-					SRD.BatchNumber,
+					CONCAT(MB.BrandName, ' ', MT.TypeName, ' - ', SRD.BatchNumber) ItemName,
 					SRD.Quantity,
 					SRD.SalePrice,
 					CASE
@@ -146,11 +150,15 @@
 					transaction_salereturn SR
 					JOIN master_customer MC
 						ON MC.CustomerID = SR.CustomerID
-					LEFT JOIN transaction_salereturndetails SRD
+					JOIN transaction_salereturndetails SRD
 						ON SRD.SaleReturnID = SR.SaleReturnID
+					JOIN master_type MT
+						ON MT.TypeID = SRD.TypeID
+					JOIN master_brand MB
+						ON MB.BrandID = MT.BrandID
 				WHERE
-					SR.TransactionDate >= '".$txtFromDate."'
-					AND SR.TransactionDate <= '".$txtToDate."'					
+					CAST(SR.TransactionDate AS DATE) >= '".$txtFromDate."'
+					AND CAST(SR.TransactionDate AS DATE) <= '".$txtToDate."'					
 					AND CASE
 							WHEN ".$CustomerID." = 0
 							THEN MC.CustomerID
@@ -173,7 +181,7 @@
 			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $RowNumber);
 			$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['OutgoingNumber']);
 			$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['TransactionDate']);
-			$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row['BatchNumber']);
+			$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row['ItemName']);
 			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, $row['Quantity']);
 			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['SalePrice']);
 			$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, number_format($row['DiscountAmount'],2,".",",").$row['Discount']);
@@ -215,7 +223,7 @@
 		);		
 		$objPHPExcel->getActiveSheet()->getStyle("A7:I".($rowExcel-1))->applyFromArray($styleArray);		
 
-		$title = "Laporan Penjualan $FromDate - $ToDate";
+		$title = "Laporan Rinci Penjualan $FromDate - $ToDate";
 		// Rename worksheet
 		//$objPHPExcel->getActiveSheet()->setTitle($title);
 		// Set active sheet index to the first sheet, so Excel opens this as the first sheet

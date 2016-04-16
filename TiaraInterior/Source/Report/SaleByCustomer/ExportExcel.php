@@ -102,8 +102,8 @@
 					LEFT JOIN transaction_outgoingdetails TOD
 						ON TOD.OutgoingID = OT.OutgoingID
 				WHERE
-					OT.TransactionDate >= '".$txtFromDate."'
-					AND OT.TransactionDate <= '".$txtToDate."'
+					CAST(OT.TransactionDate AS DATE) >= '".$txtFromDate."'
+					AND CAST(OT.TransactionDate AS DATE) <= '".$txtToDate."'
 					AND OT.IsCancelled = 0
 					AND ".$CustomerID." = MC.CustomerID
 				GROUP BY
@@ -135,8 +135,8 @@
 					LEFT JOIN transaction_salereturndetails SRD
 						ON SRD.SaleReturnID = SR.SaleReturnID
 				WHERE
-					SR.TransactionDate >= '".$txtFromDate."'
-					AND SR.TransactionDate <= '".$txtToDate."'					
+					CAST(SR.TransactionDate AS DATE) >= '".$txtFromDate."'
+					AND CAST(SR.TransactionDate AS DATE) <= '".$txtToDate."'					
 					AND ".$CustomerID." = MC.CustomerID
 				GROUP BY
 					SR.SaleReturnNumber,

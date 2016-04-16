@@ -120,8 +120,8 @@
 					LEFT JOIN master_brand MB
 						ON MB.BrandID = MT.BrandID
 				WHERE
-					OT.TransactionDate >= '".$txtFromDate."'
-					AND OT.TransactionDate <= '".$txtToDate."'
+					CAST(OT.TransactionDate AS DATE) >= '".$txtFromDate."'
+					AND CAST(OT.TransactionDate AS DATE) <= '".$txtToDate."'
 					AND OT.IsCancelled = 0
 					AND CASE
 							WHEN ".$BrandID." = 0
@@ -183,8 +183,8 @@
 					LEFT JOIN master_brand MB
 						ON MB.BrandID = MT.BrandID
 				WHERE
-					SR.TransactionDate >= '".$txtFromDate."'
-					AND SR.TransactionDate <= '".$txtToDate."'
+					CAST(SR.TransactionDate AS DATE) >= '".$txtFromDate."'
+					AND CAST(SR.TransactionDate AS DATE) <= '".$txtToDate."'
 					AND CASE
 							WHEN ".$BrandID." = 0
 							THEN MB.BrandID

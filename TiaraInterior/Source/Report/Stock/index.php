@@ -102,13 +102,14 @@
 							</div>
 						</div>
 						<br />
-						Grand Total: <span class="grandtotal"></span>
-						<br />
+						<!--Grand Total: <span class="grandtotal"></span>
+						<br />-->
 						<div class="table-responsive" id="dvTable" style="display: none;">
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
-										<th data-column-id="RowNumber" data-sortable="false" data-type="numeric" >No</th>
+										<!--<th data-column-id="RowNumber" data-sortable="false" data-type="numeric" >No</th>-->
+										<th data-column-id="BatchNumber">Batch</th>
 										<th data-column-id="TransactionNumber" data-sortable="false" data-type="numeric" >No Nota</th>
 										<th data-column-id="TransactionType" >Tipe Transaksi</th>
 										<th data-column-id="TransactionDate" >Tanggal</th>
@@ -118,16 +119,17 @@
 										<th data-column-id="TypeName">Tipe</th>
 										<th data-column-id="BatchNumber">Batch</th>-->
 										<th data-column-id="Quantity" data-align="right">Qty</th>
-										<th data-column-id="Price" data-align="right">Harga Jual/Beli</th>
+										<th data-column-id="Stock" data-align="right">Stok</td>
+										<!--<th data-column-id="Price" data-align="right">Harga Jual/Beli</th>
 										<th data-column-id="Discount" data-align="right">Diskon</th>
-										<th data-column-id="Total" data-align="right">Total</th>
+										<th data-column-id="Total" data-align="right">Total</th>-->
 										<th data-column-id="Remarks" >Keterangan</th>
 									</tr>
 								</thead>
 							</table>
 						</div>
-						<br />
-						Grand Total: <span class="grandtotal"></span>
+						<!--<br />
+						Grand Total: <span class="grandtotal"></span>-->
 					</div>
 				</div>
 			</div>
@@ -203,7 +205,6 @@
 							search: "Cari"
 						},
 						responseHandler: function(response) {
-							console.log(response);
 							$(".grandtotal").html(response.GrandTotal);
 							return response;
 						},
@@ -258,7 +259,7 @@
 				}
 				else {
 					$("#loading").show();
-					$("#excelDownload").attr("src", "Report/SaleByItem/ExportExcel.php?BrandID=" + BrandID + "&TypeID=" + TypeID + "&txtFromDate=" + txtFromDate + "&txtToDate=" + txtToDate);
+					$("#excelDownload").attr("src", "Report/Stock/ExportExcel.php?BrandID=" + BrandID + "&TypeID=" + TypeID + "&txtFromDate=" + txtFromDate + "&txtToDate=" + txtToDate);
 					$("#loading").hide();
 				}
 			}
@@ -266,7 +267,7 @@
 				$("#ddlType option").each(function() {
 					$(this).remove();
 				});
-				$("#ddlType").append('<option value=0 selected>-Pilih Semua Tipe-</option>');
+				//$("#ddlType").append('<option value=0 selected>-Pilih Semua Tipe-</option>');
 				$("#ddlType").val("0");
 				//$("#ddlType").next().find("input").val("");
 				$("#ddlHiddenType option").each(function() {

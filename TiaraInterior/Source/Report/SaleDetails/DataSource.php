@@ -59,7 +59,7 @@
 		$sql = "SELECT
 					OT.OutgoingNumber,
 					DATE_FORMAT(OT.TransactionDate, '%d/%c/%y') AS TransactionDate,
-					TOD.BatchNumber,
+					CONCAT(MB.BrandName, ' ', MT.TypeName, ' - ', TOD.BatchNumber) ItemName,
 					TOD.Quantity,
 					TOD.SalePrice,
 					CASE
@@ -84,11 +84,15 @@
 						ON MS.SalesID = OT.SalesID
 					JOIN master_customer MC
 						ON MC.CustomerID = OT.CustomerID
-					LEFT JOIN transaction_outgoingdetails TOD
+					JOIN transaction_outgoingdetails TOD
 						ON TOD.OutgoingID = OT.OutgoingID
+					JOIN master_type MT
+						ON MT.TypeID = TOD.TypeID
+					JOIN master_brand MB
+						ON MB.BrandID = MT.BrandID
 				WHERE
-					OT.TransactionDate >= '".$txtFromDate."'
-					AND OT.TransactionDate <= '".$txtToDate."'
+					CAST(OT.TransactionDate AS DATE) >= '".$txtFromDate."'
+					AND CAST(OT.TransactionDate AS DATE) <= '".$txtToDate."'
 					AND OT.IsCancelled = 0
 					AND CASE
 							WHEN ".$CustomerID." = 0
@@ -99,7 +103,7 @@
 				SELECT
 					SR.SaleReturnNumber,
 					DATE_FORMAT(SR.TransactionDate, '%d/%c/%y') AS TransactionDate,
-					SRD.BatchNumber,
+					CONCAT(MB.BrandName, ' ', MT.TypeName, ' - ', SRD.BatchNumber) ItemName,
 					SRD.Quantity,
 					SRD.SalePrice,
 					CASE
@@ -122,11 +126,15 @@
 					transaction_salereturn SR
 					JOIN master_customer MC
 						ON MC.CustomerID = SR.CustomerID
-					LEFT JOIN transaction_salereturndetails SRD
+					JOIN transaction_salereturndetails SRD
 						ON SRD.SaleReturnID = SR.SaleReturnID
+					JOIN master_type MT
+						ON MT.TypeID = SRD.TypeID
+					JOIN master_brand MB
+						ON MB.BrandID = MT.BrandID
 				WHERE
-					SR.TransactionDate >= '".$txtFromDate."'
-					AND SR.TransactionDate <= '".$txtToDate."'					
+					CAST(SR.TransactionDate AS DATE) >= '".$txtFromDate."'
+					AND CAST(SR.TransactionDate AS DATE) <= '".$txtToDate."'					
 					AND CASE
 							WHEN ".$CustomerID." = 0
 							THEN MC.CustomerID
@@ -150,7 +158,7 @@
 			$row_array['RowNumber'] = $RowNumber;
 			$row_array['OutgoingNumber']= $row['OutgoingNumber'];
 			$row_array['TransactionDate'] = $row['TransactionDate'];
-			$row_array['BatchNumber'] = $row['BatchNumber'];
+			$row_array['ItemName'] = $row['ItemName'];
 			$row_array['Quantity'] = $row['Quantity'];
 			$row_array['SalePrice'] = number_format($row['SalePrice'],2,".",",");
 			$row_array['Discount'] = number_format($row['DiscountAmount'],2,".",",").$row['Discount'];

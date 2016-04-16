@@ -90,8 +90,8 @@
 					LEFT JOIN transaction_incomingdetails TID
 						ON TID.IncomingID = TI.IncomingID
 				WHERE
-					TI.TransactionDate >= '".$txtFromDate."'
-					AND TI.TransactionDate <= '".$txtToDate."'
+					CAST(TI.TransactionDate AS DATE) >= '".$txtFromDate."'
+					AND CAST(TI.TransactionDate AS DATE) <= '".$txtToDate."'
 					AND CASE
 							WHEN ".$SupplierID." = 0
 							THEN MS.SupplierID
@@ -119,8 +119,8 @@
 					LEFT JOIN transaction_buyreturndetails BRD
 						ON BRD.BuyReturnID = BR.BuyReturnID
 				WHERE
-					BR.TransactionDate >= '".$txtFromDate."'
-					AND BR.TransactionDate <= '".$txtToDate."'
+					CAST(BR.TransactionDate AS DATE) >= '".$txtFromDate."'
+					AND CAST(BR.TransactionDate AS DATE) <= '".$txtToDate."'
 					AND CASE
 							WHEN ".$SupplierID." = 0
 							THEN MS.SupplierID

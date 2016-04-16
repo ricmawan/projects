@@ -76,7 +76,7 @@
 										<th data-column-id="RowNumber" data-sortable="false" data-type="numeric" >No</th>
 										<th data-column-id="OutgoingNumber" data-sortable="false" data-type="numeric" >No Nota</th>
 										<th data-column-id="TransactionDate" >Tanggal</th>
-										<th data-column-id="BatchNumber" >Batch</th>
+										<th data-column-id="ItemName" >Barang</th>
 										<th data-column-id="Quantity" data-align="right">Qty</th>
 										<th data-column-id="SalePrice" data-align="right">Harga</th>
 										<th data-column-id="Discount" data-align="right">Diskon</th>
@@ -156,7 +156,6 @@
 							search: "Cari"
 						},
 						responseHandler: function(response) {
-							console.log(response);
 							$(".grandtotal").html(response.GrandTotal);
 							return response;
 						},

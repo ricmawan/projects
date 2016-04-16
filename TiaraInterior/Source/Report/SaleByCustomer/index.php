@@ -154,7 +154,6 @@
 							search: "Cari"
 						},
 						responseHandler: function(response) {
-							console.log(response);
 							$(".grandtotal").html(response.GrandTotal);
 							return response;
 						},
