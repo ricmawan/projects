@@ -100,6 +100,7 @@
 				WHERE
 					OT.TransactionDate >= '".$txtFromDate."'
 					AND OT.TransactionDate <= '".$txtToDate."'
+					AND OT.IsCancelled = 0
 					AND CASE
 							WHEN ".$BrandID." = 0
 							THEN MB.BrandID
@@ -110,17 +111,6 @@
 							THEN MT.TypeID
 							ELSE ".$TypeID."
 						END = MT.TypeID
-				GROUP BY
-					OT.TransactionDate,
-					MS.SalesName,
-					MC.CustomerName,
-					MB.BrandName,
-					OT.OutgoingNumber,
-					MT.TypeName,
-					TOD.BatchNumber,
-					TOD.Quantity,
-					TOD.SalePrice,
-					OT.Remarks
 				UNION ALL
 				SELECT
 					SR.SaleReturnNumber,
@@ -172,16 +162,6 @@
 							THEN MT.TypeID
 							ELSE ".$TypeID."
 						END = MT.TypeID
-				GROUP BY
-					SR.TransactionDate,
-					MC.CustomerName,
-					MB.BrandName,
-					SR.SaleReturnNumber,
-					MT.TypeName,
-					SRD.BatchNumber,
-					SRD.Quantity,
-					SRD.SalePrice,
-					SR.Remarks
 				ORDER BY	
 					TransactionDate ASC";
 		

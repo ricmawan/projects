@@ -86,7 +86,7 @@
 			return 0;
 		}
 		if($hdnIsEdit == 0) {
-			$State = 3;
+			/*$State = 3;
 			$sql = "INSERT INTO transaction_invoicenumber
 					(
 						InvoiceNumberType,
@@ -113,7 +113,7 @@
 				echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
 				mysql_query("ROLLBACK", $dbh);
 				return 0;
-			}
+			}*/
 			
 			$State = 4;
 			$sql = "SELECT

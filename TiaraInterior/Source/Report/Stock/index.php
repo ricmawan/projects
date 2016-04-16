@@ -109,15 +109,16 @@
 								<thead>				
 									<tr>
 										<th data-column-id="RowNumber" data-sortable="false" data-type="numeric" >No</th>
-										<th data-column-id="OutgoingNumber" data-sortable="false" data-type="numeric" >No Nota</th>
+										<th data-column-id="TransactionNumber" data-sortable="false" data-type="numeric" >No Nota</th>
+										<th data-column-id="TransactionType" >Tipe Transaksi</th>
 										<th data-column-id="TransactionDate" >Tanggal</th>
 										<!--<th data-column-id="SalesName">Sales</th>-->
-										<th data-column-id="CustomerName">Pelanggan</th>
-										<th data-column-id="BrandName">Merek</th>
+										<th data-column-id="CustomerName">Pelanggan/Supplier</th>
+										<!--<th data-column-id="BrandName">Merek</th>
 										<th data-column-id="TypeName">Tipe</th>
-										<th data-column-id="BatchNumber">Batch</th>
-										<th data-column-id="Quantity">Qty</th>
-										<th data-column-id="SalePrice" data-align="right">Harga Jual</th>
+										<th data-column-id="BatchNumber">Batch</th>-->
+										<th data-column-id="Quantity" data-align="right">Qty</th>
+										<th data-column-id="Price" data-align="right">Harga Jual/Beli</th>
 										<th data-column-id="Discount" data-align="right">Diskon</th>
 										<th data-column-id="Total" data-align="right">Total</th>
 										<th data-column-id="Remarks" >Keterangan</th>
@@ -206,7 +207,7 @@
 							$(".grandtotal").html(response.GrandTotal);
 							return response;
 						},
-						url: "Report/SaleByItem/DataSource.php?BrandID=" + BrandID + "&TypeID=" + TypeID + "&txtFromDate=" + txtFromDate + "&txtToDate=" + txtToDate,
+						url: "Report/Stock/DataSource.php?BrandID=" + BrandID + "&TypeID=" + TypeID + "&txtFromDate=" + txtFromDate + "&txtToDate=" + txtToDate,
 						selection: true,
 						multiSelect: true,
 						rowSelect: true,
