@@ -210,7 +210,7 @@ VALUES
 	'Transaction/StockOpname/',
 	NULL,
 	0,
-	5
+	6
 ),
 (
 	22,
@@ -219,7 +219,7 @@ VALUES
 	'Transaction/Booking/',
 	NULL,
 	0,
-	6
+	7
 ),
 (
 	23,
@@ -228,13 +228,22 @@ VALUES
 	'Transaction/Cancellation/',
 	NULL,
 	0,
-	6
+	8
 ),
 (
 	24,
 	4,
 	'Stok',
 	'Report/Stock/',
+	NULL,
+	1,
+	5
+),
+(
+	25,
+	4,
+	'Rinci Penjualan',
+	'Report/SaleDetails/',
 	NULL,
 	1,
 	6

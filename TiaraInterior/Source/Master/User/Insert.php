@@ -34,7 +34,7 @@
 				$Message = "Terjadi Kesalahan Sistem";
 				$MessageDetail = mysql_error();
 				$FailedFlag = 1;
-				echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
+				echo returnstate($UserID, $Message, $MessageDetail, $FailedFlag, $State);
 				return 0;
 			}
 			$row = mysql_fetch_array($result);
@@ -48,7 +48,7 @@
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysql_error();
 			$FailedFlag = 1;
-			echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
+			echo returnstate($UserID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}				
 		$row=mysql_fetch_array($result);

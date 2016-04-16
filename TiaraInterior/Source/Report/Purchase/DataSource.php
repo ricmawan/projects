@@ -92,10 +92,10 @@
 					BR.BuyReturnNumber,
 					BR.Remarks,
 					-IFNULL(SUM(CASE
-						WHEN BRD.IsPercentage = 1
-						THEN BRD.Quantity * (BRD.BuyPrice - ((BRD.BuyPrice * BRD.Discount)/100)) 
-						ELSE BRD.Quantity * (BRD.BuyPrice - BRD.Discount)
-					 END), 0) AS Total
+									WHEN BRD.IsPercentage = 1
+									THEN BRD.Quantity * (BRD.BuyPrice - ((BRD.BuyPrice * BRD.Discount)/100)) 
+									ELSE BRD.Quantity * (BRD.BuyPrice - BRD.Discount)
+								END), 0) AS Total
 				FROM
 					transaction_buyreturn BR
 					JOIN master_supplier MS

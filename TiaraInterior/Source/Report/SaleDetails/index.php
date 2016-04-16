@@ -15,60 +15,25 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						 <h5>Penjualan Per Barang</h5>
+						 <h5>Penjualan Per Pelanggan</h5>
 					</div>
 					<div class="panel-body">
 						<div class="row">
 							<div class="col-md-1 labelColumn">
-								Merek:
+								Pelanggan:
 							</div>
 							<div class="col-md-3">
 								<div class="ui-widget" style="width: 100%;">
-									<select name="ddlBrand" id="ddlBrand" class="form-control-custom" placeholder="Pilih Merek" >
-										<option value=0 selected>-Pilih Semua Merek-</option>
+									<select name="ddlCustomer" id="ddlCustomer" class="form-control-custom" placeholder="Pilih Pelanggan" >
+										<option value=0 selected>-Pilih Pelanggan-</option>
 										<?php
-											$sql = "SELECT BrandID, BrandName FROM master_brand";
+											$sql = "SELECT CustomerID, CustomerName, Address FROM master_customer";
 											if(!$result = mysql_query($sql, $dbh)) {
 												echo mysql_error();
 												return 0;
 											}
 											while($row = mysql_fetch_array($result)) {
-												echo "<option value='".$row['BrandID']."' >".$row['BrandName']."</option>";
-											}
-										?>
-									</select>
-								</div>
-							</div>
-						</div>
-						<br />
-						<div class="row">
-							<div class="col-md-1 labelColumn">
-								Tipe:
-							</div>
-							<div class="col-md-3">
-								<div class="ui-widget" style="width: 100%;">
-									<select name="ddlType" id="ddlType" class="form-control-custom" placeholder="Pilih Tipe" >
-										<option value=0 selected>-Pilih Semua Tipe-</option>
-										<?php
-											$sql = "SELECT MT.TypeID, MT.TypeName, MB.BrandID, MB.BrandName FROM master_type MT JOIN master_brand MB ON MT.BrandID = MB.BrandID";
-											if(!$result = mysql_query($sql, $dbh)) {
-												echo mysql_error();
-												return 0;
-											}
-											while($row = mysql_fetch_array($result)) {
-												echo "<option value='".$row['TypeID']."' brandid='".$row['BrandID']."' >".$row['BrandName']." ".$row['TypeName']."</option>";
-											}
-										?>
-									</select>
-									<select name="ddlHiddenType" id="ddlHiddenType" style="display:none;">
-										<?php
-											$sql = "SELECT MT.TypeID, MT.TypeName, MB.BrandID, MB.BrandName FROM master_type MT JOIN master_brand MB ON MT.BrandID = MB.BrandID";
-											if(!$result = mysql_query($sql, $dbh)) {
-												echo mysql_error();
-												return 0;
-											}
-											while($row = mysql_fetch_array($result)) {
-												echo "<option value='".$row['TypeID']."' brandid='".$row['BrandID']."' >".$row['BrandName']." ".$row['TypeName']."</option>";
+												echo "<option value='".$row['CustomerID']."' >".$row['CustomerName']." - ".$row['Address']."</option>";
 											}
 										?>
 									</select>
@@ -111,13 +76,9 @@
 										<th data-column-id="RowNumber" data-sortable="false" data-type="numeric" >No</th>
 										<th data-column-id="OutgoingNumber" data-sortable="false" data-type="numeric" >No Nota</th>
 										<th data-column-id="TransactionDate" >Tanggal</th>
-										<!--<th data-column-id="SalesName">Sales</th>-->
-										<th data-column-id="CustomerName">Pelanggan</th>
-										<!--<th data-column-id="BrandName">Merek</th>
-										<th data-column-id="TypeName">Tipe</th>-->
-										<th data-column-id="BatchNumber">Batch</th>
+										<th data-column-id="BatchNumber" >Batch</th>
 										<th data-column-id="Quantity" data-align="right">Qty</th>
-										<th data-column-id="SalePrice" data-align="right">Harga Jual</th>
+										<th data-column-id="SalePrice" data-align="right">Harga</th>
 										<th data-column-id="Discount" data-align="right">Diskon</th>
 										<th data-column-id="Total" data-align="right">Total</th>
 										<th data-column-id="Remarks" >Keterangan</th>
@@ -133,8 +94,7 @@
 		</div>
 		<script>			
 			function Preview() {
-				var BrandID = $("#ddlBrand").val();
-				var TypeID = $("#ddlType").val();
+				var CustomerID = $("#ddlCustomer").val();
 				var txtFromDate = $("#txtFromDate").val();
 				var txtToDate = $("#txtToDate").val();
 				var PassValidate = 1;
@@ -153,16 +113,10 @@
 						}
 					}
 				}
-				if(BrandID == "") {
-					$("#ddlBrand").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+				if(CustomerID == 0) {
+					$("#ddlCustomer").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 					PassValidate = 0;
-					if(FirstFocus == 0) $("#ddlBrand").next().find("input").focus();
-					FirstFocus = 1;
-				}
-				if(TypeID == "") {
-					$("#ddlType").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-					PassValidate = 0;
-					if(FirstFocus == 0) $("#ddlType").next().find("input").focus();
+					if(FirstFocus == 0) $("#ddlCustomer").next().find("input").focus();
 					FirstFocus = 1;
 				}
 				if(PassValidate == 0) {
@@ -206,7 +160,7 @@
 							$(".grandtotal").html(response.GrandTotal);
 							return response;
 						},
-						url: "Report/SaleByItem/DataSource.php?BrandID=" + BrandID + "&TypeID=" + TypeID + "&txtFromDate=" + txtFromDate + "&txtToDate=" + txtToDate,
+						url: "Report/SaleDetails/DataSource.php?CustomerID=" + CustomerID + "&txtFromDate=" + txtFromDate + "&txtToDate=" + txtToDate,
 						selection: true,
 						multiSelect: true,
 						rowSelect: true,
@@ -217,8 +171,7 @@
 				}
 			}
 			function ExportExcel() {
-				var BrandID = $("#ddlBrand").val();
-				var TypeID = $("#ddlType").val();
+				var CustomerID = $("#ddlCustomer").val();
 				var txtFromDate = $("#txtFromDate").val();
 				var txtToDate = $("#txtToDate").val();
 				var PassValidate = 1;
@@ -237,16 +190,10 @@
 						}
 					}
 				}
-				if(BrandID == "") {
-					$("#ddlBrand").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+				if(CustomerID == 0) {
+					$("#ddlCustomer").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 					PassValidate = 0;
-					if(FirstFocus == 0) $("#ddlBrand").next().find("input").focus();
-					FirstFocus = 1;
-				}
-				if(TypeID == "") {
-					$("#ddlType").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-					PassValidate = 0;
-					if(FirstFocus == 0) $("#ddlType").next().find("input").focus();
+					if(FirstFocus == 0) $("#ddlCustomer").next().find("input").focus();
 					FirstFocus = 1;
 				}
 				if(PassValidate == 0) {
@@ -257,31 +204,12 @@
 				}
 				else {
 					$("#loading").show();
-					$("#excelDownload").attr("src", "Report/SaleByItem/ExportExcel.php?BrandID=" + BrandID + "&TypeID=" + TypeID + "&txtFromDate=" + txtFromDate + "&txtToDate=" + txtToDate);
+					$("#excelDownload").attr("src", "Report/SaleDetails/ExportExcel.php?CustomerID=" + CustomerID + "&txtFromDate=" + txtFromDate + "&txtToDate=" + txtToDate);
 					$("#loading").hide();
 				}
 			}
-			function BindItem() {
-				$("#ddlType option").each(function() {
-					$(this).remove();
-				});
-				$("#ddlType").append('<option value=0 selected>-Pilih Semua Tipe-</option>');
-				$("#ddlType").val("0");
-				//$("#ddlType").next().find("input").val("");
-				$("#ddlHiddenType option").each(function() {
-					if($(this).attr("brandid") == $("#ddlBrand").val() || $("#ddlBrand").val() == "0") {
-						$("#ddlType").append($(this).clone());
-					}
-				});
-			}
-			
 			$(document).ready(function () {
-				$("#ddlBrand").combobox({
-					select: function( event, ui ) {
-						BindItem();						
-					}
-				});
-				$("#ddlType").combobox();
+				$("#ddlCustomer").combobox();
 			});
 		</script>
 	</body>

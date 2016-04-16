@@ -122,6 +122,7 @@
 				WHERE
 					OT.TransactionDate >= '".$txtFromDate."'
 					AND OT.TransactionDate <= '".$txtToDate."'
+					AND OT.IsCancelled = 0
 					AND CASE
 							WHEN ".$BrandID." = 0
 							THEN MB.BrandID

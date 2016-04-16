@@ -5,7 +5,7 @@
 	$RequestPath = str_replace($file, "", $RequestPath);
 	include "../../GetPermission.php";
 
-	$where = " 1=1 ";
+	$where = " 1=1 AND BO.BookingStatusID <> 3";
 	$order_by = "BO.BookingID DESC";
 	$rows = 10;
 	$current = 1;

@@ -85,6 +85,7 @@
 				WHERE
 					OT.TransactionDate >= '".$txtFromDate."'
 					AND OT.TransactionDate <= '".$txtToDate."'
+					AND OT.IsCancelled = 0
 					AND CASE
 							WHEN ".$SalesID." = 0
 							THEN MS.SalesID

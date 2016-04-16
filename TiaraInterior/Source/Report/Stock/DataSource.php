@@ -66,7 +66,7 @@
 					SUM(STC.Quantity) Quantity,
 					0 Price,
 					0 DiscountAmount,
-					'' Discount,
+					0 Discount,
 					0 Total,
 					'' Remarks
 				FROM
@@ -714,6 +714,7 @@
 				WHERE
 					BO.TransactionDate >= '".$txtFromDate."'
 					AND BO.TransactionDate <= '".$txtToDate."'
+					AND BO.BookingStatusID = 1
 					AND CASE
 							WHEN ".$BrandID." = 0
 							THEN MB.BrandID
@@ -740,8 +741,8 @@
 						THEN SOD.SalePrice
 						ELSE SOD.BuyPrice
 					END,
-					'',
-					'',
+					0,
+					0,
 					IFNULL(CASE
 							WHEN SOD.FromQty > SOD.ToQty
 							THEN (SOD.FromQty - SOD.ToQty) * SOD.SalePrice

@@ -59,18 +59,25 @@
 		$sql = "SELECT
 					OT.OutgoingNumber,
 					DATE_FORMAT(OT.TransactionDate, '%d/%c/%y') AS TransactionDate,
-					OT.DeliveryCost,
-					IFNULL(SUM(CASE
+					TOD.BatchNumber,
+					TOD.Quantity,
+					TOD.SalePrice,
+					CASE
+						WHEN TOD.IsPercentage = 1
+						THEN (TOD.SalePrice * TOD.Discount)/100
+						ELSE TOD.Discount
+					END DiscountAmount,
+					CASE
+						WHEN TOD.IsPercentage = 1 AND TOD.Discount <> 0
+						THEN CONCAT('(', TOD.Discount, '%)')
+						ELSE ''
+					END Discount,
+					IFNULL(CASE
 						WHEN TOD.IsPercentage = 1
 						THEN TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))
 						ELSE TOD.Quantity * (TOD.SalePrice - TOD.Discount)
-					END), 0) AS SubTotal,
-					IFNULL(SUM(CASE
-						WHEN TOD.IsPercentage = 1
-						THEN TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))
-						ELSE TOD.Quantity * (TOD.SalePrice - TOD.Discount)
-					END), 0) + OT.DeliveryCost AS Total,
-					OT.Remarks
+					END, 0) AS Total,
+					TOD.Remarks
 				FROM
 					transaction_outgoing OT
 					JOIN master_sales MS
@@ -88,26 +95,28 @@
 							THEN MC.CustomerID
 							ELSE ".$CustomerID."
 						END = MC.CustomerID
-				GROUP BY
-					OT.OutgoingNumber,
-					OT.TransactionDate,
-					MS.SalesName,
-					MC.CustomerName
 				UNION
 				SELECT
 					SR.SaleReturnNumber,
 					DATE_FORMAT(SR.TransactionDate, '%d/%c/%y') AS TransactionDate,
-					0,
-					-IFNULL(SUM(CASE
+					SRD.BatchNumber,
+					SRD.Quantity,
+					SRD.SalePrice,
+					CASE
 						WHEN SRD.IsPercentage = 1
-						THEN SRD.Quantity * (SRD.SalePrice - ((SRD.SalePrice * SRD.Discount)/100))
-						ELSE SRD.Quantity * (SRD.SalePrice - SRD.Discount)
-					END), 0) AS SubTotal,
-					-IFNULL(SUM(CASE
-						WHEN SRD.IsPercentage = 1
-						THEN SRD.Quantity * (SRD.SalePrice - ((SRD.SalePrice * SRD.Discount)/100))
-						ELSE SRD.Quantity * (SRD.SalePrice - SRD.Discount)
-					END), 0) AS Total,
+						THEN (SRD.SalePrice * SRD.Discount)/100
+						ELSE SRD.Discount
+					END DiscountAmount,
+					CASE
+						WHEN SRD.IsPercentage = 1 AND SRD.Discount <> 0
+						THEN CONCAT('(', SRD.Discount, '%)')
+						ELSE ''
+					END Discount,
+					-IFNULL(CASE
+								WHEN SRD.IsPercentage = 1
+								THEN SRD.Quantity * (SRD.SalePrice - ((SRD.SalePrice * SRD.Discount)/100))
+								ELSE SRD.Quantity * (SRD.SalePrice - SRD.Discount)
+							END, 0) AS Total,
 					SR.Remarks
 				FROM
 					transaction_salereturn SR
@@ -123,10 +132,6 @@
 							THEN MC.CustomerID
 							ELSE ".$CustomerID."
 						END = MC.CustomerID
-				GROUP BY
-					SR.SaleReturnNumber,
-					SR.TransactionDate,
-					MC.CustomerName
 				ORDER BY	
 					TransactionDate ASC";
 		
@@ -145,8 +150,10 @@
 			$row_array['RowNumber'] = $RowNumber;
 			$row_array['OutgoingNumber']= $row['OutgoingNumber'];
 			$row_array['TransactionDate'] = $row['TransactionDate'];
-			$row_array['DeliveryCost'] = number_format($row['DeliveryCost'],2,".",",");
-			$row_array['SubTotal'] = number_format($row['SubTotal'],2,".",",");
+			$row_array['BatchNumber'] = $row['BatchNumber'];
+			$row_array['Quantity'] = $row['Quantity'];
+			$row_array['SalePrice'] = number_format($row['SalePrice'],2,".",",");
+			$row_array['Discount'] = number_format($row['DiscountAmount'],2,".",",").$row['Discount'];
 			$row_array['Total'] = number_format($row['Total'],2,".",",");
 			$row_array['Remarks'] = $row['Remarks'];
 			$GrandTotal += $row['Total'];
