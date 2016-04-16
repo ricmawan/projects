@@ -536,6 +536,12 @@ SET State = 8;
 		DELETE FROM transaction_outgoing WHERE TransactionDate < CurrentDate;
 		
 SET State = 9;
+		DELETE FROM transaction_booking WHERE TransactionDate < CurrentDate;
+		
+SET State = 10;
+		DELETE FROM transaction_stockopname WHERE TransactionDate < CurrentDate;
+		
+SET State = 9;
 		SELECT
 			0 AS 'ID',
 			'Reset Berhasil' AS 'Message',
