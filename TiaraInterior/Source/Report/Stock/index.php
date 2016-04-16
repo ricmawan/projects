@@ -25,7 +25,7 @@
 							<div class="col-md-3">
 								<div class="ui-widget" style="width: 100%;">
 									<select name="ddlBrand" id="ddlBrand" class="form-control-custom" placeholder="Pilih Merek" >
-										<option value=0 selected>-Pilih Semua Merek-</option>
+										<option value=0 selected>-Pilih Merek-</option>
 										<?php
 											$sql = "SELECT BrandID, BrandName FROM master_brand";
 											if(!$result = mysql_query($sql, $dbh)) {
@@ -48,7 +48,7 @@
 							<div class="col-md-3">
 								<div class="ui-widget" style="width: 100%;">
 									<select name="ddlType" id="ddlType" class="form-control-custom" placeholder="Pilih Tipe" >
-										<option value=0 selected>-Pilih Semua Tipe-</option>
+										<option value=0 selected>-Pilih Tipe-</option>
 										<?php
 											$sql = "SELECT MT.TypeID, MT.TypeName, MB.BrandID, MB.BrandName FROM master_type MT JOIN master_brand MB ON MT.BrandID = MB.BrandID";
 											if(!$result = mysql_query($sql, $dbh)) {
@@ -154,13 +154,13 @@
 						}
 					}
 				}
-				if(BrandID == "") {
+				if(BrandID == 0) {
 					$("#ddlBrand").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 					PassValidate = 0;
 					if(FirstFocus == 0) $("#ddlBrand").next().find("input").focus();
 					FirstFocus = 1;
 				}
-				if(TypeID == "") {
+				if(TypeID == 0) {
 					$("#ddlType").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 					PassValidate = 0;
 					if(FirstFocus == 0) $("#ddlType").next().find("input").focus();
