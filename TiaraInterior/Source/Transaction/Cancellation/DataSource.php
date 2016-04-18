@@ -58,23 +58,16 @@
 	$nRows = $row['nRows'];
 	$sql = "SELECT
 				TC.CancellationID,
-				OT.OutgoingID,
 				OT.OutgoingNumber,
-				MS.SalesName,
 				MC.CustomerName,
-				DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') AS TransactionDate,
-				CASE
-					WHEN OTD.IsPercentage = 1
-					THEN IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - ((OTD.SalePrice * OTD.Discount)/100))), 0)
-					ELSE IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - OTD.Discount)), 0)
-				END AS SubTotal,
+				DATE_FORMAT(TC.TransactionDate, '%d-%m-%Y') AS TransactionDate,
 				CASE
 					WHEN OTD.IsPercentage = 1
 					THEN IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - ((OTD.SalePrice * OTD.Discount)/100))), 0)
 					ELSE IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - OTD.Discount)), 0)
 				END + OT.DeliveryCost AS Total,
-				OT.DeliveryCost,
-				OT.Remarks
+				OT.Remarks,
+				MU.UserLogin DeletedBy
 			FROM
 				transaction_cancellation TC
 				JOIN transaction_outgoing OT
@@ -83,6 +76,8 @@
 					ON OT.SalesID = MS.SalesID
 				JOIN master_customer MC
 					ON OT.CustomerID = MC.CustomerID
+				JOIN master_user MU
+					ON MU.UserID = TC.DeletedBy
 				LEFT JOIN transaction_outgoingdetails OTD
 					ON OTD.OutgoingID = OT.OutgoingID
 			WHERE
@@ -108,13 +103,11 @@
 		$row_array['CancellationIDNo']= $row['CancellationID']."^".$row['OutgoingNumber'];
 		$row_array['CancellationID'] = $row['CancellationID'];
 		$row_array['OutgoingNumber']= $row['OutgoingNumber'];
-		$row_array['SalesName'] = $row['SalesName'];
 		$row_array['CustomerName'] = $row['CustomerName'];
-		$row_array['DeliveryCost'] =  number_format($row['DeliveryCost'],2,".",",");
-		$row_array['SubTotal'] =  number_format($row['SubTotal'],2,".",",");
 		$row_array['Total'] =  number_format($row['Total'],2,".",",");
 		$row_array['TransactionDate'] = $row['TransactionDate'];
 		$row_array['Remarks'] = $row['Remarks'];
+		$row_array['DeletedBy'] = $row['DeletedBy'];
 		array_push($return_arr, $row_array);
 	}
 

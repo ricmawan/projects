@@ -308,7 +308,6 @@
 				WHERE
 					CAST(OT.TransactionDate AS DATE) >= '".$txtFromDate."'
 					AND CAST(OT.TransactionDate AS DATE) <= '".$txtToDate."'
-					AND OT.IsCancelled = 0
 					AND CASE
 							WHEN ".$BrandID." = 0
 							THEN MB.BrandID
