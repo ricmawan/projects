@@ -27,13 +27,13 @@
 									<select name="ddlCustomer" id="ddlCustomer" class="form-control-custom" placeholder="Pilih Pelanggan" >
 										<option value=0 selected>-Pilih Semua Pelanggan-</option>
 										<?php
-											$sql = "SELECT CustomerID, CustomerName, Address FROM master_customer";
+											$sql = "SELECT CustomerID, CustomerName, Address1 FROM master_customer";
 											if(!$result = mysql_query($sql, $dbh)) {
 												echo mysql_error();
 												return 0;
 											}
 											while($row = mysql_fetch_array($result)) {
-												echo "<option value='".$row['CustomerID']."' >".$row['CustomerName']." - ".$row['Address']."</option>";
+												echo "<option value='".$row['CustomerID']."' >".$row['CustomerName']." - ".$row['Address1']."</option>";
 											}
 										?>
 									</select>

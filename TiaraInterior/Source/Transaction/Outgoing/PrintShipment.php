@@ -68,9 +68,9 @@
 		$Data  = $initialized . $condensed1;
 		$Data .= fnSpace(63) ."Kepada Yth.  ".$condensed0; //13
 		$Data .= $CustomerName."\n" . $condensed1; //max 30
-		$Data .= fnSpace(76) . $condensed0 . str_replace("\n", "\n" . $condensed1 . fnSpace(76) . $condensed0, $Address1) . "\n" . $condensed1;
-		if($Address2 != "") $Data .= fnSpace(76) . $condensed0 . str_replace("\n", "\n" . $condensed1 . fnSpace(76) . $condensed0, $Address2) . "\n" . $condensed1;
-		$Data .= "   Tgl : " .$TransactionDate; //16
+		$Data .= fnSpace(76) . $condensed0 . $Address1 . $condensed1;
+		if($Address2 != "") $Data .= "\n" . fnSpace(76) . $condensed0 . $Address2 . $condensed1;
+		$Data .= "\n   Tgl : " .$TransactionDate; //16
 		$Data .= fnSpace(19) . $bold1 . $double1 ."SURAT JALAN". $double0 . $bold0;
 		$Data .= fnSpace(16) . $condensed0 . $City."\n".$condensed1;
 		$Data .= "   Sales : ".$Alias;
