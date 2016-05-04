@@ -226,7 +226,7 @@
 									Catatan :
 								</div>
 								<div class="col-md-4">
-									<textarea id="txtRemarks" name="txtRemarks" class="form-control-custom" placeholder="Catatan"><?php echo $Remarks; ?></textarea>
+									<textarea id="txtRemarks" name="txtRemarks" maxlength=70 class="form-control-custom" placeholder="Catatan"><?php echo $Remarks; ?></textarea>
 								</div>
 							</div>
 							<br />

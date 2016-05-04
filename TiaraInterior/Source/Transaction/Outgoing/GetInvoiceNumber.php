@@ -22,7 +22,6 @@
 				WHERE
 					TIN.InvoiceNumberType = 'TJ'
 					AND TIN.DeleteFlag = 0
-					AND MINUTE(TIMEDIFF(NOW(), TIN.CreatedDate)) > 60
 					AND	NOT EXISTS
 						(
 							SELECT

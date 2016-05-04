@@ -6,7 +6,8 @@
 		include "../../GetPermission.php";
 		$CustomerID = mysql_real_escape_string($_GET['ID']);
 		$CustomerName = "";
-		$Address = "";
+		$Address1 = "";
+		$Address2 = "";
 		$City = "";
 		$Telephone = "";
 		$IsEdit = 0;
@@ -19,7 +20,8 @@
 						CustomerID,
 						SalesID,
 						CustomerName,
-						Address,
+						Address1,
+						Address2,
 						City,
 						Telephone
 					FROM
@@ -34,7 +36,8 @@
 			$row=mysql_fetch_array($result);
 			$CustomerID = $row['CustomerID'];
 			$CustomerName = $row['CustomerName'];
-			$Address = $row['Address'];
+			$Address1 = $row['Address1'];
+			$Address2 = $row['Address2'];
 			$City = $row['City'];
 			$Telephone = $row['Telephone'];
 			$SalesID = $row['SalesID'];
@@ -98,16 +101,25 @@
 									Telepon :
 								</div>
 								<div class="col-md-3">
-									<input id="txtTelephone" name="txtTelephone" type="text" class="form-control-custom" placeholder="Telepon" <?php echo 'value="'.$Telephone.'"'; ?> />
+									<input id="txtTelephone" name="txtTelephone" maxlength=30 type="text" class="form-control-custom" placeholder="Telepon" <?php echo 'value="'.$Telephone.'"'; ?> />
 								</div>
 							</div>
 							<br />
 							<div class="row">
 								<div class="col-md-2 labelColumn">
-									Alamat :
+									Alamat 1:
 								</div>
 								<div class="col-md-3">
-									<textarea id="txtAddress" name="txtAddress" class="form-control-custom" placeholder="Alamat"> <?php echo $Address; ?></textarea>
+									<input id="txtAddress1" name="txtAddress1" maxlength=30 type="text" class="form-control-custom" placeholder="Alamat 1" <?php echo 'value="'.$Address1.'"'; ?> />
+								</div>
+							</div>
+							<br />
+							<div class="row">
+								<div class="col-md-2 labelColumn">
+									Alamat 2:
+								</div>
+								<div class="col-md-3">
+									<input id="txtAddress2" name="txtAddress2" maxlength=30 type="text" class="form-control-custom" placeholder="Alamat 2" <?php echo 'value="'.$Address2.'"'; ?> />
 								</div>
 							</div>
 							<br />

@@ -81,7 +81,7 @@
 			return 0;
 		}
 		if($hdnIsEdit == 0) {
-			/*$State = 3;
+			$State = 3;
 			$sql = "INSERT INTO transaction_invoicenumber
 					(
 						InvoiceNumberType,
@@ -91,15 +91,24 @@
 						CreatedDate,
 						CreatedBy
 					)
-					VALUES
-					(
+					SELECT
 						'TJ',
 						'".$TransactionDate."',
 						'".$OutgoingNumber."',
 						0,
 						NOW(),
 						'".$_SESSION['UserLogin']."'
-					)";
+					FROM
+						tbl_temp
+					WHERE 
+						NOT EXISTS
+						(
+							SELECT 
+								1 
+							FROM 
+								transaction_invoicenumber TIN 
+							WHERE '".$OutgoingNumber."' = TRIM(TIN.InvoiceNumber)
+						)";
 					
 			if (! $result = mysql_query($sql, $dbh)) {
 				$Message = "Terjadi Kesalahan Sistem";
@@ -108,7 +117,7 @@
 				echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
 				mysql_query("ROLLBACK", $dbh);
 				return 0;
-			}*/
+			}
 			
 			$State = 4;
 			$sql = "SELECT

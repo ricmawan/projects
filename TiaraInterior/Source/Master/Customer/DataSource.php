@@ -24,7 +24,7 @@
 	if (ISSET($_REQUEST['searchPhrase']) )
 	{
 		$search = trim($_REQUEST['searchPhrase']);
-		$where .= " AND ( MS.SalesName LIKE '%".$search."%' OR MC.CustomerName LIKE '%".$search."%' OR MC.City LIKE '%".$search."%' OR MC.Address LIKE '%".$search."%' OR MC.Telephone LIKE '%".$search."%' ) ";
+		$where .= " AND ( MS.SalesName LIKE '%".$search."%' OR MC.CustomerName LIKE '%".$search."%' OR MC.City LIKE '%".$search."%' OR MC.Address1 LIKE '%".$search."%' OR MC.Address2 LIKE '%".$search."%' OR MC.Telephone LIKE '%".$search."%' ) ";
 	}
 	//Handles determines where in the paging count this result set falls in
 	if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];
@@ -55,7 +55,8 @@
 	$sql = "SELECT
 				MC.CustomerID,
 				MC.CustomerName,
-				MC.Address,
+				MC.Address1,
+				MC.Address2,
 				MC.City,
 				MC.Telephone,
 				MS.SalesName
@@ -81,7 +82,8 @@
 		$row_array['CustomerID']= $row['CustomerID'];
 		$row_array['CustomerName'] = $row['CustomerName'];
 		$row_array['SalesName'] = $row['SalesName'];
-		$row_array['Address'] = $row['Address'];
+		$row_array['Address1'] = $row['Address1'];
+		$row_array['Address2'] = $row['Address2'];
 		$row_array['City'] = $row['City'];
 		$row_array['Telephone'] = $row['Telephone'];
 		array_push($return_arr, $row_array);

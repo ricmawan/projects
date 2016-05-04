@@ -5,7 +5,8 @@ CREATE PROCEDURE spInsCustomer (
 	pID 			BIGINT,
 	pSalesID		BIGINT,
 	pCustomerName 	VARCHAR(255),
-	pAddress 		TEXT,
+	pAddress1 		TEXT,
+	pAddress2 		TEXT,
 	pCity			VARCHAR(100),
 	pTelephone		VARCHAR(255),
 	pIsEdit			INT,
@@ -50,7 +51,8 @@ SET State = 1;
 			master_customer
 		WHERE
 			TRIM(CustomerName) = TRIM(pCustomerName)
-			AND TRIM(Address) = TRIM(pAddress)
+			AND TRIM(Address1) = TRIM(pAddress1)
+			AND TRIM(Address2) = TRIM(pAddress2)
 			AND TRIM(City) = TRIM(pCity)
 			AND CustomerID <> pID
 		LIMIT 1;
@@ -73,7 +75,8 @@ SET State = 3;
 				(
 					CustomerName,
 					SalesID,
-					Address,
+					Address1,
+					Address2,
 					City,
 					Telephone,
 					CreatedDate,
@@ -82,7 +85,8 @@ SET State = 3;
 				VALUES (
 					pCustomerName,
 					pSalesID,
-					pAddress,
+					pAddress1,
+					pAddress2,
 					pCity,
 					pTelephone,
 					NOW(),
@@ -103,7 +107,8 @@ SET State = 5;
 				SET
 					CustomerName = pCustomerName,
 					SalesID = pSalesID,
-					Address = pAddress,
+					Address1 = pAddress1,
+					Address2 = pAddress2,
 					City = pCity,
 					Telephone = pTelephone,
 					ModifiedBy = pCurrentUser

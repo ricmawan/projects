@@ -60,13 +60,14 @@
 		$Remarks = $row['Remarks'];
 		
 		$Data  = $initialized . $condensed1;
-		$Data .= "   Tgl : " .$TransactionDate; //16 
-		$Data .= fnSpace(57) ."Kepada Yth.  ".$condensed0; //13
+		$Data .= "\n"; //16 
+		$Data .= fnSpace(76) ."Kepada Yth.  ".$condensed0; //13
 		$Data .= $CustomerName."\n".$condensed1; //max 30
-		$Data .= fnSpace(89) . $condensed0 . $City."\n".$condensed1;
+		$Data .= "   Tgl : " .$TransactionDate; //16 
+		$Data .= fnSpace(70) . $condensed0 . $City."\n".$condensed1;
 		$Data .= "   Sales           : ".$Alias;
 		$Data .= fnSpace(31 - strlen($Alias)) . $bold1 . $double1 ."INVOICE". $double0 . $bold0 . $condensed1 ."\n";
-		$Data .= "   Tgl Jatuh Tempo : " .$tanggal . "\n"; //28
+		$Data .= "   Tgl Jatuh Tempo : " .$TransactionDate . "\n"; //28
 		//$Data .= fnSpace(22) . $bold1 . $double1 ."INVOICE\n". $double0 . $bold0 . $condensed1;
 		
 		$Data .= "   Kami kirim pesanan anda dalam keadaan baik, barang-barang sbb:";
@@ -132,7 +133,7 @@
 		}
 		//$Data .= "|    2,00 m lari  |  MAESTRO 646 XTC                                  |    522  |      155,000.00  |   15.500(10%)  |   100,201,500.00  |\n";
 		$Data .= "|---------------------------------------------------------------------------------------------------------------------------------------|\n";
-		$Data .= "   Catatan   : " . $Remarks . fnSpace(75) ."Jml Pembelian         Rp. " . fnSpace(19 - strlen(number_format($GrandTotal,2,".",","))) . number_format($GrandTotal,2,".",",") . "\n";
+		$Data .= "   Catatan   : " . $Remarks . fnSpace(75 - strlen($Remarks)) ."Jml Pembelian         Rp. " . fnSpace(19 - strlen(number_format($GrandTotal,2,".",","))) . number_format($GrandTotal,2,".",",") . "\n";
 		$Data .= "   Kredit    : Rp. " . number_format($GrandTotal,2,".",",") . "\n";
 		$Data .= "   Terbilang : " . trim(strtoupper(Terbilang($GrandTotal))) . " RUPIAH\n";
 		$Data .= "_________________________________________________________________________________________________________________________________________\n";
@@ -141,7 +142,7 @@
 		$Data .=  $bold1 . "Barang yang sudah dibeli tidak dapat ditukar/dikembalikan" . Chr(12);
 		fwrite($handle, $Data);
 		fclose($handle);
-		//copy($file, $SHARED_PRINTER_ADDRESS); 
+		copy($file, $SHARED_PRINTER_ADDRESS); 
 		//exec("lp -d epson ".$file);  # Lakukan cetak
 		//unlink($file);
 		echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);

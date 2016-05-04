@@ -21,7 +21,8 @@
 										<th data-column-id="RowNumber" data-sortable="false" data-type="numeric">No</th>
 										<th data-column-id="CustomerName">Nama Pelanggan</th>
 										<th data-column-id="SalesName">Nama Sales</th>
-										<th data-column-id="Address">Alamat</th>
+										<th data-column-id="Address1">Alamat 1</th>
+										<th data-column-id="Address2">Alamat 2</th>
 										<th data-column-id="City">Kota</th>
 										<th data-column-id="Telephone">Telepon</th>
 										<?php if($EditFlag == true) echo '<th data-column-id="Opsi" data-formatter="commands" data-sortable="false">Opsi</th>'; ?>

@@ -32,7 +32,8 @@
 					OT.OutgoingNumber,
 					MC.CustomerName,
 					MC.City,
-					MC.Address,
+					MC.Address1,
+					MC.Address2,
 					MC.Telephone,
 					DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') TransactionDate,
 					UPPER(MS.Alias) Alias,
@@ -60,18 +61,20 @@
 		$TransactionDate = $row['TransactionDate'];
 		$Alias = $row['Alias'];
 		$Remarks = $row['Remarks'];
-		$Address = $row['Address'];
+		$Address1 = $row['Address1'];
+		$Address2 = $row['Address2'];
 		$Telephone = $row['Telephone'];
 		
 		$Data  = $initialized . $condensed1;
-		$Data .= "   Tgl : " .$TransactionDate; //16
-		$Data .= fnSpace(37) ."Kepada Yth.  ".$condensed0; //13
+		$Data .= fnSpace(63) ."Kepada Yth.  ".$condensed0; //13
 		$Data .= $CustomerName."\n" . $condensed1; //max 30
-		$Data .= fnSpace(69) . $condensed0 . str_replace("\n", "\n" . $condensed1 . fnSpace(69) . $condensed0, $Address) . "\n" . $condensed1;
-		$Data .= fnSpace(42) . $bold1 . $double1 ."SURAT JALAN". $double0 . $bold0;
-		$Data .= fnSpace(5) . $condensed0 . $City."\n".$condensed1;
-		$Data .= "   Sales           : ".$Alias;
-		$Data .= fnSpace(44) . $condensed0 . "Ph " . $Telephone . "\n" . $condensed1;
+		$Data .= fnSpace(76) . $condensed0 . str_replace("\n", "\n" . $condensed1 . fnSpace(76) . $condensed0, $Address1) . "\n" . $condensed1;
+		if($Address2 != "") $Data .= fnSpace(76) . $condensed0 . str_replace("\n", "\n" . $condensed1 . fnSpace(76) . $condensed0, $Address2) . "\n" . $condensed1;
+		$Data .= "   Tgl : " .$TransactionDate; //16
+		$Data .= fnSpace(19) . $bold1 . $double1 ."SURAT JALAN". $double0 . $bold0;
+		$Data .= fnSpace(16) . $condensed0 . $City."\n".$condensed1;
+		$Data .= "   Sales : ".$Alias;
+		$Data .= fnSpace(62) . $condensed0 . "Ph " . $Telephone . "\n" . $condensed1;
 		
 		$Data .= "   Kami kirim pesanan anda dalam keadaan baik, barang-barang sbb:";
 		$Data .= fnSpace(55) . "No : ".$OutgoingNumber."\n";

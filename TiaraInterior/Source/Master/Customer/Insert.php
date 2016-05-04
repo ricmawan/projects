@@ -8,14 +8,15 @@
 		$SalesID = mysql_real_escape_string($_POST['ddlSales']);
 		$Telephone = mysql_real_escape_string($_POST['txtTelephone']);
 		$CustomerName = mysql_real_escape_string($_POST['txtCustomerName']);
-		$Address = mysql_real_escape_string($_POST['txtAddress']);
+		$Address1 = mysql_real_escape_string($_POST['txtAddress1']);
+		$Address2 = mysql_real_escape_string($_POST['txtAddress2']);
 		$City = mysql_real_escape_string($_POST['txtCity']);
 		$hdnIsEdit = mysql_real_escape_string($_POST['hdnIsEdit']);
 		$Message = "Data gagal dimasukkan, cek koneksi internet dan coba lagi!";
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
-		$sql = "CALL spInsCustomer(".$CustomerID.", ".$SalesID.", '".$CustomerName."', '".$Address."', '".$City."', '".$Telephone."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsCustomer(".$CustomerID.", ".$SalesID.", '".$CustomerName."', '".$Address1."', '".$Address2."', '".$City."', '".$Telephone."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
 		
 		if (! $result=mysql_query($sql, $dbh)) {
 			$Message = "Terjadi Kesalahan Sistem";

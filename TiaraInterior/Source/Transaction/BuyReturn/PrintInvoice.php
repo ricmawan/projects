@@ -125,7 +125,7 @@
 		}
 		//$Data .= "|    2,00 m lari  |  MAESTRO 646 XTC                                  |    522  |      155,000.00  |   15.500(10%)  |   100,201,500.00  |\n";
 		$Data .= "_________________________________________________________________________________________________________________________________________\n";
-		$Data .= "   Catatan   : " . $Remarks . fnSpace(75) ."Jml Retur             Rp. " . fnSpace(19 - strlen(number_format($GrandTotal,2,".",","))) . number_format($GrandTotal,2,".",",") . "\n";
+		$Data .= "   Catatan   : " . $Remarks . fnSpace(75 - strlen($Remarks)) ."Jml Retur             Rp. " . fnSpace(19 - strlen(number_format($GrandTotal,2,".",","))) . number_format($GrandTotal,2,".",",") . "\n";
 		$Data .= "   Terbilang : " . trim(strtoupper(Terbilang($GrandTotal))) . " RUPIAH\n";
 		$Data .= "_________________________________________________________________________________________________________________________________________\n";
 		$Data .= "   Penerima,". fnSpace(50) ."Checker,". fnSpace(50) ."Hormat Kami,\n\n\n";

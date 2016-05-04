@@ -1,17 +1,18 @@
-@C!   Tgl : 16-04-2016                                                         Kepada Yth.  Bejo
-                                                                                         Semarang
-   Sales           : BUDI                           EW1INVOICEW0F
-   Tgl Jatuh Tempo : 16-04-2016
-   Kami kirim pesanan anda dalam keadaan baik, barang-barang sbb:                                                       No : TJ-160416001
+@C!
+                                                                            Kepada Yth.  SIMPLE WALLPAPER
+   Tgl : 02-05-2016                                                                      SURABAYA
+   Sales           : MRC                            EW1INVOICEW0F
+   Tgl Jatuh Tempo : 02-05-2016
+   Kami kirim pesanan anda dalam keadaan baik, barang-barang sbb:                                                       No : TJ-020516005
 -----------------------------------------------------------------------------------------------------------------------------------------
 |      Qty      |                Nama Barang                 |     Lot    |    Harga Satuan   |       Diskon      |        Total        |
 -----------------------------------------------------------------------------------------------------------------------------------------
-|      1 Roll   | Eurowall 001                               |        112 |         27,000.00 |          1,000.00 |           26,000.00 |
-|     10 m      | MAESTRO 003                                |        123 |         35,000.00 |     3,500.00(10%) |          315,000.00 |
+|      4 Roll   | MAESTRO XTC 666                            |        527 |        155,000.00 |    54,250.00(35%) |          403,000.00 |
+|      1 Roll   | MAESTRO 12-7852                            |        524 |        155,000.00 |    54,250.00(35%) |          100,750.00 |
 |---------------------------------------------------------------------------------------------------------------------------------------|
-   Catatan   :                                                                            Jml Pembelian         Rp.          341,000.00
-   Kredit    : Rp. 341,000.00
-   Terbilang : TIGA RATUS EMPAT PULUH SATU RIBU RUPIAH
+   Catatan   : BP RIZA- KEDIRI                                                            Jml Pembelian         Rp.          503,750.00
+   Kredit    : Rp. 503,750.00
+   Terbilang : LIMA RATUS TIGA RIBU TUJUH RATUS LIMA PULUH RUPIAH
 _________________________________________________________________________________________________________________________________________
    Penerima,                                                  Checker,                                                  Hormat Kami,
 

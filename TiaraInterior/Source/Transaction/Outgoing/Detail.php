@@ -295,14 +295,14 @@
 										<select name="ddlCustomer" id="ddlCustomer" class="form-control-custom" placeholder="Pilih Pelanggan" >
 											<option value="" selected> </option>
 											<?php
-												$sql = "SELECT CustomerID, CustomerName, Address, SalesID FROM master_customer";
+												$sql = "SELECT CustomerID, CustomerName, Address1, SalesID FROM master_customer";
 												if(!$result = mysql_query($sql, $dbh)) {
 													echo mysql_error();
 													return 0;
 												}
 												while($row = mysql_fetch_array($result)) {
-													if($CustomerID == $row['CustomerID']) echo "<option selected value='".$row['CustomerID']."' salesid='".$row['SalesID']."' >".$row['CustomerName']." - ".$row['Address']."</option>";
-													else echo "<option value='".$row['CustomerID']."' salesid='".$row['SalesID']."' >".$row['CustomerName']." - ".$row['Address']."</option>";
+													if($CustomerID == $row['CustomerID']) echo "<option selected value='".$row['CustomerID']."' salesid='".$row['SalesID']."' >".$row['CustomerName']." - ".$row['Address1']."</option>";
+													else echo "<option value='".$row['CustomerID']."' salesid='".$row['SalesID']."' >".$row['CustomerName']." - ".$row['Address1']."</option>";
 												}
 											?>
 										</select>
@@ -417,7 +417,7 @@
 									Catatan :
 								</div>
 								<div class="col-md-4">
-									<textarea id="txtRemarks" name="txtRemarks" class="form-control-custom" placeholder="Catatan"><?php echo $Remarks; ?></textarea>
+									<textarea id="txtRemarks" name="txtRemarks" maxlength=70 class="form-control-custom" placeholder="Catatan"><?php echo $Remarks; ?></textarea>
 								</div>
 							</div>
 							<br />
