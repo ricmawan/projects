@@ -26,7 +26,8 @@
 										<!--<th data-column-id="SubTotal" data-align="right">Sub Total</th>-->
 										<th data-column-id="Total" data-align="right">Total</th>
 										<th data-column-id="Remarks">Catatan</th>
-										<?php if($EditFlag == true) echo '<th data-column-id="Opsi" data-formatter="commands" data-sortable="false">Opsi</th>'; ?>
+										<th data-column-id="Opsi" data-formatter="commands" data-sortable="false">Opsi</th>
+										<?php //if($EditFlag == true) echo '<th data-column-id="Opsi" data-formatter="commands" data-sortable="false">Opsi</th>'; ?>
 									</tr>
 								</thead>
 							</table>
@@ -64,6 +65,7 @@
 							formatters: {
 								"commands": function(column, row)
 								{
+									
 									return "<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-edit\" data-link=\"./Transaction/Outgoing/Detail.php?ID=" + row.OutgoingID + "\" acronym title=\"Ubah Data\"></i>&nbsp;";
 								}
 							}

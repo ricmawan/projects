@@ -252,27 +252,6 @@
 								<div class="col-md-3">
 									<input type="text" id="txtOutgoingNumber" name="txtOutgoingNumber" class="form-control-custom" readonly <?php echo 'value="'.$OutgoingNumber.'"'; ?> />
 								</div>
-								<!--<div class="col-md-1 labelColumn">
-									Sales:
-								</div>
-								<div class="col-md-3">
-									<div class="ui-widget" style="width: 100%;">
-										<select name="ddlSales" id="ddlSales" class="form-control-custom" placeholder="Pilih Sales" >
-											<option value="" selected> </option>
-											<?php
-												$sql = "SELECT SalesID, SalesName FROM master_sales";
-												if(!$result = mysql_query($sql, $dbh)) {
-													echo mysql_error();
-													return 0;
-												}
-												while($row = mysql_fetch_array($result)) {
-													if($SalesID == $row['SalesID']) echo "<option selected value='".$row['SalesID']."' >".$row['SalesName']."</option>";
-													else echo "<option value='".$row['SalesID']."' >".$row['SalesName']."</option>";
-												}
-											?>
-										</select>
-									</div>
-								</div>-->
 							</div>
 							<br />
 							<div class="row">
@@ -285,7 +264,7 @@
 									<input id="hdnData" name="hdnData" type="hidden" <?php echo 'value="'.$Data.'"'; ?> />
 								</div>
 								<div class="col-md-3">
-									<input id="txtTransactionDate" name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" onchange="GetInvoiceNumber(this.value);" placeholder="Tanggal" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
+									<input id="txtTransactionDate" name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Tanggal" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
 								</div>
 								<div class="col-md-1 labelColumn">
 									Pelanggan:
@@ -472,10 +451,8 @@
 				var CurrentBatchNumber = $("#ddlType option:selected").attr("batchnumber");
 				var CurrentStock = $("#ddlType option:selected").attr("stock");
 				var CurrentTypeName = $("#ddlType option:selected").text();
-				var rows = $("#recordnew").val();
-				var AddFlag = 1;
 				//QTY + 1 if selected item already exists
-				for(i=1;i<=rows;i++) {
+				/*for(i=1;i<=rows;i++) {
 					if($("#hdnTypeID" + i).val() == CurrentTypeID && $("#hdnBatchNumber" + i).val() == CurrentBatchNumber) {
 						if((parseInt($("#txtQuantity" + i).val()) + 1) > CurrentStock) {
 							$.notify("Sisa stok yang ada : " +CurrentStock, "error");
@@ -486,18 +463,19 @@
 						}
 						AddFlag = 0;
 					}
-				}
-				if(AddFlag == 1) {
+				}*/
+				//if(AddFlag == 1) {
 					$("#btnAdd").click();
-					$("#hdnTypeID" + i).val(CurrentTypeID);
-					$("#txtTypeName" + i).val(CurrentTypeName);
-					$("#hdnBuyPrice" + i).val(returnRupiah(CurrentBuyPrice.toString()));
-					$("#hdnBatchNumber" + i).val(CurrentBatchNumber.toString());
-					$("#hdnStock" + i).val(CurrentStock.toString());
-					$("#txtSalePrice" + i).val(returnRupiah(CurrentSalePrice.toString()));
-					$("#txtQuantity" + i).val(1);
-					$("#txtTotal" + i).val(CurrentSalePrice);
-				}
+					var rows = $("#recordnew").val();
+					$("#hdnTypeID" + rows).val(CurrentTypeID);
+					$("#txtTypeName" + rows).val(CurrentTypeName);
+					$("#hdnBuyPrice" + rows).val(returnRupiah(CurrentBuyPrice.toString()));
+					$("#hdnBatchNumber" + rows).val(CurrentBatchNumber.toString());
+					$("#hdnStock" + rows).val(CurrentStock.toString());
+					$("#txtSalePrice" + rows).val(returnRupiah(CurrentSalePrice.toString()));
+					$("#txtQuantity" + rows).val(1);
+					$("#txtTotal" + rows).val(CurrentSalePrice);
+				//}
 				Calculate();
 			}
 			
@@ -667,7 +645,7 @@
 						}
 						GrandTotal += parseFloat(qty) * parseFloat(price);
 						Total = parseFloat(qty) * parseFloat(price);
-						$("#txtTotal" + row).val(returnRupiah(Total.toString()));
+						$("#txtTotal" + row).val(returnRupiah(Total.toFixed(4).toString()));
 					}
 					i++;
 				});
@@ -679,7 +657,7 @@
 					deliveryCost = $("#txtDeliveryCost").val().replace(/\,/g, "");
 				}
 				GrandTotal += parseFloat(deliveryCost);
-				$("#txtGrandTotal").val(returnRupiah(GrandTotal.toString()));
+				$("#txtGrandTotal").val(returnRupiah(GrandTotal.toFixed(2).toString()));
 			}
 			
 			function ValidateDiscount(row) {
@@ -761,6 +739,7 @@
 				});
 				
 				if(parseInt($("#hdnRow").val()) > 0) {
+					$("#txtTransactionDate").attr("readonly", "readonly");
 					var data = $("#hdnData").val();
 					var type = data.split("|");
 					var row = type.length;
@@ -891,6 +870,8 @@
 									$.notify(data.Message, "success");
 									$("#hdnOutgoingID").val(data.ID);
 									$("#hdnIsEdit").val(1);
+									$("#txtOutgoingNumber").val(data.InvoiceNumber);
+									$("#txtTransactionDate").attr("readonly", "readonly");
 								}
 								else {
 									$("#loading").hide();

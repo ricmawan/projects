@@ -260,14 +260,14 @@
 										<select name="ddlCustomer" id="ddlCustomer" class="form-control-custom" placeholder="Pilih Pelanggan" >
 											<option value="" selected> </option>
 											<?php
-												$sql = "SELECT CustomerID, CustomerName, Address, SalesID FROM master_customer";
+												$sql = "SELECT CustomerID, CustomerName, Address1, SalesID FROM master_customer";
 												if(!$result = mysql_query($sql, $dbh)) {
 													echo mysql_error();
 													return 0;
 												}
 												while($row = mysql_fetch_array($result)) {
-													if($CustomerID == $row['CustomerID']) echo "<option selected value='".$row['CustomerID']."' salesid='".$row['SalesID']."' >".$row['CustomerName']." - ".$row['Address']."</option>";
-													else echo "<option value='".$row['CustomerID']."' salesid='".$row['SalesID']."' >".$row['CustomerName']." - ".$row['Address']."</option>";
+													if($CustomerID == $row['CustomerID']) echo "<option selected value='".$row['CustomerID']."' salesid='".$row['SalesID']."' >".$row['CustomerName']." - ".$row['Address1']."</option>";
+													else echo "<option value='".$row['CustomerID']."' salesid='".$row['SalesID']."' >".$row['CustomerName']." - ".$row['Address1']."</option>";
 												}
 											?>
 										</select>
@@ -286,7 +286,7 @@
 									<input id="hdnData" name="hdnData" type="hidden" <?php echo 'value="'.$Data.'"'; ?> />
 								</div>
 								<div class="col-md-3">
-									<input id="txtTransactionDate" name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" onchange="GetInvoiceNumber(this.value);" placeholder="Tanggal" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
+									<input id="txtTransactionDate" name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Tanggal" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
 								</div>
 								<div class="col-md-1 labelColumn">
 									Tempo :
@@ -643,11 +643,11 @@
 						}
 						GrandTotal += parseFloat(qty) * parseFloat(price);
 						Total = parseFloat(qty) * parseFloat(price);
-						$("#txtTotal" + row).val(returnRupiah(Total.toString()));
+						$("#txtTotal" + row).val(returnRupiah(Total.toFixed(4).toString()));
 					}
 					i++;
 				});
-				$("#txtGrandTotal").val(returnRupiah(GrandTotal.toString()));
+				$("#txtGrandTotal").val(returnRupiah(GrandTotal.toFixed(2).toString()));
 			}
 			
 			function ValidateDiscount(row) {
@@ -735,6 +735,7 @@
 				});
 				
 				if(parseInt($("#hdnRow").val()) > 0) {
+					$("#txtTransactionDate").attr("readonly", "readonly");
 					var data = $("#hdnData").val();
 					var type = data.split("|");
 					var row = type.length;
@@ -825,8 +826,30 @@
 						}, "slow");
 						return false;
 					}
-					else {
-						SubmitForm("./Transaction/Booking/Insert.php");
+					else else {
+						$.ajax({
+							url: "./Transaction/Booking/Insert.php",
+							type: "POST",
+							data: $("#PostForm").serialize(),
+							dataType: "json",
+							success: function(data) {
+								if(data.FailedFlag == '0') {
+									$.notify(data.Message, "success");
+									$("#hdnBookingID").val(data.ID);
+									$("#hdnIsEdit").val(1);
+									$("#txtBookingNumber").val(data.InvoiceNumber);
+									$("#txtTransactionDate").attr("readonly", "readonly");
+								}
+								else {
+									$("#loading").hide();
+									$.notify(data.Message, "error");					
+								}
+							},
+							error: function(data) {
+								$("#loading").hide();
+								$.notify("Terjadi kesalahan sistem!", "error");
+							}
+						});
 					}
 				}
 			}

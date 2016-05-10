@@ -256,7 +256,7 @@
 									<input id="hdnData" name="hdnData" type="hidden" <?php echo 'value="'.$Data.'"'; ?> />
 								</div>
 								<div class="col-md-3">
-									<input id="txtTransactionDate" name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" onchange="GetInvoiceNumber(this.value);" placeholder="Tanggal" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
+									<input id="txtTransactionDate" name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Tanggal" required <?php echo 'value="'.$TransactionDate.'"'; ?>/>
 								</div>
 								<div class="col-md-1 labelColumn">
 									Supplier :
@@ -624,11 +624,11 @@
 						}
 						GrandTotal += parseFloat(qty) * parseFloat(price);
 						Total = parseFloat(qty) * parseFloat(price);
-						$("#txtTotal" + row).val(returnRupiah(Total.toString()));
+						$("#txtTotal" + row).val(returnRupiah(Total.toFixed(4).toString()));
 					}
 					i++;
 				});
-				$("#txtGrandTotal").val(returnRupiah(GrandTotal.toString()));
+				$("#txtGrandTotal").val(returnRupiah(GrandTotal.toFixed(2).toString()));
 			}
 			
 			function ValidateDiscount(row) {
@@ -705,6 +705,7 @@
 				});
 				
 				if(parseInt($("#hdnRow").val()) > 0) {
+					$("#txtTransactionDate").attr("readonly", "readonly");
 					var data = $("#hdnData").val();
 					var type = data.split("|");
 					var row = type.length;
@@ -805,6 +806,8 @@
 									$.notify(data.Message, "success");
 									$("#hdnBuyReturnID").val(data.ID);
 									$("#hdnIsEdit").val(1);
+									$("#txtBuyReturnNumber").val(data.InvoiceNumber);
+									$("#txtTransactionDate").attr("readonly", "readonly");
 								}
 								else {
 									$("#loading").hide();

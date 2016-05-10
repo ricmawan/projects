@@ -12,7 +12,7 @@
 		$sql = "SELECT
 					DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') TransactionDate,
 					OT.DeliveryCost,
-					CONCAT(MC.CustomerName, ' - ', MC.Address) CustomerName,
+					CONCAT(MC.CustomerName, ' - ', MC.Address1) CustomerName,
 					OTD.OutgoingDetailsID,
 					OTD.TypeID,
 					OTD.Quantity,

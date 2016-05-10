@@ -7,14 +7,20 @@
 		$Record = $_POST['record'];
 		$RecordNew = $_POST['recordnew'];
 		$ID = mysql_real_escape_string($_POST['hdnOutgoingID']);
+		$SelectedDate = explode('-', mysql_real_escape_string($_POST['txtTransactionDate']));
+		$Date = $SelectedDate[0].$SelectedDate[1].substr($SelectedDate[2], -2);
+		$SelectedDate = "$SelectedDate[2]-$SelectedDate[1]-$SelectedDate[0]";
 		$TransactionDate = explode('-', $_POST['txtTransactionDate']);
 		$_POST['txtTransactionDate'] = "$TransactionDate[2]-$TransactionDate[1]-$TransactionDate[0]"; 
 		$TransactionDate = $_POST['txtTransactionDate'];
+		//$Date = str_replace("-", "", mysql_real_escape_string($_POST['txtTransactionDate']));
+		//$SelectedDate[2] = substr($SelectedDate, -2);
+		$InvoiceNumberType = "TJ";
 		$SalesID = mysql_real_escape_string($_POST['hdnSalesID']);
 		$CustomerID = mysql_real_escape_string($_POST['ddlCustomer']);
 		$hdnIsEdit = mysql_real_escape_string($_POST['hdnIsEdit']);
 		$txtRemarks = mysql_real_escape_string($_POST['txtRemarks']);
-		$OutgoingNumber = mysql_real_escape_string($_POST['txtOutgoingNumber']);
+		$InvoiceNumber = mysql_real_escape_string($_POST['txtOutgoingNumber']);
 		$txtDeliveryCost = str_replace(",", "", $_POST['txtDeliveryCost']);
 		$State = 1;
 		mysql_query("START TRANSACTION", $dbh);
@@ -30,6 +36,25 @@
 		//echo $DetailID;
 		if($hdnIsEdit == 0) {
 			$State = 1;
+			$sql = "SELECT
+						CONCAT('".$InvoiceNumberType."-', '".$Date."', RIGHT(CONCAT('0000', RIGHT(IFNULL(MAX(InvoiceNumber), 000), 3) + 1), 3)) AS InvoiceNumber
+					FROM 
+						transaction_invoicenumber
+					WHERE
+						InvoiceDate = '".$SelectedDate."'
+						AND InvoiceNumberType = '".$InvoiceNumberType."'";
+			
+			if (! $result = mysql_query($sql, $dbh)) {
+				$Message = "Terjadi Kesalahan Sistem";
+				$MessageDetail = mysql_error();
+				$FailedFlag = 1;
+				echo returnstate($InvoiceNumber, $Message, $MessageDetail, $FailedFlag, $State, $InvoiceNumber);
+				return 0;
+			}
+			$row = mysql_fetch_array($result);
+			$InvoiceNumber = $row['InvoiceNumber'];
+			
+			$State = 2;
 			$sql = "INSERT INTO transaction_outgoing
 					(
 						OutgoingNumber,
@@ -44,7 +69,7 @@
 					)
 					VALUES
 					(
-						'".$OutgoingNumber."',
+						'".$InvoiceNumber."',
 						".$SalesID.",
 						".$CustomerID.",
 						'".$TransactionDate."',
@@ -60,7 +85,6 @@
 			$State = 2;
 			$sql = "UPDATE transaction_outgoing
 					SET
-						OutgoingNumber = '".$OutgoingNumber."',
 						SalesID = ".$SalesID.",
 						CustomerID = ".$CustomerID.",
 						DeliveryCost = ".$txtDeliveryCost.",
@@ -76,7 +100,7 @@
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysql_error();
 			$FailedFlag = 1;
-			echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
+			echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State, $InvoiceNumber);
 			mysql_query("ROLLBACK", $dbh);
 			return 0;
 		}
@@ -94,7 +118,7 @@
 					SELECT
 						'TJ',
 						'".$TransactionDate."',
-						'".$OutgoingNumber."',
+						'".$InvoiceNumber."',
 						0,
 						NOW(),
 						'".$_SESSION['UserLogin']."'
@@ -107,14 +131,15 @@
 								1 
 							FROM 
 								transaction_invoicenumber TIN 
-							WHERE '".$OutgoingNumber."' = TRIM(TIN.InvoiceNumber)
+							WHERE
+								'".$InvoiceNumber."' = TRIM(TIN.InvoiceNumber)
 						)";
 					
 			if (! $result = mysql_query($sql, $dbh)) {
 				$Message = "Terjadi Kesalahan Sistem";
 				$MessageDetail = mysql_error();
 				$FailedFlag = 1;
-				echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
+				echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State, $InvoiceNumber);
 				mysql_query("ROLLBACK", $dbh);
 				return 0;
 			}
@@ -129,7 +154,7 @@
 				$Message = "Terjadi Kesalahan Sistem";
 				$MessageDetail = mysql_error();
 				$FailedFlag = 1;
-				echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
+				echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State, $InvoiceNumber);
 				mysql_query("ROLLBACK", $dbh);
 				return 0;
 			}
@@ -149,7 +174,7 @@
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysql_error();
 			$FailedFlag = 1;
-			echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
+			echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State, $InvoiceNumber);
 			mysql_query("ROLLBACK", $dbh);
 			return 0;
 		}
@@ -213,7 +238,7 @@
 				$Message = "Terjadi Kesalahan Sistem";
 				$MessageDetail = mysql_error();
 				$FailedFlag = 1;
-				echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
+				echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State, $InvoiceNumber);
 				mysql_query("ROLLBACK", $dbh);
 				return 0;
 			}
@@ -235,20 +260,20 @@
 				return 0;
 			}*/
 		}
-		echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
+		echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State, $InvoiceNumber);
 		mysql_query("COMMIT", $dbh);
 		return 0;
 	}
 	
-	function returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State) {
+	function returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State, $InvoiceNumber) {
 		$data = array(
 			"ID" => $ID, 
 			"Message" => $Message,
 			"MessageDetail" => $MessageDetail,
 			"FailedFlag" => $FailedFlag,
-			"State" => $State
+			"State" => $State,
+			"InvoiceNumber" => $InvoiceNumber
 		);
 		return json_encode($data);
-	
 	}
 ?>

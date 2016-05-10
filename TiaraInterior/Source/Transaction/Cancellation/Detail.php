@@ -267,7 +267,7 @@
 						}
 						GrandTotal += parseFloat(qty) * parseFloat(price);
 						Total = parseFloat(qty) * parseFloat(price);
-						$("#txtTotal" + row).val(returnRupiah(Total.toString()));
+						$("#txtTotal" + row).val(returnRupiah(Total.toFixed(4).toString()));
 					}
 					i++;
 				});
@@ -279,7 +279,7 @@
 					deliveryCost = $("#txtDeliveryCost").val().replace(/\,/g, "");
 				}
 				GrandTotal += parseFloat(deliveryCost);
-				$("#txtGrandTotal").val(returnRupiah(GrandTotal.toString()));
+				$("#txtGrandTotal").val(returnRupiah(GrandTotal.toFixed(2).toString()));
 			}
 			
 			function LoadOutgoingDetails() {
