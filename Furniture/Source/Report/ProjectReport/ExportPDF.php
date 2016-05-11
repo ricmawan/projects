@@ -139,6 +139,26 @@
 									transaction_projecttransaction PT
 								WHERE
 									PT.ProjectID = ".$GLOBALS['ID']."
+								UNION ALL
+								SELECT
+									S.SalaryDate,
+									E.EmployeeName,
+									'',
+									SD.Days,
+									'',
+									SD.DailySalary,
+									'-' AS Debit,
+									(SD.DailySalary * SD.Days) AS Credit,
+									'Gaji Karyawan' AS Remarks,
+									5 AS UnionLevel
+								FROM
+									transaction_salary S
+									JOIN transaction_salarydetails SD
+										ON S.SalaryID = SD.SalaryID
+									JOIN master_employee E
+										ON SD.EmployeeID = E.EmployeeID
+								WHERE
+									SD.ProjectID = ".$GLOBALS['ID']."
 							)DATA
 						ORDER BY
 							DATA.TransactionDate,

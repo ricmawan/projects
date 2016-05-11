@@ -429,6 +429,19 @@ font-size: 12px;
 line-height: 1.428571429;
 }
 
+.ui-autocomplete.ui-front.ui-menu.ui-widget.ui-widget-content.ui-corner-all {
+	max-height: 227.5px;
+	overflow-y: auto;
+	width: auto !important;
+	min-width: 240px;
+	overflow-x: hidden;
+}
+.ui-menu .ui-menu-item {
+	white-space: nowrap;
+}
+.ui-menu .ui-menu-item a {
+	padding-right: 20px;
+}
 /*==============================================
     MEDIA QUERIES     
     =============================================*/
