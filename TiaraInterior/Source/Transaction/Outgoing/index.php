@@ -4,6 +4,11 @@
 ?>
 <html>
 	<head>
+		<style>
+			th[data-column-id="Opsi"] {
+				width: 75px;
+			}
+		</style>
 	</head>
 	<body>
 		<div class="row">
@@ -14,6 +19,7 @@
 					</div>
 					<div class="panel-body">
 						<div class="table-responsive">
+						<input id="hdnEditFlag" name="hdnEditFlag" type="hidden" <?php echo 'value='.$EditFlag; ?> />
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
@@ -65,8 +71,14 @@
 							formatters: {
 								"commands": function(column, row)
 								{
-									
-									return "<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-edit\" data-link=\"./Transaction/Outgoing/Detail.php?ID=" + row.OutgoingID + "\" acronym title=\"Ubah Data\"></i>&nbsp;";
+									var test;
+									if($("#hdnEditFlag").val() == true) {
+										test = "<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-edit\" data-link=\"./Transaction/Outgoing/Detail.php?ID=" + row.OutgoingID + "\" acronym title=\"Ubah Data\"></i>&nbsp;&nbsp;&nbsp;<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-print\" data-link=\"./Transaction/Outgoing/Detail.php?ID=" + row.OutgoingID + "\" acronym title=\"Cetak Nota\"></i>&nbsp;&nbsp;&nbsp;<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-truck\" data-link=\"./Transaction/Outgoing/Detail.php?ID=" + row.OutgoingID + "\" acronym title=\"Cetak Surat Jalan\"></i>&nbsp;";
+									}
+									else {
+										test = "<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-print\" data-link=\"./Transaction/Outgoing/Detail.php?ID=" + row.OutgoingID + "\" acronym title=\"Cetak Nota\"></i>&nbsp;&nbsp;&nbsp;<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-truck\" data-link=\"./Transaction/Outgoing/Detail.php?ID=" + row.OutgoingID + "\" acronym title=\"Cetak Surat Jalan\"></i>&nbsp;";
+									}
+									return test;
 								}
 							}
 						}).on("loaded.rs.jquery.bootgrid", function()

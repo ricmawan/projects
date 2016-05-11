@@ -34,7 +34,8 @@
 					MC.City,
 					DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') TransactionDate,
 					UPPER(MS.Alias) Alias,
-					OT.Remarks
+					OT.Remarks,
+					OT.CreatedBy
 				FROM
 					transaction_outgoing OT
 					JOIN master_customer MC
@@ -58,6 +59,7 @@
 		$TransactionDate = $row['TransactionDate'];
 		$Alias = $row['Alias'];
 		$Remarks = $row['Remarks'];
+		$CreatedBy = $row['CreatedBy'];
 		
 		$Data  = $initialized . $condensed1;
 		$Data .= "\n"; //16 
@@ -138,7 +140,7 @@
 		$Data .= "   Terbilang : " . trim(strtoupper(Terbilang($GrandTotal))) . " RUPIAH\n";
 		$Data .= "_________________________________________________________________________________________________________________________________________\n";
 		$Data .= "   Penerima,". fnSpace(50) ."Checker,". fnSpace(50) ."Hormat Kami,\n\n\n";
-		$Data .= fnSpace(115) . fnSpace(ceil((22 - strlen($_SESSION['UserLogin']))/2)). $_SESSION['UserLogin'] . "\n";
+		$Data .= fnSpace(115) . fnSpace(ceil((22 - strlen($CreatedBy))/2)). $CreatedBy . "\n";
 		$Data .=  $bold1 . "Barang yang sudah dibeli tidak dapat ditukar/dikembalikan" . Chr(12);
 		fwrite($handle, $Data);
 		fclose($handle);

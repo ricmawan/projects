@@ -33,7 +33,8 @@
 					MC.CustomerName,
 					MC.City,
 					DATE_FORMAT(SR.TransactionDate, '%d-%m-%Y') TransactionDate,
-					SR.Remarks
+					SR.Remarks,
+					SR.CreatedBy
 				FROM
 					transaction_salereturn SR
 					JOIN master_customer MC
@@ -54,6 +55,7 @@
 		$City = $row['City'];
 		$TransactionDate = $row['TransactionDate'];
 		$Remarks = $row['Remarks'];
+		$CreatedBy = $row['CreatedBy'];
 		
 		$Data  = $initialized . $condensed1;
 		$Data .= fnSpace(121) . "Tgl : " .$TransactionDate. "\n"; //16 
@@ -129,7 +131,7 @@
 		$Data .= "   Terbilang : " . trim(strtoupper(Terbilang($GrandTotal))) . " RUPIAH\n";
 		$Data .= "_________________________________________________________________________________________________________________________________________\n";
 		$Data .= "   Penerima,". fnSpace(50) ."Checker,". fnSpace(50) ."Hormat Kami,\n\n\n";
-		$Data .= fnSpace(115) . fnSpace(ceil((22 - strlen($_SESSION['UserLogin']))/2)). $_SESSION['UserLogin'] . Chr(12);
+		$Data .= fnSpace(115) . fnSpace(ceil((22 - strlen($CreatedBy))/2)). $CreatedBy . Chr(12);
 		fwrite($handle, $Data);
 		fclose($handle);
 		copy($file, $SHARED_PRINTER_ADDRESS); 
