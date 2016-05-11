@@ -71,14 +71,14 @@
 							formatters: {
 								"commands": function(column, row)
 								{
-									var test;
+									var option;
 									if($("#hdnEditFlag").val() == true) {
-										test = "<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-edit\" data-link=\"./Transaction/Outgoing/Detail.php?ID=" + row.OutgoingID + "\" acronym title=\"Ubah Data\"></i>&nbsp;&nbsp;&nbsp;<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-print\" data-link=\"./Transaction/Outgoing/Detail.php?ID=" + row.OutgoingID + "\" acronym title=\"Cetak Nota\"></i>&nbsp;&nbsp;&nbsp;<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-truck\" data-link=\"./Transaction/Outgoing/Detail.php?ID=" + row.OutgoingID + "\" acronym title=\"Cetak Surat Jalan\"></i>&nbsp;";
+										option = "<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-edit\" data-link=\"./Transaction/Outgoing/Detail.php?ID=" + row.OutgoingID + "\" acronym title=\"Ubah Data\"></i>&nbsp;&nbsp;&nbsp;<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-print\" acronym title=\"Cetak Nota\"></i>&nbsp;&nbsp;&nbsp;<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-truck\" acronym title=\"Cetak Surat Jalan\"></i>&nbsp;";
 									}
 									else {
-										test = "<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-print\" data-link=\"./Transaction/Outgoing/Detail.php?ID=" + row.OutgoingID + "\" acronym title=\"Cetak Nota\"></i>&nbsp;&nbsp;&nbsp;<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-truck\" data-link=\"./Transaction/Outgoing/Detail.php?ID=" + row.OutgoingID + "\" acronym title=\"Cetak Surat Jalan\"></i>&nbsp;";
+										option = "<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-print\"  acronym title=\"Cetak Nota\"></i>&nbsp;&nbsp;&nbsp;<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-truck\" acronym title=\"Cetak Surat Jalan\"></i>&nbsp;";
 									}
-									return test;
+									return option;
 								}
 							}
 						}).on("loaded.rs.jquery.bootgrid", function()
@@ -88,8 +88,59 @@
 							{
 								Redirect($(this).data("link"));
 							});
+							
+							grid.find(".fa-print").on("click", function(e)
+							{
+								PrintInvoice($(this).data("row-id"));
+							});
+							
+							grid.find(".fa-truck").on("click", function(e)
+							{
+								PrintShipment($(this).data("row-id"));
+							});
 						});
 			});
+			
+			function PrintInvoice(ID) {
+				$("#loading").show();
+				$.ajax({
+					url: "./Transaction/Outgoing/PrintInvoice.php",
+					type: "POST",
+					data: { hdnOutgoingID : ID },
+					dataType: "json",
+					success: function(data) {
+						$("html, body").animate({
+							scrollTop: 0
+						}, "slow");
+						$("#loading").hide();
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Koneksi gagal", "error");
+				
+					}
+				});
+			}
+			
+			function PrintShipment(ID) {
+				$("#loading").show();
+				$.ajax({
+					url: "./Transaction/Outgoing/PrintShipment.php",
+					type: "POST",
+					data: { hdnOutgoingID : ID },
+					dataType: "json",
+					success: function(data) {
+						$("html, body").animate({
+							scrollTop: 0
+						}, "slow");
+						$("#loading").hide();
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Koneksi gagal", "error");
+					}
+				});
+			}
 		</script>
 	</body>
 </html>

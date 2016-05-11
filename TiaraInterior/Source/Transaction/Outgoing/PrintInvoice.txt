@@ -1,18 +1,17 @@
 @C!
-                                                                            Kepada Yth.  SIMPLE WALLPAPER
-   Tgl : 02-05-2016                                                                      SURABAYA
-   Sales           : MRC                            EW1INVOICEW0F
-   Tgl Jatuh Tempo : 02-05-2016
-   Kami kirim pesanan anda dalam keadaan baik, barang-barang sbb:                                                       No : TJ-020516005
+                                                                            Kepada Yth.  Slamet
+   Tgl : 11-05-2016                                                                      Semarang
+   Sales           : IBBD                           EW1INVOICEW0F
+   Tgl Jatuh Tempo : 11-05-2016
+   Kami kirim pesanan anda dalam keadaan baik, barang-barang sbb:                                                       No : TJ-110516001
 -----------------------------------------------------------------------------------------------------------------------------------------
 |      Qty      |                Nama Barang                 |     Lot    |    Harga Satuan   |       Diskon      |        Total        |
 -----------------------------------------------------------------------------------------------------------------------------------------
-|      4 Roll   | MAESTRO XTC 666                            |        527 |        155,000.00 |    54,250.00(35%) |          403,000.00 |
-|      1 Roll   | MAESTRO 12-7852                            |        524 |        155,000.00 |    54,250.00(35%) |          100,750.00 |
+|     10 m      | MAESTRO 003                                |        123 |         35,000.00 |              0.00 |          350,000.00 |
 |---------------------------------------------------------------------------------------------------------------------------------------|
-   Catatan   : BP RIZA- KEDIRI                                                            Jml Pembelian         Rp.          503,750.00
-   Kredit    : Rp. 503,750.00
-   Terbilang : LIMA RATUS TIGA RIBU TUJUH RATUS LIMA PULUH RUPIAH
+   Catatan   :                                                                            Jml Pembelian         Rp.          350,000.00
+   Kredit    : Rp. 350,000.00
+   Terbilang : TIGA RATUS LIMA PULUH RIBU RUPIAH
 _________________________________________________________________________________________________________________________________________
    Penerima,                                                  Checker,                                                  Hormat Kami,
 
