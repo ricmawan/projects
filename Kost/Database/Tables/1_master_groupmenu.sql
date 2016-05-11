@@ -20,14 +20,14 @@ VALUES
 ),
 (
 	2,
-	'Master Data',
+	'Master',
 	'fa fa-book fa-3x',
 	NULL,
 	2
 ),
 (
 	3,
-	'Transaksi',
+	'Operasional',
 	'fa fa-cart-plus fa-3x',
 	NULL,
 	3
@@ -38,13 +38,6 @@ VALUES
 	'fa fa-line-chart fa-3x',
 	NULL,
 	4
-),
-(
-	5,
-	'Tools',
-	'fa fa-cogs fa-3x',
-	NULL,
-	5
 );
 
 CREATE UNIQUE INDEX GROUPMENU_INDEX

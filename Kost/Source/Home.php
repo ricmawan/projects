@@ -11,11 +11,10 @@
 		<link href="assets/css/bootstrap.css" rel="stylesheet" />
 		<link href="assets/css/font-awesome.css" rel="stylesheet" />
 		<link href="assets/css/jquery-ui-1.10.3.custom.min.css" rel="stylesheet" />
-		<link href="assets/js/morris/morris-0.4.3.min.css" rel="stylesheet" />
 		<link href="assets/css/custom.css" rel="stylesheet" />
 		<link href="assets/css/jquery.bootgrid.css" rel="stylesheet" />
 		<!--<link href="assets/js/dataTables/dataTables.bootstrap.css" rel="stylesheet" />-->
-		<link rel="stylesheet" href="assets/css/bootstrap-multiselect.css" type="text/css"/>
+		<!--<link rel="stylesheet" href="assets/css/bootstrap-multiselect.css" type="text/css"/>-->
 		<!--<link rel="shortcut icon" type="image/png" href="./assets/img/favicon.png"/>-->
 		<style>
 			.navbar {
