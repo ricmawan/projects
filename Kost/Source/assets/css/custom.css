@@ -95,40 +95,28 @@ textarea {
 	-webkit-box-shadow: 0 0 5px rgba(0,0,0,0.5);
 	box-shadow: 0 0 5px rgba(0,0,0,0.5);
 }
-#top-container {
-	width: calc(100% - 20px);
-	height: 120px;
-    background-color: #FF0000;
-    position: relative;
-    margin-left: 10px;
-    margin-right: 10px;
-	border-bottom: 3px solid #000;
-}
-#menu-container {
-	width: calc(100% - 20px);
-	height: 40px;
-    background-color: #ddd;
-    position: relative;
-    margin-left: 10px;
-    margin-right: 10px;
-	border-bottom: 3px solid #000;
-}
 
 #wrapper {
     width: 100%;
 }
 
-#page-wrapper {
-    padding: 25px 10px;
-    min-height: 600px;
-    background:#F3F3F3;
-   
-}
 #page-inner {
-    width: calc(100% - 20px);
-    margin: 0 10px 0 10px;
+    width: calc(100% - 10px);
+    margin: 0 5px 0 5px;
     background-color:#fff!important;
     padding:0px;
+	/*background: url(../img/cream_pixels.png);*/
+}
+
+#page-inner-left {
+	width: 30%;
+	float:left;
+	background: red;
+}
+#page-inner-right {
+	width: 70%;
+	float:left;
+	background: black;
 }
 
 .text-center {

@@ -123,9 +123,10 @@ $(document).ready(function () {
 		var MenuClicked = $(this).attr("link");
 		PrevMenu = CurrentMenu;
 		CurrentMenu = MenuClicked;
-		if( $(this).is("a")) $(".menu").removeClass("active-menu");
+		//if( $(this).is("a")) $(".menu").removeClass("active-menu");
+		$("li").removeClass("active");
 		$("#loading").show();
-		$("#page-inner").html("");
+		$("#page-inner-right").html("");
 		if(MenuClicked != "./Home.php") {
 			$.ajax({
 				url: MenuClicked,
@@ -133,7 +134,7 @@ $(document).ready(function () {
 				data: { },
 				dataType: "html",
 				success: function(data) {
-					$("#page-inner").html(data);
+					$("#page-inner-right").html(data);
 					$("html, body").animate({
 						scrollTop: 0
 					}, "slow");
@@ -165,7 +166,7 @@ $(document).ready(function () {
 			});*/
 			$("#loading").hide();
 		}
-		$(this).addClass("active-menu");
+		$(this).closest("li.dropdown").addClass("active");
 	});
 });
 function Redirect(link) {
@@ -174,7 +175,7 @@ function Redirect(link) {
 	CurrentMenu = MenuClicked;
 	//if( $(this).is("a")) $(".menu").removeClass("active-menu");
 	$("#loading").show();
-	$("#page-inner").html("");
+	$("#page-inner-right").html("");
 	if(MenuClicked != "./Home.php") {
 		$.ajax({
 			url: MenuClicked,
@@ -183,54 +184,11 @@ function Redirect(link) {
 			dataType: "html",
 			async : true,
 			success: function(data) {
-				$("#page-inner").html(data);
+				$("#page-inner-right").html(data);
 				$("html, body").animate({
 					scrollTop: 0
 				}, "slow");
 				//alert(data);
-				$("#loading").hide();
-			},
-			error: function(data) {
-				$("#loading").hide();
-				$.notify("Koneksi gagal", "error");
-			}
-		});
-	}
-	else {
-		/*$.ajax({
-			url: "./Master/Notification/",
-			type: "POST",
-			data: { },
-			dataType: "html",
-			success: function(data) {
-				$("#page-inner").html(data);
-				$("html, body").animate({
-					scrollTop: 0
-				}, "slow");
-				$("#loading").hide();
-			},
-			error: function(data) {
-				$("#loading").hide();
-				$.notify("Koneksi gagal", "error");
-			}
-		});*/
-		$("#loading").hide();
-	}
-}
-function Reload() {
-	$("#loading").show();
-	$("#page-inner").html("");
-	if(CurrentMenu != "./Home.php") {
-		$.ajax({
-			url: CurrentMenu,
-			type: "POST",
-			data: { },
-			dataType: "html",
-			success: function(data) {
-				$("#page-inner").html(data);
-				$("html, body").animate({
-					scrollTop: 0
-				}, "slow");
 				$("#loading").hide();
 			},
 			error: function(data) {
@@ -397,7 +355,7 @@ function SubmitForm(url) {
 					$.notify(data.Message, "success");
 					//window.location = PrevMenu;
 					$("#loading").show();
-					$("#page-inner").html("");
+					$("#page-inner-right").html("");
 					if(PrevMenu != "./Home.php") {
 						CurrentMenu = PrevMenu;
 						$.ajax({
@@ -406,7 +364,7 @@ function SubmitForm(url) {
 							data: { },
 							dataType: "html",
 							success: function(data) {
-								$("#page-inner").html(data);
+								$("#page-inner-right").html(data);
 								$("html, body").animate({
 									scrollTop: 0
 								}, "slow");
@@ -501,38 +459,7 @@ function GetClock(){
 	$("#Clock").html(" " + tday[nday] + ", " + ndate + " " + tmonth[nmonth] + " " + nyear + " " + nhour + ":" + nmin + ":" + nsec);
 	setTimeout("GetClock()", 1000);
 }
-//marquee title bar
-var rev = "fwd";
-function titlebar(val){
-	var msg  = "Pusat Psikologi Terapan Unika Soegijapranata";
-	var res = " ";
-	var speed = 50;
-	var pos = val;
-	msg = "   | "+msg+" |";
-	var le = msg.length;
-	if(rev == "fwd"){ 
-		if(pos < le){ 
-			pos = pos+1; 
-			scroll = msg.substr(0,pos); 
-			document.title = scroll; 
-			timer = window.setTimeout("titlebar("+pos+")",speed); 
-		} else { 
-			rev = "bwd"; 
-			timer = window.setTimeout("titlebar("+pos+")",speed); 
-		}
-	} else { 
-		if(pos > 0) {
-			pos = pos-1; 
-			var ale = le-pos; 
-			scrol = msg.substr(ale,le); 
-			document.title = scrol; 
-			timer = window.setTimeout("titlebar("+pos+")",speed); 
-		} else { 
-			rev = "fwd"; 
-			timer = window.setTimeout("titlebar("+pos+")",speed); 
-		}
-	}
-}
+
 function minmax(value, min, max) 
 {
 	if(parseInt(value) < 0 || isNaN(value)) 
