@@ -30,6 +30,7 @@ display:block;
 list-style:none;
 float:left;
 position:relative;
+height:40px;
 }
 ul.sf-menu li:hover {
 visibility:inherit; /* fixes IE7 'sticky bug' */

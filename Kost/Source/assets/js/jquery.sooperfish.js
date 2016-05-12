@@ -5,7 +5,6 @@
  * Licensed GPL: http://www.gnu.org/licenses/gpl.html
  */
 $.fn.sooperfish = function(op) {
-
   var sf = $.fn.sooperfish;
   sf.o = [];
   sf.op = {};

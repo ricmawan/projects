@@ -14,6 +14,7 @@
     =============================================*/
 body {
     font-family: 'Open Sans', sans-serif;
+	background: url(../img/cream_pixels.png);
 }
 #loading {
     position: fixed;
@@ -94,10 +95,27 @@ textarea {
 	-webkit-box-shadow: 0 0 5px rgba(0,0,0,0.5);
 	box-shadow: 0 0 5px rgba(0,0,0,0.5);
 }
+#top-container {
+	width: calc(100% - 20px);
+	height: 120px;
+    background-color: #FF0000;
+    position: relative;
+    margin-left: 10px;
+    margin-right: 10px;
+	border-bottom: 3px solid #000;
+}
+#menu-container {
+	width: calc(100% - 20px);
+	height: 40px;
+    background-color: #ddd;
+    position: relative;
+    margin-left: 10px;
+    margin-right: 10px;
+	border-bottom: 3px solid #000;
+}
 
 #wrapper {
     width: 100%;
-    background:#202020;
 }
 
 #page-wrapper {
@@ -107,8 +125,8 @@ textarea {
    
 }
 #page-inner {
-    width:100%;
-    margin:0px ;
+    width: calc(100% - 20px);
+    margin: 0 10px 0 10px;
     background-color:#fff!important;
     padding:0px;
 }
@@ -651,8 +669,8 @@ th[data-column-id="City	"] {
  
  @media(min-width:768px) {
      #page-wrapper{
-        margin: 0 0 0 200px;
-        padding: 10px 10px;
+        /*margin: 0 0 0 200px;*/
+        padding: 40px 10px 10px 10px;
     }
 	
 	

@@ -19,7 +19,7 @@ font-family:helvetica,arial,verdana,sans;
 text-decoration:none;
 color:#000;
 background:#ddd;
-border-bottom:1px solid #000;
+/*border-bottom:1px solid #000;*/
 }
 
 ul#nav li a:hover
