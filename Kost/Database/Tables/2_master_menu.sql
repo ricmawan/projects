@@ -66,7 +66,7 @@ VALUES
 	'Transaction/Inventory/',
 	NULL,
 	0,
-	6
+	2
 ),
 (
 	6,
@@ -75,7 +75,7 @@ VALUES
 	'Transaction/IncomingInventory/',
 	NULL,
 	0,
-	7
+	3
 ),
 (
 	7,
@@ -84,7 +84,7 @@ VALUES
 	'Transaction/OutgoingInventory/',
 	NULL,
 	0,
-	1
+	4
 ),
 (
 	8,
@@ -93,7 +93,7 @@ VALUES
 	'Report/ProfitAndLoss/',
 	NULL,
 	0,
-	2
+	1
 ),
 (
 	9,
@@ -102,7 +102,7 @@ VALUES
 	'Report/Inventory/',
 	NULL,
 	0,
-	3
+	2
 ),
 (
 	10,
@@ -111,7 +111,7 @@ VALUES
 	'Report/RoomUsage/',
 	NULL,
 	0,
-	4
+	3
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

@@ -1,9 +1,9 @@
-DROP TABLE IF EXISTS master_inventory;
+DROP TABLE IF EXISTS transaction_operational;
 
-CREATE TABLE master_inventory
+CREATE TABLE transaction_operational
 (
-	InventortID 	BIGINT PRIMARY KEY AUTO_INCREMENT,
-	InventoryName	VARCHAR(255) NOT NULL
+	OperationalID 	BIGINT PRIMARY KEY AUTO_INCREMENT,	
+	TransactionDate	DATETIME,
 	CreatedDate 	DATETIME NOT NULL,
 	CreatedBy 		VARCHAR(255) NOT NULL,
 	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
@@ -11,5 +11,5 @@ CREATE TABLE master_inventory
 )ENGINE=InnoDB;
 
 
-CREATE UNIQUE INDEX INVENTORY_INDEX
-ON master_inventory (InventoryID);
+CREATE UNIQUE INDEX OPERATIONAL_INDEX
+ON transaction_operational (OperationalID);

@@ -14,28 +14,28 @@ VALUES
 (
 	1,
 	'Home',
-	'fa fa-home fa-3x',
+	'fa fa-home fa-2',
 	'./Home.php',
 	1
 ),
 (
 	2,
 	'Master',
-	'fa fa-book fa-3x',
+	'fa fa-book fa-2',
 	NULL,
 	2
 ),
 (
 	3,
 	'Operasional',
-	'fa fa-cart-plus fa-3x',
+	'fa fa-cart-plus fa-2',
 	NULL,
 	3
 ),
 (
 	4,
 	'Laporan',
-	'fa fa-line-chart fa-3x',
+	'fa fa-line-chart fa-2',
 	NULL,
 	4
 );

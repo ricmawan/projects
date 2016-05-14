@@ -1,9 +1,12 @@
-DROP TABLE IF EXISTS master_inventory;
+DROP TABLE IF EXISTS transaction_expense;
 
-CREATE TABLE master_inventory
+CREATE TABLE transaction_expense
 (
-	InventortID 	BIGINT PRIMARY KEY AUTO_INCREMENT,
-	InventoryName	VARCHAR(255) NOT NULL
+	ExpenseID	 	BIGINT PRIMARY KEY AUTO_INCREMENT,
+	TransactionDate	DATETIME NOT NULL,
+	Name			VARCHAR(100),
+	Amount			DOUBLE,
+	Remarks			VARCHAR(255),
 	CreatedDate 	DATETIME NOT NULL,
 	CreatedBy 		VARCHAR(255) NOT NULL,
 	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
@@ -11,5 +14,5 @@ CREATE TABLE master_inventory
 )ENGINE=InnoDB;
 
 
-CREATE UNIQUE INDEX INVENTORY_INDEX
-ON master_inventory (InventoryID);
+CREATE UNIQUE INDEX EXPENSE_INDEX
+ON transaction_expense (ExpenseID);

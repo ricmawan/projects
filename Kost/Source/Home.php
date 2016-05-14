@@ -71,7 +71,6 @@
 											return 0;
 										}
 										while($row = mysql_fetch_array($result)) {
-
 											if($row['GroupMenuID'] == 1) echo "<li class='dropdown active'>";
 											else echo "<li class='dropdown'>";
 											$sql2 = "SELECT
@@ -100,7 +99,7 @@
 											else if($rowcount == 0) { }
 											else {
 												echo "<a href='#'><i class='".$row['Icon']."'></i> ".$row['GroupMenuName']." <i class='fa fa-angle-down'></i></a>";
-												echo "<ul class='dropdown-menu bold'>";
+												echo "<ul class='dropdown-nav-menu bold'>";
 												while($row2 = mysql_fetch_array($result2)) {
 													echo "<li>";
 													echo "<a href='#' link='".$row2['Url']."' class='menu' >".$row2['MenuName']."</a>";
@@ -111,6 +110,9 @@
 											echo "</li>";
 										}
 									?>
+									<li class='dropdown'>
+										<a href='#' class='menu' link='./Logout.php'><i class='fa fa-sign-out fa-2'></i> Logout</a>
+									<li>
 								</ul>
 							</nav>
 						</div>
@@ -119,7 +121,126 @@
 			</header>
 			<div id="page-inner">
 				<span id="page-inner-left">
-					&nbsp;
+					<span class="room">
+						101
+					</span>
+					<span class="room booked">
+						102
+					</span>
+					<span class="room">
+						101
+					</span>
+					<span class="room occupied">
+						102
+					</span>
+					<span class="room">
+						101
+					</span>
+					<span class="room booked">
+						102
+					</span>
+					<span class="room">
+						101
+					</span>
+					<span class="room">
+						102
+					</span>
+					<span class="room booked">
+						101
+					</span>
+					<span class="room">
+						102
+					</span>
+					<span class="room">
+						101
+					</span>
+					<span class="room occupied">
+						102
+					</span>
+					<span class="room occupied">
+						101
+					</span>
+					<span class="room">
+						102
+					</span>
+					<span class="room occupied">
+						101
+					</span>
+					<span class="room">
+						102
+					</span>
+					<span class="room booked">
+						101
+					</span>
+					<span class="room">
+						102
+					</span>
+					<span class="room occupied">
+						101
+					</span>
+					<span class="room occupied">
+						102
+					</span>
+					<span class="room">
+						101
+					</span>
+					<span class="room">
+						102
+					</span>
+					<span class="room">
+						101
+					</span>
+					<span class="room booked">
+						102
+					</span>
+					<span class="room booked">
+						101
+					</span>
+					<span class="room booked">
+						102
+					</span>
+					<span class="room">
+						101
+					</span>
+					<span class="room">
+						102
+					</span>
+					<span class="room">
+						101
+					</span>
+					<span class="room">
+						102
+					</span>
+					<span class="room booked">
+						101
+					</span>
+					<span class="room booked">
+						102
+					</span>
+					<span class="room booked">
+						101
+					</span>
+					<span class="room">
+						102
+					</span>
+					<span class="room occupied">
+						101
+					</span>	
+					<span class="room booked">
+						101
+					</span>
+					<span class="room booked">
+						102
+					</span>
+					<span class="room booked">
+						101
+					</span>
+					<span class="room">
+						102
+					</span>
+					<span class="room occupied">
+						101
+					</span>					
 				</span>
 				<span id="page-inner-right">
 					&nbsp;
@@ -140,18 +261,11 @@
 		<iframe id='excelDownload' src='' style='display:none'></iframe>
 		<script type="text/javascript">
 			$(document).ready(function() {
-				var windowHeight = $( window ).height() - 55;
+				var windowHeight = $( window ).height() - 65;
 				$("#page-inner").css ({
 					"min-height" : windowHeight
 				});
-				$("head").append("<style> .panel-default { min-height : " + windowHeight + "px } </style>");
-				$(".panel-default").css ({
-					"min-height" : windowHeight
-				});
-				/*$("#wrapper").css ({
-					
-					"width" : "calc(100% - 5px)"
-				});*/
+				$("head").append("<style> #page-inner-left { min-height : " + windowHeight + "px; overflow-y: auto; } .panel-default { min-height : " + windowHeight + "px; max-height : " + windowHeight + "px; } .panel-body { max-height: " + (windowHeight - 40) + "px; overflow-y: auto; } </style>");
 				/*$.ajax({
 					url: "./Master/Notification/",
 					type: "POST",
