@@ -826,7 +826,7 @@
 						}, "slow");
 						return false;
 					}
-					else else {
+					else {
 						$.ajax({
 							url: "./Transaction/Booking/Insert.php",
 							type: "POST",

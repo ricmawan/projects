@@ -5,21 +5,21 @@
 		$RequestPath = str_replace($file, "", $RequestPath);
 		include "../../GetPermission.php";
 		//echo $_SERVER['REQUEST_URI'];
-		$OperationalID = mysql_real_escape_string($_GET['ID']);
+		$IncomingInventoryID = mysql_real_escape_string($_GET['ID']);
 		$TransactionDate = "";
 		$IsEdit = 0;
 		$rowCount = 0;
 		$Data = "";
-		if($OperationalID != 0) {
+		if($IncomingID != 0) {
 			$IsEdit = 1;
 			//$Content = "Place the content here";
 			$sql = "SELECT
-						O.OperationalID,
-						DATE_FORMAT(O.TransactionDate, '%d-%m-%Y') AS TransactionDate
+						II.IncomingInventoryID,
+						DATE_FORMAT(II.TransactionDate, '%d-%m-%Y') AS TransactionDate
 					FROM
-						transaction_operational O
+						transaction_incominginventory II
 					WHERE
-						O.OperationalID = $OperationalID";
+						O.IncomingID = $IncomingInventoryID";
 						
 			if (! $result=mysql_query($sql, $dbh)) {
 				echo mysql_error();
@@ -29,13 +29,14 @@
 			$TransactionDate = $row['TransactionDate'];
 			
 			$sql = "SELECT
-						OD.OperationalDetailsID,
-						OD.Amount,
-						OD.Remarks
+						IID.IncomingInventoryDetailsID,
+						IID.Quantity,
+						IID.Price,
+						IID.Remarks
 					FROM
-						transaction_operationaldetails OD
+						transaction_incominginventorydetails IID
 					WHERE
-						OD.OperationalID = $OperationalID";
+						IID.IncomingInventoryID = $IncomingInventoryID";
 			if(!$result = mysql_query($sql, $dbh)) {
 				echo mysql_error();
 				return 0;
@@ -46,7 +47,7 @@
 				$Data = array();
 				while($row = mysql_fetch_array($result)) {
 					//array_push($DetailID, $row[0]);
-					array_push($Data, "'".$row['OperationalDetailsID']."', '".$row['Amount']."', '".$row['Remarks']."'");
+					array_push($Data, "'".$row['IncomingInventoryDetailsID']."', '".$row['Quantity']."', '".$row['Price']."', '".$row['Remarks']."'");
 				}
 				//$DetailID = implode(",", $DetailID);
 				$Data = implode("|", $Data);
@@ -73,7 +74,7 @@
 							<div class="row">
 								<div class="col-md-1 labelColumn">
 									Tanggal :
-									<input id="hdnOperationalID" name="hdnOperationalID" type="hidden" <?php echo 'value="'.$OperationalID.'"'; ?> />
+									<input id="hdnIncomingID" name="hdnIncomingID" type="hidden" <?php echo 'value="'.$IncomingID.'"'; ?> />
 									<input id="hdnRow" name="hdnRow" type="hidden" <?php echo 'value="'.$rowCount.'"'; ?> />
 									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
 									<input id="hdnData" name="hdnData" type="hidden" <?php echo 'value="'.$Data.'"'; ?> />
@@ -86,10 +87,13 @@
 							<div class="row">
 								<div class="col-md-12">
 									<table class="table" style="width:auto;" id="datainput">
-										<thead style="background-color: black;color:white;height:25px;width:410px;display:block;">
+										<thead style="background-color: black;color:white;height:25px;width:800px;display:block;">
 											<td align="center" style="width:30px;">No</td>
-											<td align="center" style="width:180px;">Keterangan</td>
+											<td align="center" style="width:180px;">Inventaris</td>
+											<td align="center" style="width:75px;">Qty</td>
+											<td align="center" style="width:135px;">Harga</td>
 											<td align="center" style="width:170px;">Total</td>
+											<td align="center" style="width:180px;">Keterangan</td>
 											<td style="width: 26px"></td>
 										</thead>
 										<tbody style="display:block;max-height:282px;height:100%;overflow-y:auto;">
@@ -97,10 +101,19 @@
 												<td id='nota' name='nota' class='nota' style="width:30px;vertical-align:middle;"></td>
 												<td style="width:180px;">
 													<input type="text" id="txtRemarks" name="txtRemarks" class="form-control-custom txtRemarks" placeholder="Keterangan" />
-													<input type="hidden" id="hdnOperationalDetailsID" class="hdnOperationalDetailsID" name="hdnOperationalDetailsID" value="0" />
+													<input type="hidden" id="hdnIncomingInventoryDetailsID" class="hdnIncomingInventoryDetailsID" name="hdnIncomingInventoryDetailsID" value="0" />
+												</td>
+												<td style="width:75px;">
+													<input type="text" row="" value=1 id="txtQuantity" style="text-align:right;" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control-custom txtQuantity" placeholder="QTY" />
+												</td>
+												<td style="width:135px;">
+													<input type="text" id="txtPrice" value="0.00" name="txtPrice" style="text-align:right;" class="form-control-custom txtPrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga" />
 												</td>
 												<td  style="width:170px;">
 													<input type="text" id="txtTotal" name="txtTotal" class="form-control-custom txtTotal" style="text-align:right;" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" value="0.00" placeholder="Jumlah" />
+												</td>
+												<td  style="width:180px;">
+													<input type="text" id="txtRemarks" name="txtRemarks" class="form-control-custom txtRemarks" placeholder="Keterangan" />
 												</td>
 												<td style="vertical-align:middle;">
 													<i class="fa fa-close btnDelete" style="cursor:pointer;" acronym title="Hapus Data" onclick="DeleteRow(this.getAttribute('row'))"></i>
@@ -161,10 +174,10 @@
 					i++;
 				});
 				i = 0;
-				$(".hdnOperationalDetailsID").each(function() {
+				$(".hdnIncomingInventoryDetailsID").each(function() {
 					if(i != 0) {
-						$(this).attr("id", "hdnOperationalDetailsID" + i);
-						$(this).attr("name", "hdnOperationalDetailsID" + i);
+						$(this).attr("id", "hdnIncomingInventoryDetailsID" + i);
+						$(this).attr("name", "hdnIncomingInventoryDetailsID" + i);
 					}
 					i++;
 				});
@@ -182,6 +195,22 @@
 					if(i != 0) {
 						$(this).attr("id", "txtTotal" + i);
 						$(this).attr("name", "txtTotal" + i);
+					}
+					i++;
+				});
+				i = 0;
+				$(".txtPrice").each(function() {
+					if(i != 0) {
+						$(this).attr("id", "txtPrice" + i);
+						$(this).attr("name", "txtPrice" + i);
+					}
+					i++;
+				});
+				i = 0;
+				$(".txtQuantity").each(function() {
+					if(i != 0) {
+						$(this).attr("id", "txtQuantity" + i);
+						$(this).attr("name", "txtQuantity" + i);
 					}
 					i++;
 				});
@@ -253,7 +282,7 @@
 						//set values
 						var d = type[i].split("', '");
 						$("#nota").text(count);
-						$("#hdnOperationalDetailsID" + count).val(d[0].replace("'", ""));
+						$("#hdnIncomingDetailsID" + count).val(d[0].replace("'", ""));
 						$("#txtRemarks" + count).val(d[2].replace("'", ""));
 						$("#txtTotal" + count).val(returnRupiah(d[1].replace("'", "")));
 						$("#record").val(count);
