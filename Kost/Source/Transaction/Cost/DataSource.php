@@ -6,7 +6,7 @@
 	include "../../GetPermission.php";
 
 	$where = " 1=1 ";
-	$order_by = "UserID";
+	$order_by = "O.OperationalID";
 	$rows = 10;
 	$current = 1;
 	$limit_l = ($current * $rows) - ($rows);
@@ -17,18 +17,14 @@
 		$order_by = "";
 		foreach($_REQUEST['sort'] as $key => $value) {
 			if($key != 'No') $order_by .= " $key $value";
-			else $order_by = "UserID";
+			else $order_by = "O.OperationalID";
 		}
 	}
 	//Handles search querystring sent from Bootgrid
 	if (ISSET($_REQUEST['searchPhrase']) )
 	{
 		$search = trim($_REQUEST['searchPhrase']);
-		$where .= " AND ( UserName LIKE '%".$search."%' OR UserLogin LIKE '%".$search."%' OR CASE
-																								WHEN IsActive = 0
-																								THEN 'Tidak Aktif'
-																								ELSE 'Aktif'
-																							 END LIKE '%".$search."%'																							 ) ";
+		$where .= " AND ( DATE_FORMAT(O.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%') ";
 	}
 	//Handles determines where in the paging count this result set falls in
 	if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];
@@ -45,7 +41,7 @@
 	$sql = "SELECT
 				COUNT(*) AS nRows
 			FROM
-				master_user
+				transaction_operational O
 			WHERE
 				$where";
 	if (! $result = mysql_query($sql, $dbh)) {
@@ -55,17 +51,13 @@
 	$row = mysql_fetch_array($result);
 	$nRows = $row['nRows'];
 	$sql = "SELECT
-				UserID,
-				UserName,
-				UserLogin,
-				CASE
-					WHEN IsActive = 0
-					THEN 'Tidak Aktif'
-					ELSE 'Aktif'
-				END AS Status,
-				UserPassword
+				O.OperationalID,
+				DATE_FORMAT(O.TransactionDate, '%d-%m-%Y') TransactionDate,
+				SUM(OD.Amount) Total
 			FROM
-				master_user
+				transaction_operational O
+				JOIN transaction_operationaldetails OD
+					ON O.OperationalID = OD.OperationalID
 			WHERE
 				$where
 			ORDER BY 
@@ -80,11 +72,9 @@
 	while ($row = mysql_fetch_array($result)) {
 		$RowNumber++;
 		$row_array['RowNumber'] = $RowNumber;
-		$row_array['UserIDName'] = $row['UserID']."^".$row['UserName'];
-		$row_array['UserID']= $row['UserID'];
-		$row_array['Status']= $row['Status'];
-		$row_array['UserName'] = $row['UserName'];
-		$row_array['UserLogin'] = $row['UserLogin'];
+		$row_array['OperationalID']= $row['OperationalID'];
+		$row_array['TransactionDate']= $row['TransactionDate'];
+		$row_array['Total'] = $row['Total'];
 		array_push($return_arr, $row_array);
 	}
 

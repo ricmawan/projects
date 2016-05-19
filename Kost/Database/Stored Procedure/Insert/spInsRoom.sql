@@ -1,14 +1,13 @@
-DROP PROCEDURE IF EXISTS spInsCustomer;
+DROP PROCEDURE IF EXISTS spInsRoom;
 
 DELIMITER $$
-CREATE PROCEDURE spInsCustomer (
-	pID 			BIGINT,
-	pSalesID		BIGINT,
-	pCustomerName 	VARCHAR(255),
-	pAddress1 		TEXT,
-	pAddress2 		TEXT,
-	pCity			VARCHAR(100),
-	pTelephone		VARCHAR(255),
+CREATE PROCEDURE spInsRoom (
+	pID				BIGINT, 
+	pRoomNumber		VARCHAR(255),
+	pStatusID		INT,
+	pDailyRate		DOUBLE,
+	pHourlyRate		DOUBLE,
+	pRoomInfo		TEXT,
 	pIsEdit			INT,
     pCurrentUser	VARCHAR(255)
 )
@@ -39,8 +38,8 @@ StoredProcedure:BEGIN
 	
 	SET PassValidate = 1;
 	
-	START TRANSACTION;	
-
+	START TRANSACTION;
+	
 SET State = 1;
 
 		SELECT 
@@ -48,20 +47,17 @@ SET State = 1;
 		INTO
 			PassValidate
 		FROM 
-			master_customer
+			master_room
 		WHERE
-			TRIM(CustomerName) = TRIM(pCustomerName)
-			AND TRIM(Address1) = TRIM(pAddress1)
-			AND TRIM(Address2) = TRIM(pAddress2)
-			AND TRIM(City) = TRIM(pCity)
-			AND CustomerID <> pID
+			TRIM(RoomNumber) = TRIM(RoomNumber)
+			AND RoomID <> pID
 		LIMIT 1;
 			
 		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
 SET State = 2;
 			SELECT
 				pID AS 'ID',
-				'Customer sudah ada' AS 'Message',
+				'Kamar sudah ada' AS 'Message',
 				'' AS 'MessageDetail',
 				1 AS 'FailedFlag',
 				State AS 'State' ;
@@ -71,24 +67,22 @@ SET State = 2;
 		ELSE /*Data yang diinput valid*/
 SET State = 3;
 			IF(pIsEdit = 0)	THEN /*Tambah baru*/
-				INSERT INTO master_customer
+				INSERT INTO master_room
 				(
-					CustomerName,
-					SalesID,
-					Address1,
-					Address2,
-					City,
-					Telephone,
+					RoomNumber,
+					StatusID,
+					DailyRate,
+					HourlyRate,
+					RoomInfo,
 					CreatedDate,
 					CreatedBy
 				)
 				VALUES (
-					pCustomerName,
-					pSalesID,
-					pAddress1,
-					pAddress2,
-					pCity,
-					pTelephone,
+					pRoomNumber,
+					pStatusID,
+					pDailyRate,
+					pHourlyRate,
+					pRoomInfo,
 					NOW(),
 					pCurrentUser
 				);
@@ -96,35 +90,35 @@ SET State = 3;
 SET State = 4;			               
 				SELECT
 					pID AS 'ID',
-					'Pelanggan Berhasil Ditambahkan' AS 'Message',
+					'Kamar Berhasil Ditambahkan' AS 'Message',
 					'' AS 'MessageDetail',
 					0 AS 'FailedFlag',
-					State AS 'State';		
+					State AS 'State';
+					
 			ELSE
 SET State = 5;
 				UPDATE
-					master_customer
+					master_room
 				SET
-					CustomerName = pCustomerName,
-					SalesID = pSalesID,
-					Address1 = pAddress1,
-					Address2 = pAddress2,
-					City = pCity,
-					Telephone = pTelephone,
+					RoomNumber = pRoomNumber,
+					StatusID = pStatusID,
+					DailyRate = pDailyRate,
+					HourlyRate = pHourlyRate,
+					RoomInfo = pRoomInfo,
 					ModifiedBy = pCurrentUser
 				WHERE
-					CustomerID = pID;
+					RoomID = pID;
 					
 SET State = 6;
 				SELECT
 					pID AS 'ID',
-					'Pelanggan Berhasil Diubah' AS 'Message',
+					'Kamar Berhasil Diubah' AS 'Message',
 					'' AS 'MessageDetail',
 					0 AS 'FailedFlag',
 					State AS 'State';
-		
-			END IF;	
-		END IF;
+				
+			END IF;
+		END IF;			
 	COMMIT;
 END;
 $$

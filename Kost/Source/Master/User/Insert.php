@@ -63,7 +63,7 @@
 	
 	function returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State) {
 		$data = array(
-			"Id" => $ID, 
+			"ID" => $ID, 
 			"Message" => $Message,
 			"MessageDetail" => $MessageDetail,
 			"FailedFlag" => $FailedFlag,

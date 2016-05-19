@@ -66,7 +66,7 @@
 									Harga Harian :
 								</div>
 								<div class="col-md-3">
-									<input id="txtDailyRate" name="txtDailyRate" type="text" class="form-control-custom" placeholder="Harga Harian" required <?php echo 'value="'.$DailyRate.'"'; ?> />
+									<input id="txtDailyRate" name="txtDailyRate" type="text" class="form-control-custom" placeholder="Harga Harian" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" required <?php echo 'value="'.$DailyRate.'"'; ?> />
 								</div>
 							</div>
 							<br />
@@ -75,7 +75,7 @@
 									Harga per Jam :
 								</div>
 								<div class="col-md-3">
-									<input id="txtHourlyRate" name="txtHourlyRate" type="password" class="form-control-custom" placeholder="Harga per Jam" required <?php echo 'value="'.$HourlyRate.'"'; ?> />
+									<input id="txtHourlyRate" name="txtHourlyRate" type="text" class="form-control-custom" placeholder="Harga per Jam" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" required <?php echo 'value="'.$HourlyRate.'"'; ?> />
 								</div>
 							</div>
 							<br />
@@ -88,7 +88,7 @@
 								</div>
 							</div>
 							<br />
-							<button type="button" class="btn btn-default" value="Simpan" onclick="SubmitValidate(this.form);" ><i class="fa fa-save"></i> Simpan</button>
+							<button type="button" class="btn btn-default" value="Simpan" onclick="SubmitForm('./Master/Room/Insert.php');" ><i class="fa fa-save"></i> Simpan</button>
 						</form>
 					</div>
 				</div>
