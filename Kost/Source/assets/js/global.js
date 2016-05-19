@@ -124,7 +124,7 @@ $(document).ready(function () {
 		PrevMenu = CurrentMenu;
 		CurrentMenu = MenuClicked;
 		//if( $(this).is("a")) $(".menu").removeClass("active-menu");
-		$("li").removeClass("active");
+		if( $(this).is("a")) $("li").removeClass("active");
 		$("#loading").show();
 		$("#page-inner-right").html("");
 		if(MenuClicked != "./Home.php") {
@@ -189,6 +189,50 @@ function Redirect(link) {
 					scrollTop: 0
 				}, "slow");
 				//alert(data);
+				$("#loading").hide();
+			},
+			error: function(data) {
+				$("#loading").hide();
+				$.notify("Koneksi gagal", "error");
+			}
+		});
+	}
+	else {
+		/*$.ajax({
+			url: "./Master/Notification/",
+			type: "POST",
+			data: { },
+			dataType: "html",
+			success: function(data) {
+				$("#page-inner").html(data);
+				$("html, body").animate({
+					scrollTop: 0
+				}, "slow");
+				$("#loading").hide();
+			},
+			error: function(data) {
+				$("#loading").hide();
+				$.notify("Koneksi gagal", "error");
+			}
+		});*/
+		$("#loading").hide();
+	}
+}
+
+function Reload() {
+	$("#loading").show();
+	$("#page-inner").html("");
+	if(CurrentMenu != "./Home.php") {
+		$.ajax({
+			url: CurrentMenu,
+			type: "POST",
+			data: { },
+			dataType: "html",
+			success: function(data) {
+				$("#page-inner").html(data);
+				$("html, body").animate({
+					scrollTop: 0
+				}, "slow");
 				$("#loading").hide();
 			},
 			error: function(data) {

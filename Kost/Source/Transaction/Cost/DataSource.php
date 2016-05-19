@@ -6,7 +6,7 @@
 	include "../../GetPermission.php";
 
 	$where = " 1=1 ";
-	$order_by = "O.OperationalID";
+	$order_by = "O.OperationalID DESC";
 	$rows = 10;
 	$current = 1;
 	$limit_l = ($current * $rows) - ($rows);
@@ -17,7 +17,7 @@
 		$order_by = "";
 		foreach($_REQUEST['sort'] as $key => $value) {
 			if($key != 'No') $order_by .= " $key $value";
-			else $order_by = "O.OperationalID";
+			else $order_by = "O.OperationalID DESC";
 		}
 	}
 	//Handles search querystring sent from Bootgrid
@@ -74,7 +74,7 @@
 		$row_array['RowNumber'] = $RowNumber;
 		$row_array['OperationalID']= $row['OperationalID'];
 		$row_array['TransactionDate']= $row['TransactionDate'];
-		$row_array['Total'] = $row['Total'];
+		$row_array['Total'] = number_format($row['Total'],2,".",",");
 		array_push($return_arr, $row_array);
 	}
 
