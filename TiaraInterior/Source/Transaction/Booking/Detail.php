@@ -26,7 +26,8 @@
 						BO.CustomerID,
 						BO.Remarks,
 						BO.BookingStatusID,
-						DATE_FORMAT(BO.TransactionDate, '%d-%m-%Y') AS TransactionDate
+						DATE_FORMAT(BO.TransactionDate, '%d-%m-%Y') AS TransactionDate,
+						DATE_FORMAT(BO.DueDate, '%d-%m-%Y') AS DueDate
 					FROM
 						transaction_booking BO
 					WHERE
@@ -43,6 +44,7 @@
 			$SalesID = $row['SalesID'];
 			$CustomerID = $row['CustomerID'];
 			$Remarks = $row['Remarks'];
+			$DueDate = $row['DueDate'];
 			$TransactionDate = $row['TransactionDate'];
 			
 			$sql = "SELECT
