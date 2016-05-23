@@ -11,7 +11,7 @@ CREATE TABLE transaction_operationaldetails
 	CreatedBy 				VARCHAR(255) NOT NULL,
 	ModifiedDate 			TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
 	ModifiedBy 				VARCHAR(255) NULL,
-	FOREIGN KEY(OperationalID) REFERENCES transaction_operational(OperationalID)
+	FOREIGN KEY(OperationalID) REFERENCES transaction_operational(OperationalID) ON UPDATE CASCADE ON DELETE CASCADE
 )ENGINE=InnoDB;
 
 
