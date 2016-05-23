@@ -6,7 +6,6 @@ CREATE TABLE transaction_outgoinginventorydetails
 	OutgoingInventoryID			BIGINT,
 	InventoryID					BIGINT,
 	Quantity					DOUBLE,
-	Price						DOUBLE,
 	Remarks						VARCHAR(255),
 	CreatedDate 				DATETIME NOT NULL,
 	CreatedBy 					VARCHAR(255) NOT NULL,

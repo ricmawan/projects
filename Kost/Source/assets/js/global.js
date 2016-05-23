@@ -153,7 +153,7 @@ $(document).ready(function () {
 				data: { },
 				dataType: "html",
 				success: function(data) {
-					$("#page-inner").html(data);
+					$("#page-inner-right").html(data);
 					$("html, body").animate({
 						scrollTop: 0
 					}, "slow");
@@ -221,7 +221,7 @@ function Redirect(link) {
 
 function Reload() {
 	$("#loading").show();
-	$("#page-inner").html("");
+	$("#page-inner-right").html("");
 	if(CurrentMenu != "./Home.php") {
 		$.ajax({
 			url: CurrentMenu,
@@ -229,7 +229,7 @@ function Reload() {
 			data: { },
 			dataType: "html",
 			success: function(data) {
-				$("#page-inner").html(data);
+				$("#page-inner-right").html(data);
 				$("html, body").animate({
 					scrollTop: 0
 				}, "slow");
@@ -248,7 +248,7 @@ function Reload() {
 			data: { },
 			dataType: "html",
 			success: function(data) {
-				$("#page-inner").html(data);
+				$("#page-inner-right").html(data);
 				$("html, body").animate({
 					scrollTop: 0
 				}, "slow");

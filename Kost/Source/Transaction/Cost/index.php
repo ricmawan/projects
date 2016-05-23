@@ -17,7 +17,7 @@
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
-										<th data-column-id="OperationalID" data-visible="false" data-type="numeric" data-identifier="true">UserID</th>
+										<th data-column-id="OperationalID" data-visible="false" data-type="numeric" data-identifier="true">OperationalID</th>
 										<th data-column-id="RowNumber" data-sortable="false" data-type="numeric">No</th>
 										<th data-column-id="TransactionDate">Tanggal</th>
 										<th data-column-id="Total">Total</th>

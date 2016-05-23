@@ -4,6 +4,7 @@ CREATE TABLE transaction_outgoinginventory
 (
 	OutgoingInventoryID 	BIGINT PRIMARY KEY AUTO_INCREMENT,
 	TransactionDate			DATETIME NOT NULL,
+	Remarks					VARCHAR(255),
 	CreatedDate 			DATETIME NOT NULL,
 	CreatedBy 				VARCHAR(255) NOT NULL,
 	ModifiedDate 			TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,

@@ -60,6 +60,9 @@
 					ON O.OperationalID = OD.OperationalID
 			WHERE
 				$where
+			GROUP BY
+				O.OperationalID,
+				O.TransactionDate
 			ORDER BY 
 				$order_by
 			$limit;";

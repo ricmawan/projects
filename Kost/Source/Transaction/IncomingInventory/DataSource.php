@@ -17,7 +17,7 @@
 		$order_by = "";
 		foreach($_REQUEST['sort'] as $key => $value) {
 			if($key != 'No') $order_by .= " $key $value";
-			else $order_by = "UserID DESC";
+			else $order_by = "IncomingInventoryID DESC";
 		}
 	}
 	//Handles search querystring sent from Bootgrid
@@ -41,7 +41,7 @@
 	$sql = "SELECT
 				COUNT(*) AS nRows
 			FROM
-				transaction_incominginventory
+				transaction_incominginventory II
 			WHERE
 				$where";
 	if (! $result = mysql_query($sql, $dbh)) {
@@ -60,6 +60,9 @@
 					ON II.IncomingInventoryID = IID.IncomingInventoryID
 			WHERE
 				$where
+			GROUP BY
+				II.IncomingInventoryID,
+				II.TransactionDate
 			ORDER BY 
 				$order_by
 			$limit;";
