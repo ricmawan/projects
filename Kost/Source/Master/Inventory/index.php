@@ -20,6 +20,7 @@
 										<th data-column-id="InventoryIDName" data-visible="false" data-type="numeric" data-identifier="true">InventoryID</th>
 										<th data-column-id="RowNumber" data-sortable="false" data-type="numeric">No</th>
 										<th data-column-id="InventoryName">Nama</th>
+										<th data-column-id="Stock">Jumlah</th>
 										<?php if($EditFlag == true) echo '<th data-column-id="Opsi" data-formatter="commands" data-sortable="false">Opsi</th>'; ?>
 									</tr>
 								</thead>

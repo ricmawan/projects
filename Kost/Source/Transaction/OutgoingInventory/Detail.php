@@ -45,7 +45,7 @@
 						LEFT JOIN
 						(
 							SELECT
-								IID.InventoryID
+								IID.InventoryID,
 								SUM(IID.Quantity) Quantity
 							FROM
 								transaction_incominginventorydetails IID
@@ -119,13 +119,42 @@
 										<select name="ddlInventory" id="ddlInventory" class="form-control ddlInventory" placeholder="Pilih Barang" >
 											<option value="" selected> </option>
 											<?php
-												$sql = "SELECT InventoryID, InventoryName FROM master_inventory";
+												$sql = "SELECT 
+															MI.InventoryID, 
+															MI.InventoryName,
+															IFNULL(IID.Quantity, 0) - IFNULL(OID.Quantity, 0) Stock
+														FROM 
+															master_inventory MI
+															LEFT JOIN
+															(
+																SELECT
+																	OID.InventoryID,
+																	SUM(OID.Quantity) Quantity
+																FROM
+																	transaction_outgoinginventorydetails OID
+																GROUP BY
+																	OID.InventoryID
+															)OID
+																ON OID.InventoryID = MI.InventoryID
+															LEFT JOIN
+															(
+																SELECT
+																	IID.InventoryID,
+																	SUM(Quantity) Quantity
+																FROM
+																	transaction_incominginventorydetails IID
+																GROUP BY
+																	IID.InventoryID
+															)IID
+																ON IID.InventoryID = MI.InventoryID
+														WHERE
+															IFNULL(IID.Quantity, 0) - IFNULL(OID.Quantity, 0) > 0";
 												if(!$result = mysql_query($sql, $dbh)) {
 													echo mysql_error();
 													return 0;
 												}
 												while($row = mysql_fetch_array($result)) {
-													echo "<option value='".$row['InventoryID']."' >".$row['InventoryName']."</option>";
+													echo "<option value='".$row['InventoryID']."' stock=".$row['Stock']." >".$row['InventoryName']."</option>";
 												}
 											?>
 										</select>
@@ -153,7 +182,7 @@
 													<input type="hidden" id="hdnOutgoingInventoryDetailsID" class="hdnOutgoingInventoryDetailsID" name="hdnOutgoingInventoryDetailsID" value="0" />
 												</td>
 												<td style="width:75px;">
-													<input type="text" row="" value=1 id="txtQuantity" style="text-align:right;" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="ValidateQty();" class="form-control-custom txtQuantity" placeholder="QTY" />
+													<input type="text" row="" value=1 id="txtQuantity" style="text-align:right;" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="ValidateQty(this.getAttribute('row'));" class="form-control-custom txtQuantity" placeholder="QTY" />
 												</td>
 												<td  style="width:180px;">
 													<input type="text" id="txtRemarksDetail" name="txtRemarksDetail" class="form-control-custom txtRemarksDetail" placeholder="Keterangan" />
@@ -170,7 +199,7 @@
 							<input type="hidden" id="recordnew" name="recordnew" value=0 />
 							<br />
 							<div class="row">
-								<div class="col-md-1">
+								<div class="col-md-2">
 									Keterangan :
 								</div>
 								<div class="col-md-3">
@@ -180,7 +209,7 @@
 							<br />
 							<div class="row">
 								<div class="col-md-12">
-									<button class="btn btn-primary" id="btnAdd" type="button"><i class="fa fa-plus"></i> Tambah</button>&nbsp;&nbsp;
+									<button class="btn btn-primary" style="display:none;" id="btnAdd" type="button"><i class="fa fa-plus"></i> Tambah</button>
 									<button class="btn btn-default" id="btnSave" type="button" onclick="SubmitForm('./Transaction/OutgoingInventory/Insert.php');" ><i class="fa fa-save "></i> Simpan</button>&nbsp;&nbsp;
 								</div>
 							</div>
@@ -195,17 +224,22 @@
 				$("#num" + row).remove();
 				$("#recordnew").val(count-1);
 				RegenerateRowNumber();
-				Calculate();
 			}
 			
-			function ValidateQty() {
-				
+			function ValidateQty(row) {
+				var currentQty = $("#txtQuantity" + row).val();
+				var currentStock = $("#hdnStock" +  row).val();
+				if(parseInt(currentQty) > parseInt(currentStock)) {
+					$.notify("Sisa barang yang ada : " + currentStock, "error");
+					$("#txtQuantity" + row).val(currentStock);
+				}
 			}
 			
 			function FillInventoryID() {
 				var AddFlag = 1;
 				var CurrentInventoryID = $("#ddlInventory").val();
 				var CurrentInventoryName = $("#ddlInventory option:selected").text();
+				var CurrentStock = $("#ddlInventory option:selected").attr("stock");
 				var rows = $("#recordnew").val();
 				//QTY + 1 if selected item already exists
 				for(var i=1;i<=rows;i++) {
@@ -220,6 +254,7 @@
 					var rows = $("#recordnew").val();
 					$("#hdnInventoryID" + rows).val(CurrentInventoryID);
 					$("#txtInventoryName" + rows).val(CurrentInventoryName);
+					$("#hdnStock" + rows).val(CurrentStock.toString());
 				}
 			}
 			
@@ -280,6 +315,7 @@
 					if(i != 0) {
 						$(this).attr("id", "txtQuantity" + i);
 						$(this).attr("name", "txtQuantity" + i);
+						$(this).attr("row", i);
 					}
 					i++;
 				});

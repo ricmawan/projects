@@ -121,126 +121,32 @@
 			</header>
 			<div id="page-inner">
 				<span id="page-inner-left">
-					<span class="room">
-						101
-					</span>
-					<span class="room booked">
-						102
-					</span>
-					<span class="room">
-						101
-					</span>
-					<span class="room occupied">
-						102
-					</span>
-					<span class="room">
-						101
-					</span>
-					<span class="room booked">
-						102
-					</span>
-					<span class="room">
-						101
-					</span>
-					<span class="room">
-						102
-					</span>
-					<span class="room booked">
-						101
-					</span>
-					<span class="room">
-						102
-					</span>
-					<span class="room">
-						101
-					</span>
-					<span class="room occupied">
-						102
-					</span>
-					<span class="room occupied">
-						101
-					</span>
-					<span class="room">
-						102
-					</span>
-					<span class="room occupied">
-						101
-					</span>
-					<span class="room">
-						102
-					</span>
-					<span class="room booked">
-						101
-					</span>
-					<span class="room">
-						102
-					</span>
-					<span class="room occupied">
-						101
-					</span>
-					<span class="room occupied">
-						102
-					</span>
-					<span class="room">
-						101
-					</span>
-					<span class="room">
-						102
-					</span>
-					<span class="room">
-						101
-					</span>
-					<span class="room booked">
-						102
-					</span>
-					<span class="room booked">
-						101
-					</span>
-					<span class="room booked">
-						102
-					</span>
-					<span class="room">
-						101
-					</span>
-					<span class="room">
-						102
-					</span>
-					<span class="room">
-						101
-					</span>
-					<span class="room">
-						102
-					</span>
-					<span class="room booked">
-						101
-					</span>
-					<span class="room booked">
-						102
-					</span>
-					<span class="room booked">
-						101
-					</span>
-					<span class="room">
-						102
-					</span>
-					<span class="room occupied">
-						101
-					</span>	
-					<span class="room booked">
-						101
-					</span>
-					<span class="room booked">
-						102
-					</span>
-					<span class="room booked">
-						101
-					</span>
-					<span class="room">
-						102
-					</span>
-					<span class="room occupied">
-						101
-					</span>					
+					<?php
+						$sql = "SELECT
+									MR.RoomID,
+									MR.RoomNumber,
+									MR.StatusID,
+									MS.StatusName
+								FROM
+									master_room MR
+									JOIN master_status MS
+										ON MS.StatusID = MR.StatusID
+								ORDER BY
+									MR.RoomNumber ASC";
+						if(!$result = mysql_query($sql, $dbh)) {
+							echo mysql_error();
+							return 0;
+						}
+						while($row = mysql_fetch_array($result)) {
+							echo "<span acronym title='".$row['StatusName']."' class='room ".$row['StatusName']." dropdown' roomid=".$row['RoomID']." >".$row['RoomNumber']."
+									<span class='dropbtn'></span>
+									<div class='dropdown-content'>";
+							if($row['StatusID'] == 1 || $row['StatusID'] == 2) echo "<a href='#' onclick='CheckIn(".$row['RoomID'].");' >Check-In</a>";
+							if($row['StatusID'] == 2) echo "<a href='#' onclick='Cancellation(".$row['RoomID'].");' >Pembatalan</a>";
+							if($row['StatusID'] == 3) echo "<a href='#' onclick='CheckOut(".$row['RoomID'].");' >Check-Out</a>";
+							echo "<a href='#' onclick='Booking(".$row['RoomID'].");'>Booking</a></div></span>";
+						}
+					?>
 				</span>
 				<span id="page-inner-right">
 					&nbsp;
@@ -260,7 +166,100 @@
 		<div id="loading"></div>
 		<iframe id='excelDownload' src='' style='display:none'></iframe>
 		<script type="text/javascript">
+			function Booking(RoomID) {
+				$("#page-inner-right").html("");
+				$.ajax({
+					url: "./Transaction/Booking/",
+					type: "POST",
+					data: { },
+					dataType: "html",
+					success: function(data) {
+						$("#page-inner-right").html(data);
+						$("html, body").animate({
+							scrollTop: 0
+						}, "slow");
+						$("#loading").hide();
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Koneksi gagal", "error");
+					}
+				});
+			}
+			
+			function Cancellation(RoomID) {
+				$("#page-inner-right").html("");
+				$.ajax({
+					url: "./Transaction/Cancellation/",
+					type: "POST",
+					data: { },
+					dataType: "html",
+					success: function(data) {
+						$("#page-inner-right").html(data);
+						$("html, body").animate({
+							scrollTop: 0
+						}, "slow");
+						$("#loading").hide();
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Koneksi gagal", "error");
+					}
+				});
+			}
+			
+			function CheckIn(RoomID) {
+				$("#page-inner-right").html("");
+				$.ajax({
+					url: "./Transaction/CheckIn/Detail.php",
+					type: "POST",
+					data: { ID : RoomID },
+					dataType: "html",
+					success: function(data) {
+						$("#page-inner-right").html(data);
+						$("html, body").animate({
+							scrollTop: 0
+						}, "slow");
+						$("#loading").hide();
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Koneksi gagal", "error");
+					}
+				});
+			}
+			
+			function CheckOut(RoomID) {
+				$("#page-inner-right").html("");
+				$.ajax({
+					url: "./Transaction/CheckOut/",
+					type: "POST",
+					data: { },
+					dataType: "html",
+					success: function(data) {
+						$("#page-inner-right").html(data);
+						$("html, body").animate({
+							scrollTop: 0
+						}, "slow");
+						$("#loading").hide();
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Koneksi gagal", "error");
+					}
+				});
+			}
+			
 			$(document).ready(function() {
+				$(".dropdown").click(function() {
+					if($(this).children("div").css("display") == "block") { 
+						$(this).children("div").toggle();
+					}
+					else if($(this).children("div").css("display") == "none") {
+						$(".dropdown .dropdown-content").hide();
+						$(this).children("div").toggle();
+					}
+				});
 				var windowHeight = $( window ).height() - 65;
 				$("#page-inner").css ({
 					"min-height" : windowHeight

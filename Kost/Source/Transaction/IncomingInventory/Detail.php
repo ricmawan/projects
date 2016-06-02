@@ -162,7 +162,7 @@
 							<br />
 							<div class="row">
 								<div class="col-md-12">
-									<button class="btn btn-primary" id="btnAdd" type="button"><i class="fa fa-plus"></i> Tambah</button>&nbsp;&nbsp;
+									<button class="btn btn-primary" id="btnAdd" style="display:none;" type="button"><i class="fa fa-plus"></i> Tambah</button>
 									<button class="btn btn-default" id="btnSave" type="button" onclick="SubmitForm('./Transaction/IncomingInventory/Insert.php');" ><i class="fa fa-save "></i> Simpan</button>&nbsp;&nbsp;
 								</div>
 							</div>

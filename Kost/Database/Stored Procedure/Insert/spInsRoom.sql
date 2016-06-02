@@ -49,7 +49,7 @@ SET State = 1;
 		FROM 
 			master_room
 		WHERE
-			TRIM(RoomNumber) = TRIM(RoomNumber)
+			TRIM(RoomNumber) = TRIM(pRoomNumber)
 			AND RoomID <> pID
 		LIMIT 1;
 			

@@ -6,7 +6,7 @@
 	include "../../GetPermission.php";
 
 	$where = " 1=1 ";
-	$order_by = "OutgoingInventoryID DESC";
+	$order_by = "OI.OutgoingInventoryID DESC";
 	$rows = 10;
 	$current = 1;
 	$limit_l = ($current * $rows) - ($rows);
@@ -17,7 +17,7 @@
 		$order_by = "";
 		foreach($_REQUEST['sort'] as $key => $value) {
 			if($key != 'No') $order_by .= " $key $value";
-			else $order_by = "OutgoingInventoryID DESC";
+			else $order_by = "OI.OutgoingInventoryID DESC";
 		}
 	}
 	//Handles search querystring sent from Bootgrid
@@ -41,7 +41,7 @@
 	$sql = "SELECT
 				COUNT(*) AS nRows
 			FROM
-				transaction_outgoinginventory
+				transaction_outgoinginventory OI
 			WHERE
 				$where";
 	if (! $result = mysql_query($sql, $dbh)) {
