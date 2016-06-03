@@ -141,7 +141,7 @@
 							echo "<span acronym title='".$row['StatusName']."' class='room ".$row['StatusName']." dropdown' roomid=".$row['RoomID']." >".$row['RoomNumber']."
 									<span class='dropbtn'></span>
 									<div class='dropdown-content'>";
-							if($row['StatusID'] == 1 || $row['StatusID'] == 2) echo "<a href='#' onclick='CheckIn(".$row['RoomID'].");' >Check-In</a>";
+							if($row['StatusID'] == 1 || $row['StatusID'] == 2) { echo "<a href='#' onclick='"; if($row['StatusID'] == 2) echo "CheckInFromBooking(".$row['RoomID'].");'"; else echo "CheckIn(".$row['RoomID'].");'"; echo ">Check-In</a>"; }
 							if($row['StatusID'] == 2) echo "<a href='#' onclick='Cancellation(".$row['RoomID'].");' >Pembatalan</a>";
 							if($row['StatusID'] == 3) echo "<a href='#' onclick='CheckOut(".$row['RoomID'].");' >Check-Out</a>";
 							echo "<a href='#' onclick='Booking(".$row['RoomID'].");'>Booking</a></div></span>";

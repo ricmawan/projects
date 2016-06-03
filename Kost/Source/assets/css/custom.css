@@ -733,6 +733,40 @@ th[data-column-id="City	"] {
     padding: 3px 12px;
 }
 
+::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+}
+::-webkit-scrollbar-button {
+	width: 10px;
+	height: 10px;
+}
+::-webkit-scrollbar-thumb {
+	background: #f9f9f9;
+	border: 0px none #ffffff;
+	border-radius: 50px;
+}
+::-webkit-scrollbar-thumb:hover {
+	background: #ffffff;
+}
+::-webkit-scrollbar-thumb:active {
+	background: #000000;
+}
+::-webkit-scrollbar-track {
+	background: #666666;
+	border: 0px none #ffffff;
+	border-radius: 50px;
+}
+::-webkit-scrollbar-track:hover {
+	background: #666666;
+}
+::-webkit-scrollbar-track:active {
+	background: #333333;
+}
+::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
 /*==============================================
     MEDIA QUERIES     
     =============================================*/

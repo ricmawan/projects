@@ -10,22 +10,12 @@ $(document).ready(function () {
 		$(this).datepicker({
 			dateFormat: 'dd-mm-yy'
 		});
-		$(this).attr("readonly", "true");
-		$(this).css({
-			"background-color": "#FFF",
-			"cursor": "text"
-		});
 	});
 	
 	$(document).on('focus',".DatePickerUntilNow", function(){
 		$(this).datepicker({
 			dateFormat: 'dd-mm-yy',
 			maxDate : "+0D"
-		});
-		$(this).attr("readonly", "true");
-		$(this).css({
-			"background-color": "#FFF",
-			"cursor": "text"
 		});
 	});
 	
@@ -34,11 +24,6 @@ $(document).ready(function () {
 			dateFormat: 'dd-mm-yy',
 			minDate : "+0D"
 		});
-		$(this).attr("readonly", "true");
-		$(this).css({
-			"background-color": "#FFF",
-			"cursor": "text"
-		});
 	});
 	
 	$(document).on('focus',".DatePickerMonthYearGlobal", function(){
@@ -46,11 +31,6 @@ $(document).ready(function () {
 			dateFormat: 'dd-mm-yy',
 			changeMonth: true,
 			changeYear: true
-		});
-		$(this).attr("readonly", "true");
-		$(this).css({
-			"background-color": "#FFF",
-			"cursor": "text"
 		});
 	});
 	
@@ -62,11 +42,6 @@ $(document).ready(function () {
 			changeYear: true,
 			yearRange: "-100:+0"
 		});
-		$(this).attr("readonly", "true");
-		$(this).css({
-			"background-color": "#FFF",
-			"cursor": "text"
-		});
 	});
 	
 	$(document).on('focus',".DatePickerMonthYearFromNow", function(){
@@ -76,11 +51,6 @@ $(document).ready(function () {
 			changeMonth: true,
 			changeYear: true,
 			yearRange: "0:+100"
-		});
-		$(this).attr("readonly", "true");
-		$(this).css({
-			"background-color": "#FFF",
-			"cursor": "text"
 		});
 	});
 	

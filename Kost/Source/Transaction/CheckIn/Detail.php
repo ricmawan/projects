@@ -37,6 +37,9 @@
 ?>
 <html>
 	<head>
+		<style>
+			.
+		</style>
 	</head>
 	<body>
 		<div class="row">
@@ -49,39 +52,41 @@
 						<form class="col-md-12" id="PostForm" method="POST" action="" >
 							<div class="row">
 								<div class="col-md-2 labelColumn">
-									<input type="radio" name="RateType" value="Daily" checked>
+									<input type="radio" name="rdRateType" id="rdRateType" value="Daily" checked>
 									Harian :
 									<input id="hdnRoomID" name="hdnRoomID" type="hidden" <?php echo 'value="'.$RoomID.'"'; ?> />
+									<input id="hdnDailyRate" name="hdnDailyRate" type="hidden" <?php echo 'value="'.$DailyRate.'"'; ?> />
+									<input id="hdnHourlyRate" name="hdnHourlyRate" type="hidden" <?php echo 'value="'.$HourlyRate.'"'; ?> />
 								</div>
 								<div class="col-md-3">
-									<div class="form-group input-group">
+									<div class="input-group">
 										<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-										<input id="txtStartDate" name="txtStartDate" type="text" class="form-control-custom DatePickerFromNow" placeholder="Tanggal" />
+										<input id="txtStartDate" name="txtStartDate" type="text" class="form-control-custom DatePickerFromNow" placeholder="Dari Tanggal" />
 									</div>
 								</div>
 								<div style="float: left;">
 								-
 								</div>
 								<div class="col-md-3">
-									<div class="form-group input-group">
+									<div class="input-group">
 										<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-										<input id="txtEndDate" name="txtEndDate" type="text" class="form-control-custom DatePickerFromNow" placeholder="Tanggal" />
+										<input id="txtEndDate" name="txtEndDate" type="text" class="form-control-custom DatePickerFromNow" placeholder="Sampai Tanggal" />
 									</div>
 								</div>
 							</div>
 							<br />
 							<div class="row">
 								<div class="col-md-2 labelColumn">
-									<input type="radio" name="RateType" value="Hourly" >
+									<input type="radio" name="rdRateType" id="rdRateType" value="Hourly" >
 									Per Jam :
 								</div>
 								<div class="col-md-3">
-									<div class="form-group input-group">
+									<div class="input-group">
 										<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
 										<input id="txtStartDateHourly" name="txtStartDateHourly" type="text" class="form-control-custom DatePickerFromNow" placeholder="Tanggal" />
 									</div>
 								</div>
-								<div class="col-md-2">
+								<div style="float: left;">
 									<select id="ddlStartHour" name="ddlStartHour" class="form-control-custom">
 										<option value="00:00:00">00:00</option>
 										<option value="01:00:00">01:00</option>
@@ -109,10 +114,10 @@
 										<option value="23:00:00">23:00</option>
 									</select>
 								</div>
-								<div style="float: left;">
+								<div style="float: left;margin: 0 10px 0 10px;">
 								-
 								</div>
-								<div class="col-md-2">
+								<div style="float: left;">
 									<select id="ddlEndHour" name="ddlEndHour" class="form-control-custom">
 										<option value="00:00:00">00:00</option>
 										<option value="01:00:00">01:00</option>
@@ -156,7 +161,7 @@
 									Tanggal Lahir :
 								</div>
 								<div class="col-md-3">
-									<div class="form-group input-group">
+									<div class="input-group">
 										<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
 										<input id="txtBirthDate" name="txtBirthDate" type="text" class="form-control-custom DatePickerMonthYearUntilNow" placeholder="Tanggal Lahir" required />
 									</div>
@@ -186,13 +191,13 @@
 									Down Payment :
 								</div>
 								<div class="col-md-3">
-									<div class="form-group input-group">
+									<div class="input-group">
 										<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
 										<input id="txtDownPaymentDate" name="txtDownPaymentDate" type="text" class="form-control-custom DatePickerFromNow" placeholder="Tanggal Down Payment" />
 									</div>
 								</div>
 								<div class="col-md-3">
-									<input id="txtDownPaymentAmount" name="txtDownPaymentAmount" type="text" class="form-control-custom" placeholder="Down Payment" />
+									<input id="txtDownPaymentAmount" name="txtDownPaymentAmount" style="text-align:right;" type="text" class="form-control-custom" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Down Payment" />
 								</div>
 							</div>
 							<br />
@@ -201,13 +206,13 @@
 									Pelunasan :
 								</div>
 								<div class="col-md-3">
-									<div class="form-group input-group">
+									<div class="input-group">
 										<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
 										<input id="txtPaymentDate" name="txtPaymentDate" type="text" class="form-control-custom DatePickerFromNow" placeholder="Tanggal Pelunasan" />
 									</div>
 								</div>
 								<div class="col-md-3">
-									<input id="txtPaymentAmount" name="txtPaymentAmount" type="text" class="form-control-custom" placeholder="Pelunasan" />
+									<input id="txtPaymentAmount" name="txtPaymentAmount" type="text" style="text-align:right;" class="form-control-custom" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Pelunasan" />
 								</div>
 							</div>
 							<br />
@@ -240,7 +245,50 @@
 			</div>
 		</div>
 		<script>
-			
+			$(document).ready(function() {
+				if($("input[name=rdRateType]:checked").val() == "Daily") {
+					$("#txtStartDateHourly").attr("disabled", true);
+					$("#txtStartDateHourly").attr("readonly", true);
+					$("#ddlStartHour").attr("disabled", true);
+					$("#ddlEndHour").attr("disabled", true);
+					$("#txtStartDate").attr("disabled", false);
+					$("#txtStartDate").attr("readonly", false);
+					$("#txtEndDate").attr("disabled", false);
+					$("#txtEndDate").attr("readonly", false);
+				}
+				else {
+					$("#txtStartDateHourly").attr("disabled", false );
+					$("#txtStartDateHourly").attr("readonly", false );
+					$("#ddlStartHour").attr("disabled", false);
+					$("#ddlEndHour").attr("disabled", false);
+					$("#txtStartDate").attr("disabled", true);
+					$("#txtStartDate").attr("readonly", true);
+					$("#txtEndDate").attr("disabled", true);
+					$("#txtEndDate").attr("readonly", true);
+				}
+				$("input[name=rdRateType]:radio").change(function() {
+					if(this.value == "Daily") {
+						$("#txtStartDateHourly").attr("disabled", true);
+						$("#txtStartDateHourly").attr("readonly", true);
+						$("#ddlStartHour").attr("disabled", true);
+						$("#ddlEndHour").attr("disabled", true);
+						$("#txtStartDate").attr("disabled", false);
+						$("#txtStartDate").attr("readonly", false);
+						$("#txtEndDate").attr("disabled", false);
+						$("#txtEndDate").attr("readonly", false);
+					}
+					else {
+						$("#txtStartDateHourly").attr("disabled", false );
+						$("#txtStartDateHourly").attr("readonly", false );
+						$("#ddlStartHour").attr("disabled", false);
+						$("#ddlEndHour").attr("disabled", false);
+						$("#txtStartDate").attr("disabled", true);
+						$("#txtStartDate").attr("readonly", true);
+						$("#txtEndDate").attr("disabled", true);
+						$("#txtEndDate").attr("readonly", true);
+					}
+				});
+			});
 		</script>
 	</body>
 </html>
