@@ -18,6 +18,8 @@ CREATE TABLE transaction_checkin
 	PaymentAmount 		DOUBLE,
 	PaymentDate			DOUBLE,
 	BookingFlag			BIT,
+	DailyRate			DOUBLE,
+	HourlyRate			DOUBLE,
 	CreatedDate 		DATETIME NOT NULL,
 	CreatedBy 			VARCHAR(255) NOT NULL,
 	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,

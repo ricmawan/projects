@@ -493,6 +493,13 @@ function minmax(value, min, max)
 	}
 });*/
 
+function addZero(i) {
+	if (i < 10) {
+		i = "0" + i;
+	}
+	return i;
+}
+			
 //combobox autocomplete
 (function( $ ) {
 	$.widget( "custom.combobox", {

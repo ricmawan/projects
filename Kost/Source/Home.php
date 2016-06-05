@@ -141,7 +141,8 @@
 							echo "<span acronym title='".$row['StatusName']."' class='room ".$row['StatusName']." dropdown' roomid=".$row['RoomID']." >".$row['RoomNumber']."
 									<span class='dropbtn'></span>
 									<div class='dropdown-content'>";
-							if($row['StatusID'] == 1 || $row['StatusID'] == 2) { echo "<a href='#' onclick='"; if($row['StatusID'] == 2) echo "CheckInFromBooking(".$row['RoomID'].");'"; else echo "CheckIn(".$row['RoomID'].");'"; echo ">Check-In</a>"; }
+							if($row['StatusID'] == 1 || $row['StatusID'] == 2) echo "<a href='#' onclick='CheckIn(".$row['RoomID'].");' >Check-In</a>";
+							if($row['StatusID'] == 2) echo "<a href='#' onclick='CheckInFromBooking(".$row['RoomID'].");' >Check-In dari Booking</a>";
 							if($row['StatusID'] == 2) echo "<a href='#' onclick='Cancellation(".$row['RoomID'].");' >Pembatalan</a>";
 							if($row['StatusID'] == 3) echo "<a href='#' onclick='CheckOut(".$row['RoomID'].");' >Check-Out</a>";
 							echo "<a href='#' onclick='Booking(".$row['RoomID'].");'>Booking</a></div></span>";
@@ -209,6 +210,27 @@
 			}
 			
 			function CheckIn(RoomID) {
+				$("#page-inner-right").html("");
+				$.ajax({
+					url: "./Transaction/CheckIn/Detail.php",
+					type: "POST",
+					data: { ID : RoomID },
+					dataType: "html",
+					success: function(data) {
+						$("#page-inner-right").html(data);
+						$("html, body").animate({
+							scrollTop: 0
+						}, "slow");
+						$("#loading").hide();
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Koneksi gagal", "error");
+					}
+				});
+			}
+			
+			function CheckInFromBooking(RoomID) {
 				$("#page-inner-right").html("");
 				$.ajax({
 					url: "./Transaction/CheckIn/Detail.php",
