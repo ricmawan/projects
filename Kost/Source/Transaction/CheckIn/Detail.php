@@ -11,6 +11,8 @@
 		$DailyRate = 0;
 		$HourlyRate = 0;
 		$RoomInfo = "";
+		$CheckInID = 0;
+		$IsEdit = 0;
 		if($RoomID != 0) {
 			//$Content = "Place the content here";
 			$sql = "SELECT
@@ -57,6 +59,8 @@
 									<input id="hdnRoomID" name="hdnRoomID" type="hidden" <?php echo 'value="'.$RoomID.'"'; ?> />
 									<input id="hdnDailyRate" name="hdnDailyRate" type="hidden" <?php echo 'value="'.$DailyRate.'"'; ?> />
 									<input id="hdnHourlyRate" name="hdnHourlyRate" type="hidden" <?php echo 'value="'.$HourlyRate.'"'; ?> />
+									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
+									<input id="hdnCheckInID" name="hdnCheckInID" type="hidden" <?php echo 'value="'.$CheckInID.'"'; ?> />
 								</div>
 								<div class="col-md-3">
 									<div class="input-group">
@@ -326,6 +330,7 @@
 					}
 				});
 				if(PassValidate == 1) {
+					$("#loading").show();
 					$.ajax({
 						url: "./Transaction/CheckIn/Insert.php",
 						type: "POST",
@@ -334,8 +339,9 @@
 						success: function(data) {
 							if(data.FailedFlag == '0') {
 								$.notify(data.Message, "success");
-								$("#loading").show();
+								$("#loading").hide();
 								$("#page-inner-right").html("");
+								LoadRoom();
 							}
 							else {
 								$("#loading").hide();

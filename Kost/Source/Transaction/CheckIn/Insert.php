@@ -1,9 +1,12 @@
 <?php
-	if(isset($_POST['hdnOutgoingInventoryID'])) {
+	SESSION_START();
+	if(isset($_POST['hdnRoomID'])) {
 		$RequestPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestPath);
 		$RequestPath = str_replace($file, "", $RequestPath);
-		include "../../GetPermission.php";
+		//include "../../GetPermission.php";
+		include "../../DBConfig.php";
+		$CheckInID = mysql_real_escape_string($_POST['hdnCheckInID']);
 		$RoomID = mysql_real_escape_string($_POST['hdnRoomID']);
 		$RateType = mysql_real_escape_string($_POST['rdRateType']);
 		$DailyRate = mysql_real_escape_string($_POST['hdnDailyRate']);
@@ -14,19 +17,42 @@
 		$StartHour = "";
 		$EndHour = "";
 		$CustomerName = mysql_real_escape_string($_POST['txtCustomerName']);
-		$BirthDate = mysql_real_escape_string($_POST['txtBirthDate']);
+		$BirthDate = explode('-', mysql_real_escape_string($_POST['txtBirthDate']));
+		$BirthDate = "$BirthDate[2]-$BirthDate[1]-$BirthDate[0]";
 		$PhoneNumber = mysql_real_escape_string($_POST['txtPhoneNumber']);
 		$Address = mysql_real_escape_string($_POST['txtAddress']);
 		$Remarks = mysql_real_escape_string($_POST['txtRemarks']);
-		$DownPaymentDate = mysql_real_escape_string($_POST['txtDownPaymentDate']);
+		if($_POST['txtDownPaymentDate'] != "") {
+			$DownPaymentDate = explode('-', mysql_real_escape_string($_POST['txtDownPaymentDate']));
+			$DownPaymentDate = "$DownPaymentDate[2]-$DownPaymentDate[1]-$DownPaymentDate[0]";
+		}
+		else $DownPaymentDate = "";
 		$DownPaymentAmount = mysql_real_escape_string($_POST['txtDownPaymentAmount']);
-		$PaymentDate = mysql_real_escape_string($_POST['txtPaymentDate']);
+		
+		if($_POST['txtPaymentDate'] != "") {
+			$PaymentDate = explode('-', mysql_real_escape_string($_POST['txtPaymentDate']));
+			$PaymentDate = "$PaymentDate[2]-$PaymentDate[1]-$PaymentDate[0]";
+		}
+		else $PaymentDate = "";
+		
 		$PaymentAmount = mysql_real_escape_string($_POST['txtPaymentAmount']);
-		if(isset($_POST['txtStartDate'])) $StartDate = mysql_real_escape_string($_POST['txtStartDate']);
-		if(isset($_POST['txtStartDateHourly'])) $StartDateHourly = mysql_real_escape_string($_POST['txtStartDateHourly']);
-		if(isset($_POST['txtEndDate'])) $EndDate = mysql_real_escape_string($_POST['txtEndDate']);
-		if(isset($_POST['ddlStartHour'])) $StartHour = mysql_real_escape_string($_POST['ddlStartHour']);
-		if(isset($_POST['ddlEndHour'])) $EndHour = mysql_real_escape_string($_POST['ddlEndHour']);
+		if(isset($_POST['txtStartDate'])) {
+			$StartDate = explode('-', mysql_real_escape_string($_POST['txtStartDate']));
+			$StartDate = "$StartDate[2]-$StartDate[1]-$StartDate[0] 14:00:00";
+		}
+		if(isset($_POST['txtEndDate'])) {
+			$EndDate = explode('-', mysql_real_escape_string($_POST['txtEndDate']));
+			$EndDate = "$EndDate[2]-$EndDate[1]-$EndDate[0] 12:00:00";
+		}
+		if(isset($_POST['txtStartDateHourly']) && isset($_POST['ddlStartHour']) && isset($_POST['ddlEndHour'])) {
+			$StartDate = explode('-', mysql_real_escape_string($_POST['txtStartDateHourly']));
+			$StartDate = "$StartDate[2]-$StartDate[1]-$StartDate[0] ".mysql_real_escape_string($_POST['ddlStartHour']).":00:00";
+			$EndDate = "$StartDate[2]-$StartDate[1]-$StartDate[0] ".mysql_real_escape_string($_POST['ddlEndHour']).":00:00";
+		}
+		
+		$BookingFlag = 0;
+		//if(isset($_POST['ddlStartHour'])) $StartHour = mysql_real_escape_string($_POST['ddlStartHour']);
+		//if(isset($_POST['ddlEndHour'])) $EndHour = mysql_real_escape_string($_POST['ddlEndHour']);
 		$hdnIsEdit = mysql_real_escape_string($_POST['hdnIsEdit']);
 		$State = 1;
 		mysql_query("START TRANSACTION", $dbh);
@@ -38,6 +64,77 @@
 		//echo $DetailID;
 		if($hdnIsEdit == 0) {
 			$State = 1;
+			$sql = "SELECT
+						1
+					FROM
+						transaction_checkin
+					WHERE
+						(StartDate BETWEEN '".$StartDate."' AND '".$EndDate."'
+						OR EndDate BETWEEN '".$StartDate."' AND '".$EndDate."'
+						OR '".$StartDate."' BETWEEN StartDate AND EndDate
+						OR '".$EndDate."' BETWEEN StartDate AND EndDate)
+						AND CheckInID <> $CheckInID
+						AND CheckOutFlag = 0";
+						
+			if (! $result = mysql_query($sql, $dbh)) {
+				$Message = "Terjadi Kesalahan Sistem";
+				$MessageDetail = mysql_error();
+				$FailedFlag = 1;
+				echo returnstate($RoomID, $Message, $MessageDetail, $FailedFlag, $State);
+				mysql_query("ROLLBACK", $dbh);
+				return 0;
+			}
+			
+			$State = 2;
+			$sql = "SELECT
+						1
+					FROM
+						transaction_booking
+					WHERE
+						(StartDate BETWEEN '".$StartDate."' AND '".$EndDate."'
+						OR EndDate BETWEEN '".$StartDate."' AND '".$EndDate."'
+						OR '".$StartDate."' BETWEEN StartDate AND EndDate
+						OR '".$EndDate."' BETWEEN StartDate AND EndDate)
+						AND CheckInFlag = 0
+						AND IsCancelled = 0";
+						AND CheckInFlag = 0";
+						
+			if (! $result2 = mysql_query($sql, $dbh)) {
+				$Message = "Terjadi Kesalahan Sistem";
+				$MessageDetail = mysql_error();
+				$FailedFlag = 1;
+				echo returnstate($RoomID, $Message, $MessageDetail, $FailedFlag, $State);
+				mysql_query("ROLLBACK", $dbh);
+				return 0;
+			}
+			
+			if(mysql_num_rows($result) > 0 OR mysql_num_rows($result2) > 0) {
+				$Message = "Kamar tidak tersedia untuk tanggal yang dipilih!";
+				$MessageDetail = mysql_error();
+				$FailedFlag = 1;
+				echo returnstate($RoomID, $Message, $MessageDetail, $FailedFlag, $State);
+				mysql_query("ROLLBACK", $dbh);
+				return 0;
+			}
+			
+			$State = 3;
+			$sql = "UPDATE
+						master_room
+					SET
+						StatusID = 3
+					WHERE
+						RoomID = $RoomID";
+						
+			if (! $result = mysql_query($sql, $dbh)) {
+				$Message = "Terjadi Kesalahan Sistem";
+				$MessageDetail = mysql_error();
+				$FailedFlag = 1;
+				echo returnstate($RoomID, $Message, $MessageDetail, $FailedFlag, $State);
+				mysql_query("ROLLBACK", $dbh);
+				return 0;
+			}
+			
+			$State = 4;
 			$sql = "INSERT INTO transaction_checkin
 					(
 						RoomID,
@@ -55,6 +152,7 @@
 						PaymentAmount,
 						PaymentDate,
 						BookingFlag,
+						CheckOutFlag,
 						DailyRate,
 						HourlyRate,
 						CreatedDate,
@@ -77,6 +175,7 @@
 						".$PaymentAmount.",
 						'".$PaymentDate."',
 						".$BookingFlag.",
+						0,
 						".$DailyRate.",
 						".$HourlyRate.",
 						NOW(),
@@ -114,11 +213,11 @@
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysql_error();
 			$FailedFlag = 1;
-			echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
+			echo returnstate($RoomID, $Message, $MessageDetail, $FailedFlag, $State);
 			mysql_query("ROLLBACK", $dbh);
 			return 0;
 		}
-		echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
+		echo returnstate($RoomID, $Message, $MessageDetail, $FailedFlag, $State);
 		mysql_query("COMMIT", $dbh);
 		return 0;
 	}

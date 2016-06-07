@@ -8,6 +8,6 @@ CREATE TABLE master_status
 
 INSERT INTO `master_status` (StatusID, StatusName)
 VALUES
-	(1, 'Available'),
-	(2, 'Booked'),
-	(3, 'Occupied');
+	(1, 'available'),
+	(2, 'booked'),
+	(3, 'occupied');

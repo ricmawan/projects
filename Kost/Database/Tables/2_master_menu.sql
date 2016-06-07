@@ -59,7 +59,7 @@ VALUES
 	0,
 	1
 ),
-(
+/*(
 	5,
 	3,
 	'Daftar Inventaris',
@@ -67,7 +67,7 @@ VALUES
 	NULL,
 	0,
 	2
-),
+),*/
 (
 	6,
 	3,

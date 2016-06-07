@@ -121,33 +121,7 @@
 			</header>
 			<div id="page-inner">
 				<span id="page-inner-left">
-					<?php
-						$sql = "SELECT
-									MR.RoomID,
-									MR.RoomNumber,
-									MR.StatusID,
-									MS.StatusName
-								FROM
-									master_room MR
-									JOIN master_status MS
-										ON MS.StatusID = MR.StatusID
-								ORDER BY
-									MR.RoomNumber ASC";
-						if(!$result = mysql_query($sql, $dbh)) {
-							echo mysql_error();
-							return 0;
-						}
-						while($row = mysql_fetch_array($result)) {
-							echo "<span acronym title='".$row['StatusName']."' class='room ".$row['StatusName']." dropdown' roomid=".$row['RoomID']." >".$row['RoomNumber']."
-									<span class='dropbtn'></span>
-									<div class='dropdown-content'>";
-							if($row['StatusID'] == 1 || $row['StatusID'] == 2) echo "<a href='#' onclick='CheckIn(".$row['RoomID'].");' >Check-In</a>";
-							if($row['StatusID'] == 2) echo "<a href='#' onclick='CheckInFromBooking(".$row['RoomID'].");' >Check-In dari Booking</a>";
-							if($row['StatusID'] == 2) echo "<a href='#' onclick='Cancellation(".$row['RoomID'].");' >Pembatalan</a>";
-							if($row['StatusID'] == 3) echo "<a href='#' onclick='CheckOut(".$row['RoomID'].");' >Check-Out</a>";
-							echo "<a href='#' onclick='Booking(".$row['RoomID'].");'>Booking</a></div></span>";
-						}
-					?>
+					
 				</span>
 				<span id="page-inner-right">
 					&nbsp;
@@ -167,6 +141,27 @@
 		<div id="loading"></div>
 		<iframe id='excelDownload' src='' style='display:none'></iframe>
 		<script type="text/javascript">
+			function LoadRoom() {
+				$("#page-inner-left").html("");
+				$.ajax({
+					url: "./ShowRoom.php",
+					type: "POST",
+					data: { },
+					dataType: "html",
+					success: function(data) {
+						$("#page-inner-left").html(data);
+						$("html, body").animate({
+							scrollTop: 0
+						}, "slow");
+						$("#loading").hide();
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Koneksi gagal", "error");
+					}
+				});
+			}
+			
 			function Booking(RoomID) {
 				$("#page-inner-right").html("");
 				$.ajax({
@@ -233,7 +228,7 @@
 			function CheckInFromBooking(RoomID) {
 				$("#page-inner-right").html("");
 				$.ajax({
-					url: "./Transaction/CheckIn/Detail.php",
+					url: "./Transaction/CheckIn/BookingList.php",
 					type: "POST",
 					data: { ID : RoomID },
 					dataType: "html",
@@ -273,7 +268,7 @@
 			}
 			
 			$(document).ready(function() {
-				$(".dropdown").click(function() {
+				$("body").on("click", "span.dropdown", function() {
 					if($(this).children("div").css("display") == "block") { 
 						$(this).children("div").toggle();
 					}
@@ -287,25 +282,9 @@
 					"min-height" : windowHeight
 				});
 				$("head").append("<style> #page-inner-left { min-height : " + windowHeight + "px; overflow-y: auto; } .panel-default { min-height : " + windowHeight + "px; max-height : " + windowHeight + "px; } .panel-body { max-height: " + (windowHeight - 40) + "px; overflow-y: auto; } </style>");
-				/*$.ajax({
-					url: "./Master/Notification/",
-					type: "POST",
-					data: { },
-					dataType: "html",
-					success: function(data) {
-						$("#page-inner").html(data);
-						$("html, body").animate({
-							scrollTop: 0
-						}, "slow");
-						$("#loading").hide();
-					},
-					error: function(data) {
-						$("#loading").hide();
-						$.notify("Koneksi gagal", "error");
-					}
-				});*/
+				LoadRoom();
 			});
-			//alert($( window ).height());
+			
 		</script>
 	</body>
 </html>

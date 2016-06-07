@@ -83,7 +83,7 @@
 								<div class="col-md-2 labelColumn">
 									Info Kamar :
 								</div>
-								<div class="col-md-4">
+								<div class="col-md-6">
 									<textarea id="txtRoomInfo" name="txtRoomInfo" class="form-control-custom" placeholder="Info"><?php echo $RoomInfo; ?></textarea>
 								</div>
 							</div>
