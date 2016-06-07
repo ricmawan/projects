@@ -165,9 +165,9 @@
 			function Booking(RoomID) {
 				$("#page-inner-right").html("");
 				$.ajax({
-					url: "./Transaction/Booking/",
-					type: "POST",
-					data: { },
+					url: "./Transaction/Booking/Detail.php",
+					type: "GET",
+					data: { ID : RoomID },
 					dataType: "html",
 					success: function(data) {
 						$("#page-inner-right").html(data);
@@ -186,15 +186,15 @@
 			function Cancellation(RoomID) {
 				$("#page-inner-right").html("");
 				$.ajax({
-					url: "./Transaction/Cancellation/",
+					url: "./Transaction/Cancellation/BookingList.php",
 					type: "POST",
-					data: { },
+					data: { ID : RoomID },
 					dataType: "html",
 					success: function(data) {
 						$("#page-inner-right").html(data);
 						$("html, body").animate({
 							scrollTop: 0
-						}, "slow");
+						}, "sID : RoomIDlow");
 						$("#loading").hide();
 					},
 					error: function(data) {
@@ -208,7 +208,7 @@
 				$("#page-inner-right").html("");
 				$.ajax({
 					url: "./Transaction/CheckIn/Detail.php",
-					type: "POST",
+					type: "GET",
 					data: { ID : RoomID },
 					dataType: "html",
 					success: function(data) {
@@ -249,9 +249,9 @@
 			function CheckOut(RoomID) {
 				$("#page-inner-right").html("");
 				$.ajax({
-					url: "./Transaction/CheckOut/",
-					type: "POST",
-					data: { },
+					url: "./Transaction/CheckOut/Detail.php",
+					type: "GET",
+					data: { ID : RoomID },
 					dataType: "html",
 					success: function(data) {
 						$("#page-inner-right").html(data);

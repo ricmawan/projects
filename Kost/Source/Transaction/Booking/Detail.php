@@ -11,7 +11,6 @@
 		$DailyRate = 0;
 		$HourlyRate = 0;
 		$RoomInfo = "";
-		$CheckInID = 0;
 		$BookingID = 0;
 		$RateType = "";
 		$StartDate = "";
@@ -24,8 +23,6 @@
 		$Address = "";
 		$DownPaymentDate = "";
 		$DownPaymentAmount = "0.00";
-		$PaymentDate = "";
-		$PaymentAmount = "0.00";
 		$Remarks = "";
 		$IsEdit = 0;
 		if($RoomID != 0) {
@@ -105,7 +102,7 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h5>Check In Kamar <?php echo $RoomNumber; ?></h5>  
+						<h5>Booking Kamar <?php echo $RoomNumber; ?></h5>  
 					</div>
 					<div class="panel-body">
 						<form class="col-md-12" id="PostForm" method="POST" action="" >
@@ -117,7 +114,6 @@
 									<input id="hdnDailyRate" name="hdnDailyRate" type="hidden" <?php echo 'value="'.$DailyRate.'"'; ?> />
 									<input id="hdnHourlyRate" name="hdnHourlyRate" type="hidden" <?php echo 'value="'.$HourlyRate.'"'; ?> />
 									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
-									<input id="hdnCheckInID" name="hdnCheckInID" type="hidden" <?php echo 'value="'.$CheckInID.'"'; ?> />
 									<input id="hdnBookingID" name="hdnBookingID" type="hidden" <?php echo 'value="'.$BookingID.'"'; ?> />
 									<input id="hdnRateType" name="hdnRateType" type="hidden" <?php echo 'value="'.$RateType.'"'; ?> />
 									<input id="hdnStartHour" name="hdnStartHour" type="hidden" <?php echo 'value="'.$StartHour.'"'; ?> />
@@ -268,21 +264,6 @@
 							<br />
 							<div class="row">
 								<div class="col-md-2 labelColumn">
-									Pelunasan :
-								</div>
-								<div class="col-md-3">
-									<div class="input-group">
-										<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-										<input id="txtPaymentDate" name="txtPaymentDate" type="text" class="form-control-custom DatePickerFromNow" placeholder="Tanggal Pelunasan" <?php echo 'value="'.$PaymentDate.'"'; ?> />
-									</div>
-								</div>
-								<div class="col-md-3">
-									<input id="txtPaymentAmount" name="txtPaymentAmount" type="text" style="text-align:right;" class="form-control-custom" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" value="0.00" placeholder="Pelunasan" <?php echo 'value="'.$PaymentAmount.'"'; ?> />
-								</div>
-							</div>
-							<br />
-							<div class="row">
-								<div class="col-md-2 labelColumn">
 									Keterangan :
 								</div>
 								<div class="col-md-6">
@@ -393,7 +374,7 @@
 				if(PassValidate == 1) {
 					$("#loading").show();
 					$.ajax({
-						url: "./Transaction/CheckIn/Insert.php",
+						url: "./Transaction/Booking/Insert.php",
 						type: "POST",
 						data: $("#PostForm").serialize(),
 						dataType: "json",
@@ -425,7 +406,7 @@
 				var currentDate = addZero(d.getDate()) + "-" + addZero(d.getMonth() + 1) + "-" + d.getFullYear();
 				nextDay.setDate(currentDay + 1);
 				var nextDate = addZero(nextDay.getDate()) + "-" + addZero(nextDay.getMonth() + 1) + "-" + nextDay.getFullYear();
-				if($("#hdnBookingID").val() != 0 || $("#hdnCheckInID").val() != 0) {
+				if($("#hdnBookingID").val() != 0 ) {
 					$("input[name=rdRateType][value=" + $("#hdnRateType").val() + "]").attr("checked", true);
 					$("input[name=rdRateType][value=" + $("#hdnRateType").val() + "]").attr("prop", true);
 						

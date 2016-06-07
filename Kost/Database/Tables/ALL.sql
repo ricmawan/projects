@@ -1,4 +1,61 @@
-DROP TABLE IF EXISTS master_groupmenu;
+DROP TABLE IF EXISTS master_room;
+
+CREATE TABLE master_room
+(
+	RoomID 			BIGINT PRIMARY KEY AUTO_INCREMENT,
+	RoomNumber 		VARCHAR(255) NOT NULL,
+	StatusID	 	INT NOT NULL,
+	DailyRate		DOUBLE,
+	HourlyRate		DOUBLE,
+	RoomInfo		TEXT,
+	CreatedDate 	DATETIME NOT NULL,
+	CreatedBy 		VARCHAR(255) NOT NULL,
+	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 		VARCHAR(255) NULL,
+	FOREIGN KEY(StatusID) REFERENCES master_status(StatusID)
+)ENGINE=InnoDB;
+
+
+CREATE UNIQUE INDEX ROOM_INDEX
+ON master_room (RoomID);
+
+INSERT INTO master_room
+VALUES
+(
+	1,
+	101,
+	1,
+	150000,
+	15000,
+	'test',
+	NOW(),
+	'Admin',
+	null,
+	null
+),
+(
+	2,
+	102,
+	1,
+	150000,
+	15000,
+	'test',
+	NOW(),
+	'Admin',
+	null,
+	null
+),(
+	3,
+	103,
+	1,
+	150000,
+	15000,
+	'test',
+	NOW(),
+	'Admin',
+	null,
+	null
+);DROP TABLE IF EXISTS master_groupmenu;
 
 CREATE TABLE master_groupmenu
 (
@@ -103,7 +160,7 @@ VALUES
 	0,
 	1
 ),
-(
+/*(
 	5,
 	3,
 	'Daftar Inventaris',
@@ -111,7 +168,7 @@ VALUES
 	NULL,
 	0,
 	2
-),
+),*/
 (
 	6,
 	3,
@@ -233,13 +290,13 @@ VALUES
 	1,
 	1
 ),
-(
+/*(
 	0,
 	1,
 	5,
 	1,
 	1
-),
+),*/
 (
 	0,
 	1,
@@ -310,28 +367,9 @@ CREATE TABLE master_status
 
 INSERT INTO `master_status` (StatusID, StatusName)
 VALUES
-	(1, 'Available'),
-	(2, 'Booked'),
-	(3, 'Occupied');DROP TABLE IF EXISTS master_room;
-
-CREATE TABLE master_room
-(
-	RoomID 			BIGINT PRIMARY KEY AUTO_INCREMENT,
-	RoomNumber 		VARCHAR(255) NOT NULL,
-	StatusID	 	INT NOT NULL,
-	DailyRate		DOUBLE,
-	HourlyRate		DOUBLE,
-	RoomInfo		TEXT,
-	CreatedDate 	DATETIME NOT NULL,
-	CreatedBy 		VARCHAR(255) NOT NULL,
-	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
-	ModifiedBy 		VARCHAR(255) NULL,
-	FOREIGN KEY(StatusID) REFERENCES master_status(StatusID)
-)ENGINE=InnoDB;
-
-
-CREATE UNIQUE INDEX ROOM_INDEX
-ON master_room (RoomID);DROP TABLE IF EXISTS master_inventory;
+	(1, 'available'),
+	(2, 'booked'),
+	(3, 'occupied');DROP TABLE IF EXISTS master_inventory;
 
 CREATE TABLE master_inventory
 (
@@ -349,20 +387,29 @@ ON master_inventory (InventoryID);DROP TABLE IF EXISTS transaction_checkin;
 
 CREATE TABLE transaction_checkin
 (
-	CheckInID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
-	RoomID			BIGINT,
-	TransactionDate	DATETIME NOT NULL,
-	RateType		VARCHAR(100) NOT NULL,
-	Duration		INT,
-	CustomerName	VARCHAR(255),
-	Phone			VARCHAR(100),
-	Address			TEXT,
-	BirthDate		DATE,
-	Remarks			TEXT,
-	CreatedDate 	DATETIME NOT NULL,
-	CreatedBy 		VARCHAR(255) NOT NULL,
-	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
-	ModifiedBy 		VARCHAR(255) NULL,
+	CheckInID 			BIGINT PRIMARY KEY AUTO_INCREMENT,
+	RoomID				BIGINT,
+	TransactionDate		DATETIME NOT NULL,
+	RateType			VARCHAR(100) NOT NULL,
+	StartDate			DATETIME,
+	EndDate				DATETIME,
+	CustomerName		VARCHAR(255),
+	Phone				VARCHAR(100),
+	Address				TEXT,
+	BirthDate			DATE,
+	Remarks				TEXT,
+	DownPaymentAmount	DOUBLE,
+	DownPaymentDate		DATE,
+	PaymentAmount 		DOUBLE,
+	PaymentDate			DOUBLE,
+	BookingFlag			BIT,
+	CheckOutFlag		BIT,
+	DailyRate			DOUBLE,
+	HourlyRate			DOUBLE,
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 			VARCHAR(255) NULL,
 	FOREIGN KEY(RoomID) REFERENCES master_room(RoomID) ON UPDATE CASCADE ON DELETE CASCADE
 )ENGINE=InnoDB;
 
@@ -388,21 +435,27 @@ ON transaction_checkout (CheckOutID, CheckInID);DROP TABLE IF EXISTS transaction
 
 CREATE TABLE transaction_booking
 (
-	BookingID	 	BIGINT PRIMARY KEY AUTO_INCREMENT,
-	RoomID			BIGINT NOT NULL,
-	TransactionDate	DATETIME,
-	CheckIn			DATETIME,
-	CheckOut		DATETIME,
-	RateType		VARCHAR(100) NOT NULL,
-	CustomerName	VARCHAR(255),
-	Phone			VARCHAR(100),
-	Address			TEXT,
-	BirthDate		DATE,
-	Remarks			TEXT,
-	CreatedDate 	DATETIME NOT NULL,
-	CreatedBy 		VARCHAR(255) NOT NULL,
-	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
-	ModifiedBy 		VARCHAR(255) NULL
+	BookingID	 		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	RoomID				BIGINT,
+	TransactionDate		DATETIME NOT NULL,
+	RateType			VARCHAR(100) NOT NULL,
+	StartDate			DATETIME,
+	EndDate				DATETIME,
+	CustomerName		VARCHAR(255),
+	Phone				VARCHAR(100),
+	Address				TEXT,
+	BirthDate			DATE,
+	Remarks				TEXT,
+	DownPaymentAmount	DOUBLE,
+	DownPaymentDate		DATE,
+	CheckInFlag			BIT,
+	DailyRate			DOUBLE,
+	HourlyRate			DOUBLE,
+	IsCancelled			BIT,
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 			VARCHAR(255) NULL
 )ENGINE=InnoDB;
 
 
@@ -434,7 +487,7 @@ CREATE TABLE transaction_operationaldetails
 	CreatedBy 				VARCHAR(255) NOT NULL,
 	ModifiedDate 			TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
 	ModifiedBy 				VARCHAR(255) NULL,
-	FOREIGN KEY(OperationalID) REFERENCES transaction_operational(OperationalID)
+	FOREIGN KEY(OperationalID) REFERENCES transaction_operational(OperationalID) ON UPDATE CASCADE ON DELETE CASCADE
 )ENGINE=InnoDB;
 
 
@@ -479,6 +532,7 @@ CREATE TABLE transaction_outgoinginventory
 (
 	OutgoingInventoryID 	BIGINT PRIMARY KEY AUTO_INCREMENT,
 	TransactionDate			DATETIME NOT NULL,
+	Remarks					VARCHAR(255),
 	CreatedDate 			DATETIME NOT NULL,
 	CreatedBy 				VARCHAR(255) NOT NULL,
 	ModifiedDate 			TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
@@ -495,7 +549,6 @@ CREATE TABLE transaction_outgoinginventorydetails
 	OutgoingInventoryID			BIGINT,
 	InventoryID					BIGINT,
 	Quantity					DOUBLE,
-	Price						DOUBLE,
 	Remarks						VARCHAR(255),
 	CreatedDate 				DATETIME NOT NULL,
 	CreatedBy 					VARCHAR(255) NOT NULL,
@@ -507,38 +560,4 @@ CREATE TABLE transaction_outgoinginventorydetails
 
 
 CREATE UNIQUE INDEX OUTGOINGINVENTORYDETAILS_INDEX
-ON transaction_outgoinginventorydetails (OutgoingInventoryDetailsID, OutgoingInventoryID, InventoryID);DROP TABLE IF EXISTS transaction_earning;
-
-CREATE TABLE transaction_earning
-(
-	EarningID	 	BIGINT PRIMARY KEY AUTO_INCREMENT,
-	TransactionDate	DATETIME NOT NULL,
-	Name			VARCHAR(100),
-	Amount			DOUBLE,
-	Remarks			VARCHAR(255),
-	CreatedDate 	DATETIME NOT NULL,
-	CreatedBy 		VARCHAR(255) NOT NULL,
-	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
-	ModifiedBy 		VARCHAR(255) NULL
-)ENGINE=InnoDB;
-
-
-CREATE UNIQUE INDEX EARNING_INDEX
-ON transaction_earning (EarningID);DROP TABLE IF EXISTS transaction_expense;
-
-CREATE TABLE transaction_expense
-(
-	ExpenseID	 	BIGINT PRIMARY KEY AUTO_INCREMENT,
-	TransactionDate	DATETIME NOT NULL,
-	Name			VARCHAR(100),
-	Amount			DOUBLE,
-	Remarks			VARCHAR(255),
-	CreatedDate 	DATETIME NOT NULL,
-	CreatedBy 		VARCHAR(255) NOT NULL,
-	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
-	ModifiedBy 		VARCHAR(255) NULL
-)ENGINE=InnoDB;
-
-
-CREATE UNIQUE INDEX EXPENSE_INDEX
-ON transaction_expense (ExpenseID);
+ON transaction_outgoinginventorydetails (OutgoingInventoryDetailsID, OutgoingInventoryID, InventoryID);
