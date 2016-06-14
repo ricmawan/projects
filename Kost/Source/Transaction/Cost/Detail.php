@@ -72,7 +72,7 @@
 						<form class="col-md-12" id="PostForm" method="POST" action="" >
 							<div class="row">
 								<div class="col-md-1 labelColumn">
-									Tanggal :
+									Tanggal:
 									<input id="hdnOperationalID" name="hdnOperationalID" type="hidden" <?php echo 'value="'.$OperationalID.'"'; ?> />
 									<input id="hdnRow" name="hdnRow" type="hidden" <?php echo 'value="'.$rowCount.'"'; ?> />
 									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
