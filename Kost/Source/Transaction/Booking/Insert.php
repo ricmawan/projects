@@ -1,11 +1,10 @@
 <?php
-	SESSION_START();
 	if(isset($_POST['hdnRoomID'])) {
 		$RequestPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestPath);
 		$RequestPath = str_replace($file, "", $RequestPath);
-		//include "../../GetPermission.php";
-		include "../../DBConfig.php";
+		include "../../GetPermission.php";
+		//include "../../DBConfig.php";
 		$RoomID = mysql_real_escape_string($_POST['hdnRoomID']);
 		$RateType = mysql_real_escape_string($_POST['rdRateType']);
 		$DailyRate = mysql_real_escape_string($_POST['hdnDailyRate']);
@@ -55,60 +54,59 @@
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		//echo $DetailID;
-		if($hdnIsEdit == 0) {			
-			$State = 1;
-			$sql = "SELECT
-						1
-					FROM
-						transaction_checkin
-					WHERE
-						(StartDate BETWEEN '".$StartDate."' AND '".$EndDate."'
-						OR EndDate BETWEEN '".$StartDate."' AND '".$EndDate."'
-						OR '".$StartDate."' BETWEEN StartDate AND EndDate
-						OR '".$EndDate."' BETWEEN StartDate AND EndDate)
-						AND CheckOutFlag = 0";
-						
-			if (! $result = mysql_query($sql, $dbh)) {
-				$Message = "Terjadi Kesalahan Sistem";
-				$MessageDetail = mysql_error();
-				$FailedFlag = 1;
-				echo returnstate($RoomID, $Message, $MessageDetail, $FailedFlag, $State);
-				mysql_query("ROLLBACK", $dbh);
-				return 0;
-			}
-			
-			$State = 2;
-			$sql = "SELECT
-						1
-					FROM
-						transaction_booking
-					WHERE
-						(StartDate BETWEEN '".$StartDate."' AND '".$EndDate."'
-						OR EndDate BETWEEN '".$StartDate."' AND '".$EndDate."'
-						OR '".$StartDate."' BETWEEN StartDate AND EndDate
-						OR '".$EndDate."' BETWEEN StartDate AND EndDate)
-						AND CheckInFlag = 0
-						AND IsCancelled = 0
-						AND BookingID <> $BookingID";
+		$State = 1;
+		$sql = "SELECT
+					1
+				FROM
+					transaction_checkin
+				WHERE
+					(StartDate BETWEEN '".$StartDate."' AND '".$EndDate."'
+					OR EndDate BETWEEN '".$StartDate."' AND '".$EndDate."'
+					OR '".$StartDate."' BETWEEN StartDate AND EndDate
+					OR '".$EndDate."' BETWEEN StartDate AND EndDate)
+					AND CheckOutFlag = 0";
+					
+		if (! $result = mysql_query($sql, $dbh)) {
+			$Message = "Terjadi Kesalahan Sistem";
+			$MessageDetail = mysql_error();
+			$FailedFlag = 1;
+			echo returnstate($RoomID, $Message, $MessageDetail, $FailedFlag, $State);
+			mysql_query("ROLLBACK", $dbh);
+			return 0;
+		}
+		
+		$State = 2;
+		$sql = "SELECT
+					1
+				FROM
+					transaction_booking
+				WHERE
+					(StartDate BETWEEN '".$StartDate."' AND '".$EndDate."'
+					OR EndDate BETWEEN '".$StartDate."' AND '".$EndDate."'
+					OR '".$StartDate."' BETWEEN StartDate AND EndDate
+					OR '".$EndDate."' BETWEEN StartDate AND EndDate)
+					AND CheckInFlag = 0
+					AND IsCancelled = 0
+					AND BookingID <> $BookingID";
 
-			if (! $result2 = mysql_query($sql, $dbh)) {
-				$Message = "Terjadi Kesalahan Sistem";
-				$MessageDetail = mysql_error();
-				$FailedFlag = 1;
-				echo returnstate($RoomID, $Message, $MessageDetail, $FailedFlag, $State);
-				mysql_query("ROLLBACK", $dbh);
-				return 0;
-			}
-			
-			if(mysql_num_rows($result) > 0 || mysql_num_rows($result2) > 0) {
-				$Message = "Kamar tidak tersedia untuk tanggal yang dipilih!";
-				$MessageDetail = mysql_error();
-				$FailedFlag = 1;
-				echo returnstate($RoomID, $Message, $MessageDetail, $FailedFlag, $State);
-				mysql_query("ROLLBACK", $dbh);
-				return 0;
-			}
-			
+		if (! $result2 = mysql_query($sql, $dbh)) {
+			$Message = "Terjadi Kesalahan Sistem";
+			$MessageDetail = mysql_error();
+			$FailedFlag = 1;
+			echo returnstate($RoomID, $Message, $MessageDetail, $FailedFlag, $State);
+			mysql_query("ROLLBACK", $dbh);
+			return 0;
+		}
+		
+		if(mysql_num_rows($result) > 0 || mysql_num_rows($result2) > 0) {
+			$Message = "Kamar tidak tersedia untuk tanggal yang dipilih!";
+			$MessageDetail = mysql_error();
+			$FailedFlag = 1;
+			echo returnstate($RoomID, $Message, $MessageDetail, $FailedFlag, $State);
+			mysql_query("ROLLBACK", $dbh);
+			return 0;
+		}
+		if($hdnIsEdit == 0) {			
 			/*$State = 3;
 			$sql = "UPDATE
 						master_room
@@ -126,7 +124,7 @@
 				return 0;
 			}*/
 			
-			$State = 4;
+			$State = 3;
 			$sql = "INSERT INTO transaction_booking
 					(
 						RoomID,
@@ -172,29 +170,27 @@
 		}
 		
 		else {
-			$State = 2;
-			$sql = "UPDATE transaction_checkin
+			$State = 4;
+			$sql = "UPDATE transaction_booking
 					SET
-						RoomID,
-						TransactionDate,
-						RateType,
-						StartDate,
-						EndDate,
-						CustomerName,
-						Phone,
-						Address,
-						BirthDate,
-						Remarks,
-						DownPaymentAmount,
-						DownPaymentDate,
-						PaymentAmount,
-						PaymentDate,
-						BookingFlag,
-						DailyRate,
-						HourlyRate,
+						TransactionDate = NOW(),
+						RateType = '".$RateType."',
+						StartDate = '".$StartDate."',
+						EndDate = '".$EndDate."',
+						CustomerName = '".$CustomerName."',
+						Phone = '".$PhoneNumber."',
+						Address = '".$Address."',
+						BirthDate = '".$BirthDate."',
+						Remarks = '".$Remarks."',
+						DownPaymentAmount = ".str_replace(",", "", $DownPaymentAmount).",
+						DownPaymentDate = '".$DownPaymentDate."',
+						CheckInFlag = 0,
+						DailyRate = ".$DailyRate.",
+						HourlyRate = ".$HourlyRate.",
+						IsCancelled = 0,
 						ModifiedBy = '".$_SESSION['UserLogin']."'
 					WHERE
-						CheckInID = $CheckInID";
+						BookingID = $BookingID";
 		}
 
 		if (! $result = mysql_query($sql, $dbh)) {

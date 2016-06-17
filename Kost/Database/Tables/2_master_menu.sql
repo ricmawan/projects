@@ -59,15 +59,15 @@ VALUES
 	0,
 	1
 ),
-/*(
+(
 	5,
-	3,
-	'Daftar Inventaris',
-	'Transaction/Inventory/',
+	5,
+	'Booking',
+	'Transaction/Booking/',
 	NULL,
 	0,
-	2
-),*/
+	1
+),
 (
 	6,
 	3,
@@ -75,7 +75,7 @@ VALUES
 	'Transaction/IncomingInventory/',
 	NULL,
 	0,
-	3
+	2
 ),
 (
 	7,
@@ -84,7 +84,7 @@ VALUES
 	'Transaction/OutgoingInventory/',
 	NULL,
 	0,
-	4
+	3
 ),
 (
 	8,
@@ -109,6 +109,15 @@ VALUES
 	4,
 	'Pemakaian Kamar',
 	'Report/RoomUsage/',
+	NULL,
+	0,
+	3
+),
+(
+	11,
+	5,
+	'Check In',
+	'Transaction/CheckIn/',
 	NULL,
 	0,
 	3

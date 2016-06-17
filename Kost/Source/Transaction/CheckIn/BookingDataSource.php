@@ -4,8 +4,8 @@
 		$RequestPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestPath);
 		$RequestPath = str_replace($file, "", $RequestPath);
-		//include "../../GetPermission.php";
-		include "../../DBConfig.php";
+		include "../../GetPermission.php";
+		//include "../../DBConfig.php";
 		$RoomID = mysql_real_escape_string($_GET['RoomID']);
 		$where = " 1=1 ";
 		$order_by = "BO.BookingID DESC";

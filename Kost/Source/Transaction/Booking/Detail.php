@@ -3,8 +3,8 @@
 		$RequestPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestPath);
 		$RequestPath = str_replace($file, "", $RequestPath);
-		//include "../../GetPermission.php";
-		include "../../DBConfig.php";
+		include "../../GetPermission.php";
+		//include "../../DBConfig.php";
 		//echo $_SERVER['REQUEST_URI'];
 		$RoomID = mysql_real_escape_string($_GET['ID']);
 		$RoomNumber = "";
@@ -49,6 +49,7 @@
 			
 			if(isset($_GET['BookingID'])) {
 				$BookingID = mysql_real_escape_string($_GET['BookingID']);
+				$IsEdit = 1;
 				$sql = "SELECT
 							BO.RateType,
 							DATE_FORMAT(BO.StartDate, '%d-%m-%Y') StartDate,
@@ -59,7 +60,11 @@
 							DATE_FORMAT(BO.BirthDate, '%d-%m-%Y') BirthDate,
 							BO.Phone,
 							BO.Address,
-							DATE_FORMAT(BO.DownPaymentDate, '%d-%m-%Y') DownPaymentDate,
+							CASE
+								WHEN BO.DownPaymentDate = '0000-00-00'
+								THEN ''
+								ELSE DATE_FORMAT(BO.DownPaymentDate, '%d-%m-%Y') 
+							END DownPaymentDate,
 							BO.DownPaymentAmount,
 							BO.Remarks,
 							BO.DailyRate,
@@ -83,7 +88,7 @@
 				$Phone = $row['Phone'];
 				$Address = $row['Address'];
 				$DownPaymentDate = $row['DownPaymentDate'];
-				$DownPaymentAmount = $row['DownPaymentAmount'];
+				$DownPaymentAmount = number_format($row['DownPaymentAmount'],2,".",",");
 				$Remarks = $row['Remarks'];
 				$DailyRate = $row['DailyRate'];
 				$HourlyRate = $row['HourlyRate'];				

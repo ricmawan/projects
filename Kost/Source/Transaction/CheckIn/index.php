@@ -1,32 +1,6 @@
 <?php
-	if(isset($_POST['ID'])) {
-		$RequestPath = "$_SERVER[REQUEST_URI]";
-		$file = basename($RequestPath);
-		$RequestPath = str_replace($file, "", $RequestPath);
-		include "../../GetPermission.php";
-		//include "../../DBConfig.php";
-		$RoomID = mysql_real_escape_string($_POST['ID']);
-		$RoomNumber = "";
-		if($RoomID != 0) {
-			//$Content = "Place the content here";
-			$sql = "SELECT
-						RoomNumber,
-						DailyRate,
-						HourlyRate,
-						RoomInfo
-					FROM
-						master_room
-					WHERE
-						RoomID = $RoomID";
-						
-			if (! $result=mysql_query($sql, $dbh)) {
-				echo mysql_error();
-				return 0;
-			}				
-			$row=mysql_fetch_array($result);
-			$RoomNumber = $row['RoomNumber'];
-		}
-	}
+	$RequestPath = "$_SERVER[REQUEST_URI]";
+	include "../../GetPermission.php";
 ?>
 <html>
 	<head>
@@ -36,8 +10,7 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						 <h5>Daftar pemesanan kamar <?php echo $RoomNumber; ?></h5>
-						 <input type="hidden" name="hdnRoomID" id="hdnRoomID" <?php echo 'value="'.$RoomID.'"'; ?> />
+						 <h5>Daftar check in</h5>
 					</div>
 					<div class="panel-body">
 						<div class="table-responsive">
@@ -80,7 +53,7 @@
 								refresh: "Refresh",
 								search: "Cari"
 							},
-							url: "./Transaction/CheckIn/BookingDataSource.php?RoomID=" + $("#hdnRoomID").val(),
+							url: "./Transaction/CheckIn/DataSource.php",
 							selection: false,
 							multiSelect: false,
 							rowSelect: false,
@@ -88,13 +61,13 @@
 							formatters: {
 								"commands": function(column, row)
 								{
-									return "<i style='cursor:pointer;' data-row-id=\"" + row.BookingID + "\" class=\"fa fa-bed\" data-link=\"./Transaction/CheckIn/Detail.php?ID=" + row.RoomID + "&BookingID=" + row.BookingID +"\" acronym title=\"Check In\"></i>&nbsp;";
+									return "<i style='cursor:pointer;' data-row-id=\"" + row.CheckInID + "\" class=\"fa fa-edit\" data-link=\"./Transaction/CheckIn/Detail.php?ID=" + row.RoomID + "&CheckInID=" + row.CheckInID +"\" acronym title=\"Ubah Data\"></i>&nbsp;";
 								}
 							}
 						}).on("loaded.rs.jquery.bootgrid", function()
 						{
 							/* Executes after data is loaded and rendered */
-							grid.find(".fa-bed").on("click", function(e)
+							grid.find(".fa-edit").on("click", function(e)
 							{
 								Redirect($(this).data("link"));
 							});

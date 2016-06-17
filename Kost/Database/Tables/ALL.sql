@@ -38,6 +38,13 @@ VALUES
 	'fa fa-line-chart fa-2',
 	NULL,
 	4
+),
+(
+	5,
+	'Transaksi',
+	'fa fa-bed fa-2',
+	NULL,
+	5
 );
 
 CREATE UNIQUE INDEX GROUPMENU_INDEX
@@ -103,15 +110,15 @@ VALUES
 	0,
 	1
 ),
-/*(
+(
 	5,
-	3,
-	'Daftar Inventaris',
-	'Transaction/Inventory/',
+	5,
+	'Booking',
+	'Transaction/Booking/',
 	NULL,
 	0,
-	2
-),*/
+	1
+),
 (
 	6,
 	3,
@@ -119,7 +126,7 @@ VALUES
 	'Transaction/IncomingInventory/',
 	NULL,
 	0,
-	3
+	2
 ),
 (
 	7,
@@ -128,7 +135,7 @@ VALUES
 	'Transaction/OutgoingInventory/',
 	NULL,
 	0,
-	4
+	3
 ),
 (
 	8,
@@ -153,6 +160,15 @@ VALUES
 	4,
 	'Pemakaian Kamar',
 	'Report/RoomUsage/',
+	NULL,
+	0,
+	3
+),
+(
+	11,
+	5,
+	'Check In',
+	'Report/CheckIn/',
 	NULL,
 	0,
 	3
@@ -233,13 +249,13 @@ VALUES
 	1,
 	1
 ),
-/*(
+(
 	0,
 	1,
 	5,
 	1,
 	1
-),*/
+),
 (
 	0,
 	1,
@@ -272,6 +288,13 @@ VALUES
 	0,
 	1,
 	10,
+	1,
+	1
+),
+(
+	0,
+	1,
+	11,
 	1,
 	1
 );

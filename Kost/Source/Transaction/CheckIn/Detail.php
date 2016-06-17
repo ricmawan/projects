@@ -3,8 +3,8 @@
 		$RequestPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestPath);
 		$RequestPath = str_replace($file, "", $RequestPath);
-		//include "../../GetPermission.php";
-		include "../../DBConfig.php";
+		include "../../GetPermission.php";
+		//include "../../DBConfig.php";
 		//echo $_SERVER['REQUEST_URI'];
 		$RoomID = mysql_real_escape_string($_GET['ID']);
 		$RoomNumber = "";
@@ -87,6 +87,60 @@
 				$Address = $row['Address'];
 				$DownPaymentDate = $row['DownPaymentDate'];
 				$DownPaymentAmount = $row['DownPaymentAmount'];
+				$Remarks = $row['Remarks'];
+				$DailyRate = $row['DailyRate'];
+				$HourlyRate = $row['HourlyRate'];				
+			}
+			if(isset($_GET['CheckInID'])) {
+				$IsEdit = 1;
+				$CheckInID = mysql_real_escape_string($_GET['CheckInID']);
+				$sql = "SELECT
+							CI.RateType,
+							DATE_FORMAT(CI.StartDate, '%d-%m-%Y') StartDate,
+							DATE_FORMAT(CI.EndDate, '%d-%m-%Y') EndDate,
+							DATE_FORMAT(CI.StartDate, '%H') StartHour,
+							DATE_FORMAT(CI.EndDate, '%H') EndHour,
+							CI.CustomerName,
+							DATE_FORMAT(CI.BirthDate, '%d-%m-%Y') BirthDate,
+							CI.Phone,
+							CI.Address,
+							CASE
+								WHEN CI.DownPaymentDate = '0000-00-00'
+								THEN ''
+								ELSE DATE_FORMAT(CI.DownPaymentDate, '%d-%m-%Y') 
+							END DownPaymentDate,
+							CI.DownPaymentAmount,
+							CASE
+								WHEN CI.PaymentDate = '0000-00-00'
+								THEN ''
+								ELSE DATE_FORMAT(CI.PaymentDate, '%d-%m-%Y') 
+							END PaymentDate,
+							CI.PaymentAmount,
+							CI.Remarks,
+							CI.DailyRate,
+							CI.HourlyRate
+						FROM
+							transaction_checkin CI
+						WHERE
+							CI.CheckInID = $CheckInID";
+				if (! $result=mysql_query($sql, $dbh)) {
+					echo mysql_error();
+					return 0;
+				}				
+				$row=mysql_fetch_array($result);
+				$RateType = $row['RateType'];
+				$StartDate = $row['StartDate'];
+				$EndDate = $row['EndDate'];
+				$StartHour = $row['StartHour'];
+				$EndHour = $row['EndHour'];
+				$CustomerName = $row['CustomerName'];
+				$BirthDate = $row['BirthDate'];
+				$Phone = $row['Phone'];
+				$Address = $row['Address'];
+				$DownPaymentDate = $row['DownPaymentDate'];
+				$DownPaymentAmount = number_format($row['DownPaymentAmount'],2,".",",");
+				$PaymentDate = $row['PaymentDate'];
+				$PaymentAmount = number_format($row['PaymentAmount'],2,".",",");
 				$Remarks = $row['Remarks'];
 				$DailyRate = $row['DailyRate'];
 				$HourlyRate = $row['HourlyRate'];				

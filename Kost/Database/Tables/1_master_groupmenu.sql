@@ -38,6 +38,13 @@ VALUES
 	'fa fa-line-chart fa-2',
 	NULL,
 	4
+),
+(
+	5,
+	'Transaksi',
+	'fa fa-bed fa-2',
+	NULL,
+	5
 );
 
 CREATE UNIQUE INDEX GROUPMENU_INDEX
