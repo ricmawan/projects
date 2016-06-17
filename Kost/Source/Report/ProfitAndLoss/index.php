@@ -15,121 +15,89 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						 <h5>Stok</h5>
+						 <h5>Laba Rugi</h5>
 					</div>
 					<div class="panel-body">
-						<div class="row">
-							<div class="col-md-1 labelColumn">
-								Merek:
-							</div>
-							<div class="col-md-3">
-								<div class="ui-widget" style="width: 100%;">
-									<select name="ddlBrand" id="ddlBrand" class="form-control-custom" placeholder="Pilih Merek" >
-										<option value=0 selected>-Pilih Merek-</option>
-										<?php
-											$sql = "SELECT BrandID, BrandName FROM master_brand";
-											if(!$result = mysql_query($sql, $dbh)) {
-												echo mysql_error();
-												return 0;
-											}
-											while($row = mysql_fetch_array($result)) {
-												echo "<option value='".$row['BrandID']."' >".$row['BrandName']."</option>";
-											}
-										?>
-									</select>
+						<form class="col-md-12" id="PostForm" method="POST" action="" >
+							<div class="row">
+								<div style="float: left; margin-left: 20px; margin-top:2px;">
+									<input type="radio" name="rdRateType" id="rdRateType" value="Daily" checked>
 								</div>
-							</div>
-						</div>
-						<br />
-						<div class="row">
-							<div class="col-md-1 labelColumn">
-								Tipe:
-							</div>
-							<div class="col-md-3">
-								<div class="ui-widget" style="width: 100%;">
-									<select name="ddlType" id="ddlType" class="form-control-custom" placeholder="Pilih Tipe" >
-										<option value=0 selected>-Pilih Tipe-</option>
-										<?php
-											$sql = "SELECT MT.TypeID, MT.TypeName, MB.BrandID, MB.BrandName FROM master_type MT JOIN master_brand MB ON MT.BrandID = MB.BrandID";
-											if(!$result = mysql_query($sql, $dbh)) {
-												echo mysql_error();
-												return 0;
-											}
-											while($row = mysql_fetch_array($result)) {
-												echo "<option value='".$row['TypeID']."' brandid='".$row['BrandID']."' >".$row['BrandName']." ".$row['TypeName']."</option>";
-											}
-										?>
-									</select>
-									<select name="ddlHiddenType" id="ddlHiddenType" style="display:none;">
-										<?php
-											$sql = "SELECT MT.TypeID, MT.TypeName, MB.BrandID, MB.BrandName FROM master_type MT JOIN master_brand MB ON MT.BrandID = MB.BrandID";
-											if(!$result = mysql_query($sql, $dbh)) {
-												echo mysql_error();
-												return 0;
-											}
-											while($row = mysql_fetch_array($result)) {
-												echo "<option value='".$row['TypeID']."' brandid='".$row['BrandID']."' >".$row['BrandName']." ".$row['TypeName']."</option>";
-											}
-										?>
-									</select>
+								<div class="col-md-3">
+									<div class="input-group">
+										<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+										<input id="txtStartDate" name="txtStartDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Dari Tanggal" />
+									</div>
 								</div>
-							</div>
-						</div>
-						<br />
-						<div class="row">
-							<div class="col-md-1 labelColumn">
-								Tanggal :
-							</div>
-							<div class="col-md-3">
-								<div class="ui-widget" style="width: 100%;">
-									<input id="txtFromDate" name="txtFromDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Dari Tanggal" />
-								</div>
-							</div>
-							<div style="float:left;" class="labelColumn">
+								<div style="float: left;">
 								-
-							</div>
-							<div class="col-md-3">
-								<div class="ui-widget" style="width: 100%;">
-									<input id="txtToDate" name="txtToDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Sampai Tanggal" />
+								</div>
+								<div class="col-md-3">
+									<div class="input-group">
+										<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+										<input id="txtEndDate" name="txtEndDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Sampai Tanggal" />
+									</div>
 								</div>
 							</div>
-						</div>
-						<br />
-						<div class="row">
-							<div class="col-md-12">
-								<button class="btn btn-info" id="btnView" onclick="Preview();" ><i class="fa fa-list"></i> Lihat</button>&nbsp;&nbsp;
-								<button class="btn btn-success" id="btnExcel" onclick="ExportExcel();" ><i class="fa fa-file-excel-o "></i> Eksport Excel</button>&nbsp;&nbsp;
+							<br />
+							<div class="row">
+								<div style="float: left; margin-left: 20px; margin-top:2px;">
+									<input type="radio" name="rdRateType" id="rdRateType" value="Daily" checked>
+								</div>
+								<div class="col-md-3">
+									<select id="ddlMonth" name="ddlMonth" class="form-control-custom" >
+										<option value=1>Januari</option>
+										<option value=2>Februari</option>
+										<option value=3>Maret</option>
+										<option value=4>April</option>
+										<option value=5>Mei</option>
+										<option value=6>Juni</option>
+										<option value=7>Juli</option>
+										<option value=8>Agustus</option>
+										<option value=9>September</option>
+										<option value=10>Oktober</option>
+										<option value=11>November</option>
+										<option value=12>Desember</option>
+									</select>
+								</div>
 							</div>
-						</div>
-						<br />
-						<!--Grand Total: <span class="grandtotal"></span>
-						<br />-->
-						<div class="table-responsive" id="dvTable" style="display: none;">
-							<table id="grid-data" class="table table-striped table-bordered table-hover" >
-								<thead>				
-									<tr>
-										<!--<th data-column-id="RowNumber" data-sortable="false" data-type="numeric" >No</th>-->
-										<th data-column-id="BatchNumber">Batch</th>
-										<th data-column-id="TransactionNumber" data-sortable="false" data-type="numeric" >No Nota</th>
-										<th data-column-id="TransactionType" >Tipe Transaksi</th>
-										<th data-column-id="TransactionDate" >Tanggal</th>
-										<!--<th data-column-id="SalesName">Sales</th>-->
-										<th data-column-id="CustomerName">Pelanggan/Supplier</th>
-										<!--<th data-column-id="BrandName">Merek</th>
-										<th data-column-id="TypeName">Tipe</th>
-										<th data-column-id="BatchNumber">Batch</th>-->
-										<th data-column-id="Quantity" data-align="right">Qty</th>
-										<th data-column-id="Stock" data-align="right">Stok</td>
-										<!--<th data-column-id="Price" data-align="right">Harga Jual/Beli</th>
-										<th data-column-id="Discount" data-align="right">Diskon</th>
-										<th data-column-id="Total" data-align="right">Total</th>-->
-										<th data-column-id="Remarks" >Keterangan</th>
-									</tr>
-								</thead>
-							</table>
-						</div>
-						<!--<br />
-						Grand Total: <span class="grandtotal"></span>-->
+							<br />
+							<div class="row">
+								<div class="col-md-12">
+									<button class="btn btn-info" id="btnView" onclick="Preview();" ><i class="fa fa-list"></i> Lihat</button>&nbsp;&nbsp;
+									<button class="btn btn-success" id="btnExcel" onclick="ExportExcel();" ><i class="fa fa-file-excel-o "></i> Eksport Excel</button>&nbsp;&nbsp;
+								</div>
+							</div>
+							<br />
+							<!--Grand Total: <span class="grandtotal"></span>
+							<br />-->
+							<div class="table-responsive" id="dvTable" style="display: none;">
+								<table id="grid-data" class="table table-striped table-bordered table-hover" >
+									<thead>				
+										<tr>
+											<!--<th data-column-id="RowNumber" data-sortable="false" data-type="numeric" >No</th>-->
+											<th data-column-id="BatchNumber">Batch</th>
+											<th data-column-id="TransactionNumber" data-sortable="false" data-type="numeric" >No Nota</th>
+											<th data-column-id="TransactionType" >Tipe Transaksi</th>
+											<th data-column-id="TransactionDate" >Tanggal</th>
+											<!--<th data-column-id="SalesName">Sales</th>-->
+											<th data-column-id="CustomerName">Pelanggan/Supplier</th>
+											<!--<th data-column-id="BrandName">Merek</th>
+											<th data-column-id="TypeName">Tipe</th>
+											<th data-column-id="BatchNumber">Batch</th>-->
+											<th data-column-id="Quantity" data-align="right">Qty</th>
+											<th data-column-id="Stock" data-align="right">Stok</td>
+											<!--<th data-column-id="Price" data-align="right">Harga Jual/Beli</th>
+											<th data-column-id="Discount" data-align="right">Diskon</th>
+											<th data-column-id="Total" data-align="right">Total</th>-->
+											<th data-column-id="Remarks" >Keterangan</th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+							<!--<br />
+							Grand Total: <span class="grandtotal"></span>-->
+						</form>
 					</div>
 				</div>
 			</div>
