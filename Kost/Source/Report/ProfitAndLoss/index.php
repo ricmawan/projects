@@ -20,9 +20,9 @@
 					<div class="panel-body">
 						<form class="col-md-12" id="PostForm" method="POST" action="" >
 							<div class="row">
-								<!--<div style="float: left; margin-left: 20px; margin-top:2px;">
+								<div style="float: left; margin-left: 20px; margin-top:2px;">
 									<input type="radio" name="rdInterval" id="rdInterval" value="Daily" checked>
-								</div>-->
+								</div>
 								<div class="col-md-3">
 									<div class="input-group">
 										<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
@@ -39,10 +39,10 @@
 									</div>
 								</div>
 							</div>
-							<!--<br />
+							<br />
 							<div class="row">
 								<div style="float: left; margin-left: 20px; margin-top:2px;">
-									<input type="radio" name="rdInterval" id="rdInterval" value="Daily">
+									<input type="radio" name="rdInterval" id="rdInterval" value="Monthly">
 								</div>
 								<div class="col-md-3">
 									<select id="ddlMonth" name="ddlMonth" class="form-control-custom" >
@@ -75,7 +75,7 @@
 										?>
 									</select>
 								</div>
-							</div>-->
+							</div>
 							<br />
 							<div class="row">
 								<div class="col-md-12">
@@ -113,6 +113,9 @@
 			function Preview() {				
 				var txtStartDate = $("#txtStartDate").val();
 				var txtEndDate = $("#txtEndDate").val();
+				var rdInterval = $("#rdInterval").val();
+				var ddlMonth = $("#ddlMonth").val();
+				var ddlYear = $("#ddlYear").val();
 				var PassValidate = 1;
 				var FirstFocus = 0;
 				if(PassValidate == 1) {
@@ -169,7 +172,7 @@
 							$(".grandtotal").html(response.GrandTotal);
 							return response;
 						},
-						url: "Report/ProfitAndLoss/DataSource.php?txtStartDate=" + txtStartDate + "&txtEndDate=" + txtEndDate,
+						url: "Report/ProfitAndLoss/DataSource.php?txtStartDate=" + txtStartDate + "&txtEndDate=" + txtEndDate + "&rdInterval=" + rdInterval + "&ddlMonth=" + ddlMonth + "&ddlYear=" + ddlYear,
 						selection: true,
 						multiSelect: true,
 						rowSelect: true,
@@ -183,6 +186,9 @@
 			function ExportExcel() {
 				var txtStartDate = $("#txtStartDate").val();
 				var txtEndDate = $("#txtEndDate").val();
+				var rdInterval = $("#rdInterval").val();
+				var ddlMonth = $("#ddlMonth").val();
+				var ddlYear = $("#ddlYear").val();
 				var PassValidate = 1;
 				var FirstFocus = 0;
 				if(PassValidate == 1) {
@@ -207,7 +213,7 @@
 				}
 				else {
 					$("#loading").show();
-					$("#excelDownload").attr("src", "Report/ProfitAndLoss/ExportExcel.php?&txtStartDate=" + txtStartDate + "&txtEndDate=" + txtEndDate);
+					$("#excelDownload").attr("src", "Report/ProfitAndLoss/ExportExcel.php?&txtStartDate=" txtStartDate + "&txtEndDate=" + txtEndDate + "&rdInterval=" + rdInterval + "&ddlMonth=" + ddlMonth + "&ddlYear=" + ddlYear);
 					$("#loading").hide();
 				}
 			}

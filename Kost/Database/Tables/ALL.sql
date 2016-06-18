@@ -168,7 +168,7 @@ VALUES
 	11,
 	5,
 	'Check In',
-	'Report/CheckIn/',
+	'Transaction/CheckIn/',
 	NULL,
 	0,
 	3
