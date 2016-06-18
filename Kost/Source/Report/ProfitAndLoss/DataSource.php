@@ -5,21 +5,30 @@
 	$RequestPath = str_replace($file, "", $RequestPath);
 	include "../../GetPermission.php";
 	date_default_timezone_set("Asia/Jakarta");
-	if($_GET['txtStartDate'] == "") {
+	$rdInterval = mysql_real_escape_string($_GET['rdInterval']);
+	$ddlMonth = mysql_real_escape_string($_GET['ddlMonth']);
+	$ddlYear = mysql_real_escape_string($_GET['ddlYear']);
+	if($_GET['txtStartDate'] == "" && $rdInterval == "Daily") {
 		$txtStartDate = "2000-01-01";
 	}
-	else {
+	else if($rdInterval == "Daily") {
 		$txtStartDate = explode('-', mysql_real_escape_string($_GET['txtStartDate']));
 		$_GET['txtStartDate'] = "$txtStartDate[2]-$txtStartDate[1]-$txtStartDate[0]"; 
 		$txtStartDate = $_GET['txtStartDate'];
 	}
-	if($_GET['txtEndDate'] == "") {
+	else {
+		$txtStartDate = $ddlYear."-".$ddlMonth."-01";
+	}
+	if($_GET['txtEndDate'] == "" && $rdInterval == "Daily") {
 		$txtEndDate = date("Y-m-d");
 	}
-	else {
+	else if($rdInterval == "Daily") {
 		$txtEndDate = explode('-', mysql_real_escape_string($_GET['txtEndDate']));
 		$_GET['txtEndDate'] = "$txtEndDate[2]-$txtEndDate[1]-$txtEndDate[0]"; 
 		$txtEndDate = $_GET['txtEndDate'];
+	}
+	else {
+		$txtEndDate = date('Y-m-t', strtotime($txtStartDate));
 	}
 	
 	//echo $txtStartDate;

@@ -113,7 +113,7 @@
 			function Preview() {				
 				var txtStartDate = $("#txtStartDate").val();
 				var txtEndDate = $("#txtEndDate").val();
-				var rdInterval = $("#rdInterval").val();
+				var rdInterval = $("input[name=rdInterval]:checked").val();
 				var ddlMonth = $("#ddlMonth").val();
 				var ddlYear = $("#ddlYear").val();
 				var PassValidate = 1;
@@ -186,7 +186,7 @@
 			function ExportExcel() {
 				var txtStartDate = $("#txtStartDate").val();
 				var txtEndDate = $("#txtEndDate").val();
-				var rdInterval = $("#rdInterval").val();
+				var rdInterval = $("input[name=rdInterval]:checked").val();
 				var ddlMonth = $("#ddlMonth").val();
 				var ddlYear = $("#ddlYear").val();
 				var PassValidate = 1;
@@ -213,10 +213,16 @@
 				}
 				else {
 					$("#loading").show();
-					$("#excelDownload").attr("src", "Report/ProfitAndLoss/ExportExcel.php?&txtStartDate=" txtStartDate + "&txtEndDate=" + txtEndDate + "&rdInterval=" + rdInterval + "&ddlMonth=" + ddlMonth + "&ddlYear=" + ddlYear);
+					$("#excelDownload").attr("src", "Report/ProfitAndLoss/ExportExcel.php?&txtStartDate=" + txtStartDate + "&txtEndDate=" + txtEndDate + "&rdInterval=" + rdInterval + "&ddlMonth=" + ddlMonth + "&ddlYear=" + ddlYear);
 					$("#loading").hide();
 				}
 			}
+			
+			$(document).ready(function() {
+				var d = new Date();
+				$("#ddlYear").val(d.getFullYear());
+				$("#ddlMonth").val(d.getMonth() + 1);
+			});
 		</script>
 	</body>
 </html>
