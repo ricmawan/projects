@@ -316,7 +316,7 @@
 									</div>
 								</div>
 								<div class="col-md-3">
-									<input id="txtDownPaymentAmount" name="txtDownPaymentAmount" style="text-align:right;" type="text" class="form-control-custom" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Down Payment" <?php echo 'value="'.$DownPaymentAmount.'"'; ?> />
+									<input id="txtDownPaymentAmount" name="txtDownPaymentAmount" style="text-align:right;" type="text" class="form-control-custom" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Down Payment" <?php echo 'value="'.$DownPaymentAmount.'"'; ?> />
 								</div>
 							</div>
 							<br />
@@ -331,7 +331,7 @@
 									</div>
 								</div>
 								<div class="col-md-3">
-									<input id="txtPaymentAmount" name="txtPaymentAmount" type="text" style="text-align:right;" class="form-control-custom" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" value="0.00" placeholder="Pelunasan" <?php echo 'value="'.$PaymentAmount.'"'; ?> />
+									<input id="txtPaymentAmount" name="txtPaymentAmount" type="text" style="text-align:right;" class="form-control-custom" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" value="0.00" placeholder="Pelunasan" <?php echo 'value="'.$PaymentAmount.'"'; ?> />
 								</div>
 							</div>
 							<br />
@@ -368,6 +368,8 @@
 				var Total = 0;
 				var dailyrate = parseInt($("#hdnDailyRate").val());
 				var hourlyRate = parseInt($("#hdnHourlyRate").val());
+				var DownPaymentAmount = parseFloat($("#txtDownPaymentAmount").val().replace(/\,/g, ""));
+				var PaymentAmount = parseFloat($("#txtPaymentAmount").val().replace(/\,/g, ""));
 				if($("input[name=rdRateType]:checked").val() == "Daily") {
 					var txtStartDate = $("#txtStartDate").val();
 					var txtEndDate = $("#txtEndDate").val();
@@ -383,12 +385,14 @@
 							EndDate.setDate(StartDate.getDate() + 1);
 							var nextDate1 = addZero(EndDate.getDate()) + "-" + addZero(EndDate.getMonth() + 1) + "-" + EndDate.getFullYear();
 							$("#txtEndDate").val(nextDate1);
+							if(dailyrate < (DownPaymentAmount + PaymentAmount)) $.notify("Total down payment dan pelunasan melebihi jumlah yang harus dibayar!", "warn" );
 							$("#txtGrandTotal").val(returnRupiah(dailyrate.toString()));
 						}
 						else {
 							var timediff = Math.abs(EndDate.getTime() - StartDate.getTime());
 							var diffDays = Math.ceil(timediff / (1000 * 3600 * 24)); 
 							Total = diffDays * dailyrate;
+							if(Total < (DownPaymentAmount + PaymentAmount)) $.notify("Total down payment dan pelunasan melebihi jumlah yang harus dibayar!", "warn" );
 							$("#txtGrandTotal").val(returnRupiah(Total.toString()));
 						}
 					}
@@ -398,11 +402,13 @@
 					var ddlEndHour = parseInt($("#ddlEndHour").val());
 					if(ddlStartHour >= ddlEndHour) {
 						$("#ddlEndHour").val(addZero(ddlStartHour + 1));
+						if(hourlyRate < DownPaymentAmount) $.notify("Total down payment dan pelunasan melebihi jumlah yang harus dibayar!", "warn" );
 						$("#txtGrandTotal").val(returnRupiah(hourlyRate.toString()));
 					}
 					else {
 						var diffHour = ddlEndHour - ddlStartHour;
 						Total = diffHour * hourlyRate;
+						if(Total < DownPaymentAmount) $.notify("Total down payment dan pelunasan melebihi jumlah yang harus dibayar!", "warn" );
 						$("#txtGrandTotal").val(returnRupiah(Total.toString()));
 					}
 				}
@@ -444,6 +450,29 @@
 						}
 					}
 				});
+				
+				if($("#txtDownPaymentAmount").val() != "0.00" && $("#txtDownPaymentDate").val() == "") {
+					PassValidate = 0;
+					$("#txtDownPaymentDate").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+					if(FirstFocus == 0) $("#txtDownPaymentDate").focus();
+					FirstFocus = 1;
+				}
+				
+				if($("#txtPaymentAmount").val() != "0.00" && $("#txtPaymentDate").val() == "") {
+					PassValidate = 0;
+					$("#txtPaymentDate").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+					if(FirstFocus == 0) $("#txtPaymentDate").focus();
+					FirstFocus = 1;
+				}
+				
+				var Total = $("#txtGrandTotal").val().replace(/\,/g, "");
+				var DownPaymentAmount = parseFloat($("#txtDownPaymentAmount").val().replace(/\,/g, ""));
+				var PaymentAmount = parseFloat($("#txtPaymentAmount").val().replace(/\,/g, ""));
+				if(Total < (DownPaymentAmount + PaymentAmount)) {
+					$.notify("Total down payment dan pelunasan melebihi jumlah yang harus dibayar!", "warn" );
+					PassValidate = 0;
+				}
+				
 				if(PassValidate == 1) {
 					$("#loading").show();
 					$.ajax({

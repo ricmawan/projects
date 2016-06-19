@@ -75,7 +75,8 @@
 					OR '".$StartDate."' BETWEEN StartDate AND EndDate
 					OR '".$EndDate."' BETWEEN StartDate AND EndDate)
 					AND CheckInID <> $CheckInID
-					AND CheckOutFlag = 0";
+					AND CheckOutFlag = 0
+					AND RoomID = $RoomID";
 					
 		if (! $result = mysql_query($sql, $dbh)) {
 			$Message = "Terjadi Kesalahan Sistem";
@@ -98,7 +99,8 @@
 					OR '".$EndDate."' BETWEEN StartDate AND EndDate)
 					AND CheckInFlag = 0
 					AND BookingID <> $BookingID
-					AND IsCancelled = 0";
+					AND IsCancelled = 0
+					AND RoomID = $RoomID";
 					
 		if (! $result2 = mysql_query($sql, $dbh)) {
 			$Message = "Terjadi Kesalahan Sistem";
