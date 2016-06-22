@@ -26,8 +26,9 @@
 								<div class="ui-widget" style="width: 100%;">
 									<select name="ddlBrand" id="ddlBrand" class="form-control-custom" placeholder="Pilih Merek" >
 										<option value=0 selected>-Pilih Semua Merek-</option>
+										<option value="" > </option>
 										<?php
-											$sql = "SELECT BrandID, BrandName FROM master_brand";
+											$sql = "SELECT BrandID, BrandName FROM master_brand ORDER BY BrandName";
 											if(!$result = mysql_query($sql, $dbh)) {
 												echo mysql_error();
 												return 0;
@@ -49,8 +50,9 @@
 								<div class="ui-widget" style="width: 100%;">
 									<select name="ddlType" id="ddlType" class="form-control-custom" placeholder="Pilih Tipe" >
 										<option value=0 selected>-Pilih Semua Tipe-</option>
+										<option value="" > </option>
 										<?php
-											$sql = "SELECT MT.TypeID, MT.TypeName, MB.BrandID, MB.BrandName FROM master_type MT JOIN master_brand MB ON MT.BrandID = MB.BrandID";
+											$sql = "SELECT MT.TypeID, MT.TypeName, MB.BrandID, MB.BrandName FROM master_type MT JOIN master_brand MB ON MT.BrandID = MB.BrandID ORDER BY MT.TypeName";
 											if(!$result = mysql_query($sql, $dbh)) {
 												echo mysql_error();
 												return 0;
@@ -265,6 +267,7 @@
 					$(this).remove();
 				});
 				$("#ddlType").append('<option value=0 selected>-Pilih Semua Tipe-</option>');
+				$("#ddlType").append('<option value="" > </option>');
 				$("#ddlType").val("0");
 				//$("#ddlType").next().find("input").val("");
 				$("#ddlHiddenType option").each(function() {
@@ -272,15 +275,24 @@
 						$("#ddlType").append($(this).clone());
 					}
 				});
+				$("#ddlType").next().find("input").val("-Pilih Semua Tipe-");
 			}
 			
 			$(document).ready(function () {
 				$("#ddlBrand").combobox({
 					select: function( event, ui ) {
-						BindItem();						
+						BindItem();
 					}
 				});
 				$("#ddlType").combobox();
+				
+				$("#ddlBrand").next().find("input").click(function() {
+					$(this).val("");
+				});
+				
+				$("#ddlType").next().find("input").on("click", function() {
+					$(this).val("");
+				});
 			});
 		</script>
 	</body>

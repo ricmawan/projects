@@ -14,6 +14,7 @@
 		$_POST['txtTransactionDate'] = "$TransactionDate[2]-$TransactionDate[1]-$TransactionDate[0]"; 
 		$TransactionDate = $_POST['txtTransactionDate'];
 		$InvoiceNumberType = "RJ";
+		$SalesID = mysql_real_escape_string($_POST['hdnSalesID']);
 		$CustomerID = mysql_real_escape_string($_POST['ddlCustomer']);
 		$hdnIsEdit = mysql_real_escape_string($_POST['hdnIsEdit']);
 		$txtRemarks = mysql_real_escape_string($_POST['txtRemarks']);
@@ -54,6 +55,7 @@
 			$sql = "INSERT INTO transaction_salereturn
 					(
 						SaleReturnNumber,
+						SalesID,
 						CustomerID,
 						TransactionDate,
 						Remarks,
@@ -63,6 +65,7 @@
 					VALUES
 					(
 						'".$InvoiceNumber."',
+						".$SalesID.",
 						".$CustomerID.",
 						'".$TransactionDate."',
 						'".$txtRemarks."',
@@ -75,6 +78,7 @@
 			$State = 2;
 			$sql = "UPDATE transaction_salereturn
 					SET
+						SalesID = ".$SalesID.",
 						CustomerID = ".$CustomerID.",
 						Remarks = '".$txtRemarks."',
 						TransactionDate = '".$TransactionDate."',

@@ -13,8 +13,8 @@
 					MB.BrandID,
 					MB.BrandName,
 					FS.BatchNumber,
-					IFNULL(FS.BuyPrice, MT.BuyPrice) BuyPrice,
-					IFNULL(FS.SalePrice, MT.SalePrice) SalePrice,
+					MT.BuyPrice,
+					MT.SalePrice,
 					(IFNULL(FS.Quantity, 0) - IFNULL(TOD.Quantity, 0) - IFNULL(BR.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(BO.Quantity, 0) + IFNULL(SO.Quantity, 0)) Stock,
 					MU.UnitName
 				FROM
@@ -28,46 +28,28 @@
 						SELECT
 							TypeID,
 							TRIM(BatchNumber) BatchNumber,
-							SUM(SA.Quantity) Quantity,
-							BuyPrice,
-							SalePrice
+							SUM(SA.Quantity) Quantity
 						FROM
 						(
 							SELECT
 								TypeID,
 								TRIM(BatchNumber) BatchNumber,
-								SUM(Quantity) Quantity,
-								BuyPrice,
-								SalePrice,
-								CreatedDate
+								SUM(Quantity) Quantity
 							FROM
 								transaction_firststockdetails
 							GROUP BY
 								TypeID,
-								BatchNumber,
-								BuyPrice,
-								SalePrice,
-								CreatedDate,
-								Discount
+								BatchNumber
 							UNION
 							SELECT
 								TypeID,
 								TRIM(BatchNumber) BatchNumber,
-								SUM(Quantity) Quantity,
-								BuyPrice,
-								SalePrice,
-								CreatedDate
+								SUM(Quantity) Quantity
 							FROM
 								transaction_incomingdetails
 							GROUP BY
 								TypeID,
-								BatchNumber,
-								BuyPrice,
-								SalePrice,
-								CreatedDate,
-								Discount
-							ORDER BY
-								CreatedDate DESC
+								BatchNumber
 						)SA
 						GROUP BY
 							TypeID,

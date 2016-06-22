@@ -26,8 +26,9 @@
 								<div class="ui-widget" style="width: 100%;">
 									<select name="ddlCustomer" id="ddlCustomer" class="form-control-custom" placeholder="Pilih Pelanggan" >
 										<option value=0 selected>-Pilih Semua Pelanggan-</option>
+										<option value="" > </option>
 										<?php
-											$sql = "SELECT CustomerID, CustomerName, Address1 FROM master_customer";
+											$sql = "SELECT CustomerID, CustomerName, Address1 FROM master_customer ORDER BY CustomerName";
 											if(!$result = mysql_query($sql, $dbh)) {
 												echo mysql_error();
 												return 0;
@@ -49,8 +50,9 @@
 								<div class="ui-widget" style="width: 100%;">
 									<select name="ddlSales" id="ddlSales" class="form-control-custom" placeholder="Pilih Sales" >
 										<option value=0 selected>-Pilih Semua Sales-</option>
+										<option value="" > </option>
 										<?php
-											$sql = "SELECT SalesID, SalesName FROM master_sales";
+											$sql = "SELECT SalesID, SalesName FROM master_sales ORDER BY SalesName";
 											if(!$result = mysql_query($sql, $dbh)) {
 												echo mysql_error();
 												return 0;
@@ -247,6 +249,13 @@
 			$(document).ready(function () {
 				$("#ddlSales").combobox();
 				$("#ddlCustomer").combobox();
+				$("#ddlSales").next().find("input").click(function() {
+					$(this).val("");
+				});
+				
+				$("#ddlCustomer").next().find("input").click(function() {
+					$(this).val("");
+				});
 			});
 		</script>
 	</body>

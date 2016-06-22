@@ -112,7 +112,7 @@
 										<select name="ddlOutgoing" id="ddlOutgoing" class="form-control-custom" placeholder="Pilih Nota" >
 											<option value="" selected> </option>
 											<?php
-												$sql = "SELECT OutgoingID, OutgoingNumber FROM transaction_outgoing OT WHERE IsCancelled = 0";
+												$sql = "SELECT OutgoingID, OutgoingNumber FROM transaction_outgoing OT WHERE IsCancelled = 0 ORDER BY OutgoingNumber";
 												if(!$result = mysql_query($sql, $dbh)) {
 													echo mysql_error();
 													return 0;

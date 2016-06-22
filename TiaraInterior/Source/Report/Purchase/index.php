@@ -26,8 +26,9 @@
 								<div class="ui-widget" style="width: 100%;">
 									<select name="ddlSupplier" id="ddlSupplier" class="form-control-custom" placeholder="Pilih Supplier" >
 										<option value=0 selected>-Pilih Semua Supplier-</option>
+										<option value="" > </option>
 										<?php
-											$sql = "SELECT SupplierID, SupplierName FROM master_supplier";
+											$sql = "SELECT SupplierID, SupplierName FROM master_supplier ORDER BY SupplierName";
 											if(!$result = mysql_query($sql, $dbh)) {
 												echo mysql_error();
 												return 0;
@@ -110,18 +111,21 @@
 						}
 					}
 				}
+				
 				if(SupplierID == "") {
 					$("#ddlSupplier").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 					PassValidate = 0;
 					if(FirstFocus == 0) $("#ddlSupplier").next().find("input").focus();
 					FirstFocus = 1;
 				}
+				
 				if(PassValidate == 0) {
 					$("html, body").animate({
 						scrollTop: 0
 					}, "slow");
 					return false;
 				}
+				
 				else {
 					$("#loading").show();
 					$("#grid-data").bootgrid('destroy');
@@ -206,6 +210,9 @@
 			}
 			$(document).ready(function () {
 				$("#ddlSupplier").combobox();
+				$("#ddlSupplier").next().find("input").click(function() {
+					$(this).val("");
+				});
 			});
 		</script>
 	</body>

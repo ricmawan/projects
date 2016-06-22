@@ -262,7 +262,7 @@
 										<select name="ddlCustomer" id="ddlCustomer" class="form-control-custom" placeholder="Pilih Pelanggan" >
 											<option value="" selected> </option>
 											<?php
-												$sql = "SELECT CustomerID, CustomerName, Address1, SalesID FROM master_customer";
+												$sql = "SELECT CustomerID, CustomerName, Address1, SalesID FROM master_customer ORDER BY CustomerName";
 												if(!$result = mysql_query($sql, $dbh)) {
 													echo mysql_error();
 													return 0;
@@ -307,7 +307,7 @@
 										<select name="ddlBrand" id="ddlBrand" class="form-control-custom" placeholder="Pilih Merek" >
 											<option value="" selected> </option>
 											<?php
-												$sql = "SELECT BrandID, BrandName FROM master_brand";
+												$sql = "SELECT BrandID, BrandName FROM master_brand ORDER BY BrandName";
 												if(!$result = mysql_query($sql, $dbh)) {
 													echo mysql_error();
 													return 0;

@@ -61,7 +61,9 @@
 		$objPHPExcel->getActiveSheet()->getStyle("A1:A2")->getFont()->setBold(true);
 	
 		$objPHPExcel->getActiveSheet()->setCellValue("A4", "Nama Pelanggan :");
+		$objPHPExcel->getActiveSheet()->mergeCells("A4:B4");
 		$objPHPExcel->getActiveSheet()->setCellValue("A5", "Kota :");
+		$objPHPExcel->getActiveSheet()->mergeCells("A5:B5");
 		$rowExcel = 7;
 		$col = 0;
 		//set color
@@ -191,8 +193,8 @@
 			$rowExcel++;
 		}
 		
-		$objPHPExcel->getActiveSheet()->setCellValue("B4", $CustomerName);
-		$objPHPExcel->getActiveSheet()->setCellValue("B5", $City);
+		$objPHPExcel->getActiveSheet()->setCellValue("C4", $CustomerName);
+		$objPHPExcel->getActiveSheet()->setCellValue("C5", $City);
 		$objPHPExcel->getActiveSheet()->getStyle("F7:F".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 		$objPHPExcel->getActiveSheet()->getStyle("H7:H".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 		$objPHPExcel->getActiveSheet()->getStyle("G7:G".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);

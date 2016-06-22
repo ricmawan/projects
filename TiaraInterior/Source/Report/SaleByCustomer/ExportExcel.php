@@ -61,7 +61,9 @@
 		$objPHPExcel->getActiveSheet()->getStyle("A1:A2")->getFont()->setBold(true);
 	
 		$objPHPExcel->getActiveSheet()->setCellValue("A4", "Nama Pelanggan :");
+		$objPHPExcel->getActiveSheet()->mergeCells("A4:B4");
 		$objPHPExcel->getActiveSheet()->setCellValue("A5", "Kota :");
+		$objPHPExcel->getActiveSheet()->mergeCells("A5:B5");
 		$rowExcel = 7;
 		$col = 0;
 		//set color
@@ -167,8 +169,8 @@
 			$rowExcel++;
 		}
 		
-		$objPHPExcel->getActiveSheet()->setCellValue("B4", $CustomerName);
-		$objPHPExcel->getActiveSheet()->setCellValue("B5", $City);
+		$objPHPExcel->getActiveSheet()->setCellValue("C4", $CustomerName);
+		$objPHPExcel->getActiveSheet()->setCellValue("C5", $City);
 		$objPHPExcel->getActiveSheet()->getStyle("D7:F".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 		$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, "=SUM(F7:F".($rowExcel-1).")");
 		$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Grand Total");

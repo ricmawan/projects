@@ -266,7 +266,7 @@
 										<select name="ddlSupplier" id="ddlSupplier" class="form-control-custom" placeholder="Pilih Supplier" >
 											<option value="" selected> </option>
 											<?php
-												$sql = "SELECT SupplierID, SupplierName FROM master_supplier";
+												$sql = "SELECT SupplierID, SupplierName FROM master_supplier ORDER BY SupplierName";
 												if(!$result = mysql_query($sql, $dbh)) {
 													echo mysql_error();
 													return 0;
@@ -290,7 +290,7 @@
 										<select name="ddlBrand" id="ddlBrand" class="form-control-custom" placeholder="Pilih Merek" >
 											<option value="" selected> </option>
 											<?php
-												$sql = "SELECT BrandID, BrandName FROM master_brand";
+												$sql = "SELECT BrandID, BrandName FROM master_brand ORDER BY BrandName";
 												if(!$result = mysql_query($sql, $dbh)) {
 													echo mysql_error();
 													return 0;
@@ -314,16 +314,18 @@
 											<option value="" brandid="" selected> </option>
 											<?php
 												$sql = "SELECT 
-															MI.TypeID, 
-															MI.TypeName, 
+															MT.TypeID, 
+															MT.TypeName, 
 															MB.BrandID, 
-															MI.BuyPrice,
-															MI.SalePrice,
+															MT.BuyPrice,
+															MT.SalePrice,
 															MB.BrandName
 														FROM 
-															master_type MI 
+															master_type MT
 															JOIN master_brand MB
-																ON MB.BrandID = MI.BrandID";
+																ON MB.BrandID = MT.BrandID
+														ORDER BY
+															MT.TypeName";
 												if(!$result = mysql_query($sql, $dbh)) {
 													echo mysql_error();
 													return 0;

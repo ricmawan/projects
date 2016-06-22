@@ -123,6 +123,8 @@
 					transaction_salereturn SR
 					JOIN master_customer MC
 						ON MC.CustomerID = SR.CustomerID
+					JOIN master_sales MS
+						ON MS.SalesID = SR.SalesID
 					LEFT JOIN transaction_salereturndetails SRD
 						ON SRD.SaleReturnID = SR.SaleReturnID
 				WHERE
@@ -133,6 +135,11 @@
 							THEN MC.CustomerID
 							ELSE ".$CustomerID."
 						END = MC.CustomerID
+					AND CASE
+							WHEN ".$SalesID." = 0
+							THEN MS.SalesID
+							ELSE ".$SalesID."
+						END = MS.SalesID
 				GROUP BY
 					SR.SaleReturnNumber,
 					SR.TransactionDate,

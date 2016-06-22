@@ -25,9 +25,9 @@
 							<div class="col-md-3">
 								<div class="ui-widget" style="width: 100%;">
 									<select name="ddlCustomer" id="ddlCustomer" class="form-control-custom" placeholder="Pilih Pelanggan" >
-										<option value=0 selected>-Pilih Pelanggan-</option>
+										<option value="" > </option>
 										<?php
-											$sql = "SELECT CustomerID, CustomerName, Address1 FROM master_customer";
+											$sql = "SELECT CustomerID, CustomerName, Address1 FROM master_customer ORDER BY CustomerName";
 											if(!$result = mysql_query($sql, $dbh)) {
 												echo mysql_error();
 												return 0;

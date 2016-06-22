@@ -11,6 +11,7 @@
 		$SaleReturnNumber = "";
 		$Remarks = "";
 		$TransactionDate = "";
+		$SalesID = "";
 		$IsEdit = 0;
 		$rowCount = 0;
 		$Data = "";
@@ -22,6 +23,7 @@
 					SR.SaleReturnNumber,
 					SR.Remarks,
 					SR.CustomerID,
+					SR.SalesID,
 					DATE_FORMAT(SR.TransactionDate, '%d-%m-%Y') AS TransactionDate
 				FROM
 					transaction_salereturn SR
@@ -36,6 +38,7 @@
 			$SaleReturnID = $row['SaleReturnID'];
 			$CustomerID = $row['CustomerID'];
 			$SaleReturnNumber = $row['SaleReturnNumber'];
+			$SalesID = $row['SalesID'];
 			$Remarks = $row['Remarks'];
 			$TransactionDate = $row['TransactionDate'];
 			
@@ -103,6 +106,7 @@
 								<div class="col-md-1 labelColumn">
 									Tanggal :
 									<input id="hdnSaleReturnID" name="hdnSaleReturnID" type="hidden" <?php echo 'value="'.$SaleReturnID.'"'; ?> />
+									<input id="hdnSalesID" name="hdnSalesID" type="hidden" <?php echo 'value="'.$SalesID.'"'; ?> />
 									<input id="hdnRow" name="hdnRow" type="hidden" <?php echo 'value="'.$rowCount.'"'; ?> />
 									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
 									<input id="hdnData" name="hdnData" type="hidden" <?php echo 'value="'.$Data.'"'; ?> />
@@ -118,7 +122,7 @@
 										<select name="ddlCustomer" id="ddlCustomer" class="form-control-custom" placeholder="Pilih Pelanggan" >
 											<option value="" selected> </option>
 											<?php
-												$sql = "SELECT CustomerID, CustomerName, Address1, SalesID FROM master_customer";
+												$sql = "SELECT CustomerID, CustomerName, Address1, SalesID FROM master_customer ORDER BY CustomerName";
 												if(!$result = mysql_query($sql, $dbh)) {
 													echo mysql_error();
 													return 0;
@@ -142,7 +146,7 @@
 										<select name="ddlBrand" id="ddlBrand" class="form-control-custom" placeholder="Pilih Merek" >
 											<option value="" selected> </option>
 											<?php
-												$sql = "SELECT BrandID, BrandName FROM master_brand";
+												$sql = "SELECT BrandID, BrandName FROM master_brand ORDER BY BrandName";
 												if(!$result = mysql_query($sql, $dbh)) {
 													echo mysql_error();
 													return 0;
@@ -245,6 +249,7 @@
 		</div>
 		<script>
 			function BindTypeFromCustomer() {
+				$("#hdnSalesID").val($("#ddlCustomer option:selected").attr("salesid"));
 				if($("#ddlBrand").val() != "") {
 					$("#ddlType option").each(function() {
 						$(this).remove();

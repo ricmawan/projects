@@ -62,7 +62,10 @@
 						AND SR.BatchNumber = TOD.BatchNumber
 				WHERE
 					MB.BrandID = ".$BrandID."
-					AND IFNULL(TOD.Quantity, 0) - IFNULL(SR.Quantity, 0) > 0";
+					AND IFNULL(TOD.Quantity, 0) - IFNULL(SR.Quantity, 0) > 0
+				ORDER BY
+					MT.TypeName,
+					TOD.BatchNumber";
 		
 		if (! $result = mysql_query($sql, $dbh)) {
 			$Message = "Terjadi Kesalahan Sistem";

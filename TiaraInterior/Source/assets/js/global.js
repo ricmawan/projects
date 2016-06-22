@@ -303,7 +303,7 @@ function PercentNumber(evt, id, value) {
 	return true;
 }
 function convertRupiah(id, angka){
-	if(angka.indexOf(",") < 0 && angka != "") {
+	if(angka.indexOf(",") < 0 && angka != "" && angka != ".00") {
 		var flag = 0;
 		if(angka.indexOf(".") > 0) {
 			var temp = angka.split(".");
@@ -327,14 +327,14 @@ function convertRupiah(id, angka){
 			else $("#" + id).val(angka + ".00");
 		}
 	}
-	else if(angka == "") {
-		$("#" + id).val(angka + "0.00");
+	else if(angka == "" || angka == ".00") {
+		$("#" + id).val("0.00");
 	}
 	//$("#" + id).blur();
 }
 
 function returnRupiah(angka) {	
-	if(angka.indexOf(",") < 0 && angka != "") {
+	if(angka.indexOf(",") < 0 && angka != "" && angka != ".00") {
 		var flag = 0;
 		if(angka.indexOf(".") > 0) {
 			var temp = angka.split(".");
@@ -356,7 +356,7 @@ function returnRupiah(angka) {
 			else angka = angka + ".00";
 		}
 	}
-	else if(angka == "") {
+	else if(angka == "" || angka == ".00") {
 		angka = "0.00";
 	}
 	return angka;
@@ -365,8 +365,11 @@ function returnRupiah(angka) {
 
 
 function clearFormat(id, angka) {
-	var angka1 = angka.replace(/\,/g, "");
-	$("#" + id).val(angka1);				
+	if($("#" + id).val() == "0.00") $("#" + id).val(".00");
+	else {
+		var angka1 = angka.replace(/\,/g, "");
+		$("#" + id).val(angka1);
+	}
 }
 
 function SubmitForm(url) {

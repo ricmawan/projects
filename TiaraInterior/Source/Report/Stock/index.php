@@ -25,9 +25,9 @@
 							<div class="col-md-3">
 								<div class="ui-widget" style="width: 100%;">
 									<select name="ddlBrand" id="ddlBrand" class="form-control-custom" placeholder="Pilih Merek" >
-										<option value=0 selected>-Pilih Merek-</option>
+										<option value="" > </option>
 										<?php
-											$sql = "SELECT BrandID, BrandName FROM master_brand";
+											$sql = "SELECT BrandID, BrandName FROM master_brand ORDER BY BrandName";
 											if(!$result = mysql_query($sql, $dbh)) {
 												echo mysql_error();
 												return 0;
@@ -48,7 +48,7 @@
 							<div class="col-md-3">
 								<div class="ui-widget" style="width: 100%;">
 									<select name="ddlType" id="ddlType" class="form-control-custom" placeholder="Pilih Tipe" >
-										<option value=0 selected>-Pilih Tipe-</option>
+										<option value="" > </option>
 										<?php
 											$sql = "SELECT MT.TypeID, MT.TypeName, MB.BrandID, MB.BrandName FROM master_type MT JOIN master_brand MB ON MT.BrandID = MB.BrandID";
 											if(!$result = mysql_query($sql, $dbh)) {
@@ -268,6 +268,7 @@
 					$(this).remove();
 				});
 				//$("#ddlType").append('<option value=0 selected>-Pilih Semua Tipe-</option>');
+				$("#ddlType").append('<option value="" > </option>');
 				$("#ddlType").val("0");
 				//$("#ddlType").next().find("input").val("");
 				$("#ddlHiddenType option").each(function() {
@@ -275,6 +276,7 @@
 						$("#ddlType").append($(this).clone());
 					}
 				});
+				$("#ddlType").next().find("input").val("");
 			}
 			
 			$(document).ready(function () {
