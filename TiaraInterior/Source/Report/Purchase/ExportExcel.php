@@ -75,6 +75,7 @@
 		mysql_query("SET @row:=0;", $dbh);
 		$sql = "SELECT
 					DATE_FORMAT(TI.TransactionDate, '%d/%c/%y') AS TransactionDate,
+					TI.TransactionDate DateNoFormat,
 					MS.SupplierName AS SupplierName,
 					TI.IncomingNumber,
 					TI.Remarks,
@@ -82,7 +83,7 @@
 									WHEN TID.IsPercentage = 1
 									THEN TID.Quantity * (TID.BuyPrice - ((TID.BuyPrice * TID.Discount)/100))
 									ELSE TID.Quantity * (TID.BuyPrice - TID.Discount)
-								END), 0) AS Total
+								END), 0)  AS Total
 				FROM
 					transaction_incoming TI
 					JOIN master_supplier MS
@@ -104,14 +105,15 @@
 				UNION ALL
 				SELECT
 					DATE_FORMAT(BR.TransactionDate, '%d/%c/%y') AS TransactionDate,
+					BR.TransactionDate DateNoFormat,
 					MS.SupplierName AS SupplierName,
 					BR.BuyReturnNumber,
 					BR.Remarks,
 					-IFNULL(SUM(CASE
-						WHEN BRD.IsPercentage = 1
-						THEN BRD.Quantity * (BRD.BuyPrice - ((BRD.BuyPrice * BRD.Discount)/100)) 
-						ELSE BRD.Quantity * (BRD.BuyPrice - BRD.Discount)
-					 END), 0) AS Total
+									WHEN BRD.IsPercentage = 1
+									THEN BRD.Quantity * (BRD.BuyPrice - ((BRD.BuyPrice * BRD.Discount)/100)) 
+									ELSE BRD.Quantity * (BRD.BuyPrice - BRD.Discount)
+								END), 0) AS Total
 				FROM
 					transaction_buyreturn BR
 					JOIN master_supplier MS
@@ -131,7 +133,7 @@
 					BR.TransactionDate,
 					MS.SupplierName
 				ORDER BY	
-					TransactionDate ASC";
+					DateNoFormat ASC";
 					
 		if (! $result = mysql_query($sql, $dbh)) {
 			echo mysql_error();

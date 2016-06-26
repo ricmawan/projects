@@ -59,6 +59,7 @@
 		$sql = "SELECT
 					OT.OutgoingNumber,
 					DATE_FORMAT(OT.TransactionDate, '%d/%c/%y') AS TransactionDate,
+					OT.TransactionDate DateNoFormat,
 					CONCAT(MB.BrandName, ' ', MT.TypeName, ' - ', TOD.BatchNumber) ItemName,
 					TOD.Quantity,
 					TOD.SalePrice,
@@ -103,6 +104,7 @@
 				SELECT
 					SR.SaleReturnNumber,
 					DATE_FORMAT(SR.TransactionDate, '%d/%c/%y') AS TransactionDate,
+					SR.TransactionDate DateNoFormat,
 					CONCAT(MB.BrandName, ' ', MT.TypeName, ' - ', SRD.BatchNumber) ItemName,
 					SRD.Quantity,
 					SRD.SalePrice,
@@ -141,7 +143,7 @@
 							ELSE ".$CustomerID."
 						END = MC.CustomerID
 				ORDER BY	
-					TransactionDate ASC";
+					DateNoFormat ASC";
 		
 		if (! $result = mysql_query($sql, $dbh)) {
 			echo mysql_error();

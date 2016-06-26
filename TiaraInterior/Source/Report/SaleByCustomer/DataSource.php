@@ -59,6 +59,7 @@
 		$sql = "SELECT
 					OT.OutgoingNumber,
 					DATE_FORMAT(OT.TransactionDate, '%d/%c/%y') AS TransactionDate,
+					OT.TransactionDate DateNoFormat,
 					OT.DeliveryCost,
 					IFNULL(SUM(CASE
 						WHEN TOD.IsPercentage = 1
@@ -97,6 +98,7 @@
 				SELECT
 					SR.SaleReturnNumber,
 					DATE_FORMAT(SR.TransactionDate, '%d/%c/%y') AS TransactionDate,
+					SR.TransactionDate DateNoFormat,
 					0,
 					-IFNULL(SUM(CASE
 						WHEN SRD.IsPercentage = 1
@@ -128,7 +130,7 @@
 					SR.TransactionDate,
 					MC.CustomerName
 				ORDER BY	
-					TransactionDate ASC";
+					DateNoFormat ASC";
 		
 		if (! $result = mysql_query($sql, $dbh)) {
 			echo mysql_error();

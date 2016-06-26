@@ -83,6 +83,7 @@
 		$sql = "SELECT
 					OT.OutgoingNumber,
 					DATE_FORMAT(OT.TransactionDate, '%d/%c%/%y') AS TransactionDate,
+					OT.TransactionDate DateNoFormat,
 					MS.SalesName,
 					MC.CustomerName,
 					MB.BrandName,
@@ -133,21 +134,11 @@
 							THEN MT.TypeID
 							ELSE ".$TypeID."
 						END = MT.TypeID
-				GROUP BY
-					OT.TransactionDate,
-					MS.SalesName,
-					MC.CustomerName,
-					MB.BrandName,
-					OT.OutgoingNumber,
-					MT.TypeName,
-					TOD.BatchNumber,
-					TOD.Quantity,
-					TOD.SalePrice,
-					OT.Remarks
 				UNION ALL
 				SELECT
 					SR.SaleReturnNumber,
 					DATE_FORMAT(SR.TransactionDate, '%d/%c%/%y') AS TransactionDate,
+					SR.TransactionDate DateNoFormat,
 					'',
 					MC.CustomerName,
 					MB.BrandName,
@@ -195,18 +186,8 @@
 							THEN MT.TypeID
 							ELSE ".$TypeID."
 						END = MT.TypeID
-				GROUP BY
-					SR.TransactionDate,
-					MC.CustomerName,
-					MB.BrandName,
-					SR.SaleReturnNumber,
-					MT.TypeName,
-					SRD.BatchNumber,
-					SRD.Quantity,
-					SRD.SalePrice,
-					SR.Remarks
 				ORDER BY	
-					TransactionDate ASC";
+					DateNoFormat ASC";
 					
 		if (! $result = mysql_query($sql, $dbh)) {
 			echo mysql_error();

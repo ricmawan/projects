@@ -80,6 +80,7 @@
 					'Stok Awal' TransactionType,
 					'' TransactionNumber,
 					'' TransactionDate,
+					'2000-01-01' DateNoFormat,
 					'' CustomerName,
 					FS.BatchNumber,
 					(IFNULL(FS.Quantity, 0) - IFNULL(TOD.Quantity, 0) - IFNULL(BR.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(BO.Quantity, 0) + IFNULL(SO.Quantity, 0)) Quantity,
@@ -244,6 +245,7 @@
 					'Stok Awal' TransactionType,
 					FS.FirstStockNumber TransactionNumber,
 					DATE_FORMAT(FS.TransactionDate, '%d/%c%/%y') AS TransactionDate,
+					FS.TransactionDate DateNoFormat,
 					'' CustomerName,
 					FSD.BatchNumber,
 					FSD.Quantity,
@@ -274,6 +276,7 @@
 					'Pembelian',
 					TI.IncomingNumber,
 					DATE_FORMAT(TI.TransactionDate, '%d/%c%/%y') AS TransactionDate,
+					TI.TransactionDate DateNoFormat,
 					MS.SupplierName,
 					TID.BatchNumber,
 					TID.Quantity,
@@ -306,6 +309,7 @@
 					'Penjualan',
 					OT.OutgoingNumber,
 					DATE_FORMAT(OT.TransactionDate, '%d/%c%/%y') AS TransactionDate,
+					OT.TransactionDate DateNoFormat,
 					MC.CustomerName,
 					TOD.BatchNumber,
 					-TOD.Quantity,
@@ -340,6 +344,7 @@
 					'Retur Jual',
 					SR.SaleReturnNumber,
 					DATE_FORMAT(SR.TransactionDate, '%d/%c%/%y') AS TransactionDate,
+					SR.TransactionDate DateNoFormat,
 					MC.CustomerName,
 					SRD.BatchNumber,
 					SRD.Quantity,
@@ -372,6 +377,7 @@
 					'Retur Beli',
 					BR.BuyReturnNumber,
 					DATE_FORMAT(BR.TransactionDate, '%d/%c%/%y') AS TransactionDate,
+					BR.TransactionDate DateNoFormat,
 					MS.SupplierName,
 					BRD.BatchNumber,
 					-BRD.Quantity,
@@ -404,6 +410,7 @@
 					'Booking',
 					BO.BookingNumber,
 					DATE_FORMAT(BO.TransactionDate, '%d/%c%/%y') AS TransactionDate,
+					BO.TransactionDate DateNoFormat,
 					MC.CustomerName,
 					BOD.BatchNumber,
 					-BOD.Quantity,
@@ -437,6 +444,7 @@
 					'Penyesuaian',
 					'',
 					DATE_FORMAT(SO.TransactionDate, '%d/%c%/%y') AS TransactionDate,
+					SO.TransactionDate DateNoFormat,
 					'',
 					SOD.BatchNumber,
 					CASE
@@ -471,6 +479,7 @@
 					'Pembatalan',
 					OT.OutgoingNumber,
 					DATE_FORMAT(OT.TransactionDate, '%d/%c%/%y') AS TransactionDate,
+					OT.TransactionDate DateNoFormat,
 					MC.CustomerName,
 					TOD.BatchNumber,
 					TOD.Quantity,
@@ -502,7 +511,7 @@
 							ELSE ".$TypeID."
 						END = MT.TypeID
 				ORDER BY	
-					BatchNumber,TransactionDate ASC";
+					BatchNumber,DateNoFormat ASC";
 					
 		if (! $result = mysql_query($sql, $dbh)) {
 			echo mysql_error();

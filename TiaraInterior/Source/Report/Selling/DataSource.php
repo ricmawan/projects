@@ -60,6 +60,7 @@
 		$sql = "SELECT
 					OT.OutgoingNumber,
 					DATE_FORMAT(OT.TransactionDate, '%d/%c/%y') AS TransactionDate,
+					OT.TransactionDate DateNoFormat,
 					MS.SalesName,
 					MC.CustomerName,
 					OT.DeliveryCost,
@@ -105,6 +106,7 @@
 				SELECT
 					SR.SaleReturnNumber,
 					DATE_FORMAT(SR.TransactionDate, '%d/%c/%y') AS TransactionDate,
+					SR.TransactionDate DateNoFormat,
 					'',
 					MC.CustomerName,
 					0,
@@ -145,7 +147,7 @@
 					SR.TransactionDate,
 					MC.CustomerName
 				ORDER BY	
-					TransactionDate ASC";
+					DateNoFormat ASC";
 		
 		if (! $result = mysql_query($sql, $dbh)) {
 			echo mysql_error();

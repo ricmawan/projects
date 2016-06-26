@@ -59,6 +59,7 @@
 		mysql_query("SET @row:=0;", $dbh);
 		$sql = "SELECT
 					DATE_FORMAT(TI.TransactionDate, '%d/%c/%y') AS TransactionDate,
+					TI.TransactionDate DateNoFormat,
 					MS.SupplierName AS SupplierName,
 					TI.IncomingNumber,
 					TI.Remarks,
@@ -88,6 +89,7 @@
 				UNION ALL
 				SELECT
 					DATE_FORMAT(BR.TransactionDate, '%d/%c/%y') AS TransactionDate,
+					BR.TransactionDate DateNoFormat,
 					MS.SupplierName AS SupplierName,
 					BR.BuyReturnNumber,
 					BR.Remarks,
@@ -115,7 +117,7 @@
 					BR.TransactionDate,
 					MS.SupplierName
 				ORDER BY	
-					TransactionDate ASC";
+					DateNoFormat ASC";
 		
 		if (! $result = mysql_query($sql, $dbh)) {
 			echo mysql_error();
