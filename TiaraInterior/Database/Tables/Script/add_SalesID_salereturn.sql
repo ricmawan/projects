@@ -1,0 +1,1 @@
+ALTER TABLE `transaction_salereturn` ADD `SalesID` BIGINT NOT NULL AFTER `CustomerID`;
