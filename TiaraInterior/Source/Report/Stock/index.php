@@ -285,7 +285,14 @@
 						BindItem();						
 					}
 				});
+				$("#ddlBrand").next().find("input").click(function() {
+					$(this).val("");
+				});
+				
 				$("#ddlType").combobox();
+				$("#ddlType").next().find("input").click(function() {
+					$(this).val("");
+				});
 			});
 		</script>
 	</body>

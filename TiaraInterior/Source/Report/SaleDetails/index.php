@@ -209,6 +209,9 @@
 			}
 			$(document).ready(function () {
 				$("#ddlCustomer").combobox();
+				$("#ddlCustomer").next().find("input").click(function() {
+					$(this).val("");
+				});
 			});
 		</script>
 	</body>

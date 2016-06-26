@@ -49,7 +49,6 @@
 							<div class="col-md-3">
 								<div class="ui-widget" style="width: 100%;">
 									<select name="ddlSales" id="ddlSales" class="form-control-custom" placeholder="Pilih Sales" >
-										<option value=0 selected>-Pilih Semua Sales-</option>
 										<option value="" > </option>
 										<?php
 											$sql = "SELECT SalesID, SalesName FROM master_sales ORDER BY SalesName";

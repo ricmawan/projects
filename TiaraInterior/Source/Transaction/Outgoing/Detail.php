@@ -678,12 +678,17 @@
 						BindType();						
 					}
 				});
-				
+				$("#ddlBrand").next().find("input").click(function() {
+					$(this).val("");
+				});
 				//$("#ddlSales").combobox();
 				$("#ddlCustomer").combobox({
 					select: function( event, ui ) {
 						BindSales();						
 					}
+				});
+				$("#ddlCustomer").next().find("input").click(function() {
+					$(this).val("");
 				});
 				$("#ddlType").combobox({
 					select: function(event, ui) {

@@ -144,7 +144,7 @@
 					MB.BrandName,
 					MT.TypeName,
 					SRD.BatchNumber,
-					SRD.Quantity,
+					-SRD.Quantity,
 					SRD.SalePrice,
 					CASE
 						WHEN SRD.IsPercentage = 1

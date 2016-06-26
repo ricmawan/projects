@@ -107,7 +107,7 @@
 					SR.SaleReturnNumber,
 					DATE_FORMAT(SR.TransactionDate, '%d/%c/%y') AS TransactionDate,
 					SR.TransactionDate DateNoFormat,
-					'',
+					MS.SalesName,
 					MC.CustomerName,
 					0,
 					-IFNULL(SUM(CASE

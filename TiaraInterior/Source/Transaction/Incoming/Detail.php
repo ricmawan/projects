@@ -489,8 +489,13 @@
 						BindType();						
 					}
 				});
-				
+				$("#ddlBrand").next().find("input").click(function() {
+					$(this).val("");
+				});
 				$("#ddlSupplier").combobox();
+				$("#ddlSupplier").next().find("input").click(function() {
+					$(this).val("");
+				});
 				$("#ddlType").combobox({
 					select: function(event, ui) {
 						BindTypeList();
