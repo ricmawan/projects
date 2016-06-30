@@ -77,6 +77,7 @@
 				WHERE
 					CAST(TI.TransactionDate AS DATE) >= '".$txtFromDate."'
 					AND CAST(TI.TransactionDate AS DATE) <= '".$txtToDate."'
+					AND TI.IsCancelled = 0
 					AND CASE
 							WHEN ".$SupplierID." = 0
 							THEN MS.SupplierID
@@ -107,6 +108,7 @@
 				WHERE
 					CAST(BR.TransactionDate AS DATE) >= '".$txtFromDate."'
 					AND CAST(BR.TransactionDate AS DATE) <= '".$txtToDate."'
+					AND BR.IsCancelled = 0
 					AND CASE
 							WHEN ".$SupplierID." = 0
 							THEN MS.SupplierID

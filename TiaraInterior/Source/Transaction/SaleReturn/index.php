@@ -14,6 +14,7 @@
 					</div>
 					<div class="panel-body">
 						<div class="table-responsive">
+							<input id="hdnEditFlag" name="hdnEditFlag" type="hidden" <?php echo 'value='.$EditFlag; ?> />
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
@@ -61,7 +62,14 @@
 							formatters: {
 								"commands": function(column, row)
 								{
-									return "<i style='cursor:pointer;' data-row-id=\"" + row.SaleReturnID + "\" class=\"fa fa-edit\" data-link=\"./Transaction/SaleReturn/Detail.php?ID=" + row.SaleReturnID + "\" acronym title=\"Ubah Data\"></i>&nbsp;";
+									var option;
+									if($("#hdnEditFlag").val() == true) {
+										option = "<i style='cursor:pointer;' data-row-id=\"" + row.SaleReturnID + "\" class=\"fa fa-edit\" data-link=\"./Transaction/SaleReturn/Detail.php?ID=" + row.SaleReturnID + "\" acronym title=\"Ubah Data\"></i>&nbsp;&nbsp;&nbsp;<i style='cursor:pointer;' data-row-id=\"" + row.SaleReturnID + "\" class=\"fa fa-print\" acronym title=\"Cetak Nota\"></i>";
+									}
+									else {
+										option = "<i style='cursor:pointer;' data-row-id=\"" + row.SaleReturnID + "\" class=\"fa fa-print\"  acronym title=\"Cetak Nota\"></i>";
+									}
+									return option;
 								}
 							}
 						}).on("loaded.rs.jquery.bootgrid", function()
@@ -71,8 +79,34 @@
 							{
 								Redirect($(this).data("link"));
 							});
+							
+							grid.find(".fa-print").on("click", function(e)
+							{
+								PrintInvoice($(this).data("row-id"));
+							});
 						});
 			});
+			
+			function PrintInvoice(ID) {
+				$("#loading").show();
+				$.ajax({
+					url: "./Transaction/SaleReturn/PrintInvoice.php",
+					type: "POST",
+					data: { hdnSaleReturnID : ID },
+					dataType: "json",
+					success: function(data) {
+						$("html, body").animate({
+							scrollTop: 0
+						}, "slow");
+						$("#loading").hide();
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Koneksi gagal", "error");
+				
+					}
+				});
+			}
 		</script>
 	</body>
 </html>

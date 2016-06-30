@@ -25,7 +25,7 @@
 						OT.OutgoingNumber,
 						OT.Remarks,
 						OT.DeliveryCost,
-						CONCAT(MC.CustomerName, ' - ', MC.Address) CustomerName,
+						CONCAT(MC.CustomerName, ' - ', MC.Address1) CustomerName,
 						DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') AS TransactionDate
 					FROM
 						transaction_cancellation TC

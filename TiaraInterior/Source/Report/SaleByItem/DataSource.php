@@ -154,6 +154,7 @@
 				WHERE
 					CAST(SR.TransactionDate AS DATE) >= '".$txtFromDate."'
 					AND CAST(SR.TransactionDate AS DATE) <= '".$txtToDate."'
+					AND SR.IsCancelled = 0
 					AND CASE
 							WHEN ".$BrandID." = 0
 							THEN MB.BrandID

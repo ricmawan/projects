@@ -54,26 +54,35 @@
 									 ->setCategory("Laporan");
 		//Header
 		$objPHPExcel->setActiveSheetIndex(0)
-					->setCellValue('A1', "LAPORAN PENJUALAN");
+					->setCellValue('A1', "LAPORAN PENJUALAN SALES");
+					
+		//set margin
+		$objPHPExcel->getActiveSheet()->getPageMargins()->setTop(2);
+		$objPHPExcel->getActiveSheet()->getPageMargins()->setRight(2);
+		$objPHPExcel->getActiveSheet()->getPageMargins()->setLeft(1);
+		$objPHPExcel->getActiveSheet()->getPageMargins()->setBottom(2);
 		
 		$objPHPExcel->getActiveSheet()->getStyle('A1')->getAlignment()->setWrapText(true);
 		
 		//set bold
 		$objPHPExcel->getActiveSheet()->getStyle("A1:A2")->getFont()->setBold(true);
-		
-		$rowExcel = 4;
+		$objPHPExcel->getActiveSheet()->getStyle("A4:C5")->getFont()->setSize(14);
+		$objPHPExcel->getActiveSheet()->getStyle("A1")->getFont()->setSize(16);
+		$objPHPExcel->getActiveSheet()->getStyle("F4")->getFont()->setSize(14);
+		$objPHPExcel->getActiveSheet()->getStyle("F4")->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->setCellValue("A4", "Nama Sales :");
+		$objPHPExcel->getActiveSheet()->setCellValue("F4", date("M") . " - " . date("Y"));
+		$objPHPExcel->getActiveSheet()->mergeCells("A4:B4");
+		$rowExcel = 6;
 		$col = 0;
 		//set color
 		//$objPHPExcel->getFont()->setColor( new PHPExcel_Style_Color( PHPExcel_Style_Color::COLOR_DARKGREEN ) );
 		$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "No");
 		$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, "No Nota");
-		$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, "Tanggal");
-		$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, "Nama Sales");
-		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Nama Pelanggan");
-		$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, "Ongkos Kirim");
-		$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, "Sub Total");
-		$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, "Total");
-		$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, "Keterangan");
+		$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, "Tanggal");		
+		$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, "Nama Pelanggan");		
+		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Sub Total");
+		$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, "Jumlah Komisi");
 		$rowExcel++;
 		
 		mysql_query("SET @row:=0;", $dbh);
@@ -151,7 +160,8 @@
 						ON SRD.SaleReturnID = SR.SaleReturnID
 				WHERE
 					CAST(SR.TransactionDate AS DATE) >= '".$txtFromDate."'
-					AND CAST(SR.TransactionDate AS DATE) <= '".$txtToDate."'					
+					AND CAST(SR.TransactionDate AS DATE) <= '".$txtToDate."'
+					AND SR.IsCancelled = 0
 					AND CASE
 							WHEN ".$CustomerID." = 0
 							THEN MC.CustomerID
@@ -176,32 +186,30 @@
 		$RowNumber = 1;
 		$Stock = 0;
 		while($row = mysql_fetch_array($result)) {
+			$SalesName = $row['SalesName'];
 			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $RowNumber);
 			$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['OutgoingNumber']);
 			$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['TransactionDate']);
-			$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row['SalesName']);
-			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, $row['CustomerName']);
-			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['DeliveryCost']);
-			$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, $row['SubTotal']);
-			$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, $row['Total']);
-			$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, $row['Remarks']);
+			$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row['CustomerName']);
+			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, $row['SubTotal']);
 			$RowNumber++;
 			$rowExcel++;
 		}
-		$objPHPExcel->getActiveSheet()->getStyle("F5:H".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-		$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, "=SUM(H5:H".($rowExcel-1).")");
+		$objPHPExcel->getActiveSheet()->setCellValue("C4", $SalesName);
+		$objPHPExcel->getActiveSheet()->getStyle("E6:F".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "=SUM(E6:E".($rowExcel-1).")");
 		$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Grand Total");
-		$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":G".$rowExcel);
+		$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":D".$rowExcel);
 		$rowExcel++;
 		//merge title
-		$objPHPExcel->getActiveSheet()->mergeCells("A1:I2");
-		$objPHPExcel->getActiveSheet()->getStyle("A4:I4")->getFont()->setBold(true);
-		$objPHPExcel->getActiveSheet()->getStyle("A1:I2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-		$objPHPExcel->getActiveSheet()->getStyle("A4:I4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('c4bd97');
+		$objPHPExcel->getActiveSheet()->mergeCells("A1:F2");
+		$objPHPExcel->getActiveSheet()->getStyle("A4:F4")->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle("A1:F2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$objPHPExcel->getActiveSheet()->getStyle("A6:F6")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');
 
 		//set all width 
 		$fromCol='A';
-		$toCol= 'J';
+		$toCol= 'G';
 		for($j = $fromCol; $j !== $toCol; $j++) {
 			//$calculatedWidth = $objPHPExcel->getActiveSheet()->getColumnDimension($i)->getWidth();
 			$objPHPExcel->getActiveSheet()->getColumnDimension($j)->setAutoSize(true);
@@ -213,9 +221,9 @@
 			  )
 			)
 		);		
-		$objPHPExcel->getActiveSheet()->getStyle("A4:I".($rowExcel-1))->applyFromArray($styleArray);		
+		$objPHPExcel->getActiveSheet()->getStyle("A6:F".($rowExcel-1))->applyFromArray($styleArray);		
 
-		$title = "Laporan Penjualan $FromDate - $ToDate";
+		$title = "Laporan Penjualan Sales $FromDate - $ToDate";
 		// Rename worksheet
 		//$objPHPExcel->getActiveSheet()->setTitle($title);
 		// Set active sheet index to the first sheet, so Excel opens this as the first sheet

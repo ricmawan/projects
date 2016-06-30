@@ -1,12 +1,12 @@
 <?php
-	if(ISSET($_GET['CustomerID'])) {
+	if(ISSET($_GET['SupplierID'])) {
 		header('Content-Type: application/json');
 		$RequestPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestPath);
 		$RequestPath = str_replace($file, "", $RequestPath);
 		include "../../GetPermission.php";
 		date_default_timezone_set("Asia/Jakarta");
-		$CustomerID = mysql_real_escape_string($_GET['CustomerID']);
+		$SupplierID = mysql_real_escape_string($_GET['SupplierID']);
 		if($_GET['txtFromDate'] == "") {
 			$txtFromDate = "2000-01-01";
 		}
@@ -38,7 +38,7 @@
 			$order_by = "";
 			foreach($_REQUEST['sort'] as $key => $value) {
 				if($key != 'No') $order_by .= " $key $value";
-				else $order_by = "DATE_FORMAT(TO.TransactionDate, '%d-%m-%Y') ASC";
+				else $order_by = "DATE_FORMAT(TI.TransactionDate, '%d-%m-%Y') ASC";
 			}
 		}
 		//Handles search querystring sent from Bootgrid
@@ -56,80 +56,50 @@
 			$limit_l = ($current * $rows) - ($rows);
 			$limit_h = $rows ;
 		}
+		mysql_query("SET @row:=0;", $dbh);
 		$sql = "SELECT
-					OT.OutgoingNumber,
-					DATE_FORMAT(OT.TransactionDate, '%d/%c/%y') AS TransactionDate,
-					OT.TransactionDate DateNoFormat,
-					OT.DeliveryCost,
-					IFNULL(SUM(CASE
-						WHEN TOD.IsPercentage = 1
-						THEN TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))
-						ELSE TOD.Quantity * (TOD.SalePrice - TOD.Discount)
-					END), 0) AS SubTotal,
-					IFNULL(SUM(CASE
-						WHEN TOD.IsPercentage = 1
-						THEN TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))
-						ELSE TOD.Quantity * (TOD.SalePrice - TOD.Discount)
-					END), 0) + OT.DeliveryCost AS Total,
-					OT.Remarks
+					BR.BuyReturnNumber,
+					DATE_FORMAT(BR.TransactionDate, '%d/%c/%y') AS TransactionDate,
+					BR.TransactionDate DateNoFormat,
+					CONCAT(MB.BrandName, ' ', MT.TypeName) ItemName,
+					BRD.BatchNumber,
+					BRD.Quantity,
+					BRD.BuyPrice,
+					CASE
+						WHEN BRD.IsPercentage = 1
+						THEN (BRD.BuyPrice * BRD.Discount)/100
+						ELSE BRD.Discount
+					END DiscountAmount,
+					CASE
+						WHEN BRD.IsPercentage = 1 AND BRD.Discount <> 0
+						THEN CONCAT('(', BRD.Discount, '%)')
+						ELSE ''
+					END Discount,
+					IFNULL(CASE
+								WHEN BRD.IsPercentage = 1
+								THEN BRD.Quantity * (BRD.BuyPrice - ((BRD.BuyPrice * BRD.Discount)/100))
+								ELSE BRD.Quantity * (BRD.BuyPrice - BRD.Discount)
+							END, 0) AS Total,
+					BR.Remarks
 				FROM
-					transaction_outgoing OT
-					JOIN master_sales MS
-						ON MS.SalesID = OT.SalesID
-					JOIN master_customer MC
-						ON MC.CustomerID = OT.CustomerID
-					LEFT JOIN transaction_outgoingdetails TOD
-						ON TOD.OutgoingID = OT.OutgoingID
+					transaction_buyreturn BR
+					JOIN master_supplier MS
+						ON MS.SupplierID = BR.SupplierID
+					JOIN transaction_buyreturndetails BRD
+						ON BR.BuyReturnID = BRD.BuyReturnID
+					JOIN master_type MT
+						ON MT.TypeID = BRD.TypeID
+					JOIN master_brand MB
+						ON MB.BrandID = MT.BrandID
 				WHERE
-					CAST(OT.TransactionDate AS DATE) >= '".$txtFromDate."'
-					AND CAST(OT.TransactionDate AS DATE) <= '".$txtToDate."'
-					AND OT.IsCancelled = 0
+					CAST(BR.TransactionDate AS DATE) >= '".$txtFromDate."'
+					AND CAST(BR.TransactionDate AS DATE) <= '".$txtToDate."'
+					AND BR.IsCancelled = 0
 					AND CASE
-							WHEN ".$CustomerID." = 0
-							THEN MC.CustomerID
-							ELSE ".$CustomerID."
-						END = MC.CustomerID
-				GROUP BY
-					OT.OutgoingNumber,
-					OT.TransactionDate,
-					MS.SalesName,
-					MC.CustomerName
-				UNION
-				SELECT
-					SR.SaleReturnNumber,
-					DATE_FORMAT(SR.TransactionDate, '%d/%c/%y') AS TransactionDate,
-					SR.TransactionDate DateNoFormat,
-					0,
-					-IFNULL(SUM(CASE
-						WHEN SRD.IsPercentage = 1
-						THEN SRD.Quantity * (SRD.SalePrice - ((SRD.SalePrice * SRD.Discount)/100))
-						ELSE SRD.Quantity * (SRD.SalePrice - SRD.Discount)
-					END), 0) AS SubTotal,
-					-IFNULL(SUM(CASE
-						WHEN SRD.IsPercentage = 1
-						THEN SRD.Quantity * (SRD.SalePrice - ((SRD.SalePrice * SRD.Discount)/100))
-						ELSE SRD.Quantity * (SRD.SalePrice - SRD.Discount)
-					END), 0) AS Total,
-					SR.Remarks
-				FROM
-					transaction_salereturn SR
-					JOIN master_customer MC
-						ON MC.CustomerID = SR.CustomerID
-					LEFT JOIN transaction_salereturndetails SRD
-						ON SRD.SaleReturnID = SR.SaleReturnID
-				WHERE
-					CAST(SR.TransactionDate AS DATE) >= '".$txtFromDate."'
-					AND CAST(SR.TransactionDate AS DATE) <= '".$txtToDate."'
-					AND SR.IsCancelled = 0
-					AND CASE
-							WHEN ".$CustomerID." = 0
-							THEN MC.CustomerID
-							ELSE ".$CustomerID."
-						END = MC.CustomerID
-				GROUP BY
-					SR.SaleReturnNumber,
-					SR.TransactionDate,
-					MC.CustomerName
+							WHEN ".$SupplierID." = 0
+							THEN MS.SupplierID
+							ELSE ".$SupplierID."
+						END = MS.SupplierID
 				ORDER BY	
 					DateNoFormat ASC";
 		
@@ -146,12 +116,14 @@
 		while ($row = mysql_fetch_array($result)) {
 			$RowNumber++;
 			$row_array['RowNumber'] = $RowNumber;
-			$row_array['OutgoingNumber']= $row['OutgoingNumber'];
+			$row_array['BuyReturnNumber']= $row['BuyReturnNumber'];
 			$row_array['TransactionDate'] = $row['TransactionDate'];
-			$row_array['DeliveryCost'] = number_format($row['DeliveryCost'],2,".",",");
-			$row_array['SubTotal'] = number_format($row['SubTotal'],2,".",",");
+			$row_array['Quantity'] = $row['Quantity'];
+			$row_array['ItemName'] = $row['ItemName'];
+			$row_array['BatchNumber'] = $row['BatchNumber'];
+			$row_array['BuyPrice'] = number_format($row['BuyPrice'],2,".",",");
+			$row_array['Discount'] = number_format($row['DiscountAmount'],2,".",",").$row['Discount'];
 			$row_array['Total'] = number_format($row['Total'],2,".",",");
-			$row_array['Remarks'] = $row['Remarks'];
 			$GrandTotal += $row['Total'];
 			array_push($return_arr, $row_array);
 		}

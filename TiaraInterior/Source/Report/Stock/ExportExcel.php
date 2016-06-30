@@ -55,13 +55,22 @@
 		//Header
 		$objPHPExcel->setActiveSheetIndex(0)
 					->setCellValue('A1', "LAPORAN STOK");
+					
+		//set margin
+		$objPHPExcel->getActiveSheet()->getPageMargins()->setTop(2);
+		$objPHPExcel->getActiveSheet()->getPageMargins()->setRight(2);
+		$objPHPExcel->getActiveSheet()->getPageMargins()->setLeft(1);
+		$objPHPExcel->getActiveSheet()->getPageMargins()->setBottom(2);
 		
 		$objPHPExcel->getActiveSheet()->getStyle('A1')->getAlignment()->setWrapText(true);
 		
 		//set bold
 		$objPHPExcel->getActiveSheet()->getStyle("A1:A2")->getFont()->setBold(true);
-		
-		$rowExcel = 4;
+		$objPHPExcel->getActiveSheet()->getStyle("A1")->getFont()->setSize(16);
+		$objPHPExcel->getActiveSheet()->getStyle("I4")->getFont()->setSize(14);
+		$objPHPExcel->getActiveSheet()->getStyle("I4")->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->setCellValue("I4", date("M") . " - " . date("Y"));
+		$rowExcel = 6;
 		$col = 0;
 		//set color
 		//$objPHPExcel->getFont()->setColor( new PHPExcel_Style_Color( PHPExcel_Style_Color::COLOR_DARKGREEN ) );
@@ -125,6 +134,7 @@
 							WHERE
 								CAST(TI.TransactionDate AS DATE) < '".$txtFromDate."'
 								AND TID.TypeID = ".$TypeID."
+								AND TI.IsCancelled = 0
 							GROUP BY
 								TypeID,
 								BatchNumber
@@ -167,6 +177,7 @@
 						WHERE
 							CAST(BR.TransactionDate AS DATE) < '".$txtFromDate."'
 							AND BRD.TypeID = ".$TypeID."
+							AND BR.IsCancelled = 0
 						GROUP BY
 							TypeID,
 							BatchNumber
@@ -186,6 +197,7 @@
 						WHERE
 							CAST(SR.TransactionDate AS DATE) < '".$txtFromDate."'
 							AND SRD.TypeID = ".$TypeID."
+							AND SR.IsCancelled = 0
 						GROUP BY
 							TypeID,
 							BatchNumber
@@ -510,6 +522,108 @@
 							THEN MT.TypeID
 							ELSE ".$TypeID."
 						END = MT.TypeID
+				UNION ALL
+				SELECT
+					'Pembatalan',
+					TI.IncomingNumber,
+					DATE_FORMAT(TI.TransactionDate, '%d/%c%/%y') AS TransactionDate,
+					TI.TransactionDate DateNoFormat,
+					MS.SupplierName,
+					TID.BatchNumber,
+					-TID.Quantity,
+					TI.Remarks
+				FROM
+					transaction_incoming TI
+					JOIN master_supplier MS
+						ON MS.SupplierID = TI.SupplierID
+					LEFT JOIN transaction_incomingdetails TID
+						ON TI.IncomingID = TID.IncomingID
+					LEFT JOIN master_type MT
+						ON MT.TypeID = TID.TypeID
+					LEFT JOIN master_brand MB
+						ON MB.BrandID = MT.BrandID
+				WHERE
+					CAST(TI.TransactionDate AS DATE) >= '".$txtFromDate."'
+					AND CAST(TI.TransactionDate AS DATE) <= '".$txtToDate."'
+					AND TI.IsCancelled = 1
+					AND CASE
+							WHEN ".$BrandID." = 0
+							THEN MB.BrandID
+							ELSE ".$BrandID."
+						END = MB.BrandID
+					AND CASE
+							WHEN ".$TypeID." = 0
+							THEN MT.TypeID
+							ELSE ".$TypeID."
+						END = MT.TypeID
+				UNION ALL
+				SELECT
+					'Pembatalan',
+					SR.SaleReturnNumber,
+					DATE_FORMAT(SR.TransactionDate, '%d/%c%/%y') AS TransactionDate,
+					SR.TransactionDate DateNoFormat,
+					MC.CustomerName,
+					SRD.BatchNumber,
+					-SRD.Quantity,
+					SR.Remarks
+				FROM
+					transaction_salereturn SR
+					JOIN master_customer MC
+						ON MC.CustomerID = SR.CustomerID
+					LEFT JOIN transaction_salereturndetails SRD
+						ON SRD.SaleReturnID = SR.SaleReturnID
+					LEFT JOIN master_type MT
+						ON MT.TypeID = SRD.TypeID
+					LEFT JOIN master_brand MB
+						ON MB.BrandID = MT.BrandID
+				WHERE
+					CAST(SR.TransactionDate AS DATE) >= '".$txtFromDate."'
+					AND CAST(SR.TransactionDate AS DATE) <= '".$txtToDate."'
+					AND SR.IsCancelled = 1
+					AND CASE
+							WHEN ".$BrandID." = 0
+							THEN MB.BrandID
+							ELSE ".$BrandID."
+						END = MB.BrandID
+					AND CASE
+							WHEN ".$TypeID." = 0
+							THEN MT.TypeID
+							ELSE ".$TypeID."
+						END = MT.TypeID
+				UNION ALL
+				SELECT
+					'Pembatalan',
+					BR.BuyReturnNumber,
+					DATE_FORMAT(BR.TransactionDate, '%d/%c%/%y') AS TransactionDate,
+					BR.TransactionDate DateNoFormat,
+					MS.SupplierName,
+					BRD.BatchNumber,
+					BRD.Quantity,
+					BR.Remarks
+				FROM
+					transaction_buyreturn BR
+					JOIN master_supplier MS
+						ON MS.SupplierID = BR.SupplierID
+					LEFT JOIN transaction_buyreturndetails BRD
+						ON BRD.BuyReturnID = BR.BuyReturnID
+					LEFT JOIN master_type MT
+						ON MT.TypeID = BRD.TypeID
+					LEFT JOIN master_brand MB
+						ON MB.BrandID = MT.BrandID
+				WHERE
+					CAST(BR.TransactionDate AS DATE) >= '".$txtFromDate."'
+					AND CAST(BR.TransactionDate AS DATE) <= '".$txtToDate."'
+					AND BR.IsCancelled = 1
+					AND CASE
+							WHEN ".$BrandID." = 0
+							THEN MB.BrandID
+							ELSE ".$BrandID."
+						END = MB.BrandID
+					AND CASE
+							WHEN ".$TypeID." = 0
+							THEN MT.TypeID
+							ELSE ".$TypeID."
+						END = MT.TypeID
 				ORDER BY	
 					BatchNumber,DateNoFormat ASC";
 					
@@ -536,14 +650,16 @@
 			$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, $row['Quantity']);
 			$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, $Stock);
 			$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, $row['Remarks']);
+			$BatchNumber = $row['BatchNumber'];
 			$RowNumber++;
 			$rowExcel++;
 		}
 		//merge title
 		$objPHPExcel->getActiveSheet()->mergeCells("A1:I2");
-		$objPHPExcel->getActiveSheet()->getStyle("A4:I4")->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle("A6:I6")->getFont()->setBold(true);
 		$objPHPExcel->getActiveSheet()->getStyle("A1:I2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-		$objPHPExcel->getActiveSheet()->getStyle("A4:I4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('c4bd97');
+		$objPHPExcel->getActiveSheet()->getStyle("B6:B".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+		$objPHPExcel->getActiveSheet()->getStyle("A6:I6")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');
 
 		//set all width 
 		$fromCol='A';
@@ -559,7 +675,7 @@
 			  )
 			)
 		);		
-		$objPHPExcel->getActiveSheet()->getStyle("A4:I".($rowExcel-1))->applyFromArray($styleArray);		
+		$objPHPExcel->getActiveSheet()->getStyle("A6:I".($rowExcel-1))->applyFromArray($styleArray);		
 
 		$title = "Laporan Stok $FromDate - $ToDate";
 		// Rename worksheet

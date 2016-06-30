@@ -1,18 +1,17 @@
-@C!                                                                                                                         Tgl : 15-04-2016
-   Retur Dari   Slamet
-                Semarang
+@C!                                                                                                                         Tgl : 25-06-2016
+   Retur Dari   PESONA INDAH
+                SEMARANG
                            EW14RETUR JUAL
-5W0F   Kami terima retur barang-barang sbb :                                                                                No : RJ-150416002
+5W0F   Kami terima retur barang-barang sbb :                                                                                No : RJ-250616003
 _________________________________________________________________________________________________________________________________________
 |      Qty      |                Nama Barang                 |     Lot    |    Harga Satuan   |       Diskon      |        Total        |
 _________________________________________________________________________________________________________________________________________
-|      1 m      | MAESTRO 003                                |        123 |         36,000.00 |     3,600.00(10%) |           32,400.00 |
-|      1 m      | MAESTRO 003                                |        124 |         36,000.00 |          1,000.00 |           35,000.00 |
+|      2 Roll   | BELLAGIO BLB 364                           |        550 |        230,000.00 |    80,500.00(35%) |          299,000.00 |
 _________________________________________________________________________________________________________________________________________
-   Catatan   :                                                                            Jml Retur             Rp.           67,400.00
-   Terbilang : ENAM PULUH TUJUH RIBU EMPAT RATUS RUPIAH
+   Catatan   :                                                                            Jml Retur             Rp.          299,000.00
+   Terbilang : DUA RATUS SEMBILAN PULUH SEMBILAN RIBU RUPIAH
 _________________________________________________________________________________________________________________________________________
    Penerima,                                                  Checker,                                                  Hormat Kami,
 
 
-                                                                                                                            Admin
+                                                                                                                             mil

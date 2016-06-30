@@ -1,20 +1,21 @@
 @C!
-                                                                            Kepada Yth.  Slamet
-   Tgl : 11-05-2016                                                                      Semarang
-   Sales           : IBBD                           EW1INVOICEW0F
-   Tgl Jatuh Tempo : 11-05-2016
-   Kami kirim pesanan anda dalam keadaan baik, barang-barang sbb:                                                       No : TJ-110516001
+                                                                            Kepada Yth.  7 PILAR ABADI WALLDESIGN
+   Tgl : 25-06-2016                                                                      MALANG
+   Sales           : MRC                            EW1INVOICEW0F
+   Tgl Jatuh Tempo : 25-06-2016
+   Kami kirim pesanan anda dalam keadaan baik, barang-barang sbb:                                                       No : TJ-250616033
 -----------------------------------------------------------------------------------------------------------------------------------------
 |      Qty      |                Nama Barang                 |     Lot    |    Harga Satuan   |       Diskon      |        Total        |
 -----------------------------------------------------------------------------------------------------------------------------------------
-|     10 m      | MAESTRO 003                                |        123 |         35,000.00 |              0.00 |          350,000.00 |
+|      3 Roll   | ROCK DV 1466                               |      A0001 |        185,000.00 |    64,750.00(35%) |          360,750.00 |
+|     50 pcs    | LEM GREATWALL                              |          0 |         17,000.00 |              0.00 |          850,000.00 |
 |---------------------------------------------------------------------------------------------------------------------------------------|
-   Catatan   :                                                                            Jml Pembelian         Rp.          350,000.00
-   Kredit    : Rp. 350,000.00
-   Terbilang : TIGA RATUS LIMA PULUH RIBU RUPIAH
+   Catatan   :                                                                            Jml Pembelian         Rp.        1,210,750.00
+   Kredit    : Rp. 1,210,750.00
+   Terbilang : SATU JUTA DUA RATUS SEPULUH RIBU TUJUH RATUS LIMA PULUH RUPIAH
 _________________________________________________________________________________________________________________________________________
    Penerima,                                                  Checker,                                                  Hormat Kami,
 
 
-                                                                                                                            Admin
+                                                                                                                             mil
 EBarang yang sudah dibeli tidak dapat ditukar/dikembalikan

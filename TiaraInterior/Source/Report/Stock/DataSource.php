@@ -108,6 +108,7 @@
 							WHERE
 								CAST(TI.TransactionDate AS DATE) < '".$txtFromDate."'
 								AND TID.TypeID = ".$TypeID."
+								AND TI.IsCancelled = 0
 							GROUP BY
 								TypeID,
 								BatchNumber
@@ -150,6 +151,7 @@
 						WHERE
 							CAST(BR.TransactionDate AS DATE) < '".$txtFromDate."'
 							AND BRD.TypeID = ".$TypeID."
+							AND BR.IsCancelled = 0
 						GROUP BY
 							TypeID,
 							BatchNumber
@@ -169,6 +171,7 @@
 						WHERE
 							CAST(SR.TransactionDate AS DATE) < '".$txtFromDate."'
 							AND SRD.TypeID = ".$TypeID."
+							AND SR.IsCancelled = 0
 						GROUP BY
 							TypeID,
 							BatchNumber
@@ -461,8 +464,8 @@
 				SELECT
 					'Pembatalan',
 					OT.OutgoingNumber,
-					DATE_FORMAT(OT.TransactionDate, '%d/%c%/%y') AS TransactionDate,
-					OT.TransactionDate DateNoFormat,
+					DATE_FORMAT(OT.ModifiedDate, '%d/%c%/%y') AS TransactionDate,
+					OT.ModifiedDate DateNoFormat,
 					MC.CustomerName,
 					TOD.BatchNumber,
 					TOD.Quantity,
@@ -480,9 +483,111 @@
 					LEFT JOIN master_brand MB
 						ON MB.BrandID = MT.BrandID
 				WHERE
-					CAST(OT.TransactionDate AS DATE) >= '".$txtFromDate."'
-					AND CAST(OT.TransactionDate AS DATE) <= '".$txtToDate."'
+					CAST(OT.ModifiedDate AS DATE) >= '".$txtFromDate."'
+					AND CAST(OT.ModifiedDate AS DATE) <= '".$txtToDate."'
 					AND OT.IsCancelled = 1
+					AND CASE
+							WHEN ".$BrandID." = 0
+							THEN MB.BrandID
+							ELSE ".$BrandID."
+						END = MB.BrandID
+					AND CASE
+							WHEN ".$TypeID." = 0
+							THEN MT.TypeID
+							ELSE ".$TypeID."
+						END = MT.TypeID
+				UNION ALL
+				SELECT
+					'Pembatalan',
+					TI.IncomingNumber,
+					DATE_FORMAT(TI.ModifiedDate, '%d/%c%/%y') AS TransactionDate,
+					TI.ModifiedDate DateNoFormat,
+					MS.SupplierName,
+					TID.BatchNumber,
+					-TID.Quantity,
+					TI.Remarks
+				FROM
+					transaction_incoming TI
+					JOIN master_supplier MS
+						ON MS.SupplierID = TI.SupplierID
+					LEFT JOIN transaction_incomingdetails TID
+						ON TI.IncomingID = TID.IncomingID
+					LEFT JOIN master_type MT
+						ON MT.TypeID = TID.TypeID
+					LEFT JOIN master_brand MB
+						ON MB.BrandID = MT.BrandID
+				WHERE
+					CAST(TI.ModifiedDate AS DATE) >= '".$txtFromDate."'
+					AND CAST(TI.ModifiedDate AS DATE) <= '".$txtToDate."'
+					AND TI.IsCancelled = 1
+					AND CASE
+							WHEN ".$BrandID." = 0
+							THEN MB.BrandID
+							ELSE ".$BrandID."
+						END = MB.BrandID
+					AND CASE
+							WHEN ".$TypeID." = 0
+							THEN MT.TypeID
+							ELSE ".$TypeID."
+						END = MT.TypeID
+				UNION ALL
+				SELECT
+					'Pembatalan',
+					SR.SaleReturnNumber,
+					DATE_FORMAT(SR.ModifiedDate, '%d/%c%/%y') AS TransactionDate,
+					SR.ModifiedDate DateNoFormat,
+					MC.CustomerName,
+					SRD.BatchNumber,
+					-SRD.Quantity,
+					SR.Remarks
+				FROM
+					transaction_salereturn SR
+					JOIN master_customer MC
+						ON MC.CustomerID = SR.CustomerID
+					LEFT JOIN transaction_salereturndetails SRD
+						ON SRD.SaleReturnID = SR.SaleReturnID
+					LEFT JOIN master_type MT
+						ON MT.TypeID = SRD.TypeID
+					LEFT JOIN master_brand MB
+						ON MB.BrandID = MT.BrandID
+				WHERE
+					CAST(SR.ModifiedDate AS DATE) >= '".$txtFromDate."'
+					AND CAST(SR.ModifiedDate AS DATE) <= '".$txtToDate."'
+					AND SR.IsCancelled = 1
+					AND CASE
+							WHEN ".$BrandID." = 0
+							THEN MB.BrandID
+							ELSE ".$BrandID."
+						END = MB.BrandID
+					AND CASE
+							WHEN ".$TypeID." = 0
+							THEN MT.TypeID
+							ELSE ".$TypeID."
+						END = MT.TypeID
+				UNION ALL
+				SELECT
+					'Pembatalan',
+					BR.BuyReturnNumber,
+					DATE_FORMAT(BR.ModifiedDate, '%d/%c%/%y') AS TransactionDate,
+					BR.ModifiedDate DateNoFormat,
+					MS.SupplierName,
+					BRD.BatchNumber,
+					BRD.Quantity,
+					BR.Remarks
+				FROM
+					transaction_buyreturn BR
+					JOIN master_supplier MS
+						ON MS.SupplierID = BR.SupplierID
+					LEFT JOIN transaction_buyreturndetails BRD
+						ON BRD.BuyReturnID = BR.BuyReturnID
+					LEFT JOIN master_type MT
+						ON MT.TypeID = BRD.TypeID
+					LEFT JOIN master_brand MB
+						ON MB.BrandID = MT.BrandID
+				WHERE
+					CAST(BR.ModifiedDate AS DATE) >= '".$txtFromDate."'
+					AND CAST(BR.ModifiedDate AS DATE) <= '".$txtToDate."'
+					AND BR.IsCancelled = 1
 					AND CASE
 							WHEN ".$BrandID." = 0
 							THEN MB.BrandID

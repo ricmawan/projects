@@ -55,12 +55,23 @@
 		$objPHPExcel->setActiveSheetIndex(0)
 					->setCellValue('A1', "LAPORAN PENJUALAN");
 		
+		//set margin
+		$objPHPExcel->getActiveSheet()->getPageMargins()->setTop(2);
+		$objPHPExcel->getActiveSheet()->getPageMargins()->setRight(2);
+		$objPHPExcel->getActiveSheet()->getPageMargins()->setLeft(1);
+		$objPHPExcel->getActiveSheet()->getPageMargins()->setBottom(2);
+		
 		$objPHPExcel->getActiveSheet()->getStyle('A1')->getAlignment()->setWrapText(true);
 		
 		//set bold
 		$objPHPExcel->getActiveSheet()->getStyle("A1:A2")->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle("A4:C5")->getFont()->setSize(14);
+		$objPHPExcel->getActiveSheet()->getStyle("A1")->getFont()->setSize(16);
+		$objPHPExcel->getActiveSheet()->getStyle("G4")->getFont()->setSize(14);
+		$objPHPExcel->getActiveSheet()->getStyle("G4")->getFont()->setBold(true);
 	
 		$objPHPExcel->getActiveSheet()->setCellValue("A4", "Nama Pelanggan :");
+		$objPHPExcel->getActiveSheet()->setCellValue("G4", date("M") . " - " . date("Y"));
 		$objPHPExcel->getActiveSheet()->mergeCells("A4:B4");
 		$objPHPExcel->getActiveSheet()->setCellValue("A5", "Kota :");
 		$objPHPExcel->getActiveSheet()->mergeCells("A5:B5");
@@ -140,7 +151,8 @@
 						ON SRD.SaleReturnID = SR.SaleReturnID
 				WHERE
 					CAST(SR.TransactionDate AS DATE) >= '".$txtFromDate."'
-					AND CAST(SR.TransactionDate AS DATE) <= '".$txtToDate."'					
+					AND CAST(SR.TransactionDate AS DATE) <= '".$txtToDate."'
+					AND SR.IsCancelled = 0
 					AND ".$CustomerID." = MC.CustomerID
 				GROUP BY
 					SR.SaleReturnNumber,
@@ -183,15 +195,18 @@
 		$objPHPExcel->getActiveSheet()->getStyle("A7:G7")->getFont()->setBold(true);
 		$objPHPExcel->getActiveSheet()->getStyle("A4:B5")->getFont()->setBold(true);
 		$objPHPExcel->getActiveSheet()->getStyle("A1:G2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-		$objPHPExcel->getActiveSheet()->getStyle("A7:G7")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('c4bd97');
+		$objPHPExcel->getActiveSheet()->getStyle("A7:G7")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');
 
 		//set all width 
 		$fromCol='A';
-		$toCol= 'G';
+		$toCol= 'H';
 		for($j = $fromCol; $j !== $toCol; $j++) {
 			//$calculatedWidth = $objPHPExcel->getActiveSheet()->getColumnDimension($i)->getWidth();
 			$objPHPExcel->getActiveSheet()->getColumnDimension($j)->setAutoSize(true);
 		}
+		$objPHPExcel->getActiveSheet()->getColumnDimension('B')->setAutoSize(false);
+		$objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(20);
+		
 		$styleArray = array(
 			'borders' => array(
 			  'allborders' => array(

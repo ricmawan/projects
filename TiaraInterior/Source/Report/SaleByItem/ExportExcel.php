@@ -55,13 +55,22 @@
 		//Header
 		$objPHPExcel->setActiveSheetIndex(0)
 					->setCellValue('A1', "LAPORAN PENJUALAN PER BARANG");
+					
+		//set margin
+		$objPHPExcel->getActiveSheet()->getPageMargins()->setTop(2);
+		$objPHPExcel->getActiveSheet()->getPageMargins()->setRight(2);
+		$objPHPExcel->getActiveSheet()->getPageMargins()->setLeft(1);
+		$objPHPExcel->getActiveSheet()->getPageMargins()->setBottom(2);
 		
 		$objPHPExcel->getActiveSheet()->getStyle('A1')->getAlignment()->setWrapText(true);
 		
 		//set bold
 		$objPHPExcel->getActiveSheet()->getStyle("A1:A2")->getFont()->setBold(true);
-		
-		$rowExcel = 4;
+		$objPHPExcel->getActiveSheet()->getStyle("A1")->getFont()->setSize(16);
+		$objPHPExcel->getActiveSheet()->getStyle("M4")->getFont()->setSize(14);
+		$objPHPExcel->getActiveSheet()->getStyle("M4")->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->setCellValue("M4", date("M") . " - " . date("Y"));
+		$rowExcel = 6;
 		$col = 0;
 		//set color
 		//$objPHPExcel->getFont()->setColor( new PHPExcel_Style_Color( PHPExcel_Style_Color::COLOR_DARKGREEN ) );
@@ -212,18 +221,19 @@
 			$RowNumber++;
 			$rowExcel++;
 		}
-		$objPHPExcel->getActiveSheet()->getStyle("J5:J".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-		$objPHPExcel->getActiveSheet()->getStyle("K5:K".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
-		$objPHPExcel->getActiveSheet()->getStyle("L5:L".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-		$objPHPExcel->getActiveSheet()->setCellValue("L".$rowExcel, "=SUM(L5:L".($rowExcel-1).")");
+		$objPHPExcel->getActiveSheet()->getStyle("J7:J".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+		$objPHPExcel->getActiveSheet()->getStyle("K7:K".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
+		$objPHPExcel->getActiveSheet()->getStyle("H7:H".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+		$objPHPExcel->getActiveSheet()->getStyle("L7:L".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+		$objPHPExcel->getActiveSheet()->setCellValue("L".$rowExcel, "=SUM(L7:L".($rowExcel-1).")");
 		$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Grand Total");
 		$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":K".$rowExcel);
 		$rowExcel++;
 		//merge title
 		$objPHPExcel->getActiveSheet()->mergeCells("A1:M2");
-		$objPHPExcel->getActiveSheet()->getStyle("A4:M4")->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle("A6:M6")->getFont()->setBold(true);
 		$objPHPExcel->getActiveSheet()->getStyle("A1:M2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-		$objPHPExcel->getActiveSheet()->getStyle("A4:M4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('c4bd97');
+		$objPHPExcel->getActiveSheet()->getStyle("A6:M6")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');
 
 		//set all width 
 		$fromCol='A';
@@ -239,7 +249,7 @@
 			  )
 			)
 		);		
-		$objPHPExcel->getActiveSheet()->getStyle("A4:M".($rowExcel-1))->applyFromArray($styleArray);		
+		$objPHPExcel->getActiveSheet()->getStyle("A6:M".($rowExcel-1))->applyFromArray($styleArray);		
 
 		$title = "Laporan Penjualan Per Barang $FromDate - $ToDate";
 		// Rename worksheet

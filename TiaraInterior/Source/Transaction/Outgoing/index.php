@@ -19,7 +19,7 @@
 					</div>
 					<div class="panel-body">
 						<div class="table-responsive">
-						<input id="hdnEditFlag" name="hdnEditFlag" type="hidden" <?php echo 'value='.$EditFlag; ?> />
+							<input id="hdnEditFlag" name="hdnEditFlag" type="hidden" <?php echo 'value='.$EditFlag; ?> />
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>

@@ -15,7 +15,7 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						 <h5>Rinci Penjualan</h5>
+						 <h5>Retur Jual</h5>
 					</div>
 					<div class="panel-body">
 						<div class="row">
@@ -74,14 +74,14 @@
 								<thead>				
 									<tr>
 										<th data-column-id="RowNumber" data-sortable="false" data-type="numeric" >No</th>
-										<th data-column-id="OutgoingNumber" data-sortable="false" data-type="numeric" >No Nota</th>
+										<th data-column-id="SaleReturnNumber" data-sortable="false" data-type="numeric" >No Nota</th>
 										<th data-column-id="TransactionDate" >Tanggal</th>
-										<th data-column-id="ItemName" >Barang</th>
-										<th data-column-id="Quantity" data-align="right">Qty</th>
+										<th data-column-id="Quantity" data-align="right">Jumlah</th>
+										<th data-column-id="ItemName">Barang</th>
+										<th data-column-id="BatchNumber">Batch</th>
 										<th data-column-id="SalePrice" data-align="right">Harga</th>
 										<th data-column-id="Discount" data-align="right">Diskon</th>
 										<th data-column-id="Total" data-align="right">Total</th>
-										<th data-column-id="Remarks" >Keterangan</th>
 									</tr>
 								</thead>
 							</table>
@@ -159,7 +159,7 @@
 							$(".grandtotal").html(response.GrandTotal);
 							return response;
 						},
-						url: "Report/SaleDetails/DataSource.php?CustomerID=" + CustomerID + "&txtFromDate=" + txtFromDate + "&txtToDate=" + txtToDate,
+						url: "Report/SaleReturn/DataSource.php?CustomerID=" + CustomerID + "&txtFromDate=" + txtFromDate + "&txtToDate=" + txtToDate,
 						selection: true,
 						multiSelect: true,
 						rowSelect: true,
@@ -203,7 +203,7 @@
 				}
 				else {
 					$("#loading").show();
-					$("#excelDownload").attr("src", "Report/SaleDetails/ExportExcel.php?CustomerID=" + CustomerID + "&txtFromDate=" + txtFromDate + "&txtToDate=" + txtToDate);
+					$("#excelDownload").attr("src", "Report/SaleReturn/ExportExcel.php?CustomerID=" + CustomerID + "&txtFromDate=" + txtFromDate + "&txtToDate=" + txtToDate);
 					$("#loading").hide();
 				}
 			}

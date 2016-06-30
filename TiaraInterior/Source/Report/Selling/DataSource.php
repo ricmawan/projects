@@ -137,6 +137,7 @@
 							THEN MC.CustomerID
 							ELSE ".$CustomerID."
 						END = MC.CustomerID
+					AND SR.IsCancelled = 0
 					AND CASE
 							WHEN ".$SalesID." = 0
 							THEN MS.SalesID

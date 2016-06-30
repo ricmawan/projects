@@ -247,6 +247,24 @@ VALUES
 	NULL,
 	1,
 	6
+),
+(
+	26,
+	4,
+	'Retur Jual',
+	'Report/SaleReturn/',
+	NULL,
+	1,
+	7
+),
+(
+	27,
+	4,
+	'Retur Beli',
+	'Report/BuyReturn/',
+	NULL,
+	1,
+	8
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

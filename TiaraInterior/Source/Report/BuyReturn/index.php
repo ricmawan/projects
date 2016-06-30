@@ -15,25 +15,25 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						 <h5>Rinci Penjualan</h5>
+						 <h5>Retur Beli</h5>
 					</div>
 					<div class="panel-body">
 						<div class="row">
 							<div class="col-md-1 labelColumn">
-								Pelanggan:
+								Supplier :
 							</div>
 							<div class="col-md-3">
 								<div class="ui-widget" style="width: 100%;">
-									<select name="ddlCustomer" id="ddlCustomer" class="form-control-custom" placeholder="Pilih Pelanggan" >
+									<select name="ddlSupplier" id="ddlSupplier" class="form-control-custom" placeholder="Pilih Supplier" >
 										<option value="" > </option>
 										<?php
-											$sql = "SELECT CustomerID, CustomerName, Address1 FROM master_customer ORDER BY CustomerName";
+											$sql = "SELECT SupplierID, SupplierName FROM master_supplier ORDER BY SupplierName";
 											if(!$result = mysql_query($sql, $dbh)) {
 												echo mysql_error();
 												return 0;
 											}
 											while($row = mysql_fetch_array($result)) {
-												echo "<option value='".$row['CustomerID']."' >".$row['CustomerName']." - ".$row['Address1']."</option>";
+												echo "<option value='".$row['SupplierID']."' >".$row['SupplierName']."</option>";
 											}
 										?>
 									</select>
@@ -74,14 +74,14 @@
 								<thead>				
 									<tr>
 										<th data-column-id="RowNumber" data-sortable="false" data-type="numeric" >No</th>
-										<th data-column-id="OutgoingNumber" data-sortable="false" data-type="numeric" >No Nota</th>
+										<th data-column-id="BuyReturnNumber" data-sortable="false" data-type="numeric" >No Nota</th>
 										<th data-column-id="TransactionDate" >Tanggal</th>
-										<th data-column-id="ItemName" >Barang</th>
-										<th data-column-id="Quantity" data-align="right">Qty</th>
-										<th data-column-id="SalePrice" data-align="right">Harga</th>
+										<th data-column-id="Quantity" data-align="right">Jumlah</th>
+										<th data-column-id="ItemName">Barang</th>
+										<th data-column-id="BatchNumber">Batch</th>
+										<th data-column-id="BuyPrice" data-align="right">Harga</th>
 										<th data-column-id="Discount" data-align="right">Diskon</th>
 										<th data-column-id="Total" data-align="right">Total</th>
-										<th data-column-id="Remarks" >Keterangan</th>
 									</tr>
 								</thead>
 							</table>
@@ -94,7 +94,7 @@
 		</div>
 		<script>			
 			function Preview() {
-				var CustomerID = $("#ddlCustomer").val();
+				var SupplierID = $("#ddlSupplier").val();
 				var txtFromDate = $("#txtFromDate").val();
 				var txtToDate = $("#txtToDate").val();
 				var PassValidate = 1;
@@ -113,18 +113,21 @@
 						}
 					}
 				}
-				if(CustomerID == 0) {
-					$("#ddlCustomer").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+				
+				if(SupplierID == "") {
+					$("#ddlSupplier").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 					PassValidate = 0;
-					if(FirstFocus == 0) $("#ddlCustomer").next().find("input").focus();
+					if(FirstFocus == 0) $("#ddlSupplier").next().find("input").focus();
 					FirstFocus = 1;
 				}
+				
 				if(PassValidate == 0) {
 					$("html, body").animate({
 						scrollTop: 0
 					}, "slow");
 					return false;
 				}
+				
 				else {
 					$("#loading").show();
 					$("#grid-data").bootgrid('destroy');
@@ -159,7 +162,7 @@
 							$(".grandtotal").html(response.GrandTotal);
 							return response;
 						},
-						url: "Report/SaleDetails/DataSource.php?CustomerID=" + CustomerID + "&txtFromDate=" + txtFromDate + "&txtToDate=" + txtToDate,
+						url: "Report/BuyReturn/DataSource.php?SupplierID=" + SupplierID + "&txtFromDate=" + txtFromDate + "&txtToDate=" + txtToDate,
 						selection: true,
 						multiSelect: true,
 						rowSelect: true,
@@ -170,7 +173,7 @@
 				}
 			}
 			function ExportExcel() {
-				var CustomerID = $("#ddlCustomer").val();
+				var SupplierID = $("#ddlSupplier").val();
 				var txtFromDate = $("#txtFromDate").val();
 				var txtToDate = $("#txtToDate").val();
 				var PassValidate = 1;
@@ -189,10 +192,10 @@
 						}
 					}
 				}
-				if(CustomerID == 0) {
-					$("#ddlCustomer").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+				if(SupplierID == "") {
+					$("#ddlSupplier").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 					PassValidate = 0;
-					if(FirstFocus == 0) $("#ddlCustomer").next().find("input").focus();
+					if(FirstFocus == 0) $("#ddlSupplier").next().find("input").focus();
 					FirstFocus = 1;
 				}
 				if(PassValidate == 0) {
@@ -203,13 +206,13 @@
 				}
 				else {
 					$("#loading").show();
-					$("#excelDownload").attr("src", "Report/SaleDetails/ExportExcel.php?CustomerID=" + CustomerID + "&txtFromDate=" + txtFromDate + "&txtToDate=" + txtToDate);
+					$("#excelDownload").attr("src", "Report/BuyReturn/ExportExcel.php?SupplierID=" + SupplierID + "&txtFromDate=" + txtFromDate + "&txtToDate=" + txtToDate);
 					$("#loading").hide();
 				}
 			}
 			$(document).ready(function () {
-				$("#ddlCustomer").combobox();
-				$("#ddlCustomer").next().find("input").click(function() {
+				$("#ddlSupplier").combobox();
+				$("#ddlSupplier").next().find("input").click(function() {
 					$(this).val("");
 				});
 			});

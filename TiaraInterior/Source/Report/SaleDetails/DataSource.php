@@ -106,7 +106,7 @@
 					DATE_FORMAT(SR.TransactionDate, '%d/%c/%y') AS TransactionDate,
 					SR.TransactionDate DateNoFormat,
 					CONCAT(MB.BrandName, ' ', MT.TypeName, ' - ', SRD.BatchNumber) ItemName,
-					SRD.Quantity,
+					-SRD.Quantity,
 					SRD.SalePrice,
 					CASE
 						WHEN SRD.IsPercentage = 1
@@ -136,7 +136,8 @@
 						ON MB.BrandID = MT.BrandID
 				WHERE
 					CAST(SR.TransactionDate AS DATE) >= '".$txtFromDate."'
-					AND CAST(SR.TransactionDate AS DATE) <= '".$txtToDate."'					
+					AND CAST(SR.TransactionDate AS DATE) <= '".$txtToDate."'
+					AND SR.IsCancelled = 0
 					AND CASE
 							WHEN ".$CustomerID." = 0
 							THEN MC.CustomerID

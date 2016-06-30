@@ -121,6 +121,8 @@ SET State = 3;
 						Discount
 					FROM
 						transaction_incomingdetails
+					WHERE
+						IsCancelled = 0
 					GROUP BY
 						TypeID,
 						BatchNumber
@@ -159,6 +161,8 @@ SET State = 3;
 					SUM(Quantity) Quantity
 				FROM
 					transaction_buyreturndetails
+				WHERE
+					IsCancelled = 0
 				GROUP BY
 					TypeID,
 					BatchNumber
@@ -173,6 +177,8 @@ SET State = 3;
 					SUM(Quantity) Quantity
 				FROM
 					transaction_salereturndetails
+				WHERE
+					IsCancelled = 0
 				GROUP BY
 					TypeID,
 					BatchNumber

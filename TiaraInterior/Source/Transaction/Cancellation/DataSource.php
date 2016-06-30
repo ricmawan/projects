@@ -24,7 +24,7 @@
 	if (ISSET($_REQUEST['searchPhrase']) )
 	{
 		$search = trim($_REQUEST['searchPhrase']);
-		$where .= " AND ( OT.OutgoingNumber LIKE '%".$search."%' OR OT.Remarks LIKE '%".$search."%' OR MC.CustomerName LIKE '%".$search."%' OR MS.SalesName LIKE '%".$search."%' OR DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' ) ";
+		$where .= " AND ( TI.IncomingNumber LIKE '%".$search."%' OR OT.OutgoingNumber LIKE '%".$search."%' OR SR.SaleReturnNumber LIKE '%".$search."%' OR BR.BuyReturnNumber LIKE '%".$search."%' OR TI.Remarks LIKE '%".$search."%' OR OT.Remarks LIKE '%".$search."%' OR SR.Remarks LIKE '%".$search."%' OR BR.Remarks LIKE '%".$search."%' OR MC.CustomerName LIKE '%".$search."%' OR MS.SupplierName LIKE '%".$search."%' OR DATE_FORMAT(TC.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' ) ";
 	}
 	//Handles determines where in the paging count this result set falls in
 	if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];
@@ -41,12 +41,22 @@
 				COUNT(*) AS nRows
 			FROM
 				transaction_cancellation TC
-				JOIN transaction_outgoing OT
+				JOIN master_user MU
+					ON MU.UserID = TC.DeletedBy
+				LEFT JOIN transaction_outgoing OT
 					ON OT.OutgoingID = TC.OutgoingID
-				JOIN master_sales MS
-					ON OT.SalesID = MS.SalesID
-				JOIN master_customer MC
-					ON OT.CustomerID = MC.CustomerID
+				LEFT JOIN transaction_incoming TI
+					ON TI.IncomingID = TC.IncomingID
+				LEFT JOIN transaction_buyreturn BR
+					ON BR.BuyReturnID = TC.BuyReturnID
+				LEFT JOIN transaction_salereturn SR
+					ON SR.SaleReturnID = TC.SaleReturnID
+				LEFT JOIN master_customer MC
+					ON (OT.CustomerID = MC.CustomerID
+					OR SR.CustomerID = MC.CustomerID)
+				LEFT JOIN master_supplier MS
+					ON (MS.SupplierID = TI.SupplierID
+					OR MS.SupplierID = BR.SupplierID)
 			WHERE
 				$where";
 	
@@ -58,36 +68,82 @@
 	$nRows = $row['nRows'];
 	$sql = "SELECT
 				TC.CancellationID,
-				OT.OutgoingNumber,
-				MC.CustomerName,
+				COALESCE(OT.OutgoingNumber, TI.IncomingNumber, SR.SaleReturnNumber, BR.BuyReturnNumber) InvoiceNumber,
+				IFNULL(MC.CustomerName, MS.SupplierName) Name,
 				DATE_FORMAT(TC.TransactionDate, '%d-%m-%Y') AS TransactionDate,
 				CASE
-					WHEN OTD.IsPercentage = 1
-					THEN IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - ((OTD.SalePrice * OTD.Discount)/100))), 0)
-					ELSE IFNULL(SUM(OTD.Quantity * (OTD.SalePrice - OTD.Discount)), 0)
-				END + OT.DeliveryCost AS Total,
-				OT.Remarks,
+					WHEN TC.OutgoingID <> 0
+					THEN IFNULL(SUM(CASE
+								WHEN OTD.IsPercentage = 1
+								THEN OTD.Quantity * (OTD.SalePrice - ((OTD.SalePrice * OTD.Discount)/100))
+								ELSE OTD.Quantity * (OTD.SalePrice - OTD.Discount)
+							END), 0) + OT.DeliveryCost
+					WHEN TC.IncomingID <> 0
+					THEN IFNULL(SUM(CASE
+								WHEN ITD.IsPercentage = 1
+								THEN ITD.Quantity * (ITD.BuyPrice - ((ITD.BuyPrice * ITD.Discount)/100))
+								ELSE ITD.Quantity * (ITD.BuyPrice - ITD.Discount)
+							END), 0) + TI.DeliveryCost
+					WHEN TC.BuyReturnID <> 0
+					THEN IFNULL(SUM(CASE
+								WHEN BRD.IsPercentage = 1
+								THEN BRD.Quantity * (BRD.BuyPrice - ((BRD.BuyPrice * BRD.Discount)/100))
+								ELSE BRD.Quantity * (BRD.BuyPrice - BRD.Discount)
+							END), 0)
+					ELSE IFNULL(SUM(CASE
+								WHEN SRD.IsPercentage = 1
+								THEN SRD.Quantity * (SRD.SalePrice - ((SRD.SalePrice * SRD.Discount)/100))
+								ELSE SRD.Quantity * (SRD.SalePrice - SRD.Discount)
+							END), 0)
+				END AS Total,
+				COALESCE(OT.Remarks, TI.Remarks, BR.Remarks, SR.Remarks) Remarks,
 				MU.UserLogin DeletedBy
 			FROM
 				transaction_cancellation TC
-				JOIN transaction_outgoing OT
-					ON OT.OutgoingID = TC.OutgoingID
-				JOIN master_sales MS
-					ON OT.SalesID = MS.SalesID
-				JOIN master_customer MC
-					ON OT.CustomerID = MC.CustomerID
 				JOIN master_user MU
 					ON MU.UserID = TC.DeletedBy
+				LEFT JOIN transaction_outgoing OT
+					ON OT.OutgoingID = TC.OutgoingID
+				LEFT JOIN transaction_incoming TI
+					ON TI.IncomingID = TC.IncomingID
+				LEFT JOIN transaction_buyreturn BR
+					ON BR.BuyReturnID = TC.BuyReturnID
+				LEFT JOIN transaction_salereturn SR
+					ON SR.SaleReturnID = TC.SaleReturnID
+				LEFT JOIN master_customer MC
+					ON (OT.CustomerID = MC.CustomerID
+					OR SR.CustomerID = MC.CustomerID)
+				LEFT JOIN master_supplier MS
+					ON (MS.SupplierID = TI.SupplierID
+					OR MS.SupplierID = BR.SupplierID)
 				LEFT JOIN transaction_outgoingdetails OTD
 					ON OTD.OutgoingID = OT.OutgoingID
+				LEFT JOIN transaction_incomingdetails ITD
+					ON TI.IncomingID = ITD.IncomingID
+				LEFT JOIN transaction_buyreturndetails BRD
+					ON BR.BuyReturnID = BRD.BuyReturnID
+				LEFT JOIN transaction_salereturndetails SRD
+					ON SR.SaleReturnID = SRD.SaleReturnID
 			WHERE
 				$where
 			GROUP BY
-				OT.OutgoingID,
-				MS.SalesName,
-				MC.CustomerName,
-				OT.Remarks,
-				OT.TransactionDate
+				TC.CancellationID,
+				OT.OutgoingNumber, 
+				TI.IncomingNumber, 
+				SR.SaleReturnNumber, 
+				BR.BuyReturnNumber,
+				MC.CustomerName, 
+				MS.SupplierName,
+				TC.TransactionDate,
+				TC.OutgoingID,
+				TC.IncomingID,
+				TC.BuyReturnID,
+				TC.SaleReturnID,
+				OT.Remarks, 
+				TI.Remarks, 
+				BR.Remarks, 
+				SR.Remarks,
+				MU.UserLogin
 			ORDER BY 
 				$order_by
 			$limit";
@@ -100,10 +156,10 @@
 	while ($row = mysql_fetch_array($result)) {
 		$RowNumber++;
 		$row_array['RowNumber'] = $RowNumber;
-		$row_array['CancellationIDNo']= $row['CancellationID']."^".$row['OutgoingNumber'];
+		$row_array['CancellationIDNo']= $row['CancellationID']."^".$row['InvoiceNumber'];
 		$row_array['CancellationID'] = $row['CancellationID'];
-		$row_array['OutgoingNumber']= $row['OutgoingNumber'];
-		$row_array['CustomerName'] = $row['CustomerName'];
+		$row_array['InvoiceNumber']= $row['InvoiceNumber'];
+		$row_array['Name'] = $row['Name'];
 		$row_array['Total'] =  number_format($row['Total'],2,".",",");
 		$row_array['TransactionDate'] = $row['TransactionDate'];
 		$row_array['Remarks'] = $row['Remarks'];

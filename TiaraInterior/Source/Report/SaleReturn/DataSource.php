@@ -57,66 +57,39 @@
 			$limit_h = $rows ;
 		}
 		$sql = "SELECT
-					OT.OutgoingNumber,
-					DATE_FORMAT(OT.TransactionDate, '%d/%c/%y') AS TransactionDate,
-					OT.TransactionDate DateNoFormat,
-					OT.DeliveryCost,
-					IFNULL(SUM(CASE
-						WHEN TOD.IsPercentage = 1
-						THEN TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))
-						ELSE TOD.Quantity * (TOD.SalePrice - TOD.Discount)
-					END), 0) AS SubTotal,
-					IFNULL(SUM(CASE
-						WHEN TOD.IsPercentage = 1
-						THEN TOD.Quantity * (TOD.SalePrice - ((TOD.SalePrice * TOD.Discount)/100))
-						ELSE TOD.Quantity * (TOD.SalePrice - TOD.Discount)
-					END), 0) + OT.DeliveryCost AS Total,
-					OT.Remarks
-				FROM
-					transaction_outgoing OT
-					JOIN master_sales MS
-						ON MS.SalesID = OT.SalesID
-					JOIN master_customer MC
-						ON MC.CustomerID = OT.CustomerID
-					LEFT JOIN transaction_outgoingdetails TOD
-						ON TOD.OutgoingID = OT.OutgoingID
-				WHERE
-					CAST(OT.TransactionDate AS DATE) >= '".$txtFromDate."'
-					AND CAST(OT.TransactionDate AS DATE) <= '".$txtToDate."'
-					AND OT.IsCancelled = 0
-					AND CASE
-							WHEN ".$CustomerID." = 0
-							THEN MC.CustomerID
-							ELSE ".$CustomerID."
-						END = MC.CustomerID
-				GROUP BY
-					OT.OutgoingNumber,
-					OT.TransactionDate,
-					MS.SalesName,
-					MC.CustomerName
-				UNION
-				SELECT
 					SR.SaleReturnNumber,
 					DATE_FORMAT(SR.TransactionDate, '%d/%c/%y') AS TransactionDate,
 					SR.TransactionDate DateNoFormat,
-					0,
-					-IFNULL(SUM(CASE
+					CONCAT(MB.BrandName, ' ', MT.TypeName) ItemName,
+					SRD.BatchNumber,
+					SRD.Quantity,
+					SRD.SalePrice,
+					CASE
 						WHEN SRD.IsPercentage = 1
-						THEN SRD.Quantity * (SRD.SalePrice - ((SRD.SalePrice * SRD.Discount)/100))
-						ELSE SRD.Quantity * (SRD.SalePrice - SRD.Discount)
-					END), 0) AS SubTotal,
-					-IFNULL(SUM(CASE
-						WHEN SRD.IsPercentage = 1
-						THEN SRD.Quantity * (SRD.SalePrice - ((SRD.SalePrice * SRD.Discount)/100))
-						ELSE SRD.Quantity * (SRD.SalePrice - SRD.Discount)
-					END), 0) AS Total,
+						THEN (SRD.SalePrice * SRD.Discount)/100
+						ELSE SRD.Discount
+					END DiscountAmount,
+					CASE
+						WHEN SRD.IsPercentage = 1 AND SRD.Discount <> 0
+						THEN CONCAT('(', SRD.Discount, '%)')
+						ELSE ''
+					END Discount,
+					IFNULL(CASE
+								WHEN SRD.IsPercentage = 1
+								THEN SRD.Quantity * (SRD.SalePrice - ((SRD.SalePrice * SRD.Discount)/100))
+								ELSE SRD.Quantity * (SRD.SalePrice - SRD.Discount)
+							END, 0) AS Total,
 					SR.Remarks
 				FROM
 					transaction_salereturn SR
 					JOIN master_customer MC
 						ON MC.CustomerID = SR.CustomerID
-					LEFT JOIN transaction_salereturndetails SRD
+					JOIN transaction_salereturndetails SRD
 						ON SRD.SaleReturnID = SR.SaleReturnID
+					JOIN master_type MT
+						ON MT.TypeID = SRD.TypeID
+					JOIN master_brand MB
+						ON MB.BrandID = MT.BrandID
 				WHERE
 					CAST(SR.TransactionDate AS DATE) >= '".$txtFromDate."'
 					AND CAST(SR.TransactionDate AS DATE) <= '".$txtToDate."'
@@ -126,10 +99,6 @@
 							THEN MC.CustomerID
 							ELSE ".$CustomerID."
 						END = MC.CustomerID
-				GROUP BY
-					SR.SaleReturnNumber,
-					SR.TransactionDate,
-					MC.CustomerName
 				ORDER BY	
 					DateNoFormat ASC";
 		
@@ -146,12 +115,14 @@
 		while ($row = mysql_fetch_array($result)) {
 			$RowNumber++;
 			$row_array['RowNumber'] = $RowNumber;
-			$row_array['OutgoingNumber']= $row['OutgoingNumber'];
+			$row_array['SaleReturnNumber']= $row['SaleReturnNumber'];
 			$row_array['TransactionDate'] = $row['TransactionDate'];
-			$row_array['DeliveryCost'] = number_format($row['DeliveryCost'],2,".",",");
-			$row_array['SubTotal'] = number_format($row['SubTotal'],2,".",",");
+			$row_array['Quantity'] = $row['Quantity'];
+			$row_array['ItemName'] = $row['ItemName'];
+			$row_array['BatchNumber'] = $row['BatchNumber'];
+			$row_array['SalePrice'] = number_format($row['SalePrice'],2,".",",");
+			$row_array['Discount'] = number_format($row['DiscountAmount'],2,".",",").$row['Discount'];
 			$row_array['Total'] = number_format($row['Total'],2,".",",");
-			$row_array['Remarks'] = $row['Remarks'];
 			$GrandTotal += $row['Total'];
 			array_push($return_arr, $row_array);
 		}
