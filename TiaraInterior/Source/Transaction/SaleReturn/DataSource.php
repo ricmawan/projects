@@ -44,7 +44,8 @@
 				LEFT JOIN master_customer MC
 					ON SR.CustomerID = MC.CustomerID
 			WHERE
-				$where";
+				$where
+				AND SR.IsCancelled = 0";
 	
 	if (! $result = mysql_query($sql, $dbh)) {
 		echo mysql_error();
@@ -71,6 +72,7 @@
 					ON SRD.SaleReturnID = SR.SaleReturnID
 			WHERE
 				$where
+				AND SR.IsCancelled = 0
 			GROUP BY
 				SR.SaleReturnID,
 				MC.CustomerName,

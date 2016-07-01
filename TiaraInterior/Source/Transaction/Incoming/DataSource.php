@@ -44,7 +44,8 @@
 				LEFT JOIN master_supplier MS
 					ON IT.SupplierID = MS.SupplierID
 			WHERE
-				$where";
+				$where
+				AND IT.IsCancelled = 0";
 	
 	if (! $result = mysql_query($sql, $dbh)) {
 		echo mysql_error();
@@ -61,7 +62,8 @@
 								WHEN ITD.IsPercentage = 1
 								THEN ITD.Quantity * (ITD.BuyPrice - ((ITD.BuyPrice * ITD.Discount)/100))
 								ELSE ITD.Quantity * (ITD.BuyPrice - ITD.Discount)
-							END), 0) AS TotalAmount,
+							END), 0) + IT.DeliveryCost AS TotalAmount,
+				IT.DeliveryCost,
 				IT.Remarks
 			FROM
 				transaction_incoming IT
@@ -71,6 +73,7 @@
 					ON ITD.IncomingID = IT.IncomingID
 			WHERE
 				$where
+				AND IT.IsCancelled = 0
 			GROUP BY
 				IT.IncomingID,
 				MS.SupplierName,
@@ -93,6 +96,7 @@
 		$row_array['IncomingNumber']= $row['IncomingNumber'];
 		$row_array['SupplierName'] = $row['SupplierName'];
 		$row_array['TotalAmount'] =  number_format($row['TotalAmount'],2,".",",");
+		$row_array['DeliveryCost'] =  number_format($row['DeliveryCost'],2,".",",");
 		$row_array['TransactionDate'] = $row['TransactionDate'];
 		$row_array['Remarks'] = $row['Remarks'];
 		array_push($return_arr, $row_array);

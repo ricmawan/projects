@@ -21,6 +21,7 @@
 										<th data-column-id="IncomingNumber">No Nota</th>
 										<th data-column-id="TransactionDate" data-type="numeric">Tanggal</th>
 										<th data-column-id="SupplierName">Nama Supplier</th>
+										<th data-column-id="DeliveryCost" data-align="right">Ongkos Kirim</th>
 										<th data-column-id="TotalAmount" data-align="right">Total</th>
 										<th data-column-id="Remarks">Catatan</th>
 										<?php if($EditFlag == true) echo '<th data-column-id="Opsi" data-formatter="commands" data-sortable="false">Opsi</th>'; ?>

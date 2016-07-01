@@ -11,6 +11,7 @@
 		$TransactionDate = explode('-', mysql_real_escape_string($_POST['txtTransactionDate']));
 		$TransactionDate = "$TransactionDate[2]-$TransactionDate[1]-$TransactionDate[0]";
 		$IncomingNumber = mysql_real_escape_string($_POST['txtIncomingNumber']);
+		$txtDeliveryCost = str_replace(",", "", $_POST['txtDeliveryCost']);
 		$hdnIsEdit = mysql_real_escape_string($_POST['hdnIsEdit']);
 		$txtRemarks = mysql_real_escape_string($_POST['txtRemarks']);
 		$State = 1;
@@ -32,6 +33,7 @@
 						SupplierID,
 						IncomingNumber,
 						TransactionDate,
+						DeliveryCost,
 						Remarks,
 						CreatedDate,
 						CreatedBy
@@ -41,6 +43,7 @@
 						".$SupplierID.",
 						'".$IncomingNumber."',
 						'".$TransactionDate."',
+						".$txtDeliveryCost.",
 						'".$txtRemarks."',
 						NOW(),
 						'".$_SESSION['UserLogin']."'
@@ -54,6 +57,7 @@
 						SupplierID = ".$SupplierID.",
 						IncomingNumber = '".$IncomingNumber."',
 						TransactionDate = '".$TransactionDate."',
+						DeliveryCost = ".$txtDeliveryCost.",
 						Remarks = '".$txtRemarks."',
 						ModifiedBy = '".$_SESSION['UserLogin']."'
 					WHERE

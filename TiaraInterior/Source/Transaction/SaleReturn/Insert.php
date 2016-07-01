@@ -228,23 +228,6 @@
 				mysql_query("ROLLBACK", $dbh);
 				return 0;
 			}
-
-			/*$sql = "UPDATE 
-						master_item
-					SET
-						Price = ".str_replace(",", "", $_POST['txtPrice'.$j]).",
-						ModifiedBy = '".$_SESSION['UserLogin']."'
-					WHERE
-						ItemID = ".$_POST['hdnItemID'.$j];
-						
-			if (! $result = mysql_query($sql, $dbh)) {
-				$Message = "Terjadi Kesalahan Sistem";
-				$MessageDetail = mysql_error();
-				$FailedFlag = 1;
-				echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State, $InvoiceNumber);
-				mysql_query("ROLLBACK", $dbh);
-				return 0;
-			}*/
 		}
 		echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State, $InvoiceNumber);
 		mysql_query("COMMIT", $dbh);

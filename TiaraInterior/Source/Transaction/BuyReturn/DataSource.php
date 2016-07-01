@@ -44,7 +44,8 @@
 				LEFT JOIN master_supplier MS
 					ON BR.SupplierID = MS.SupplierID
 			WHERE
-				$where";
+				$where
+				AND BR.IsCancelled = 0";
 	
 	if (! $result = mysql_query($sql, $dbh)) {
 		echo mysql_error();
@@ -71,6 +72,7 @@
 					ON BRD.BuyReturnID = BR.BuyReturnID
 			WHERE
 				$where
+				AND BR.IsCancelled = 0
 			GROUP BY
 				BR.BuyReturnID,
 				MS.SupplierName,

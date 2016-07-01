@@ -13,6 +13,7 @@
 		$TransactionDate = "";
 		$IsEdit = 0;
 		$rowCount = 0;
+		$DeliveryCost = 0.00;
 		$Data = "";
 		if($IncomingID != 0) {
 			$IsEdit = 1;
@@ -22,7 +23,8 @@
 					IT.SupplierID,
 					IT.IncomingNumber,
 					DATE_FORMAT(IT.TransactionDate, '%d-%m-%Y') AS TransactionDate,
-					IT.Remarks
+					IT.Remarks,
+					IT.DeliveryCost
 				FROM
 					transaction_incoming IT
 				WHERE
@@ -38,6 +40,7 @@
 			$SupplierID = $row['SupplierID'];
 			$Remarks = $row['Remarks'];
 			$TransactionDate = $row['TransactionDate'];
+			$DeliveryCost = $row['DeliveryCost'];
 			
 			$sql = "SELECT
 						ITD.IncomingDetailsID,
@@ -245,9 +248,18 @@
 							<br />
 							<div class="row">
 								<div class="col-md-2">
+									Ongkos Kirim :
+								</div>
+								<div class="col-md-3">
+									<input type="text" id="txtDeliveryCost" style="text-align:right;" <?php echo 'value="'.number_format($DeliveryCost,2,".",",").'"'; ?> name="txtDeliveryCost" class="form-control-custom" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" />
+								</div>
+							</div>
+							<br />
+							<div class="row">
+								<div class="col-md-2">
 									Grand Total :
 								</div>
-								<div class="col-md-2">
+								<div class="col-md-3">
 									<input type="text" id="txtGrandTotal" style="text-align:right;" value="0.00" name="txtGrandTotal" class="form-control-custom" readonly />
 								</div>
 							</div>
@@ -468,6 +480,14 @@
 					}
 					i++;
 				});
+				if ($("#txtDeliveryCost").val() == "") {
+					$("#txtDeliveryCost").val(0);
+					deliveryCost = 0;
+				}
+				else {
+					deliveryCost = $("#txtDeliveryCost").val().replace(/\,/g, "");
+				}
+				GrandTotal += parseFloat(deliveryCost);
 				$("#txtGrandTotal").val(returnRupiah(GrandTotal.toFixed(2).toString()));
 			}
 			

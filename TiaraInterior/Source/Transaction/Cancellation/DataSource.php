@@ -97,7 +97,16 @@
 							END), 0)
 				END AS Total,
 				COALESCE(OT.Remarks, TI.Remarks, BR.Remarks, SR.Remarks) Remarks,
-				MU.UserLogin DeletedBy
+				MU.UserLogin DeletedBy,
+				CASE
+					WHEN TC.OutgoingID <> 0
+					THEN 1
+					WHEN TC.IncomingID <> 0
+					THEN 2
+					WHEN TC.SaleReturnID <> 0
+					THEN 3
+					ELSE 4
+				END TransactionType
 			FROM
 				transaction_cancellation TC
 				JOIN master_user MU
@@ -156,7 +165,7 @@
 	while ($row = mysql_fetch_array($result)) {
 		$RowNumber++;
 		$row_array['RowNumber'] = $RowNumber;
-		$row_array['CancellationIDNo']= $row['CancellationID']."^".$row['InvoiceNumber'];
+		$row_array['CancellationIDNo']= $row['CancellationID']."^".$row['InvoiceNumber']."^".$row['TransactionType'];
 		$row_array['CancellationID'] = $row['CancellationID'];
 		$row_array['InvoiceNumber']= $row['InvoiceNumber'];
 		$row_array['Name'] = $row['Name'];

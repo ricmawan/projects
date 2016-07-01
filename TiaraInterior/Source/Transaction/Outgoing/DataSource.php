@@ -5,7 +5,7 @@
 	$RequestPath = str_replace($file, "", $RequestPath);
 	include "../../GetPermission.php";
 
-	$where = " 1=1 AND OT.IsCancelled = 0 ";
+	$where = " 1=1";
 	$order_by = "OT.OutgoingID DESC";
 	$rows = 10;
 	$current = 1;
@@ -46,7 +46,8 @@
 				JOIN master_customer MC
 					ON OT.CustomerID = MC.CustomerID
 			WHERE
-				$where";
+				$where
+				AND OT.IsCancelled = 0";
 	
 	if (! $result = mysql_query($sql, $dbh)) {
 		echo mysql_error();
@@ -82,6 +83,7 @@
 					ON OTD.OutgoingID = OT.OutgoingID
 			WHERE
 				$where
+				AND OT.IsCancelled = 0 
 			GROUP BY
 				OT.OutgoingID,
 				MS.SalesName,

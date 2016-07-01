@@ -5,10 +5,6 @@
 		$RequestPath = str_replace($file, "", $RequestPath);
 		include "../../GetPermission.php";
 		$OutgoingID = mysql_real_escape_string($_POST['OutgoingID']);
-		$State = 1;
-		$Message = "Data Berhasil Disimpan";
-		$MessageDetail = "";
-		$FailedFlag = 0;
 		$sql = "SELECT
 					DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') TransactionDate,
 					OT.DeliveryCost,
@@ -44,19 +40,6 @@
 			$rows[] = $row;
 		}
 		echo json_encode($rows);
-		//echo returnstate($InvoiceNumber, $Message, $MessageDetail, $FailedFlag, $State);
 		return 0;
-	}
-	
-	function returnstate($InvoiceNumber, $Message, $MessageDetail, $FailedFlag, $State) {
-		$data = array(
-			"InvoiceNumber" => $InvoiceNumber, 
-			"Message" => $Message,
-			"MessageDetail" => $MessageDetail,
-			"FailedFlag" => $FailedFlag,
-			"State" => $State
-		);
-		return json_encode($data);
-	
 	}
 ?>

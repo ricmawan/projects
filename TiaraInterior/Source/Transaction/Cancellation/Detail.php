@@ -16,6 +16,7 @@
 		$rowCount = 0;
 		$DeliveryCost = 0.00;
 		$Data = "";
+		$TransactionType = 1;
 		if($CancellationID != 0) {
 			$IsEdit = 1;
 			//$Content = "Place the content here";
@@ -109,17 +110,53 @@
 								</div>
 								<div class="col-md-3">
 									<div class="ui-widget" style="width: 100%;">
-										<select name="ddlOutgoing" id="ddlOutgoing" class="form-control-custom" placeholder="Pilih Nota" >
+										<select name="ddlInvoiceNumber" id="ddlInvoiceNumber" class="form-control-custom" placeholder="Pilih Nota" >
 											<option value="" selected> </option>
 											<?php
-												$sql = "SELECT OutgoingID, OutgoingNumber FROM transaction_outgoing OT WHERE IsCancelled = 0 ORDER BY OutgoingNumber";
+												$sql = "SELECT 
+															OT.OutgoingID InvoiceID, 
+															OT.OutgoingNumber InvoiceNumber,
+															1 TransactionType
+														FROM 
+															transaction_outgoing OT 
+														WHERE 
+															OT.IsCancelled = 0 
+														UNION ALL
+														SELECT
+															TI.IncomingID,
+															TI.IncomingNumber,
+															2 TransactionType
+														FROM
+															transaction_incoming TI
+														WHERE
+															TI.IsCancelled = 0
+														UNION ALL
+														SELECT
+															SR.SaleReturnID,
+															SR.SaleReturnNumber,
+															3 TransactionType
+														FROM
+															transaction_salereturn SR
+														WHERE
+															SR.IsCancelled = 0
+														UNION ALL
+														SELECT
+															BR.BuyReturnID,
+															BR.BuyReturnNumber,
+															4 TransactionType
+														FROM
+															transaction_buyreturn BR
+														WHERE
+															BR.IsCancelled = 0
+														ORDER BY
+															InvoiceNumber
+															";
 												if(!$result = mysql_query($sql, $dbh)) {
 													echo mysql_error();
 													return 0;
 												}
 												while($row = mysql_fetch_array($result)) {
-													if($OutgoingID == $row['OutgoingID']) echo "<option selected value='".$row['OutgoingID']."' >".$row['OutgoingNumber']."</option>";
-													else echo "<option value='".$row['OutgoingID']."' >".$row['OutgoingNumber']."</option>";
+													echo "<option value='".$row['InvoiceID']."' transactiontype=".$row['TransactionType']." >".$row['InvoiceNumber']."</option>";
 												}
 											?>
 										</select>
@@ -135,11 +172,12 @@
 									<input id="hdnRow" name="hdnRow" type="hidden" <?php echo 'value="'.$rowCount.'"'; ?> />
 									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
 									<input id="hdnData" name="hdnData" type="hidden" <?php echo 'value="'.$Data.'"'; ?> />
+									<input id="hdnTransactionType" name="hdnTransactionType" type="hidden" <?php echo 'value="'.$TransactionType.'"'; ?> />
 								</div>
 								<div class="col-md-3">
 									<input id="txtTransactionDate" disabled name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Tanggal" <?php echo 'value="'.$TransactionDate.'"'; ?>/>
 								</div>
-								<div class="col-md-1 labelColumn">
+								<div class="col-md-1 labelColumn" id="dvCustomer" >
 									Pelanggan:
 								</div>
 								<div class="col-md-3">
@@ -151,14 +189,15 @@
 								<div class="col-md-12">
 									
 									<table class="table" style="width:auto;" id="datainput">
-										<thead style="background-color: black;color:white;height:25px;width:995px;display:block;">
+										<thead style="background-color: black;color:white;height:25px;width:1080px;display:block;">
 											<td align="center" style="width:30px;">No</td>
 											<td align="center" style="width:230px;">Nama Barang</td>
 											<td align="center" style="width:75px;">QTY</td>
-											<td align="center" style="width:135px;">Harga Jual</td>
+											<td align="center" style="width:135px;" class="tdSalePrice" >Harga Jual</td>
+											<td align="center" style="width:135px;" class="tdBuyPrice" >Harga Beli</td>
 											<td align="center" style="width:155px;">Diskon</td>
 											<td align="center" style="width:170px;">Total</td>
-											<td align="center" style="width:200px;">Keterangan</td>
+											<td align="center" style="width:150px;" class="tdRemarks" >Keterangan</td>
 										</thead>
 										<tbody style="display:block;max-height:172px;height:100%;overflow-y:auto;">
 											<tr id='' style='display:none;' class="num">
@@ -174,8 +213,11 @@
 												<td style="width:75px;">
 													<input type="text" row="" value=1 id="txtQuantity" style="text-align:right;" name="txtQuantity" class="form-control-custom txtQuantity" placeholder="QTY" readonly />
 												</td>
-												<td style="width:135px;">
+												<td style="width:135px;" class="tdSalePrice">
 													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;" class="form-control-custom" placeholder="Harga Jual" readonly />
+												</td>
+												<td style="width:135px;" class="tdBuyPrice">
+													<input type="text" id="txtBuyPrice" value="0.00" name="txtBuyPrice" style="text-align:right;" class="form-control-custom" placeholder="Harga Beli" readonly />
 												</td>
 												<td style="width:155px;">
 													<input type="text" id="txtDiscount" style="display:inline-block;width: 90px;text-align:right;" value="0" name="txtDiscount" style="text-align:right;" class="form-control-custom" placeholder="Diskon"  readonly /> &nbsp; <input type="checkbox" name="chkIsPercentage" id="chkIsPercentage" style="margin-top:2px;vertical-align:sub;" value=1 checked class="chkIsPercentage" disabled /> (%)
@@ -183,7 +225,7 @@
 												<td  style="width:170px;">
 													<input type="text" id="txtTotal" name="txtTotal" class="form-control-custom" style="text-align:right;" value="0.00" placeholder="Jumlah" readonly />
 												</td>
-												<td  style="width:200px;">
+												<td  style="width:200px;" class="tdRemarks">
 													<input type="text" id="txtRemarksDetail" name="txtRemarksDetail" class="form-control-custom" placeholder="Keterangan" readonly />
 												</td>
 											</tr>
@@ -194,7 +236,7 @@
 							<input type="hidden" id="record" name="record" value=0 />
 							<input type="hidden" id="recordnew" name="recordnew" value=0 />
 							<br />
-							<div class="row">
+							<div class="row" id="rwDeliveryCost" >
 								<div class="col-md-2">
 									Ongkos Kirim :
 								</div>
@@ -248,7 +290,8 @@
 					if(i != 0) {
 						qty = $(this).val();
 						row = $(this).attr("row");
-						price = $("#txtSalePrice" + row).val().replace(/\,/g, "");
+						if($("#hdnTransactionType").val() == 1 || $("#hdnTransactionType").val() == 3 ) price = $("#txtSalePrice" + row).val().replace(/\,/g, "");
+						else if($("#hdnTransactionType").val() == 2 || $("#hdnTransactionType").val() == 4 ) price = $("#txtBuyPrice" + row).val().replace(/\,/g, "");
 						disc = $("#txtDiscount" + row).val().replace(/\,/g, "");
 						isPercentage = $("#chkIsPercentage" + row).prop('checked');
 						if(qty == "") {
@@ -283,8 +326,13 @@
 			}
 			
 			function LoadOutgoingDetails() {
-				var currentOutgoingID = $("#ddlOutgoing").val();
+				var currentOutgoingID = $("#ddlInvoiceNumber").val();
+				$("#dvCustomer").html("Pelanggan:");
 				$("#hdnOutgoingID").val(currentOutgoingID);
+				$(".tdBuyPrice").hide();
+				$(".tdSalePrice").show();
+				$(".tdRemarks").show();
+				$("#rwDeliveryCost").show();
 				$.ajax({
 					url: "./Transaction/Cancellation/GetOutgoingDetails.php",
 					type: "POST",
@@ -331,11 +379,183 @@
 					}
 				});
 			}
-			$(document).ready(function () {
-				$("#ddlOutgoing").combobox({
-					select: function( event, ui ) {
-						LoadOutgoingDetails();						
+			
+			function LoadIncomingDetails() {
+				var currentIncomingID = $("#ddlInvoiceNumber").val();
+				$("#dvCustomer").html("Supplier:");
+				$("#hdnOutgoingID").val(currentIncomingID);
+				$(".tdBuyPrice").show();
+				$(".tdSalePrice").show();
+				$(".tdRemarks").hide();
+				$("#rwDeliveryCost").show();
+				$.ajax({
+					url: "./Transaction/Cancellation/GetIncomingDetails.php",
+					type: "POST",
+					data: { IncomingID : currentIncomingID },
+					dataType: "json",
+					success: function(data) {
+						var count = 0;
+						$('#datainput tbody:last > tr:not(:first)').remove();
+						$("#txtTransactionDate").val(data[0].TransactionDate);
+						$("#txtDeliveryCost").val(returnRupiah(data[0].DeliveryCost));
+						$("#txtCustomerName").val(data[0].SupplierName);
+						for(var i = 0; i < data.length; i++) {
+							$("#btnAdd").click();
+							count++;
+							//set values
+							$("#nota").text(count);
+							$("#hdnOutgoingDetailsID" + count).val(data[i].OutgoingDetailsID);
+							$("#hdnTypeID" + count).val(data[i].TypeID);
+							$("#txtTypeName" + count).val(data[i].TypeName);
+							$("#hdnBatchNumber" + count).val(data[i].BatchNumber);
+							$("#txtQuantity" + count).val(data[i].Quantity);
+							$("#txtBuyPrice" + count).val(returnRupiah(data[i].BuyPrice));
+							$("#txtSalePrice" + count).val(returnRupiah(data[i].SalePrice));
+							//$("#txtRemarksDetail" + count).val(data[i].Remarks);
+							
+							if(data[i].IsPercentage == true) {
+								$("#txtDiscount" + count).val(data[i].Discount);
+								$("#chkIsPercentage" + count).attr("checked", true);
+								$("#chkIsPercentage" + count).prop("checked", true);
+							}
+							else {
+								$("#txtDiscount" + count).val(returnRupiah(data[i].Discount));
+								$("#chkIsPercentage" + count).attr("checked", false);
+								$("#chkIsPercentage" + count).prop("checked", false);
+							}
+							$("#record").val(count);
+							$("#recordnew").val(count);
+						}
+						Calculate();
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Terjadi kesalahan sistem!", "error");
 					}
+				});
+			}
+			
+			function LoadSaleReturnDetails() {
+				var currentSaleReturnID = $("#ddlInvoiceNumber").val();
+				$("#dvCustomer").html("Pelanggan:");
+				$("#hdnOutgoingID").val(currentSaleReturnID);
+				$(".tdBuyPrice").hide();
+				$(".tdSalePrice").show();
+				$(".tdRemarks").hide();
+				$("#rwDeliveryCost").hide();
+				$.ajax({
+					url: "./Transaction/Cancellation/GetSaleReturnDetails.php",
+					type: "POST",
+					data: { SaleReturnID : currentSaleReturnID },
+					dataType: "json",
+					success: function(data) {
+						var count = 0;
+						$('#datainput tbody:last > tr:not(:first)').remove();
+						$("#txtTransactionDate").val(data[0].TransactionDate);
+						$("#txtDeliveryCost").val(0.00);
+						$("#txtCustomerName").val(data[0].CustomerName);
+						for(var i = 0; i < data.length; i++) {
+							$("#btnAdd").click();
+							count++;
+							//set values
+							$("#nota").text(count);
+							$("#hdnOutgoingDetailsID" + count).val(data[i].OutgoingDetailsID);
+							$("#hdnTypeID" + count).val(data[i].TypeID);
+							$("#txtTypeName" + count).val(data[i].TypeName);
+							$("#hdnBatchNumber" + count).val(data[i].BatchNumber);
+							$("#txtQuantity" + count).val(data[i].Quantity);
+							//$("#txtBuyPrice" + count).val(returnRupiah(data[i].BuyPrice));
+							$("#txtSalePrice" + count).val(returnRupiah(data[i].SalePrice));
+							//$("#txtRemarksDetail" + count).val(data[i].Remarks);
+							
+							if(data[i].IsPercentage == true) {
+								$("#txtDiscount" + count).val(data[i].Discount);
+								$("#chkIsPercentage" + count).attr("checked", true);
+								$("#chkIsPercentage" + count).prop("checked", true);
+							}
+							else {
+								$("#txtDiscount" + count).val(returnRupiah(data[i].Discount));
+								$("#chkIsPercentage" + count).attr("checked", false);
+								$("#chkIsPercentage" + count).prop("checked", false);
+							}
+							$("#record").val(count);
+							$("#recordnew").val(count);
+						}
+						Calculate();
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Terjadi kesalahan sistem!", "error");
+					}
+				});
+			}
+			
+			function LoadBuyReturnDetails() {
+				var currentBuyReturnID = $("#ddlInvoiceNumber").val();
+				$("#dvCustomer").html("Supplier:");
+				$("#hdnOutgoingID").val(currentBuyReturnID);
+				$(".tdBuyPrice").show();
+				$(".tdSalePrice").hide();
+				$(".tdRemarks").hide();
+				$("#rwDeliveryCost").hide();
+				$.ajax({
+					url: "./Transaction/Cancellation/GetBuyReturnDetails.php",
+					type: "POST",
+					data: { BuyReturnID : currentBuyReturnID },
+					dataType: "json",
+					success: function(data) {
+						var count = 0;
+						$('#datainput tbody:last > tr:not(:first)').remove();
+						$("#txtTransactionDate").val(data[0].TransactionDate);	
+						$("#txtDeliveryCost").val(0.00);
+						$("#txtCustomerName").val(data[0].SupplierName);
+						for(var i = 0; i < data.length; i++) {
+							$("#btnAdd").click();
+							count++;
+							//set values
+							$("#nota").text(count);
+							$("#hdnOutgoingDetailsID" + count).val(data[i].OutgoingDetailsID);
+							$("#hdnTypeID" + count).val(data[i].TypeID);
+							$("#txtTypeName" + count).val(data[i].TypeName);
+							$("#hdnBatchNumber" + count).val(data[i].BatchNumber);
+							$("#txtQuantity" + count).val(data[i].Quantity);
+							$("#txtBuyPrice" + count).val(returnRupiah(data[i].BuyPrice));
+							//$("#txtSalePrice" + count).val(returnRupiah(data[i].SalePrice));
+							//$("#txtRemarksDetail" + count).val(data[i].Remarks);
+							
+							if(data[i].IsPercentage == true) {
+								$("#txtDiscount" + count).val(data[i].Discount);
+								$("#chkIsPercentage" + count).attr("checked", true);
+								$("#chkIsPercentage" + count).prop("checked", true);
+							}
+							else {
+								$("#txtDiscount" + count).val(returnRupiah(data[i].Discount));
+								$("#chkIsPercentage" + count).attr("checked", false);
+								$("#chkIsPercentage" + count).prop("checked", false);
+							}
+							$("#record").val(count);
+							$("#recordnew").val(count);
+						}
+						Calculate();
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Terjadi kesalahan sistem!", "error");
+					}
+				});
+			}
+			$(document).ready(function () {
+				$("#ddlInvoiceNumber").combobox({
+					select: function( event, ui ) {
+						if(ui.item.attributes["transactiontype"].value == 1) LoadOutgoingDetails();
+						else if(ui.item.attributes["transactiontype"].value == 2) LoadIncomingDetails();
+						else if(ui.item.attributes["transactiontype"].value == 3) LoadSaleReturnDetails();
+						else if(ui.item.attributes["transactiontype"].value == 4) LoadBuyReturnDetails();
+						$("#hdnTransactionType").val(ui.item.attributes["transactiontype"].value);
+					}
+				});
+				$("#ddlInvoiceNumber").next().find("input").click(function() {
+					$(this).val("");
 				});
 				$("#btnAdd").on("click", function() {
 					var count = $("#datainput tbody tr").length - 1;

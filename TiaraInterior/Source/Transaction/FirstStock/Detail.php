@@ -221,7 +221,7 @@
 								<div class="col-md-2">
 									Grand Total :
 								</div>
-								<div class="col-md-2">
+								<div class="col-md-3">
 									<input type="text" id="txtGrandTotal" style="text-align:right;" value="0.00" name="txtGrandTotal" class="form-control-custom" readonly />
 								</div>
 							</div>
