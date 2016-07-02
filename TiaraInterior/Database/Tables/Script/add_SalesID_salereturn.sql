@@ -63,3 +63,5 @@ UPDATE
 		ON MC.CustomerID = SR.CustomerID
 SET
 	SR.SalesID = MC.SalesID
+	
+ALTER TABLE `transaction_cancellation` DROP FOREIGN KEY `transaction_cancellation_ibfk_2`;

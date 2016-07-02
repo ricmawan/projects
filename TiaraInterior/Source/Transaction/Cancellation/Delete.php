@@ -50,7 +50,7 @@
 					$sql = "UPDATE 
 								transaction_buyreturn BR
 								JOIN transaction_cancellation TC
-									ON TC.SaleReturnID = BR.SaleReturnID
+									ON TC.BuyReturnID = BR.BuyReturnID
 							SET
 								BR.IsCancelled = 0
 							WHERE

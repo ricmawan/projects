@@ -16,24 +16,27 @@
 		$rowCount = 0;
 		$DeliveryCost = 0.00;
 		$Data = "";
-		$TransactionType = 1;
+		$TransactionType = 0;
 		if($CancellationID != 0) {
 			$IsEdit = 1;
 			//$Content = "Place the content here";
 			$sql = "SELECT
 						TC.CancellationID,
-						OT.OutgoingID,
-						OT.OutgoingNumber,
-						OT.Remarks,
-						OT.DeliveryCost,
-						CONCAT(MC.CustomerName, ' - ', MC.Address1) CustomerName,
-						DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') AS TransactionDate
+						TC.OutgoingID,
+						TC.IncomingID,
+						TC.SaleReturnID,
+						TC.BuyReturnID,
+						CASE
+							WHEN TC.OutgoingID <> 0
+							THEN 1
+							WHEN TC.IncomingID <> 0
+							THEN 2
+							WHEN TC.SaleReturnID <> 0
+							THEN 3
+							ELSE 4
+						END TransactionType
 					FROM
 						transaction_cancellation TC
-						JOIN transaction_outgoing OT
-							ON OT.OutgoingID = TC.OutgoingID
-						JOIN master_customer MC
-							ON MC.CustomerID = OT.CustomerID
 					WHERE
 						TC.CancellationID = $CancellationID";
 						
@@ -43,52 +46,11 @@
 			}				
 			$row=mysql_fetch_array($result);
 			$CancellationID = $row['CancellationID'];
-			$OutgoingID = $row['OutgoingID'];
-			$OutgoingNumber = $row['OutgoingNumber'];
-			$Remarks = $row['Remarks'];
-			$CustomerName = $row['CustomerName'];
-			$DeliveryCost = $row['DeliveryCost'];
-			$TransactionDate = $row['TransactionDate'];
-			
-			$sql = "SELECT
-						OTD.OutgoingDetailsID,
-						OTD.TypeID,
-						OTD.Quantity,
-						OTD.BuyPrice,
-						OTD.SalePrice,
-						OTD.BatchNumber,
-						OTD.Discount,
-						CONCAT(MB.BrandName, ' ', I.TypeName, ' - ', OTD.BatchNumber) AS TypeName,
-						OTD.IsPercentage,
-						OTD.Remarks
-					FROM
-						transaction_outgoingdetails OTD
-						JOIN master_type I
-							ON I.TypeID = OTD.TypeID
-						JOIN master_brand MB
-							ON MB.BrandID = I.BrandID
-					WHERE
-						OTD.OutgoingID = $OutgoingID";
-						
-			if(!$result = mysql_query($sql, $dbh)) {
-				echo mysql_error();
-				return 0;
-			}
-			$rowCount = mysql_num_rows($result);
-			if($rowCount > 0) {
-				//$DetailID = array();
-				$Data = array();
-				while($row = mysql_fetch_array($result)) {
-					//array_push($DetailID, $row[0]);
-					array_push($Data, "'".$row['OutgoingDetailsID']."', '".$row['TypeID']."', '".$row['TypeName']."', '".$row['BatchNumber']."', '".$row['Quantity']."', '".$row['BuyPrice']."', '".$row['SalePrice']."', '".$row['Discount']."', '".$row['Remarks']."', '".$row['IsPercentage']."'");
-				}
-				//$DetailID = implode(",", $DetailID);
-				$Data = implode("|", $Data);
-			}
-			else {
-				//$DetailID = "";
-				$Data = "";
-			}
+			if($row['OutgoingID'] != "0") $OutgoingID = $row['OutgoingID'];
+			else if($row['IncomingID'] != "0") $OutgoingID = $row['IncomingID'];
+			else if($row['SaleReturnID'] != "0") $OutgoingID = $row['SaleReturnID'];
+			else $OutgoingID = $row['BuyReturnID'];
+			$TransactionType = $row['TransactionType'];
 		}
 	}
 ?>
@@ -175,13 +137,13 @@
 									<input id="hdnTransactionType" name="hdnTransactionType" type="hidden" <?php echo 'value="'.$TransactionType.'"'; ?> />
 								</div>
 								<div class="col-md-3">
-									<input id="txtTransactionDate" disabled name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Tanggal" <?php echo 'value="'.$TransactionDate.'"'; ?>/>
+									<input id="txtTransactionDate" disabled name="txtTransactionDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Tanggal" />
 								</div>
 								<div class="col-md-1 labelColumn" id="dvCustomer" >
 									Pelanggan:
 								</div>
 								<div class="col-md-3">
-									<input id="txtCustomerName" readonly name="txtCustomerName" type="text" class="form-control-custom" placeholder="Pelanggan" <?php echo 'value="'.$CustomerName.'"'; ?>/>
+									<input id="txtCustomerName" readonly name="txtCustomerName" type="text" class="form-control-custom" placeholder="Pelanggan" />
 								</div>
 							</div>
 							<br />
@@ -325,8 +287,10 @@
 				$("#txtGrandTotal").val(returnRupiah(GrandTotal.toFixed(2).toString()));
 			}
 			
-			function LoadOutgoingDetails() {
-				var currentOutgoingID = $("#ddlInvoiceNumber").val();
+			function LoadOutgoingDetails(ID) {
+				var currentOutgoingID = 0;
+				if(ID == "0") currentOutgoingID = $("#ddlInvoiceNumber").val();
+				else currentOutgoingID = ID;
 				$("#dvCustomer").html("Pelanggan:");
 				$("#hdnOutgoingID").val(currentOutgoingID);
 				$(".tdBuyPrice").hide();
@@ -380,8 +344,10 @@
 				});
 			}
 			
-			function LoadIncomingDetails() {
-				var currentIncomingID = $("#ddlInvoiceNumber").val();
+			function LoadIncomingDetails(ID) {
+				var currentIncomingID = 0;
+				if(ID == "0") currentIncomingID = $("#ddlInvoiceNumber").val();
+				else currentIncomingID = ID;
 				$("#dvCustomer").html("Supplier:");
 				$("#hdnOutgoingID").val(currentIncomingID);
 				$(".tdBuyPrice").show();
@@ -435,8 +401,10 @@
 				});
 			}
 			
-			function LoadSaleReturnDetails() {
-				var currentSaleReturnID = $("#ddlInvoiceNumber").val();
+			function LoadSaleReturnDetails(ID) {
+				var currentSaleReturnID = 0;
+				if(ID == "0") currentSaleReturnID = $("#ddlInvoiceNumber").val();
+				else currentSaleReturnID = ID;
 				$("#dvCustomer").html("Pelanggan:");
 				$("#hdnOutgoingID").val(currentSaleReturnID);
 				$(".tdBuyPrice").hide();
@@ -490,8 +458,10 @@
 				});
 			}
 			
-			function LoadBuyReturnDetails() {
-				var currentBuyReturnID = $("#ddlInvoiceNumber").val();
+			function LoadBuyReturnDetails(ID) {
+				var currentBuyReturnID = 0;
+				if(ID == "0") currentBuyReturnID = $("#ddlInvoiceNumber").val();
+				else currentBuyReturnID = ID;
 				$("#dvCustomer").html("Supplier:");
 				$("#hdnOutgoingID").val(currentBuyReturnID);
 				$(".tdBuyPrice").show();
@@ -547,10 +517,10 @@
 			$(document).ready(function () {
 				$("#ddlInvoiceNumber").combobox({
 					select: function( event, ui ) {
-						if(ui.item.attributes["transactiontype"].value == 1) LoadOutgoingDetails();
-						else if(ui.item.attributes["transactiontype"].value == 2) LoadIncomingDetails();
-						else if(ui.item.attributes["transactiontype"].value == 3) LoadSaleReturnDetails();
-						else if(ui.item.attributes["transactiontype"].value == 4) LoadBuyReturnDetails();
+						if(ui.item.attributes["transactiontype"].value == 1) LoadOutgoingDetails("0");
+						else if(ui.item.attributes["transactiontype"].value == 2) LoadIncomingDetails("0");
+						else if(ui.item.attributes["transactiontype"].value == 3) LoadSaleReturnDetails("0");
+						else if(ui.item.attributes["transactiontype"].value == 4) LoadBuyReturnDetails("0");
 						$("#hdnTransactionType").val(ui.item.attributes["transactiontype"].value);
 					}
 				});
@@ -560,7 +530,7 @@
 				$("#btnAdd").on("click", function() {
 					var count = $("#datainput tbody tr").length - 1;
 					count++;
-					if(count <= 10) {
+					//if(count <= 10) {
 						var $clone = $("#datainput tbody tr:first").clone();
 						$clone.find("#nota").text(count);
 						$clone.find("#nota").attr("id", "nota" + count);
@@ -588,47 +558,25 @@
 								scrollTop: (25 * count)
 							}, "slow");
 						}						
-					}
-					else {
-						$.notify("Jumlah barang melebihi maksimal!", "error");
-					}
+					//}
+					//else {
+						//$.notify("Jumlah barang melebihi maksimal!", "error");
+					//}
 				});
 				
-				if(parseInt($("#hdnRow").val()) > 0) {
-					var data = $("#hdnData").val();
-					var type = data.split("|");
-					var row = type.length;
-					var count = 0;
-					$('#datainput tbody:last > tr:not(:first)').remove();
-					for(var i=0; i<row; i++) {
-						$("#btnAdd").click();
-						count++;
-						//set values
-						var d = type[i].split("', '");
-						$("#nota").text(count);
-						$("#hdnOutgoingDetailsID" + count).val(d[0].replace("'", ""));
-						$("#hdnTypeID" + count).val(d[1].replace("'", ""));
-						$("#txtTypeName" + count).val(d[2].replace("'", ""));
-						$("#hdnBatchNumber" + count).val(d[3].replace("'", ""));
-						$("#txtQuantity" + count).val(d[4].replace("'", ""));
-						$("#hdnBuyPrice" + count).val(d[5].replace("'", ""));
-						$("#txtSalePrice" + count).val(returnRupiah(d[6].replace("'", "")));
-						$("#txtRemarksDetail" + count).val(d[8].replace("'", ""));
-						
-						if(d[9].replace("'", "") == true) {
-							$("#txtDiscount" + count).val(d[7].replace("'", ""));
-							$("#chkIsPercentage" + count).attr("checked", true);
-							$("#chkIsPercentage" + count).prop("checked", true);
-						}
-						else {
-							$("#txtDiscount" + count).val(returnRupiah(d[7].replace("'", "")));
-							$("#chkIsPercentage" + count).attr("checked", false);
-							$("#chkIsPercentage" + count).prop("checked", false);
-						}
-						$("#record").val(count);
-						$("#recordnew").val(count);
+				if(parseInt($("#hdnIsEdit").val()) == 1) {
+					if($("#hdnTransactionType").val() == "1") {
+						LoadOutgoingDetails($("#hdnOutgoingID").val());
 					}
-					Calculate();
+					else if($("#hdnTransactionType").val() == "2") {
+						LoadIncomingDetails($("#hdnOutgoingID").val());
+					}
+					else if($("#hdnTransactionType").val() == "3") {
+						LoadSaleReturnDetails($("#hdnOutgoingID").val());
+					}
+					else if($("#hdnTransactionType").val() == "4") {
+						LoadBuyReturnDetails($("#hdnOutgoingID").val());
+					}
 				}
 			});
 			
