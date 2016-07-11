@@ -62,6 +62,7 @@
 		$objPHPExcel->getActiveSheet()->getPageMargins()->setBottom(0.787402);
 		
 		$objPHPExcel->getActiveSheet()->getStyle('A1')->getAlignment()->setWrapText(true);
+		$monthName = array("Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des");
 		
 		//set bold
 		$objPHPExcel->getActiveSheet()->getStyle("A1:A2")->getFont()->setBold(true);
@@ -71,7 +72,7 @@
 		$objPHPExcel->getActiveSheet()->getStyle("G4")->getFont()->setBold(true);
 	
 		$objPHPExcel->getActiveSheet()->setCellValue("A4", "Nama Supplier :");
-		$objPHPExcel->getActiveSheet()->setCellValue("G4", date("M") . " - " . date("Y"));
+		$objPHPExcel->getActiveSheet()->setCellValue("G4", $monthName[date("m", strtotime($txtFromDate)) - 1] . " - " . date("Y", strtotime($txtFromDate)));
 		$objPHPExcel->getActiveSheet()->mergeCells("A4:B4");
 		$objPHPExcel->getActiveSheet()->setCellValue("A5", "Kota :");
 		$objPHPExcel->getActiveSheet()->mergeCells("A5:B5");
