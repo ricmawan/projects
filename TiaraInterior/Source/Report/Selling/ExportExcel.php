@@ -57,10 +57,10 @@
 					->setCellValue('A1', "LAPORAN PENJUALAN SALES");
 					
 		//set margin
-		$objPHPExcel->getActiveSheet()->getPageMargins()->setTop(2);
-		$objPHPExcel->getActiveSheet()->getPageMargins()->setRight(2);
-		$objPHPExcel->getActiveSheet()->getPageMargins()->setLeft(1);
-		$objPHPExcel->getActiveSheet()->getPageMargins()->setBottom(2);
+		$objPHPExcel->getActiveSheet()->getPageMargins()->setTop(0.787402);
+		$objPHPExcel->getActiveSheet()->getPageMargins()->setRight(0.787402);
+		$objPHPExcel->getActiveSheet()->getPageMargins()->setLeft(0.393701);
+		$objPHPExcel->getActiveSheet()->getPageMargins()->setBottom(0.787402);
 		
 		$objPHPExcel->getActiveSheet()->getStyle('A1')->getAlignment()->setWrapText(true);
 		
