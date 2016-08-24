@@ -1,21 +1,22 @@
 @C!
                                                                             Kepada Yth.  7 PILAR ABADI WALLDESIGN
-   Tgl : 25-06-2016                                                                      MALANG
+   Tgl : 22-07-2016                                                                      MALANG
    Sales           : MRC                            EW1INVOICEW0F
-   Tgl Jatuh Tempo : 25-06-2016
-   Kami kirim pesanan anda dalam keadaan baik, barang-barang sbb:                                                       No : TJ-250616033
+   Tgl Jatuh Tempo : 22-07-2016
+   Kami kirim pesanan anda dalam keadaan baik, barang-barang sbb:                                                       No : TJ-220716018
 -----------------------------------------------------------------------------------------------------------------------------------------
 |      Qty      |                Nama Barang                 |     Lot    |    Harga Satuan   |       Diskon      |        Total        |
 -----------------------------------------------------------------------------------------------------------------------------------------
-|      3 Roll   | ROCK DV 1466                               |      A0001 |        185,000.00 |    64,750.00(35%) |          360,750.00 |
-|     50 pcs    | LEM GREATWALL                              |          0 |         17,000.00 |              0.00 |          850,000.00 |
+|     13 Roll   | MAESTRO 12-7845                            |      A0002 |        155,000.00 |    54,250.00(35%) |        1,309,750.00 |
+|     12 Roll   | MAESTRO XTC 648                            |      A0008 |        155,000.00 |    54,250.00(35%) |        1,209,000.00 |
+|     12 Roll   | SUPRA XTA 012                              |      A0001 |        155,000.00 |    54,250.00(35%) |        1,209,000.00 |
 |---------------------------------------------------------------------------------------------------------------------------------------|
-   Catatan   :                                                                            Jml Pembelian         Rp.        1,210,750.00
-   Kredit    : Rp. 1,210,750.00
-   Terbilang : SATU JUTA DUA RATUS SEPULUH RIBU TUJUH RATUS LIMA PULUH RUPIAH
+   Catatan   :                                                                            Jml Pembelian         Rp.        3,727,750.00
+   Kredit    : Rp. 3,727,750.00
+   Terbilang : TIGA JUTA TUJUH RATUS DUA PULUH TUJUH RIBU TUJUH RATUS LIMA PULUH RUPIAH
 _________________________________________________________________________________________________________________________________________
    Penerima,                                                  Checker,                                                  Hormat Kami,
 
 
-                                                                                                                             mil
+                                                                                                                             DWI
 EBarang yang sudah dibeli tidak dapat ditukar/dikembalikan

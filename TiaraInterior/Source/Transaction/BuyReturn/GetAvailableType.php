@@ -40,7 +40,7 @@
 							GROUP BY
 								TypeID,
 								BatchNumber
-							UNION
+							UNION ALL
 							SELECT
 								TypeID,
 								TRIM(BatchNumber) BatchNumber,

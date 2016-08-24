@@ -63,7 +63,7 @@
 						GROUP BY
 							TypeID,
 							BatchNumber
-						UNION
+						UNION ALL
 						SELECT
 							TID.TypeID,
 							TRIM(TID.BatchNumber) BatchNumber,
@@ -129,6 +129,8 @@
 						transaction_salereturn SR
 						JOIN transaction_salereturndetails SRD
 							ON SR.SaleReturnID = SRD.SaleReturnID
+					WHERE
+						SR.IsCancelled = 0
 					GROUP BY
 						SRD.TypeID,
 						SRD.BatchNumber
@@ -215,7 +217,7 @@
 						GROUP BY
 							TypeID,
 							BatchNumber
-						UNION
+						UNION ALL
 						SELECT
 							TID.TypeID,
 							TRIM(TID.BatchNumber) BatchNumber,
@@ -281,6 +283,8 @@
 						transaction_salereturn SR
 						JOIN transaction_salereturndetails SRD
 							ON SR.SaleReturnID = SRD.SaleReturnID
+					WHERE
+						SR.IsCancelled = 0 
 					GROUP BY
 						SRD.TypeID,
 						SRD.BatchNumber

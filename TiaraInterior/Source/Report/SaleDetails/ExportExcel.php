@@ -137,7 +137,7 @@
 							THEN MC.CustomerID
 							ELSE ".$CustomerID."
 						END = MC.CustomerID
-				UNION
+				UNION ALL
 				SELECT
 					SR.SaleReturnNumber,
 					DATE_FORMAT(SR.TransactionDate, '%d/%c/%y') AS TransactionDate,

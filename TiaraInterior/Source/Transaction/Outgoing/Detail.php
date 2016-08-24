@@ -93,7 +93,7 @@
 									SalePrice,
 									CreatedDate,
 									Discount
-								UNION
+								UNION ALL
 								SELECT
 									TypeID,
 									TRIM(BatchNumber) BatchNumber,

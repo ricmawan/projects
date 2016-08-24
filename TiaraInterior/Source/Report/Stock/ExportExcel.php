@@ -123,7 +123,7 @@
 							GROUP BY
 								TypeID,
 								BatchNumber
-							UNION
+							UNION ALL
 							SELECT
 								TypeID,
 								TRIM(BatchNumber) BatchNumber,
@@ -491,8 +491,8 @@
 				SELECT
 					'Pembatalan',
 					OT.OutgoingNumber,
-					DATE_FORMAT(OT.TransactionDate, '%d/%c%/%y') AS TransactionDate,
-					OT.TransactionDate DateNoFormat,
+					DATE_FORMAT(OT.ModifiedDate, '%d/%c%/%y') AS TransactionDate,
+					OT.ModifiedDate DateNoFormat,
 					MC.CustomerName,
 					TOD.BatchNumber,
 					TOD.Quantity,
@@ -510,8 +510,8 @@
 					LEFT JOIN master_brand MB
 						ON MB.BrandID = MT.BrandID
 				WHERE
-					CAST(OT.TransactionDate AS DATE) >= '".$txtFromDate."'
-					AND CAST(OT.TransactionDate AS DATE) <= '".$txtToDate."'
+					CAST(OT.ModifiedDate AS DATE) >= '".$txtFromDate."'
+					AND CAST(OT.ModifiedDate AS DATE) <= '".$txtToDate."'
 					AND OT.IsCancelled = 1
 					AND CASE
 							WHEN ".$BrandID." = 0
@@ -527,8 +527,8 @@
 				SELECT
 					'Pembatalan',
 					TI.IncomingNumber,
-					DATE_FORMAT(TI.TransactionDate, '%d/%c%/%y') AS TransactionDate,
-					TI.TransactionDate DateNoFormat,
+					DATE_FORMAT(TI.ModifiedDate, '%d/%c%/%y') AS TransactionDate,
+					TI.ModifiedDate DateNoFormat,
 					MS.SupplierName,
 					TID.BatchNumber,
 					-TID.Quantity,
@@ -544,8 +544,8 @@
 					LEFT JOIN master_brand MB
 						ON MB.BrandID = MT.BrandID
 				WHERE
-					CAST(TI.TransactionDate AS DATE) >= '".$txtFromDate."'
-					AND CAST(TI.TransactionDate AS DATE) <= '".$txtToDate."'
+					CAST(TI.ModifiedDate AS DATE) >= '".$txtFromDate."'
+					AND CAST(TI.ModifiedDate AS DATE) <= '".$txtToDate."'
 					AND TI.IsCancelled = 1
 					AND CASE
 							WHEN ".$BrandID." = 0
@@ -561,8 +561,8 @@
 				SELECT
 					'Pembatalan',
 					SR.SaleReturnNumber,
-					DATE_FORMAT(SR.TransactionDate, '%d/%c%/%y') AS TransactionDate,
-					SR.TransactionDate DateNoFormat,
+					DATE_FORMAT(SR.ModifiedDate, '%d/%c%/%y') AS TransactionDate,
+					SR.ModifiedDate DateNoFormat,
 					MC.CustomerName,
 					SRD.BatchNumber,
 					-SRD.Quantity,
@@ -578,8 +578,8 @@
 					LEFT JOIN master_brand MB
 						ON MB.BrandID = MT.BrandID
 				WHERE
-					CAST(SR.TransactionDate AS DATE) >= '".$txtFromDate."'
-					AND CAST(SR.TransactionDate AS DATE) <= '".$txtToDate."'
+					CAST(SR.ModifiedDate AS DATE) >= '".$txtFromDate."'
+					AND CAST(SR.ModifiedDate AS DATE) <= '".$txtToDate."'
 					AND SR.IsCancelled = 1
 					AND CASE
 							WHEN ".$BrandID." = 0
@@ -595,8 +595,8 @@
 				SELECT
 					'Pembatalan',
 					BR.BuyReturnNumber,
-					DATE_FORMAT(BR.TransactionDate, '%d/%c%/%y') AS TransactionDate,
-					BR.TransactionDate DateNoFormat,
+					DATE_FORMAT(BR.ModifiedDate, '%d/%c%/%y') AS TransactionDate,
+					BR.ModifiedDate DateNoFormat,
 					MS.SupplierName,
 					BRD.BatchNumber,
 					BRD.Quantity,
@@ -612,8 +612,8 @@
 					LEFT JOIN master_brand MB
 						ON MB.BrandID = MT.BrandID
 				WHERE
-					CAST(BR.TransactionDate AS DATE) >= '".$txtFromDate."'
-					AND CAST(BR.TransactionDate AS DATE) <= '".$txtToDate."'
+					CAST(BR.ModifiedDate AS DATE) >= '".$txtFromDate."'
+					AND CAST(BR.ModifiedDate AS DATE) <= '".$txtToDate."'
 					AND BR.IsCancelled = 1
 					AND CASE
 							WHEN ".$BrandID." = 0

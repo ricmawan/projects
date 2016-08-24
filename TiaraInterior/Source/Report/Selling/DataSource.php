@@ -102,7 +102,7 @@
 					OT.TransactionDate,
 					MS.SalesName,
 					MC.CustomerName
-				UNION
+				UNION ALL
 				SELECT
 					SR.SaleReturnNumber,
 					DATE_FORMAT(SR.TransactionDate, '%d/%c/%y') AS TransactionDate,

@@ -33,7 +33,6 @@
 										<th data-column-id="Total" data-align="right">Total</th>
 										<th data-column-id="Remarks">Catatan</th>
 										<th data-column-id="Opsi" data-formatter="commands" data-sortable="false">Opsi</th>
-										<?php //if($EditFlag == true) echo '<th data-column-id="Opsi" data-formatter="commands" data-sortable="false">Opsi</th>'; ?>
 									</tr>
 								</thead>
 							</table>
