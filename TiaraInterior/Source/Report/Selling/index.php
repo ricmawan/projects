@@ -50,6 +50,7 @@
 								<div class="ui-widget" style="width: 100%;">
 									<select name="ddlSales" id="ddlSales" class="form-control-custom" placeholder="Pilih Sales" >
 										<option value="" > </option>
+										<option value=0 selected>-Pilih Semua Sales-</option>
 										<?php
 											$sql = "SELECT SalesID, SalesName FROM master_sales ORDER BY SalesName";
 											if(!$result = mysql_query($sql, $dbh)) {

@@ -26,6 +26,7 @@
 								<div class="ui-widget" style="width: 100%;">
 									<select name="ddlSupplier" id="ddlSupplier" class="form-control-custom" placeholder="Pilih Supplier" >
 										<option value="" > </option>
+										<option value=0 selected>-Pilih Semua Supplier-</option>
 										<?php
 											$sql = "SELECT SupplierID, SupplierName FROM master_supplier ORDER BY SupplierName";
 											if(!$result = mysql_query($sql, $dbh)) {
