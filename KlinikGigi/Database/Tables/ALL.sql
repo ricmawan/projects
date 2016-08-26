@@ -83,7 +83,7 @@ VALUES
 	'Master/Examination/',
 	NULL,
 	0,
-	2
+	3
 ),
 (
 	3,
@@ -92,7 +92,7 @@ VALUES
 	'Master/Patient/',
 	NULL,
 	0,
-	3
+	4
 ),
 (
 	4,
@@ -147,6 +147,15 @@ VALUES
 	NULL,
 	1,
 	3
+),
+(
+	10,
+	2,
+	'Dokter',
+	'Master/Doctor/',
+	NULL,
+	0,
+	2
 );
 
 CREATE UNIQUE INDEX MENU_INDEX
@@ -278,6 +287,13 @@ VALUES
 	9,
 	1,
 	1
+),
+(
+	0,
+	1,
+	10,
+	1,
+	1
 );
 
 CREATE UNIQUE INDEX ROLE_INDEX
@@ -332,6 +348,8 @@ CREATE TABLE transaction_medication
 	Remarks				TEXT,
 	IsDone				BIT,
 	IsCancelled			BIT,
+	Cash				DOUBLE,
+	Debit				DOUBLE,
 	CreatedDate 		DATETIME NOT NULL,
 	CreatedBy 			VARCHAR(255) NOT NULL,
 	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
@@ -384,7 +402,25 @@ INSERT INTO `master_parameter` (`ParameterID`, `ParameterName`, `ParameterValue`
 (5, 'BACKUP_FOLDER', 'BackupFiles\\\\', 'Backup path', 0, '2016-03-12 00:00:00', 'Admin', '2016-03-12 14:43:21', NULL),
 (6, 'MYSQL_PATH', 'C:\\xampp\\mysql\\bin\\mysql.exe', 'mysql.exe path', 0, '2016-03-12 00:00:00', 'Admin', NULL, NULL),
 (7, 'UPLOAD_PATH', 'C:\\xampp\\htdocs\\Projects\\KlinikGigi\\Source\\UploadedFiles\\', 'Upload Path', 0, '2016-03-12 00:00:00', 'Admin', NULL, NULL),
-(8, 'SHARED_PRINTER_ADDRESS', '//localhost/EPSON', 'For shared printer', 0, '2016-03-20 00:00:00', 'Admin', NULL, NULL);DROP TABLE IF EXISTS transaction_invoicenumber;
+(8, 'SHARED_PRINTER_ADDRESS', '//localhost/EPSON', 'For shared printer', 0, '2016-03-20 00:00:00', 'Admin', NULL, NULL);DROP TABLE IF EXISTS transaction_doctorcommision;
+
+CREATE TABLE transaction_doctorcommision
+(
+	DoctorCommisionID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	BusinessMonth 			SMALLINT,
+	BusinessYear 			INT,
+	DoctorID				BIGINT,
+	CommisionPercentage		SMALLINT,
+	ToolsFee				DOUBLE,
+	CreatedDate 			DATETIME NOT NULL,
+	CreatedBy 				VARCHAR(255) NOT NULL,
+	ModifiedDate 			TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 				VARCHAR(255) NULL,
+	FOREIGN KEY (DoctorID) REFERENCES master_user(UserID) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX DOCTORCOMMISION_INDEX
+ON transaction_doctorcommision (DoctorCommisionID, DoctorID);DROP TABLE IF EXISTS transaction_invoicenumber;
 
 CREATE TABLE transaction_invoicenumber
 (
@@ -399,4 +435,13 @@ CREATE TABLE transaction_invoicenumber
 )ENGINE=InnoDB;
 
 CREATE UNIQUE INDEX INVOICENUMBER_INDEX
-ON transaction_invoicenumber (InvoiceNumberID, TransactionDate);
+ON transaction_invoicenumber (InvoiceNumberID, TransactionDate);DROP TABLE IF EXISTS tbl_temp;
+
+CREATE TABLE tbl_temp
+(
+	ID INT
+);
+
+INSERT INTO tbl_temp
+VALUES
+(1);
