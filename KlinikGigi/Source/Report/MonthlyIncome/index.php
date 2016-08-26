@@ -90,6 +90,8 @@
 									<tr>
 										<th data-column-id="RowNumber" data-sortable="false" data-type="numeric" >No</th>
 										<th data-column-id="MonthName">Bulan</th>
+										<th data-column-id="Cash" data-align="right">Cash</th>
+										<th data-column-id="Debit" data-align="right">Debit</th>
 										<th data-column-id="IncomeTotal" data-align="right">Total Pendapatan</th>
 									</tr>
 								</thead>

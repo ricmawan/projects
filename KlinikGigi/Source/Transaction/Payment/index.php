@@ -31,14 +31,72 @@
 					</div>
 				</div>
 			</div>
-			<form id="PostForm" method="post">
-				<input type="hidden" value=0 id="hdnMedicationID" name="hdnMedicationID" />
-			</form>
-			<div id="dialog-confirm-print" title="Konfirmasi" style="display: none;">
-				<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 40px 0;"></span>Apakah anda yakin ingin mencetak nota untuk pasien bernama <span style="font-weight: bold; font-size: 18px; color: red;" id="patientName2"></span>?</p>
+			<div id="dialog-confirm-print" title="Pembayaran" style="display: none;">
+				<form class="col-md-12" id="PostForm" method="POST" action="" >
+					<input type="hidden" value=0 id="hdnMedicationID" name="hdnMedicationID" />
+					<div class="row">
+						<div class="col-md-2 labelColumn">
+							Pasien :
+						</div>
+						<div class="col-md-6" id="patientName" style="font-weight: bold; font-size: 15px; color: red;">
+						</div>
+					</div>
+					<br />
+					<div class="row">
+						<div class="col-md-2 labelColumn">
+							Total :
+						</div>
+						<div class="col-md-6" id="Total" style="color: red;text-align: right">
+							<input type="text" id="txtTotal" style="color: red;text-align: right" name="txtTotal" class="form-control-custom" readonly />
+						</div>
+					</div>
+					<br />
+					<div class="row">
+						<div class="col-md-2 labelColumn">
+							Cash :
+						</div>
+						<div class="col-md-6">
+							<input type="text" value="0.00" style="text-align:right;" id="txtCash" name="txtCash" class="form-control-custom" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" />
+						</div>
+					</div>
+					<br />
+					<div class="row">
+						<div class="col-md-2 labelColumn">
+							Debit :
+						</div>
+						<div class="col-md-6">
+							<input type="text" value="0.00" style="text-align:right;" id="txtDebit" name="txtDebit" class="form-control-custom" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" />
+						</div>
+					</div>
+					<br />
+				</form>
+			</div>
+			<div id="dialog-confirm" title="Konfirmasi" style="display: none;">
+				<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Apakah anda yakin data yang diinput sudah benar?</p>
 			</div>
 		</div>
 		<script>
+			function LoadDetails() {
+				$("#loading").show();
+				$("#txtCash").val("0.00");
+				$("#txtDebit").val("0.00");
+				var MedicationID = $("#hdnMedicationID").val();
+				$.ajax({
+					url: "./Transaction/Payment/Detail.php",
+					type: "POST",
+					data: { MedicationID : MedicationID },
+					dataType: "json",
+					success: function(data) {
+						$("#loading").hide();
+						$("#txtCash").val(returnRupiah(data[0].Cash));
+						$("#txtDebit").val(returnRupiah(data[0].Debit));							
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Terjadi kesalahan sistem!", "error");
+					}
+				});
+			}
 			$(document).ready(function() {
 				var grid = $("#grid-data").bootgrid({
 							ajax: true,
@@ -65,7 +123,7 @@
 							formatters: {
 								"commands": function(column, row)
 								{
-									return "<i style='cursor:pointer;' data-row-id=\"" + row.MedicationID + "\" data-patient-name=\"" + row.PatientName + "\" class=\"fa fa-print\" acronym title=\"Cetak Nota\"></i>&nbsp;";
+									return "<i style='cursor:pointer;' data-total=\"" + row.Total + "\" data-row-id=\"" + row.MedicationID + "\" data-patient-name=\"" + row.PatientName + "\" class=\"fa fa-print\" acronym title=\"Cetak Nota\"></i>&nbsp;";
 								}
 							}
 						}).on("loaded.rs.jquery.bootgrid", function()
@@ -73,8 +131,10 @@
 							/* Executes after data is loaded and rendered */
 							grid.find(".fa-print").on("click", function(e)
 							{
-								$("#patientName2").html($(this).data("patient-name"));
 								$("#hdnMedicationID").val($(this).data("row-id"));
+								$("#patientName").html($(this).data("patient-name"));
+								$("#txtTotal").val(returnRupiah($(this).data("total")));
+								LoadDetails();
 								$("#dialog-confirm-print").dialog({
 									autoOpen: false,
 									show: {
@@ -87,23 +147,83 @@
 									},
 									resizable: false,
 									height: "auto",
-									width: 400,
+									width: 600,
 									close: function() {
 										$(this).dialog("destroy");
 									},
 									modal: true,
 									buttons: {
-										"Ya": function() {
-											$(this).dialog("destroy");
-											$("#loading").show();
-											$("#loading").show();
-											form = $("#PostForm");
-											form.attr("action", "./Transaction/Payment/Print.php");
-											form.attr("target", "_blank");
-											form.submit();
-											$("#loading").hide();
+										"Simpan": function() {
+											var Cash = parseFloat($("#txtCash").val().replace(/\,/g, ""));
+											var Debit = parseFloat($("#txtDebit").val().replace(/\,/g, ""));
+											var Total = parseFloat($("#txtTotal").val().replace(/\,/g, ""));
+											if((Cash + Debit) > Total) {
+												$("#txtCash").notify("Total cash dan debit melebihi total yang harus dibayar!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+												$("#txtDebit").notify("Total cash dan debit melebihi total yang harus dibayar!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+												return false;
+											}
+											else if((Cash + Debit) < Total) {
+												$("#txtCash").notify("Total cash dan debit kurang dari total yang harus dibayar!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+												$("#txtDebit").notify("Total cash dan debit kurang dari total yang harus dibayar!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+												return false
+											}
+											else if((Cash + Debit) == Total) {
+												$("#dialog-confirm").dialog({
+													autoOpen: false,
+													show: {
+														effect: "fade",
+														duration: 500
+													},
+													hide: {
+														effect: "fade",
+														duration: 500
+													},
+													resizable: false,
+													height: "auto",
+													width: 400,
+													modal: true,
+													close: function() {
+														$(this).dialog("destroy");
+													},
+													buttons: {
+														"Ya": function() {
+															$(this).dialog("destroy");
+															$("#loading").show();
+															$.ajax({
+																url: "./Transaction/Payment/Insert.php",
+																type: "POST",
+																data: $("#PostForm").serialize(),
+																dataType: "json",
+																success: function(data) {
+																	$("#loading").hide();
+																	if(data.FailedFlag == '0') {
+																		$.notify(data.Message, "success");
+																		$("#loading").show();
+																		form = $("#PostForm");
+																		form.attr("action", "./Transaction/Payment/Print.php");
+																		form.attr("target", "_blank");
+																		form.submit();
+																		$("#loading").hide();
+																	}
+																	else {
+																		$.notify(data.Message, "error");					
+																	}
+																},
+																error: function(data) {
+																	$("#loading").hide();
+																	$.notify("Terjadi kesalahan sistem!", "error");
+																}
+															});
+														},
+														"Tidak": function() {
+															$(this).dialog("destroy");
+															return false;
+														}
+													}
+												}).dialog("open");
+											}
 										},
-										"Tidak": function() {
+										"Tutup": function() {
 											$(this).dialog("destroy");
 											return false;
 										}

@@ -92,6 +92,7 @@
 										<th data-column-id="DoctorName" >Dokter</th>
 										<th data-column-id="IncomeTotal" data-align="right">Total Pemasukan</th>
 										<th data-column-id="Commision" data-align="right">Komisi</th>
+										<th data-column-id="ToolsFee" data-align="right">Biaya Alat</th>
 										<th data-column-id="Earning" data-align="right">Pendapatan</th>
 									</tr>
 								</thead>

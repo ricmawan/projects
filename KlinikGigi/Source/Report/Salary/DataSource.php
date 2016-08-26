@@ -11,14 +11,19 @@
 		$sql = "SELECT
 					MU.UserName,
 					SUM(TMD.Quantity * TMD.Price) AS TotalIncome,
-					'75%' AS Commision,
-					(SUM(TMD.Quantity * TMD.Price) /100) * 75 AS Earning
+					TDC.ToolsFee,
+					CONCAT(TDC.CommisionPercentage, '%') AS Commision,
+					((SUM(TMD.Quantity * TMD.Price) - TDC.ToolsFee) /100) * TDC.CommisionPercentage AS Earning
 				FROM
 					transaction_medication TM
 					JOIN transaction_medicationdetails TMD
 						ON TM.MedicationID = TMD.MedicationID
 					JOIN master_user MU
 						ON MU.UserID = TMD.DoctorID
+					LEFT JOIN transaction_doctorcommision TDC
+						ON TDC.DoctorID = TMD.DoctorID
+						AND TDC.BusinessMonth = ".$ddlMonth."
+						AND TDC.BusinessYear = ".$ddlYear."
 				WHERE
 					MONTH(TM.TransactionDate) = ".$ddlMonth."
 					AND YEAR(TM.TransactionDate) = ".$ddlYear."
@@ -41,6 +46,7 @@
 			$row_array['RowNumber'] = $RowNumber;
 			$row_array['DoctorName']= $row['UserName'];
 			$row_array['IncomeTotal'] = number_format($row['TotalIncome'],2,".",",");
+			$row_array['ToolsFee'] = number_format($row['ToolsFee'],2,".",",");
 			$row_array['Commision'] = $row['Commision'];
 			$row_array['Earning'] = number_format($row['Earning'],2,".",",");
 			array_push($return_arr, $row_array);

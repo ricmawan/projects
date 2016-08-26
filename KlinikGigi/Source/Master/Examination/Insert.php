@@ -18,7 +18,7 @@
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysql_error();
 			$FailedFlag = 1;
-			echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
+			echo returnstate($ExaminationID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}				
 		$row=mysql_fetch_array($result);

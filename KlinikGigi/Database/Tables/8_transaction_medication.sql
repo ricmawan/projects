@@ -9,6 +9,8 @@ CREATE TABLE transaction_medication
 	Remarks				TEXT,
 	IsDone				BIT,
 	IsCancelled			BIT,
+	Cash				DOUBLE,
+	Debit				DOUBLE,
 	CreatedDate 		DATETIME NOT NULL,
 	CreatedBy 			VARCHAR(255) NOT NULL,
 	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,

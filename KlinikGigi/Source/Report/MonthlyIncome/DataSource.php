@@ -35,7 +35,9 @@
 						WHEN 12
 						THEN 'Desember'
 					END	MonthName,
-					SUM(TMD.Quantity * TMD.Price) AS TotalIncome
+					SUM(TMD.Quantity * TMD.Price) AS TotalIncome,
+					SUM(TM.Cash) Cash,
+					SUM(TM.Debit) Debit
 				FROM
 					transaction_medication TM
 					JOIN transaction_medicationdetails TMD
@@ -61,6 +63,8 @@
 			$row_array['RowNumber'] = $RowNumber;
 			$row_array['MonthName']= $row['MonthName'];
 			$row_array['IncomeTotal'] = number_format($row['TotalIncome'],2,".",",");
+			$row_array['Cash'] = number_format($row['Cash'],2,".",",");
+			$row_array['Debit'] = number_format($row['Debit'],2,".",",");
 			array_push($return_arr, $row_array);
 		}
 

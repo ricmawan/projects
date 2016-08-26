@@ -17,15 +17,15 @@
 		<!--<link href="assets/js/dataTables/dataTables.bootstrap.css" rel="stylesheet" />-->
 		<link rel="stylesheet" href="assets/css/bootstrap-multiselect.css" type="text/css"/>
 		
-<link rel="apple-touch-icon" sizes="180x180" href="./assets/img/apple-touch-icon.png">
-<link rel="icon" type="image/png" href="./assets/img/favicon-32x32.png" sizes="32x32">
-<link rel="icon" type="image/png" href="./assets/img/favicon-16x16.png" sizes="16x16">
-<link rel="manifest" href="./assets/img/manifest.json">
-<link rel="mask-icon" href="./assets/img/safari-pinned-tab.svg" color="#5bbad5">
-<link rel="shortcut icon" href="./assets/img/favicon.ico">
-<meta name="msapplication-config" content="./assets/img/browserconfig.xml">
-<meta name="theme-color" content="#ffffff">
-<link rel="icon" type="image/png" sizes="32x32" href="./assets/img/favicon-32x32.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="./assets/img/apple-touch-icon.png">
+		<link rel="icon" type="image/png" href="./assets/img/favicon-32x32.png" sizes="32x32">
+		<link rel="icon" type="image/png" href="./assets/img/favicon-16x16.png" sizes="16x16">
+		<link rel="manifest" href="./assets/img/manifest.json">
+		<link rel="mask-icon" href="./assets/img/safari-pinned-tab.svg" color="#5bbad5">
+		<link rel="shortcut icon" href="./assets/img/favicon.ico">
+		<meta name="msapplication-config" content="./assets/img/browserconfig.xml">
+		<meta name="theme-color" content="#ffffff">
+		<link rel="icon" type="image/png" sizes="32x32" href="./assets/img/favicon-32x32.png">
 		<link rel="icon" type="image/png" sizes="96x96" href="./assets/img/favicon-96x96.png">
 		<link rel="icon" type="image/png" sizes="16x16" href="./assets/img/favicon-16x16.png">
 		<style>
@@ -174,7 +174,10 @@
 			$(document).ready(function() {
 				var windowHeight = $( window ).height() - 55;
 				$("#page-inner").css ({
-					"min-height" : windowHeight
+					"min-height" : windowHeight,
+					"max-height" : windowHeight,
+					"overflow-x" : "hidden",
+					"overflow-y" : "auto"
 				});
 				$("head").append("<style> .panel-default { min-height : " + windowHeight + "px } </style>");
 				$(".panel-default").css ({
