@@ -19,7 +19,7 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h5><?php if($IsEdit == 0) echo "Tambah"; else echo "Ubah"; ?> Data Medication</h5>  
+						<h5>Pendaftaran Pasien</h5>  
 					</div>
 					<div class="panel-body">
 						<form class="col-md-12" id="PostForm" method="POST" action="" >

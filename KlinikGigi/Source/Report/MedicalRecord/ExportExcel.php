@@ -45,13 +45,11 @@
 		
 		//set bold
 		$objPHPExcel->getActiveSheet()->getStyle("A1:A2")->getFont()->setBold(true);
-		$objPHPExcel->getActiveSheet()->getStyle("A4:C5")->getFont()->setSize(14);
 		$objPHPExcel->getActiveSheet()->getStyle("A1")->getFont()->setSize(16);
-		$objPHPExcel->getActiveSheet()->getStyle("G4")->getFont()->setSize(14);
-		$objPHPExcel->getActiveSheet()->getStyle("G4")->getFont()->setBold(true);
-	
+		
 		$objPHPExcel->getActiveSheet()->setCellValue("A4", "ID Pasien :");
 		$objPHPExcel->getActiveSheet()->mergeCells("A4:B4");
+		$objPHPExcel->getActiveSheet()->getStyle("C4")->getNumberFormat()->setFormatCode( PHPExcel_Style_NumberFormat::FORMAT_TEXT );
 		$objPHPExcel->getActiveSheet()->setCellValue("A5", "Nama Pasien :");
 		$objPHPExcel->getActiveSheet()->mergeCells("A5:B5");
 		$rowExcel = 7;

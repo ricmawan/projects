@@ -46,10 +46,7 @@
 		
 		//set bold
 		$objPHPExcel->getActiveSheet()->getStyle("A1:A2")->getFont()->setBold(true);
-		$objPHPExcel->getActiveSheet()->getStyle("A4:C5")->getFont()->setSize(14);
 		$objPHPExcel->getActiveSheet()->getStyle("A1")->getFont()->setSize(16);
-		$objPHPExcel->getActiveSheet()->getStyle("G4")->getFont()->setSize(14);
-		$objPHPExcel->getActiveSheet()->getStyle("G4")->getFont()->setBold(true);
 	
 		$rowExcel = 4;
 		$col = 0;
@@ -114,7 +111,7 @@
 			$rowExcel++;
 		}
 		
-		$objPHPExcel->getActiveSheet()->getStyle("C7:C".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+		$objPHPExcel->getActiveSheet()->getStyle("C5:C".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 		//merge title
 		$objPHPExcel->getActiveSheet()->mergeCells("A1:C2");
 		$objPHPExcel->getActiveSheet()->getStyle("A4:C4")->getFont()->setBold(true);

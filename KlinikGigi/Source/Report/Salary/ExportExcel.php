@@ -46,11 +46,8 @@
 		
 		//set bold
 		$objPHPExcel->getActiveSheet()->getStyle("A1:A2")->getFont()->setBold(true);
-		$objPHPExcel->getActiveSheet()->getStyle("A4:C5")->getFont()->setSize(14);
 		$objPHPExcel->getActiveSheet()->getStyle("A1")->getFont()->setSize(16);
-		$objPHPExcel->getActiveSheet()->getStyle("G4")->getFont()->setSize(14);
-		$objPHPExcel->getActiveSheet()->getStyle("G4")->getFont()->setBold(true);
-	
+		
 		$rowExcel = 4;
 		$col = 0;
 		//set color
@@ -59,20 +56,26 @@
 		$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, "Dokter");
 		$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, "Total Pemasukan");
 		$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, "Komisi");
-		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Pendapatan");
+		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Biaya Alat");
+		$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, "Pendapatan");
 		$rowExcel++;
 		
 		$sql = "SELECT
 					MU.UserName,
 					SUM(TMD.Quantity * TMD.Price) AS TotalIncome,
-					'75%' AS Commision,
-					(SUM(TMD.Quantity * TMD.Price) /100) * 75 AS Earning
+					TDC.ToolsFee,
+					CONCAT(TDC.CommisionPercentage, '%') AS Commision,
+					((SUM(TMD.Quantity * TMD.Price) - TDC.ToolsFee) /100) * TDC.CommisionPercentage AS Earning
 				FROM
 					transaction_medication TM
 					JOIN transaction_medicationdetails TMD
 						ON TM.MedicationID = TMD.MedicationID
 					JOIN master_user MU
 						ON MU.UserID = TMD.DoctorID
+					LEFT JOIN transaction_doctorcommision TDC
+						ON TDC.DoctorID = TMD.DoctorID
+						AND TDC.BusinessMonth = ".$ddlMonth."
+						AND TDC.BusinessYear = ".$ddlYear."
 				WHERE
 					MONTH(TM.TransactionDate) = ".$ddlMonth."
 					AND YEAR(TM.TransactionDate) = ".$ddlYear."
@@ -93,22 +96,24 @@
 			$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['UserName']);
 			$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['TotalIncome']);
 			$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row['Commision']);
-			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, $row['Earning']);
+			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, $row['ToolsFee']);
+			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['Earning']);
 			$RowNumber++;
 			$rowExcel++;
 		}
 		
 		$objPHPExcel->getActiveSheet()->getStyle("C4:C".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 		$objPHPExcel->getActiveSheet()->getStyle("E4:E".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+		$objPHPExcel->getActiveSheet()->getStyle("F4:F".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 		//merge title
-		$objPHPExcel->getActiveSheet()->mergeCells("A1:E2");
-		$objPHPExcel->getActiveSheet()->getStyle("A4:E4")->getFont()->setBold(true);
-		$objPHPExcel->getActiveSheet()->getStyle("A1:E2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-		$objPHPExcel->getActiveSheet()->getStyle("A4:E4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');
+		$objPHPExcel->getActiveSheet()->mergeCells("A1:F2");
+		$objPHPExcel->getActiveSheet()->getStyle("A4:F4")->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle("A1:F2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$objPHPExcel->getActiveSheet()->getStyle("A4:F4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');
 
 		//set all width 
 		$fromCol='A';
-		$toCol= 'F';
+		$toCol= 'G';
 		for($j = $fromCol; $j !== $toCol; $j++) {
 			//$calculatedWidth = $objPHPExcel->getActiveSheet()->getColumnDimension($i)->getWidth();
 			$objPHPExcel->getActiveSheet()->getColumnDimension($j)->setAutoSize(true);
@@ -123,7 +128,7 @@
 			  )
 			)
 		);		
-		$objPHPExcel->getActiveSheet()->getStyle("A4:E".($rowExcel-1))->applyFromArray($styleArray);		
+		$objPHPExcel->getActiveSheet()->getStyle("A4:F".($rowExcel-1))->applyFromArray($styleArray);		
 
 		$title = "Laporan Pendapatan Dokter - ".$monthName[$ddlMonth - 1]." ".$ddlYear;
 		// Rename worksheet
