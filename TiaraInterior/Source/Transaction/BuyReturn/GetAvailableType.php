@@ -42,14 +42,18 @@
 								BatchNumber
 							UNION ALL
 							SELECT
-								TypeID,
-								TRIM(BatchNumber) BatchNumber,
-								SUM(Quantity) Quantity
+								TID.TypeID,
+								TRIM(TID.BatchNumber) BatchNumber,
+								SUM(TID.Quantity) Quantity
 							FROM
-								transaction_incomingdetails
+								transaction_incoming TI
+								JOIN transaction_incomingdetails TID
+									ON TI.IncomingID = TID.IncomingID
+							WHERE
+								TI.IsCancelled = 0
 							GROUP BY
-								TypeID,
-								BatchNumber
+								TID.TypeID,
+								TID.BatchNumber
 						)SA
 						GROUP BY
 							TypeID,
@@ -76,29 +80,37 @@
 						AND TOD.BatchNumber = FS.BatchNumber
 					LEFT JOIN
 					(
-						SELECT
-							TypeID,
-							TRIM(BatchNumber) BatchNumber,
-							SUM(Quantity) Quantity
-						FROM
-							transaction_buyreturndetails
-						GROUP BY
-							TypeID,
-							BatchNumber
+							SELECT
+								BRD.TypeID,
+								TRIM(BRD.BatchNumber) BatchNumber,
+								SUM(BRD.Quantity) Quantity
+							FROM
+								transaction_buyreturn BR
+								JOIN transaction_buyreturndetails BRD
+									ON BR.BuyReturnID = BRD.BuyReturnID
+							WHERE
+								BR.IsCancelled = 0
+							GROUP BY
+								BRD.TypeID,
+								BRD.BatchNumber
 					)BR
 						ON BR.TypeID = MT.TypeID
 						AND BR.BatchNumber = FS.BatchNumber
 					LEFT JOIN
 					(
 						SELECT
-							TypeID,
-							TRIM(BatchNumber) BatchNumber,
-							SUM(Quantity) Quantity
+							SRD.TypeID,
+							TRIM(SRD.BatchNumber) BatchNumber,
+							SUM(SRD.Quantity) Quantity
 						FROM
-							transaction_salereturndetails
+							transaction_salereturn SR
+							JOIN transaction_salereturndetails SRD
+								ON SR.SaleReturnID = SRD.SaleReturnID
+						WHERE
+							SR.IsCancelled = 0
 						GROUP BY
-							TypeID,
-							BatchNumber
+							SRD.TypeID,
+							SRD.BatchNumber
 					)SR
 						ON SR.TypeID = MT.TypeID
 						AND SR.BatchNumber = FS.BatchNumber

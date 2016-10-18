@@ -54,6 +54,7 @@
 								ON SR.SaleReturnID = SRD.SaleReturnID
 						WHERE
 							SR.CustomerID = ".$CustomerID."
+							AND SR.IsCancelled = 0
 						GROUP BY
 							SRD.TypeID,
 							SRD.BatchNumber
