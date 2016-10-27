@@ -1,0 +1,19 @@
+DROP TABLE IF EXISTS master_machine;
+
+CREATE TABLE master_machine
+(
+	MachineID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	MachineKind		VARCHAR(100) NOT NULL,
+	MachineType 	VARCHAR(255) NOT NULL,
+	MachineYear		INT NULL,
+	MachineCode		VARCHAR(255) NULL,
+	BrandName		VARCHAR(255) NULL,
+	Remarks 		TEXT,
+	CreatedDate 	DATETIME NOT NULL,
+	CreatedBy 		VARCHAR(255) NOT NULL,
+	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 		VARCHAR(255) NULL
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX MACHINE_INDEX
+ON master_machine (MachineID);
