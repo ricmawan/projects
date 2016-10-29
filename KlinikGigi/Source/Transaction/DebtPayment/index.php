@@ -10,19 +10,22 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						 <h5>Pembayaran</h5>
+						 <h5>Pembayaran Kekurangan</h5>
 					</div>
 					<div class="panel-body">
 						<div class="table-responsive">
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
-										<th data-column-id="MedicationIDNo" data-visible="false" data-type="numeric" data-identifier="true">UserID</th>
-										<th data-column-id="OrderNumber" data-type="numeric">No Urut</th>
+										<th data-column-id="PatientIDName" data-visible="false" data-type="numeric" data-identifier="true">PatientID</th>
+										<th data-column-id="RowNumber" data-sortable="false" data-type="numeric">No</th>
 										<th data-column-id="PatientNumber">ID Pasien</th>
 										<th data-column-id="PatientName">Nama Pasien</th>
-										<th data-column-id="Allergy">Alergi</th>
+										<th data-column-id="TransactionDate">Tanggal</th>
 										<th data-column-id="Total" data-align="right">Total</th>
+										<th data-column-id="Cash" data-align="right">Cash</th>
+										<th data-column-id="Debit" data-align="right">Debit</th>
+										<th data-column-id="Debt" data-align="right">Kekurangan</th>
 										<th data-column-id="Opsi" data-formatter="commands" data-sortable="false">Opsi</th>
 									</tr>
 								</thead>
@@ -31,38 +34,28 @@
 					</div>
 				</div>
 			</div>
-			<div id="dialog-confirm-print" title="Pembayaran" style="display: none;">
+			<div id="dialog-confirm-print" title="Pembayaran Kekurangan" style="display: none;">
 				<form class="col-md-12" id="PostForm" method="POST" action="" >
 					<input type="hidden" value=0 id="hdnMedicationID" name="hdnMedicationID" />
 					<div class="row">
-						<div class="col-md-4 labelColumn">
+						<div class="col-md-3 labelColumn">
 							Pasien :
 						</div>
 						<div class="col-md-6" id="patientName" style="font-weight: bold; font-size: 15px; color: red;">
 						</div>
 					</div>
 					<br />
-					<div class="row" id="rowDebt" style="display:none;">
-						<div class="col-md-4 labelColumn">
+					<div class="row">
+						<div class="col-md-3 labelColumn">
 							Kekurangan :
 						</div>
 						<div class="col-md-6" id="Total" style="color: red;text-align: right">
 							<input type="text" id="txtDebt" style="color: red;text-align: right" name="txtDebt" class="form-control-custom" readonly />
 						</div>
-						<br />
-						<br />
-					</div>
-					<div class="row">
-						<div class="col-md-4 labelColumn">
-							Total :
-						</div>
-						<div class="col-md-6" id="Total" style="color: red;text-align: right">
-							<input type="text" id="txtTotal" style="color: red;text-align: right" name="txtTotal" class="form-control-custom" readonly />
-						</div>
 					</div>
 					<br />
 					<div class="row">
-						<div class="col-md-4 labelColumn">
+						<div class="col-md-3 labelColumn">
 							Cash :
 						</div>
 						<div class="col-md-6">
@@ -71,7 +64,7 @@
 					</div>
 					<br />
 					<div class="row">
-						<div class="col-md-4 labelColumn">
+						<div class="col-md-3 labelColumn">
 							Debit :
 						</div>
 						<div class="col-md-6">
@@ -79,16 +72,6 @@
 						</div>
 					</div>
 					<br />
-					<div class="row">
-						<div class="col-md-4 labelColumn">
-							Jadwal Berikutnya :
-						</div>
-						<div class="col-md-6">
-							<input id="txtNextSchedule" name="txtNextSchedule" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Jadwal Berikutnya" />
-						</div>
-					</div>
-					<br />
-					<p id="lblInfo" style="display:none;"><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Masih terdapat kekurangan pembayaran dari transaksi sebelumnya!</p>
 				</form>
 			</div>
 			<div id="dialog-confirm" title="Konfirmasi" style="display: none;">
@@ -96,38 +79,6 @@
 			</div>
 		</div>
 		<script>
-			function LoadDetails() {
-				$("#loading").show();
-				$("#txtCash").val("0.00");
-				$("#txtDebit").val("0.00");
-				var MedicationID = $("#hdnMedicationID").val();
-				$.ajax({
-					url: "./Transaction/Payment/Detail.php",
-					type: "POST",
-					data: { MedicationID : MedicationID },
-					dataType: "json",
-					success: function(data) {
-						$("#loading").hide();
-						$("#txtCash").val(returnRupiah(data[0].Cash));
-						$("#txtDebit").val(returnRupiah(data[0].Debit));	
-						if(data[0].Debt > 0) {
-							$("#rowDebt").show();
-							$("#lblInfo").show();
-							$("#txtDebt").val(returnRupiah(data[0].Debt));
-							$('.ui-dialog-buttonpane button:contains("Simpan")').button().hide();
-						}
-						else {
-							$("#rowDebt").hide();
-							$("#lblInfo").hide();
-							$('.ui-dialog-buttonpane button:contains("Simpan")').button().show();
-						}
-					},
-					error: function(data) {
-						$("#loading").hide();
-						$.notify("Terjadi kesalahan sistem!", "error");
-					}
-				});
-			}
 			$(document).ready(function() {
 				var grid = $("#grid-data").bootgrid({
 							ajax: true,
@@ -146,15 +97,15 @@
 								refresh: "Refresh",
 								search: "Cari"
 							},
-							url: "./Transaction/Payment/DataSource.php",
+							url: "./Transaction/DebtPayment/DataSource.php",
 							selection: false,
-							multiSelect: false,
+							multiSelect: true,
 							rowSelect: true,
-							keepSelection: false,
+							keepSelection: true,
 							formatters: {
 								"commands": function(column, row)
 								{
-									return "<i style='cursor:pointer;' data-total=\"" + row.Total + "\" data-row-id=\"" + row.MedicationID + "\" data-patient-name=\"" + row.PatientName + "\" class=\"fa fa-print\" acronym title=\"Cetak Nota\"></i>&nbsp;";
+									return "<i style='cursor:pointer;' data-debt=\"" + row.Debt + "\" data-row-id=\"" + row.MedicationID + "\" data-patient-name=\"" + row.PatientName + "\" class=\"fa fa-print\" acronym title=\"Bayar Kekurangan\"></i>&nbsp;";
 								}
 							}
 						}).on("loaded.rs.jquery.bootgrid", function()
@@ -164,8 +115,8 @@
 							{
 								$("#hdnMedicationID").val($(this).data("row-id"));
 								$("#patientName").html($(this).data("patient-name"));
-								$("#txtTotal").val(returnRupiah($(this).data("total")));
-								LoadDetails();
+								$("#txtDebt").val(returnRupiah($(this).data("debt")));
+								//LoadDetails();
 								$("#dialog-confirm-print").dialog({
 									autoOpen: false,
 									show: {
@@ -187,19 +138,18 @@
 										"Simpan": function() {
 											var Cash = parseFloat($("#txtCash").val().replace(/\,/g, ""));
 											var Debit = parseFloat($("#txtDebit").val().replace(/\,/g, ""));
-											var Total = parseFloat($("#txtTotal").val().replace(/\,/g, ""));
+											var Total = parseFloat($("#txtDebt").val().replace(/\,/g, ""));
 											if((Cash + Debit) > Total) {
 												$("#txtCash").notify("Total cash dan debit melebihi total yang harus dibayar!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 												$("#txtDebit").notify("Total cash dan debit melebihi total yang harus dibayar!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 												return false;
 											}
-											/*else if((Cash + Debit) < Total) {
+											else if((Cash + Debit) < Total) {
 												$("#txtCash").notify("Total cash dan debit kurang dari total yang harus dibayar!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 												$("#txtDebit").notify("Total cash dan debit kurang dari total yang harus dibayar!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 												return false
-											}*/
-											//else if((Cash + Debit) == Total) {
-											else {
+											}
+											else if((Cash + Debit) == Total) {
 												$("#dialog-confirm").dialog({
 													autoOpen: false,
 													show: {
@@ -222,7 +172,7 @@
 															$(this).dialog("destroy");
 															$("#loading").show();
 															$.ajax({
-																url: "./Transaction/Payment/Insert.php",
+																url: "./Transaction/DebtPayment/Insert.php",
 																type: "POST",
 																data: $("#PostForm").serialize(),
 																dataType: "json",
@@ -232,7 +182,7 @@
 																		$.notify(data.Message, "success");
 																		$("#loading").show();
 																		form = $("#PostForm");
-																		form.attr("action", "./Transaction/Payment/Print.php");
+																		form.attr("action", "./Transaction/DebtPayment/Print.php");
 																		form.attr("target", "_blank");
 																		form.submit();
 																		$("#loading").hide();

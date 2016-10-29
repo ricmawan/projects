@@ -18,29 +18,6 @@
 						 <h5>Pendapatan Bulanan</h5>
 					</div>
 					<div class="panel-body">
-						<!--<div class="row">
-							<div class="col-md-1 labelColumn">
-								Dokter :
-							</div>
-							<div class="col-md-3">
-								<div class="ui-widget" style="width: 100%;">
-									<select name="ddlDoctor" id="ddlDoctor" class="form-control-custom" placeholder="Pilih Dokter" >
-										<option value="" ></option>
-										<?php
-											$sql = "SELECT UserID, UserName FROM master_user WHERE UserTypeID = 2";
-											if(!$result = mysql_query($sql, $dbh)) {
-												echo mysql_error();
-												return 0;
-											}
-											while($row = mysql_fetch_array($result)) {
-												echo "<option value='".$row['UserID']."' >".$row['UserName']."</option>";
-											}
-										?>
-									</select>
-								</div>
-							</div>
-						</div>-->
-						<br />
 						<div class="row">
 							<div class="col-md-1 labelColumn">
 								Bulan :

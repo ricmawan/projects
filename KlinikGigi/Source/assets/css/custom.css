@@ -586,6 +586,10 @@ th[data-column-id="Total"] {
 	width: 150px;
 }
 
+th[data-column-id="Debt"] {
+	width: 150px;
+}
+
 th[data-column-id="Telephone"] {
 	width: 100px;
 }

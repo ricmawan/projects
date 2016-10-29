@@ -112,6 +112,24 @@ VALUES
 	NULL,
 	0,
 	2
+),
+(
+	11,
+	3,
+	'Pembayaran Kekurangan',
+	'Transaction/DebtPayment/',
+	NULL,
+	0,
+	4
+),
+(
+	12,
+	3,
+	'Jadwal Hari Ini',
+	'Transaction/CheckSchedule/',
+	NULL,
+	0,
+	4
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

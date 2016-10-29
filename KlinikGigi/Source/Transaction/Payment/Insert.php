@@ -23,6 +23,60 @@
 			echo returnstate($MedicationID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}
+		
+		if($_POST['txtNextSchedule'] != "") {
+			$ScheduledDate = explode('-', mysql_real_escape_string($_POST['txtNextSchedule']));
+			$ScheduledDate = "$ScheduledDate[2]-$ScheduledDate[1]-$ScheduledDate[0]";
+			
+			$sql = "UPDATE transaction_checkschedule
+					SET
+						ScheduledDate = '".$ScheduledDate."',
+						ModifiedBy = '".$_SESSION['UserLogin']."'
+					WHERE
+						MedicationID = ".$MedicationID."";
+			
+			if (! $result=mysql_query($sql, $dbh)) {
+				$Message = "Terjadi Kesalahan Sistem";
+				$MessageDetail = mysql_error();
+				$FailedFlag = 1;
+				echo returnstate($MedicationID, $Message, $MessageDetail, $FailedFlag, $State);
+				return 0;
+			}
+			
+			$sql = "INSERT INTO transaction_checkschedule
+					(
+						MedicationID,
+						ScheduledDate,
+						CreatedDate,
+						CreatedBy
+					)
+					SELECT
+						".$MedicationID.",
+						'".$ScheduledDate."',
+						NOW(),
+						'".$_SESSION['UserLogin']."'
+					FROM
+						tbl_temp
+					WHERE
+						NOT EXISTS
+						(
+							SELECT
+								1
+							FROM
+								transaction_checkschedule CS
+							WHERE
+								CS.MedicationID = ".$MedicationID."
+								AND CS.ScheduledDate = '".$ScheduledDate."'
+						)";
+		
+			if (! $result=mysql_query($sql, $dbh)) {
+				$Message = "Terjadi Kesalahan Sistem";
+				$MessageDetail = mysql_error();
+				$FailedFlag = 1;
+				echo returnstate($MedicationID, $Message, $MessageDetail, $FailedFlag, $State);
+				return 0;
+			}
+		}
 		echo returnstate($MedicationID, $Message, $MessageDetail, $FailedFlag, $State);
 	}
 	

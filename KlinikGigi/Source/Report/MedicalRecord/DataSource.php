@@ -7,7 +7,7 @@
 		date_default_timezone_set("Asia/Jakarta");
 		include "../../GetPermission.php";
 		$PatientID = mysql_real_escape_string($_GET['PatientID']);
-		$where = " 1=1 AND MP.PatientID = ".$PatientID."";
+		$where = " 1=1 AND MP.PatientID = ".$PatientID." AND TM.IsCancelled = 0 ";
 		$order_by = "DateNoFormat";
 		$rows = 10;
 		$current = 1;

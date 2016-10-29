@@ -85,13 +85,16 @@
 							TM.Cash,
 							TM.Debit,
 							(TMD.Quantity * TMD.Price) SubTotal,
-							TMD.Remarks
+							TMD.Remarks,
+							(DP.Cash + DP.Debit) Debt
 						FROM
 							transaction_medication TM
 							JOIN transaction_medicationdetails TMD
 								ON TM.MedicationID = TMD.MedicationID
 							JOIN master_examination ME
 								ON ME.ExaminationID = TMD.ExaminationID
+							LEFT JOIN transaction_debtpayment DP
+								ON TM.MedicationID = DP.MedicationID
 						WHERE
 							TM.MedicationID = ".$GLOBALS['ID'];
 							
@@ -103,10 +106,12 @@
 				$GrandTotal = 0;
 				$Cash = 0;
 				$Debit = 0;
+				$Debt = 0;
 				while($row = mysql_fetch_array($result)) {
 					$GrandTotal += $row['SubTotal'];
 					$Cash = $row['Cash'];
 					$Debit = $row['Debit'];
+					$Debt = $row['Debt'];
 					$this->Cell($w[0],0.7,$RowNumber,1,0,'C');
 					$this->Cell($w[1],0.7,$row['ExaminationName'],1,0,'L');
 					$this->Cell($w[2],0.7,$row['Quantity'],1,0,'R');
@@ -134,14 +139,12 @@
 				$this->Cell(2.25,0.7,number_format($Debit,2,".",","),1,0,'R');
 				$this->Cell(3,0.7,'',1,0,'L');
 				
-				if($GrandTotal > ($Cash + $Debit)) {
-					$this->Ln();
-					$this->SetX(1);
-						
-					$this->Cell(7.55,0.7,'Kekurangan',1,0,'L');
-					$this->Cell(2.25,0.7,number_format(($GrandTotal - $Cash - $Debit),2,".",","),1,0,'R');
-					$this->Cell(3,0.7,'',1,0,'L');
-				}
+				$this->Ln();
+				$this->SetX(1);
+				
+				$this->Cell(7.55,0.7,'Pembayaran Kekurangan',1,0,'L');
+				$this->Cell(2.25,0.7,number_format($Debt,2,".",","),1,0,'R');
+				$this->Cell(3,0.7,'',1,0,'L');
 			}
 			function AutoPrint($dialog=false)
 			{

@@ -40,7 +40,22 @@
 									<input id="hdnPatientID" name="hdnPatientID" type="hidden" value="0" />
 									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" value="0" />
 									<input id="IsExists" type="hidden" value="0" />
-									<input id="txtPatientName" name="txtPatientName" type="text" class="form-control-custom" placeholder="Nama Pasien" readonly required />
+									<div class="ui-widget" style="width: 100%;" id="dvPatient">
+										<select name="ddlPatient" id="ddlPatient" class="form-control-custom" placeholder="Pilih Pasien" >
+											<option value="" ></option>
+											<?php
+												$sql = "SELECT PatientID, PatientName, PatientNumber, Address FROM master_patient";
+												if(!$result = mysql_query($sql, $dbh)) {
+													echo mysql_error();
+													return 0;
+												}
+												while($row = mysql_fetch_array($result)) {
+													echo "<option value='".$row['PatientID']."' patientnumber='".$row['PatientNumber']."'>".$row['PatientName']." - ".$row['Address']."</option>";
+												}
+											?>
+										</select>
+									</div>
+									<input id="txtPatientName" style="display: none;" name="txtPatientName" type="text" class="form-control-custom" placeholder="Nama Pasien" readonly required />
 								</div>
 							</div>
 							<span id="PatientForm" style="display: none;">
@@ -130,8 +145,10 @@
 							if(data.IsExists == '0') {
 								$.notify(data.Message, "warn");
 								$("#PatientForm").show();
+								$("#txtPatientName").show();
 								$("#txtPatientName").attr("readonly", false);
 								$("#txtPatientName").val("");
+								$("#dvPatient").hide();
 								$("#txtBirthDate").val("");
 								$("#txtAddress").val("");
 								$("#txtAllergy").val("");
@@ -141,6 +158,8 @@
 							}
 							else {
 								$("#PatientForm").hide();
+								$("#txtPatientName").show();
+								$("#dvPatient").hide();
 								$("#txtPatientName").attr("readonly", "readonly");
 								$("#txtPatientName").val(data.PatientName);
 								$("#hdnPatientID").val(data.ID);
@@ -340,6 +359,18 @@
 					}).dialog("open");
 				}
 			}
+			
+			$(document).ready(function() {
+				$("#ddlPatient").combobox({
+					select: function( event, ui ) {
+						var PatientNumber = $("#ddlPatient option:selected").attr("patientnumber");				
+						$("#txtPatientNumber").val(PatientNumber);
+					}
+				});
+				$("#ddlPatient").next().find("input").click(function() {
+					$(this).val("");
+				});
+			});
 		</script>
 	</body>
 </html>
