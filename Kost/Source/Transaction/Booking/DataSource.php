@@ -54,6 +54,7 @@
 	$sql = "SELECT
 				BO.BookingID,
 				BO.RoomID,
+				MR.RoomNumber,
 				BO.CustomerName,
 				BO.Address,
 				BO.Phone,
@@ -62,6 +63,8 @@
 				DATE_FORMAT(BO.EndDate, '%d-%m-%Y %H:%i') EndDate
 			FROM
 				transaction_booking BO
+				JOIN master_room MR
+					ON MR.RoomID = BO.RoomID
 			WHERE
 				$where
 				AND BO.IsCancelled = 0
@@ -80,6 +83,7 @@
 		$row_array['RowNumber'] = $RowNumber;
 		$row_array['BookingID'] = $row['BookingID'];
 		$row_array['RoomID'] = $row['RoomID'];
+		$row_array['RoomNumber'] = $row['RoomNumber'];
 		$row_array['CustomerName']= $row['CustomerName'];
 		$row_array['Address']= $row['Address'];
 		$row_array['Phone']= $row['Phone'];

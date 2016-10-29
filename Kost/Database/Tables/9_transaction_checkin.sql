@@ -16,7 +16,7 @@ CREATE TABLE transaction_checkin
 	DownPaymentAmount	DOUBLE,
 	DownPaymentDate		DATE,
 	PaymentAmount 		DOUBLE,
-	PaymentDate			DOUBLE,
+	PaymentDate			DATE,
 	BookingFlag			BIT,
 	CheckOutFlag		BIT,
 	DailyRate			DOUBLE,

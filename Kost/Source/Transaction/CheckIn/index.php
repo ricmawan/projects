@@ -22,7 +22,8 @@
 										<th data-column-id="CustomerName">Nama</th>
 										<th data-column-id="Address">Alamat</th>
 										<th data-column-id="Phone">No HP</th>
-										<th data-column-id="BirthDate">Tanggal Lahir</th>
+										<!--<th data-column-id="BirthDate">Tanggal Lahir</th>-->
+										<th data-column-id="RoomNumber">No Kamar</th>
 										<th data-column-id="StartDate">Dari</th>
 										<th data-column-id="EndDate">Sampai</th>
 										<th data-column-id="Opsi" data-formatter="commands" data-sortable="false">Opsi</th>

@@ -658,6 +658,18 @@ th[data-column-id="City	"] {
 	width: 80px;
 }
 
+th[data-column-id="BirthDate"] {
+	width: 85px;
+}
+
+th[data-column-id="StartDate"] {
+	width: 115px;
+}
+
+th[data-column-id="EndDate"] {
+	width: 115px;
+}
+
 .room {
 	width: 70px;
 	height: 70px;

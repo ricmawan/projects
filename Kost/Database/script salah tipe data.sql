@@ -1,0 +1,1 @@
+ALTER TABLE `transaction_checkin` CHANGE `PaymentDate` `PaymentDate` DATE NULL DEFAULT NULL;

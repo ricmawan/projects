@@ -15,9 +15,29 @@
 		$FailedFlag = 0;
 		//echo $DetailID;
 		$State = 1;
+		if($_POST['txtDownPaymentDate'] != "") {
+			$DownPaymentDate = explode('-', mysql_real_escape_string($_POST['txtDownPaymentDate']));
+			$DownPaymentDate = "$DownPaymentDate[2]-$DownPaymentDate[1]-$DownPaymentDate[0]";
+		}
+		else $DownPaymentDate = "";
+		$DownPaymentAmount = $_POST['txtDownPaymentAmount'];
+		if($DownPaymentAmount == "") $DownPaymentAmount = 0;
+		
+		if($_POST['txtPaymentDate'] != "") {
+			$PaymentDate = explode('-', mysql_real_escape_string($_POST['txtPaymentDate']));
+			$PaymentDate = "$PaymentDate[2]-$PaymentDate[1]-$PaymentDate[0]";
+		}
+		else $PaymentDate = "";
+		
+		$PaymentAmount = $_POST['txtPaymentAmount'];
+		if($PaymentAmount == "") $PaymentAmount = 0;
 		$sql = "UPDATE transaction_checkin
 				SET
 					CheckOutFlag = 1,
+					DownPaymentAmount = ".str_replace(",", "", $DownPaymentAmount).",
+					DownPaymentDate = '".$DownPaymentDate."',
+					PaymentAmount = ".str_replace(",", "", $PaymentAmount).",
+					PaymentDate = '".$PaymentDate."',
 					ModifiedBy = '".$_SESSION['UserLogin']."'
 				WHERE
 					CheckInID = $CheckInID";

@@ -331,7 +331,7 @@
 									</div>
 								</div>
 								<div class="col-md-3">
-									<input id="txtPaymentAmount" name="txtPaymentAmount" type="text" style="text-align:right;" class="form-control-custom" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" value="0.00" placeholder="Pelunasan" <?php echo 'value="'.$PaymentAmount.'"'; ?> />
+									<input id="txtPaymentAmount" name="txtPaymentAmount" type="text" style="text-align:right;" class="form-control-custom" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Pelunasan" <?php echo 'value="'.$PaymentAmount.'"'; ?> />
 								</div>
 							</div>
 							<br />

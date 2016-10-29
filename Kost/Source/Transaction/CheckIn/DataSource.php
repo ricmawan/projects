@@ -54,6 +54,7 @@
 	$sql = "SELECT
 				CI.CheckInID,
 				CI.RoomID,
+				MR.RoomNumber,
 				CI.CustomerName,
 				CI.Address,
 				CI.Phone,
@@ -62,6 +63,8 @@
 				DATE_FORMAT(CI.EndDate, '%d-%m-%Y %H:%i') EndDate
 			FROM
 				transaction_checkin CI
+				JOIN master_room MR
+					ON MR.RoomID = CI.RoomID
 			WHERE
 				$where
 				AND CI.CheckOutFlag = 0
@@ -79,6 +82,7 @@
 		$row_array['RowNumber'] = $RowNumber;
 		$row_array['CheckInID'] = $row['CheckInID'];
 		$row_array['RoomID'] = $row['RoomID'];
+		$row_array['RoomNumber'] = $row['RoomNumber'];
 		$row_array['CustomerName']= $row['CustomerName'];
 		$row_array['Address']= $row['Address'];
 		$row_array['Phone']= $row['Phone'];
