@@ -54,7 +54,9 @@
 		//$objPHPExcel->getFont()->setColor( new PHPExcel_Style_Color( PHPExcel_Style_Color::COLOR_DARKGREEN ) );
 		$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "No");
 		$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, "Bulan");
-		$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, "Total Pendapatan");
+		$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, "Cash");
+		$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, "Debit");
+		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Total Pendapatan");
 		$rowExcel++;
 		
 		$sql = "SELECT
@@ -138,21 +140,23 @@
 		while($row = mysql_fetch_array($result)) {
 			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $RowNumber);
 			$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['MonthName']);
-			$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['TotalIncome']);
+			$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['Cash']);
+			$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row['Debit']);
+			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, $row['TotalIncome']);
 			$RowNumber++;
 			$rowExcel++;
 		}
 		
-		$objPHPExcel->getActiveSheet()->getStyle("C5:C".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+		$objPHPExcel->getActiveSheet()->getStyle("C5:E".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 		//merge title
-		$objPHPExcel->getActiveSheet()->mergeCells("A1:C2");
-		$objPHPExcel->getActiveSheet()->getStyle("A4:C4")->getFont()->setBold(true);
-		$objPHPExcel->getActiveSheet()->getStyle("A1:C2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-		$objPHPExcel->getActiveSheet()->getStyle("A4:C4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');
+		$objPHPExcel->getActiveSheet()->mergeCells("A1:E2");
+		$objPHPExcel->getActiveSheet()->getStyle("A4:E4")->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle("A1:E2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$objPHPExcel->getActiveSheet()->getStyle("A4:E4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');
 
 		//set all width 
 		$fromCol='A';
-		$toCol= 'D';
+		$toCol= 'F';
 		for($j = $fromCol; $j !== $toCol; $j++) {
 			//$calculatedWidth = $objPHPExcel->getActiveSheet()->getColumnDimension($i)->getWidth();
 			$objPHPExcel->getActiveSheet()->getColumnDimension($j)->setAutoSize(true);
@@ -167,7 +171,7 @@
 			  )
 			)
 		);		
-		$objPHPExcel->getActiveSheet()->getStyle("A4:C".($rowExcel-1))->applyFromArray($styleArray);		
+		$objPHPExcel->getActiveSheet()->getStyle("A4:E".($rowExcel-1))->applyFromArray($styleArray);		
 
 		$title = "Laporan Pendapatan Bulanan - ".$monthName[$ddlMonth - 1]." ".$ddlYear;
 		// Rename worksheet
