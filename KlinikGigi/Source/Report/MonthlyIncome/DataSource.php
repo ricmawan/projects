@@ -9,7 +9,7 @@
 		$ddlMonth = mysql_real_escape_string($_GET['ddlMonth']);
 		$ddlYear = mysql_real_escape_string($_GET['ddlYear']);
 		$sql = "SELECT
-					CASE MONTH(TM.TransactionDate)
+					CASE TM.TransactionDate
 						WHEN 1
 						THEN 'Januari'
 						WHEN 2
@@ -35,30 +35,51 @@
 						WHEN 12
 						THEN 'Desember'
 					END	MonthName,
-					SUM(TMD.TotalIncome) TotalIncome,
+					SUM(TM.TotalIncome) TotalIncome,
 					SUM(TM.Cash) Cash,
 					SUM(TM.Debit) Debit
 				FROM
-					transaction_medication TM
-					JOIN 
 					(
 						SELECT
-							TMD.MedicationID,
-							SUM(TMD.Quantity * TMD.Price) AS TotalIncome
+							MONTH(TM.TransactionDate) TransactionDate,
+							SUM(TMD.TotalIncome) TotalIncome,
+							SUM(TM.Cash) Cash,
+							SUM(TM.Debit) Debit
 						FROM
-							transaction_medicationdetails TMD
+							transaction_medication TM
+							JOIN 
+							(
+								SELECT
+									TMD.MedicationID,
+									SUM(TMD.Quantity * TMD.Price) AS TotalIncome
+								FROM
+									transaction_medicationdetails TMD
+								GROUP BY
+									TMD.MedicationID
+							)TMD
+								ON TM.MedicationID = TMD.MedicationID
+						WHERE
+							MONTH(TM.TransactionDate) = ".$ddlMonth."
+							AND YEAR(TM.TransactionDate) = ".$ddlYear."
+							AND TM.IsCancelled = 0
 						GROUP BY
-							TMD.MedicationID
-					)TMD
-						ON TM.MedicationID = TMD.MedicationID
-				WHERE
-					MONTH(TM.TransactionDate) = ".$ddlMonth."
-					AND YEAR(TM.TransactionDate) = ".$ddlYear."
-					AND TM.IsCancelled = 0
-				GROUP BY
-					MONTH(TM.TransactionDate)
+							MONTH(TM.TransactionDate)
+						UNION ALL
+						SELECT
+							MONTH(DP.CreatedDate) MonthNumber,
+							0 TotalIncome,
+							SUM(DP.Cash) Cash,
+							SUM(DP.Debit) Debit
+						FROM
+							transaction_debtpayment DP
+						WHERE
+							MONTH(DP.CreatedDate) = ".$ddlMonth."
+							AND YEAR(DP.CreatedDate) = ".$ddlYear."
+						GROUP BY
+							MONTH(DP.CreatedDate)
+					)TM
 				ORDER BY	
-					MONTH(TM.TransactionDate) ASC";
+					TM.TransactionDate ASC";
 		
 		if (! $result = mysql_query($sql, $dbh)) {
 			echo mysql_error();
