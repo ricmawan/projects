@@ -35,12 +35,21 @@
 						WHEN 12
 						THEN 'Desember'
 					END	MonthName,
-					SUM(TMD.Quantity * TMD.Price) AS TotalIncome,
+					SUM(TMD.TotalIncome) TotalIncome,
 					SUM(TM.Cash) Cash,
 					SUM(TM.Debit) Debit
 				FROM
 					transaction_medication TM
-					JOIN transaction_medicationdetails TMD
+					JOIN 
+					(
+						SELECT
+							TMD.MedicationID,
+							SUM(TMD.Quantity * TMD.Price) AS TotalIncome
+						FROM
+							transaction_medicationdetails TMD
+						GROUP BY
+							TMD.MedicationID
+					)TMD
 						ON TM.MedicationID = TMD.MedicationID
 				WHERE
 					MONTH(TM.TransactionDate) = ".$ddlMonth."
