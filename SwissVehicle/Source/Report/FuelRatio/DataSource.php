@@ -122,7 +122,7 @@
 						SELECT
 							MAX(TF.TransactionDate),
 							TF.MachineID,
-							TF.Kilometer
+							MAX(TF.Kilometer) Kilometer
 						FROM
 							transaction_fuel TF
 						WHERE

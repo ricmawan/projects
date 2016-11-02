@@ -38,7 +38,7 @@
 		if (ISSET($_GET['searchPhrase']) )
 		{
 			$search = trim($_GET['searchPhrase']);
-			$where .= " AND ( MM.MachineType LIKE '%".$search."%' OR MM.MachineCode LIKE '%".$search."%' OR SK.Kilometer LIKE '%".$search."%' OR EK.Kilometer LIKE '%".$search."%' OR (EK.Kilometer - SK.Kilometer) LIKE '%".$search."%' OR SK.FuelTypeName LIKE '%".$search."%' OR SK.Price LIKE '%".$search."%' OR SK.Quantity LIKE '%".$search."%' OR CONCAT('1:', (EK.Kilometer - SK.Kilometer)/SK.Quantity) LIKE '%".$search."%' )";
+			$where .= " AND ( MM.MachineType LIKE '%".$search."%' OR MM.MachineCode LIKE '%".$search."%' OR SK.Kilometer LIKE '%".$search."%' OR EK.Kilometer LIKE '%".$search."%' OR (EK.Kilometer - SK.Kilometer) LIKE '%".$search."%' OR EK.FuelTypeName LIKE '%".$search."%' OR EK.Price LIKE '%".$search."%' OR EK.Quantity LIKE '%".$search."%' OR CONCAT('1:', (EK.Kilometer - SK.Kilometer)/EK.Quantity) LIKE '%".$search."%' )";
 		}
 		class PDF_AutoPrint extends PDF_JavaScript
 		{
@@ -180,27 +180,15 @@
 							IFNULL(SK.Kilometer, '-') StartKilometer,
 							IFNULL(EK.Kilometer, '-') EndKilometer,
 							IFNULL((EK.Kilometer - SK.Kilometer), '-') Difference,
-							IFNULL(SK.FuelTypeName, '') FuelTypeName,
-							SK.Price,
-							IFNULL(SK.Quantity, '-') Quantity,
-							IFNULL(CONCAT('1:', ROUND((EK.Kilometer - SK.Kilometer)/SK.Quantity, 2)), '-') FuelRatio
+							IFNULL(EK.FuelTypeName, '') FuelTypeName,
+							EK.Price,
+							IFNULL(EK.Quantity, '-') Quantity,
+							IFNULL(CONCAT('1:', ROUND((EK.Kilometer - SK.Kilometer)/EK.Quantity, 2)), '-') FuelRatio
 						FROM
 							master_machine MM
 							JOIN 
 							(
 								SELECT
-									TF.MachineID,
-									TF.Kilometer
-								FROM
-									transaction_fuel TF
-								WHERE
-									CAST(TF.TransactionDate AS DATE) = '".$GLOBALS['txtDate']."'
-							)EK
-								ON MM.MachineID = EK.MachineID
-							JOIN
-							(
-								SELECT
-									MAX(TF.TransactionDate),
 									TF.MachineID,
 									TF.Kilometer,
 									FT.FuelTypeName,
@@ -210,6 +198,18 @@
 									transaction_fuel TF
 									JOIN master_fueltype FT
 										ON FT.FuelTypeID = TF.FuelTypeID
+								WHERE
+									CAST(TF.TransactionDate AS DATE) = '".$GLOBALS['txtDate']."'
+							)EK
+								ON MM.MachineID = EK.MachineID
+							JOIN
+							(
+								SELECT
+									MAX(TF.TransactionDate),
+									TF.MachineID,
+									MAX(TF.Kilometer) Kilometer
+								FROM
+									transaction_fuel TF
 								WHERE
 									CAST(TF.TransactionDate AS DATE) < '".$GLOBALS['txtDate']."'
 								GROUP BY
