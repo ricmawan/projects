@@ -194,7 +194,7 @@
 						$("#page-inner-right").html(data);
 						$("html, body").animate({
 							scrollTop: 0
-						}, "sID : RoomIDlow");
+						}, "slow");
 						$("#loading").hide();
 					},
 					error: function(data) {
