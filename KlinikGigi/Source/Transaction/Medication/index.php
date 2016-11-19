@@ -41,11 +41,54 @@
 			<div id="dialog-confirm-finish" title="Konfirmasi" style="display: none;">
 				<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 40px 0;"></span>Apakah anda yakin pasien bernama <span style="font-weight: bold; font-size: 18px; color: red;" id="patientName2"></span> sudah menjalani seluruh pemeriksaan & tindakan?</p>
 			</div>
+			<div id="dialog-delete-examination" title="Konfirmasi" style="display: none;">
+				<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 40px 0;"></span>Apakah anda yakin ingin menghapus tindakan <span style="font-weight: bold; font-size: 18px; color: red;" id="ExaminationName"></span>?</p>
+			</div>
+			<div id="dialog-edit-medication" title="Edit Tindakan" style="display: none;">
+				<form class="col-md-12" id="EditForm" method="POST" action="" >
+					<input type="hidden" id="hdnMedicationDetailsID" name="hdnMedicationDetailsID" value=0 />
+					<div class="row" >
+						<div class="col-md-3 labelColumn" >
+							Tindakan:
+						</div>
+						<div class="col-md-6" >
+							<span style="font-weight: bold; font-size: 18px; color: red;" id="ExaminationName2"></span>
+						</div>
+					</div>
+					<br />
+					<div class="row" >
+						<div class="col-md-3 labelColumn" >
+							Harga:
+						</div>
+						<div class="col-md-6">
+							<input type="text" id="txtExaminationPrice2" name="txtExaminationPrice2" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" class="form-control-custom" style="text-align: right;" value="0.00" />
+						</div>
+					</div>
+					<br />
+					<div class="row" >
+						<div class="col-md-3 labelColumn" >
+							Jumlah:
+						</div>
+						<div class="col-md-6">
+							<input type="text" autocomplete="off" id="txtQuantity2" name="txtQuantity2" onkeypress="return isNumberKey(event)" class="form-control-custom" style="text-align: right;" value=1 />
+						</div>
+					</div>
+					<br />
+					<div class="row" >
+						<div class="col-md-3 labelColumn" >
+							Keterangan:
+						</div>
+						<div class="col-md-6">
+							<textarea id="txtRemarks2" name="txtRemarks2" class="form-control-custom" ></textarea>
+						</div>
+					</div>
+				</form>
+			</div>
 			<div id="dialog-confirm" title="Konfirmasi" style="display: none;">
 				<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Apakah anda yakin data yang diinput sudah benar?</p>
 			</div>
 			<div id="dialog-medication" title="Tambah Tindakan" style="display: none;">
-				<div id="left-side" style="display: inline-block;width: 45%; height: 100%; float: left;">
+				<div id="left-side" style="display: inline-block;width: 30%; height: 100%; float: left;">
 					<form class="col-md-12" id="PostForm" method="POST" action="" >
 						<input type="hidden" id="hdnMedicationID" name="hdnMedicationID" value=0 />
 						<div class="row" >
@@ -117,16 +160,19 @@
 						</div>
 					</div>
 				</form>
-				<div style=" width:1px; background-color:#000; position:absolute; top:0; bottom:0; left:calc(45% - 10px);float:left;">
+				<div style=" width:1px; background-color:#000; position:absolute; top:0; bottom:0; left:calc(30% - 10px);float:left;">
 				</div>
-				<div id="right-side" style="display: inline-block; width: calc(55% - 5px); height: 100%; float: left;">
+				<div id="right-side" style="display: inline-block; width: calc(70% - 5px); height: 100%; float: left;">
 					Tindakan Sebelumnya: 
-					<table class="table table-striped table-bordered table-hover" style="width:auto;" id="datainput">
-						<thead style="background-color: black;color:white;height:25px;display:block;width:523px;margin-right:17px;">
-							<td align="center" style="width:33px;">No</td>
+					<table class="table table-striped table-bordered table-hover" style="width:auto;padding-right:17px;" id="datainput">
+						<thead style="background-color: black;color:white;height:25px;display:block;width:810px;">
+							<td align="center" style="width:36px;">No</td>
 							<td align="center" style="width: 200px;" >Tindakan</td>
 							<td align="center" style="width: 80px;" >Jumlah</td>
+							<td align="center" style="width: 100px;" >Harga</td>
+							<td align="center" style="width: 125px;" >Total</td>
 							<td align="center" style="width: 210px;" >Keterangan</td>
+							<td align="center" style="width: 60px;" >Opsi</td>
 						</thead>
 						<tbody style="display:block;max-height:200px;height:100%;overflow-y:auto;" id="tableContent">
 						</tbody>
@@ -135,6 +181,113 @@
 			</div>
 		</div>
 		<script>
+			function EditData(MedicationID, MedicationDetailsID, Quantity, Price, Remarks, ExaminationName) {
+				$("#hdnMedicationDetailsID").val(MedicationDetailsID);
+				$("#ExaminationName2").html(ExaminationName);
+				$("#txtQuantity2").val(Quantity);
+				$("#txtExaminationPrice2").val(Price);
+				$("#txtRemarks2").val(Remarks);
+				$("#dialog-edit-medication").dialog({
+					autoOpen: false,
+					show: {
+						effect: "fade",
+						duration: 500
+					},
+					hide: {
+						effect: "fade",
+						duration: 500
+					},
+					resizable: false,
+					height: "auto",
+					width: 600,
+					modal: true,
+					close: function() {
+						$(this).dialog("destroy");
+					},
+					buttons: {
+						"Simpan": function() {
+							$(this).dialog("destroy");
+							$.ajax({
+								url: "./Transaction/Medication/Update.php",
+								type: "POST",
+								data: $("#EditForm").serialize(),
+								dataType: "json",
+								success: function(data) {
+									$("#loading").hide();
+									if(data.FailedFlag == '0') {
+										$.notify(data.Message, "success");
+										LoadMedicationDetails(MedicationID);
+									}
+									else {
+										$.notify(data.Message, "error");					
+									}
+								},
+								error: function(data) {
+									$("#loading").hide();
+									$.notify("Terjadi kesalahan sistem!", "error");
+								}
+							});
+						},
+						"Batal": function() {
+							$(this).dialog("destroy");
+							return false;
+						}
+					}
+				}).dialog("open");
+			}
+			
+			function DeleteExamination(MedicationID, MedicationDetailsID, ExaminationName) {
+				$("#ExaminationName").html(ExaminationName);
+				$("#dialog-delete-examination").dialog({
+					autoOpen: false,
+					show: {
+						effect: "fade",
+						duration: 500
+					},
+					hide: {
+						effect: "fade",
+						duration: 500
+					},
+					resizable: false,
+					height: "auto",
+					width: 400,
+					modal: true,
+					close: function() {
+						$(this).dialog("destroy");
+					},
+					buttons: {
+						"Ya": function() {
+							$(this).dialog("destroy");
+							$.ajax({
+								url: "./Transaction/Medication/Delete.php",
+								type: "POST",
+								data: { ID : MedicationDetailsID },
+								dataType: "html",
+								success: function(data) {
+									$("#loading").hide();
+									var datadelete = data.split("+");
+									var berhasil = datadelete[0];
+									var gagal = datadelete [1];
+									if(berhasil!="") {
+										$.notify(berhasil, "success");
+										LoadMedicationDetails(MedicationID);
+									}
+									if(gagal!="") $.notify(gagal, "error");
+								},
+								error: function(data) {
+									$("#loading").hide();
+									$.notify("Terjadi kesalahan sistem!", "error");
+								}
+							});
+						},
+						"Tidak": function() {
+							$(this).dialog("destroy");
+							return false;
+						}
+					}
+				}).dialog("open");
+						
+			}
 			function LoadMedicationDetails(MedicationID) {				
 				$("#loading").show();
 				$.ajax({
@@ -224,13 +377,13 @@
 									},
 									resizable: false,
 									height: "auto",
-									width: 1000,
+									width: 1200,
 									modal: true,
 									close: function() {
 										$(this).dialog("destroy");
 									},
 									buttons: {
-										"Tambah": function() {
+										"Simpan": function() {
 											//$(this).dialog("close");
 											$("#dialog-confirm").dialog({
 												autoOpen: false,

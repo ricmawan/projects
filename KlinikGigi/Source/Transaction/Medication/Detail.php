@@ -14,8 +14,11 @@
 		$State = 1;
 		
 		$sql = "SELECT
+					TMD.MedicationDetailsID,
 					ME.ExaminationName,
 					TMD.Quantity,
+					TMD.Price,
+					(TMD.Price * TMD.Quantity) Total,
 					TMD.Remarks
 				FROM
 					transaction_medicationdetails TMD
@@ -37,10 +40,16 @@
 		$RowNumber = 1;
 		while ($row = mysql_fetch_array($result)) {
 			$MedicationDetails .= "<tr>";
-			$MedicationDetails .= "<td align='center' style='width: 33px;' >$RowNumber</td>";
+			$MedicationDetails .= "<td align='center' style='width: 36px;' >$RowNumber</td>";
 			$MedicationDetails .= "<td align='left' style='width: 200px;' >".$row['ExaminationName']."</td>";
 			$MedicationDetails .= "<td align='right' style='width: 80px;' >".$row['Quantity']."</td>";
+			$MedicationDetails .= "<td align='right' style='width: 100px;' >".number_format($row['Price'],2,".",",")."</td>";
+			$MedicationDetails .= "<td align='right' style='width: 125px;' >".number_format($row['Total'],2,".",",")."</td>";
 			$MedicationDetails .= "<td align='left' style='width: 210px;' >".$row['Remarks']."</td>";
+			$MedicationDetails .= '<td align="center" style="vertical-align:middle;width: 60px;">
+										<i style="cursor:pointer;" class="fa fa-edit" onclick="EditData('.$MedicationID.', '.$row['MedicationDetailsID'].', '.$row['Quantity'].', \''.number_format($row['Price'],2,".",",").'\', \''.$row['Remarks'].'\', \''.$row['ExaminationName'].'\');" acronym title="Ubah Data"></i>
+										&nbsp;&nbsp;<i class="fa fa-close btnDelete" onclick="DeleteExamination('.$MedicationID.', '.$row['MedicationDetailsID'].', \''.$row['ExaminationName'].'\');" style="cursor:pointer;" acronym title="Hapus Data" onclick="DeleteRow(this.getAttribute(\'row\'))"></i>
+									</td>';
 			$MedicationDetails .= "</tr>";
 			$RowNumber++;
 		}
