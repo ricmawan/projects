@@ -125,7 +125,7 @@ VALUES
 (
 	12,
 	3,
-	'Jadwal Hari Ini',
+	'Jadwal Periksa',
 	'Transaction/CheckSchedule/',
 	NULL,
 	0,
