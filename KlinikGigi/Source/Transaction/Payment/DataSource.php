@@ -56,6 +56,7 @@
 				TM.MedicationID,
 				TM.OrderNumber,
 				MP.PatientNumber,
+				TM.PatientID,
 				MP.PatientName,
 				MP.Allergy,
 				SUM(TMD.Price * TMD.Quantity) Total
@@ -84,6 +85,7 @@
 	while ($row = mysql_fetch_array($result)) {
 		$row_array['OrderNumber'] = $row['OrderNumber'];
 		$row_array['PatientNumber'] = $row['PatientNumber'];
+		$row_array['PatientID'] = $row['PatientID'];
 		$row_array['MedicationID'] = $row['MedicationID'];
 		$row_array['PatientName'] = $row['PatientName'];
 		$row_array['Allergy'] = $row['Allergy'];

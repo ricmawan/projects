@@ -34,6 +34,7 @@
 			<div id="dialog-confirm-print" title="Pembayaran" style="display: none;">
 				<form class="col-md-12" id="PostForm" method="POST" action="" >
 					<input type="hidden" value=0 id="hdnMedicationID" name="hdnMedicationID" />
+					<input type="hidden" value=0 id="hdnPatientID" name="hdnPatientID" />
 					<div class="row">
 						<div class="col-md-4 labelColumn">
 							Pasien :
@@ -84,7 +85,7 @@
 							Jadwal Berikutnya :
 						</div>
 						<div class="col-md-6">
-							<input id="txtNextSchedule" name="txtNextSchedule" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Jadwal Berikutnya" />
+							<input id="txtNextSchedule" name="txtNextSchedule" type="text" class="form-control-custom" placeholder="Jadwal Berikutnya" />
 						</div>
 					</div>
 					<br />
@@ -129,6 +130,15 @@
 				});
 			}
 			$(document).ready(function() {
+				$("#txtNextSchedule").datepicker({
+					dateFormat: 'DD, dd-mm-yy',
+					dayNames: [ "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jum'at", "Sabtu" ]
+				});
+				$("#txtNextSchedule").attr("readonly", "true");
+				$("#txtNextSchedule").css({
+					"background-color": "#FFF",
+					"cursor": "text"
+				});
 				var grid = $("#grid-data").bootgrid({
 							ajax: true,
 							post: function ()
@@ -154,7 +164,7 @@
 							formatters: {
 								"commands": function(column, row)
 								{
-									return "<i style='cursor:pointer;' data-total=\"" + row.Total + "\" data-row-id=\"" + row.MedicationID + "\" data-patient-name=\"" + row.PatientName + "\" class=\"fa fa-print\" acronym title=\"Cetak Nota\"></i>&nbsp;";
+									return "<i style='cursor:pointer;' data-total=\"" + row.Total + "\" data-row-id=\"" + row.MedicationID + "\" data-patient-id=\"" + row.PatientID + "\" data-patient-name=\"" + row.PatientName + "\" class=\"fa fa-print\" acronym title=\"Cetak Nota\"></i>&nbsp;";
 								}
 							}
 						}).on("loaded.rs.jquery.bootgrid", function()
@@ -163,6 +173,7 @@
 							grid.find(".fa-print").on("click", function(e)
 							{
 								$("#hdnMedicationID").val($(this).data("row-id"));
+								$("#hdnPatientID").val($(this).data("patient-id"));
 								$("#patientName").html($(this).data("patient-name"));
 								$("#txtTotal").val(returnRupiah($(this).data("total")));
 								LoadDetails();

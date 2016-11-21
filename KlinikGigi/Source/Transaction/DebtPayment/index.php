@@ -116,6 +116,8 @@
 								$("#hdnMedicationID").val($(this).data("row-id"));
 								$("#patientName").html($(this).data("patient-name"));
 								$("#txtDebt").val(returnRupiah($(this).data("debt")));
+								$("#txtCash").val("0.00");
+								$("#txtDebit").val("0.00");
 								//LoadDetails();
 								$("#dialog-confirm-print").dialog({
 									autoOpen: false,

@@ -4,8 +4,34 @@
 	$file = basename($RequestPath);
 	$RequestPath = str_replace($file, "", $RequestPath);
 	include "../../GetPermission.php";
-
-	$where = " 1=1 AND CS.ScheduledDate = CAST(NOW() AS DATE)";
+	
+	if($_GET['Filter'] == "1") {
+		if($_GET['txtFromDate'] == "") {
+			$txtFromDate = "2000-01-01";
+		}
+		else {
+			$FromDate = explode(', ', mysql_real_escape_string($_GET['txtFromDate']));
+			$txtFromDate = explode('-', $FromDate[1]);
+			$_GET['txtFromDate'] = "$txtFromDate[2]-$txtFromDate[1]-$txtFromDate[0]"; 
+			$txtFromDate = $_GET['txtFromDate'];
+		}
+		if($_GET['txtToDate'] == "") {
+			$txtToDate = date("Y-m-d");
+		}
+		else {
+			$ToDate = explode(', ', mysql_real_escape_string($_GET['txtToDate']));
+			$txtToDate = explode('-', $ToDate[1]);
+			$_GET['txtToDate'] = "$txtToDate[2]-$txtToDate[1]-$txtToDate[0]"; 
+			$txtToDate = $_GET['txtToDate'];
+		}
+	}
+	else {
+		$txtToDate = date("Y-m-d");
+		$txtFromDate = date("Y-m-d");
+	}
+	$where = " 1=1 AND CS.ScheduledDate BETWEEN '".$txtFromDate."' AND '".$txtToDate."' ";
+	
+	
 	$order_by = "PatientID";
 	$rows = 10;
 	$current = 1;
@@ -42,10 +68,8 @@
 				COUNT(*) AS nRows
 			FROM
 				transaction_checkschedule CS
-				JOIN transaction_medication TM
-					ON TM.MedicationID = CS.MedicationID
 				JOIN master_patient MP
-					ON MP.PatientID = TM.PatientID
+					ON MP.PatientID = CS.PatientID
 			WHERE
 				$where";
 	if (! $result = mysql_query($sql, $dbh)) {
@@ -59,16 +83,15 @@
 				MP.PatientNumber,
 				MP.PatientName,
 				DATE_FORMAT(MP.BirthDate, '%d-%m-%Y') BirthDate,
+				DATE_FORMAT(CS.ScheduledDate, '%d-%m-%Y') ScheduledDate,
 				MP.Address,
 				MP.City,
 				MP.Telephone,
 				MP.Allergy
 			FROM
 				transaction_checkschedule CS
-				JOIN transaction_medication TM
-					ON TM.MedicationID = CS.MedicationID
 				JOIN master_patient MP
-					ON MP.PatientID = TM.PatientID
+					ON MP.PatientID = CS.PatientID
 			WHERE
 				$where
 			ORDER BY 
@@ -83,15 +106,13 @@
 	while ($row = mysql_fetch_array($result)) {
 		$RowNumber++;
 		$row_array['RowNumber'] = $RowNumber;
-		$row_array['PatientIDName'] = $row['PatientID']."^".$row['PatientName'];
-		$row_array['PatientID']= $row['PatientID'];
 		$row_array['PatientNumber']= $row['PatientNumber'];
 		$row_array['PatientName'] = $row['PatientName'];
 		$row_array['BirthDate'] = $row['BirthDate'];
+		$row_array['ScheduledDate'] = $row['ScheduledDate'];
 		$row_array['Address'] = $row['Address'];
 		$row_array['City'] = $row['City'];
 		$row_array['Telephone'] = $row['Telephone'];
-		$row_array['Allergy'] = $row['Allergy'];
 		array_push($return_arr, $row_array);
 	}
 

@@ -5,6 +5,7 @@
 		$RequestPath = str_replace($file, "", $RequestPath);
 		include "../../GetPermission.php";
 		$MedicationID = mysql_real_escape_string($_POST['hdnMedicationID']);
+		$PatientID = mysql_real_escape_string($_POST['hdnPatientID']);
 		$Message = "Data Berhasil Disimpan";
 		$MessageDetail = "";
 		$FailedFlag = 0;
@@ -25,7 +26,8 @@
 		}
 		
 		if($_POST['txtNextSchedule'] != "") {
-			$ScheduledDate = explode('-', mysql_real_escape_string($_POST['txtNextSchedule']));
+			$Date = explode(', ', mysql_real_escape_string($_POST['txtNextSchedule']));
+			$ScheduledDate = explode('-', $Date[1]);
 			$ScheduledDate = "$ScheduledDate[2]-$ScheduledDate[1]-$ScheduledDate[0]";
 			
 			$sql = "UPDATE transaction_checkschedule
@@ -46,12 +48,14 @@
 			$sql = "INSERT INTO transaction_checkschedule
 					(
 						MedicationID,
+						PatientID,
 						ScheduledDate,
 						CreatedDate,
 						CreatedBy
 					)
 					SELECT
 						".$MedicationID.",
+						".$PatientID.",
 						'".$ScheduledDate."',
 						NOW(),
 						'".$_SESSION['UserLogin']."'
