@@ -2,13 +2,14 @@ DROP PROCEDURE IF EXISTS spInsItem;
 
 DELIMITER $$
 CREATE PROCEDURE spInsItem (
-	pID 			BIGINT, 
-	pItemName 		VARCHAR(255),
-	pItemCode		VARCHAR(255),
-	pIsSecond		BIT,
-	pPrice			DOUBLE,
-	pIsEdit			INT,
-	pCurrentUser	VARCHAR(255)
+	pID 				BIGINT,
+	pReportCategoryID	INT,
+	pItemName 			VARCHAR(255),
+	pItemCode			VARCHAR(255),
+	pIsSecond			BIT,
+	pPrice				DOUBLE,
+	pIsEdit				INT,
+	pCurrentUser		VARCHAR(255)
 )
 StoredProcedure:BEGIN
 
@@ -71,6 +72,7 @@ SET State = 3;
 				INSERT INTO master_item
 				(
 					ItemName,
+					ReportCategoryID,
 					ItemCode,
 					IsSecond,
 					Price,
@@ -79,6 +81,7 @@ SET State = 3;
 				)
 				VALUES (
 					pItemName,
+					pReportCategoryID,
 					pItemCode,
 					pIsSecond,
 					pPrice,
@@ -92,6 +95,7 @@ SET State = 5;
 					master_item
 				SET
 					ItemName = pItemName,
+					ReportCategoryID = pReportCategoryID,
 					ItemCode = pItemCode,
 					IsSecond = pIsSecond,
 					Price = pPrice,

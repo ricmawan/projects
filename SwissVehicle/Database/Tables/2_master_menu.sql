@@ -184,6 +184,33 @@ VALUES
 	NULL,
 	0,
 	3
+),
+(
+	19,
+	2,
+	'Jenis BBM',
+	'Master/FuelType/',
+	NULL,
+	0,
+	6
+),
+(
+	20,
+	2,
+	'Kategori Laporan',
+	'Master/ReportCategory/',
+	NULL,
+	0,
+	7
+),
+(
+	21,
+	4,
+	'Saldo Spare Part',
+	'Report/SparePartBalance/',
+	NULL,
+	1,
+	9
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

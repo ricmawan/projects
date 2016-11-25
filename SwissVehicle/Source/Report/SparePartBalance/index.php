@@ -78,11 +78,9 @@
 					return false;
 				}
 				else {
-					form = $("#PostForm");
-					form.attr("action", "./Report/SparePartBalance/Print.php?PrintType=" + PrintType);
-					if(PrintType == 2) form.attr("target", "_blank");
-					else form.removeAttr("target");
-					form.submit();
+					$("#loading").show();
+					$("#excelDownload").attr("src", "Report/SparePartBalance/ExportExcel.php?ddlMonth=" + ddlMonth + "&ddlYear=" + ddlYear);
+					$("#loading").hide();
 				}
 			}
 			$(document).ready(function () {
