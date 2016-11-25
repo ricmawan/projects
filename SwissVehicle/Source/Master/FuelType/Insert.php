@@ -1,28 +1,24 @@
 <?php
-	if(isset($_POST['hdnItemID'])) {
+	if(isset($_POST['hdnFuelTypeID'])) {
 		$RequestPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestPath);
 		$RequestPath = str_replace($file, "", $RequestPath);
 		include "../../GetPermission.php";
-		$ItemID = mysql_real_escape_string($_POST['hdnItemID']);
-		$ItemName = mysql_real_escape_string($_POST['txtItemName']);
-		$ItemCode = mysql_real_escape_string($_POST['txtItemCode']);
-		$ReportCategoryID = mysql_real_escape_string($_POST['ddlReportCategory']);
-		if(ISSET($_POST['chkSecond'])) $chkSecond = true;
-		else $chkSecond = false;
+		$FuelTypeID = mysql_real_escape_string($_POST['hdnFuelTypeID']);
+		$FuelTypeName = mysql_real_escape_string($_POST['txtFuelTypeName']);
 		$hdnIsEdit = mysql_real_escape_string($_POST['hdnIsEdit']);
 		$Price = str_replace(",", "", $_POST['txtPrice']);
 		$Message = "Data gagal dimasukkan, cek koneksi internet dan coba lagi!";
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
-		$sql = "CALL spInsItem(".$ItemID.", ".$ReportCategoryID.", '".$ItemName."', '".$ItemCode."', '".$chkSecond."', ".$Price.", ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsFuelType(".$FuelTypeID.", '".$FuelTypeName."', ".$Price.", ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
 		
 		if (! $result=mysql_query($sql, $dbh)) {
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysql_error();
 			$FailedFlag = 1;
-			echo returnstate($ItemID, $Message, $MessageDetail, $FailedFlag, $State);
+			echo returnstate($FuelTypeID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}				
 		$row=mysql_fetch_array($result);

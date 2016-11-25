@@ -26,7 +26,8 @@
 										<th data-column-id="Kilometer" data-align="right">KM</th>
 										<th data-column-id="FuelTypeName" >Jenis BBM</th>
 										<th data-column-id="Quantity" data-align="right">Jumlah (liter)</th>
-										<th data-column-id="Price" data-align="right">Total</th>
+										<th data-column-id="Price" data-align="right">Harga</th>
+										<th data-column-id="Total" data-align="right">Total</th>
 										<th data-column-id="Remarks">Keterangan</th>
 										<?php if($EditFlag == true) echo '<th data-column-id="Opsi" data-formatter="commands" data-sortable="false">Opsi</th>'; ?>
 									</tr>

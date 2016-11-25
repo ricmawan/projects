@@ -149,8 +149,9 @@
 			$row_array['EndKilometer'] = number_format($row['EndKilometer'],0,".",",");
 			$row_array['Difference'] = number_format($row['Difference'],0,".",",");
 			$row_array['FuelTypeName'] = $row['FuelTypeName'];
-			$row_array['Quantity'] = $row['Quantity'];
+			$row_array['Quantity'] = number_format($row['Quantity'],2,".",",");
 			$row_array['Price'] = number_format($row['Price'],2,".",",");
+			$row_array['Total'] = number_format($row['Price'] * $row['Quantity'],2,".",",");
 			$row_array['FuelRatio'] = $row['FuelRatio'];
 			array_push($return_arr, $row_array);
 		}

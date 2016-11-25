@@ -4,14 +4,15 @@
 	$file = basename($RequestPath);
 	$RequestPath = str_replace($file, "", $RequestPath);
 	include "../../GetPermission.php";
-	$where = " 1=1 AND CASE
+
+	$where = " 1=1  AND CASE
 							WHEN '".$_SESSION['UserLogin']."' = 'Admin'
 							THEN 1
-							WHEN '".$_SESSION['UserLogin']."' = TF.CreatedBy
+							WHEN '".$_SESSION['UserLogin']."' = RC.CreatedBy
 							THEN 1
 							ELSE 0
 						END = 1 ";
-	$order_by = "TF.FuelID DESC";
+	$order_by = "RC.ReportCategoryName ASC";
 	$rows = 10;
 	$current = 1;
 	$limit_l = ($current * $rows) - ($rows);
@@ -22,14 +23,14 @@
 		$order_by = "";
 		foreach($_REQUEST['sort'] as $key => $value) {
 			if($key != 'No') $order_by .= " $key $value";
-			else $order_by = "TF.FuelID DESC";
+			else $order_by = "RC.ReportCategoryName ASC";
 		}
 	}
 	//Handles search querystring sent from Bootgrid
 	if (ISSET($_REQUEST['searchPhrase']) )
 	{
 		$search = trim($_REQUEST['searchPhrase']);
-		$where .= " AND (DATE_FORMAT(TF.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' OR FT.FuelTypeName LIKE '%".$search."%' OR MM.MachineKind LIKE '%".$search."%' OR MM.MachineType LIKE '%".$search."%' OR MM.MachineCode LIKE '%".$search."%' OR MM.BrandName LIKE '%".$search."%' OR TF.Kilometer LIKE '%".$search."%' OR TF.Quantity LIKE '%".$search."%' OR TF.Price LIKE '%".$search."%' OR TF.Remarks LIKE '%".$search."%') ";
+		$where .= " AND ( RC.ReportCategoryName LIKE '%".$search."%' OR RC.ReportCategoryType LIKE '%".$search."%' )";
 	}
 	//Handles determines where in the paging count this result set falls in
 	if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];
@@ -42,14 +43,11 @@
 	}
 	if ($rows == -1) $limit = ""; //no limit
 	else $limit = " LIMIT $limit_l, $limit_h ";
+	//echo "$limit_l $limit_h";
 	$sql = "SELECT
-				COUNT(*) AS nRows
+				COUNT(1) AS nRows
 			FROM
-				transaction_fuel TF
-				JOIN master_machine MM
-					ON MM.MachineID = TF.MachineID
-				JOIN master_fueltype FT
-					ON FT.FuelTypeID = TF.FuelTypeID 
+				master_reportcategory RC
 			WHERE
 				$where";
 	if (! $result = mysql_query($sql, $dbh)) {
@@ -59,23 +57,11 @@
 	$row = mysql_fetch_array($result);
 	$nRows = $row['nRows'];
 	$sql = "SELECT
-				TF.FuelID,
-				DATE_FORMAT(TF.TransactionDate, '%d-%m-%Y') AS TransactionDate,
-				FT.FuelTypeName,
-				MM.MachineKind,
-				MM.BrandName,
-				MM.MachineType,
-				MM.MachineCode,
-				TF.Remarks,
-				TF.Kilometer,
-				TF.Quantity,
-				TF.Price
+				RC.ReportCategoryID,
+				RC.ReportCategoryName,
+				RC.ReportCategoryType
 			FROM
-				transaction_fuel TF
-				JOIN master_machine MM
-					ON MM.MachineID = TF.MachineID
-				JOIN master_fueltype FT
-					ON FT.FuelTypeID = TF.FuelTypeID
+				master_reportcategory RC
 			WHERE
 				$where
 			ORDER BY 
@@ -90,21 +76,13 @@
 	while ($row = mysql_fetch_array($result)) {
 		$RowNumber++;
 		$row_array['RowNumber'] = $RowNumber;
-		$row_array['FuelID']= $row['FuelID'];
-		$row_array['TransactionDate'] = $row['TransactionDate'];
-		$row_array['FuelTypeName'] = $row['FuelTypeName'];
-		$row_array['MachineKind'] = $row['MachineKind'];
-		$row_array['BrandName'] = $row['BrandName'];
-		$row_array['MachineType'] = $row['MachineType'];
-		$row_array['MachineCode'] = $row['MachineCode'];
-		$row_array['Kilometer'] =  number_format($row['Kilometer'],2,".",",");
-		$row_array['Quantity'] =  number_format($row['Quantity'],2,".",",");
-		$row_array['Price'] =  number_format($row['Price'],2,".",",");
-		$row_array['Total'] =  number_format($row['Price'] * $row['Quantity'],2,".",",");
-		$row_array['Remarks'] = $row['Remarks'];
+		$row_array['ReportCategoryIDName'] = $row['ReportCategoryID']."^".$row['ReportCategoryName'];
+		$row_array['ReportCategoryID'] = $row['ReportCategoryID'];
+		$row_array['ReportCategoryName'] = $row['ReportCategoryName'];
+		$row_array['ReportCategoryType'] = $row['ReportCategoryType'];
 		array_push($return_arr, $row_array);
 	}
-
 	$json = json_encode($return_arr);
 	echo "{ \"current\": $current, \"rowCount\":$rows, \"rows\": ".$json.", \"total\": $nRows }";
+	
 ?>

@@ -30,7 +30,7 @@
 	if (ISSET($_REQUEST['searchPhrase']) )
 	{
 		$search = trim($_REQUEST['searchPhrase']);
-		$where .= " AND ( MI.ItemName LIKE '%".$search."%' OR IF(IsSecond = 0, 'Tidak', 'Ya') LIKE '%".$search."%' OR MI.ItemCode LIKE '%".$search."%' OR MI.Price LIKE '%".$search."%' )";
+		$where .= " AND ( MI.ItemName LIKE '%".$search."%' OR RC.ReportCategoryName LIKE '%".$search."%' OR IF(IsSecond = 0, 'Tidak', 'Ya') LIKE '%".$search."%' OR MI.ItemCode LIKE '%".$search."%' OR MI.Price LIKE '%".$search."%' )";
 	}
 	//Handles determines where in the paging count this result set falls in
 	if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];
@@ -48,6 +48,8 @@
 				COUNT(1) AS nRows
 			FROM
 				master_item MI
+				LEFT JOIN master_reportcategory RC
+					ON RC.ReportCategoryID = MI.ReportCategoryID
 			WHERE
 				$where";
 	if (! $result = mysql_query($sql, $dbh)) {
@@ -61,9 +63,12 @@
 				MI.ItemName,
 				MI.ItemCode,
 				MI.Price,
+				RC.ReportCategoryName,
 				IF(IsSecond = 0, 'Tidak', 'Ya') IsSecond
 			FROM
 				master_item MI
+				LEFT JOIN master_reportcategory RC
+					ON RC.ReportCategoryID = MI.ReportCategoryID
 			WHERE
 				$where
 			ORDER BY 
@@ -83,6 +88,7 @@
 		$row_array['ItemName'] = $row['ItemName'];
 		$row_array['ItemCode'] = $row['ItemCode'];
 		$row_array['IsSecond'] = $row['IsSecond'];
+		$row_array['ReportCategoryName'] = $row['ReportCategoryName'];
 		$row_array['Price'] = number_format($row['Price'],2,".",",");
 		array_push($return_arr, $row_array);
 	}

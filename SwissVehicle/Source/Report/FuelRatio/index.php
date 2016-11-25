@@ -43,8 +43,9 @@
 										<th data-column-id="EndKilometer" data-align="right">KM Akhir</th>
 										<th data-column-id="Difference" data-align="right">Selisih</th>
 										<th data-column-id="FuelTypeName" >Jenis BBM</th>
-										<th data-column-id="Price" data-align="right">Harga</th>
 										<th data-column-id="Quantity" data-align="right">Liter</th>
+										<th data-column-id="Price" data-align="right">Harga</th>
+										<th data-column-id="Total" data-align="right">Total</th>
 										<!--<th data-column-id="TotalAmount" data-align="right">Total</th>-->
 										<th data-column-id="FuelRatio" data-align="center">Rasio</th>
 									</tr>

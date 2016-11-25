@@ -152,7 +152,7 @@
 				$this->Line(10,26,200,26);
 				$this->Ln(5);
 				//Judul Kolom
-				$w = Array(20,20,25,25,20,20,25,15,20);
+				$w = Array(20,20,20,20,20,20,15,15,20,20);
 				$this->SetTextColor(0, 0, 0);
 				$this->SetFont('Arial', 'B', 14);
 				$this->Ln(2);
@@ -162,7 +162,7 @@
 				$this->Cell(25,0.5,"Tanggal",0,0,'L');
 				$this->Cell(100,0.5," : ".$GLOBALS['date'],0,1,'L');
 				$this->Ln(5);
-				$header = array('Tipe', 'Plat No', 'KM Awal', 'KM Akhir', 'Selisih', 'Jenis BBM', 'Harga', 'Liter', 'Rasio');
+				$header = array('Tipe', 'Plat No', 'KM Awal', 'KM Akhir', 'Selisih', 'Jenis BBM', 'Liter', 'Harga', 'Total', 'Rasio');
 				$this->SetFont('Arial','B',9);
 				for($i=0; $i<count($header); $i++) {
 					$this->Cell($w[$i],5,$header[$i],1,0,'C');
@@ -221,19 +221,91 @@
 						ORDER BY
 							".$GLOBALS['order_by'];
 								
-					if (! $result = mysql_query($sql, $dbh)) {
-						echo mysql_error();
-						return 0;
-					}
-					$GrandTotal = 0;
-					while($row = mysql_fetch_array($result)) {
-						$GrandTotal += $row['Price'];
-						$this->Row(Array($row['MachineType'], $row['MachineCode'], number_format($row['StartKilometer'],0,".",","), number_format($row['EndKilometer'],0,".",","), number_format($row['Difference'],0,".",","), $row['FuelTypeName'], number_format($row['Price'],2,".",","), $row['Quantity'], $row['FuelRatio']));
-					}
-					$this->Cell(130,5,'Grand Total',1,0,'L');
-					$this->Cell(25,5,number_format($GrandTotal,2,".",","),1,0,'R');
-					$this->Cell(15,5,'',1,0,'L');
-					$this->Cell(20,5,'',1,0,'L');
+				if (! $result = mysql_query($sql, $dbh)) {
+					echo mysql_error();
+					return 0;
+				}
+				$GrandTotal = 0;
+				while($row = mysql_fetch_array($result)) {
+					$GrandTotal += $row['Price'] * $row['Quantity'];
+					$this->Row(Array($row['MachineType'], $row['MachineCode'], number_format($row['StartKilometer'],0,".",","), number_format($row['EndKilometer'],0,".",","), number_format($row['Difference'],0,".",","), $row['FuelTypeName'], number_format($row['Quantity'],2,".",","), number_format($row['Price'],2,".",","), number_format($row['Price'] * $row['Quantity'],2,".",","), $row['FuelRatio']));
+				}
+				$this->Cell(150,5,'Grand Total',1,0,'L');
+				$this->Cell(20,5,number_format($GrandTotal,2,".",","),1,0,'R');
+				$this->Cell(20,5,'',1,0,'L');
+				
+				$this->Ln(15);
+				
+				$sql = "SELECT
+							IFNULL(EK.FuelTypeName, '') FuelTypeName,
+							EK.Price,
+							SUM(IFNULL(EK.Quantity, 0)) Quantity,
+							EK.Price * SUM(IFNULL(EK.Quantity, 0)) Total
+						FROM
+							master_machine MM
+							JOIN 
+							(
+								SELECT
+									TF.MachineID,
+									TF.Kilometer,
+									FT.FuelTypeName,
+									TF.Quantity,
+									TF.Price
+								FROM
+									transaction_fuel TF
+									JOIN master_fueltype FT
+										ON FT.FuelTypeID = TF.FuelTypeID
+								WHERE
+									CAST(TF.TransactionDate AS DATE) = '".$GLOBALS['txtDate']."'
+							)EK
+								ON MM.MachineID = EK.MachineID
+							JOIN
+							(
+								SELECT
+									MAX(TF.TransactionDate),
+									TF.MachineID,
+									MAX(TF.Kilometer) Kilometer
+								FROM
+									transaction_fuel TF
+								WHERE
+									CAST(TF.TransactionDate AS DATE) < '".$GLOBALS['txtDate']."'
+								GROUP BY
+									TF.MachineID
+							)SK
+								ON MM.MachineID = SK.MachineID
+						WHERE
+							".$GLOBALS['where']."
+						GROUP BY
+							FuelTypeName,
+							Price
+						ORDER BY
+							".$GLOBALS['order_by'];
+				if (! $result = mysql_query($sql, $dbh)) {
+					echo mysql_error();
+					return 0;
+				}
+				
+				$this->Cell(95,0.5,"",0,0,'L');
+				$this->SetWidths(Array(25,20,20,30));
+				$this->SetAligns(Array('L', 'R', 'R', 'R'));
+				$w = Array(25,20,20,30);
+				$header = array('Jenis BBM', 'Liter', 'Harga', 'Total');
+				$this->SetFont('Arial','B',9);
+				for($i=0; $i<count($header); $i++) {
+					$this->Cell($w[$i],5,$header[$i],1,0,'C');
+				}
+				$this->Ln(5);
+				$this->SetFont('Arial','',8);
+				$GrandTotal = 0;
+				while($row = mysql_fetch_array($result)) {
+					$this->Cell(95,0.5,"",0,0,'L');
+					$GrandTotal += $row['Total'];
+					$this->Row(Array($row['FuelTypeName'], number_format($row['Quantity'],2,".",","), number_format($row['Price'],2,".",","), number_format($row['Total'],2,".",",")));
+				}
+				$this->Cell(95,0.5,"",0,0,'L');
+				$this->SetWidths(Array(65,30));
+				$this->SetAligns(Array('L', 'R'));
+				$this->Row(Array('Grand Total', number_format($GrandTotal,2,".",",")));
 			}
 
 			function Footer() {
@@ -270,8 +342,8 @@
 		$pdf->SetLeftMargin(10);
 		$pdf->SetRightMargin(10);
 		$pdf->AddPage();
-		$pdf->SetWidths(Array(20,20,25,25,20,20,25,15,20));
-		$pdf->SetAligns(Array('L', 'C', 'R', 'R', 'R', 'L', 'R', 'R', 'C'));
+		$pdf->SetWidths(Array(20,20,20,20,20,20,15,15,20,20));
+		$pdf->SetAligns(Array('L', 'C', 'R', 'R', 'R', 'L', 'R', 'R', 'R', 'C'));
 		srand(microtime()*1000000);
 		$pdf->Table();
 		$filename = "Laporan Rasio BBM " . $GLOBALS['date'] . ".pdf";
@@ -280,7 +352,7 @@
 			$pdf->Output($filename, "D");
 		}
 		else {
-			$pdf->AutoPrint(true);
+			//$pdf->AutoPrint(true);
 			$pdf->Output($filename, "I");
 		}
 		

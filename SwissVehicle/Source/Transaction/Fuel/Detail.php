@@ -13,6 +13,7 @@
 		$Kilometer = "0";
 		$Quantity = "0";
 		$Price = 0.00;
+		$Total = 0.00;
 		$Remarks = "";
 		$IsEdit = 0;
 		$rowCount = 0;
@@ -109,10 +110,12 @@
 								</div>
 								<div class="col-md-3">
 									<select id="ddlFuelType" name="ddlFuelType" class="form-control-custom">
+										<option value="" >-Pilih Jenis BBM-</option>
 										<?php
 											$sql = "SELECT 
 														FT.FuelTypeID,
-														FT.FuelTypeName
+														FT.FuelTypeName,
+														FT.Price
 													FROM 
 														master_fueltype FT
 													ORDER BY
@@ -122,8 +125,8 @@
 												return 0;
 											}
 											while($row = mysql_fetch_array($result)) {
-												if($FuelTypeID == $row['FuelTypeID']) echo "<option value='".$row['FuelTypeID']."' selected>".$row['FuelTypeName']."</option>";
-												else echo "<option value='".$row['FuelTypeID']."' >".$row['FuelTypeName']."</option>";
+												if($FuelTypeID == $row['FuelTypeID']) echo "<option value='".$row['FuelTypeID']."' price=".$row['Price']." selected>".$row['FuelTypeName']."</option>";
+												else echo "<option value='".$row['FuelTypeID']."' price=".$row['Price']." >".$row['FuelTypeName']."</option>";
 											}
 										?>
 									</select>
@@ -144,7 +147,16 @@
 									Jumlah (Liter) :
 								</div>
 								<div class="col-md-3">
-									<input id="txtQuantity" style="text-align:right;" name="txtQuantity" type="text" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertThousand(this.id, this.value)" class="form-control-custom" placeholder="Jumlah (Liter)" required <?php echo 'value="'.number_format($Quantity,2,".",",").'"'; ?>/>
+									<input id="txtQuantity" style="text-align:right;" name="txtQuantity" type="text" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertThousand(this.id, this.value)" class="form-control-custom" placeholder="Jumlah (Liter)" required <?php echo 'value="'.number_format($Quantity,2,".",",").'"'; ?>/>
+								</div>
+							</div>
+							<br />
+							<div class="row" id="RowItem" >
+								<div class="col-md-2 labelColumn">
+									Harga :
+								</div>
+								<div class="col-md-3">
+									<input id="txtPrice" style="text-align:right;" name="txtPrice" type="text" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" class="form-control-custom" placeholder="Total" required <?php echo 'value="'.number_format($Price,2,".",",").'"'; ?>/>
 								</div>
 							</div>
 							<br />
@@ -153,7 +165,7 @@
 									Total :
 								</div>
 								<div class="col-md-3">
-									<input id="txtPrice" style="text-align:right;" name="txtPrice" type="text" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" class="form-control-custom" placeholder="Total" required <?php echo 'value="'.number_format($Price,2,".",",").'"'; ?>/>
+									<input id="txtTotal" style="text-align:right;" name="txtTotal" type="text" class="form-control-custom" placeholder="Total" readonly <?php echo 'value="'.number_format($Total,2,".",",").'"'; ?>/>
 								</div>
 							</div>
 							<br />
@@ -184,8 +196,20 @@
 				$("#ddlMachine").next().find("input").click(function() {
 					$(this).val("");
 				});
+				
+				$("#ddlFuelType").change(function() {
+					var price = $("#ddlFuelType option:selected").attr("price");
+					$("#txtPrice").val(returnRupiah(price));
+					Calculate();
+				});
 			});
 			
+			function Calculate() {
+				var qty = $("#txtQuantity").val().replace(/\,/g, "");
+				var price = $("#txtPrice").val().replace(/\,/g, "");
+				var total = parseFloat(qty) * parseFloat(price);
+				$("#txtTotal").val(returnRupiah(total.toFixed(2).toString()));
+			}
 			function SubmitValidate() {
 				var PassValidate = 1;
 				var FirstFocus = 0;

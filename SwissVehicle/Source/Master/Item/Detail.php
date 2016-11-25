@@ -11,11 +11,13 @@
 		$IsSecond = "";
 		$Price = 0.00;
 		$IsEdit = 0;
+		$ReportCategoryID = 0;
 		
 		if($ItemID != 0) {
 			$IsEdit = 1;
 			//$Content = "Place the content here";
 			$sql = "SELECT
+						MI.ReportCategoryID,
 						MI.ItemID,
 						MI.ItemName,
 						MI.ItemCode,
@@ -35,6 +37,7 @@
 			$ItemName = $row['ItemName'];
 			$ItemCode = $row['ItemCode'];
 			$IsSecond = $row['IsSecond'];
+			$ReportCategoryID = $row['ReportCategoryID'];
 			$Price = $row['Price'];
 		}
 	}
@@ -51,6 +54,34 @@
 					</div>
 					<div class="panel-body">
 						<form class="col-md-12" id="PostForm" method="POST" action="" >
+							<div class="row">
+								<div class="col-md-2 labelColumn">
+									Kategori Laporan :
+								</div>
+								<div class="col-md-3">
+									<select id="ddlReportCategory" name="ddlReportCategory" class="form-control-custom">
+										<option value="" >-Pilih Kategori Laporan-</option>
+										<?php
+											$sql = "SELECT 
+														RC.ReportCategoryID,
+														RC.ReportCategoryName
+													FROM 
+														master_reportcategory RC
+													ORDER BY
+														RC.ReportCategoryName";
+											if(!$result = mysql_query($sql, $dbh)) {
+												echo mysql_error();
+												return 0;
+											}
+											while($row = mysql_fetch_array($result)) {
+												if($ReportCategoryID == $row['ReportCategoryID']) echo "<option value='".$row['ReportCategoryID']."' selected>".$row['ReportCategoryName']."</option>";
+												else echo "<option value='".$row['ReportCategoryID']."' >".$row['ReportCategoryName']."</option>";
+											}
+										?>
+									</select>
+								</div>
+							</div>
+							<br />
 							<div class="row">
 								<div class="col-md-2 labelColumn">
 									Nama Barang :

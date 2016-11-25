@@ -10,27 +10,24 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						 <h5>Barang</h5>
+						 <h5>Jenis BBM</h5>
 					</div>
 					<div class="panel-body">
 						<div class="table-responsive">
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
-										<th data-column-id="ItemIDName" data-visible="false" data-type="numeric" data-identifier="true">ItemID</th>
+										<th data-column-id="FuelTypeIDName" data-visible="false" data-type="numeric" data-identifier="true">FuelTypeID</th>
 										<th data-column-id="RowNumber" data-sortable="false" data-type="numeric">No</th>
-										<th data-column-id="ItemCode">Kode</th>
-										<th data-column-id="ItemName">Nama</th>
-										<th data-column-id="IsSecond">Dijual Bekas</th>
-										<th data-column-id="ReportCategoryName">Kategori Laporan</th>
+										<th data-column-id="FuelTypeName">Nama</th>
 										<th data-column-id="Price" data-align="right">Harga</th>
 										<?php if($EditFlag == true) echo '<th data-column-id="Opsi" data-formatter="commands" data-sortable="false">Opsi</th>'; ?>
 									</tr>
 								</thead>
 							</table>
 						</div>
-						<button class="btn btn-primary menu" link="./Master/Item/Detail.php?ID=0"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
-						<?php if($DeleteFlag == true) echo '<button class="btn btn-danger" onclick="DeleteData(\'./Master/Item/Delete.php\');" ><i class="fa fa-close"></i> Hapus</button>'; ?>
+						<button class="btn btn-primary menu" link="./Master/FuelType/Detail.php?ID=0"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
+						<?php if($DeleteFlag == true) echo '<button class="btn btn-danger" onclick="DeleteData(\'./Master/FuelType/Delete.php\');" ><i class="fa fa-close"></i> Hapus</button>'; ?>
 					</div>
 				</div>
 			</div>
@@ -54,7 +51,7 @@
 								refresh: "Refresh",
 								search: "Cari"
 							},
-							url: "./Master/Item/DataSource.php",
+							url: "./Master/FuelType/DataSource.php",
 							selection: true,
 							multiSelect: true,
 							rowSelect: true,
@@ -62,7 +59,7 @@
 							formatters: {
 								"commands": function(column, row)
 								{
-									return "<i style='cursor:pointer;' data-row-id=\"" + row.ItemID + "\" class=\"fa fa-edit\" data-link=\"./Master/Item/Detail.php?ID=" + row.ItemID + "\" acronym title=\"Ubah Data\"></i>&nbsp;";
+									return "<i style='cursor:pointer;' data-row-id=\"" + row.FuelTypeID + "\" class=\"fa fa-edit\" data-link=\"./Master/FuelType/Detail.php?ID=" + row.FuelTypeID + "\" acronym title=\"Ubah Data\"></i>&nbsp;";
 								}
 							}
 						}).on("loaded.rs.jquery.bootgrid", function()
