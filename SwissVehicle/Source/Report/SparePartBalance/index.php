@@ -57,7 +57,7 @@
 						<br />
 						<div class="row">
 							<div class="col-md-12">
-								<button class="btn btn-success" id="btnExport" onclick="PrintReport(1);" ><i class="fa fa-file-excel-o "></i> Eksport PDF</button>&nbsp;&nbsp;
+								<button class="btn btn-success" id="btnExport" onclick="PrintReport(1);" ><i class="fa fa-file-excel-o "></i> Eksport Excel</button>&nbsp;&nbsp;
 							</div>
 						</div>
 					</div>
