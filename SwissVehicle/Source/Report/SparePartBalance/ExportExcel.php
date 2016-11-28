@@ -87,7 +87,7 @@
 		while($row = mysql_fetch_array($result)) {
 			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $row['ReportCategoryName']);
 			$sql2 = "SELECT
-						IFNULL((TPD.Total - TSD.Total), 0) PreviousBalance
+						IFNULL(TPD.Total, 0) - IFNULL(TSD.Total, 0) PreviousBalance
 					FROM
 						master_reportcategory RC
 						LEFT JOIN 
@@ -125,7 +125,9 @@
 							GROUP BY
 								MI.ReportCategoryID 
 						)TSD
-							ON RC.ReportCategoryID = TSD.ReportCategoryID";
+							ON RC.ReportCategoryID = TSD.ReportCategoryID
+					WHERE
+						RC.ReportCategoryID = ".$row['ReportCategoryID'];
 									
 			
 			if (! $result2 = mysql_query($sql2, $dbh)) {
@@ -177,7 +179,9 @@
 							GROUP BY
 								MI.ReportCategoryID 
 						)TSD
-							ON RC.ReportCategoryID = TSD.ReportCategoryID";
+							ON RC.ReportCategoryID = TSD.ReportCategoryID
+					WHERE
+						RC.ReportCategoryID = ".$row['ReportCategoryID'];
 
 			if (! $result3 = mysql_query($sql3, $dbh)) {
 				echo mysql_error();
@@ -187,7 +191,7 @@
 			
 			$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row3['CurrentPurchase']);
 			$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row3['CurrentUsage']);
-			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, '=C'.$rowExcel.'-D'.$rowExcel);
+			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, '=B'.$rowExcel.'+C'.$rowExcel.'-D'.$rowExcel);
 			$rowExcel++;
 		}
 		
@@ -205,7 +209,7 @@
 		$rowStart = $rowExcel;
 		
 		//Peralatan
-		$sql = "SELECT
+		$sql4 = "SELECT
 					RC.ReportCategoryID,
 					RC.ReportCategoryName
 				FROM
@@ -215,15 +219,15 @@
 				ORDER BY	
 					RC.ReportCategoryName ASC";
 					
-		if (! $result = mysql_query($sql, $dbh)) {
+		if (! $result4 = mysql_query($sql4, $dbh)) {
 			echo mysql_error();
 			return 0;
 		}
 		
-		while($row = mysql_fetch_array($result)) {
-			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $row['ReportCategoryName']);
-			$sql2 = "SELECT
-						IFNULL((TPD.Total - TSD.Total), 0) PreviousBalance
+		while($row4 = mysql_fetch_array($result4)) {
+			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $row4['ReportCategoryName']);
+			$sql5 = "SELECT
+						IFNULL(TPD.Total, 0) - IFNULL(TSD.Total, 0) PreviousBalance
 					FROM
 						master_reportcategory RC
 						LEFT JOIN 
@@ -239,7 +243,7 @@
 									ON MI.ItemID = TPD.ItemID
 							WHERE
 								TP.TransactionDate < '".$ddlYear."-".$ddlMonth."-01'
-								AND MI.ReportCategoryID = ".$row['ReportCategoryID']."
+								AND MI.ReportCategoryID = ".$row4['ReportCategoryID']."
 							GROUP BY
 								MI.ReportCategoryID
 						)TPD
@@ -257,21 +261,23 @@
 									ON MI.ItemID = TSD.ItemID
 							WHERE
 								TS.TransactionDate < '".$ddlYear."-".$ddlMonth."-01'
-								AND MI.ReportCategoryID = ".$row['ReportCategoryID']."
+								AND MI.ReportCategoryID = ".$row4['ReportCategoryID']."
 							GROUP BY
 								MI.ReportCategoryID 
 						)TSD
-							ON RC.ReportCategoryID = TSD.ReportCategoryID";
+							ON RC.ReportCategoryID = TSD.ReportCategoryID
+					WHERE
+						RC.ReportCategoryID = ".$row4['ReportCategoryID'];
 									
 			
-			if (! $result2 = mysql_query($sql2, $dbh)) {
+			if (! $result5 = mysql_query($sql5, $dbh)) {
 				echo mysql_error();
 				return 0;
 			}
-			$row2 = mysql_fetch_array($result2);
-			$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row2['PreviousBalance']);
+			$row5 = mysql_fetch_array($result5);
+			$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row5['PreviousBalance']);
 			
-			$sql3 = "SELECT
+			$sql6 = "SELECT
 						IFNULL(TPD.Total, 0) CurrentPurchase,
 						IFNULL(TSD.Total, 0) CurrentUsage
 					FROM
@@ -290,7 +296,7 @@
 							WHERE
 								MONTH(TP.TransactionDate) = ".$ddlMonth."
 								AND YEAR(TP.TransactionDate) = ".$ddlYear."
-								AND MI.ReportCategoryID = ".$row['ReportCategoryID']."
+								AND MI.ReportCategoryID = ".$row4['ReportCategoryID']."
 							GROUP BY
 								MI.ReportCategoryID
 						)TPD
@@ -309,21 +315,23 @@
 							WHERE
 								MONTH(TS.TransactionDate) = ".$ddlMonth."
 								AND YEAR(TS.TransactionDate) = ".$ddlYear."
-								AND MI.ReportCategoryID = ".$row['ReportCategoryID']."
+								AND MI.ReportCategoryID = ".$row4['ReportCategoryID']."
 							GROUP BY
 								MI.ReportCategoryID 
 						)TSD
-							ON RC.ReportCategoryID = TSD.ReportCategoryID";
+							ON RC.ReportCategoryID = TSD.ReportCategoryID
+					WHERE
+						RC.ReportCategoryID = ".$row4['ReportCategoryID'];
 
-			if (! $result3 = mysql_query($sql3, $dbh)) {
+			if (! $result6 = mysql_query($sql6, $dbh)) {
 				echo mysql_error();
 				return 0;
 			}
-			$row3 = mysql_fetch_array($result3);
+			$row6 = mysql_fetch_array($result6);
 			
-			$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row3['CurrentPurchase']);
-			$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row3['CurrentUsage']);
-			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, '=C'.$rowExcel.'-D'.$rowExcel);
+			$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row6['CurrentPurchase']);
+			$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row6['CurrentUsage']);
+			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, '=B'.$rowExcel.'+C'.$rowExcel.'-D'.$rowExcel);
 			$rowExcel++;
 		}
 		
