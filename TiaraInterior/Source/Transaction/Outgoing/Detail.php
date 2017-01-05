@@ -348,13 +348,13 @@
 													<input type="hidden" id="hdnStock" name="hdnStock" class="hdnStock" value="" />
 												</td>
 												<td style="width:75px;">
-													<input type="text" row="" value=1 id="txtQuantity" style="text-align:right;" name="txtQuantity" onkeypress="return isNumberKey(event)" onchange="ValidateQty(this.getAttribute('row'));" class="form-control-custom txtQuantity" placeholder="QTY"/>
+													<input type="text" row="" value=1 id="txtQuantity" style="text-align:right;" name="txtQuantity" onclick="this.select();" onkeypress="return isNumberKey(event)" onchange="ValidateQty(this.getAttribute('row'));" class="form-control-custom txtQuantity" placeholder="QTY"/>
 												</td>
 												<td style="width:135px;">
-													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;" class="form-control-custom txtSalePrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual"/>
+													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;" onclick="this.select();" class="form-control-custom txtSalePrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual"/>
 												</td>
 												<td style="width:155px;">
-													<input type="text" id="txtDiscount" style="display:inline-block;width: 90px;text-align:right;" value="0" name="txtDiscount" style="text-align:right;" class="form-control-custom txtDiscount" onchange="ValidateDiscount(this.getAttribute('row'))" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" placeholder="Diskon" /> &nbsp; <input type="checkbox" name="chkIsPercentage" id="chkIsPercentage" style="margin-top:2px;vertical-align:sub;" onchange="ValidateDiscount(this.getAttribute('row'))" value=1 checked class="chkIsPercentage" /> (%)
+													<input type="text" id="txtDiscount" style="display:inline-block;width: 90px;text-align:right;" onclick="this.select();" value="0" name="txtDiscount" style="text-align:right;" class="form-control-custom txtDiscount" onchange="ValidateDiscount(this.getAttribute('row'))" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" placeholder="Diskon" /> &nbsp; <input type="checkbox" name="chkIsPercentage" id="chkIsPercentage" style="margin-top:2px;vertical-align:sub;" onchange="ValidateDiscount(this.getAttribute('row'))" value=1 checked class="chkIsPercentage" /> (%)
 												</td>
 												<td  style="width:170px;">
 													<input type="text" id="txtTotal" name="txtTotal" class="form-control-custom txtTotal" style="text-align:right;" value="0.00" placeholder="Jumlah" readonly />
@@ -378,7 +378,7 @@
 									Ongkos Kirim :
 								</div>
 								<div class="col-md-3">
-									<input type="text" id="txtDeliveryCost" style="text-align:right;" <?php echo 'value="'.number_format($DeliveryCost,2,".",",").'"'; ?> name="txtDeliveryCost" class="form-control-custom" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" />
+									<input type="text" id="txtDeliveryCost" style="text-align:right;"  onclick="this.select();" <?php echo 'value="'.number_format($DeliveryCost,2,".",",").'"'; ?> name="txtDeliveryCost" class="form-control-custom" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" />
 								</div>
 							</div>
 							<br />

@@ -145,13 +145,13 @@
 													<input type="text" row="" value=1 id="txtQuantity" style="text-align:right;" name="txtQuantity" class="form-control-custom txtQuantity" placeholder="QTY" readonly />
 												</td>
 												<td style="width:85px;">
-													<input type="text" row="" value=1 id="txtAdjustment" style="text-align:right;" name="txtAdjustment" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control-custom txtAdjustment" placeholder="Penyesuaian" />
+													<input type="text" row="" value=1 id="txtAdjustment" style="text-align:right;" name="txtAdjustment" onclick="this.select();" onkeypress="return isNumberKey(event)" onchange="Calculate();" class="form-control-custom txtAdjustment" placeholder="Penyesuaian" />
 												</td>
 												<td style="width:135px;">
-													<input type="text" id="txtBuyPrice" value="0.00" name="txtBuyPrice" style="text-align:right;" class="form-control-custom txtBuyPrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Beli"/>
+													<input type="text" id="txtBuyPrice" value="0.00" name="txtBuyPrice" style="text-align:right;" onclick="this.select();" class="form-control-custom txtBuyPrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Beli"/>
 												</td>
 												<td style="width:135px;">
-													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;" class="form-control-custom txtSalePrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual"/>
+													<input type="text" id="txtSalePrice" value="0.00" name="txtSalePrice" style="text-align:right;" onclick="this.select();" class="form-control-custom txtSalePrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual"/>
 												</td>
 												<td  style="width:170px;">
 													<input type="text" id="txtTotal" name="txtTotal" class="form-control-custom txtTotal" style="text-align:right;" value="0.00" placeholder="Jumlah" readonly />

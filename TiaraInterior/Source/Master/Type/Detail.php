@@ -120,7 +120,7 @@
 									Harga Beli :
 								</div>
 								<div class="col-md-3">
-									<input id="txtBuyPrice" name="txtBuyPrice" type="text" class="form-control-custom" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Beli" style="text-align:right;" <?php echo 'value="'.number_format($BuyPrice,2,".",",").'"'; ?> />
+									<input id="txtBuyPrice" name="txtBuyPrice" type="text" class="form-control-custom" onclick="this.select();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Beli" style="text-align:right;" <?php echo 'value="'.number_format($BuyPrice,2,".",",").'"'; ?> />
 								</div>
 							</div>
 							<br />
@@ -129,7 +129,7 @@
 									Harga Jual :
 								</div>
 								<div class="col-md-3">
-									<input id="txtSalePrice" name="txtSalePrice" type="text" class="form-control-custom" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual" style="text-align:right;" <?php echo 'value="'.number_format($SalePrice,2,".",",").'"'; ?> />
+									<input id="txtSalePrice" name="txtSalePrice" type="text" class="form-control-custom" onclick="this.select();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" placeholder="Harga Jual" style="text-align:right;" <?php echo 'value="'.number_format($SalePrice,2,".",",").'"'; ?> />
 								</div>
 							</div>
 							<br />
