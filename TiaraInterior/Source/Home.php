@@ -63,7 +63,7 @@
 				</div>
 				<span id="Clock" style="color: white; padding: 5px 20px 0px 20px; float: left; font-size: 16px;"></span>
 				<div style="color: white; padding: 5px 20px 0px 50px; float: right; font-size: 16px;"> 
-					 Selamat Datang, <?php echo $_SESSION['Nama']; ?>! &nbsp;&nbsp;&nbsp;<a href="#" class="menu" link="./Logout.php"><img src="./assets/img/logout.png" width="20px" border="0" acronym title="Logout" /></a>
+					 Selamat Datang, <a href="#" style="color: white;font-size: 16px;" onclick="UpdatePassword();"><?php echo $_SESSION['Nama']; ?>!</a> &nbsp;&nbsp;&nbsp;<a href="#" class="menu" link="./Logout.php"><img src="./assets/img/logout.png" width="20px" border="0" acronym title="Logout" /></a>
 				</div>
 			</nav>   
 			<!-- /. NAV TOP  -->
@@ -141,6 +141,42 @@
 				</div>
 			</div>
 		</div>
+		<div id="delete-confirm" title="Konfirmasi" style="display: none;">
+			<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Apakah anda yakin ingin menghapusnya?</p>
+		</div>
+		<div id="save-confirm" title="Konfirmasi" style="display: none;">
+			<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Apakah anda yakin data yang diinput sudah benar?</p>
+		</div>
+		<div id="update-password" title="Ganti Password" style="display: none;">
+			<form class="col-md-12" id="UpdatePasswordForm" method="POST" action="" >
+				<div class="row">
+					<div class="col-md-5 labelColumn">
+						Password Lama :
+					</div>
+					<div class="col-md-6">
+						<input id="txtCurrentPassword" name="txtCurrentPassword" type="password" class="form-control-custom" placeholder="Password Lama" />
+					</div>
+				</div>
+				<br />
+				<div class="row">
+					<div class="col-md-5 labelColumn">
+						Password Baru :
+					</div>
+					<div class="col-md-6">
+						<input id="txtNewPassword" name="txtNewPassword" type="password" class="form-control-custom" placeholder="Password Baru" />
+					</div>
+				</div>
+				<br />
+				<div class="row">
+					<div class="col-md-5 labelColumn">
+						Konfirmasi Password :
+					</div>
+					<div class="col-md-6">
+						<input id="txtConfirmNewPassword" name="txtConfirmNewPassword" type="password" class="form-control-custom" placeholder="Konfirmasi Password" />
+					</div>
+				</div>
+			</form>
+		</div>
 		<script src="assets/js/jquery-1.10.2.js"></script>
 		<script src="assets/js/jquery-ui-1.10.3.custom.js"></script>
 		<script src="assets/js/bootstrap.min.js"></script>
@@ -153,14 +189,17 @@
 		<script src="assets/js/dataTables/dataTables.bootstrap.js"></script>-->
 		<script src="assets/js/bootstrap-multiselect.js"></script>
 		<a href="#Top" class="scrollup" onclick="return false;">Scroll</a>
-		<a href="#Bottom" class="scrolldown" onclick="return false;">Scroll</a>
+		<!--<a href="#Bottom" class="scrolldown" onclick="return false;">Scroll</a>-->
 		<div id="loading"></div>
 		<iframe id='excelDownload' src='' style='display:none'></iframe>
 		<script type="text/javascript">
 			$(document).ready(function() {
 				var windowHeight = $( window ).height() - 55;
 				$("#page-inner").css ({
-					"min-height" : windowHeight
+					"min-height" : windowHeight,
+					"max-height" : windowHeight,
+					"overflow-x" : "hidden",
+					"overflow-y" : "auto"
 				});
 				$("head").append("<style> .panel-default { min-height : " + windowHeight + "px } </style>");
 				$(".panel-default").css ({

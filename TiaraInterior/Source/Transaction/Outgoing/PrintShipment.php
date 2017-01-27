@@ -74,7 +74,7 @@
 		$Data .= fnSpace(19) . $bold1 . $double1 ."SURAT JALAN". $double0 . $bold0;
 		$Data .= fnSpace(16) . $condensed0 . $City."\n".$condensed1;
 		$Data .= "   Sales : ".$Alias;
-		$Data .= fnSpace(62) . $condensed0 . "Ph " . $Telephone . "\n" . $condensed1;
+		$Data .= fnSpace(65 - strlen($Alias)) . $condensed0 . "Ph " . $Telephone . "\n" . $condensed1;
 		
 		$Data .= "   Kami kirim pesanan anda dalam keadaan baik, barang-barang sbb:";
 		$Data .= fnSpace(55) . "No : ".$OutgoingNumber."\n";

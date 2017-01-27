@@ -1,20 +1,21 @@
 @C!
-                                                                            Kepada Yth.  PUTRA MURIA GORDYN
-   Tgl : 22-07-2016                                                                      SEMARANG
-   Sales           : MRC                            EW1INVOICEW0F
-   Tgl Jatuh Tempo : 22-07-2016
-   Kami kirim pesanan anda dalam keadaan baik, barang-barang sbb:                                                       No : TJ-220716012
+                                                                            Kepada Yth.  ABRAHAM TN 
+   Tgl : 25-01-2017                                                                      SEMARANG
+   Sales           : TR                             EW1INVOICEW0F
+   Tgl Jatuh Tempo : 25-01-2017
+   Kami kirim pesanan anda dalam keadaan baik, barang-barang sbb:                                                       No : TJ-250117001
 -----------------------------------------------------------------------------------------------------------------------------------------
 |      Qty      |                Nama Barang                 |     Lot    |    Harga Satuan   |       Diskon      |        Total        |
 -----------------------------------------------------------------------------------------------------------------------------------------
-|      1 Roll   | KING QUEEN FSE 2411                        |        514 |        175,000.00 |    61,250.00(35%) |          113,750.00 |
+|     10 Roll   | BELLAGIO AR 5940                           |        555 |         27,000.00 |              0.00 |          270,000.00 |
+|      3 Roll   | BELLAGIO AR 5940                           |        557 |         27,000.00 |              0.00 |           81,000.00 |
 |---------------------------------------------------------------------------------------------------------------------------------------|
-   Catatan   :                                                                            Jml Pembelian         Rp.          113,750.00
-   Kredit    : Rp. 113,750.00
-   Terbilang : SERATUS TIGA BELAS RIBU TUJUH RATUS LIMA PULUH RUPIAH
+   Catatan   :                                                                            Jml Pembelian         Rp.          351,000.00
+   Kredit    : Rp. 351,000.00
+   Terbilang : TIGA RATUS LIMA PULUH SATU RIBU RUPIAH
 _________________________________________________________________________________________________________________________________________
    Penerima,                                                  Checker,                                                  Hormat Kami,
 
 
-                                                                                                                             VER
+                                                                                                                            Admin
 EBarang yang sudah dibeli tidak dapat ditukar/dikembalikan

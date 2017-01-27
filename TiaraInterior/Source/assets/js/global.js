@@ -84,7 +84,7 @@ $(document).ready(function () {
 		});
 	});
 	
-	$(window).scroll(function () {
+	$("#page-inner").scroll(function () {
 		if ($(this).scrollTop() > 100) {
 			$('.scrollup').fadeIn();
 		} else {
@@ -92,11 +92,11 @@ $(document).ready(function () {
 		}
 	});
 	
-	if ($(window).scrollTop() <= 50) {
+	if ($("#page-inner").scrollTop() <= 50) {
 		$('.scrolldown').fadeIn();
 	}
 	
-	$(window).scroll(function () {
+	$("#page-inner").scroll(function () {
 		if ($(this).scrollTop() <= 50) {
 			$('.scrolldown').fadeIn();
 		} else {
@@ -105,14 +105,14 @@ $(document).ready(function () {
 	});
 
 	$('.scrollup').click(function () {
-		$("html, body").animate({
+		$("#page-inner").animate({
 			scrollTop: 0
 		}, "slow");
 		return false;
 	});
 	
 	$('.scrolldown').click(function () {
-		$("html, body").animate({
+		$("#page-inner").animate({
 			scrollTop: $(document).height()
 		}, "slow");
 		return false;
@@ -373,72 +373,181 @@ function clearFormat(id, angka) {
 }
 
 function SubmitForm(url) {
-	$("#loading").show();
-	var PassValidate = 1;
-	var FirstFocus = 0;
-	$(".form-control-custom").each(function() {
-		if($(this).hasAttr('required')) {
-			if($(this).val() == "") {
-				PassValidate = 0;
-				$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-				if(FirstFocus == 0) $(this).focus();
-				FirstFocus = 1;
-				$("html, body").animate({
-					scrollTop: 0
-				}, "slow");
-			}
-		}
-	});
-	if(PassValidate == 1) {
-		$.ajax({
-			url: url,
-			type: "POST",
-			data: $("#PostForm").serialize(),
-			dataType: "json",
-			success: function(data) {
-				if(data.FailedFlag == '0') {
-					$.notify(data.Message, "success");
-					//window.location = PrevMenu;
-					$("#loading").show();
-					$("#page-inner").html("");
-					if(PrevMenu != "./Home.php") {
-						CurrentMenu = PrevMenu;
-						$.ajax({
-							url: PrevMenu,
-							type: "POST",
-							data: { },
-							dataType: "html",
-							success: function(data) {
-								$("#page-inner").html(data);
-								$("html, body").animate({
-									scrollTop: 0
-								}, "slow");
-								$("#loading").hide();
-							},
-							error: function(data) {
-								$("#loading").hide();
-								$.notify("Koneksi gagal", "error");
-							}
-						});
+	$("#save-confirm").dialog({
+		autoOpen: false,
+		show: {
+			effect: "fade",
+			duration: 500
+		},
+		hide: {
+			effect: "fade",
+			duration: 500
+		},
+		close: function() {
+			$(this).dialog("destroy");
+		},
+		resizable: false,
+		height: "auto",
+		width: 400,
+		modal: true,
+		buttons: {
+			"Ya": function() {
+				$(this).dialog("destroy");
+				$("#loading").show();
+				var PassValidate = 1;
+				var FirstFocus = 0;
+				$(".form-control-custom").each(function() {
+					if($(this).hasAttr('required')) {
+						if($(this).val() == "") {
+							PassValidate = 0;
+							$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+							if(FirstFocus == 0) $(this).focus();
+							FirstFocus = 1;
+							$("html, body").animate({
+								scrollTop: 0
+							}, "slow");
+						}
 					}
-					else $("#loading").hide();
+				});
+				if(PassValidate == 1) {
+					$.ajax({
+						url: url,
+						type: "POST",
+						data: $("#PostForm").serialize(),
+						dataType: "json",
+						success: function(data) {
+							if(data.FailedFlag == '0') {
+								$.notify(data.Message, "success");
+								//window.location = PrevMenu;
+								$("#loading").show();
+								$("#page-inner").html("");
+								if(PrevMenu != "./Home.php") {
+									CurrentMenu = PrevMenu;
+									$.ajax({
+										url: PrevMenu,
+										type: "POST",
+										data: { },
+										dataType: "html",
+										success: function(data) {
+											$("#page-inner").html(data);
+											$("html, body").animate({
+												scrollTop: 0
+											}, "slow");
+											$("#loading").hide();
+										},
+										error: function(data) {
+											$("#loading").hide();
+											$.notify("Koneksi gagal", "error");
+										}
+									});
+								}
+								else $("#loading").hide();
+							}
+							else {
+								$("#loading").hide();
+								$.notify(data.Message, "error");					
+							}
+						},
+						error: function(data) {
+							$("#loading").hide();
+							$.notify("Koneksi gagal", "error");
+							//$("#error").html(data.responseText);
+							//$.notify(data.ResponseText, "error");
+						}
+					});
 				}
 				else {
 					$("#loading").hide();
-					$.notify(data.Message, "error");					
 				}
 			},
-			error: function(data) {
-				$("#loading").hide();
-				$.notify("Koneksi gagal", "error");
-				//$("#error").html(data.responseText);
-				//$.notify(data.ResponseText, "error");
+			"Tidak": function() {
+				$(this).dialog("destroy");
+				return false;
 			}
-		});
-	}
-	else {
-		$("#loading").hide();
-	}
+		}
+	}).dialog("open");
+}
+
+function UpdatePassword() {
+	$("#update-password").dialog({
+		autoOpen: false,
+		show: {
+			effect: "fade",
+			duration: 500
+		},
+		hide: {
+			effect: "fade",
+			duration: 500
+		},
+		close: function() {
+			$(this).dialog("destroy");
+		},
+		resizable: false,
+		height: 230,
+		width: 450,
+		modal: true,
+		buttons: {
+			"Simpan": function() {
+				var PassValidate = 1;
+				var FirstFocus = 0;
+				if($("#txtCurrentPassword").val() == '') {
+					$("#txtCurrentPassword").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+					if(FirstFocus == 0) $("#txtCurrentPassword").focus();
+					PassValidate = 0;
+					FirstFocus = 1;
+				}
+				if($("#txtNewPassword").val() == '') {
+					$("#txtNewPassword").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+					if(FirstFocus == 0) $("#txtNewPassword").focus();
+					PassValidate = 0;
+					FirstFocus = 1;
+				}
+				if($("#txtConfirmNewPassword").val() == '') {
+					$("#txtConfirmNewPassword").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+					if(FirstFocus == 0) $("#txtConfirmNewPassword").focus();
+					PassValidate = 0;
+					FirstFocus = 1;
+				}
+				
+				if($("#txtConfirmNewPassword").val() != $("#txtNewPassword").val()) {
+					$("#txtConfirmNewPassword").notify("Konfirmasi Password tidak cocok!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+					if(FirstFocus == 0) $("#txtConfirmNewPassword").focus();
+					PassValidate = 0;
+					FirstFocus = 1;
+				}
+				if(PassValidate == 0) return false;
+				$("#loading").show();
+				
+				$.ajax({
+					url: "./UpdatePassword.php",
+					type: "POST",
+					data: $("#UpdatePasswordForm").serialize(),
+					dataType: "json",
+					success: function(data) {
+						$("#loading").hide();
+						if(data.FailedFlag == '0') {
+							$.notify(data.Message, "success");
+							$("#update-password").dialog("destroy");
+						}
+						else {
+							$("#loading").hide();
+							$.notify(data.Message, "error");					
+						}
+						
+					},
+					error: function(data) {
+						$.notify("Koneksi gagal, Cek koneksi internet!", "error");
+						$("#loading").hide();
+					}
+						
+				});
+			},
+			"Batal": function() {
+				$(this).dialog("destroy");
+				return false;
+			}
+		}
+	}).dialog("open");
 }
 
 function DeleteData(url) {
@@ -447,30 +556,54 @@ function DeleteData(url) {
 		if($(this).val() != 'all') DeleteID.push($(this).val());
 	});
 	if(DeleteID.length > 0) {
-		var ask=confirm("Apakah anda yakin ingin menghapusnya?");
-		if(ask==true) {
-			$("#loading").show();
-			$.ajax({
-				url: url,
-				type: "POST",
-				data: { ID : DeleteID },
-				dataType: "html",
-				success: function(data) {
-					$("#loading").hide();
-					var datadelete = data.split("+");
-					var berhasil = datadelete[0];
-					var gagal = datadelete [1];
-					if(berhasil!="") $.notify(berhasil, "success");
-					if(gagal!="") $.notify(gagal, "error");
-					Reload();
+		$("#delete-confirm").dialog({
+			autoOpen: false,
+			show: {
+				effect: "fade",
+				duration: 500
+			},
+			hide: {
+				effect: "fade",
+				duration: 500
+			},
+			close: function() {
+				$(this).dialog("destroy");
+			},
+			resizable: false,
+			height: "auto",
+			width: 400,
+			modal: true,
+			buttons: {
+				"Ya": function() {
+					$(this).dialog("destroy");
+					$("#loading").show();
+					$.ajax({
+						url: url,
+						type: "POST",
+						data: { ID : DeleteID },
+						dataType: "html",
+						success: function(data) {
+							$("#loading").hide();
+							var datadelete = data.split("+");
+							var berhasil = datadelete[0];
+							var gagal = datadelete [1];
+							if(berhasil!="") $.notify(berhasil, "success");
+							if(gagal!="") $.notify(gagal, "error");
+							Reload();
+						},
+						error: function(data) {
+							$.notify("Koneksi gagal, Cek koneksi internet!", "error");
+							$("#loading").hide();
+						}
+							
+					});
 				},
-				error: function(data) {
-					$.notify("Koneksi gagal, Cek koneksi internet!", "error");
-					$("#loading").hide();
+				"Tidak": function() {
+					$(this).dialog("destroy");
+					return false;
 				}
-					
-			});
-		}
+			}
+		}).dialog("open");
 	}
 }
 
