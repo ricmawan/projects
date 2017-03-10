@@ -7,6 +7,7 @@ CREATE TABLE transaction_buyreturn
 	SupplierID 		BIGINT,
 	TransactionDate DATETIME NOT NULL,
 	Remarks			TEXT,
+	IsCancelled		BIT(1) NOT NULL,
 	CreatedDate 	DATETIME NOT NULL,
 	CreatedBy 		VARCHAR(255) NOT NULL,
 	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
