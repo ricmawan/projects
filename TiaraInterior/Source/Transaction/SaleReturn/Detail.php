@@ -549,9 +549,11 @@
 						$("#datainput tbody").append($clone);
 						//$("#txtQuantity" + count).addClass("txtQuantity");
 						$("#recordnew").val(count);
-						$("#datainput tbody").animate({
-							scrollTop: (25 * count)
-						}, "slow");
+						if($("#hdnIsEdit").val() == 0 ) {
+							$("#datainput tbody").animate({
+								scrollTop: (25 * count)
+							}, "slow");
+						}
 					}
 					else {
 						$.notify("Jumlah barang melebihi maksimal!", "error");

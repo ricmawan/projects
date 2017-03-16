@@ -113,19 +113,21 @@ SET State = 3;
 						BatchNumber
 					UNION ALL
 					SELECT
-						TypeID,
-						TRIM(BatchNumber) BatchNumber,
-						SUM(Quantity) Quantity,
-						BuyPrice,
-						SalePrice,
-						Discount
+						TID.TypeID,
+						TRIM(TID.BatchNumber) BatchNumber,
+						SUM(TID.Quantity) Quantity,
+						TID.BuyPrice,
+						TID.SalePrice,
+						TID.Discount
 					FROM
-						transaction_incomingdetails
+						transaction_incoming TI
+						JOIN transaction_incomingdetails TID
+							ON TI.IncomingID = TID.IncomingID
 					WHERE
-						IsCancelled = 0
+						TI.IsCancelled = 0
 					GROUP BY
-						TypeID,
-						BatchNumber
+						TID.TypeID,
+						TID.BatchNumber
 				)SA
 				GROUP BY
 					TypeID,
@@ -156,32 +158,36 @@ SET State = 3;
 			LEFT JOIN
 			(
 				SELECT
-					TypeID,
-					TRIM(BatchNumber) BatchNumber,
-					SUM(Quantity) Quantity
+					BRD.TypeID,
+					TRIM(BRD.BatchNumber) BatchNumber,
+					SUM(BRD.Quantity) Quantity
 				FROM
-					transaction_buyreturndetails
+					transaction_buyreturn BR
+					LEFT JOIN transaction_buyreturndetails BRD
+						ON BR.BuyReturnID = BRD.BuyReturnID
 				WHERE
-					IsCancelled = 0
+					BR.IsCancelled = 0
 				GROUP BY
-					TypeID,
-					BatchNumber
+					BRD.TypeID,
+					BRD.BatchNumber
 			)BR
 				ON BR.TypeID = MT.TypeID
 				AND BR.BatchNumber = FS.BatchNumber
 			LEFT JOIN
 			(
 				SELECT
-					TypeID,
-					TRIM(BatchNumber) BatchNumber,
-					SUM(Quantity) Quantity
+					SRD.TypeID,
+					TRIM(SRD.BatchNumber) BatchNumber,
+					SUM(SRD.Quantity) Quantity
 				FROM
-					transaction_salereturndetails
+					transaction_salereturn SR
+					LEFT JOIN transaction_salereturndetails SRD
+						ON SR.SaleReturnID = SRD.SaleReturnID
 				WHERE
-					IsCancelled = 0
+					SR.IsCancelled = 0
 				GROUP BY
-					TypeID,
-					BatchNumber
+					SRD.TypeID,
+					SRD.BatchNumber
 			)SR
 				ON SR.TypeID = MT.TypeID
 				AND SR.BatchNumber = FS.BatchNumber
@@ -249,7 +255,10 @@ SET State = 9;
 SET State = 10;
 		DELETE FROM transaction_stockopname WHERE TransactionDate < CurrentDate;
 		
-SET State = 9;
+SET State = 11;
+		DELETE FROM transaction_cancellation WHERE TransactionDate < CurrentDate;
+		
+SET State = 12;
 		SELECT
 			0 AS 'ID',
 			'Reset Berhasil' AS 'Message',

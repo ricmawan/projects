@@ -416,28 +416,61 @@
 			</div>
 		</div>
 		<script>
+			function BindTypeFromSupplier() {
+				if($("#ddlBrand").val() != "") {
+					$("#ddlType option").each(function() {
+						$(this).remove();
+					});
+					$("#ddlType").append('<option value="" brandid="" selected> </option>');
+					$("#ddlType").val("");
+					$("#ddlType").next().find("input").val("");
+					$.ajax({
+						url: "./Transaction/BuyReturn/GetAvailableType.php",
+						type: "POST",
+						data: { BrandID : $("#ddlBrand").val(), SupplierID : $("#ddlSupplier").val() },
+						dataType: "json",
+						success: function(data) {
+							$.each(data, function(key, value) {
+								$("#ddlType").append("<option value='" + value.TypeID + "' buyprice='" + value.BuyPrice + "' saleprice='" + value.SalePrice + "' stock='" + value.Stock + "' batchnumber='" + value.BatchNumber + "' brandid='" + value.BrandID + "' >" + value.BrandName + " " + value.TypeName + " - " + value.BatchNumber + "</option>");
+							});
+						},
+						error: function(data) {
+							$("#loading").hide();
+							$.notify("Terjadi kesalahan sistem!", "error");
+						}
+					});
+				}
+			}
+			
 			function BindType() {
-				$("#ddlType option").each(function() {
-					$(this).remove();
-				});
-				$("#ddlType").append('<option value="" brandid="" selected> </option>');
-				$("#ddlType").val("");
-				$("#ddlType").next().find("input").val("");
-				$.ajax({
-					url: "./Transaction/BuyReturn/GetAvailableType.php",
-					type: "POST",
-					data: { BrandID : $("#ddlBrand").val() },
-					dataType: "json",
-					success: function(data) {
-						$.each(data, function(key, value) {
-							$("#ddlType").append("<option value='" + value.TypeID + "' buyprice='" + value.BuyPrice + "' saleprice='" + value.SalePrice + "' stock='" + value.Stock + "' batchnumber='" + value.BatchNumber + "' brandid='" + value.BrandID + "' >" + value.BrandName + " " + value.TypeName + " - " + value.BatchNumber + "</option>");
-						});
-					},
-					error: function(data) {
-						$("#loading").hide();
-						$.notify("Terjadi kesalahan sistem!", "error");
-					}
-				});
+				if($("#ddlSupplier").val() == "") {
+					$("#ddlSupplier").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+					$("#ddlSupplier").next().find("input").focus();
+					//$("#ddlBrand").val("");
+				}
+				else {
+					$("#ddlType option").each(function() {
+						$(this).remove();
+					});
+					$("#ddlType").append('<option value="" brandid="" selected> </option>');
+					$("#ddlType").val("");
+					$("#ddlType").next().find("input").val("");
+					$.ajax({
+						url: "./Transaction/BuyReturn/GetAvailableType.php",
+						type: "POST",
+						data: { BrandID : $("#ddlBrand").val(), SupplierID : $("#ddlSupplier").val() },
+						dataType: "json",
+						success: function(data) {
+							$.each(data, function(key, value) {
+								$("#ddlType").append("<option value='" + value.TypeID + "' buyprice='" + value.BuyPrice + "' saleprice='" + value.SalePrice + "' stock='" + value.Stock + "' batchnumber='" + value.BatchNumber + "' brandid='" + value.BrandID + "' >" + value.BrandName + " " + value.TypeName + " - " + value.BatchNumber + "</option>");
+							});
+						},
+						error: function(data) {
+							$("#loading").hide();
+							$.notify("Terjadi kesalahan sistem!", "error");
+						}
+					});
+				}
 			}
 			
 			function BindTypeList() {
@@ -654,7 +687,11 @@
 				$("#ddlBrand").next().find("input").click(function() {
 					$(this).val("");
 				});
-				$("#ddlSupplier").combobox();
+				$("#ddlSupplier").combobox({
+					select: function( event, ui ) {
+						BindTypeFromSupplier();						
+					}
+				});
 				$("#ddlSupplier").next().find("input").click(function() {
 					$(this).val("");
 				});

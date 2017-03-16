@@ -31,6 +31,7 @@
 						</div>
 						<!--<button class="btn btn-primary menu" link="./Master/Type/Detail.php?ID=0"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
 						<?php if($DeleteFlag == true) echo '<button class="btn btn-danger" onclick="DeleteData(\'./Master/Type/Delete.php\');" ><i class="fa fa-close"></i> Hapus</button>'; ?>-->
+						<button class="btn btn-success" id="btnExcel" onclick="ExportExcel();" ><i class="fa fa-file-excel-o "></i> Eksport Excel</button>&nbsp;&nbsp;
 					</div>
 				</div>
 			</div>
@@ -68,6 +69,14 @@
 							});
 						});
 			});
+			
+			function ExportExcel() {
+				$("#loading").show();
+				var searchPhrase = $("#grid-data").bootgrid("getSearchPhrase");
+				var sortDictionary = JSON.stringify($("#grid-data").bootgrid("getSortDictionary"));
+				$("#excelDownload").attr("src", "Master/Item/ExportExcel.php?searchPhrase=" + searchPhrase + "&sort=" + sortDictionary);
+				$("#loading").hide();
+			}
 		</script>
 	</body>
 </html>

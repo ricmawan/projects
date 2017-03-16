@@ -2,6 +2,7 @@
 	if(isset($_POST['BrandID'])) {
 		include "../../DBConfig.php";
 		$BrandID = mysql_real_escape_string($_POST['BrandID']);
+		$SupplierID = mysql_real_escape_string($_POST['SupplierID']);
 		$State = 1;
 		$Message = "Data Berhasil Disimpan";
 		$MessageDetail = "";
@@ -51,6 +52,7 @@
 									ON TI.IncomingID = TID.IncomingID
 							WHERE
 								TI.IsCancelled = 0
+								AND TI.SupplierID = ".$SupplierID."
 							GROUP BY
 								TID.TypeID,
 								TID.BatchNumber
