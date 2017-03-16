@@ -16,6 +16,7 @@
 		<link href="assets/css/jquery.bootgrid.css" rel="stylesheet" />
 		<!--<link href="assets/js/dataTables/dataTables.bootstrap.css" rel="stylesheet" />-->
 		<link rel="stylesheet" href="assets/css/bootstrap-multiselect.css" type="text/css"/>
+		<link rel="stylesheet" href="assets/css/jquery.fancybox.css" type="text/css" media="screen" />
 		
 		<link rel="apple-touch-icon" sizes="180x180" href="./assets/img/apple-touch-icon.png">
 		<link rel="icon" type="image/png" href="./assets/img/favicon-32x32.png" sizes="32x32">
@@ -163,6 +164,7 @@
 		<script src="assets/js/notify.js"></script>
 		<script src="assets/js/global.js"></script>
 		<script src="assets/js/jquery.bootgrid.js"></script>
+		<script type="text/javascript" src="assets/js/jquery.fancybox.js"></script>
 		<!--<script src="assets/js/dataTables/jquery.dataTables.js"></script>
 		<script src="assets/js/dataTables/dataTables.bootstrap.js"></script>-->
 		<script src="assets/js/bootstrap-multiselect.js"></script>
