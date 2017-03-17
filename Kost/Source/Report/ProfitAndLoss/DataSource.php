@@ -135,7 +135,7 @@
 			SELECT
 				DATE_FORMAT(O.TransactionDate, '%d-%m-%Y') TransactionDate,
 				OD.Remarks,
-				OD.Amount,
+				-OD.Amount,
 				'Biaya'
 			FROM
 				transaction_operational O
