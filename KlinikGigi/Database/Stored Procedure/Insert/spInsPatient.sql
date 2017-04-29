@@ -10,6 +10,7 @@ CREATE PROCEDURE spInsPatient (
 	pAllergy 		TEXT,
 	pCity			VARCHAR(100),
 	pTelephone		VARCHAR(255),
+	pEmail			VARCHAR(255),
 	pIsEdit			INT,
     pCurrentUser	VARCHAR(255)
 )
@@ -82,6 +83,7 @@ SET State = 3;
 					Allergy,
 					City,
 					Telephone,
+					Email,
 					CreatedDate,
 					CreatedBy
 				)
@@ -93,6 +95,7 @@ SET State = 3;
 					pAllergy,
 					pCity,
 					pTelephone,
+					pEmail,
 					NOW(),
 					pCurrentUser
 				);
@@ -119,6 +122,7 @@ SET State = 5;
 					Allergy = pAllergy,
 					City = pCity,
 					Telephone = pTelephone,
+					Email = pEmail,
 					ModifiedBy = pCurrentUser
 				WHERE
 					PatientID = pID;

@@ -11,6 +11,7 @@
 		$Address = "";
 		$City = "";
 		$Telephone = "";
+		$Email = "";
 		$IsEdit = 0;
 		$SalesID = 0;
 		$Allergy = "";
@@ -25,6 +26,7 @@
 						Address,
 						City,
 						Telephone,
+						Email,
 						Allergy
 					FROM
 						master_patient
@@ -43,6 +45,7 @@
 			$Address = $row['Address'];
 			$City = $row['City'];
 			$Telephone = $row['Telephone'];
+			$Email = $row['Email'];
 			$Allergy = $row['Allergy'];
 		}
 	}
@@ -104,6 +107,15 @@
 							<br />
 							<div class="row">
 								<div class="col-md-2 labelColumn">
+									Email :
+								</div>
+								<div class="col-md-3">
+									<input id="txtEmail" name="txtEmail" type="text" class="form-control-custom" placeholder="Email" <?php echo 'value="'.$Email.'"'; ?> required />
+								</div>
+							</div>
+							<br />
+							<div class="row">
+								<div class="col-md-2 labelColumn">
 									Alamat:
 								</div>
 								<div class="col-md-3">
@@ -141,9 +153,15 @@
 				$("#ddlSales").combobox();
 			});
 			
+			function validateEmail(email) {
+				var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+				return re.test(email);
+			}
+			
 			function SubmitValidate() {
 				var PassValidate = 1;
 				var FirstFocus = 0;
+				var Email = $("#txtEmail").val();
 				$(".form-control-custom").each(function() {
 					if($(this).hasAttr('required')) {
 						if($(this).val() == "") {
@@ -161,15 +179,22 @@
 					if(FirstFocus == 0) $("#ddlSales").next().find("input").focus();
 					FirstFocus = 1;
 				}
+				
+				if(Email != "") {
+					if (!validateEmail(Email)) {
+						PassValidate = 0;
+						$("#txtEmail").notify("Email tidak valid!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+					}
+				}
 				if(PassValidate == 0) {
-						$("html, body").animate({
-							scrollTop: 0
-						}, "slow");
-						return false;
-					}
-					else {
-						SubmitForm('./Master/Patient/Insert.php')
-					}
+					$("html, body").animate({
+						scrollTop: 0
+					}, "slow");
+					return false;
+				}
+				else {
+					SubmitForm('./Master/Patient/Insert.php')
+				}
 			}
 		</script>
 	</body>

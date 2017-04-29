@@ -34,7 +34,6 @@
 			$MessageDetail = mysql_error();
 			$FailedFlag = 1;
 			echo returnstate($MedicationID, $Message, $MessageDetail, $FailedFlag, $State);
-			mysql_query("ROLLBACK", $dbh);
 			return 0;
 		}
 		$RowNumber = 1;
