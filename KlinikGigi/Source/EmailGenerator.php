@@ -10,12 +10,12 @@
 	$mail->isSMTP();                                      // Set mailer to use SMTP
 	$mail->SMTPAuth = true;                               // Enable SMTP authentication
 	$mail->Host = 'smtp-mail.outlook.com';  // Specify main and backup SMTP servers
-	$mail->Username = 'ricmawan@hotmail.com';                 // SMTP username
-	$mail->Password = 'Wijayaadi10+14=0811';                           // SMTP password
+	$mail->Username = 'test@example.com';                 // SMTP username
+	$mail->Password = '*************';                           // SMTP password
 	$mail->Port = 587;                                    // TCP port to connect to
 	$mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
 
-	$mail->setFrom('ra@example.com', 'Mailer');
+	$mail->setFrom('test@example.com', 'Mailer');
 	$mail->isHTML(true);                                  // Set email format to HTML
 	$mail->addReplyTo('info@example.com', 'Information');
 	$monthName = array("Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember");
