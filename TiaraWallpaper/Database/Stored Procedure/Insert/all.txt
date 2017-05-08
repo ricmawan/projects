@@ -1,0 +1,1267 @@
+DROP PROCEDURE IF EXISTS spInsBackup;
+
+DELIMITER $$
+CREATE PROCEDURE spInsBackup (
+	pFilePath	 	VARCHAR(255), 
+	pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE RowCount INT;
+
+	DECLARE PassValidate INT;
+	
+	/*DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR ", IFNULL(@ErrNo, ''), " (", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		SELECT 
+			pId AS 'ID', 
+			'Terjadi Kesalahan Sistem' AS 'Message', 
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag', 
+			State AS 'State';
+	END;*/
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+		INSERT INTO backup_history
+		(
+			BackupDate,
+			FilePath,
+			CreatedDate,
+			CreatedBy
+		)
+		VALUES (
+			NOW(),
+			pFilePath,
+			NOW(),
+			pCurrentUser
+		);
+			
+SET State = 2;			               
+		SELECT
+			0 AS 'ID',
+			'Backup Berhasil' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State';
+			
+	COMMIT;
+END;
+$$
+DELIMITER ;
+DROP PROCEDURE IF EXISTS spInsBrand;
+
+DELIMITER $$
+CREATE PROCEDURE spInsBrand (
+	pID				BIGINT, 
+	pBrandName 	VARCHAR(255), 
+	pIsEdit			INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE RowCount INT;
+
+	DECLARE PassValidate INT;
+	
+	/*DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR ", IFNULL(@ErrNo, ''), " (", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		SELECT 
+			pId AS 'ID', 
+			'Terjadi Kesalahan Sistem' AS 'Message', 
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag', 
+			State AS 'State';
+	END;*/
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+
+		SELECT 
+			0
+		INTO
+			PassValidate
+		FROM 
+			master_brand
+		WHERE
+			TRIM(BrandName) = TRIM(pBrandName)
+			AND BrandID <> pID
+		LIMIT 1;
+			
+		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
+SET State = 2;
+			SELECT
+				pID AS 'ID',
+				'Merek sudah ada' AS 'Message',
+				'' AS 'MessageDetail',
+				1 AS 'FailedFlag',
+				State AS 'State' ;
+		
+			LEAVE StoredProcedure;
+			
+		ELSE /*Data yang diinput valid*/
+SET State = 3;
+			IF(pIsEdit = 0)	THEN /*Tambah baru*/
+				INSERT INTO master_brand
+				(
+					BrandName,
+					CreatedDate,
+					CreatedBy
+				)
+				VALUES (
+					pBrandName,
+					NOW(),
+					pCurrentUser
+				);
+			
+SET State = 4;			               
+				SELECT
+					pID AS 'ID',
+					'Merek Berhasil Ditambahkan' AS 'Message',
+					'' AS 'MessageDetail',
+					0 AS 'FailedFlag',
+					State AS 'State';
+					
+			ELSE
+SET State = 5;
+				UPDATE
+					master_brand
+				SET
+					BrandName = pBrandName,
+					ModifiedBy = pCurrentUser
+				WHERE
+					BrandID = pID;
+					
+SET State = 6;
+				SELECT
+					pID AS 'ID',
+					'Merek Berhasil Diubah' AS 'Message',
+					'' AS 'MessageDetail',
+					0 AS 'FailedFlag',
+					State AS 'State';
+				
+			END IF;
+		END IF;			
+	COMMIT;
+END;
+$$
+DELIMITER ;
+DROP PROCEDURE IF EXISTS spInsCustomer;
+
+DELIMITER $$
+CREATE PROCEDURE spInsCustomer (
+	pID 			BIGINT,
+	pSalesID		BIGINT,
+	pCustomerName 	VARCHAR(255),
+	pAddress 		TEXT,
+	pCity			VARCHAR(100),
+	pTelephone		VARCHAR(255),
+	pIsEdit			INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE RowCount INT;
+
+	DECLARE PassValidate INT;
+	
+	/*DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR ", IFNULL(@ErrNo, ''), " (", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		SELECT 
+			pId AS 'ID', 
+			'Terjadi Kesalahan Sistem' AS 'Message', 
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag', 
+			State AS 'State';
+	END;*/
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;	
+
+SET State = 1;
+
+		SELECT 
+			0
+		INTO
+			PassValidate
+		FROM 
+			master_customer
+		WHERE
+			TRIM(CustomerName) = TRIM(pCustomerName)
+			AND TRIM(Address) = TRIM(pAddress)
+			AND TRIM(City) = TRIM(pCity)
+			AND CustomerID <> pID
+		LIMIT 1;
+			
+		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
+SET State = 2;
+			SELECT
+				pID AS 'ID',
+				'Customer sudah ada' AS 'Message',
+				'' AS 'MessageDetail',
+				1 AS 'FailedFlag',
+				State AS 'State' ;
+		
+			LEAVE StoredProcedure;
+			
+		ELSE /*Data yang diinput valid*/
+SET State = 3;
+			IF(pIsEdit = 0)	THEN /*Tambah baru*/
+				INSERT INTO master_customer
+				(
+					CustomerName,
+					SalesID,
+					Address,
+					City,
+					Telephone,
+					CreatedDate,
+					CreatedBy
+				)
+				VALUES (
+					pCustomerName,
+					pSalesID,
+					pAddress,
+					pCity,
+					pTelephone,
+					NOW(),
+					pCurrentUser
+				);
+			
+SET State = 4;			               
+				SELECT
+					pID AS 'ID',
+					'Pelanggan Berhasil Ditambahkan' AS 'Message',
+					'' AS 'MessageDetail',
+					0 AS 'FailedFlag',
+					State AS 'State';		
+			ELSE
+SET State = 5;
+				UPDATE
+					master_customer
+				SET
+					CustomerName = pCustomerName,
+					SalesID = pSalesID,
+					Address = pAddress,
+					City = pCity,
+					Telephone = pTelephone,
+					ModifiedBy = pCurrentUser
+				WHERE
+					CustomerID = pID;
+					
+SET State = 6;
+				SELECT
+					pID AS 'ID',
+					'Pelanggan Berhasil Diubah' AS 'Message',
+					'' AS 'MessageDetail',
+					0 AS 'FailedFlag',
+					State AS 'State';
+		
+			END IF;	
+		END IF;
+	COMMIT;
+END;
+$$
+DELIMITER ;
+DROP PROCEDURE IF EXISTS spInsFirstStock;
+
+DELIMITER $$
+CREATE PROCEDURE spInsFirstStock (
+	pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE RowCount INT;
+	DECLARE CurrentDate  DATETIME;
+	DECLARE pFirstStockID BIGINT;
+	DECLARE PassValidate INT;
+	
+	SET CurrentDate = NOW();
+	/*DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR ", IFNULL(@ErrNo, ''), " (", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		SELECT 
+			pId AS 'ID', 
+			'Terjadi Kesalahan Sistem' AS 'Message', 
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag', 
+			State AS 'State';
+	END;*/
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+		INSERT INTO transaction_firststock
+		(
+			FirstStockNumber,
+			TransactionDate,
+			Remarks,
+			CreatedDate,
+			CreatedBy
+		)
+		SELECT
+			CONCAT('SA', DATE_FORMAT(NOW(), '%Y%m%d'), RIGHT(CONCAT('0000', COUNT(1) + 1), 4)),
+			CurrentDate,
+			'Reset',
+			NOW(),
+			'Admin'
+		FROM 
+			transaction_invoicenumber
+		WHERE
+			InvoiceDate = DATE_FORMAT(NOW(), '%Y-%m-%d')
+			AND InvoiceNumberType = 'SA';
+			
+SET @State = 2;
+		SET pFirstStockID = (SELECT MAX(FirstStockID) FROM transaction_firststock);
+
+SET State = 3;			               
+		INSERT INTO transaction_firststockdetails
+		(
+			FirstStockID,
+			TypeID,
+			Quantity,
+			BuyPrice,
+			SalePrice,
+			Discount,
+			BatchNumber,
+			CreatedDate,
+			CreatedBy
+		)
+		SELECT
+			pFirstStockID,
+			MT.TypeID,
+			(IFNULL(FS.Quantity, 0) - IFNULL(TOD.Quantity, 0) - IFNULL(BR.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(BO.Quantity, 0) + IFNULL(SO.Quantity, 0)),
+			IFNULL(FS.BuyPrice, MT.BuyPrice) BuyPrice,
+			IFNULL(FS.SalePrice, MT.SalePrice) SalePrice,
+			FS.Discount,
+			FS.BatchNumber,
+			NOW(),
+			pCurrentUser
+		FROM
+			master_type MT
+			JOIN master_brand MB
+				ON MB.BrandID = MT.BrandID
+			JOIN master_unit MU
+				ON MU.UnitID = MT.UnitID
+			LEFT JOIN
+			(
+				SELECT
+					TypeID,
+					TRIM(BatchNumber) BatchNumber,
+					SUM(SA.Quantity) Quantity,
+					BuyPrice,
+					SalePrice,
+					Discount
+				FROM
+				(
+					SELECT
+						TypeID,
+						TRIM(BatchNumber) BatchNumber,
+						SUM(Quantity) Quantity,
+						BuyPrice,
+						SalePrice,
+						Discount
+					FROM
+						transaction_firststockdetails
+					GROUP BY
+						TypeID,
+						BatchNumber
+					UNION
+					SELECT
+						TypeID,
+						TRIM(BatchNumber) BatchNumber,
+						SUM(Quantity) Quantity,
+						BuyPrice,
+						SalePrice,
+						Discount
+					FROM
+						transaction_incomingdetails
+					GROUP BY
+						TypeID,
+						BatchNumber
+				)SA
+				GROUP BY
+					TypeID,
+					BatchNumber,
+					BuyPrice,
+					SalePrice,
+					Discount
+			)FS
+				ON FS.TypeID = MT.TypeID
+			LEFT JOIN
+			(
+				SELECT
+					OTD.TypeID,
+					TRIM(OTD.BatchNumber) BatchNumber,
+					SUM(OTD.Quantity) Quantity
+				FROM
+					transaction_outgoingdetails OTD
+					JOIN transaction_outgoing OT
+						ON OT.OutgoingID = OTD.OutgoingID
+				WHERE
+					OT.IsCancelled = 0
+				GROUP BY
+					OTD.TypeID,
+					OTD.BatchNumber
+			)TOD
+				ON TOD.TypeID = MT.TypeID
+				AND TOD.BatchNumber = FS.BatchNumber
+			LEFT JOIN
+			(
+				SELECT
+					TypeID,
+					TRIM(BatchNumber) BatchNumber,
+					SUM(Quantity) Quantity
+				FROM
+					transaction_buyreturndetails
+				GROUP BY
+					TypeID,
+					BatchNumber
+			)BR
+				ON BR.TypeID = MT.TypeID
+				AND BR.BatchNumber = FS.BatchNumber
+			LEFT JOIN
+			(
+				SELECT
+					TypeID,
+					TRIM(BatchNumber) BatchNumber,
+					SUM(Quantity) Quantity
+				FROM
+					transaction_salereturndetails
+				GROUP BY
+					TypeID,
+					BatchNumber
+			)SR
+				ON SR.TypeID = MT.TypeID
+				AND SR.BatchNumber = FS.BatchNumber
+			LEFT JOIN
+			(
+				SELECT
+					BOD.TypeID,
+					TRIM(BOD.BatchNumber) BatchNumber,
+					SUM(BOD.Quantity) Quantity
+				FROM
+					transaction_booking BO
+					JOIN transaction_bookingdetails BOD
+						ON BO.BookingID = BOD.BookingID
+				WHERE
+					BO.BookingStatusID = 1
+				GROUP BY
+					BOD.TypeID,
+					BOD.BatchNumber
+			)BO
+				ON BO.TypeID = MT.TypeID
+				AND BO.BatchNumber = FS.BatchNumber
+			LEFT JOIN
+			(
+				SELECT
+					SOD.TypeID,
+					TRIM(SOD.BatchNumber) BatchNumber,
+					SUM(
+							CASE
+								WHEN SOD.FromQty > SOD.ToQty
+								THEN -(SOD.FromQty - SOD.ToQty)
+								ELSE (SOD.ToQty - SOD.FromQty)
+							END
+						) Quantity
+				FROM
+					transaction_stockopname SO
+					JOIN transaction_stockopnamedetails SOD
+						ON SO.StockOpnameID = SOD.StockOpnameID
+				GROUP BY
+					SOD.TypeID,
+					SOD.BatchNumber
+			)SO
+				ON SO.TypeID = MT.TypeID
+				AND SO.BatchNumber = FS.BatchNumber
+		WHERE
+			(IFNULL(FS.Quantity, 0) - IFNULL(TOD.Quantity, 0) - IFNULL(BR.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(BO.Quantity, 0) + IFNULL(SO.Quantity, 0)) > 0;
+			
+SET State = 4;
+		DELETE FROM transaction_firststock WHERE TransactionDate < CurrentDate;
+		
+SET State = 5;
+		DELETE FROM transaction_incoming WHERE TransactionDate < CurrentDate;
+
+SET State = 6;
+		DELETE FROM transaction_buyreturn WHERE TransactionDate < CurrentDate;
+
+SET State = 7;		
+		DELETE FROM transaction_salereturn WHERE TransactionDate < CurrentDate;
+		
+SET State = 8;
+		DELETE FROM transaction_outgoing WHERE TransactionDate < CurrentDate;
+		
+SET State = 9;
+		DELETE FROM transaction_booking WHERE TransactionDate < CurrentDate;
+		
+SET State = 10;
+		DELETE FROM transaction_stockopname WHERE TransactionDate < CurrentDate;
+		
+SET State = 9;
+		SELECT
+			0 AS 'ID',
+			'Reset Berhasil' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State';
+	COMMIT;
+END;
+$$
+DELIMITER ;
+DROP PROCEDURE IF EXISTS spInsRestore;
+
+DELIMITER $$
+CREATE PROCEDURE spInsRestore (
+	pFilePath	 	VARCHAR(255), 
+	pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE RowCount INT;
+
+	DECLARE PassValidate INT;
+	
+	/*DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR ", IFNULL(@ErrNo, ''), " (", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		SELECT 
+			pId AS 'ID', 
+			'Terjadi Kesalahan Sistem' AS 'Message', 
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag', 
+			State AS 'State';
+	END;*/
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+		INSERT INTO restore_history
+		(
+			RestoreDate,
+			FilePath,
+			CreatedDate,
+			CreatedBy
+		)
+		VALUES (
+			NOW(),
+			pFilePath,
+			NOW(),
+			pCurrentUser
+		);
+			
+SET State = 2;			               
+		SELECT
+			0 AS 'ID',
+			'Restore Berhasil' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State';
+			
+	COMMIT;
+END;
+$$
+DELIMITER ;
+DROP PROCEDURE IF EXISTS spInsSales;
+
+DELIMITER $$
+CREATE PROCEDURE spInsSales (
+	pID 			BIGINT, 
+	pSalesName 		VARCHAR(255),
+	pAlias			VARCHAR(4),
+	pAddress 		TEXT,
+	pTelephone		VARCHAR(255),
+	pIsEdit			INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE RowCount INT;
+
+	DECLARE PassValidate INT;
+	
+	/*DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR ", IFNULL(@ErrNo, ''), " (", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		SELECT 
+			pId AS 'ID', 
+			'Terjadi Kesalahan Sistem' AS 'Message', 
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag', 
+			State AS 'State';
+	END;*/
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;	
+
+SET State = 1;
+
+		SELECT 
+			0
+		INTO
+			PassValidate
+		FROM 
+			master_sales
+		WHERE
+			TRIM(SalesName) = TRIM(pSalesName)
+			AND TRIM(Alias) = TRIM(pAlias)
+			AND SalesID <> pID
+		LIMIT 1;
+			
+		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
+SET State = 2;
+			SELECT
+				pID AS 'ID',
+				'Sales sudah ada' AS 'Message',
+				'' AS 'MessageDetail',
+				1 AS 'FailedFlag',
+				State AS 'State' ;
+		
+			LEAVE StoredProcedure;
+			
+		ELSE /*Data yang diinput valid*/
+SET State = 3;
+			IF(pIsEdit = 0)	THEN /*Tambah baru*/
+				INSERT INTO master_sales
+				(
+					SalesName,
+					Alias,
+					Address,
+					Telephone,
+					CreatedDate,
+					CreatedBy
+				)
+				VALUES (
+					pSalesName,
+					pAlias,
+					pAddress,
+					pTelephone,
+					NOW(),
+					pCurrentUser
+				);
+			
+SET State = 4;			               
+				SELECT
+					pID AS 'ID',
+					'Sales Berhasil Ditambahkan' AS 'Message',
+					'' AS 'MessageDetail',
+					0 AS 'FailedFlag',
+					State AS 'State';		
+			ELSE
+SET State = 5;
+				UPDATE
+					master_sales
+				SET
+					SalesName = pSalesName,
+					Alias = pAlias,
+					Address = pAddress,
+					Telephone = pTelephone,
+					ModifiedBy = pCurrentUser
+				WHERE
+					SalesID = pID;
+					
+SET State = 6;
+				SELECT
+					pID AS 'ID',
+					'Sales Berhasil Diubah' AS 'Message',
+					'' AS 'MessageDetail',
+					0 AS 'FailedFlag',
+					State AS 'State';
+		
+			END IF;	
+		END IF;
+	COMMIT;
+END;
+$$
+DELIMITER ;
+DROP PROCEDURE IF EXISTS spInsSupplier;
+
+DELIMITER $$
+CREATE PROCEDURE spInsSupplier (
+	pID 			BIGINT, 
+	pSupplierName 	VARCHAR(255),
+	pAddress		TEXT,
+	pCity			VARCHAR(100),
+	pTelephone		VARCHAR(255),
+	pIsEdit			INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE RowCount INT;
+
+	DECLARE PassValidate INT;
+	
+	/*DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR ", IFNULL(@ErrNo, ''), " (", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		SELECT 
+			pId AS 'ID', 
+			'Terjadi Kesalahan Sistem' AS 'Message', 
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag', 
+			State AS 'State';
+	END;*/
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;	
+
+SET State = 1;
+
+		SELECT 
+			0
+		INTO
+			PassValidate
+		FROM 
+			master_supplier
+		WHERE
+			TRIM(SupplierName) = TRIM(pSupplierName)
+			AND TRIM(Address) = TRIM(pAddress)
+			AND TRIM(City) = TRIM(pCity)
+			AND SupplierID <> pID
+		LIMIT 1;
+			
+		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
+SET State = 2;
+			SELECT
+				pID AS 'ID',
+				'Supplier sudah ada' AS 'Message',
+				'' AS 'MessageDetail',
+				1 AS 'FailedFlag',
+				State AS 'State' ;
+		
+			LEAVE StoredProcedure;
+			
+		ELSE /*Data yang diinput valid*/
+SET State = 3;
+			IF(pIsEdit = 0)	THEN /*Tambah baru*/
+				INSERT INTO master_supplier
+				(
+					SupplierName,
+					Address,
+					City,
+					Telephone,
+					CreatedDate,
+					CreatedBy
+				)
+				VALUES (
+					pSupplierName,
+					pAddress,
+					pCity,
+					pTelephone,
+					NOW(),
+					pCurrentUser
+				);
+			
+SET State = 4;			               
+				SELECT
+					pID AS 'ID',
+					'Supplier Berhasil Ditambahkan' AS 'Message',
+					'' AS 'MessageDetail',
+					0 AS 'FailedFlag',
+					State AS 'State';		
+			ELSE
+SET State = 5;
+				UPDATE
+					master_supplier
+				SET
+					SupplierName = pSupplierName,
+					Address = pAddress,
+					City = pCity,
+					Telephone = pTelephone,
+					ModifiedBy = pCurrentUser
+				WHERE
+					SupplierID = pID;
+					
+SET State = 6;
+				SELECT
+					pID AS 'ID',
+					'Supplier Berhasil Diubah' AS 'Message',
+					'' AS 'MessageDetail',
+					0 AS 'FailedFlag',
+					State AS 'State';
+		
+			END IF;	
+		END IF;
+	COMMIT;
+END;
+$$
+DELIMITER ;
+DROP PROCEDURE IF EXISTS spInsType;
+
+DELIMITER $$
+CREATE PROCEDURE spInsType (
+	pID 			BIGINT, 
+	pTypeName 		VARCHAR(255),
+	pBrandID 		BIGINT,
+	pUnitID			BIGINT,
+	pReminderCount	INT,
+	pBuyPrice		DOUBLE,
+	pSalePrice		DOUBLE,
+	pIsEdit			INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE RowCount INT;
+
+	DECLARE PassValidate INT;
+	
+	/*DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR ", IFNULL(@ErrNo, ''), " (", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		SELECT 
+			pId AS 'ID', 
+			'Terjadi Kesalahan Sistem' AS 'Message', 
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag', 
+			State AS 'State';
+	END;*/
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+
+		SELECT 
+			0
+		INTO
+			PassValidate
+		FROM 
+			master_type
+		WHERE
+			TRIM(TypeName) = TRIM(pTypeName)
+			AND BrandID = pBrandID
+			AND TypeID <> pID
+		LIMIT 1;
+			
+		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
+SET State = 2;
+			SELECT
+				pID AS 'ID',
+				'Tipe sudah ada' AS 'Message',
+				'' AS 'MessageDetail',
+				1 AS 'FailedFlag',
+				State AS 'State' ;
+		
+			LEAVE StoredProcedure;
+			
+		ELSE /*Data yang diinput valid*/
+SET State = 3;
+			IF(pIsEdit = 0)	THEN /*Tambah baru*/
+				INSERT INTO master_type
+				(
+					TypeName,
+					BrandID,
+					UnitID,
+					ReminderCount,
+					BuyPrice,
+					SalePrice,
+					CreatedDate,
+					CreatedBy
+				)
+				VALUES (
+					pTypeName,
+					pBrandID,
+					pUnitID,
+					pReminderCount,
+					pBuyPrice,
+					pSalePrice,
+					NOW(),
+					pCurrentUser
+				);
+			
+SET State = 4;			               
+				SELECT
+					pID AS 'ID',
+					'Tipe Berhasil Ditambahkan' AS 'Message',
+					'' AS 'MessageDetail',
+					0 AS 'FailedFlag',
+					State AS 'State';
+			ELSE
+SET State = 5;
+				UPDATE
+					master_type
+				SET
+					TypeName = pTypeName,
+					ReminderCount = pReminderCount,
+					BrandID = pBrandID,
+					UnitID = pUnitID,
+					BuyPrice = pBuyPrice,
+					SalePrice = pSalePrice,
+					ModifiedBy = pCurrentUser
+				WHERE
+					TypeID = pID;
+
+SET State = 6;
+				SELECT
+					pID AS 'ID',
+					'Tipe Berhasil Diubah' AS 'Message',
+					'' AS 'MessageDetail',
+					0 AS 'FailedFlag',
+					State AS 'State';
+			END IF;
+		END IF;
+	COMMIT;
+END;
+$$
+DELIMITER ;
+DROP PROCEDURE IF EXISTS spInsUnit;
+
+DELIMITER $$
+CREATE PROCEDURE spInsUnit (
+	pID				BIGINT, 
+	pUnitName 	VARCHAR(255), 
+	pIsEdit			INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE RowCount INT;
+
+	DECLARE PassValidate INT;
+	
+	/*DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR ", IFNULL(@ErrNo, ''), " (", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		SELECT 
+			pId AS 'ID', 
+			'Terjadi Kesalahan Sistem' AS 'Message', 
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag', 
+			State AS 'State';
+	END;*/
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+
+		SELECT 
+			0
+		INTO
+			PassValidate
+		FROM 
+			master_unit
+		WHERE
+			TRIM(UnitName) = TRIM(pUnitName)
+			AND UnitID <> pID
+		LIMIT 1;
+			
+		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
+SET State = 2;
+			SELECT
+				pID AS 'ID',
+				'Satuan sudah ada' AS 'Message',
+				'' AS 'MessageDetail',
+				1 AS 'FailedFlag',
+				State AS 'State' ;
+		
+			LEAVE StoredProcedure;
+			
+		ELSE /*Data yang diinput valid*/
+SET State = 3;
+			IF(pIsEdit = 0)	THEN /*Tambah baru*/
+				INSERT INTO master_unit
+				(
+					UnitName,
+					CreatedDate,
+					CreatedBy
+				)
+				VALUES (
+					pUnitName,
+					NOW(),
+					pCurrentUser
+				);
+			
+SET State = 4;			               
+				SELECT
+					pID AS 'ID',
+					'Satuan Berhasil Ditambahkan' AS 'Message',
+					'' AS 'MessageDetail',
+					0 AS 'FailedFlag',
+					State AS 'State';
+					
+			ELSE
+SET State = 5;
+				UPDATE
+					master_unit
+				SET
+					UnitName = pUnitName,
+					ModifiedBy = pCurrentUser
+				WHERE
+					UnitID = pID;
+					
+SET State = 6;
+				SELECT
+					pID AS 'ID',
+					'Satuan Berhasil Diubah' AS 'Message',
+					'' AS 'MessageDetail',
+					0 AS 'FailedFlag',
+					State AS 'State';
+				
+			END IF;
+		END IF;			
+	COMMIT;
+END;
+$$
+DELIMITER ;
+DROP PROCEDURE IF EXISTS spInsUser;
+
+DELIMITER $$
+CREATE PROCEDURE spInsUser (
+	pID 			BIGINT, 
+	pUserName 		VARCHAR(255), 
+	pUserLogin 		VARCHAR(100),
+	pPassword 		VARCHAR(255),
+	pIsActive		BIT,
+	pMenuID 		VARCHAR(255),
+	pEditMenuID 	VARCHAR(255),
+	pDeleteMenuID	VARCHAR(255),
+	pIsEdit			INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE RowCount INT;
+
+	DECLARE PassValidate INT;
+	
+	/*DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR ", IFNULL(@ErrNo, ''), " (", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		SELECT 
+			pID AS 'ID', 
+			'Terjadi Kesalahan Sistem' AS 'Message', 
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag', 
+			State AS 'State';
+	END;*/
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+
+		SELECT 
+			0
+		INTO
+			PassValidate
+		FROM 
+			master_user 
+		WHERE
+			UserName = pUserName
+			AND UserLogin = pUserLogin
+			AND UserID <> pID
+		LIMIT 1;
+			
+		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
+SET State = 2;
+			SELECT
+				pID AS 'ID',
+				'Username sudah dipakai' AS 'Message',
+				'' AS 'MessageDetail',
+				1 AS 'FailedFlag',
+				State AS 'State' ;
+		
+			LEAVE StoredProcedure;
+			
+		ELSE /*Data yang diinput valid*/
+		
+SET State = 3;
+			IF(pIsEdit = 0)	THEN /*Tambah baru*/
+				INSERT INTO master_user
+				(
+					UserName,
+					UserLogin,
+					UserPassword,
+					IsActive,
+					CreatedDate,
+					CreatedBy
+				)
+				VALUES (
+					pUserName,
+					pUserLogin,
+					pPassword,
+					pIsActive,
+					NOW(),
+					pCurrentUser
+				);
+			
+SET State = 4;			               
+				SELECT
+					MAX(UserID)
+				INTO 
+					pID
+				FROM
+					master_user;
+					
+			ELSE
+SET State = 5;
+				UPDATE
+					master_user
+				SET
+					UserName = pUserName,
+					UserLogin = pUserLogin,
+					UserPassword = pPassword,
+					IsActive = pIsActive,
+					ModifiedBy = pCurrentUser
+				WHERE
+					UserID = pID;
+		
+			END IF;
+	
+SET State = 6;
+
+			DELETE 
+			FROM 
+				master_role
+			WHERE
+				UserID = pID;
+				
+SET State = 7;
+			loopdata : WHILE pMenuID <> "" DO
+				INSERT INTO master_role
+				(
+					UserID,
+					MenuID,
+					EditFlag,
+					DeleteFlag
+				)
+				VALUES
+				(
+					pID,
+					SUBSTRING(pMenuID, 1, IF((INSTR(pMenuID, ',') - 1) = -1, LENGTH(pMenuID), (INSTR(pMenuID, ',') - 1))),
+					SUBSTRING(pEditMenuID, 1, IF((INSTR(pEditMenuID, ',') - 1) = -1, LENGTH(pEditMenuID), (INSTR(pEditMenuID, ',') - 1))),
+					SUBSTRING(pDeleteMenuID, 1, IF((INSTR(pDeleteMenuID, ',') - 1) = -1, LENGTH(pDeleteMenuID), (INSTR(pDeleteMenuID, ',') - 1)))
+				);
+				
+				IF(INSTR(pMenuID, ',') = 0) THEN SET pMenuID = "";
+				ELSE
+					SET pMenuID = SUBSTRING(pMenuID, INSTR(pMenuID, ',') + 1, LENGTH(pMenuID));
+					SET pEditMenuID = SUBSTRING(pEditMenuID, INSTR(pEditMenuID, ',') + 1, LENGTH(pEditMenuID));
+					SET pDeleteMenuID = SUBSTRING(pDeleteMenuID, INSTR(pDeleteMenuID, ',') + 1, LENGTH(pDeleteMenuID));
+				END IF;
+				
+			END WHILE loopdata; 
+		END IF;
+
+	IF(pIsEdit = 0) THEN
+SET State = 8;
+		SELECT
+			pID AS 'ID',
+			'User Berhasil Ditambahkan' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State';
+	ELSE
+SET State = 9;
+		SELECT
+			pID AS 'ID',
+			'User Berhasil Diubah' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State';
+	END IF;
+    COMMIT;
+END;
+$$
+DELIMITER ;

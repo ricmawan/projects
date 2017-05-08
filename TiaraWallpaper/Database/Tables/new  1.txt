@@ -1,0 +1,1295 @@
+ALTER TABLE `transaction_salereturn` ADD `SalesID` BIGINT NOT NULL AFTER `CustomerID`;
+
+ALTER TABLE `transaction_buyreturn` ADD `IsCancelled` BIT(1) NOT NULL AFTER `Remarks`;
+
+ALTER TABLE `transaction_salereturn` ADD `IsCancelled` BIT(1) NOT NULL AFTER `Remarks`;
+
+ALTER TABLE `transaction_incoming` ADD `IsCancelled` BIT(1) NOT NULL AFTER `Remarks`;
+
+ALTER TABLE `transaction_cancellation` ADD `IncomingID` BIGINT NOT NULL AFTER `OutgoingID`, ADD `SaleReturnID` BIGINT NOT NULL AFTER `IncomingID`, ADD `BuyReturnID` BIGINT NOT NULL AFTER `SaleReturnID`;
+
+ALTER TABLE `transaction_incoming` ADD `DeliveryCost` DOUBLE NOT NULL AFTER `TransactionDate`;
+
+INSERT INTO master_menu
+(
+	MenuID,
+	GroupMenuID,
+	MenuName,
+	URL,
+	Icon,
+	IsReport,
+	OrderNo    
+)
+VALUES
+(
+	26,
+	4,
+	'Retur Jual',
+	'Report/SaleReturn/',
+	NULL,
+	1,
+	7
+),
+(
+	27,
+	4,
+	'Retur Beli',
+	'Report/BuyReturn/',
+	NULL,
+	1,
+	8
+);
+
+INSERT INTO master_role
+VALUES
+(
+	0,
+	1,
+	26,
+	1,
+	1
+),
+(
+	0,
+	1,
+	27,
+	1,
+	1
+);
+
+UPDATE 
+	transaction_salereturn SR
+	JOIN master_customer MC
+		ON MC.CustomerID = SR.CustomerID
+SET
+	SR.SalesID = MC.SalesID
+	
+ALTER TABLE `transaction_cancellation` DROP FOREIGN KEY `transaction_cancellation_ibfk_2`;DROP TABLE IF EXISTS master_groupmenu;
+
+CREATE TABLE master_groupmenu
+(
+	GroupMenuID		INT PRIMARY KEY,
+	GroupMenuName 	VARCHAR(255),
+	Icon			VARCHAR(255),
+	Url				VARCHAR(255),
+	OrderNo			INT
+)ENGINE=InnoDB;
+
+INSERT INTO master_groupmenu
+VALUES
+(
+	1,
+	'Home',
+	'fa fa-home fa-3x',
+	'./Home.php',
+	1
+),
+(
+	2,
+	'Master Data',
+	'fa fa-book fa-3x',
+	NULL,
+	2
+),
+(
+	3,
+	'Transaksi',
+	'fa fa-cart-plus fa-3x',
+	NULL,
+	3
+),
+(
+	4,
+	'Laporan',
+	'fa fa-line-chart fa-3x',
+	NULL,
+	4
+),
+(
+	5,
+	'Tools',
+	'fa fa-cogs fa-3x',
+	NULL,
+	5
+);
+
+CREATE UNIQUE INDEX GROUPMENU_INDEX
+ON master_groupmenu (GroupMenuID);
+DROP TABLE IF EXISTS master_menu;
+
+CREATE TABLE master_menu
+(
+	MenuID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	GroupMenuID	INT,
+	MenuName 	VARCHAR(255),
+	Url			VARCHAR(255),
+	Icon		VARCHAR(255),
+	IsReport	BIT,
+	OrderNo		INT,
+	FOREIGN KEY(GroupMenuID) REFERENCES master_groupmenu(GroupMenuID)
+)ENGINE=InnoDB;
+
+INSERT INTO master_menu
+(
+	MenuID,
+	GroupMenuID,
+	MenuName,
+	URL,
+	Icon,
+	IsReport,
+	OrderNo    
+)
+VALUES
+(
+	1,
+	2,
+	'User',
+	'Master/User/',
+	NULL,
+	0,
+	1
+),
+(
+	2,
+	2,
+	'Merek',
+	'Master/Brand/',
+	NULL,
+	0,
+	2
+),
+(
+	3,
+	2,
+	'Satuan',
+	'Master/Unit/',
+	NULL,
+	0,
+	3
+),
+(
+	4,
+	2,
+	'Tipe',
+	'Master/Type/',
+	NULL,
+	0,
+	4
+),
+(
+	5,
+	2,
+	'Pelanggan',
+	'Master/Customer/',
+	NULL,
+	0,
+	6
+),
+(
+	6,
+	2,
+	'Supplier',
+	'Master/Supplier/',
+	NULL,
+	0,
+	7
+),
+(
+	7,
+	3,
+	'Stok Awal',
+	'Transaction/FirstStock/',
+	NULL,
+	0,
+	1
+),
+(
+	8,
+	3,
+	'Barang Masuk',
+	'Transaction/Incoming/',
+	NULL,
+	0,
+	2
+),
+(
+	9,
+	3,
+	'Barang Keluar',
+	'Transaction/Outgoing/',
+	NULL,
+	0,
+	3
+),
+(
+	10,
+	3,
+	'Retur Beli',
+	'Transaction/BuyReturn/',
+	NULL,
+	0,
+	4
+),
+(
+	11,
+	3,
+	'Retur Jual',
+	'Transaction/SaleReturn/',
+	NULL,
+	0,
+	5
+),
+(
+	12,
+	4,
+	'Pembelian',
+	'Report/Purchase/',
+	NULL,
+	1,
+	1
+),
+(
+	13,
+	4,
+	'Penjualan',
+	'Report/Selling/',
+	NULL,
+	1,
+	2
+),
+(
+	14,
+	4,
+	'Penjualan Per Barang',
+	'Report/SaleByItem/',
+	NULL,
+	1,
+	3
+),
+(
+	15,
+	2,
+	'Barang',
+	'Master/Item/',
+	NULL,
+	0,
+	5
+),
+(
+	16,
+	2,
+	'Sales',
+	'Master/Sales/',
+	NULL,
+	0,
+	8
+),
+(
+	17,
+	5,
+	'Bakcup Database',
+	'Tools/BackupDB/',
+	NULL,
+	0,
+	1
+),
+(
+	18,
+	5,
+	'Restore Database',
+	'Tools/RestoreDB/',
+	NULL,
+	0,
+	2
+),
+(
+	19,
+	5,
+	'Reset',
+	'Tools/Reset/',
+	NULL,
+	0,
+	3
+),
+(
+	20,
+	4,
+	'Penjualan Per Pelanggan',
+	'Report/SaleByCustomer/',
+	NULL,
+	1,
+	3
+),
+(
+	21,
+	3,
+	'Penyesuaian Stok',
+	'Transaction/StockOpname/',
+	NULL,
+	0,
+	6
+),
+(
+	22,
+	3,
+	'Booking',
+	'Transaction/Booking/',
+	NULL,
+	0,
+	7
+),
+(
+	23,
+	3,
+	'Pembatalan',
+	'Transaction/Cancellation/',
+	NULL,
+	0,
+	8
+),
+(
+	24,
+	4,
+	'Stok',
+	'Report/Stock/',
+	NULL,
+	1,
+	5
+),
+(
+	25,
+	4,
+	'Rinci Penjualan',
+	'Report/SaleDetails/',
+	NULL,
+	1,
+	6
+),
+(
+	26,
+	4,
+	'Retur Jual',
+	'Report/SaleReturn/',
+	NULL,
+	1,
+	7
+),
+(
+	27,
+	4,
+	'Retur Beli',
+	'Report/BuyReturn/',
+	NULL,
+	1,
+	8
+),
+(
+	28,
+	3,
+	'Operasional',
+	'Transaction/Operational/',
+	NULL,
+	0,
+	9
+),
+(
+	29,
+	4,
+	'Laba Rugi',
+	'Report/Profit/',
+	NULL,
+	1,
+	9
+),
+(
+	30,
+	3,
+	'Nota Titipan',
+	'Transaction/Titipan/',
+	NULL,
+	0,
+	10
+),
+(
+	31,
+	4,
+	'Stok Per Merek',
+	'Report/StockByBrand/',
+	NULL,
+	1,
+	10
+);
+
+CREATE UNIQUE INDEX MENU_INDEX
+ON master_menu (MenuID);DROP TABLE IF EXISTS master_user;
+
+CREATE TABLE master_user
+(
+	UserID 			BIGINT PRIMARY KEY AUTO_INCREMENT,
+	UserName		VARCHAR(255) NOT NULL,
+	UserLogin 		VARCHAR(100) NOT NULL,
+	UserPassword 	VARCHAR(255) NOT NULL,
+	IsActive		BOOLEAN,
+	CreatedDate 	DATETIME NOT NULL,
+	CreatedBy 		VARCHAR(255) NOT NULL,
+	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy		VARCHAR(255) NULL
+)ENGINE=InnoDB;
+
+INSERT INTO master_user
+VALUES
+(
+	0,
+	'System Administrator',
+	'Admin',
+	MD5('abcdef'),
+	1,
+	NOW(),
+	'System',
+	NULL,
+	NULL
+);
+
+CREATE UNIQUE INDEX USER_INDEX
+ON master_user (UserID);
+DROP TABLE IF EXISTS master_role;
+
+CREATE TABLE master_role
+(
+	RoleID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	UserID 		BIGINT,
+	MenuID 		BIGINT,
+	EditFlag 	BOOLEAN,
+	DeleteFlag 	BOOLEAN,
+	FOREIGN KEY(UserID) REFERENCES master_user(UserID) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY(MenuID) REFERENCES master_menu(MenuID) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB;
+
+INSERT INTO master_role
+VALUES
+(
+	0,
+	1,
+	1,
+	1,
+	1
+),
+(
+	0,
+	1,
+	2,
+	1,
+	1
+),
+(
+	0,
+	1,
+	3,
+	1,
+	1
+),
+(
+	0,
+	1,
+	4,
+	1,
+	1
+),
+(
+	0,
+	1,
+	5,
+	1,
+	1
+),
+(
+	0,
+	1,
+	6,
+	1,
+	1
+),
+(
+	0,
+	1,
+	7,
+	1,
+	1
+),
+(
+	0,
+	1,
+	8,
+	1,
+	1
+),
+(
+	0,
+	1,
+	9,
+	1,
+	1
+),
+(
+	0,
+	1,
+	10,
+	1,
+	1
+),
+(
+	0,
+	1,
+	11,
+	1,
+	1
+),
+(
+	0,
+	1,
+	12,
+	1,
+	1
+),
+(
+	0,
+	1,
+	13,
+	1,
+	1
+),
+(
+	0,
+	1,
+	14,
+	1,
+	1
+),
+(
+	0,
+	1,
+	15,
+	1,
+	1
+),
+(
+	0,
+	1,
+	16,
+	1,
+	1
+),
+(
+	0,
+	1,
+	17,
+	1,
+	1
+),
+(
+	0,
+	1,
+	18,
+	1,
+	1
+),
+(
+	0,
+	1,
+	19,
+	1,
+	1
+),
+(
+	0,
+	1,
+	20,
+	1,
+	1
+),
+(
+	0,
+	1,
+	21,
+	1,
+	1
+),
+(
+	0,
+	1,
+	22,
+	1,
+	1
+),
+(
+	0,
+	1,
+	23,
+	1,
+	1
+),
+(
+	0,
+	1,
+	24,
+	1,
+	1
+),
+(
+	0,
+	1,
+	25,
+	1,
+	1
+),
+(
+	0,
+	1,
+	26,
+	1,
+	1
+),
+(
+	0,
+	1,
+	27,
+	1,
+	1
+),
+(
+	0,
+	1,
+	28,
+	1,
+	1
+),
+(
+	0,
+	1,
+	29,
+	1,
+	1
+),
+(
+	0,
+	1,
+	31,
+	1,
+	1
+);
+
+CREATE UNIQUE INDEX ROLE_INDEX
+ON master_role (RoleID, UserID, MenuID);DROP TABLE IF EXISTS master_brand;
+
+CREATE TABLE master_brand
+(
+	BrandID			BIGINT PRIMARY KEY AUTO_INCREMENT,
+	BrandName		VARCHAR(255) NOT NULL,
+	CreatedDate 	DATETIME NOT NULL,
+	CreatedBy 		VARCHAR(255) NOT NULL,
+	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 		VARCHAR(255) NULL
+)ENGINE=InnoDB;
+
+INSERT INTO `master_brand` (`BrandID`, `BrandName`, `CreatedDate`, `CreatedBy`, `ModifiedDate`, `ModifiedBy`) VALUES
+(1, 'Eurowall', '2016-03-12 17:02:18', 'Admin', NULL, NULL),
+(2, 'MAESTRO', '2016-03-12 17:02:36', 'Admin', NULL, NULL),
+(3, 'KING', '2016-03-12 17:02:44', 'Admin', NULL, NULL),
+(4, 'Queen', '2016-03-12 17:02:53', 'Admin', NULL, NULL),
+(5, 'MONCHERI', '2016-03-12 17:03:06', 'Admin', NULL, NULL),
+(6, 'WOW', '2016-03-12 17:03:12', 'Admin', NULL, NULL),
+(7, 'Econia', '2016-03-12 17:03:33', 'Admin', NULL, NULL),
+(8, 'Borneo', '2016-03-12 17:03:49', 'Admin', NULL, NULL),
+(9, 'Bacan', '2016-03-12 17:03:56', 'Admin', NULL, NULL),
+(10, 'Crown', '2016-03-12 17:06:03', 'Admin', NULL, NULL),
+(11, 'Star', '2016-03-12 17:09:20', 'Admin', NULL, NULL),
+(12, 'Bravo', '2016-03-12 17:12:21', 'Admin', NULL, NULL),
+(13, 'Empire', '2016-03-12 17:12:30', 'Admin', NULL, NULL),
+(14, 'Excellent', '2016-03-12 17:12:41', 'Admin', NULL, NULL),
+(15, 'Sky Line', '2016-03-12 17:12:53', 'Admin', NULL, NULL),
+(16, 'Supra', '2016-03-12 17:13:04', 'Admin', NULL, NULL),
+(17, 'Delta', '2016-03-12 17:13:15', 'Admin', NULL, NULL),
+(18, 'Ion', '2016-03-12 17:13:19', 'Admin', NULL, NULL),
+(19, 'Focus', '2016-03-12 17:13:26', 'Admin', NULL, NULL),
+(20, 'Renova', '2016-03-12 17:13:35', 'Admin', '2016-03-12 19:27:52', 'Admin');
+
+CREATE UNIQUE INDEX BRAND_INDEX
+ON master_brand (BrandID);DROP TABLE IF EXISTS master_unit;
+
+CREATE TABLE master_unit
+(
+	UnitID			BIGINT PRIMARY KEY AUTO_INCREMENT,
+	UnitName		VARCHAR(255) NOT NULL,
+	CreatedDate 	DATETIME NOT NULL,
+	CreatedBy 		VARCHAR(255) NOT NULL,
+	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 		VARCHAR(255) NULL
+)ENGINE=InnoDB;
+
+INSERT INTO `master_unit` (`UnitID`, `UnitName`, `CreatedDate`, `CreatedBy`, `ModifiedDate`, `ModifiedBy`) VALUES
+(1, 'Roll', '2016-03-12 17:09:55', 'Admin', '2016-03-12 19:28:06', 'Admin'),
+(2, 'm', '2016-03-12 17:10:54', 'Admin', '2016-03-20 07:43:38', 'Admin'),
+(3, 'm lari', '2016-03-12 17:11:14', 'Admin', NULL, NULL),
+(4, 'Box', '2016-03-13 02:28:21', 'Admin', NULL, NULL);
+
+CREATE UNIQUE INDEX UNIT_INDEX
+ON master_unit (UnitID);DROP TABLE IF EXISTS master_type;
+
+CREATE TABLE master_type
+(
+	TypeID 			BIGINT PRIMARY KEY AUTO_INCREMENT,
+	TypeName		VARCHAR(255) NOT NULL,
+	UnitID			BIGINT,
+	BrandID 		BIGINT NOT NULL,
+	ReminderCount 	INT,
+	BuyPrice		DOUBLE,
+	SalePrice		DOUBLE,
+	Quantity		INT,
+	CreatedDate 	DATETIME NOT NULL,
+	CreatedBy 		VARCHAR(255) NOT NULL,
+	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 		VARCHAR(255) NULL,
+	FOREIGN KEY(BrandID) REFERENCES master_brand(BrandID) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(UnitID) REFERENCES master_unit(UnitID) ON UPDATE CASCADE ON DELETE CASCADE
+)ENGINE=InnoDB;
+
+INSERT INTO `master_type` (`TypeID`, `TypeName`, `UnitID`, `BrandID`, `ReminderCount`, `BuyPrice`, `SalePrice`, `Quantity`, `CreatedDate`, `CreatedBy`, `ModifiedDate`, `ModifiedBy`) VALUES
+(1, '001', 1, 1, 0, 17100, 27000, NULL, '2016-03-13 01:49:16', 'Admin', '2016-03-12 18:51:54', 'Admin'),
+(2, '002', 1, 1, 0, 25000, 35000, NULL, '2016-03-13 01:49:31', 'Admin', '2016-03-12 18:50:29', 'Admin'),
+(3, '003', 2, 2, 0, 22500, 35000, NULL, '2016-03-17 23:42:58', 'Admin', '2016-03-18 16:12:24', 'Admin');
+
+CREATE UNIQUE INDEX TYPE_INDEX
+ON master_type (TypeID, BrandID, UnitID);DROP TABLE IF EXISTS master_supplier;
+
+CREATE TABLE master_supplier
+(
+	SupplierID		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	SupplierName	VARCHAR(255) NOT NULL,
+	Telephone 		VARCHAR(100) NOT NULL,
+	Address 		VARCHAR(255),
+	City			VARCHAR(100),
+	CreatedDate 	DATETIME NOT NULL,
+	CreatedBy 		VARCHAR(255) NOT NULL,
+	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 		VARCHAR(255) NULL
+)ENGINE=InnoDB;
+
+INSERT INTO `master_supplier` (`SupplierID`, `SupplierName`, `Telephone`, `Address`, `City`, `CreatedDate`, `CreatedBy`, `ModifiedDate`, `ModifiedBy`) VALUES
+(1, 'CV. WallPaper', '081286098', '  Pekunden Tengah', 'Semarang', '2016-03-13 01:51:07', 'Admin', '2016-03-12 19:28:51', 'Admin'),
+(2, 'CV. Interior', '0811928121', '  Pekunden Barat', 'Semarang', '2016-03-13 01:51:07', 'Admin', '2016-03-12 19:28:51', 'Admin');
+
+CREATE UNIQUE INDEX SUPPLIER_INDEX
+ON master_supplier (SupplierID);DROP TABLE IF EXISTS master_sales;
+
+CREATE TABLE master_sales
+(
+	SalesID			BIGINT PRIMARY KEY AUTO_INCREMENT,
+	SalesName		VARCHAR(255) NOT NULL,
+	Alias			VARCHAR(4) NOT NULL,
+	Telephone 		VARCHAR(100) NOT NULL,
+	Address 		VARCHAR(255),
+	CreatedDate 	DATETIME NOT NULL,
+	CreatedBy 		VARCHAR(255) NOT NULL,
+	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 		VARCHAR(255) NULL
+)ENGINE=InnoDB;
+
+INSERT INTO `master_sales` (`SalesID`, `SalesName`, `Alias`, `Telephone`, `Address`, `CreatedDate`, `CreatedBy`, `ModifiedDate`, `ModifiedBy`) VALUES
+(1, 'Budi', 'Budi', '08128716', '  Pekunden Barat ', '2016-03-13 01:51:22', 'Admin', '2016-03-19 19:44:38', 'Admin'),
+(2, 'Ibu Budi', 'IBBD', '08112121', '  Pekunden Tengah ', '2016-03-13 01:51:22', 'Admin', '2016-03-19 19:44:38', 'Admin');
+
+CREATE UNIQUE INDEX SALES_INDEX
+ON master_sales (SalesID);DROP TABLE IF EXISTS master_parameter;
+
+CREATE TABLE master_parameter
+(
+	ParameterID 	BIGINT PRIMARY KEY AUTO_INCREMENT,
+	ParameterName 	VARCHAR(255) NOT NULL,
+	ParameterValue 	VARCHAR(255) NOT NULL,
+	Remarks 		TEXT,
+	IsNumber		INT,
+	CreatedDate 	DATETIME NOT NULL,
+	CreatedBy 		VARCHAR(255) NOT NULL,
+	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 		VARCHAR(255) NULL
+)ENGINE=InnoDB;
+
+INSERT INTO `master_parameter` (`ParameterID`, `ParameterName`, `ParameterValue`, `Remarks`, `IsNumber`, `CreatedDate`, `CreatedBy`, `ModifiedDate`, `ModifiedBy`) VALUES
+(1, 'APPLICATION_PATH', '/Projects/TiaraInterior/Source/', 'Location of the application', 0, '2016-03-12 15:01:05', 'System', NULL, NULL),
+(2, 'MYSQL_DUMP_PATH', 'C:\\xampp\\mysql\\bin\\mysqldump.exe', 'Path of mysqldump.exe', 0, '2016-03-12 00:00:00', 'Admin', NULL, NULL),
+(3, 'ERROR_LOG_PATH', 'C:\\xampp\\htdocs\\Projects\\TiaraInterior\\Source\\BackupFiles\\dumperrors.txt', 'log error when backup failed', 0, '2016-03-12 00:00:00', 'admin', NULL, NULL),
+(4, 'BACKUP_FULLPATH', 'C:\\xampp\\htdocs\\Projects\\TiaraInterior\\Source\\BackupFiles\\', 'Directory where backup files located', 0, '2016-03-12 00:00:00', 'admin', '2016-03-12 14:25:59', NULL),
+(5, 'BACKUP_FOLDER', 'BackupFiles\\\\', 'Backup path', 0, '2016-03-12 00:00:00', 'Admin', '2016-03-12 14:43:21', NULL),
+(6, 'MYSQL_PATH', 'C:\\xampp\\mysql\\bin\\mysql.exe', 'mysql.exe path', 0, '2016-03-12 00:00:00', 'Admin', NULL, NULL),
+(7, 'UPLOAD_PATH', 'C:\\xampp\\htdocs\\Projects\\TiaraInterior\\Source\\UploadedFiles\\', 'Upload Path', 0, '2016-03-12 00:00:00', 'Admin', NULL, NULL),
+(8, 'SHARED_PRINTER_ADDRESS', '//localhost/EPSON', 'For shared printer', 0, '2016-03-20 00:00:00', 'Admin', NULL, NULL);DROP TABLE IF EXISTS master_customer;
+
+CREATE TABLE master_customer
+(
+	CustomerID		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	SalesID			BIGINT,
+	CustomerName	VARCHAR(255) NOT NULL,
+	Telephone 		VARCHAR(100) NOT NULL,
+	Address1 		VARCHAR(255),
+	Address2 		VARCHAR(255),
+	City			VARCHAR(100),
+	CreatedDate 	DATETIME NOT NULL,
+	CreatedBy 		VARCHAR(255) NOT NULL,
+	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 		VARCHAR(255) NULL,
+	FOREIGN KEY(SalesID) REFERENCES master_sales(SalesID) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB;
+
+INSERT INTO `master_customer` (`CustomerID`, `SalesID`, `CustomerName`, `Telephone`, `Address1`, `City`, `CreatedDate`, `CreatedBy`, `ModifiedDate`, `ModifiedBy`) VALUES
+(1, 1, 'Bejo', '20983091', 'Jalan Pekunden Tengah No 1108\r\n(Wingko Babat Pak Moel)', 'Semarang', '2016-03-13 01:52:39', 'Admin', '2016-03-20 16:02:31', 'Admin'),
+(2, 2, 'Slamet', '0812182655', 'Thamrin Square C14\r\nJalan MH. Thamrin No 5\r\n(Salon Slamet Saleh)', 'Semarang', '2016-03-13 01:52:39', 'Admin', '2016-03-20 16:02:31', 'Admin');
+
+CREATE UNIQUE INDEX CUSTOMER_INDEX
+ON master_Customer (CustomerID);DROP TABLE IF EXISTS transaction_incoming;
+
+CREATE TABLE transaction_incoming
+(
+	IncomingID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	IncomingNumber	VARCHAR(100) NULL,
+	SupplierID 		BIGINT,
+	TransactionDate DATETIME NOT NULL,
+	DeliveryCost	DOUBLE,
+	Remarks			TEXT,
+	IsCancelled		BIT(1) NOT NULL,
+	CreatedDate 	DATETIME NOT NULL,
+	CreatedBy 		VARCHAR(255) NOT NULL,
+	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 		VARCHAR(255) NULL
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX INCOMING_INDEX
+ON transaction_incoming (IncomingID, SupplierID);DROP TABLE IF EXISTS transaction_incomingdetails;
+
+CREATE TABLE transaction_incomingdetails
+(
+	IncomingDetailsID 	BIGINT PRIMARY KEY AUTO_INCREMENT,
+	IncomingID			BIGINT,
+	TypeID 				BIGINT NOT NULL,
+	Quantity			DOUBLE,
+	BuyPrice			DOUBLE,
+	SalePrice			DOUBLE,
+	Discount			DOUBLE,
+	IsPercentage		BIT,
+	BatchNumber			VARCHAR(100) NULL,
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy			VARCHAR(255) NULL,
+	FOREIGN KEY(IncomingID) REFERENCES transaction_incoming(IncomingID) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(TypeID) REFERENCES master_type(TypeID) ON UPDATE CASCADE ON DELETE CASCADE
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX INCOMINGDETAILS_INDEX
+ON transaction_incomingdetails (IncomingDetailsID, IncomingID, TypeID);DROP TABLE IF EXISTS transaction_outgoing;
+
+CREATE TABLE transaction_outgoing
+(
+	OutgoingID 			BIGINT PRIMARY KEY AUTO_INCREMENT,
+	OutgoingNumber		VARCHAR(100) NULL,
+	CustomerID			BIGINT,
+	SalesID				BIGINT,
+	TransactionDate 	DATETIME NOT NULL,
+	DeliveryCost		DOUBLE,
+	Remarks				TEXT,
+	IsCancelled			BIT,
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 			VARCHAR(255) NULL,
+	FOREIGN KEY(CustomerID) REFERENCES master_customer(CustomerID) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY(SalesID) REFERENCES master_sales(SalesID) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX OUTGOING_INDEX
+ON transaction_outgoing (OutgoingID, CustomerID);DROP TABLE IF EXISTS transaction_outgoingdetails;
+
+CREATE TABLE transaction_outgoingdetails
+(
+	OutgoingDetailsID	BIGINT PRIMARY KEY AUTO_INCREMENT,
+	OutgoingID			BIGINT,
+	TypeID 				BIGINT NOT NULL,
+	Quantity			DOUBLE,
+	BuyPrice			DOUBLE,
+	SalePrice			DOUBLE,
+	Discount			DOUBLE,
+	IsPercentage		BIT,
+	BatchNumber			VARCHAR(100) NULL,
+	Remarks				TEXT,
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy			VARCHAR(255) NULL,
+	FOREIGN KEY(OutgoingID) REFERENCES transaction_outgoing(OutgoingID) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(TypeID) REFERENCES master_type(TypeID) ON UPDATE CASCADE ON DELETE CASCADE
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX OUTGOINGDETAILS_INDEX
+ON transaction_outgoingdetails(OutgoingDetailsID, OutgoingID, TypeID);DROP TABLE IF EXISTS transaction_buyreturn;
+
+CREATE TABLE transaction_buyreturn
+(
+	BuyReturnID 	BIGINT PRIMARY KEY AUTO_INCREMENT,
+	BuyReturnNumber	VARCHAR(100) NULL,
+	SupplierID 		BIGINT,
+	TransactionDate DATETIME NOT NULL,
+	Remarks			TEXT,
+	IsCancelled		BIT(1) NOT NULL,
+	CreatedDate 	DATETIME NOT NULL,
+	CreatedBy 		VARCHAR(255) NOT NULL,
+	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 		VARCHAR(255) NULL
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX BUYRETURN_INDEX
+ON transaction_buyreturn (BuyReturnID, SupplierID);DROP TABLE IF EXISTS transaction_buyreturndetails;
+
+CREATE TABLE transaction_buyreturndetails
+(
+	BuyReturnDetailsID 	BIGINT PRIMARY KEY AUTO_INCREMENT,
+	BuyReturnID			BIGINT,
+	TypeID 				BIGINT NOT NULL,
+	Quantity			DOUBLE,
+	BuyPrice			DOUBLE,
+	Discount			DOUBLE,
+	IsPercentage		BIT,
+	BatchNumber			VARCHAR(100) NULL,
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy			VARCHAR(255) NULL,
+	FOREIGN KEY(BuyReturnID) REFERENCES transaction_buyreturn(BuyReturnID) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(TypeID) REFERENCES master_type(TypeID) ON UPDATE CASCADE ON DELETE CASCADE
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX BUYRETURNDETAILS_INDEX
+ON transaction_buyreturndetails (BuyReturnDetailsID, BuyReturnID);DROP TABLE IF EXISTS transaction_salereturn;
+
+CREATE TABLE transaction_salereturn
+(
+	SaleReturnID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	SaleReturnNumber	VARCHAR(100) NULL,
+	CustomerID			BIGINT,
+	SalesID				BIGINT NOT NULL,
+	TransactionDate 	DATETIME NOT NULL,
+	Remarks				TEXT,
+	IsCancelled			BIT(1) NOT NULL,
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 			VARCHAR(255) NULL,
+	FOREIGN KEY(CustomerID) REFERENCES master_customer(CustomerID) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX SALERETURN_INDEX
+ON transaction_salereturn (SaleReturnID, CustomerID);
+DROP TABLE IF EXISTS transaction_salereturndetails;
+
+CREATE TABLE transaction_salereturndetails
+(
+	SaleReturnDetailsID	BIGINT PRIMARY KEY AUTO_INCREMENT,
+	SaleReturnID		BIGINT,
+	TypeID 				BIGINT NOT NULL,
+	Quantity			DOUBLE,
+	BuyPrice			DOUBLE,
+	SalePrice			DOUBLE,
+	Discount			DOUBLE,
+	IsPercentage		BIT,
+	BatchNumber			VARCHAR(100) NULL,
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy			VARCHAR(255) NULL,
+	FOREIGN KEY(SaleReturnID) REFERENCES transaction_salereturn(SaleReturnID) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(TypeID) REFERENCES master_type(TypeID) ON UPDATE CASCADE ON DELETE CASCADE
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX SALERETURNDETAILS_INDEX
+ON transaction_salereturndetails(SaleReturnDetailsID, SaleReturnID);DROP TABLE IF EXISTS transaction_firststock;
+
+CREATE TABLE transaction_firststock
+(
+	FirstStockID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	FirstStockNumber	VARCHAR(100) NULL,
+	TransactionDate 	DATETIME NOT NULL,
+	Remarks				TEXT,
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 			VARCHAR(255) NULL
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX FIRSTSTOCK_INDEX
+ON transaction_firststock (FirstStockID);DROP TABLE IF EXISTS transaction_firststockdetails;
+
+CREATE TABLE transaction_firststockdetails
+(
+	FirstStockDetailsID BIGINT PRIMARY KEY AUTO_INCREMENT,
+	FirstStockID		BIGINT,
+	TypeID 				BIGINT NOT NULL,
+	Quantity			DOUBLE,
+	BuyPrice			DOUBLE,
+	SalePrice			DOUBLE,
+	Discount			DOUBLE,
+	IsPercentage		BIT,
+	BatchNumber			VARCHAR(100) NULL,
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy			VARCHAR(255) NULL,
+	FOREIGN KEY(FirstStockID) REFERENCES transaction_firststock(FirstStockID) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(TypeID) REFERENCES master_type(TypeID) ON UPDATE CASCADE ON DELETE CASCADE
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX FIRSTSTOCKDETAILS_INDEX
+ON transaction_firststockdetails (FirstStockDetailsID, FirstStockID, TypeID);DROP TABLE IF EXISTS transaction_invoicenumber;
+
+CREATE TABLE transaction_invoicenumber
+(
+	InvoiceNumberID		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	InvoiceNumberType	VARCHAR(2),
+	InvoiceDate 		DATE,
+	InvoiceNumber		VARCHAR(20),
+	DeleteFlag			BIT,
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy			VARCHAR(255) NULL
+	
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX INVOICENUMBER_INDEX
+ON transaction_invoicenumber (InvoiceNumberID, InvoiceNumberType, InvoiceDate);DROP TABLE IF EXISTS backup_history;
+
+CREATE TABLE backup_history
+(
+	BackupHistoryID		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	BackupDate			DATE,
+	FilePath			VARCHAR(255),
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy			VARCHAR(255) NULL
+	
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX BACKUPHISTORY_INDEX
+ON backup_history (BackupHistoryID);DROP TABLE IF EXISTS restore_history;
+
+CREATE TABLE restore_history
+(
+	RestoreHistoryID		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	RestoreDate			DATE,
+	FilePath			VARCHAR(255),
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy			VARCHAR(255) NULL
+	
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX RESTOREHISTORY_INDEX
+ON restore_history (RestoreHistoryID);DROP TABLE IF EXISTS reset_history;
+
+CREATE TABLE reset_history
+(
+	ResetHistoryID		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	ResetDate			DATE,	
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy			VARCHAR(255) NULL
+	
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX RESETHISTORY_INDEX
+ON reset_history (ResetHistoryID);DROP TABLE IF EXISTS transaction_stockopname;
+
+CREATE TABLE transaction_stockopname
+(
+	StockOpnameID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	TransactionDate 	DATETIME NOT NULL,
+	Remarks				TEXT,
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 			VARCHAR(255) NULL
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX STOCKOPNAME_INDEX
+ON transaction_stockopname (StockOpnameID);DROP TABLE IF EXISTS transaction_stockopnamedetails;
+
+CREATE TABLE transaction_stockopnamedetails
+(
+	StockOpnameDetailsID	BIGINT PRIMARY KEY AUTO_INCREMENT,
+	StockOpnameID			BIGINT,
+	TypeID 					BIGINT NOT NULL,
+	FromQty					DOUBLE,
+	ToQty					DOUBLE,
+	BuyPrice				DOUBLE,
+	SalePrice				DOUBLE,
+	BatchNumber				VARCHAR(100) NULL,
+	CreatedDate 			DATETIME NOT NULL,
+	CreatedBy 				VARCHAR(255) NOT NULL,
+	ModifiedDate 			TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 				VARCHAR(255) NULL,
+	FOREIGN KEY(StockOpnameID) REFERENCES transaction_stockopname(StockOpnameID) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(TypeID) REFERENCES master_type(TypeID) ON UPDATE CASCADE ON DELETE CASCADE
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX STOCKOPNAMEDETAILS_INDEX
+ON transaction_stockopnamedetails (StockOpnameDetailsID, StockOpnameID);DROP TABLE IF EXISTS transaction_cancellation;
+
+CREATE TABLE transaction_cancellation
+(
+	CancellationID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	DeletedBy			BIGINT,
+	OutgoingID			BIGINT,
+	IncomingID			BIGINT,
+	SaleReturnID		BIGINT,
+	BuyReturnID			BIGINT,
+	TransactionDate 	DATETIME NOT NULL,
+	Remarks				TEXT,
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 			VARCHAR(255) NULL,
+	FOREIGN KEY(DeletedBy) REFERENCES master_user(UserID) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(OutgoingID) REFERENCES transaction_outgoing(OutgoingID) ON UPDATE CASCADE ON DELETE CASCADE
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX CANCELLATION_INDEX
+ON transaction_cancellation (CancellationID);DROP TABLE IF EXISTS master_bookingstatus;
+
+CREATE TABLE master_bookingstatus
+(
+	BookingStatusID		TINYINT PRIMARY KEY AUTO_INCREMENT,
+	BookingStatusName	VARCHAR(255) NOT NULL
+)ENGINE=InnoDB;
+
+INSERT INTO `master_bookingstatus` 
+VALUES
+(1, 'Dalam Proses'),
+(2, 'Sudah Selesai'),
+(3, 'Sudah Jatuh Tempo');
+
+CREATE UNIQUE INDEX BOOKINGSTATUS_INDEX
+ON master_bookingstatus (BookingStatusID);DROP TABLE IF EXISTS transaction_booking;
+
+CREATE TABLE transaction_booking
+(
+	BookingID 			BIGINT PRIMARY KEY AUTO_INCREMENT,
+	BookingNumber		VARCHAR(100) NULL,
+	CustomerID			BIGINT,
+	SalesID				BIGINT,
+	TransactionDate 	DATETIME NOT NULL,
+	DueDate				DATETIME NULL,
+	Remarks				TEXT,
+	BookingStatusID		TINYINT,
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 			VARCHAR(255) NULL,
+	FOREIGN KEY(CustomerID) REFERENCES master_customer(CustomerID) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY(SalesID) REFERENCES master_sales(SalesID) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX BOOKING_INDEX
+ON transaction_booking (BookingID);DROP TABLE IF EXISTS transaction_bookingdetails;
+
+CREATE TABLE transaction_bookingdetails
+(
+	BookingDetailsID	BIGINT PRIMARY KEY AUTO_INCREMENT,
+	BookingID			BIGINT,
+	TypeID 				BIGINT NOT NULL,
+	Quantity			DOUBLE,
+	BuyPrice			DOUBLE,
+	SalePrice			DOUBLE,
+	Discount			DOUBLE,
+	IsPercentage		BIT,
+	BatchNumber			VARCHAR(100) NULL,
+	Remarks				TEXT,
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy			VARCHAR(255) NULL,
+	FOREIGN KEY(BookingID) REFERENCES transaction_booking(BookingID) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(TypeID) REFERENCES master_type(TypeID) ON UPDATE CASCADE ON DELETE CASCADE
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX BOOKING_INDEX
+ON transaction_bookingdetails (BookingDetailsID, BookingID, TypeID);DROP TABLE IF EXISTS tbl_temp;
+
+CREATE TABLE tbl_temp
+(
+	ID INT
+);
+
+INSERT INTO tbl_temp
+VALUES
+(1);DROP TABLE IF EXISTS transaction_operational;
+
+CREATE TABLE transaction_operational
+(
+	OperationalID 			BIGINT PRIMARY KEY AUTO_INCREMENT,
+	TransactionDate			DATETIME,
+	Remarks					TEXT,
+	CreatedDate 			DATETIME NOT NULL,
+	CreatedBy 				VARCHAR(255) NOT NULL,
+	ModifiedDate			TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 				VARCHAR(255) NULL
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX OPERATIONAL_INDEX
+ON transaction_operational (OperationalID);DROP TABLE IF EXISTS transaction_operationaldetails;
+
+CREATE TABLE transaction_operationaldetails
+(
+	OperationalDetailsID 	BIGINT PRIMARY KEY AUTO_INCREMENT,
+	OperationalID			BIGINT,
+	Remarks 					TEXT,
+	Amount 						DOUBLE NOT NULL,
+	CreatedDate 				DATETIME NOT NULL,
+	CreatedBy 					VARCHAR(255) NOT NULL,
+	ModifiedDate 				TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy					VARCHAR(255) NULL,
+	FOREIGN KEY(OperationalID) REFERENCES transaction_operational(OperationalID) ON UPDATE CASCADE ON DELETE CASCADE
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX OPERATIONALDETAILS_INDEX
+ON transaction_operationaldetails (OperationalDetailsID, OperationalID);DROP TABLE IF EXISTS transaction_titpan;
+
+CREATE TABLE transaction_titipan
+(
+	TitipanID 				BIGINT PRIMARY KEY AUTO_INCREMENT,
+	TransactionDate			DATETIME,
+	Remarks					TEXT,
+	CreatedDate 			DATETIME NOT NULL,
+	CreatedBy 				VARCHAR(255) NOT NULL,
+	ModifiedDate			TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 				VARCHAR(255) NULL
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX TITIPAN_INDEX
+ON transaction_titipan(TitipanID);DROP TABLE IF EXISTS transaction_titipandetails;
+
+CREATE TABLE transaction_titipandetails
+(
+	TitipanDetailsID 			BIGINT PRIMARY KEY AUTO_INCREMENT,
+	TitipanID					BIGINT,
+	Remarks 					TEXT,
+	Quantity					DOUBLE,
+	Price						DOUBLE,
+	CreatedDate 				DATETIME NOT NULL,
+	CreatedBy 					VARCHAR(255) NOT NULL,
+	ModifiedDate 				TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy					VARCHAR(255) NULL,
+	FOREIGN KEY(TitipanID) REFERENCES transaction_titipan(TitipanID) ON UPDATE CASCADE ON DELETE CASCADE
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX TITIPANDETAILS_INDEX
+ON transaction_titipandetails (TitipanDetailsID, TitipanID);
