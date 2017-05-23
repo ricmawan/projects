@@ -43,6 +43,17 @@
 						</div>
 						<br />
 						<div class="row">
+							<div class="col-md-1 labelColumn">
+								Tanggal :
+							</div>
+							<div class="col-md-3">
+								<div class="ui-widget" style="width: 100%;">
+									<input id="txtFromDate" name="txtFromDate" type="text" class="form-control-custom DatePickerMonthYearGlobal" placeholder="Dari Tanggal" />
+								</div>
+							</div>
+						</div>
+						<br />
+						<div class="row">
 							<div class="col-md-12">
 								<button class="btn btn-info" id="btnView" onclick="Preview();" ><i class="fa fa-list"></i> Lihat</button>&nbsp;&nbsp;
 								<button class="btn btn-success" id="btnExcel" onclick="ExportExcel();" ><i class="fa fa-file-excel-o "></i> Eksport Excel</button>&nbsp;&nbsp;
@@ -74,6 +85,7 @@
 		<script>			
 			function Preview() {
 				var BrandID = $("#ddlBrand").val();
+				var txtFromDate = $("#txtFromDate").val();
 				var PassValidate = 1;
 				var FirstFocus = 0;
 				if(BrandID == "") {
@@ -118,7 +130,7 @@
 							refresh: "Refresh",
 							search: "Cari"
 						},
-						url: "Report/StockByBrand/DataSource.php?BrandID=" + BrandID,
+						url: "Report/StockByBrand/DataSource.php?BrandID=" + BrandID + "&txtFromDate=" + txtFromDate,
 						selection: true,
 						multiSelect: true,
 						rowSelect: true,
@@ -130,6 +142,7 @@
 			}
 			function ExportExcel() {
 				var BrandID = $("#ddlBrand").val();
+				var txtFromDate = $("#txtFromDate").val();
 				var TypeID = $("#ddlType").val();
 				var PassValidate = 1;
 				var FirstFocus = 0;
@@ -149,7 +162,7 @@
 				}
 				else {
 					$("#loading").show();
-					$("#excelDownload").attr("src", "Report/StockByBrand/ExportExcel.php?BrandID=" + BrandID );
+					$("#excelDownload").attr("src", "Report/StockByBrand/ExportExcel.php?BrandID=" + BrandID + "&txtFromDate=" + txtFromDate );
 					$("#loading").hide();
 				}
 			}

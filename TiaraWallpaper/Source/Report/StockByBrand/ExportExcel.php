@@ -6,8 +6,15 @@
 		include "../../GetPermission.php";
 		//echo $_SERVER['REQUEST_URI'];
 		$BrandID = mysql_real_escape_string($_GET['BrandID']);
-				
-		$txtToDate = date("Y-m-d");
+		if($_GET['txtFromDate'] == "") {
+			$txtFromDate = date("Y-m-d");
+		}
+		else {
+			$txtFromDate = explode('-', mysql_real_escape_string($_GET['txtFromDate']));
+			$_GET['txtFromDate'] = "$txtFromDate[2]-$txtFromDate[1]-$txtFromDate[0]"; 
+			$txtFromDate = $_GET['txtFromDate'];
+		}
+		$txtToDate = $txtFromDate;
 		$ToDate = date("d-m-Y");
 
 		error_reporting(E_ALL);
@@ -81,7 +88,11 @@
 								TRIM(BatchNumber) BatchNumber,
 								SUM(Quantity) Quantity
 							FROM
-								transaction_firststockdetails
+								transaction_firststock FS
+								JOIN transaction_firststockdetails FSD
+									ON FS.FirstStockID = FSD.FirstStockID
+							WHERE
+								CAST(FS.TransactionDate AS DATE) <= '".$txtFromDate."'
 							GROUP BY
 								TypeID,
 								BatchNumber
@@ -96,6 +107,7 @@
 									ON TI.IncomingID = TID.IncomingID
 							WHERE
 								TI.IsCancelled = 0
+								AND CAST(TI.TransactionDate AS DATE) <= '".$txtFromDate."'
 							GROUP BY
 								TID.TypeID,
 								TID.BatchNumber
@@ -117,6 +129,7 @@
 								ON OT.OutgoingID = OTD.OutgoingID
 						WHERE
 							OT.IsCancelled = 0
+							AND CAST(OT.TransactionDate AS DATE) <= '".$txtFromDate."'
 						GROUP BY
 							OTD.TypeID,
 							OTD.BatchNumber
@@ -135,6 +148,7 @@
 								ON BR.BuyReturnID = BRD.BuyReturnID
 						WHERE
 							BR.IsCancelled = 0
+							AND CAST(BR.TransactionDate AS DATE) <= '".$txtFromDate."'
 						GROUP BY
 							BRD.TypeID,
 							BRD.BatchNumber
@@ -152,7 +166,8 @@
 							JOIN transaction_salereturndetails SRD
 								ON SR.SaleReturnID = SRD.SaleReturnID
 						WHERE
-							SR.IsCancelled = 0 
+							SR.IsCancelled = 0
+							AND CAST(SR.TransactionDate AS DATE) <= '".$txtFromDate."'
 						GROUP BY
 							SRD.TypeID,
 							SRD.BatchNumber
@@ -171,6 +186,7 @@
 								ON BO.BookingID = BOD.BookingID
 						WHERE
 							BO.BookingStatusID = 1
+							AND CAST(BO.TransactionDate AS DATE) <= '".$txtFromDate."'
 						GROUP BY
 							BOD.TypeID,
 							BOD.BatchNumber
@@ -193,6 +209,8 @@
 							transaction_stockopname SO
 							JOIN transaction_stockopnamedetails SOD
 								ON SO.StockOpnameID = SOD.StockOpnameID
+						WHERE
+							CAST(SO.TransactionDate AS DATE) <= '".$txtFromDate."'
 						GROUP BY
 							SOD.TypeID,
 							SOD.BatchNumber
