@@ -37,7 +37,8 @@
 					MC.Telephone,
 					DATE_FORMAT(OT.TransactionDate, '%d-%m-%Y') TransactionDate,
 					UPPER(MS.Alias) Alias,
-					OT.Remarks
+					OT.Remarks,
+					OT.CreatedBy
 				FROM
 					transaction_outgoing OT
 					JOIN master_customer MC
@@ -64,6 +65,7 @@
 		$Address1 = $row['Address1'];
 		$Address2 = $row['Address2'];
 		$Telephone = $row['Telephone'];
+		$CreatedBy = $row['CreatedBy'];
 		
 		$Data  = $initialized ;
 		//$Data .= "\n"; //16 
@@ -141,7 +143,7 @@
 		$Data .= "_________________________________________________________________________________________________________________________________________\n";
 		$Data .= "   Penerima,". fnSpace(50) ."Checker,". fnSpace(50) ."Hormat Kami,\n\n\n";
 		//$Data .= fnSpace(115) . fnSpace(ceil((22 - strlen($_SESSION['UserLogin']))/2)). $_SESSION['UserLogin'] ."\n";
-		$Data .= "_______________                                            _______________                                             _______________". Chr(12);
+		$Data .= "_______________                                            _______________                                             ". fnSpace(ceil((15 - strlen($CreatedBy))/2)). $CreatedBy . Chr(12);
 		//$Data .=  $bold1 . "Barang yang sudah dibeli tidak dapat ditukar/dikembalikan" . Chr(12);
 		fwrite($handle, $Data);
 		fclose($handle);

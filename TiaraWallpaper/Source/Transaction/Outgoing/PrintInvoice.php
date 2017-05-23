@@ -169,7 +169,7 @@
 		//$Data .= fnSpace(90) . "Grand Total           Rp. " . fnSpace(19 - strlen(number_format($GrandTotal,2,".",","))) . number_format($GrandTotal,2,".",",") . "\n";
 		$Data .= "_________________________________________________________________________________________________________________________________________\n";
 		$Data .= "   Penerima,". fnSpace(50) ."Checker,". fnSpace(50) ."Hormat Kami,\n\n\n";
-		$Data .= "_______________                                            _______________                                             _______________". Chr(12);
+		$Data .= "_______________                                            _______________                                             ". fnSpace(ceil((15 - strlen($CreatedBy))/2)). $CreatedBy . Chr(12);
 		fwrite($handle, $Data);
 		fclose($handle);
 		copy($file, $SHARED_PRINTER_ADDRESS); 

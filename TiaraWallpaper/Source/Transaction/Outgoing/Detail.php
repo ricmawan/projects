@@ -451,22 +451,18 @@
 				var CurrentBatchNumber = $("#ddlType option:selected").attr("batchnumber");
 				var CurrentStock = $("#ddlType option:selected").attr("stock");
 				var CurrentTypeName = $("#ddlType option:selected").text();
-				//QTY + 1 if selected item already exists
-				/*for(i=1;i<=rows;i++) {
+				var qtyInput = 0;
+				var rows = $("#recordnew").val();
+				//check qty in the current transaction
+				for(i=1;i<=rows;i++) {
 					if($("#hdnTypeID" + i).val() == CurrentTypeID && $("#hdnBatchNumber" + i).val() == CurrentBatchNumber) {
-						if((parseInt($("#txtQuantity" + i).val()) + 1) > CurrentStock) {
-							$.notify("Sisa stok yang ada : " +CurrentStock, "error");
-							$("#txtQuantity" + i).val(CurrentStock);
-						}
-						else {
-							$("#txtQuantity" + i).val((parseInt($("#txtQuantity" + i).val()) + 1));
-						}
-						AddFlag = 0;
+						qtyInput += parseInt($("#txtQuantity" + i).val());
 					}
-				}*/
+				}
+				if(qtyInput < CurrentStock) {
 				//if(AddFlag == 1) {
 					$("#btnAdd").click();
-					var rows = $("#recordnew").val();
+					rows = $("#recordnew").val();
 					$("#hdnTypeID" + rows).val(CurrentTypeID);
 					$("#txtTypeName" + rows).val(CurrentTypeName);
 					$("#hdnBuyPrice" + rows).val(returnRupiah(CurrentBuyPrice.toString()));
@@ -475,7 +471,10 @@
 					$("#txtSalePrice" + rows).val(returnRupiah(CurrentSalePrice.toString()));
 					$("#txtQuantity" + rows).val(1);
 					$("#txtTotal" + rows).val(CurrentSalePrice);
-				//}
+				}
+				else {
+					$.notify("Stok tidak cukup!", "error");
+				}
 				Calculate();
 			}
 			
@@ -893,11 +892,22 @@
 			}
 			
 			function ValidateQty(row) {
-				var currentQty = $("#txtQuantity" + row).val();
+				var currentQty = 0;
 				var currentStock = $("#hdnStock" +  row).val();
+				var CurrentTypeID = $("#hdnTypeID" + row).val();
+				var CurrentBatchNumber = $("#hdnBatchNumber" + row).val();
+				var rows = $("#recordnew").val();
+				//check qty in the current transaction
+				for(i=1;i<=rows;i++) {
+					if($("#hdnTypeID" + i).val() == CurrentTypeID && $("#hdnBatchNumber" + i).val() == CurrentBatchNumber) {
+						currentQty += parseInt($("#txtQuantity" + i).val());
+					}
+				}
+				console.log(currentQty);
+				
 				if(parseInt(currentQty) > parseInt(currentStock)) {
 					$.notify("Sisa stok yang ada : " + currentStock, "error");
-					$("#txtQuantity" + row).val(currentStock);
+					$("#txtQuantity" + row).val(0);
 				}
 				Calculate();
 			}
