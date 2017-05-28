@@ -38,7 +38,7 @@
 				JOIN master_patient MP
 					ON MP.PatientID = CS.PatientID
 			WHERE
-				CS.ScheduledDate = DATE_FORMAT(NOW(), '%Y-%m-%d')
+				ADDTIME(CS.ScheduledDate, '06:00:00') <= NOW()
 				AND IFNULL(CS.EmailStatus, '') <> 'Sent'";
 				
 	if (! $result = mysql_query($sql, $dbh)) {
