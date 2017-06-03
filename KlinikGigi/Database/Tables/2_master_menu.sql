@@ -130,6 +130,24 @@ VALUES
 	NULL,
 	0,
 	4
+),
+(
+	13,
+	4,
+	'Foto Pemeriksaan',
+	'Report/Photos',
+	NULL,
+	0,
+	4
+),
+(
+	14,
+	4,
+	'Email',
+	'Report/Email/',
+	NULL,
+	0,
+	5
 );
 
 CREATE UNIQUE INDEX MENU_INDEX
