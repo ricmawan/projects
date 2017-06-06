@@ -104,10 +104,16 @@
 								{
 									var option;
 									if($("#hdnEditFlag").val() == true) {
-										option = "<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-edit\" data-link=\"./Transaction/Outgoing/Detail.php?ID=" + row.OutgoingID + "\" acronym title=\"Ubah Data\"></i>&nbsp;&nbsp;&nbsp;<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-print\" acronym title=\"Cetak Nota\"></i>&nbsp;&nbsp;&nbsp;<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-truck\" acronym title=\"Cetak Surat Jalan\"></i>&nbsp;&nbsp;&nbsp;<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" data-outgoing-number=\"" + row.OutgoingNumber + "\" data-customer-name=\"" + row.CustomerName + "\" data-delivery-cost=\"" + row.DeliveryCost + "\" class=\"fa fa-ship\" acronym title=\"Ongkos Kirim\"></i>";
+										option = "<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-edit\" data-link=\"./Transaction/Outgoing/Detail.php?ID=" + row.OutgoingID + "\" acronym title=\"Ubah Data\"></i>&nbsp;&nbsp;&nbsp;";
+										option += "<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-print\" acronym title=\"Cetak Nota\"></i>&nbsp;&nbsp;&nbsp;";
+										option += "<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-truck\" acronym title=\"Cetak Surat Jalan\"></i>&nbsp;&nbsp;&nbsp;";
+										option += "<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" data-outgoing-number=\"" + row.OutgoingNumber + "\" data-customer-name=\"" + row.CustomerName + "\" data-delivery-cost=\"" + row.DeliveryCost + "\" class=\"fa fa-ship\" acronym title=\"Ongkos Kirim\"></i>&nbsp;&nbsp;&nbsp;";
+										option += "<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" data-outgoing-number=\"" + row.OutgoingNumber + "\" data-customer-name=\"" + row.CustomerName + "\" data-delivery-cost=\"" + row.DeliveryCost + "\" class=\"fa fa-usd\" acronym title=\"Pembayaran\"></i>";
 									}
 									else {
-										option = "<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-print\"  acronym title=\"Cetak Nota\"></i>&nbsp;&nbsp;&nbsp;<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-truck\" acronym title=\"Cetak Surat Jalan\"></i>&nbsp;&nbsp;&nbsp;<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" data-outgoing-number=\"" + row.OutgoingNumber + "\" data-customer-name=\"" + row.CustomerName + "\" data-delivery-cost=\"" + row.DeliveryCost + "\" class=\"fa fa-ship\" acronym title=\"Ongkos Kirim\"></i>";
+										option = "<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-print\" acronym title=\"Cetak Nota\"></i>&nbsp;&nbsp;&nbsp;";
+										option += "<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" class=\"fa fa-truck\" acronym title=\"Cetak Surat Jalan\"></i>&nbsp;&nbsp;&nbsp;";
+										option += "<i style='cursor:pointer;' data-row-id=\"" + row.OutgoingID + "\" data-outgoing-number=\"" + row.OutgoingNumber + "\" data-customer-name=\"" + row.CustomerName + "\" data-delivery-cost=\"" + row.DeliveryCost + "\" class=\"fa fa-ship\" acronym title=\"Ongkos Kirim\"></i>";
 									}
 									return option;
 								}
