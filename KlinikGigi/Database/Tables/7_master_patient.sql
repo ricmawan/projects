@@ -7,7 +7,7 @@ CREATE TABLE master_patient
 	PatientName		VARCHAR(255) NOT NULL,
 	BirthDate		DATE NOT NULL,
 	Telephone 		VARCHAR(100) NOT NULL,
-	E-mail			VARCHAR(255),
+	Email			VARCHAR(255),
 	Address 		TEXT,
 	City			VARCHAR(100),
 	Allergy			TEXT,
