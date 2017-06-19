@@ -46,7 +46,7 @@
 			</div>
 			<div id="dialog-edit-medication" title="Edit Tindakan" style="display: none;">
 				<form class="col-md-12" id="EditForm" method="POST" action="" >
-					<input type="hidden" id="hdnMedicationDetailsID" name="hdnMedicationDetailsID" value=0 />
+					<input type="hidden" id="hdnMedicationDetailsID" name="hdnMedicationDetailsID" value=0 autofocus="autofocus" />
 					<div class="row" >
 						<div class="col-md-3 labelColumn" >
 							Tindakan:
@@ -61,7 +61,7 @@
 							Harga:
 						</div>
 						<div class="col-md-6">
-							<input type="text" id="txtExaminationPrice2" name="txtExaminationPrice2" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" class="form-control-custom" style="text-align: right;" value="0.00" />
+							<input type="text" readonly id="txtExaminationPrice2" name="txtExaminationPrice2" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" class="form-control-custom" style="text-align: right;" value="0.00" />
 						</div>
 					</div>
 					<br />
@@ -128,7 +128,7 @@
 								Harga:
 							</div>
 							<div class="col-md-8">
-								<input type="text" id="txtExaminationPrice" name="txtExaminationPrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" class="form-control-custom" style="text-align: right;" value="0.00" />
+								<input type="text" readonly id="txtExaminationPrice" name="txtExaminationPrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" class="form-control-custom" style="text-align: right;" value="0.00" />
 							</div>
 						</div>
 						<br />
@@ -185,7 +185,7 @@
 				$("#hdnMedicationDetailsID").val(MedicationDetailsID);
 				$("#ExaminationName2").html(ExaminationName);
 				$("#txtQuantity2").val(Quantity);
-				$("#txtExaminationPrice2").val(Price);
+				$("#txtExaminationPrice2").val(returnRupiah(Price));
 				$("#txtRemarks2").val(Remarks);
 				$("#dialog-edit-medication").dialog({
 					autoOpen: false,
