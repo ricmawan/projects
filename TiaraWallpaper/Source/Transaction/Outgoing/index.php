@@ -27,9 +27,7 @@
 										<th data-column-id="OutgoingNumber">No Nota</th>
 										<th data-column-id="TransactionDate" data-type="numeric">Tanggal</th>
 										<th data-column-id="CustomerName">Nama Pelanggan</th>
-										<!--<th data-column-id="SalesName">Nama Sales</th>-->
 										<th data-column-id="DeliveryCost" data-align="right">Ongkos Kirim</th>
-										<!--<th data-column-id="SubTotal" data-align="right">Sub Total</th>-->
 										<th data-column-id="Total" data-align="right">Total</th>
 										<th data-column-id="Remarks">Catatan</th>
 										<th data-column-id="Opsi" data-formatter="commands" data-sortable="false">Opsi</th>
@@ -69,6 +67,38 @@
 						</div>
 						<div class="col-md-8">
 							<input type="text" id="txtDeliveryCost" style="text-align:right;"  onclick="this.select();"  name="txtDeliveryCost" class="form-control-custom" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" />
+						</div>
+					</div>
+					<br />
+				</div>
+			</div>
+			<div id="dialog-payment" title="Pembayaran" style="display: none;" >
+				<div class="col-md-12">
+					<input type="hidden" id="hdnOutgoingID2" name="hdnOutgoingID2" value=0 autofocus="autofocus" />
+					<div class="row" >
+						<div class="col-md-4 labelColumn" >
+							No Nota:
+						</div>
+						<div class="col-md-8">
+							<span id="lblOutgoingNumber2" style="font-weight: bold; font-size: 15px; color: red;"></span>
+						</div>
+					</div>
+					<br />
+					<div class="row" >
+						<div class="col-md-4 labelColumn" >
+							Pelanggan:
+						</div>
+						<div class="col-md-8">
+							<span id="lblCustomerName2" style="font-weight: bold; font-size: 15px; color: red;"></span>
+						</div>
+					</div>
+					<br />
+					<div class="row" >
+						<div class="col-md-4 labelColumn" >
+							Jumlah Pembayaran:
+						</div>
+						<div class="col-md-8">
+							<input type="text" id="txtAmount" name="txtAmount" style="text-align:right;" onclick="this.select();" class="form-control-custom" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" />
 						</div>
 					</div>
 					<br />
@@ -139,6 +169,11 @@
 							grid.find(".fa-ship").on("click", function(e)
 							{
 								DeliveryCost($(this).data("row-id"), $(this).data("outgoing-number"), $(this).data("customer-name"), $(this).data("delivery-cost"));
+							});
+							
+							grid.find(".fa-usd").on("click", function(e)
+							{
+								Payment($(this).data("row-id"), $(this).data("outgoing-number"), $(this).data("customer-name"));
 							});
 						});
 			});
@@ -213,6 +248,84 @@
 							$("#loading").show();
 							$.ajax({
 								url: "./Transaction/Outgoing/UpdateDeliveryCost.php",
+								type: "POST",
+								data: { OutgoingID : $("#hdnOutgoingID").val(), txtDeliveryCost : $("#txtDeliveryCost").val() },
+								dataType: "json",
+								success: function(data) {
+									$("#loading").hide();
+									if(data.FailedFlag == '0') {
+										$.notify(data.Message, "success");
+										$("#dialog-delivery").dialog("destroy");
+										$("#grid-data").bootgrid("reload");
+									}
+									else {
+										$.notify(data.Message, "error");					
+									}
+								},
+								error: function(data) {
+									$("#loading").hide();
+									$.notify("Terjadi kesalahan sistem!", "error");
+								}
+							});
+						},
+						"Batal": function() {
+							$(this).dialog("destroy");
+							return false;
+						}
+					}
+				}).dialog("open");
+			}
+			
+			function Payment(ID, OutgoingNumber, CustomerName) {
+				$("#lblOutgoingNumber2").html("");
+				$("#lblCustomerName2").html("");
+				$("#lblOutgoingNumber2").html(OutgoingNumber);
+				$("#lblCustomerName2").html(CustomerName);
+				$("#hdnOutgoingID2").val(ID);
+				$("#loading").show();
+				$.ajax({
+					url: "./Transaction/Outgoing/Payment.php",
+					type: "POST",
+					data: { OutgoingID : $("#hdnOutgoingID").val(), txtDeliveryCost : $("#txtDeliveryCost").val() },
+					dataType: "json",
+					success: function(data) {
+						$("#loading").hide();
+						if(data.FailedFlag == '0') {
+							$.notify(data.Message, "success");
+							$("#dialog-delivery").dialog("destroy");
+							$("#grid-data").bootgrid("reload");
+						}
+						else {
+							$.notify(data.Message, "error");					
+						}
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Terjadi kesalahan sistem!", "error");
+					}
+				});
+				$("#dialog-payment").dialog({
+					autoOpen: false,
+					show: {
+						effect: "fade",
+						duration: 500
+					},
+					hide: {
+						effect: "fade",
+						duration: 500
+					},
+					resizable: false,
+					height: "auto",
+					width: 400,
+					close: function() {
+						$(this).dialog("destroy");
+					},
+					modal: true,
+					buttons: {
+						"Simpan": function() {
+							$("#loading").show();
+							$.ajax({
+								url: "./Transaction/Outgoing/Payment.php",
 								type: "POST",
 								data: { OutgoingID : $("#hdnOutgoingID").val(), txtDeliveryCost : $("#txtDeliveryCost").val() },
 								dataType: "json",

@@ -252,6 +252,15 @@
 								<div class="col-md-3">
 									<input type="text" id="txtOutgoingNumber" name="txtOutgoingNumber" class="form-control-custom" readonly <?php echo 'value="'.$OutgoingNumber.'"'; ?> />
 								</div>
+								<div class="col-md-1 labelColumn">
+									Pembayaran:
+								</div>
+								<div class="col-md-3">
+									<select id="ddlPaymentMethod" name="ddlPaymentMethod" class="form-control-custom" >
+										<option value=1 >Cash</option>
+										<option value=2 >Tempo</option>
+									</select>
+								</div>
 							</div>
 							<br />
 							<div class="row">
