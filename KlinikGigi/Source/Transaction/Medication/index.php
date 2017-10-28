@@ -44,6 +44,9 @@
 			<div id="dialog-delete-examination" title="Konfirmasi" style="display: none;">
 				<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 40px 0;"></span>Apakah anda yakin ingin menghapus tindakan <span style="font-weight: bold; font-size: 18px; color: red;" id="ExaminationName"></span>?</p>
 			</div>
+			<div id="dialog-delete-material" title="Konfirmasi" style="display: none;">
+				<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 40px 0;"></span>Apakah anda yakin ingin menghapus material <span style="font-weight: bold; font-size: 18px; color: red;" id="MaterialName"></span>?</p>
+			</div>
 			<div id="dialog-edit-medication" title="Edit Tindakan" style="display: none;">
 				<form class="col-md-12" id="EditForm" method="POST" action="" >
 					<input type="hidden" id="hdnMedicationDetailsID" name="hdnMedicationDetailsID" value=0 autofocus="autofocus" />
@@ -91,6 +94,7 @@
 				<div id="left-side" style="display: inline-block;width: 30%; height: 100%; float: left;">
 					<form class="col-md-12" id="PostForm" method="POST" action="" >
 						<input type="hidden" id="hdnMedicationID" name="hdnMedicationID" value=0 />
+						<input type="hidden" id="hdnSessionID2" name="hdnSessionID2" class="hdnSessionID" value=0 />
 						<div class="row" >
 							<div class="col-md-3 labelColumn" >
 								Pasien:
@@ -104,7 +108,7 @@
 							<div class="col-md-3 labelColumn" >
 								Tindakan:
 							</div>
-							<div class="col-md-8" >
+							<div class="col-md-6" >
 								<div class="ui-widget" style="width: 100%;">
 									<select name="ddlExamination" id="ddlExamination" class="form-control-custom" placeholder="Pilih Tindakan" >
 										<option value="" selected> </option>
@@ -120,6 +124,9 @@
 										?>
 									</select>
 								</div>
+							</div>
+							<div class="col-md-2" >
+								<i style='cursor:pointer;' class="fa fa-cubes" acronym title="Tambah Material" onclick="MaterialPopUp()"></i>
 							</div>
 						</div>
 						<br />
@@ -162,6 +169,8 @@
 				</form>
 				<div style=" width:1px; background-color:#000; position:absolute; top:0; bottom:0; left:calc(30% - 10px);float:left;">
 				</div>
+				<div style=" width:1px; background-color:#000; position:absolute; top:0; bottom:0; left:calc(30% - 12px);float:left;">
+				</div>
 				<div id="right-side" style="display: inline-block; width: calc(70% - 5px); height: 100%; float: left;">
 					Tindakan Sebelumnya: 
 					<table class="table table-striped table-bordered table-hover" style="width:auto;padding-right:17px;" id="datainput">
@@ -179,8 +188,228 @@
 					</table>
 				</div>
 			</div>
+			
+			<div id="dialog-material" title="Tambah Material" style="display: none;">
+				<div id="left-side" style="display: inline-block;width: 30%; height: 100%; float: left;">
+					<form class="col-md-12" id="MaterialForm" method="POST" action="" >
+						<input type="hidden" id="hdnSessionID" name="hdnSessionID" class="hdnSessionID" value=0 />
+						<input type="hidden" id="hdnTotalMaterial" name="hdnTotalMaterial" value=0 />
+						<div class="row" >
+							<div class="col-md-3 labelColumn" >
+								Tindakan:
+							</div>
+							<div class="col-md-8">
+								<span id="examintaionName" style="font-weight: bold; font-size: 15px; color: red;"></span>
+							</div>
+						</div>
+						<br />
+						<div class="row" >
+							<div class="col-md-3 labelColumn" >
+								Material:
+							</div>
+							<div class="col-md-8" >
+								<div class="ui-widget" style="width: 100%;">
+									<select name="ddlMaterial" id="ddlMaterial" class="form-control-custom" placeholder="Pilih Material" >
+										<option value="" selected> </option>
+										<?php
+											$sql = "SELECT MaterialID, MaterialName, SalePrice FROM master_material";
+											if(!$result = mysql_query($sql, $dbh)) {
+												echo mysql_error();
+												return 0;
+											}
+											while($row = mysql_fetch_array($result)) {
+												echo "<option value='".$row['MaterialID']."' saleprice=".$row['SalePrice']." >".$row['MaterialName']."</option>";
+											}
+										?>
+									</select>
+								</div>
+							</div>
+						</div>
+						<br />
+						<div class="row" >
+							<div class="col-md-3 labelColumn" >
+								Harga:
+							</div>
+							<div class="col-md-8">
+								<input type="text" readonly id="txtMaterialPrice" name="txtMaterialPrice" onchange="Calculate();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" class="form-control-custom" style="text-align: right;" value="0.00" />
+							</div>
+						</div>
+						<br />
+						<div class="row" >
+							<div class="col-md-3 labelColumn" >
+								Jumlah:
+							</div>
+							<div class="col-md-8">
+								<input type="text" autocomplete="off" id="txtMaterialQuantity" name="txtMaterialQuantity" onkeypress="return isNumberKey(event)" onchange="CalculateMaterial();" class="form-control-custom" style="text-align: right;" value=1 />
+							</div>
+						</div>
+						<br />
+						<div class="row" >
+							<div class="col-md-3 labelColumn" >
+								Total:
+							</div>
+							<div class="col-md-8">
+								<input type="text" id="txtMaterialTotal" name="txtMaterialTotal" class="form-control-custom" style="text-align: right;" readonly value="0.00" />
+							</div>
+						</div>
+						<br />
+						<div class="row" >
+							<div class="col-md-3 labelColumn" >
+								Keterangan:
+							</div>
+							<div class="col-md-8">
+								<textarea id="txtMaterialRemarks" name="txtMaterialRemarks" class="form-control-custom" ></textarea>
+							</div>
+						</div>
+					</div>
+				</form>
+				<div style=" width:1px; background-color:#000; position:absolute; top:0; bottom:0; left:calc(30% - 10px);float:left;">
+				</div>
+				<div style=" width:1px; background-color:#000; position:absolute; top:0; bottom:0; left:calc(30% - 12px);float:left;">
+				</div>
+				<div id="right-side" style="display: inline-block; width: calc(70% - 5px); height: 100%; float: left;">
+					Material yang dipakai: 
+					<table class="table table-striped table-bordered table-hover" style="width:auto;padding-right:17px;" id="datainput">
+						<thead style="background-color: red;color:white;height:25px;display:block;width:810px;">
+							<td align="center" style="width:36px;">No</td>
+							<td align="center" style="width: 200px;" >Material</td>
+							<td align="center" style="width: 80px;" >Jumlah</td>
+							<td align="center" style="width: 100px;" >Harga</td>
+							<td align="center" style="width: 125px;" >Total</td>
+							<td align="center" style="width: 210px;" >Keterangan</td>
+							<td align="center" style="width: 60px;" >Opsi</td>
+						</thead>
+						<tbody style="display:block;max-height:200px;height:100%;overflow-y:auto;" id="materialTable">
+						</tbody>
+					</table>
+				</div>
+			</div>
 		</div>
 		<script>
+			function guid() {
+				function s4() {
+					return Math.floor((1 + Math.random()) * 0x10000)
+					.toString(16)
+					.substring(1);
+				}
+				return s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4();
+			}
+
+			function MaterialPopUp() {
+				var ddlExamination = $("#ddlExamination").val();
+				if(ddlExamination == "") {
+					$.notify("Mohon pilih tindakan terlebih dahulu!", "error");
+				}
+				else {
+					$("#hdnTotalMaterial").val(0);
+					LoadMaterialDetails($("#hdnSessionID").val());
+					$("#examintaionName").html($("#ddlExamination option:selected").text());
+					$("#ddlMaterial").val("");
+					$("#ddlMaterial").next().find("input").val("");
+					$("#txtMaterialPrice").val("0.00");
+					$("#txtMaterialTotal").val("0.00");
+					$("#txtMaterialQuantity").val(1);
+					$("#txtMaterialRemarks").val("");
+					$("#dialog-material").dialog({
+						autoOpen: false,
+						show: {
+							effect: "fade",
+							duration: 500
+						},
+						hide: {
+							effect: "fade",
+							duration: 500
+						},
+						resizable: false,
+						height: "auto",
+						width: 1200,
+						modal: true,
+						close: function() {
+							$(this).dialog("destroy");
+							Calculate();
+						},
+						buttons: {
+							"Simpan": function() {
+								//$(this).dialog("close");
+								$("#dialog-confirm").dialog({
+									autoOpen: false,
+									show: {
+										effect: "fade",
+										duration: 500
+									},
+									hide: {
+										effect: "fade",
+										duration: 500
+									},
+									resizable: false,
+									height: "auto",
+									width: 400,
+									modal: true,
+									close: function() {
+										$(this).dialog("destroy");
+									},
+									buttons: {
+										"Ya": function() {
+											$(this).dialog("destroy");
+											var PassValidate = 1;
+											if($("#ddlMaterial").val() == "") {
+												PassValidate = 0;
+												$("#ddlMaterial").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+												if(FirstFocus == 0) $("#ddlMaterial").next().find("input").focus();
+												FirstFocus = 1;
+											}
+											
+											if($("#txtMaterialQuantity").val() == "") {
+												$("#txtMaterialQuantity").val(1);
+												Calculate();
+											}
+											if(PassValidate == 0) return false;
+											else {
+												$("#loading").show();
+												$.ajax({
+													url: "./Transaction/Medication/InsertMaterial.php",
+													type: "POST",
+													data: $("#MaterialForm").serialize(),
+													dataType: "json",
+													success: function(data) {
+														$("#loading").hide();
+														if(data.FailedFlag == '0') {
+															$.notify(data.Message, "success");
+															$("#ddlMaterial").val("");
+															$("#ddlMaterial").next().find("input").val("");
+															$("#txtMaterialPrice").val("0.00");
+															$("#txtMaterialTotal").val("0.00");
+															$("#txtMaterialQuantity").val(1);
+															$("#txtMaterialRemarks").val("");
+															LoadMaterialDetails($("#hdnSessionID").val());
+														}
+														else {
+															$.notify(data.Message, "error");					
+														}
+													},
+													error: function(data) {
+														$("#loading").hide();
+														$.notify("Terjadi kesalahan sistem!", "error");
+													}
+												});
+											}
+										},
+										"Tidak": function() {
+											$(this).dialog("destroy");
+											return false;
+										}
+									}
+								}).dialog("open");
+							},
+							"Tutup": function() {
+								$(this).dialog("destroy");
+								Calculate();
+							}
+						}
+					}).dialog("open");
+				}
+			}
+			
 			function EditData(MedicationID, MedicationDetailsID, Quantity, Price, Remarks, ExaminationName) {
 				$("#hdnMedicationDetailsID").val(MedicationDetailsID);
 				$("#ExaminationName2").html(ExaminationName);
@@ -234,6 +463,58 @@
 						}
 					}
 				}).dialog("open");
+			}
+			function DeleteMaterial(SessionID, MaterialDetailsID, MaterialName) {
+				$("#MaterialName").html(MaterialName);
+				$("#dialog-delete-material").dialog({
+					autoOpen: false,
+					show: {
+						effect: "fade",
+						duration: 500
+					},
+					hide: {
+						effect: "fade",
+						duration: 500
+					},
+					resizable: false,
+					height: "auto",
+					width: 400,
+					modal: true,
+					close: function() {
+						$(this).dialog("destroy");
+					},
+					buttons: {
+						"Ya": function() {
+							$(this).dialog("destroy");
+							$.ajax({
+								url: "./Transaction/Medication/DeleteMaterial.php",
+								type: "POST",
+								data: { ID : MaterialDetailsID },
+								dataType: "html",
+								success: function(data) {
+									$("#loading").hide();
+									var datadelete = data.split("+");
+									var berhasil = datadelete[0];
+									var gagal = datadelete [1];
+									if(berhasil!="") {
+										$.notify(berhasil, "success");
+										LoadMaterialDetails(SessionID);
+									}
+									if(gagal!="") $.notify(gagal, "error");
+								},
+								error: function(data) {
+									$("#loading").hide();
+									$.notify("Terjadi kesalahan sistem!", "error");
+								}
+							});
+						},
+						"Tidak": function() {
+							$(this).dialog("destroy");
+							return false;
+						}
+					}
+				}).dialog("open");
+						
 			}
 			
 			function DeleteExamination(MedicationID, MedicationDetailsID, ExaminationName) {
@@ -311,6 +592,30 @@
 				});
 			}
 			
+			function LoadMaterialDetails(SessionID) {				
+				$("#loading").show();
+				$.ajax({
+					url: "./Transaction/Medication/MaterialDetail.php",
+					type: "POST",
+					data: { SessionID : SessionID },
+					dataType: "json",
+					success: function(data) {
+						$("#loading").hide();
+						if(data.FailedFlag == '0') {
+							$("#materialTable").html(data.MaterialDetails);
+							$("#hdnTotalMaterial").val(data.Total);
+						}
+						else {
+							$.notify(data.Message, "error");					
+						}
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Terjadi kesalahan sistem!", "error");
+					}
+				});
+			}
+			
 			function Calculate() {
 				var price = $("#txtExaminationPrice").val().replace(/\,/g, "");
 				var qty = $("#txtQuantity").val();
@@ -319,7 +624,20 @@
 					$("#txtQuantity").val(1);
 				}
 				var Total = parseFloat(price) * parseFloat(qty);
+				var TotalMaterial = parseFloat($("#hdnTotalMaterial").val());
+				Total += TotalMaterial;
 				$("#txtTotal").val(returnRupiah(Total.toFixed(2).toString()));
+			}
+			
+			function CalculateMaterial() {
+				var price = $("#txtMaterialPrice").val().replace(/\,/g, "");
+				var qty = $("#txtMaterialQuantity").val();
+				if(qty == "") {
+					qty = 1;
+					$("#txtMaterialQuantity").val(1);
+				}
+				var Total = parseFloat(price) * parseFloat(qty);
+				$("#txtMaterialTotal").val(returnRupiah(Total.toFixed(2).toString()));
 			}
 						
 			$(document).ready(function() {
@@ -327,6 +645,13 @@
 					select: function( event, ui ) {
 						$("#txtExaminationPrice").val(returnRupiah($("#ddlExamination option:selected").attr("price")));
 						Calculate();
+					}
+				});
+				
+				$("#ddlMaterial").combobox({
+					select: function( event, ui ) {
+						$("#txtMaterialPrice").val(returnRupiah($("#ddlMaterial option:selected").attr("saleprice")));
+						CalculateMaterial();
 					}
 				});
 				var grid = $("#grid-data").bootgrid({
@@ -364,7 +689,15 @@
 							{
 								$("#patientName").html($(this).data("patient-name"));
 								$("#hdnMedicationID").val($(this).data("row-id"));
+								$("#hdnTotalMaterial").val(0);
 								LoadMedicationDetails($(this).data("row-id"));
+								$("#ddlExamination").val("");
+								$("#ddlExamination").next().find("input").val("");
+								$("#txtExaminationPrice").val("0.00");
+								$("#txtTotal").val("0.00");
+								$("#txtQuantity").val(1);
+								$("#txtRemarks").val("");
+								$(".hdnSessionID").val(guid());
 								$("#dialog-medication").dialog({
 									autoOpen: false,
 									show: {
@@ -435,6 +768,8 @@
 																		$("#txtTotal").val("0.00");
 																		$("#txtQuantity").val(1);
 																		$("#txtRemarks").val("");
+																		$(".hdnSessionID").val(guid());
+																		$("#hdnTotalMaterial").val(0);
 																		LoadMedicationDetails($("#hdnMedicationID").val());
 																	}
 																	else {

@@ -1,15 +1,14 @@
 <?php
-	if(isset($_POST['hdnMedicationID'])) {
+	if(isset($_POST['hdnSessionID'])) {
 		$RequestPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestPath);
 		$RequestPath = str_replace($file, "", $RequestPath);
 		include "../../GetPermission.php";
-		$ID = mysql_real_escape_string($_POST['hdnMedicationID']);
-		$SessionID = mysql_real_escape_string($_POST['hdnSessionID2']);
-		$txtRemarks = mysql_real_escape_string($_POST['txtRemarks']);
-		$ExaminationID = mysql_real_escape_string($_POST['ddlExamination']);
-		$Quantity = mysql_real_escape_string($_POST['txtQuantity']);
-		$Price = str_replace(",", "", $_POST['txtExaminationPrice']);
+		$ID = mysql_real_escape_string($_POST['hdnSessionID']);
+		$txtRemarks = mysql_real_escape_string($_POST['txtMaterialRemarks']);
+		$MaterialID = mysql_real_escape_string($_POST['ddlMaterial']);
+		$Quantity = mysql_real_escape_string($_POST['txtMaterialQuantity']);
+		$Price = str_replace(",", "", $_POST['txtMaterialPrice']);
 		$State = 1;
 		mysql_query("START TRANSACTION", $dbh);
 		mysql_query("SET autocommit=0", $dbh);
@@ -18,47 +17,29 @@
 		$FailedFlag = 0;
 		//echo $DetailID;		
 		$State = 1;
-		$sql = "INSERT INTO transaction_medicationdetails
+		$sql = "INSERT INTO transaction_materialdetails
 				(
-					DoctorID,
-					ExaminationID,
-					MedicationID,
+					MedicationDetailsID,
+					MaterialID,
 					Remarks,
-					Price,
+					SalePrice,
 					Quantity,
+					SessionID,
 					CreatedDate,
 					CreatedBy
 				)
 				VALUES
 				(
-					".$_SESSION['UserID'].",
-					".$ExaminationID.",
-					".$ID.",
+					0,
+					".$MaterialID.",
 					'".$txtRemarks."',
 					".$Price.",
 					".$Quantity.",
+					'".$ID."',
 					NOW(),
 					'".$_SESSION['UserLogin']."'
 				)";
 				
-		if (! $result = mysql_query($sql, $dbh)) {
-			$Message = "Terjadi Kesalahan Sistem";
-			$MessageDetail = mysql_error();
-			$FailedFlag = 1;
-			echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
-			mysql_query("ROLLBACK", $dbh);
-			return 0;
-		}
-		
-		$State = 2;
-		$last_id = mysql_insert_id();
-		$sql = "UPDATE transaction_materialdetails
-				SET
-					MedicationDetailsID = ".$last_id.",
-					ModifiedBy = '".$_SESSION['UserLogin']."'
-				WHERE
-					SessionID = '$SessionID'";
-					
 		if (! $result = mysql_query($sql, $dbh)) {
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysql_error();

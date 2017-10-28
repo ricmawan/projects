@@ -18,12 +18,23 @@
 					ME.ExaminationName,
 					TMD.Quantity,
 					TMD.Price,
-					(TMD.Price * TMD.Quantity) Total,
+					IFNULL(MD.Total, 0) + (TMD.Price * TMD.Quantity) AS Total,
 					TMD.Remarks
 				FROM
 					transaction_medicationdetails TMD
 					JOIN master_examination ME
 						ON ME.ExaminationID = TMD.ExaminationID
+					LEFT JOIN
+					(
+						SELECT
+							MD.MedicationDetailsID,
+							SUM(MD.SalePrice * MD.Quantity) Total
+						FROM
+							transaction_materialdetails MD
+						GROUP BY
+							MD.MedicationDetailsID
+					)MD
+						ON MD.MedicationDetailsID = TMD.MedicationDetailsID
 				WHERE
 					TMD.MedicationID = $MedicationID
 				ORDER BY
@@ -33,7 +44,7 @@
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysql_error();
 			$FailedFlag = 1;
-			echo returnstate($MedicationID, $Message, $MessageDetail, $FailedFlag, $State);
+			echo returnstate($MedicationID, $Message, $MessageDetail, $MedicationDetails, $FailedFlag, $State);
 			return 0;
 		}
 		$RowNumber = 1;
@@ -47,7 +58,7 @@
 			$MedicationDetails .= "<td align='left' style='width: 210px;' >".$row['Remarks']."</td>";
 			$MedicationDetails .= '<td align="center" style="vertical-align:middle;width: 60px;">
 										<i style="cursor:pointer;" class="fa fa-edit" onclick="EditData('.$MedicationID.', '.$row['MedicationDetailsID'].', '.$row['Quantity'].', \''.number_format($row['Price'],2,".",",").'\', \''.$row['Remarks'].'\', \''.$row['ExaminationName'].'\');" acronym title="Ubah Data"></i>
-										&nbsp;&nbsp;<i class="fa fa-close btnDelete" onclick="DeleteExamination('.$MedicationID.', '.$row['MedicationDetailsID'].', \''.$row['ExaminationName'].'\');" style="cursor:pointer;" acronym title="Hapus Data" onclick="DeleteRow(this.getAttribute(\'row\'))"></i>
+										&nbsp;&nbsp;<i class="fa fa-close btnDelete" onclick="DeleteExamination('.$MedicationID.', '.$row['MedicationDetailsID'].', \''.$row['ExaminationName'].'\');" style="cursor:pointer;" acronym title="Hapus Data" ></i>
 									</td>';
 			$MedicationDetails .= "</tr>";
 			$RowNumber++;
