@@ -148,6 +148,33 @@ VALUES
 	NULL,
 	0,
 	5
+),
+(
+	15,
+	2,
+	'Material',
+	'Master/Material/',
+	NULL,
+	0,
+	5
+),
+(
+	16,
+	3,
+	'Pembelian Material',
+	'Transaction/IncomingMaterial/',
+	NULL,
+	0,
+	4
+),
+(
+	17,
+	4,
+	'Pembelian Material',
+	'Report/IncomingMaterial/',
+	NULL,
+	0,
+	4
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

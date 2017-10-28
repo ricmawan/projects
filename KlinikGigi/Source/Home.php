@@ -169,7 +169,7 @@
 		<script src="assets/js/dataTables/dataTables.bootstrap.js"></script>-->
 		<script src="assets/js/bootstrap-multiselect.js"></script>
 		<a href="#Top" class="scrollup" onclick="return false;">Scroll</a>
-		<a href="#Bottom" class="scrolldown" onclick="return false;">Scroll</a>
+		<!--<a href="#Bottom" class="scrolldown" onclick="return false;">Scroll</a>-->
 		<div id="loading"></div>
 		<iframe id='excelDownload' src='' style='display:none'></iframe>
 		<script type="text/javascript">
