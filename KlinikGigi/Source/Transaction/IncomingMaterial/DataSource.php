@@ -4,8 +4,33 @@
 	$file = basename($RequestPath);
 	$RequestPath = str_replace($file, "", $RequestPath);
 	include "../../GetPermission.php";
-
-	$where = " 1=1 ";
+	
+	if($_GET['Filter'] == "1") {
+		if($_GET['txtFromDate'] == "") {
+			$txtFromDate = "2000-01-01";
+		}
+		else {
+			$FromDate = explode(', ', mysql_real_escape_string($_GET['txtFromDate']));
+			$txtFromDate = explode('-', $FromDate[1]);
+			$_GET['txtFromDate'] = "$txtFromDate[2]-$txtFromDate[1]-$txtFromDate[0]"; 
+			$txtFromDate = $_GET['txtFromDate'];
+		}
+		if($_GET['txtToDate'] == "") {
+			$txtToDate = date("Y-m-d");
+		}
+		else {
+			$ToDate = explode(', ', mysql_real_escape_string($_GET['txtToDate']));
+			$txtToDate = explode('-', $ToDate[1]);
+			$_GET['txtToDate'] = "$txtToDate[2]-$txtToDate[1]-$txtToDate[0]"; 
+			$txtToDate = $_GET['txtToDate'];
+		}
+	}
+	else {
+		$txtToDate = "2099-12-31";
+		$txtFromDate = "2000-01-01";
+	}
+	$where = " 1=1 AND IT.TransactionDate BETWEEN '".$txtFromDate."' AND '".$txtToDate."' ";
+	
 	$order_by = "IT.TransactionDate DESC";
 	$rows = 10;
 	$current = 1;
