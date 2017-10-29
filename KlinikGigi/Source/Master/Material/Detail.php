@@ -7,7 +7,7 @@
 		//echo $_SERVER['REQUEST_URI'];		
 		$MaterialID = mysql_real_escape_string($_GET['ID']);
 		$MaterialName = "";
-		$Price = 0.00;
+		$SalePrice = 0.00;
 		$IsEdit = 0;
 		
 		if($MaterialID != 0) {
@@ -16,7 +16,7 @@
 			$sql = "SELECT
 						MaterialID,
 						MaterialName,
-						Price
+						SalePrice
 					FROM
 						master_material
 					WHERE
@@ -29,7 +29,7 @@
 			$row=mysql_fetch_array($result);
 			$MaterialID = $row['MaterialID'];
 			$MaterialName = $row['MaterialName'];
-			$Price = $row['Price'];
+			$SalePrice = $row['SalePrice'];
 		}
 	}
 ?>
@@ -61,7 +61,7 @@
 									Harga :
 								</div>
 								<div class="col-md-3">
-									<input id="txtPrice" name="txtPrice" type="text" class="form-control-custom" placeholder="Harga" style="text-align:right;" <?php echo 'value="'.number_format($Price,2,".",",").'"'; ?> onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" />
+									<input id="txtSalePrice" name="txtSalePrice" type="text" class="form-control-custom" placeholder="Harga" style="text-align:right;" <?php echo 'value="'.number_format($SalePrice,2,".",",").'"'; ?> onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" />
 								</div>
 							</div>
 							<br />

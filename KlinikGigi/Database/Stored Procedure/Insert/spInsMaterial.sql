@@ -4,7 +4,7 @@ DELIMITER $$
 CREATE PROCEDURE spInsMaterial (
 	pID 				BIGINT, 
 	pMaterialName 	VARCHAR(255),
-	pPrice				DOUBLE,
+	pSalePrice				DOUBLE,
 	pIsEdit				INT,
     pCurrentUser		VARCHAR(255)
 )
@@ -67,13 +67,13 @@ SET State = 3;
 				INSERT INTO master_material
 				(
 					MaterialName,
-					Price,
+					SalePrice,
 					CreatedDate,
 					CreatedBy
 				)
 				VALUES (
 					pMaterialName,
-					pPrice,
+					pSalePrice,
 					NOW(),
 					pCurrentUser
 				);
@@ -91,7 +91,7 @@ SET State = 5;
 					master_material
 				SET
 					MaterialName = pMaterialName,
-					Price = pPrice,
+					SalePrice = pSalePrice,
 					ModifiedBy = pCurrentUser
 				WHERE
 					MaterialID = pID;

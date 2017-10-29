@@ -7,12 +7,12 @@
 		$MaterialID = mysql_real_escape_string($_POST['hdnMaterialID']);
 		$MaterialName = mysql_real_escape_string($_POST['txtMaterialName']);
 		$hdnIsEdit = mysql_real_escape_string($_POST['hdnIsEdit']);
-		$Price = str_replace(",", "", $_POST['txtPrice']);
+		$SalePrice = str_replace(",", "", $_POST['txtSalePrice']);
 		$Message = "Data gagal dimasukkan, cek koneksi internet dan coba lagi!";
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
-		$sql = "CALL spInsMaterial(".$MaterialID.", '".$MaterialName."', ".$Price.", ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsMaterial(".$MaterialID.", '".$MaterialName."', ".$SalePrice.", ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
 		
 		if (! $result=mysql_query($sql, $dbh)) {
 			$Message = "Terjadi Kesalahan Sistem";

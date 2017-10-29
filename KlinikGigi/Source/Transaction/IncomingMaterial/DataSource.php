@@ -6,7 +6,7 @@
 	include "../../GetPermission.php";
 
 	$where = " 1=1 ";
-	$order_by = "MaterialID";
+	$order_by = "IT.TransactionDate DESC";
 	$rows = 10;
 	$current = 1;
 	$limit_l = ($current * $rows) - ($rows);
@@ -17,14 +17,14 @@
 		$order_by = "";
 		foreach($_REQUEST['sort'] as $key => $value) {
 			if($key != 'No') $order_by .= " $key $value";
-			else $order_by = "MaterialID";
+			else $order_by = "IT.TransactionDate DESC";
 		}
 	}
 	//Handles search querystring sent from Bootgrid
 	if (ISSET($_REQUEST['searchPhrase']) )
 	{
 		$search = trim($_REQUEST['searchPhrase']);
-		$where .= " AND ( MaterialName LIKE '%".$search."%' OR SalePrice LIKE '%".$search."%' )";
+		$where .= " AND ( ITD.Remarks LIKE '%".$search."%' OR MM.MaterialName LIKE '%".$search."%' OR ITD.SupplierName LIKE '%".$search."%' OR DATE_FORMAT(IT.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' ) ";
 	}
 	//Handles determines where in the paging count this result set falls in
 	if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];
@@ -37,13 +37,17 @@
 	}
 	if ($rows == -1) $limit = ""; //no limit
 	else $limit = " LIMIT $limit_l, $limit_h ";
-	//echo "$limit_l $limit_h";
 	$sql = "SELECT
-				COUNT(1) AS nRows
+				COUNT(*) AS nRows
 			FROM
-				master_material
+				transaction_incoming IT
+				JOIN transaction_incomingdetails ITD
+					ON IT.IncomingID = ITD.IncomingID
+				JOIN master_material MM
+					ON MM.MaterialID = ITD.MaterialID
 			WHERE
 				$where";
+	
 	if (! $result = mysql_query($sql, $dbh)) {
 		echo mysql_error();
 		return 0;
@@ -51,11 +55,19 @@
 	$row = mysql_fetch_array($result);
 	$nRows = $row['nRows'];
 	$sql = "SELECT
-				MaterialID,
-				MaterialName,
-				SalePrice
+				IT.IncomingID,
+				ITD.IncomingDetailsID,
+				MM.MaterialName,
+				ITD.SupplierName,
+				DATE_FORMAT(IT.TransactionDate, '%d-%m-%Y') AS TransactionDate,
+				ITD.Remarks,
+				ITD.Quantity
 			FROM
-				master_material
+				transaction_incoming IT
+				JOIN transaction_incomingdetails ITD
+					ON IT.IncomingID = ITD.IncomingID
+				JOIN master_material MM
+					ON MM.MaterialID = ITD.MaterialID
 			WHERE
 				$where
 			ORDER BY 
@@ -70,13 +82,15 @@
 	while ($row = mysql_fetch_array($result)) {
 		$RowNumber++;
 		$row_array['RowNumber'] = $RowNumber;
-		$row_array['MaterialIDName'] = $row['MaterialID']."^".$row['MaterialName'];
-		$row_array['MaterialID'] = $row['MaterialID'];
+		$row_array['IncomingDetailsID']= $row['IncomingDetailsID'];
 		$row_array['MaterialName'] = $row['MaterialName'];
-		$row_array['SalePrice'] = number_format($row['SalePrice'],2,".",",");
+		$row_array['SupplierName'] = $row['SupplierName'];
+		$row_array['TransactionDate'] = $row['TransactionDate'];
+		$row_array['Quantity'] = $row['Quantity'];
+		$row_array['Remarks'] = $row['Remarks'];
 		array_push($return_arr, $row_array);
 	}
+
 	$json = json_encode($return_arr);
 	echo "{ \"current\": $current, \"rowCount\":$rows, \"rows\": ".$json.", \"total\": $nRows }";
-	
 ?>

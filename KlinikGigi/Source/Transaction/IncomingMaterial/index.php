@@ -10,24 +10,26 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						 <h5>Material</h5>
+						 <h5>Pembelian Material</h5>
 					</div>
 					<div class="panel-body">
 						<div class="table-responsive">
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
-										<th data-column-id="MaterialIDName" data-visible="false" data-type="numeric" data-identifier="true">MaterialID</th>
-										<th data-column-id="RowNumber" data-sortable="false" data-type="numeric">No</th>
-										<th data-column-id="MaterialName">Nama</th>
-										<th data-column-id="SalePrice" data-align="right">Harga</th>
+										<th data-column-id="IncomingDetailsID" data-type="numeric" data-visible="false" data-identifier="true">ID Transaksi</th>
+										<th data-column-id="TransactionDate" data-type="numeric">Tanggal</th>
+										<th data-column-id="MaterialName" data-type="numeric">Material</th>
+										<th data-column-id="SupplierName" data-type="numeric">Supplier</th>
+										<th data-column-id="Quantity" data-type="numeric">Jumlah</th>
+										<th data-column-id="Remarks">Keterangan</th>
 										<?php if($EditFlag == true) echo '<th data-column-id="Opsi" data-formatter="commands" data-sortable="false">Opsi</th>'; ?>
 									</tr>
 								</thead>
 							</table>
 						</div>
-						<button class="btn btn-primary menu" link="./Master/Material/Detail.php?ID=0"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
-						<?php if($DeleteFlag == true) echo '<button class="btn btn-danger" onclick="DeleteData(\'./Master/Material/Delete.php\');" ><i class="fa fa-close"></i> Hapus</button>'; ?>
+						<button class="btn btn-primary menu" link="./Transaction/IncomingMaterial/Detail.php?ID=0"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
+						<?php if($DeleteFlag == true) echo '<button class="btn btn-danger" onclick="DeleteData(\'./Transaction/IncomingMaterial/Delete.php\');" ><i class="fa fa-close"></i> Hapus</button>'; ?>
 					</div>
 				</div>
 			</div>
@@ -43,6 +45,9 @@
 									id: "b0df282a-0d67-40e5-8558-c9e93b7befed"
 								};
 							},
+							templates: {
+								search: ""
+							},
 							labels: {
 								all: "Semua Data",
 								infos: "Menampilkan {{ctx.start}} sampai {{ctx.end}} dari {{ctx.total}} data",
@@ -51,7 +56,7 @@
 								refresh: "Refresh",
 								search: "Cari"
 							},
-							url: "./Master/Material/DataSource.php",
+							url: "./Transaction/IncomingMaterial/DataSource.php",
 							selection: true,
 							multiSelect: true,
 							rowSelect: true,
@@ -59,7 +64,7 @@
 							formatters: {
 								"commands": function(column, row)
 								{
-									return "<i style='cursor:pointer;' data-row-id=\"" + row.MaterialID + "\" class=\"fa fa-edit\" data-link=\"./Master/Material/Detail.php?ID=" + row.MaterialID + "\" acronym title=\"Ubah Data\"></i>&nbsp;";
+									return "<i style='cursor:pointer;' data-row-id=\"" + row.IncomingID + "\" class=\"fa fa-edit\" data-link=\"./Transaction/IncomingMaterial/Detail.php?ID=" + row.IncomingID + "\" acronym title=\"Ubah Data\"></i>&nbsp;";
 								}
 							}
 						}).on("loaded.rs.jquery.bootgrid", function()
