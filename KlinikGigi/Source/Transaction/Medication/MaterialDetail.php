@@ -7,6 +7,7 @@
 		//echo $_SERVER['REQUEST_URI'];
 		$Content = "";
 		$SessionID = mysql_real_escape_string($_POST['SessionID']);
+		$EditFlag = mysql_real_escape_string($_POST['EditFlag']);
 		$Message = "";
 		$MaterialDetails = "";
 		$MessageDetail = "";
@@ -19,7 +20,8 @@
 					TMD.Quantity,
 					TMD.SalePrice,
 					(TMD.SalePrice * TMD.Quantity) Total,
-					TMD.Remarks
+					TMD.Remarks,
+					TMD.SessionID
 				FROM
 					transaction_materialdetails TMD
 					JOIN master_material MM
@@ -36,6 +38,7 @@
 			echo returnstate($SessionID, $Message, $MessageDetail, $MaterialDetails, $FailedFlag, $State, $Total);
 			return 0;
 		}
+		
 		$RowNumber = 1;
 		while ($row = mysql_fetch_array($result)) {
 			$MaterialDetails .= "<tr>";
@@ -46,7 +49,8 @@
 			$MaterialDetails .= "<td align='right' style='width: 125px;' >".number_format($row['Total'],2,".",",")."</td>";
 			$MaterialDetails .= "<td align='left' style='width: 210px;' >".$row['Remarks']."</td>";
 			$MaterialDetails .= '<td align="center" style="vertical-align:middle;width: 60px;">
-										<i class="fa fa-close btnDelete" onclick="DeleteMaterial(\''.$SessionID.'\', '.$row['MaterialDetailsID'].', \''.$row['MaterialName'].'\');" style="cursor:pointer;" acronym title="Hapus Data" ></i>
+										<i style="cursor:pointer;" class="fa fa-edit" onclick="EditMaterial('.$row['MaterialDetailsID'].', '.$row['Quantity'].', \''.number_format($row['SalePrice'],2,".",",").'\', \''.$row['Remarks'].'\', \''.$row['MaterialName'].'\', '.$EditFlag.');" acronym title="Ubah Data"></i>
+										&nbsp;&nbsp;<i class="fa fa-close btnDelete" onclick="DeleteMaterial(\''.$SessionID.'\', '.$row['MaterialDetailsID'].', \''.$row['MaterialName'].'\', '.$EditFlag.');" style="cursor:pointer;" acronym title="Hapus Data" ></i>
 									</td>';
 			$MaterialDetails .= "</tr>";
 			$RowNumber++;

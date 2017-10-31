@@ -9,6 +9,7 @@
 		$MaterialID = mysql_real_escape_string($_POST['ddlMaterial']);
 		$Quantity = mysql_real_escape_string($_POST['txtMaterialQuantity']);
 		$Price = str_replace(",", "", $_POST['txtMaterialPrice']);
+		$MedicationDetailsID = mysql_real_escape_string($_POST['hdnMedicationDetailsID2']);
 		$State = 1;
 		mysql_query("START TRANSACTION", $dbh);
 		mysql_query("SET autocommit=0", $dbh);
@@ -47,6 +48,23 @@
 			echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
 			mysql_query("ROLLBACK", $dbh);
 			return 0;
+		}
+		
+		if($MedicationDetailsID != 0) {
+			$sql = "UPDATE transaction_materialdetails
+					SET
+						MedicationDetailsID = ".$MedicationDetailsID.",
+						ModifiedBy = '".$_SESSION['UserLogin']."'
+					WHERE
+						SessionID = '$ID'";
+					
+			if (! $result = mysql_query($sql, $dbh)) {
+				$Message = "Terjadi Kesalahan Sistem";
+				$MessageDetail = mysql_error();
+				$FailedFlag = 1;
+				echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
+				return 0;
+			}
 		}
 		
 		echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);

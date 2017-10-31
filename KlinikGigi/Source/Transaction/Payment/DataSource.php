@@ -59,13 +59,25 @@
 				TM.PatientID,
 				MP.PatientName,
 				MP.Allergy,
-				SUM(TMD.Price * TMD.Quantity) Total
+				IFNULL(SUM(MD.Total), 0) + SUM(TMD.Price * TMD.Quantity) Total
 			FROM
 				transaction_medication TM
 				JOIN master_patient MP
 					ON MP.PatientID = TM.PatientID
 				LEFT JOIN transaction_medicationdetails TMD
 					ON TM.MedicationID = TMD.MedicationID
+				LEFT JOIN
+				(
+					SELECT
+						MD.MedicationDetailsID,
+						MD.SessionID,
+						SUM(MD.SalePrice * MD.Quantity) Total
+					FROM
+						transaction_materialdetails MD
+					GROUP BY
+						MD.MedicationDetailsID
+				)MD
+					ON MD.MedicationDetailsID = TMD.MedicationDetailsID
 			WHERE
 				$where
 			GROUP BY

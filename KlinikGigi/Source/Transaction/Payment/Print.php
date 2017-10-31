@@ -84,7 +84,7 @@
 							TMD.Price,
 							TM.Cash,
 							TM.Debit,
-							(TMD.Quantity * TMD.Price) SubTotal,
+							IFNULL(MD.Total, 0) + (TMD.Quantity * TMD.Price) SubTotal,
 							TMD.Remarks
 						FROM
 							transaction_medication TM
@@ -92,6 +92,18 @@
 								ON TM.MedicationID = TMD.MedicationID
 							JOIN master_examination ME
 								ON ME.ExaminationID = TMD.ExaminationID
+							LEFT JOIN
+							(
+								SELECT
+									MD.MedicationDetailsID,
+									MD.SessionID,
+									SUM(MD.SalePrice * MD.Quantity) Total
+								FROM
+									transaction_materialdetails MD
+								GROUP BY
+									MD.MedicationDetailsID
+							)MD
+								ON MD.MedicationDetailsID = TMD.MedicationDetailsID
 						WHERE
 							TM.MedicationID = ".$GLOBALS['ID'];
 							

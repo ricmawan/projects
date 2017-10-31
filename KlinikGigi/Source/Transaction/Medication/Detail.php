@@ -19,7 +19,8 @@
 					TMD.Quantity,
 					TMD.Price,
 					IFNULL(MD.Total, 0) + (TMD.Price * TMD.Quantity) AS Total,
-					TMD.Remarks
+					TMD.Remarks,
+					IFNULL(MD.SessionID, '-') SessionID
 				FROM
 					transaction_medicationdetails TMD
 					JOIN master_examination ME
@@ -28,6 +29,7 @@
 					(
 						SELECT
 							MD.MedicationDetailsID,
+							MD.SessionID,
 							SUM(MD.SalePrice * MD.Quantity) Total
 						FROM
 							transaction_materialdetails MD
@@ -55,9 +57,10 @@
 			$MedicationDetails .= "<td align='right' style='width: 80px;' >".$row['Quantity']."</td>";
 			$MedicationDetails .= "<td align='right' style='width: 100px;' >".number_format($row['Price'],2,".",",")."</td>";
 			$MedicationDetails .= "<td align='right' style='width: 125px;' >".number_format($row['Total'],2,".",",")."</td>";
-			$MedicationDetails .= "<td align='left' style='width: 210px;' >".$row['Remarks']."</td>";
-			$MedicationDetails .= '<td align="center" style="vertical-align:middle;width: 60px;">
+			$MedicationDetails .= "<td align='left' style='width: 180px;' >".$row['Remarks']."</td>";
+			$MedicationDetails .= '<td align="center" style="vertical-align:middle;width: 90px;">
 										<i style="cursor:pointer;" class="fa fa-edit" onclick="EditData('.$MedicationID.', '.$row['MedicationDetailsID'].', '.$row['Quantity'].', \''.number_format($row['Price'],2,".",",").'\', \''.$row['Remarks'].'\', \''.$row['ExaminationName'].'\');" acronym title="Ubah Data"></i>
+										&nbsp;&nbsp;<i style="cursor:pointer;" class="fa fa-cubes" onclick="MaterialPopUp(\''.$row['SessionID'].'\', \''.$row['ExaminationName'].'\', '.$row['MedicationDetailsID'].');" acronym title="Ubah Material"></i>
 										&nbsp;&nbsp;<i class="fa fa-close btnDelete" onclick="DeleteExamination('.$MedicationID.', '.$row['MedicationDetailsID'].', \''.$row['ExaminationName'].'\');" style="cursor:pointer;" acronym title="Hapus Data" ></i>
 									</td>';
 			$MedicationDetails .= "</tr>";

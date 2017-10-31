@@ -47,6 +47,48 @@
 			<div id="dialog-delete-material" title="Konfirmasi" style="display: none;">
 				<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 40px 0;"></span>Apakah anda yakin ingin menghapus material <span style="font-weight: bold; font-size: 18px; color: red;" id="MaterialName"></span>?</p>
 			</div>
+			
+			<div id="dialog-edit-material" title="Edit Material" style="display: none;">
+				<form class="col-md-12" id="MaterialEditForm" method="POST" action="" >
+					<input type="hidden" id="hdnMaterialDetailsID" name="hdnMaterialDetailsID" value=0 autofocus="autofocus" />
+					<div class="row" >
+						<div class="col-md-3 labelColumn" >
+							Material:
+						</div>
+						<div class="col-md-6" >
+							<span style="font-weight: bold; font-size: 18px; color: red;" id="MaterialName2"></span>
+						</div>
+					</div>
+					<br />
+					<div class="row" >
+						<div class="col-md-3 labelColumn" >
+							Harga:
+						</div>
+						<div class="col-md-6">
+							<input type="text" readonly id="txtMaterialPrice2" name="txtMaterialPrice2" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value)" onblur="convertRupiah(this.id, this.value)" class="form-control-custom" style="text-align: right;" value="0.00" />
+						</div>
+					</div>
+					<br />
+					<div class="row" >
+						<div class="col-md-3 labelColumn" >
+							Jumlah:
+						</div>
+						<div class="col-md-6">
+							<input type="text" autocomplete="off" id="txtMaterialQuantity2" name="txtMaterialQuantity2" onkeypress="return isNumberKey(event)" class="form-control-custom" style="text-align: right;" value=1 />
+						</div>
+					</div>
+					<br />
+					<div class="row" >
+						<div class="col-md-3 labelColumn" >
+							Keterangan:
+						</div>
+						<div class="col-md-6">
+							<textarea id="txtMaterialRemarks2" name="txtMaterialRemarks2" class="form-control-custom" ></textarea>
+						</div>
+					</div>
+				</form>
+			</div>
+			
 			<div id="dialog-edit-medication" title="Edit Tindakan" style="display: none;">
 				<form class="col-md-12" id="EditForm" method="POST" action="" >
 					<input type="hidden" id="hdnMedicationDetailsID" name="hdnMedicationDetailsID" value=0 autofocus="autofocus" />
@@ -126,7 +168,7 @@
 								</div>
 							</div>
 							<div class="col-md-2" >
-								<i style='cursor:pointer;' class="fa fa-cubes" acronym title="Tambah Material" onclick="MaterialPopUp()"></i>
+								<i style='cursor:pointer;' class="fa fa-cubes" acronym title="Tambah Material" onclick="MaterialPopUp(0, '', 0)"></i>
 							</div>
 						</div>
 						<br />
@@ -180,8 +222,8 @@
 							<td align="center" style="width: 80px;" >Jumlah</td>
 							<td align="center" style="width: 100px;" >Harga</td>
 							<td align="center" style="width: 125px;" >Total</td>
-							<td align="center" style="width: 210px;" >Keterangan</td>
-							<td align="center" style="width: 60px;" >Opsi</td>
+							<td align="center" style="width: 180px;" >Keterangan</td>
+							<td align="center" style="width: 90px;" >Opsi</td>
 						</thead>
 						<tbody style="display:block;max-height:200px;height:100%;overflow-y:auto;" id="tableContent">
 						</tbody>
@@ -193,6 +235,7 @@
 				<div id="left-side" style="display: inline-block;width: 30%; height: 100%; float: left;">
 					<form class="col-md-12" id="MaterialForm" method="POST" action="" >
 						<input type="hidden" id="hdnSessionID" name="hdnSessionID" class="hdnSessionID" value=0 />
+						<input type="hidden" id="hdnMedicationDetailsID2" name="hdnMedicationDetailsID2" value=0 autofocus="autofocus" />
 						<input type="hidden" id="hdnTotalMaterial" name="hdnTotalMaterial" value=0 />
 						<div class="row" >
 							<div class="col-md-3 labelColumn" >
@@ -286,6 +329,7 @@
 			</div>
 		</div>
 		<script>
+			var oldSession;
 			function guid() {
 				function s4() {
 					return Math.floor((1 + Math.random()) * 0x10000)
@@ -295,15 +339,28 @@
 				return s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4();
 			}
 
-			function MaterialPopUp() {
+			function MaterialPopUp(SessionID, ExaminationName, MedicationDetailsID) {
 				var ddlExamination = $("#ddlExamination").val();
-				if(ddlExamination == "") {
-					$.notify("Mohon pilih tindakan terlebih dahulu!", "error");
+				var EditFlag = 0;
+				$("#hdnMedicationDetailsID2").val(MedicationDetailsID);
+				if(SessionID == 0) { 
+					if(ddlExamination == "") {
+						$.notify("Mohon pilih tindakan terlebih dahulu!", "error");
+						return 0;
+					}
+					else {
+						ExaminationName = $("#ddlExamination option:selected").text()
+					}
 				}
 				else {
+					EditFlag = 1;
+					oldSession = $("#hdnSessionID").val();
+					$(".hdnSessionID").val(SessionID);
+				}
+				//else {
 					$("#hdnTotalMaterial").val(0);
-					LoadMaterialDetails($("#hdnSessionID").val());
-					$("#examintaionName").html($("#ddlExamination option:selected").text());
+					LoadMaterialDetails($("#hdnSessionID").val(), EditFlag);
+					$("#examintaionName").html(ExaminationName);
 					$("#ddlMaterial").val("");
 					$("#ddlMaterial").next().find("input").val("");
 					$("#txtMaterialPrice").val("0.00");
@@ -327,6 +384,7 @@
 						close: function() {
 							$(this).dialog("destroy");
 							Calculate();
+							if(EditFlag == 1) $(".hdnSessionID").val(oldSession);
 						},
 						buttons: {
 							"Simpan": function() {
@@ -381,7 +439,7 @@
 															$("#txtMaterialTotal").val("0.00");
 															$("#txtMaterialQuantity").val(1);
 															$("#txtMaterialRemarks").val("");
-															LoadMaterialDetails($("#hdnSessionID").val());
+															LoadMaterialDetails($("#hdnSessionID").val(), EditFlag);
 														}
 														else {
 															$.notify(data.Message, "error");					
@@ -404,10 +462,66 @@
 							"Tutup": function() {
 								$(this).dialog("destroy");
 								Calculate();
+								if(EditFlag == 1) $(".hdnSessionID").val(oldSession);
 							}
 						}
 					}).dialog("open");
-				}
+				//}
+			}
+			
+			function EditMaterial(MaterialDetailsID, Quantity, Price, Remarks, MaterialName, EditFlag) {
+				$("#hdnMaterialDetailsID").val(MaterialDetailsID);
+				$("#MaterialName2").html(MaterialName);
+				$("#txtMaterialQuantity2").val(Quantity);
+				$("#txtMaterialPrice2").val(returnRupiah(Price));
+				$("#txtMaterialRemarks2").val(Remarks);
+				$("#dialog-edit-material").dialog({
+					autoOpen: false,
+					show: {
+						effect: "fade",
+						duration: 500
+					},
+					hide: {
+						effect: "fade",
+						duration: 500
+					},
+					resizable: false,
+					height: "auto",
+					width: 600,
+					modal: true,
+					close: function() {
+						$(this).dialog("destroy");
+					},
+					buttons: {
+						"Simpan": function() {
+							$(this).dialog("destroy");
+							$.ajax({
+								url: "./Transaction/Medication/UpdateMaterial.php",
+								type: "POST",
+								data: $("#MaterialEditForm").serialize(),
+								dataType: "json",
+								success: function(data) {
+									$("#loading").hide();
+									if(data.FailedFlag == '0') {
+										$.notify(data.Message, "success");
+										LoadMaterialDetails($("#hdnSessionID").val(), EditFlag);
+									}
+									else {
+										$.notify(data.Message, "error");					
+									}
+								},
+								error: function(data) {
+									$("#loading").hide();
+									$.notify("Terjadi kesalahan sistem!", "error");
+								}
+							});
+						},
+						"Batal": function() {
+							$(this).dialog("destroy");
+							return false;
+						}
+					}
+				}).dialog("open");
 			}
 			
 			function EditData(MedicationID, MedicationDetailsID, Quantity, Price, Remarks, ExaminationName) {
@@ -464,7 +578,7 @@
 					}
 				}).dialog("open");
 			}
-			function DeleteMaterial(SessionID, MaterialDetailsID, MaterialName) {
+			function DeleteMaterial(SessionID, MaterialDetailsID, MaterialName, EditFlag) {
 				$("#MaterialName").html(MaterialName);
 				$("#dialog-delete-material").dialog({
 					autoOpen: false,
@@ -498,7 +612,7 @@
 									var gagal = datadelete [1];
 									if(berhasil!="") {
 										$.notify(berhasil, "success");
-										LoadMaterialDetails(SessionID);
+										LoadMaterialDetails(SessionID, EditFlag);
 									}
 									if(gagal!="") $.notify(gagal, "error");
 								},
@@ -592,18 +706,22 @@
 				});
 			}
 			
-			function LoadMaterialDetails(SessionID) {				
+			function LoadMaterialDetails(SessionID, EditFlag) {				
 				$("#loading").show();
 				$.ajax({
 					url: "./Transaction/Medication/MaterialDetail.php",
 					type: "POST",
-					data: { SessionID : SessionID },
+					data: { SessionID : SessionID, MedicationDetailsID : $("#hdnMedicationDetailsID2").val(), EditFlag : EditFlag },
 					dataType: "json",
 					success: function(data) {
 						$("#loading").hide();
 						if(data.FailedFlag == '0') {
 							$("#materialTable").html(data.MaterialDetails);
-							$("#hdnTotalMaterial").val(data.Total);
+							if(EditFlag == 0) $("#hdnTotalMaterial").val(data.Total);
+							else {
+								$("#hdnTotalMaterial").val(0);
+								LoadMedicationDetails($("#hdnMedicationID").val());
+							}
 						}
 						else {
 							$.notify(data.Message, "error");					
