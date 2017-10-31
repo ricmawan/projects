@@ -122,7 +122,7 @@
 					$this->Cell($w[0],0.7,$RowNumber,1,0,'C');
 					$this->Cell($w[1],0.7,$row['ExaminationName'],1,0,'L');
 					$this->Cell($w[2],0.7,$row['Quantity'],1,0,'R');
-					$this->Cell($w[3],0.7,number_format($row['Price'],2,".",","),1,0,'R');
+					$this->Cell($w[3],0.7,number_format($row['SubTotal'],2,".",","),1,0,'R');
 					$this->Cell($w[4],0.7,number_format($row['SubTotal'],2,".",","),1,0,'R');
 					$this->Cell($w[5],0.7,$row['Remarks'],1,0,'L');
 					$this->Ln();
