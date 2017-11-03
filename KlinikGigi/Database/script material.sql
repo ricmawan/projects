@@ -62,3 +62,5 @@ VALUES
 );
 
 ALTER TABLE `transaction_medicationdetails` ADD `MaterialID` BIGINT NOT NULL AFTER `MedicationID`;
+
+INSERT INTO `klinik_gigi`.`master_parameter` (`ParameterID`, `ParameterName`, `ParameterValue`, `Remarks`, `IsNumber`, `CreatedDate`, `CreatedBy`, `ModifiedDate`, `ModifiedBy`) VALUES ('9', 'DAILY_SCHEDULE_LIMIT', '8', 'Limit pendaftaran per hari', '1', NOW(), 'Admin', NULL, NULL);
