@@ -135,7 +135,7 @@ VALUES
 	13,
 	4,
 	'Foto Pemeriksaan',
-	'Report/Photos',
+	'Report/Photos/',
 	NULL,
 	0,
 	4

@@ -7,25 +7,49 @@
 	
 	$StartDate = $_GET['start'];
 	$EndDate = $_GET['end'];
+	$ddlBranch = $_GET['ddlBranch'];
 	$sql = "SELECT
-				CS.CheckScheduleID,
-				MP.PatientName,
-				DATE_FORMAT(CS.ScheduledDate, '%Y-%m-%dT%T+07:00') ScheduledDate,
-				MP.Telephone,
+				CSO.ScheduleID,
+				CSO.PatientName,
+				CSO.ScheduledDate,
 				CASE
-					WHEN CN.CountNumber < $DAILY_SCHEDULE_LIMIT
+					WHEN (IFNULL(CN.countNumber, 0) + IFNULL(CNT.countNumber, 0)) < CSO.DailyLimit
 					THEN '#3198cb'
 					ELSE '#FF0000'
 				END BackgroundColor,
 				CASE
-					WHEN CN.CountNumber < $DAILY_SCHEDULE_LIMIT
+					WHEN (IFNULL(CN.countNumber, 0) + IFNULL(CNT.countNumber, 0)) < CSO.DailyLimit
 					THEN 1
 					ELSE 0
 				END IsAvailable
 			FROM
-				transaction_checkschedule CS
-				JOIN master_patient MP
-					ON MP.PatientID = CS.PatientID
+				(
+					SELECT
+						OS.OnlineScheduleID ScheduleID,
+						OS.PatientName,
+						DATE_FORMAT(OS.ScheduledDate, '%Y-%m-%dT%T+07:00') ScheduledDate,
+						MB.DailyLimit
+					FROM
+						transaction_onlineschedule OS
+						JOIN master_branch MB
+							ON OS.BranchID = MB.BranchID
+					WHERE
+						OS.ScheduledDate BETWEEN '".$StartDate."' AND '".$EndDate."'
+						AND OS.BranchID = $ddlBranch
+					UNION ALL
+					SELECT
+						CS.CheckScheduleID,
+						MP.PatientName,
+						DATE_FORMAT(CS.ScheduledDate, '%Y-%m-%dT%T+07:00') ScheduledDate,
+						$DAILY_SCHEDULE_LIMIT AS DailyLimit
+					FROM
+						transaction_checkschedule CS
+						JOIN master_patient MP
+							ON MP.PatientID = CS.PatientID
+					WHERE
+						CS.ScheduledDate BETWEEN '".$StartDate."' AND '".$EndDate."'
+						AND $ddlBranch = 1
+				)CSO
 				LEFT JOIN
 				(
 					SELECT
@@ -35,30 +59,11 @@
 						transaction_checkschedule
 					WHERE
 						ScheduledDate BETWEEN '".$StartDate."' AND '".$EndDate."'
+						AND $ddlBranch = 1
 					GROUP BY
 						DATE_FORMAT(ScheduledDate, '%Y-%m-%d')
 				)CN
-					ON DATE_FORMAT(CN.ScheduledDate, '%Y-%m-%d')  = DATE_FORMAT(CS.ScheduledDate, '%Y-%m-%d')
-			WHERE
-				CS.ScheduledDate BETWEEN '".$StartDate."' AND '".$EndDate."' 
-			UNION ALL
-			SELECT
-				OS.OnlineScheduleID,
-				OS.PatientName,
-				DATE_FORMAT(OS.ScheduledDate, '%Y-%m-%dT%T+07:00') ScheduledDate,
-				OS.PhoneNumber,
-				CASE
-					WHEN CNT.CountNumber < $DAILY_SCHEDULE_LIMIT
-					THEN '#3198cb'
-					ELSE '#FF0000'
-				END BackgroundColor,
-				CASE
-					WHEN CNT.CountNumber < $DAILY_SCHEDULE_LIMIT
-					THEN 1
-					ELSE 0
-				END IsAvailable
-			FROM
-				transaction_onlineschedule OS
+					ON DATE_FORMAT(CN.ScheduledDate, '%Y-%m-%d')  = DATE_FORMAT(CSO.ScheduledDate, '%Y-%m-%d')
 				LEFT JOIN
 				(
 					SELECT
@@ -68,20 +73,19 @@
 						transaction_onlineschedule
 					WHERE
 						ScheduledDate BETWEEN '".$StartDate."' AND '".$EndDate."'
+						AND BranchID = $ddlBranch
 					GROUP BY
 						DATE_FORMAT(ScheduledDate, '%Y-%m-%d')
 				)CNT
-					ON DATE_FORMAT(CNT.ScheduledDate, '%Y-%m-%d')  = DATE_FORMAT(OS.ScheduledDate, '%Y-%m-%d')
-			WHERE
-				OS.ScheduledDate BETWEEN '".$StartDate."' AND '".$EndDate."' ";
-				
+					ON DATE_FORMAT(CNT.ScheduledDate, '%Y-%m-%d')  = DATE_FORMAT(CSO.ScheduledDate, '%Y-%m-%d')";
+
 	if (! $result = mysql_query($sql, $dbh)) {
 		echo mysql_error();
 		return 0;
 	}
 	$return_arr = array();
 	while ($row = mysql_fetch_array($result)) {
-		$row_array['checkscheduleid']= $row['CheckScheduleID'];
+		$row_array['checkscheduleid']= $row['ScheduleID'];
 		$row_array['title']= $row['PatientName'];
 		$row_array['start'] = $row['ScheduledDate'];
 		$row_array['end'] = $row['ScheduledDate'];

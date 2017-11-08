@@ -53,6 +53,17 @@
 							ON MP.PatientID = TM.PatientID
 						LEFT JOIN transaction_medicationdetails TMD
 							ON TM.MedicationID = TMD.MedicationID
+						LEFT JOIN
+						(
+							SELECT
+								MD.MedicationDetailsID,
+								SUM(MD.SalePrice * MD.Quantity) Total
+							FROM
+								transaction_materialdetails MD
+							GROUP BY
+								MD.MedicationDetailsID
+						)MD
+							ON MD.MedicationDetailsID = TMD.MedicationDetailsID
 						LEFT JOIN transaction_debtpayment DP
 							ON TM.MedicationID = DP.MedicationID
 					WHERE
@@ -62,9 +73,10 @@
 						TM.Debit,
 						TM.Cash,
 						DP.Cash,
-						DP.Debit
+						DP.Debit,
+						MD.Total
 					HAVING 
-						SUM(TMD.Price * TMD.Quantity) > (TM.Debit + TM.Cash + IFNULL(DP.Debit, 0) + IFNULL(DP.Cash, 0))
+						(SUM(TMD.Price * TMD.Quantity) + IFNULL(MD.Total, 0)) > (IFNULL(TM.Debit, 0) + IFNULL(TM.Cash, 0) + IFNULL(DP.Debit, 0) + IFNULL(DP.Cash, 0))
 				)D";
 	
 	if (! $result = mysql_query($sql, $dbh)) {
@@ -82,14 +94,25 @@
 				TM.Cash,
 				DP.Cash DebtCash,
 				DP.Debit DebtDebit,
-				SUM(TMD.Price * TMD.Quantity) Total,
-				SUM(TMD.Price * TMD.Quantity) - (TM.Debit + TM.Cash) Debt
+				SUM(TMD.Price * TMD.Quantity) + IFNULL(MD.Total, 0)  Total,
+				SUM(TMD.Price * TMD.Quantity) - (IFNULL(TM.Debit, 0) + IFNULL(TM.Cash, 0)) Debt
 			FROM
 				transaction_medication TM
 				JOIN master_patient MP
 					ON MP.PatientID = TM.PatientID
 				LEFT JOIN transaction_medicationdetails TMD
 					ON TM.MedicationID = TMD.MedicationID
+				LEFT JOIN
+				(
+					SELECT
+						MD.MedicationDetailsID,
+						SUM(MD.SalePrice * MD.Quantity) Total
+					FROM
+						transaction_materialdetails MD
+					GROUP BY
+						MD.MedicationDetailsID
+				)MD
+					ON MD.MedicationDetailsID = TMD.MedicationDetailsID
 				LEFT JOIN transaction_debtpayment DP
 					ON TM.MedicationID = DP.MedicationID
 			WHERE
@@ -101,9 +124,10 @@
 				TM.Debit,
 				TM.Cash,
 				DP.Cash,
-				DP.Debit
+				DP.Debit,
+				MD.Total
 			HAVING 
-				SUM(TMD.Price * TMD.Quantity) > (TM.Debit + TM.Cash + IFNULL(DP.Debit, 0) + IFNULL(DP.Cash, 0))
+				(SUM(TMD.Price * TMD.Quantity) + IFNULL(MD.Total, 0)) > (IFNULL(TM.Debit, 0) + IFNULL(TM.Cash, 0) + IFNULL(DP.Debit, 0) + IFNULL(DP.Cash, 0))
 			ORDER BY
 				$order_by
 			$limit";

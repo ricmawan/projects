@@ -70,7 +70,6 @@
 				(
 					SELECT
 						MD.MedicationDetailsID,
-						MD.SessionID,
 						SUM(MD.SalePrice * MD.Quantity) Total
 					FROM
 						transaction_materialdetails MD
