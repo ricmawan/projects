@@ -439,10 +439,10 @@
 				var i = 0;
 				$(".txtQuantity").each(function() {
 					if(i != 0) {
-						qty = $(this).val();
+						qty = parseFloat($(this).val());
 						row = $(this).attr("row");
 						price = $("#txtPrice" + row).val().replace(/\,/g, "");
-						totalqty = $("#txtTotalQuantity" + row).val();
+						totalqty = parseFloat($("#txtTotalQuantity" + row).val());
 						if(qty > totalqty) {
 							$(this).notify("Quantity melebihi Total Quantity Dari Transaksi Barang Keluar!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 							$(this).val(1);
