@@ -1,13 +1,11 @@
 <?php
-	if(isset($_POST['txtPatientName'])) {
+	if(isset($_POST['ddlPatient'])) {
 		$RequestPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestPath);
 		$RequestPath = str_replace($file, "", $RequestPath);
 		include "../../GetPermission.php";
-		$txtPatientName = mysql_real_escape_string($_POST['txtPatientName']);
-		$txtPhone = mysql_real_escape_string($_POST['txtPhone']);
+		$ddlPatient = mysql_real_escape_string($_POST['ddlPatient']);
 		$ddlTime = mysql_real_escape_string($_POST['ddlTime']);
-		$txtEmail = mysql_real_escape_string($_POST['txtEmail']);
 		$ddlBranch = mysql_real_escape_string($_POST['hdnDDLBranch']);
 		$ScheduledDate = $_POST['hdnStartDate'] . " " . $ddlTime;
 		//echo $ScheduledDate;
@@ -77,23 +75,17 @@
 			return 0;
 		}
 		else {
-			$sql = "INSERT INTO transaction_onlineschedule
+			$sql = "INSERT INTO transaction_checkschedule
 					(
+						PatientID,
 						ScheduledDate,
-						PatientName,
-						PhoneNumber,
-						Email,
-						BranchID,
 						CreatedDate,
 						CreatedBy
 					)
 					VALUES
 					(
+						".$ddlPatient.",
 						'".$ScheduledDate."',
-						'".$txtPatientName."',
-						'".$txtPhone."',
-						'".$txtEmail."',
-						".$ddlBranch.",
 						NOW(),
 						'".$_SESSION['UserLogin']."'
 					)";

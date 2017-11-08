@@ -337,23 +337,25 @@
 						}
 						$('#calendar').fullCalendar('unselect');*/
 						var count = 0;
-						$('#calendar').fullCalendar('clientEvents', function(event) {
-							if(moment(date).format('YYYY-MM-DD') == moment(event.start._i).format('YYYY-MM-DD') && count == 0) {
-								count++;
-								if(event.isavailable[0] == "0") {
-									$.notify("Jadwal Penuh!", "error");
-									return false;
+						if(date.format('e') > 0 && date.format('e') < 6) {
+							$('#calendar').fullCalendar('clientEvents', function(event) {
+								if(moment(date).format('YYYY-MM-DD') == moment(event.start._i).format('YYYY-MM-DD') && count == 0) {
+									count++;
+									if(event.isavailable[0] == "0") {
+										$.notify("Jadwal Penuh!", "error");
+										return false;
+									}
+									else {
+										dialogSchedule();
+									}
 								}
-								else {
-									dialogSchedule();
-								}
-							}
-						});
-						if(count == 0) dialogSchedule();
-						var startDate = new Date(date);
-						var scheduledDate = startDate.getFullYear().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getDate().toString();
-						$("#lblStartDate").html(startDate.getDate().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getFullYear().toString());
-						$("#hdnStartDate").val(scheduledDate);
+							});
+							if(count == 0) dialogSchedule();
+							var startDate = new Date(date);
+							var scheduledDate = startDate.getFullYear().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getDate().toString();
+							$("#lblStartDate").html(startDate.getDate().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getFullYear().toString());
+							$("#hdnStartDate").val(scheduledDate);
+						}
 					},
 					editable: true,
 					eventLimit: true, // allow "more" link when too many events

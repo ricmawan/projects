@@ -73,4 +73,49 @@
 			echo mysql_error();
 		}
 	}
+	
+	$sql = "SELECT
+				OS.OnlineScheduleID,
+				OS.ScheduledDate,
+				DATE_FORMAT(OS.ScheduledDate, '%w') DayCount,
+				OS.PatientName,
+				OS.Email
+			FROM
+				transaction_onlineschedule OS
+			WHERE
+				ADDTIME(OS.ScheduledDate, '06:00:00') <= NOW()
+				AND IFNULL(OS.EmailStatus, '') <> 'Sent'";
+				
+	if (! $result = mysql_query($sql, $dbh)) {
+		echo mysql_error();
+	}
+		
+	while ($row = mysql_fetch_array($result)) {
+		$MessageSent = $MessageBody;
+		$MessageSent = str_replace("[Day_Name]", $dayName[$row['DayCount']], $MessageSent);
+		$MessageSent = str_replace("[ScheduledDate]", date("d", strtotime($row['ScheduledDate'])) . " " . $monthName[date("m", strtotime($row['ScheduledDate'])) - 1] . " " . date("Y", strtotime($row['ScheduledDate'])), $MessageSent);
+		$mail->addAddress($row['Email'], $row['PatientName']);     // Add a recipient
+		$mail->Subject = 'Pengingat Pemeriksaan Gigi';
+		$mail->Body    = str_replace('[Patient_Name]', $row['PatientName'], $MessageSent);
+		//$mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+
+		if(!$mail->send()) {
+			$sql2 = "UPDATE transaction_onlineschedule
+					SET
+						EmailStatus = '".$mail->ErrorInfo."'
+					WHERE
+						OnlineScheduleID = ".$row['OnlineScheduleID'];
+		} else {
+			$sql2 = 'UPDATE transaction_onlineschedule
+					SET
+						EmailStatus = "Sent",
+						DeliveredDate = NOW()					
+					WHERE
+						OnlineScheduleID = '.$row['OnlineScheduleID'];
+		}
+		
+		if (! $result2 = mysql_query($sql2, $dbh)) {
+			echo mysql_error();
+		}
+	}
 ?>

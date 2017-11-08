@@ -75,10 +75,10 @@
 			$ScheduleDetails .= "<tr>";
 			$ScheduleDetails .= "<td align='center' style='width: 35px;' >$RowNumber</td>";
 			$ScheduleDetails .= "<td align='left' style='width: 200px;' >".$row['PatientName']."</td>";
-			$ScheduleDetails .= "<td align='right' style='width: 200px;' >".$row['PhoneNumber']."</td>";
-			$ScheduleDetails .= "<td align='right' style='width: 250px;' >".$row['Email']."</td>";
-			$ScheduleDetails .= "<td align='right' style='width: 200px;' >".$row['ScheduledDate']."</td>";
-			$ScheduleDetails .= "<td align='right' style='width: 200px;' >".$row['BranchName']."</td>";
+			$ScheduleDetails .= "<td align='left' style='width: 200px;' >".$row['PhoneNumber']."</td>";
+			$ScheduleDetails .= "<td align='left' style='width: 250px;' >".$row['Email']."</td>";
+			$ScheduleDetails .= "<td align='left' style='width: 200px;' >".$row['ScheduledDate']."</td>";
+			$ScheduleDetails .= "<td align='left' style='width: 200px;' >".$row['BranchName']."</td>";
 			$ScheduleDetails .= "</tr>";
 			$RowNumber++;
 		}

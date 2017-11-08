@@ -62,11 +62,26 @@
 					</div>
 					<br />
 					<div class="row" >
-						<div class="col-md-3 labelColumn" >
+						<div class="col-md-3 labelColumn">
 							Nama:
 						</div>
 						<div class="col-md-9">
-							<input type="text" placeholder="Nama" required id="txtPatientName" name="txtPatientName" class="form-control-custom" />
+							<input id="hdnPatientID" name="hdnPatientID" type="hidden" value="0" />
+							<div class="ui-widget" style="width: 100%;" id="dvPatient">
+								<select name="ddlPatient" id="ddlPatient" class="form-control-custom" placeholder="Pilih Pasien" >
+									<option value="" ></option>
+									<?php
+										$sql = "SELECT PatientID, PatientName, PatientNumber, Address, Telephone, Email FROM master_patient";
+										if(!$result = mysql_query($sql, $dbh)) {
+											echo mysql_error();
+											return 0;
+										}
+										while($row = mysql_fetch_array($result)) {
+											echo "<option value='".$row['PatientID']."' patientnumber='".$row['PatientNumber']."' telephone='".$row['Telephone']."' email='".$row['Email']."' >".$row['PatientName']." - ".$row['Address']."</option>";
+										}
+									?>
+								</select>
+							</div>
 						</div>
 					</div>
 					<br />
@@ -75,7 +90,7 @@
 							No HP:
 						</div>
 						<div class="col-md-9">
-							<input type="text" placeholder="No HP" required id="txtPhone" name="txtPhone" class="form-control-custom" />
+							<input type="text" placeholder="No HP" required readonly id="txtPhone" name="txtPhone" class="form-control-custom" />
 						</div>
 					</div>
 					<br />
@@ -84,7 +99,7 @@
 							Email:
 						</div>
 						<div class="col-md-9">
-							<input type="text" placeholder="Email" id="txtEmail" name="txtEmail" class="form-control-custom" />
+							<input type="text" placeholder="Email" id="txtEmail" readonly name="txtEmail" class="form-control-custom" />
 						</div>
 					</div>
 					<br />
@@ -116,7 +131,7 @@
 			function loadSchedule(startDate) {
 				$("#loading").show();
 				$.ajax({
-					url: "./Transaction/Calendar/Detail.php",
+					url: "./Transaction/CheckSchedule/Detail.php",
 					type: "POST",
 					data: { StartDate : startDate },
 					dataType: "json",
@@ -239,7 +254,7 @@
 										else {
 											$("#loading").show();
 											$.ajax({
-												url: "./Transaction/Calendar/Insert.php",
+												url: "./Transaction/CheckSchedule/Insert.php",
 												type: "POST",
 												data: $("#ScheduleForm").serialize(),
 												dataType: "json",
@@ -280,6 +295,14 @@
 			
 			$(document).ready(function() {
 				ddlTime();
+				$("#ddlPatient").combobox({
+					select: function( event, ui ) {
+						var Telephone = $("#ddlPatient option:selected").attr("telephone");
+						var Email = $("#ddlPatient option:selected").attr("email");
+						$("#txtEmail").val(Email);
+						$("#txtPhone").val(Telephone);
+					}
+				});
 				var currentDate = new Date();
 				var currentMonth;
 				currentDate.setMonth(currentDate.getMonth() + 6);
@@ -330,28 +353,30 @@
 						}
 						$('#calendar').fullCalendar('unselect');*/
 						var count = 0;
-						$('#calendar').fullCalendar('clientEvents', function(event) {
-							if(moment(date).format('YYYY-MM-DD') == moment(event.start._i).format('YYYY-MM-DD') && count == 0) {
-								count++;
-								if(event.isavailable[0] == "0") {
-									$.notify("Jadwal Penuh!", "error");
-									return false;
+						if(date.format('e') > 0 && date.format('e') < 6) {
+							$('#calendar').fullCalendar('clientEvents', function(event) {
+								if(moment(date).format('YYYY-MM-DD') == moment(event.start._i).format('YYYY-MM-DD') && count == 0) {
+									count++;
+									if(event.isavailable[0] == "0") {
+										$.notify("Jadwal Penuh!", "error");
+										return false;
+									}
+									else {
+										dialogSchedule();
+									}
 								}
-								else {
-									dialogSchedule();
-								}
-							}
-						});
-						if(count == 0) dialogSchedule();
-						var startDate = new Date(date);
-						var scheduledDate = startDate.getFullYear().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getDate().toString();
-						$("#lblStartDate").html(startDate.getDate().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getFullYear().toString());
-						$("#hdnStartDate").val(scheduledDate);
+							});
+							if(count == 0) dialogSchedule();
+							var startDate = new Date(date);
+							var scheduledDate = startDate.getFullYear().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getDate().toString();
+							$("#lblStartDate").html(startDate.getDate().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getFullYear().toString());
+							$("#hdnStartDate").val(scheduledDate);
+						}
 					},
 					editable: true,
 					eventLimit: true, // allow "more" link when too many events
 					events: {
-						url: "./Transaction/Calendar/DataSource.php",
+						url: "./Transaction/CheckSchedule/DataSource.php",
 						 data: function () { // a function that returns an object
 							return {
 								ddlBranch: $('#ddlBranch').val(),
