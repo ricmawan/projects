@@ -166,15 +166,6 @@ VALUES
 	NULL,
 	0,
 	4
-),
-(
-	17,
-	4,
-	'Pembelian Material',
-	'Report/IncomingMaterial/',
-	NULL,
-	0,
-	4
 );
 
 CREATE UNIQUE INDEX MENU_INDEX
