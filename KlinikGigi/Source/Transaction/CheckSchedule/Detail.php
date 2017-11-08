@@ -1,161 +1,100 @@
 <?php
-	$RequestPath = "$_SERVER[REQUEST_URI]";
-	$file = basename($RequestPath);
-	$RequestPath = str_replace($file, "", $RequestPath);
-	include "../../GetPermission.php";
+	if(isset($_POST['StartDate'])) {
+		$RequestPath = "$_SERVER[REQUEST_URI]";
+		$file = basename($RequestPath);
+		$RequestPath = str_replace($file, "", $RequestPath);
+		include "../../GetPermission.php";
+		//echo $_SERVER['REQUEST_URI'];
+		$Content = "";
+		$StartDate = $_POST['StartDate'];
+		$Message = "";
+		$ScheduleDetails = "";
+		$MessageDetail = "";
+		$FailedFlag = 0;
+		$State = 1;
+		
+		$sql = "SELECT
+					DATA.ScheduleID,
+					DATA.PatientName,
+					DATA.ScheduledDate,
+					DATA.PhoneNumber,
+					DATA.Email,
+					DATA.DailyLimit,
+					DATA.BranchName,
+					DATA.CreatedDate,
+					DATA.ScheduledDatePlain
+				FROM
+				(
+					SELECT
+						OS.OnlineScheduleID ScheduleID,
+						OS.PatientName,
+						DATE_FORMAT(OS.ScheduledDate, '%d-%m-%Y %H:%i:%S') ScheduledDate,
+						OS.PhoneNumber,
+						OS.Email,
+						MB.DailyLimit,
+						MB.BranchName,
+						OS.CreatedDate,
+						OS.ScheduledDate ScheduledDatePlain
+					FROM
+						transaction_onlineschedule OS
+						JOIN master_branch MB
+							ON OS.BranchID = MB.BranchID
+					WHERE
+						DATE_FORMAT(OS.ScheduledDate, '%Y-%m-%d') = '".$StartDate."'
+					UNION ALL
+					SELECT
+						CS.CheckScheduleID,
+						MP.PatientName,
+						DATE_FORMAT(CS.ScheduledDate, '%d-%m-%Y %H:%i:%S') ScheduledDate,
+						MP.Telephone,
+						MP.Email,
+						$DAILY_SCHEDULE_LIMIT AS DailyLimit,
+						'Kawi',
+						CS.CreatedDate,
+						CS.ScheduledDate
+					FROM
+						transaction_checkschedule CS
+						JOIN master_patient MP
+							ON MP.PatientID = CS.PatientID
+					WHERE
+						DATE_FORMAT(CS.ScheduledDate, '%Y-%m-%d') = '".$StartDate."'
+				)DATA
+				ORDER BY
+					ScheduledDatePlain ASC,
+					CreatedDate ASC";
+					
+		if (! $result = mysql_query($sql, $dbh)) {
+			$Message = "Terjadi Kesalahan Sistem";
+			$MessageDetail = mysql_error();
+			$FailedFlag = 1;
+			echo returnstate($Message, $MessageDetail, $ScheduleDetails, $FailedFlag, $State);
+			return 0;
+		}
+		$RowNumber = 1;
+		while ($row = mysql_fetch_array($result)) {
+			$ScheduleDetails .= "<tr>";
+			$ScheduleDetails .= "<td align='center' style='width: 35px;' >$RowNumber</td>";
+			$ScheduleDetails .= "<td align='left' style='width: 200px;' >".$row['PatientName']."</td>";
+			$ScheduleDetails .= "<td align='right' style='width: 200px;' >".$row['PhoneNumber']."</td>";
+			$ScheduleDetails .= "<td align='right' style='width: 250px;' >".$row['Email']."</td>";
+			$ScheduleDetails .= "<td align='right' style='width: 200px;' >".$row['ScheduledDate']."</td>";
+			$ScheduleDetails .= "<td align='right' style='width: 200px;' >".$row['BranchName']."</td>";
+			$ScheduleDetails .= "</tr>";
+			$RowNumber++;
+		}
+		echo returnstate($Message, $MessageDetail, $ScheduleDetails, $FailedFlag, $State);
+		return 0;
+	}
+	
+	function returnstate($Message, $MessageDetail, $ScheduleDetails, $FailedFlag, $State) {
+		$data = array(
+			"Message" => $Message,
+			"MessageDetail" => $MessageDetail,
+			"ScheduleDetails" => $ScheduleDetails,
+			"FailedFlag" => $FailedFlag,
+			"State" => $State
+		);
+		return json_encode($data);
+	
+	}
 ?>
-<html>
-	<head>
-	</head>
-	<body>
-		<div class="row">
-			<div class="col-md-12">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h5>Tambah Data Jadwal Periksa</h5>  
-					</div>
-					<div class="panel-body">
-						<form class="col-md-12" id="PostForm" method="POST" action="" >
-							<div class="row">
-								<div class="col-md-2 labelColumn">
-									Nama Pasien :
-								</div>
-								<div class="col-md-3">
-									<div class="ui-widget" style="width: 100%;" id="dvPatient">
-										<select name="ddlPatient" id="ddlPatient" class="form-control-custom" placeholder="Pilih Pasien" >
-											<option value="" ></option>
-											<?php
-												$sql = "SELECT PatientID, PatientName, PatientNumber, Address FROM master_patient";
-												if(!$result = mysql_query($sql, $dbh)) {
-													echo mysql_error();
-													return 0;
-												}
-												while($row = mysql_fetch_array($result)) {
-													echo "<option value='".$row['PatientID']."' patientnumber='".$row['PatientNumber']."'>[".$row['PatientNumber']."] ".$row['PatientName']." - ".$row['Address']."</option>";
-												}
-											?>
-										</select>
-									</div>
-								</div>
-							</div>
-							<br />
-							<div class="row">
-								<div class="col-md-2 labelColumn">
-									Jadwal Periksa :
-								</div>
-								<div class="col-md-3">
-									<input id="txtNextSchedule" name="txtNextSchedule" type="text" class="form-control-custom" placeholder="Jadwal Berikutnya" required />
-								</div>
-							</div>
-							<br />
-							<button type="button" class="btn btn-default" value="Simpan" onclick='SubmitValidate()' ><i class="fa fa-save"></i> Simpan</button>&nbsp;&nbsp;
-							<button type="button" class="btn btn-default" value="Kembali" onclick='Back();' ><i class="fa fa-arrow-circle-left"></i> Kembali</button>
-						</form>
-					</div>
-				</div>
-			</div>
-			<div id="dialog-confirm" title="Konfirmasi" style="display: none;">
-				<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Apakah anda yakin data yang diinput sudah benar?</p>
-			</div>
-		</div>
-		<script>
-			function SubmitValidate() {
-				var PassValidate = 1;
-				var FirstFocus = 0;
-				$(".form-control-custom").each(function() {
-					if($(this).hasAttr('required')) {
-						if($(this).val() == "") {
-							PassValidate = 0;
-							$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-							if(FirstFocus == 0) $(this).focus();
-							FirstFocus = 1;
-						}
-					}
-				});
-
-				if($("#ddlPatient").val() == "") {
-					PassValidate = 0;
-					$("#ddlPatient").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-					if(FirstFocus == 0) $("#ddlPatient").next().find("input").focus();
-					FirstFocus = 1;
-				}
-
-				if(PassValidate == 0) {
-					$("html, body").animate({
-						scrollTop: 0
-					}, "slow");
-					return false;
-				}
-				else {
-					$("#dialog-confirm").dialog({
-						autoOpen: false,
-						show: {
-							effect: "fade",
-							duration: 500
-						},
-						hide: {
-							effect: "fade",
-							duration: 500
-						},
-						resizable: false,
-						height: "auto",
-						width: 400,
-						close: function() {
-							$(this).dialog("destroy");
-						},
-						modal: true,
-						buttons: {
-							"Ya": function() {
-								$(this).dialog("destroy");
-								$("#loading").show();
-								$.ajax({
-									url: "./Transaction/CheckSchedule/Insert.php",
-									type: "POST",
-									data: $("#PostForm").serialize(),
-									dataType: "json",
-									success: function(data) {
-										if(data.FailedFlag == '0') {
-											$.notify(data.Message, "success");
-											$("#txtOrderNumber").val(data.OrderNumber);
-											setTimeout(Back, 2000);
-										}
-										else {
-											$("#loading").hide();
-											$.notify(data.Message, "error");					
-										}
-									},
-									error: function(data) {
-										$("#loading").hide();
-										$.notify("Terjadi kesalahan sistem!", "error");
-									}
-								});
-							},
-							"Tidak": function() {
-								$(this).dialog("destroy");
-								return false;
-							}
-						}
-					}).dialog("open");
-				}
-			}
-			$(document).ready(function() {
-				$("#txtNextSchedule").datepicker({
-					dateFormat: 'DD, dd-mm-yy',
-					dayNames: [ "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jum'at", "Sabtu" ]
-				});
-				$("#txtNextSchedule").attr("readonly", "true");
-				$("#txtNextSchedule").css({
-					"background-color": "#FFF",
-					"cursor": "text"
-				});
-				
-				$("#ddlPatient").combobox({
-					select: function( event, ui ) {
-						var PatientNumber = $("#ddlPatient option:selected").attr("patientnumber");				
-						$("#txtPatientNumber").val(PatientNumber);
-					}
-				});
-			});
-		</script>
-	</body>
-</html>

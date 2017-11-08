@@ -1,59 +1,120 @@
 <?php
-	if(isset($_POST['ddlPatient'])) {
+	if(isset($_POST['txtPatientName'])) {
 		$RequestPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestPath);
 		$RequestPath = str_replace($file, "", $RequestPath);
 		include "../../GetPermission.php";
-		$PatientID = mysql_real_escape_string($_POST['ddlPatient']);
+		$txtPatientName = mysql_real_escape_string($_POST['txtPatientName']);
+		$txtPhone = mysql_real_escape_string($_POST['txtPhone']);
+		$ddlTime = mysql_real_escape_string($_POST['ddlTime']);
+		$txtEmail = mysql_real_escape_string($_POST['txtEmail']);
+		$ddlBranch = mysql_real_escape_string($_POST['hdnDDLBranch']);
+		$ScheduledDate = $_POST['hdnStartDate'] . " " . $ddlTime;
+		//echo $ScheduledDate;
+		$State = 1;
+		mysql_query("START TRANSACTION", $dbh);
+		mysql_query("SET autocommit=0", $dbh);
 		$Message = "Data Berhasil Disimpan";
 		$MessageDetail = "";
 		$FailedFlag = 0;
+		//echo $DetailID;		
 		$State = 1;
-		
-		$Date = explode(', ', mysql_real_escape_string($_POST['txtNextSchedule']));
-		$ScheduledDate = explode('-', $Date[1]);
-		$ScheduledDate = "$ScheduledDate[2]-$ScheduledDate[1]-$ScheduledDate[0]";
-			
-		$sql = "INSERT INTO transaction_checkschedule
-				(
-					PatientID,
-					ScheduledDate,
-					CreatedDate,
-					CreatedBy
-				)
-				SELECT
-					".$PatientID.",
-					'".$ScheduledDate."',
-					NOW(),
-					'".$_SESSION['UserLogin']."'
+		$countNumber = 0;
+		$sql = "SELECT
+					COUNT(1) countNumber,
+					ScheduledDate
 				FROM
-					tbl_temp
+					transaction_checkschedule
 				WHERE
-					NOT EXISTS
-					(
-						SELECT
-							1
-						FROM
-							transaction_checkschedule CS
-						WHERE
-							CS.PatientID = ".$PatientID."
-							AND CS.ScheduledDate = '".$ScheduledDate."'
-					)";
-	
-		if (! $result=mysql_query($sql, $dbh)) {
+					ScheduledDate = '".$ScheduledDate."'
+					AND $ddlBranch = 1
+				GROUP BY
+					ScheduledDate";
+		
+		if (! $result = mysql_query($sql, $dbh)) {
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysql_error();
 			$FailedFlag = 1;
-			echo returnstate($PatientID, $Message, $MessageDetail, $FailedFlag, $State);
+			echo returnstate($Message, $MessageDetail, $FailedFlag, $State);
+			mysql_query("ROLLBACK", $dbh);
 			return 0;
 		}
 		
-		echo returnstate($PatientID, $Message, $MessageDetail, $FailedFlag, $State);
+		$row = mysql_fetch_array($result);
+		$countNumber += $row['countNumber'];
+		
+		
+		$sql = "SELECT
+					COUNT(1) countNumber,
+					ScheduledDate
+				FROM
+					transaction_onlineschedule
+				WHERE
+					ScheduledDate  = '".$ScheduledDate."'
+					AND BranchID = $ddlBranch
+				GROUP BY
+					ScheduledDate";
+		
+		if (! $result = mysql_query($sql, $dbh)) {
+			$Message = "Terjadi Kesalahan Sistem";
+			$MessageDetail = mysql_error();
+			$FailedFlag = 1;
+			echo returnstate($Message, $MessageDetail, $FailedFlag, $State);
+			mysql_query("ROLLBACK", $dbh);
+			return 0;
+		}
+		
+		$row = mysql_fetch_array($result);
+		$countNumber += $row['countNumber'];
+		
+		
+		if($countNumber >= $MINUTE_SCHEDULE_LIMIT) {
+			$Message = "Jadwal untuk jam yang dipilih sudah penuh!";
+			$MessageDetail = mysql_error();
+			$FailedFlag = 1;
+			echo returnstate($Message, $MessageDetail, $FailedFlag, $State);
+			mysql_query("ROLLBACK", $dbh);
+			return 0;
+		}
+		else {
+			$sql = "INSERT INTO transaction_onlineschedule
+					(
+						ScheduledDate,
+						PatientName,
+						PhoneNumber,
+						Email,
+						BranchID,
+						CreatedDate,
+						CreatedBy
+					)
+					VALUES
+					(
+						'".$ScheduledDate."',
+						'".$txtPatientName."',
+						'".$txtPhone."',
+						'".$txtEmail."',
+						".$ddlBranch.",
+						NOW(),
+						'".$_SESSION['UserLogin']."'
+					)";
+					
+			if (! $result = mysql_query($sql, $dbh)) {
+				$Message = "Terjadi Kesalahan Sistem";
+				$MessageDetail = mysql_error();
+				$FailedFlag = 1;
+				echo returnstate($Message, $MessageDetail, $FailedFlag, $State);
+				mysql_query("ROLLBACK", $dbh);
+				return 0;
+			}
+			
+			echo returnstate($Message, $MessageDetail, $FailedFlag, $State);
+			mysql_query("COMMIT", $dbh);
+			return 0;
+		}
 	}
 	
-	function returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State) {
+	function returnstate($Message, $MessageDetail, $FailedFlag, $State) {
 		$data = array(
-			"ID" => $ID, 
 			"Message" => $Message,
 			"MessageDetail" => $MessageDetail,
 			"FailedFlag" => $FailedFlag,
