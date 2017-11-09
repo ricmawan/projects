@@ -98,7 +98,31 @@
 				</form>
 			</div>
 			
-			<div id="dialog-confirm" title="Konfirmasi" style="display: none;">
+			<div id="dialog-confirm" title="Konfirmasi" style="display: none;" class="col-md-12" >
+				<div class="row col-md-12" >
+					<div class="col-md-3 labelColumn" >
+						Nama:
+					</div>
+					<div class="col-md-9">
+						<span id="lblPatientName" style="font-weight: bold; font-size: 15px; color: red;"></span>
+					</div>
+				</div>
+				<div class="row col-md-12" >
+					<div class="col-md-3 labelColumn" >
+						No HP:
+					</div>
+					<div class="col-md-9">
+						<span id="lblPhoneNumber" style="font-weight: bold; font-size: 15px; color: red;"></span>
+					</div>
+				</div>
+				<div class="row col-md-12" >
+					<div class="col-md-3 labelColumn" >
+						Email:
+					</div>
+					<div class="col-md-9">
+						<span id="lblEmail" style="font-weight: bold; font-size: 15px; color: red;"></span>
+					</div>
+				</div>
 				<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Apakah anda yakin data yang diinput sudah benar?</p>
 			</div>
 			
@@ -119,7 +143,35 @@
 		</div>
 		<script>
 			var counter = 0;
-			
+			function hideUnavailableTime() {
+				var startDate = $("#hdnStartDate").val();
+				$("#ddlTime option").each(function() {
+					$(this).show();
+				});
+				$.ajax({
+					url: "./Transaction/Calendar/UnavailableTime.php",
+					type: "POST",
+					data: { StartDate : startDate },
+					dataType: "json",
+					success: function(data) {
+						$("#loading").hide();
+						for(var i=0;i<data.length;i++) {
+							console.log(data[i].unavailableTime);
+							$("#ddlTime option[value='" + data[i].unavailableTime + "']").hide();
+						}
+						$("#ddlTime option").each(function() {
+							if($(this).css("display") == "block") {
+								$(this).prop("selected", true);
+								return false;
+							}
+						});
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Terjadi kesalahan sistem!", "error");
+					}
+				});
+			}
 			function loadSchedule(startDate) {
 				$("#loading").show();
 				$.ajax({
@@ -191,6 +243,7 @@
 			}
 			
 			function dialogSchedule() {
+				hideUnavailableTime();
 				$("#dialog-schedule").dialog({
 					autoOpen: false,
 					show: {
@@ -211,6 +264,9 @@
 					buttons: {
 						"Simpan": function() {
 							//$(this).dialog("close");
+							$("#lblPatientName").html($("#txtPatientName").val());
+							$("#lblPhoneNumber").html($("#txtPhone").val());
+							$("#lblEmail").html($("#txtEmail").val());
 							$("#dialog-confirm").dialog({
 								autoOpen: false,
 								show: {
@@ -297,6 +353,8 @@
 				else currentMonth = (currentDate.getMonth() + 1).toString();
 				var endDate = new Date(currentDate.getFullYear().toString() + "-" + currentMonth + "-" + endMonth.toString());
 				endDate.setDate(endDate.getDate() + 1);
+				currentDate = new Date();
+				currentDate.setDate(currentDate.getDate() - 1);
 				$('#calendar').fullCalendar({
 					header: {
 						left: 'prev,next today',
@@ -319,8 +377,9 @@
 					fixedWeekCount: false,
 					height: 500,
 					eventStartEditable: false,
-					validRange: function(currentDate) {
+					validRange: function() {
 						return {
+							start: currentDate,
 							end: endDate
 						};
 					},
@@ -346,15 +405,21 @@
 										return false;
 									}
 									else {
+										var startDate = new Date(date);
+										var scheduledDate = startDate.getFullYear().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getDate().toString();
+										$("#lblStartDate").html(startDate.getDate().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getFullYear().toString());
+										$("#hdnStartDate").val(scheduledDate);
 										dialogSchedule();
 									}
 								}
 							});
-							if(count == 0) dialogSchedule();
-							var startDate = new Date(date);
-							var scheduledDate = startDate.getFullYear().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getDate().toString();
-							$("#lblStartDate").html(startDate.getDate().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getFullYear().toString());
-							$("#hdnStartDate").val(scheduledDate);
+							if(count == 0) {
+								var startDate = new Date(date);
+								var scheduledDate = startDate.getFullYear().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getDate().toString();
+								$("#lblStartDate").html(startDate.getDate().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getFullYear().toString());
+								$("#hdnStartDate").val(scheduledDate);
+								dialogSchedule();
+							}
 						}
 					},
 					editable: true,
@@ -378,10 +443,10 @@
 					},
 					selectConstraint: "businessHours",
 					eventLimitClick: function( cellInfo, jsEvent ) {
-						loadSchedule(moment(cellInfo.date).format('YYYY-MM-DD'));
+						//loadSchedule(moment(cellInfo.date).format('YYYY-MM-DD'));
 					},
 					navLinkDayClick: function(date, jsEvent) {
-						loadSchedule(date.format('YYYY-MM-DD'));
+						//loadSchedule(date.format('YYYY-MM-DD'));
 					}
 				});
 			});
