@@ -84,6 +84,7 @@
 				WHERE
 					PatientName = '".$txtPatientName."'
 					AND PhoneNumber = '".$txtPhone."'
+					AND BranchID = ".$ddlBranch."
 					AND DATE_FORMAT(ScheduledDate, '%Y-%m-%d') = DATE_FORMAT('".$ScheduledDate."', '%Y-%m-%d')";
 		
 		if (! $result = mysql_query($sql, $dbh)) {
