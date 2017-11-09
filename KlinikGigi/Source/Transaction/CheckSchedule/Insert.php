@@ -17,7 +17,7 @@
 		$FailedFlag = 0;
 		//echo $DetailID;		
 		$State = 1;
-		$countNumber = 0;
+		/*$countNumber = 0;
 		$sql = "SELECT
 					COUNT(1) countNumber,
 					ScheduledDate
@@ -73,7 +73,36 @@
 			echo returnstate($Message, $MessageDetail, $FailedFlag, $State);
 			mysql_query("ROLLBACK", $dbh);
 			return 0;
+		}*/
+		
+		$sql = "SELECT
+					1 Valid
+				FROM
+					transaction_checkschedule
+				WHERE
+					PatientID = ".$ddlPatient."
+					AND DATE_FORMAT(ScheduledDate, '%Y-%m-%d') = DATE_FORMAT('".$ScheduledDate."', '%Y-%m-%d')";
+		
+		if (! $result = mysql_query($sql, $dbh)) {
+			$Message = "Terjadi Kesalahan Sistem";
+			$MessageDetail = mysql_error();
+			$FailedFlag = 1;
+			echo returnstate($Message, $MessageDetail, $FailedFlag, $State);
+			mysql_query("ROLLBACK", $dbh);
+			return 0;
 		}
+		
+		$row = mysql_fetch_array($result);
+		
+		if($row['Valid'] == 1) {
+			$Message = "Pasien sudah terdaftar untuk tanggal yang dipilih!";
+			$MessageDetail = mysql_error();
+			$FailedFlag = 1;
+			echo returnstate($Message, $MessageDetail, $FailedFlag, $State);
+			mysql_query("ROLLBACK", $dbh);
+			return 0;
+		}
+		
 		else {
 			$sql = "INSERT INTO transaction_checkschedule
 					(

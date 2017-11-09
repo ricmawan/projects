@@ -111,7 +111,7 @@
 			$sql2 = 'UPDATE transaction_onlineschedule
 					SET
 						EmailStatus = "Sent",
-						DeliveredDate = NOW()					
+						DeliveredDate = NOW()
 					WHERE
 						OnlineScheduleID = '.$row['OnlineScheduleID'];
 		}
