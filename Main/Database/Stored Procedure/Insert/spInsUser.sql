@@ -1,3 +1,10 @@
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for insert the user
+Created Date: 12 November 2017
+Modified Date: 
+===============================================================*/
+
 DROP PROCEDURE IF EXISTS spInsUser;
 
 DELIMITER $$
@@ -21,23 +28,17 @@ StoredProcedure:BEGIN
 	DECLARE FailedFlag INT;
 	DECLARE State INT;
 	DECLARE RowCount INT;
-
 	DECLARE PassValidate INT;
 	
-	/*DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
 	BEGIN		
 		GET DIAGNOSTICS CONDITION 1
 		@MessageText = MESSAGE_TEXT, 
 		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
 		ROLLBACK;
-		SET @full_error = CONVERT(CONCAT("ERROR ", IFNULL(@ErrNo, ''), " (", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		SELECT 
-			pID AS 'ID', 
-			'Terjadi Kesalahan Sistem' AS 'Message', 
-			@full_error AS 'MessageDetail',
-			1 AS 'FailedFlag', 
-			State AS 'State';
-	END;*/
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (State ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelUserLogin', pCurrentUser);
+	END;
 	
 	SET PassValidate = 1;
 	
@@ -57,8 +58,9 @@ SET State = 1;
 			AND UserID <> pID
 		LIMIT 1;
 			
-		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
 SET State = 2;
+
+		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
 			SELECT
 				pID AS 'ID',
 				'Username sudah dipakai' AS 'Message',
@@ -71,6 +73,7 @@ SET State = 2;
 		ELSE /*Data yang diinput valid*/
 		
 SET State = 3;
+
 			IF(pIsEdit = 0)	THEN /*Tambah baru*/
 				INSERT INTO master_user
 				(
@@ -101,6 +104,7 @@ SET State = 4;
 					master_user;
 					
 			ELSE
+			
 SET State = 5;
 				UPDATE
 					master_user
@@ -125,6 +129,7 @@ SET State = 6;
 				UserID = pID;
 				
 SET State = 7;
+
 			loopdata : WHILE pMenuID <> "" DO
 				INSERT INTO master_role
 				(
@@ -151,8 +156,9 @@ SET State = 7;
 			END WHILE loopdata; 
 		END IF;
 
-	IF(pIsEdit = 0) THEN
 SET State = 8;
+
+	IF(pIsEdit = 0) THEN
 		SELECT
 			pID AS 'ID',
 			'User Berhasil Ditambahkan' AS 'Message',
@@ -160,7 +166,9 @@ SET State = 8;
 			0 AS 'FailedFlag',
 			State AS 'State';
 	ELSE
+	
 SET State = 9;
+
 		SELECT
 			pID AS 'ID',
 			'User Berhasil Diubah' AS 'Message',
@@ -168,6 +176,7 @@ SET State = 9;
 			0 AS 'FailedFlag',
 			State AS 'State';
 	END IF;
+	
     COMMIT;
 END;
 $$

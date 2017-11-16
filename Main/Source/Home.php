@@ -1,64 +1,41 @@
 <?php
-	include "DBConfig.php";
-	include "GetSession.php";
+	include __DIR__ . "/DBConfig.php";
+	include __DIR__ . "/GetSession.php";
 ?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
+		<title>Main App</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Klinik Gigi</title>
+		
+		
 		<link href="assets/css/bootstrap.css" rel="stylesheet" />
 		<link href="assets/css/font-awesome.css" rel="stylesheet" />
 		<link href="assets/css/jquery-ui-1.10.3.custom.min.css" rel="stylesheet" />
 		<link href="assets/js/morris/morris-0.4.3.min.css" rel="stylesheet" />
 		<link href="assets/css/custom.css" rel="stylesheet" />
 		<link href="assets/css/jquery.bootgrid.css" rel="stylesheet" />
-		<!--<link href="assets/js/dataTables/dataTables.bootstrap.css" rel="stylesheet" />-->
 		<link rel="stylesheet" href="assets/css/bootstrap-multiselect.css" type="text/css"/>
 		
-		<link rel="apple-touch-icon" sizes="180x180" href="./assets/img/apple-touch-icon.png">
-		<link rel="icon" type="image/png" href="./assets/img/favicon-32x32.png" sizes="32x32">
-		<link rel="icon" type="image/png" href="./assets/img/favicon-16x16.png" sizes="16x16">
-		<link rel="manifest" href="./assets/img/manifest.json">
-		<link rel="mask-icon" href="./assets/img/safari-pinned-tab.svg" color="#5bbad5">
-		<link rel="shortcut icon" href="./assets/img/favicon.ico">
-		<meta name="msapplication-config" content="./assets/img/browserconfig.xml">
-		<meta name="theme-color" content="#ffffff">
+		<link rel="shortcut icon" href="./assets/img/logo.ico">
+		<link rel="apple-touch-icon" sizes="57x57" href="./assets/img/apple-icon-57x57.png">
+		<link rel="apple-touch-icon" sizes="60x60" href="./assets/img/apple-icon-60x60.png">
+		<link rel="apple-touch-icon" sizes="72x72" href="./assets/img/apple-icon-72x72.png">
+		<link rel="apple-touch-icon" sizes="76x76" href="./assets/img/apple-icon-76x76.png">
+		<link rel="apple-touch-icon" sizes="114x114" href="./assets/img/apple-icon-114x114.png">
+		<link rel="apple-touch-icon" sizes="120x120" href="./assets/img/apple-icon-120x120.png">
+		<link rel="apple-touch-icon" sizes="144x144" href="./assets/img/apple-icon-144x144.png">
+		<link rel="apple-touch-icon" sizes="152x152" href="./assets/img/apple-icon-152x152.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="./assets/img/apple-icon-180x180.png">
+		<link rel="icon" type="image/png" sizes="192x192"  href="./assets/img/android-icon-192x192.png">
 		<link rel="icon" type="image/png" sizes="32x32" href="./assets/img/favicon-32x32.png">
 		<link rel="icon" type="image/png" sizes="96x96" href="./assets/img/favicon-96x96.png">
 		<link rel="icon" type="image/png" sizes="16x16" href="./assets/img/favicon-16x16.png">
-		<style>
-			.navbar {
-				min-height : 0px;
-			}
-			@media (min-width: 992px) {
-				.col-md-12 {
-				   float: none;
-				}
-			}
-			.panel-heading {
-				padding: 1px 15px;
-			}
-			.panel {
-				margin-bottom : 0px;
-			}
-			.panel-body {
-				margin-bottom : 0px;
-				padding : 5px;
-			}
-			h1, .h1, h2, .h2, h3, .h3 {
-				margin-top: 5px;
-				margin-bottom: 5px;
-			}
-			.panel-default {
-				height : device-height;
-			}
-			.bootgrid-footer {
-				margin: 10px 0;
-			}
-		</style>
-		
+		<link rel="manifest" href="./assets/img/manifest.json">
+		<meta name="msapplication-config" content="./assets/img/browserconfig.xml">
+		<meta name="msapplication-TileImage" content="./assets/img/ms-icon-144x144.png">
+		<meta name="theme-color" content="#ffffff">
 	</head>
 	<body>
 		<div id="wrapper">
@@ -89,55 +66,60 @@
 						</li>
 						<?php
 							$sql = "SELECT 
-									GroupMenuID,
-									GroupMenuName,
-									Icon,
-									Url
-								FROM
-									master_groupmenu
-								ORDER BY 
-									OrderNo ASC";
-							if (! $result=mysql_query($sql, $dbh)) {
-								echo mysql_error();
+										GroupMenuID,
+										GroupMenuName,
+										Icon,
+										Url
+									FROM
+										master_groupmenu
+									ORDER BY 
+										OrderNo ASC";
+										
+							if (!$result = mysqli_query($dbh, $sql)) {
+								echo mysqli_error($dbh);
 								return 0;
 							}
-							while($row = mysql_fetch_array($result)) {
-
+							
+							while($row = mysqli_fetch_array($result)) {
 								echo "<li>";
 								$sql2 = "SELECT
-										MM.MenuID,
-										MM.GroupMenuID,
-										MM.MenuName,
-										MM.Url,
-										MM.Icon
-									 FROM
-										master_menu MM
-										JOIN master_role MR
-											ON MR.MenuID = MM.MenuID
-									WHERE 
-										GroupMenuID = ".$row['GroupMenuID']."
-										AND MR.UserID = ".$_SESSION['UserID']."
-									GROUP BY
-										MM.MenuID
-									ORDER BY
-										MM.OrderNo ASC";
-								if (! $result2=mysql_query($sql2, $dbh)) {
-									echo mysql_error();
+											MM.MenuID,
+											MM.GroupMenuID,
+											MM.MenuName,
+											MM.Url,
+											MM.Icon
+										 FROM
+											master_menu MM
+											JOIN master_role MR
+												ON MR.MenuID = MM.MenuID
+										WHERE 
+											GroupMenuID = ".$row['GroupMenuID']."
+											AND MR.UserID = ".$_SESSION['UserID']."
+										GROUP BY
+											MM.MenuID
+										ORDER BY
+											MM.OrderNo ASC";
+											
+								if (!$result2 = mysqli_query($dbh, $sql2)) {
+									echo mysqli_error($dbh);
 									return 0;
 								}
-								$rowcount = mysql_num_rows($result2);
+								
+								$rowcount = mysqli_num_rows($result2);
+								
 								if($rowcount == 0 && $row['GroupMenuID'] == 1) echo "<a class='menu active-menu' href='#' id='Menu".$row['GroupMenuID']."' link='".$row['Url']."'><i class='".$row['Icon']."'></i> ".$row['GroupMenuName']."</a>";
 								else if($rowcount == 0) { }
 								else {
 									echo "<a href='#'><i class='".$row['Icon']."'></i>&nbsp; ".$row['GroupMenuName']."<span class='fa arrow'></span></a>";
 									echo "<ul class='nav nav-second-level'>";
-									while($row2 = mysql_fetch_array($result2)) {
+									while($row2 = mysqli_fetch_array($result2)) {
 										echo "<li>";
 										echo "<a href='#' link='".$row2['Url']."' class='menu' ><i class='".$row2['Icon']."'></i> ".$row2['MenuName']."</a>";
 										echo "</li>";
 									}
 									echo "</ul>";
 								}
+								
 								echo "</li>";
 							}
 						?>
@@ -147,7 +129,7 @@
 			<!-- /. NAV SIDE  -->
 			
 			<div id="page-wrapper">
-				<div id="page-inner">
+				<div id="page-inner" style="overflow-x:hidden;overflow-y:hidden;">
 					<!--<img src="./assets/img/logo.png" style="width:100%;"/>--><h1>Logo here</h1>
 				</div>
 			</div>
@@ -196,11 +178,9 @@
 		<script src="assets/js/notify.js"></script>
 		<script src="assets/js/global.js"></script>
 		<script src="assets/js/jquery.bootgrid.js"></script>
-		<!--<script src="assets/js/dataTables/jquery.dataTables.js"></script>
-		<script src="assets/js/dataTables/dataTables.bootstrap.js"></script>-->
 		<script src="assets/js/bootstrap-multiselect.js"></script>
+		<script src="assets/js/arrow-table.js"></script>
 		<a href="#Top" class="scrollup" onclick="return false;">Scroll</a>
-		<a href="#Bottom" class="scrolldown" onclick="return false;">Scroll</a>
 		<div id="loading"></div>
 		<iframe id='excelDownload' src='' style='display:none'></iframe>
 		<script type="text/javascript">
@@ -208,16 +188,28 @@
 				var windowHeight = $( window ).height() - 55;
 				$("#page-inner").css ({
 					"min-height" : windowHeight,
-					"max-height" : windowHeight,
-					"overflow-x" : "hidden",
-					"overflow-y" : "auto"
+					"max-height" : windowHeight
 				});
-				$("head").append("<style> .panel-default { min-height : " + windowHeight + "px } </style>");
 				$(".panel-default").css ({
 					"min-height" : windowHeight
 				});
+				$("head").append("<style> .panel-default { min-height : " + windowHeight + "px; } .panel-body { min-height : " + (windowHeight - 56) + "px; max-height : " + (windowHeight - 56) + "px } </style>");
 				$("#wrapper").css ({
 					"width" : "calc(100% - 5px)"
+				});
+				$( window ).resize(function() {
+					windowHeight = $( window ).height() - 55;
+					$("#page-inner").css ({
+						"min-height" : windowHeight,
+						"max-height" : windowHeight
+					});
+
+					$(".panel-default").css ({
+						"min-height" : windowHeight
+					});
+					$("#wrapper").css ({
+						"width" : "calc(100% - 5px)"
+					});
 				});
 				/*$.ajax({
 					url: "./Master/Notification/",
@@ -237,7 +229,6 @@
 					}
 				});*/
 			});
-			//alert($( window ).height());
 		</script>
 	</body>
 </html>

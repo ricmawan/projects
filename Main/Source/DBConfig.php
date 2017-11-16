@@ -1,29 +1,39 @@
 <?php
 	$DBUser = "root";
 	$DBPass = "";
-	$DBName = "klinik_gigi";
+	$DBName = "main";
 	$Host = "localhost";
-	if (! $dbh = mysql_connect($Host, $DBUser, $DBPass)) {
-		echo mysql_error();
+	
+	GLOBAL $dbh;
+	$dbh = mysqli_connect($Host, $DBUser, $DBPass, $DBName);
+
+	if (mysqli_connect_errno()) {
+		echo "Failed to connect to MySQL: " . mysqli_connect_error();
+	}
+	
+	$currentUser = "user";
+	if(ISSET($_SESSION['UserLogin'])) $currentUser = $_SESSION['UserLogin'];
+	$sql = "CALL spSelParameter('$currentUser')";
+			
+	if(!$result = mysqli_query($dbh, $sql)) {
+		logEvent(mysqli_error($dbh), '/Login.php', mysqli_real_escape_string($dbh, $currentUser));
+		echo "<script>$('#loading').hide();</script>";
 		return 0;
 	}
 
-	if (! mysql_select_db($DBName)) {
-		echo mysql_error();
-		return 0;
-	}
-
-	$sql = "SELECT
-			ParameterName,
-			ParameterValue
-		FROM
-			master_parameter";
-	if (! $result=mysql_query($sql, $dbh)) {
-		echo mysql_error();
-		return 0;
-	}
-
-	while($row = mysql_fetch_array($result)) {
+	while($row = mysqli_fetch_array($result)) {
 		${$row['ParameterName']} = $row['ParameterValue'];
+	}
+	mysqli_free_result($result);
+	mysqli_next_result($dbh);
+	
+	function logEvent($message, $source, $user) {
+		mysqli_next_result($GLOBALS['dbh']);
+		$sql = "CALL spInsEventLog('$message', '$source', '$user');";
+		if (!$result = mysqli_query($GLOBALS['dbh'], $sql)) {
+			echo mysqli_error($GLOBALS['dbh']);
+			//logEvent(mysqli_error($GLOBALS['dbh']), '/DBConfig.php', mysqli_real_escape_string($GLOBALS['dbh'], $user));
+			//return 0;
+		}
 	}
 ?>

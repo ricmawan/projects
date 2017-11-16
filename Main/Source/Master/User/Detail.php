@@ -1,8 +1,8 @@
 <?php
 	if(isset($_GET['ID'])) {
-		$RequestPath = "$_SERVER[REQUEST_URI]";
-		$file = basename($RequestPath);
-		$RequestPath = str_replace($file, "", $RequestPath);
+		$RequestedPath = "$_SERVER[REQUEST_URI]";
+		$file = basename($RequestedPath);
+		$RequestedPath = str_replace($file, "", $RequestedPath);
 		include "../../GetPermission.php";
 		//echo $_SERVER['REQUEST_URI'];
 		$Content = "";
@@ -74,7 +74,7 @@
 					<div class="panel-heading">
 						<h5><?php if($IsEdit == 0) echo "Tambah"; else echo "Ubah"; ?> Data User</h5>  
 					</div>
-					<div class="panel-body">
+					<div class="panel-body" style="overflow-y:auto;">
 						<form class="col-md-12" id="PostForm" method="POST" action="" >
 							<div class="row">
 								<div class="col-md-1 labelColumn">
@@ -119,11 +119,11 @@
 							<br />
 							<div class="row">
 								<div class="col-md-10">
-									<div class="panel panel-default" style="max-height: 370px;min-height: 340px;" >
+									<div class="panel panel-default" style="max-height: 380px;min-height: 380px;" >
 										<div class="panel-heading">
 											<h5>Pilih Hak Akses Menu</h5>
 										</div>
-										<div class="panel-body" style="min-height: 320px;max-height:325px;overflow-y:auto;">
+										<div class="panel-body" style="min-height: 320px !important;max-height:320px!important;overflow-y:auto;">
 											<div class="table-responsive">
 												<table class="table table-striped table-bordered table-hover">
 													<thead>
@@ -197,6 +197,8 @@
 									</div>
 								</div>
 							</div>
+							<br />
+							<br />
 							<br />
 							<input type="hidden" name="hdnMenuID" id="hdnMenuID" <?php echo 'value="'.$MenuID.'"'; ?> />
 							<input type="hidden" name="hdnEditMenuID" id="hdnEditMenuID" <?php echo 'value="'.$EditMenuID.'"'; ?> />

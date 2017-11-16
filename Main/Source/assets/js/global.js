@@ -1,10 +1,11 @@
 $.fn.hasAttr = function(name) {  
 	return this.attr(name) !== undefined;
 };
+
 var CurrentMenu = "./Home.php";
 var PrevMenu;
-$(document).ready(function () {
 
+$(document).ready(function () {
 	//Date picker option : .DatePickerGlobal, .DatePickerUntilNow, .DatePickerFromNow, .DatePickerMonthYearGlobal, .DatePickerMonthYearUntilNow, .DatePickerMonthYearFromNow
 	$(document).on('focus',".DatePickerGlobal", function(){
 		$(this).datepicker({
@@ -119,7 +120,6 @@ $(document).ready(function () {
 	});
 	
 	$(document).on("click", ".menu", function() {
-		//alert($(this).attr("link"));
 		var MenuClicked = $(this).attr("link");
 		PrevMenu = CurrentMenu;
 		CurrentMenu = MenuClicked;
@@ -170,11 +170,11 @@ $(document).ready(function () {
 		$(this).addClass("active-menu");
 	});
 });
+
 function Redirect(link) {
 	var MenuClicked = link;
 	PrevMenu = CurrentMenu;
 	CurrentMenu = MenuClicked;
-	//if( $(this).is("a")) $(".menu").removeClass("active-menu");
 	$("#loading").show();
 	$("#page-inner").html("");
 	if(MenuClicked != "./Home.php") {
@@ -221,6 +221,7 @@ function Redirect(link) {
 		$("#loading").hide();
 	}
 }
+
 function Reload() {
 	$("#loading").show();
 	$("#page-inner").html("");
@@ -296,6 +297,7 @@ function isEnterKey(evt, fn) {
 	var charCode = e.which || e.keyCode;
 	if (charCode == 13) window[fn]();
 }
+
 function PercentNumber(evt, id, value) {
 	$("#" + id).removeAttr("onpaste");
 	$("#" + id).attr("onpaste", "return false;");
@@ -308,6 +310,7 @@ function PercentNumber(evt, id, value) {
 	if (e.shiftKey) return false;
 	return true;
 }
+
 function convertRupiah(id, angka){
 	if(angka.indexOf(",") < 0 && angka != "" && angka != ".00") {
 		var flag = 0;
@@ -322,7 +325,6 @@ function convertRupiah(id, angka){
 		var angkarev = angka.toString().split('').reverse().join('');
 		for(var i = 0; i < angkarev.length; i++) if(i%3 == 0) rupiah += angkarev.substr(i,3)+',';
 		
-		//console.log(rupiah);
 		if(angkarev.length > 3) {
 			angka = rupiah.split('',rupiah.length-1).reverse().join('');
 			if(flag == 1) $("#" + id).val(angka + "." + koma);
@@ -336,7 +338,6 @@ function convertRupiah(id, angka){
 	else if(angka == "" || angka == ".00") {
 		$("#" + id).val("0.00");
 	}
-	//$("#" + id).blur();
 }
 
 function returnRupiah(angka) {	
@@ -366,7 +367,6 @@ function returnRupiah(angka) {
 		angka = "0.00";
 	}
 	return angka;
-	//$("#" + id).blur();
 }
 
 
@@ -639,6 +639,7 @@ function DeleteData(url) {
 window.onload=GetClock;
 tday  =new Array("Minggu","Senin","Selasa","Rabu","Kamis","Jum'at","Sabtu");
 tmonth=new Array("January","February","Maret","April","Mei","Juni","July","Agustus","September","Oktober","November","Desember");
+
 function checkall() {
 	var checkall = $("#check-all").is(':checked'); 
 	if(checkall == true) {
@@ -650,6 +651,7 @@ function checkall() {
 		$(".delete").removeAttr('checked');
 	}
 }
+
 function GetClock(){
 	d = new Date();
 	nday   = d.getDay();
@@ -665,6 +667,7 @@ function GetClock(){
 	$("#Clock").html(" " + tday[nday] + ", " + ndate + " " + tmonth[nmonth] + " " + nyear + " " + nhour + ":" + nmin + ":" + nsec);
 	setTimeout("GetClock()", 1000);
 }
+
 //marquee title bar
 var rev = "fwd";
 function titlebar(val){
@@ -697,6 +700,7 @@ function titlebar(val){
 		}
 	}
 }
+
 function minmax(value, min, max) 
 {
 	if(parseInt(value) < 0 || isNaN(value)) 

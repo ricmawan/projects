@@ -14,5 +14,5 @@ VALUES
 ),
 (
 	2,
-	'Dokter'
+	'Kasir'
 );

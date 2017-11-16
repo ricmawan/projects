@@ -1,12 +1,12 @@
 <?php
 	header('Content-Type: application/json');
-	$RequestedPath = "$_SERVER[REQUEST_URI]";
-	$file = basename($RequestedPath);
-	$RequestedPath = str_replace($file, "", $RequestedPath);
+	$RequestPath = "$_SERVER[REQUEST_URI]";
+	$file = basename($RequestPath);
+	$RequestPath = str_replace($file, "", $RequestPath);
 	include "../../GetPermission.php";
 
-	$where = " 1=1 AND MUT.UserTypeID = 1 ";
-	$order_by = "MU.UserID";
+	$where = " 1=1";
+	$order_by = "OP.OperationalID DESC";
 	$rows = 10;
 	$current = 1;
 	$limit_l = ($current * $rows) - ($rows);
@@ -17,18 +17,14 @@
 		$order_by = "";
 		foreach($_REQUEST['sort'] as $key => $value) {
 			if($key != 'No') $order_by .= " $key $value";
-			else $order_by = "MU.UserID";
+			else $order_by = "OP.OperationalID DESC";
 		}
 	}
 	//Handles search querystring sent from Bootgrid
 	if (ISSET($_REQUEST['searchPhrase']) )
 	{
 		$search = trim($_REQUEST['searchPhrase']);
-		$where .= " AND ( MU.UserName LIKE '%".$search."%' OR MUT.UserTypeName LIKE '%".$search."%' OR MU.UserLogin LIKE '%".$search."%' OR CASE
-																								WHEN MU.IsActive = 0
-																								THEN 'Tidak Aktif'
-																								ELSE 'Aktif'
-																							 END LIKE '%".$search."%'																							 ) ";
+		$where .= " AND ( OP.Remarks LIKE '%".$search."%' OR DATE_FORMAT(OP.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' ) ";
 	}
 	//Handles determines where in the paging count this result set falls in
 	if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];
@@ -41,56 +37,48 @@
 	}
 	if ($rows == -1) $limit = ""; //no limit
 	else $limit = " LIMIT $limit_l, $limit_h ";
-
 	$sql = "SELECT
 				COUNT(*) AS nRows
 			FROM
-				master_user MU
-				JOIN master_usertype MUT
-					ON MU.UserTypeID = MUT.UserTypeID
+				transaction_operational OP
 			WHERE
 				$where";
-	if (! $result = mysqli_query($dbh, $sql)) {
-		echo mysqli_error();
+	
+	if (! $result = mysql_query($sql, $dbh)) {
+		echo mysql_error();
 		return 0;
 	}
-	$row = mysqli_fetch_array($result);
+	$row = mysql_fetch_array($result);
 	$nRows = $row['nRows'];
 	$sql = "SELECT
-				MU.UserID,
-				MU.UserName,
-				MU.UserLogin,
-				CASE
-					WHEN MU.IsActive = 0
-					THEN 'Tidak Aktif'
-					ELSE 'Aktif'
-				END AS Status,
-				MU.UserPassword,
-				MUT.UserTypeName
+				OP.OperationalID,
+				DATE_FORMAT(OP.TransactionDate, '%d-%m-%Y') AS TransactionDate,
+				IFNULL(SUM(OPD.Amount), 0) Total,
+				OP.Remarks
 			FROM
-				master_user MU
-				JOIN master_usertype MUT
-					ON MU.UserTypeID = MUT.UserTypeID
+				transaction_operational OP
+				LEFT JOIN transaction_operationaldetails OPD
+					ON OP.OperationalID = OPD.OperationalID
 			WHERE
 				$where
+			GROUP BY
+				OP.OperationalID
 			ORDER BY 
 				$order_by
-			$limit;";
-	if (! $result = mysqli_query($dbh, $sql)) {
-		echo mysqli_error();
+			$limit";
+	if (! $result = mysql_query($sql, $dbh)) {
+		echo mysql_error();
 		return 0;
 	}
 	$return_arr = array();
 	$RowNumber = $limit_l;
-	while ($row = mysqli_fetch_array($result)) {
+	while ($row = mysql_fetch_array($result)) {
 		$RowNumber++;
 		$row_array['RowNumber'] = $RowNumber;
-		$row_array['UserIDName'] = $row['UserID']."^".$row['UserName'];
-		$row_array['UserID']= $row['UserID'];
-		$row_array['Status']= $row['Status'];
-		$row_array['UserName'] = $row['UserName'];
-		$row_array['UserTypeName'] = $row['UserTypeName'];
-		$row_array['UserLogin'] = $row['UserLogin'];
+		$row_array['OperationalID']= $row['OperationalID'];
+		$row_array['Total'] =  number_format($row['Total'],2,".",",");
+		$row_array['TransactionDate'] = $row['TransactionDate'];
+		$row_array['Remarks'] = $row['Remarks'];
 		array_push($return_arr, $row_array);
 	}
 

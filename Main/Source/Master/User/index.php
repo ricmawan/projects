@@ -1,5 +1,5 @@
 <?php
-	$RequestPath = "$_SERVER[REQUEST_URI]";
+	$RequestedPath = "$_SERVER[REQUEST_URI]";
 	include "../../GetPermission.php";
 ?>
 <html>
@@ -72,6 +72,8 @@
 								Redirect($(this).data("link"));
 							});
 						});
+						
+				$("#grid-data").arrowTable();
 			});
 		</script>
 	</body>

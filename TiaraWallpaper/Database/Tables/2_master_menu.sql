@@ -301,6 +301,15 @@ VALUES
 	NULL,
 	1,
 	10
+),
+(
+	32,
+	3,
+	'Pembayaran',
+	'Transaction/Payment/',
+	NULL,
+	0,
+	10
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

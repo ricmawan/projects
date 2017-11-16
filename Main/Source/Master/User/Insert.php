@@ -1,8 +1,8 @@
 <?php
 	if(isset($_POST['hdnUserID'])) {
-		$RequestPath = "$_SERVER[REQUEST_URI]";
-		$file = basename($RequestPath);
-		$RequestPath = str_replace($file, "", $RequestPath);
+		$RequestedPath = "$_SERVER[REQUEST_URI]";
+		$file = basename($RequestedPath);
+		$RequestedPath = str_replace($file, "", $RequestedPath);
 		include "../../GetPermission.php";
 		$UserID = mysql_real_escape_string($_POST['hdnUserID']);
 		$UserName = mysql_real_escape_string($_POST['txtUserName']);

@@ -1,8 +1,8 @@
 <?php
 	if(isset($_POST['ID'])) {
-		$RequestPath = "$_SERVER[REQUEST_URI]";
-		$file = basename($RequestPath);
-		$RequestPath = str_replace($file, "", $RequestPath);
+		$RequestedPath = "$_SERVER[REQUEST_URI]";
+		$file = basename($RequestedPath);
+		$RequestedPath = str_replace($file, "", $RequestedPath);
 		include "../../GetPermission.php";
 		$MessageSuccessDelete = "";
 		$MessageFailedDelete = "";
