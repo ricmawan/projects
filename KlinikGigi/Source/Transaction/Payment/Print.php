@@ -61,8 +61,8 @@
 				$this->Cell(2,0.5,"Tanggal",0,0,'L');
 				$this->Cell(10,0.5," : ".$GLOBALS['date'],0,1,'L');
 				$this->Ln();
-				$header = array('No', 'Tindakan', 'Jumlah', 'Harga', 'Sub Total', 'Keterangan');
-				$w=array(0.8,3,1.5,2.25,2.25,3);
+				$header = array('No', 'Tindakan', 'Jumlah', 'Harga', 'Sub Total');
+				$w=array(0.8,4.5,1.5,3,3);
 				$this->SetX(1);
 				$this->SetFont('Arial','B',9);
 				for($i=0; $i<count($header); $i++) {
@@ -76,15 +76,16 @@
 				//Data
 				$this->SetFont('Arial','',8);
 				//Lebar kolom
-				$w=array(0.8,3,1.5,2.25,2.25,3);
+				$w=array(0.8,4.5,1.5,3,3);
 				$this->SetX(1);
 				$sql = "SELECT
+							TMD.MedicationDetailsID,
 							ME.ExaminationName,
 							TMD.Quantity,
 							TMD.Price,
 							TM.Cash,
 							TM.Debit,
-							IFNULL(MD.Total, 0) + (TMD.Quantity * TMD.Price) SubTotal,
+							(TMD.Quantity * TMD.Price) SubTotal,
 							TMD.Remarks
 						FROM
 							transaction_medication TM
@@ -92,18 +93,6 @@
 								ON TM.MedicationID = TMD.MedicationID
 							JOIN master_examination ME
 								ON ME.ExaminationID = TMD.ExaminationID
-							LEFT JOIN
-							(
-								SELECT
-									MD.MedicationDetailsID,
-									MD.SessionID,
-									SUM(MD.SalePrice * MD.Quantity) Total
-								FROM
-									transaction_materialdetails MD
-								GROUP BY
-									MD.MedicationDetailsID
-							)MD
-								ON MD.MedicationDetailsID = TMD.MedicationDetailsID
 						WHERE
 							TM.MedicationID = ".$GLOBALS['ID'];
 							
@@ -122,37 +111,65 @@
 					$this->Cell($w[0],0.7,$RowNumber,1,0,'C');
 					$this->Cell($w[1],0.7,$row['ExaminationName'],1,0,'L');
 					$this->Cell($w[2],0.7,$row['Quantity'],1,0,'R');
-					$this->Cell($w[3],0.7,number_format($row['SubTotal'],2,".",","),1,0,'R');
+					$this->Cell($w[3],0.7,number_format($row['Price'],2,".",","),1,0,'R');
 					$this->Cell($w[4],0.7,number_format($row['SubTotal'],2,".",","),1,0,'R');
-					$this->Cell($w[5],0.7,$row['Remarks'],1,0,'L');
+					//$this->Cell($w[5],0.7,$row['Remarks'],1,0,'L');
 					$this->Ln();
 					$this->SetX(1);
 					$RowNumber++;
+					
+					$sql2 = "SELECT
+								MM.MaterialName,
+								MD.SalePrice,
+								MD.Quantity,
+								(MD.SalePrice * MD.Quantity) SubTotal
+							FROM
+								transaction_materialdetails MD
+								JOIN master_material MM
+									ON MM.MaterialID = MD.MaterialID
+							WHERE
+								MD.MedicationDetailsID = ".$row['MedicationDetailsID'];
+								
+					if (! $result2 = mysql_query($sql2, $dbh)) {
+						echo mysql_error();
+						return 0;
+					}
+					
+					while($row2 = mysql_fetch_array($result2)) {
+						$GrandTotal += $row2['SubTotal'];
+						$this->Cell($w[0],0.7,"",1,0,'C');
+						$this->Cell($w[1],0.7,chr(149). " " .$row2['MaterialName'],1,0,'L');
+						$this->Cell($w[2],0.7,$row2['Quantity'],1,0,'R');
+						$this->Cell($w[3],0.7,number_format($row2['SalePrice'],2,".",","),1,0,'R');
+						$this->Cell($w[4],0.7,number_format($row2['SubTotal'],2,".",","),1,0,'R');
+						$this->Ln();
+						$this->SetX(1);
+					}
 				}
-				$this->Cell(7.55,0.7,'Total',1,0,'L');
-				$this->Cell(2.25,0.7,number_format($GrandTotal,2,".",","),1,0,'R');
-				$this->Cell(3,0.7,'',1,0,'L');
+				$this->Cell(9.8,0.7,'Total',1,0,'L');
+				$this->Cell(3,0.7,number_format($GrandTotal,2,".",","),1,0,'R');
+				//$this->Cell(3,0.7,'',1,0,'L');
 				$this->Ln();
 				$this->SetX(1);
 					
-				$this->Cell(7.55,0.7,'Cash',1,0,'L');
-				$this->Cell(2.25,0.7,number_format($Cash,2,".",","),1,0,'R');
-				$this->Cell(3,0.7,'',1,0,'L');
+				$this->Cell(9.8,0.7,'Cash',1,0,'L');
+				$this->Cell(3,0.7,number_format($Cash,2,".",","),1,0,'R');
+				//$this->Cell(3,0.7,'',1,0,'L');
 				
 				$this->Ln();
 				$this->SetX(1);
 					
-				$this->Cell(7.55,0.7,'Debit',1,0,'L');
-				$this->Cell(2.25,0.7,number_format($Debit,2,".",","),1,0,'R');
-				$this->Cell(3,0.7,'',1,0,'L');
+				$this->Cell(9.8,0.7,'Debit',1,0,'L');
+				$this->Cell(3,0.7,number_format($Debit,2,".",","),1,0,'R');
+				//$this->Cell(3,0.7,'',1,0,'L');
 				
 				if($GrandTotal > ($Cash + $Debit)) {
 					$this->Ln();
 					$this->SetX(1);
 						
-					$this->Cell(7.55,0.7,'Kekurangan',1,0,'L');
-					$this->Cell(2.25,0.7,number_format(($GrandTotal - $Cash - $Debit),2,".",","),1,0,'R');
-					$this->Cell(3,0.7,'',1,0,'L');
+					$this->Cell(9.8,0.7,'Kekurangan',1,0,'L');
+					$this->Cell(3,0.7,number_format(($GrandTotal - $Cash - $Debit),2,".",","),1,0,'R');
+					//$this->Cell(3,0.7,'',1,0,'L');
 				}
 			}
 			function AutoPrint($dialog=false)
