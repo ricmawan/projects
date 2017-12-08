@@ -169,27 +169,32 @@
 						multiSelect: true,
 						rowSelect: true,
 						keepSelection: true
-					});
-					if($("input:radio[name=chkInterval]:checked").val() == "Daily") {
-						$("th[data-column-id='TransactionDate']").css({
-							"display" : "table-cell"
-						});
-						
-						$("#grid-data tbody tr td:nth-child(2)").css({
-							"display" : "table-cell"
-						});
-					}
-					else {
-						$("th[data-column-id='TransactionDate']").css({
-							"display" : "none"
-						});
-						
-						setTimeout(function () {
+					}).on("loaded.rs.jquery.bootgrid", function (e)
+					{
+						/* your code goes here */
+						if($("input:radio[name=chkInterval]:checked").val() == "Daily") {
+							$("th[data-column-id='TransactionDate']").css({
+								"display" : "table-cell"
+							});
+							
 							$("#grid-data tbody tr td:nth-child(2)").css({
+								"display" : "table-cell"
+							});
+						}
+						else {
+							$("th[data-column-id='TransactionDate']").css({
 								"display" : "none"
-							});	
-						}, 100);
-					}
+							});
+							
+							setTimeout(function () {
+								$("#grid-data tbody tr td:nth-child(2)").css({
+									"display" : "none"
+								});	
+							}, 100);
+							
+						}
+					});
+					
 					$("#dvTable").show();
 					$("#loading").hide();
 				}

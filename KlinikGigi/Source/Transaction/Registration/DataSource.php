@@ -5,7 +5,7 @@
 	$RequestPath = str_replace($file, "", $RequestPath);
 	include "../../GetPermission.php";
 
-	$where = " 1=1 AND TM.IsDone = 0 AND TM.IsCancelled = 0 AND DATE_FORMAT(TM.TransactionDate, '%d-%m-%Y') = DATE_FORMAT(NOW(), '%d-%m-%Y') ";
+	$where = " 1=1 AND TM.IsDone = 0 AND TM.IsCancelled = 0 AND DATE_FORMAT(TM.TransactionDate, '%d-%m-%Y') = DATE_FORMAT(ADDTIME(NOW(), '07:00:00'), '%d-%m-%Y') ";
 	$order_by = "TM.OrderNumber";
 	$rows = 10;
 	$current = 1;

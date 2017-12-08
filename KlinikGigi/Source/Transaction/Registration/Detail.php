@@ -74,7 +74,16 @@
 										Telepon :
 									</div>
 									<div class="col-md-3">
-										<input id="txtTelephone" name="txtTelephone" maxlength=30 type="text" class="form-control-custom" placeholder="Telepon" />
+										<input id="txtTelephone" name="txtTelephone" maxlength=30 type="text" class="form-control-custom" placeholder="Telepon" required />
+									</div>
+								</div>
+								<br />
+								<div class="row">
+									<div class="col-md-2 labelColumn">
+										Email :
+									</div>
+									<div class="col-md-3">
+										<input id="txtEmail" name="txtEmail" type="text" class="form-control-custom" placeholder="Email" />
 									</div>
 								</div>
 								<br />

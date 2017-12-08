@@ -25,7 +25,7 @@
 			return 0;
 		}
 		
-		if($_POST['txtNextSchedule'] != "") {
+		/*if($_POST['txtNextSchedule'] != "") {
 			$Date = explode(', ', mysql_real_escape_string($_POST['txtNextSchedule']));
 			$ScheduledDate = explode('-', $Date[1]);
 			$ScheduledDate = "$ScheduledDate[2]-$ScheduledDate[1]-$ScheduledDate[0]";
@@ -80,7 +80,7 @@
 				echo returnstate($MedicationID, $Message, $MessageDetail, $FailedFlag, $State);
 				return 0;
 			}
-		}
+		}*/
 		echo returnstate($MedicationID, $Message, $MessageDetail, $FailedFlag, $State);
 	}
 	

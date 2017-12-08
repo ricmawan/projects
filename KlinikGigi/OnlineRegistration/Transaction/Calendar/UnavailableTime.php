@@ -19,9 +19,9 @@
 				FROM
 					transaction_onlineschedule OS
 				WHERE
-					DATE_FORMAT(ScheduledDate, '%Y-%m-%e') = '".$StartDate."'
+					DATE_FORMAT(OS.ScheduledDate, '%Y-%m-%e') = '".$StartDate."'
 				GROUP BY
-					ScheduledDate
+					OS.ScheduledDate
 				HAVING
 					COUNT(1) > 2";
 

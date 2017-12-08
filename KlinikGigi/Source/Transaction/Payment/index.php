@@ -80,7 +80,7 @@
 						</div>
 					</div>
 					<br />
-					<div class="row">
+					<!--<div class="row">
 						<div class="col-md-4 labelColumn">
 							Jadwal Berikutnya :
 						</div>
@@ -88,7 +88,7 @@
 							<input id="txtNextSchedule" name="txtNextSchedule" type="text" class="form-control-custom" placeholder="Jadwal Berikutnya" />
 						</div>
 					</div>
-					<br />
+					<br />-->
 					<p id="lblInfo" style="display:none;"><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Masih terdapat kekurangan pembayaran dari transaksi sebelumnya!</p>
 				</form>
 			</div>

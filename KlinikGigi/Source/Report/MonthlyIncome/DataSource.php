@@ -42,7 +42,7 @@
 					(
 						SELECT
 							MONTH(TM.TransactionDate) TransactionDate,
-							SUM(TMD.TotalIncome) TotalIncome,
+							SUM(TMD.TotalIncome) + IFNULL(MD.Total, 0) TotalIncome,
 							SUM(TM.Cash) Cash,
 							SUM(TM.Debit) Debit
 						FROM
@@ -51,30 +51,35 @@
 							(
 								SELECT
 									TMD.MedicationID,
-									SUM(TMD.Quantity * TMD.Price) + IFNULL(MD.Total, 0) AS TotalIncome
+									SUM(TMD.Quantity * TMD.Price) AS TotalIncome
 								FROM
 									transaction_medicationdetails TMD
-									LEFT JOIN
-									(
-										SELECT
-											MD.MedicationDetailsID,
-											SUM(MD.SalePrice * MD.Quantity) Total
-										FROM
-											transaction_materialdetails MD
-										GROUP BY
-											MD.MedicationDetailsID
-									)MD
-										ON MD.MedicationDetailsID = TMD.MedicationDetailsID
 								GROUP BY
 									TMD.MedicationID
 							)TMD
 								ON TM.MedicationID = TMD.MedicationID
+							LEFT JOIN
+							(
+								SELECT
+									TM.MedicationID,
+									SUM(MD.SalePrice * MD.Quantity) Total
+								FROM
+									transaction_materialdetails MD
+									JOIN transaction_medicationdetails TMD
+										ON TMD.MedicationDetailsID = MD.MedicationDetailsID
+									JOIN transaction_medication TM
+										ON TM.MedicationID = TMD.MedicationID
+								GROUP BY
+									TM.MedicationID
+							)MD
+								ON TM.MedicationID = MD.MedicationID
 						WHERE
 							MONTH(TM.TransactionDate) = ".$ddlMonth."
 							AND YEAR(TM.TransactionDate) = ".$ddlYear."
 							AND TM.IsCancelled = 0
 							AND TM.IsDone = 1
 						GROUP BY
+							TM.MedicationID,
 							MONTH(TM.TransactionDate)
 						UNION ALL
 						SELECT

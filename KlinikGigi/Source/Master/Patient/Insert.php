@@ -34,10 +34,10 @@
 			$RootFolder = '../../assets/photos/';
 			$FolderName = $RootFolder . $PatientNumber . "_" . str_replace(" ", "_", $PatientName);
 			if(!is_dir($FolderName)) {
-				mkdir($FolderName, true);
-				mkdir($FolderName . "/Sebelum", true);
-				mkdir($FolderName . "/Proses", true);
-				mkdir($FolderName . "/Setelah", true);
+				mkdir($FolderName, 0777, true);
+				mkdir($FolderName . "/Sebelum", 0777, true);
+				mkdir($FolderName . "/Proses", 0777, true);
+				mkdir($FolderName . "/Setelah", 0777, true);
 			}
 		}
 		echo returnstate($row['ID'], $row['Message'], $row['MessageDetail'], $row['FailedFlag'], $row['State']);

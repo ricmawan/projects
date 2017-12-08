@@ -95,7 +95,7 @@
 				DP.Cash DebtCash,
 				DP.Debit DebtDebit,
 				SUM(TMD.Price * TMD.Quantity) + IFNULL(MD.Total, 0)  Total,
-				SUM(TMD.Price * TMD.Quantity) - (IFNULL(TM.Debit, 0) + IFNULL(TM.Cash, 0)) Debt
+				SUM(TMD.Price * TMD.Quantity) + IFNULL(MD.Total, 0) - (IFNULL(TM.Debit, 0) + IFNULL(TM.Cash, 0)) Debt
 			FROM
 				transaction_medication TM
 				JOIN master_patient MP
@@ -105,14 +105,18 @@
 				LEFT JOIN
 				(
 					SELECT
-						MD.MedicationDetailsID,
+						TM.MedicationID,
 						SUM(MD.SalePrice * MD.Quantity) Total
 					FROM
 						transaction_materialdetails MD
+						JOIN transaction_medicationdetails TMD
+							ON TMD.MedicationDetailsID = MD.MedicationDetailsID
+						JOIN transaction_medication TM
+							ON TM.MedicationID = TMD.MedicationID
 					GROUP BY
-						MD.MedicationDetailsID
+						TM.MedicationID
 				)MD
-					ON MD.MedicationDetailsID = TMD.MedicationDetailsID
+					ON TM.MedicationID = MD.MedicationID
 				LEFT JOIN transaction_debtpayment DP
 					ON TM.MedicationID = DP.MedicationID
 			WHERE

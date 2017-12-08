@@ -14,14 +14,14 @@
 		$State = 1;
 		
 		$sql = "SELECT
-					DATE_FORMAT(OS.ScheduledDate, '%k:%i') unavailableTime,
+					DATE_FORMAT(CS.ScheduledDate, '%k:%i') unavailableTime,
 					COUNT(1)
 				FROM
-					transaction_onlineschedule OS
+					transaction_checkschedule CS
 				WHERE
-					DATE_FORMAT(ScheduledDate, '%Y-%m-%e') = '".$StartDate."'
+					DATE_FORMAT(CS.ScheduledDate, '%Y-%m-%e') = '".$StartDate."'
 				GROUP BY
-					ScheduledDate
+					CS.ScheduledDate
 				HAVING
 					COUNT(1) > 2";
 

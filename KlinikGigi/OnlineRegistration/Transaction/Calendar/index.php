@@ -369,7 +369,33 @@
 
 						// change the border color just for fun
 						//$(this).css('border-color', 'red');
-
+						var date = calEvent.start;
+						var count = 0;
+						if(date.format('e') > 0 && date.format('e') < 6) {
+							$('#calendar').fullCalendar('clientEvents', function(event) {
+								if(moment(date).format('YYYY-MM-DD') == moment(event.start._i).format('YYYY-MM-DD') && count == 0) {
+									count++;
+									if(event.isavailable[0] == "0") {
+										$.notify("Jadwal Penuh!", "error");
+										return false;
+									}
+									else {
+										var startDate = new Date(date);
+										var scheduledDate = startDate.getFullYear().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getDate().toString();
+										$("#lblStartDate").html(startDate.getDate().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getFullYear().toString());
+										$("#hdnStartDate").val(scheduledDate);
+										dialogSchedule();
+									}
+								}
+							});
+							if(count == 0) {
+								var startDate = new Date(date);
+								var scheduledDate = startDate.getFullYear().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getDate().toString();
+								$("#lblStartDate").html(startDate.getDate().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getFullYear().toString());
+								$("#hdnStartDate").val(scheduledDate);
+								dialogSchedule();
+							}
+						}
 					},
 					navLinks: true, // can click day/week names to navigate views
 					selectable: true,
