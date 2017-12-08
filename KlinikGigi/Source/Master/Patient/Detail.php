@@ -101,7 +101,7 @@
 									Telepon :
 								</div>
 								<div class="col-md-3">
-									<input id="txtTelephone" name="txtTelephone" maxlength=30 type="text" class="form-control-custom" placeholder="Telepon" <?php echo 'value="'.$Telephone.'"'; ?> />
+									<input id="txtTelephone" name="txtTelephone" maxlength=30 type="text" class="form-control-custom" placeholder="Telepon" <?php echo 'value="'.$Telephone.'"'; ?> required />
 								</div>
 							</div>
 							<br />
@@ -110,7 +110,7 @@
 									Email :
 								</div>
 								<div class="col-md-3">
-									<input id="txtEmail" name="txtEmail" type="text" class="form-control-custom" placeholder="Email" <?php echo 'value="'.$Email.'"'; ?> required />
+									<input id="txtEmail" name="txtEmail" type="text" class="form-control-custom" placeholder="Email" <?php echo 'value="'.$Email.'"'; ?> />
 								</div>
 							</div>
 							<br />
