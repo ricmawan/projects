@@ -5,95 +5,79 @@
 	$RequestedPath = str_replace($file, "", $RequestedPath);
 	include "../../GetPermission.php";
 
+	$requestData= $_REQUEST;
+	$columns = array(
+					0 => "UserID",
+					1 => "RowNumber",
+					2 => "UserName",
+					3 => "UserLogin",
+					4 => "Status"
+				);
+
 	$where = " 1=1 AND MUT.UserTypeID = 1 ";
 	$order_by = "MU.UserID";
-	$rows = 10;
-	$current = 1;
-	$limit_l = ($current * $rows) - ($rows);
-	$limit_h = $limit_l + $rows ;
+	$limit_s = $requestData['start'];
+	$limit_l = $requestData['length'];
+	
 	//Handles Sort querystring sent from Bootgrid
-	if (ISSET($_REQUEST['sort']) && is_array($_REQUEST['sort']) )
-	{
-		$order_by = "";
-		foreach($_REQUEST['sort'] as $key => $value) {
-			if($key != 'No') $order_by .= " $key $value";
-			else $order_by = "MU.UserID";
-		}
-	}
+	$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
 	//Handles search querystring sent from Bootgrid
-	if (ISSET($_REQUEST['searchPhrase']) )
+	if (!empty($requestData['search']['value']))
 	{
-		$search = trim($_REQUEST['searchPhrase']);
-		$where .= " AND ( MU.UserName LIKE '%".$search."%' OR MUT.UserTypeName LIKE '%".$search."%' OR MU.UserLogin LIKE '%".$search."%' OR CASE
-																								WHEN MU.IsActive = 0
-																								THEN 'Tidak Aktif'
-																								ELSE 'Aktif'
-																							 END LIKE '%".$search."%'																							 ) ";
+		$search = trim($requestData['search']['value']);
+		$where .= " AND ( MU.UserName LIKE '%".$search."%'";
+		$where .= "OR MUT.UserTypeName LIKE '%".$search."%'";
+		$where .= "OR MU.UserLogin LIKE '%".$search."%'";
+		$where .= "OR CASE
+						WHEN MU.IsActive = 0
+						THEN 'Tidak Aktif'
+						ELSE 'Aktif'
+					  END LIKE '%".$search."%') ";
 	}
-	//Handles determines where in the paging count this result set falls in
-	if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];
-	//calculate the low and high limits for the SQL LIMIT x,y clause
-	if (ISSET($_REQUEST['current']) )
-	{
-		$current = $_REQUEST['current'];
-		$limit_l = ($current * $rows) - ($rows);
-		$limit_h = $rows ;
-	}
-	if ($rows == -1) $limit = ""; //no limit
-	else $limit = " LIMIT $limit_l, $limit_h ";
-
-	$sql = "SELECT
-				COUNT(*) AS nRows
-			FROM
-				master_user MU
-				JOIN master_usertype MUT
-					ON MU.UserTypeID = MUT.UserTypeID
-			WHERE
-				$where";
+	
+	$sql = "CALL spSelUser('$where', '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";		
 	if (! $result = mysqli_query($dbh, $sql)) {
-		echo mysqli_error();
+		logEvent(mysqli_error($dbh), '/Master/User/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+		echo "<script>$('#loading').hide();</script>";
 		return 0;
 	}
+	//$result1 = mysqli_use_result($dbh);
 	$row = mysqli_fetch_array($result);
-	$nRows = $row['nRows'];
-	$sql = "SELECT
-				MU.UserID,
-				MU.UserName,
-				MU.UserLogin,
-				CASE
-					WHEN MU.IsActive = 0
-					THEN 'Tidak Aktif'
-					ELSE 'Aktif'
-				END AS Status,
-				MU.UserPassword,
-				MUT.UserTypeName
-			FROM
-				master_user MU
-				JOIN master_usertype MUT
-					ON MU.UserTypeID = MUT.UserTypeID
-			WHERE
-				$where
-			ORDER BY 
-				$order_by
-			$limit;";
-	if (! $result = mysqli_query($dbh, $sql)) {
-		echo mysqli_error();
+	$totalData = $row['nRows'];
+	$totalFiltered = $totalData;
+	mysqli_free_result($result);
+	mysqli_next_result($dbh);
+	
+	$result2 = mysqli_use_result($dbh);
+	/*if (! $result = mysqli_query($dbh, $sql)) {
+		logEvent(mysqli_error($dbh), '/Master/User/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+		echo "<script>$('#loading').hide();</script>";
 		return 0;
-	}
+	}*/
 	$return_arr = array();
-	$RowNumber = $limit_l;
-	while ($row = mysqli_fetch_array($result)) {
+	$RowNumber = $requestData['start'];
+	while ($row = mysqli_fetch_array($result2)) {
+		$row_array = array();
 		$RowNumber++;
-		$row_array['RowNumber'] = $RowNumber;
-		$row_array['UserIDName'] = $row['UserID']."^".$row['UserName'];
-		$row_array['UserID']= $row['UserID'];
-		$row_array['Status']= $row['Status'];
-		$row_array['UserName'] = $row['UserName'];
-		$row_array['UserTypeName'] = $row['UserTypeName'];
-		$row_array['UserLogin'] = $row['UserLogin'];
+		$row_array[] = "<input type='checkbox' name='select' value='".$row['UserID']."^".$row['UserName']."' />";
+		$row_array[] = $RowNumber;
+		$row_array[] = $row['UserName'];
+		$row_array[] = $row['UserID'];
+		$row_array[] = $row['UserLogin'];
+		$row_array[]= $row['Status'];
+		
 		array_push($return_arr, $row_array);
 	}
+	
+	mysqli_free_result($result2);
+	mysqli_next_result($dbh);
 
-	$json = json_encode($return_arr);
-	echo "{ \"current\": $current, \"rowCount\":$rows, \"rows\": ".$json.", \"total\": $nRows }";
+	$json_data = array(
+					"draw"				=> intval( $requestData['draw'] ),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw. 
+					"recordsTotal"		=> intval( $totalData ),  // total number of records
+					"recordsFiltered"	=> intval( $totalFiltered ), // total number of records after searching, if there is no searching then totalFiltered = totalData
+					"data"				=> $return_arr
+				);
+	
+	echo json_encode($json_data);
 ?>

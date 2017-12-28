@@ -19,48 +19,26 @@
 		if($UserID != 0) {
 			$IsEdit = 1;
 			//$Content = "Place the content here";
-			$sql = "SELECT
-						UserID,
-						UserName,
-						UserLogin,
-						IsActive
-					FROM
-						master_user
-					WHERE
-						UserID = $UserID";
-						
-			if (! $result=mysql_query($sql, $dbh)) {
-				echo mysql_error();
-				return 0;
-			}				
-			$row=mysql_fetch_array($result);
-			$UserId = $row['UserID'];
-			$UserName = $row['UserName'];
-			$UserLogin = $row['UserLogin'];
-			$IsActive = $row['IsActive'];
-			
-			$sql = "SELECT
-						RoleID,
-						UserID,
-						MenuID,
-						EditFlag,
-						DeleteFlag
-					FROM
-						master_role
-					WHERE
-						UserID = $UserID";
-			if(!$result = mysql_query($sql, $dbh)) {
-				echo mysql_error();
+			$sql = "CALL spSelUserDetails($UserID, '".$_SESSION['UserLogin']."')";
+			if(!$result = mysqli_query($dbh, $sql)) {
+				logEvent(mysqli_error($dbh), '/Home.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+				echo "<script>$('#loading').hide();</script>";
 				return 0;
 			}
-			while($row = mysql_fetch_array($result)) {
+			while($row = mysqli_fetch_array($result)) {
 				$MenuID .= $row['MenuID'].", ";
 				$EditMenuID .= $row['EditFlag'].", ";
 				$DeleteMenuID .= $row['DeleteFlag'].", ";
+				$UserId = $row['UserID'];
+				$UserName = $row['UserName'];
+				$UserLogin = $row['UserLogin'];
+				$IsActive = $row['IsActive'];
 			}
 			$MenuID = substr($MenuID, 0, -2);
 			$EditMenuID = substr($EditMenuID, 0, -2);
 			$DeleteMenuID = substr($DeleteMenuID, 0, -2);
+			mysqli_free_result($result);
+			mysqli_next_result($dbh);
 		}
 	}
 ?>
@@ -72,12 +50,18 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h5><?php if($IsEdit == 0) echo "Tambah"; else echo "Ubah"; ?> Data User</h5>  
+						<span style="width:50%;display:inline-block;">
+							<h5><?php if($IsEdit == 0) echo "Tambah"; else echo "Ubah"; ?> Data User</h5>
+						</span>
+						<span style="width:49%;display:inline-block;text-align:right;">
+							<button type="button" class="btn btn-default" value="Simpan" onclick="SubmitValidate(this.form);" ><i class="fa fa-save"></i> Simpan</button>&nbsp;&nbsp;
+							<button type="button" class="btn btn-default" value="Kembali" onclick='Back();' ><i class="fa fa-arrow-circle-left"></i> Kembali</button>
+						</span>
 					</div>
 					<div class="panel-body" style="overflow-y:auto;">
 						<form class="col-md-12" id="PostForm" method="POST" action="" >
 							<div class="row">
-								<div class="col-md-1 labelColumn">
+								<div class="col-md-2 labelColumn">
 									Nama :
 									<input id="hdnUserID" name="hdnUserID" type="hidden" <?php echo 'value="'.$UserID.'"'; ?> />
 									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
@@ -94,8 +78,8 @@
 							</div>
 							<br />
 							<div class="row">
-								<div class="col-md-1 labelColumn">
-									Password:
+								<div class="col-md-2 labelColumn">
+									Password :
 								</div>
 								<div class="col-md-3">
 									<input id="txtPassword" name="txtPassword" type="password" class="form-control-custom" placeholder="Password" />
@@ -109,7 +93,7 @@
 							</div>
 							<br />
 							<div class="row">
-								<div class="col-md-1 labelColumn">
+								<div class="col-md-2 labelColumn">
 								</div>
 								<div class="col-md-3">
 									<input type="checkbox" id="chkActive" name="chkActive" value=1 /> Aktif
@@ -144,11 +128,11 @@
 																		Url
 																	FROM
 																		master_groupmenu";
-															if (! $result=mysql_query($sql, $dbh)) {
-																echo mysql_error();
+															if (! $result=mysqli_query($dbh, $sql)) {
+																echo mysqli_error();
 																return 0;
 															}
-															while($row = mysql_fetch_array($result)) {
+															while($row = mysqli_fetch_array($result)) {
 																$RowNumber = 1;
 																$sql2 = "SELECT
 																			MenuID,
@@ -162,11 +146,11 @@
 																			GroupMenuID = ".$row['GroupMenuID']."
 																		ORDER BY
 																			OrderNo";
-																if (! $result2=mysql_query($sql2, $dbh)) {
-																	echo mysql_error();
+																if (! $result2=mysqli_query($dbh, $sql2)) {
+																	echo mysqli_error();
 																	return 0;
 																}
-																$rowcount = mysql_num_rows($result2);
+																$rowcount = mysqli_num_rows($result2);
 																if($rowcount > 0) {
 																	echo "
 																		<tr>
@@ -176,7 +160,7 @@
 																			<td style='text-align:center;'><input id='ge".$row['GroupMenuID']."' name='groupedit' type='checkbox' value='true' /></td>
 																			<td style='text-align:center;'><input id='gd".$row['GroupMenuID']."' name='groupdelete' type='checkbox' value='true' /></td>
 																		</tr>";
-																	while($row2 = mysql_fetch_array($result2)) {
+																	while($row2 = mysqli_fetch_array($result2)) {
 																		echo "
 																			<tr>
 																				<td>$RowNumber.</td>
@@ -197,15 +181,10 @@
 									</div>
 								</div>
 							</div>
-							<br />
-							<br />
-							<br />
 							<input type="hidden" name="hdnMenuID" id="hdnMenuID" <?php echo 'value="'.$MenuID.'"'; ?> />
 							<input type="hidden" name="hdnEditMenuID" id="hdnEditMenuID" <?php echo 'value="'.$EditMenuID.'"'; ?> />
 							<input type="hidden" name="hdnDeleteMenuID" id="hdnDeleteMenuID" <?php echo 'value="'.$DeleteMenuID.'"'; ?> />
 							<input type="hidden" name="hdnIsActive" id="hdnIsActive" <?php echo 'value="'.$IsActive.'"'; ?> />
-							<button type="button" class="btn btn-default" value="Simpan" onclick="SubmitValidate(this.form);" ><i class="fa fa-save"></i> Simpan</button>&nbsp;&nbsp;
-							<button type="button" class="btn btn-default" value="Kembali" onclick='Back();' ><i class="fa fa-arrow-circle-left"></i> Kembali</button>
 						</form>
 					</div>
 				</div>
@@ -213,6 +192,7 @@
 		</div>
 		<script>
 			$(document).ready(function () {
+				$("#txtUserName").focus();
 				var MenuID = $("#hdnMenuID").val().split(", ");
 				var EditMenuID = $("#hdnEditMenuID").val().split(", ");
 				var DeleteMenuID = $("#hdnDeleteMenuID").val().split(", ");

@@ -30,34 +30,37 @@
 						master_user
 					WHERE
 						UserID = ".$UserID."";
-			if (! $result=mysql_query($sql, $dbh)) {
+			if (! $result=mysqli_query($dbh, $sql)) {
 				$Message = "Terjadi Kesalahan Sistem";
-				$MessageDetail = mysql_error();
+				$MessageDetail = mysqli_error();
 				$FailedFlag = 1;
 				echo returnstate($UserID, $Message, $MessageDetail, $FailedFlag, $State);
 				return 0;
 			}
-			$row = mysql_fetch_array($result);
+			$row = mysqli_fetch_array($result);
 			$Password = $row['UserPassword'];
 		}
 		else $Password = MD5($Password);
 
 		$sql = "CALL spInsUser(".$UserID.", '".$UserName."', 1, '".$UserLogin."', '".$Password."', '".$chkActive."', '".$hdnMenuID."', '".$hdnEditMenuID."', '".$hdnDeleteMenuID."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
 		
-		if (! $result=mysql_query($sql, $dbh)) {
+		if (! $result=mysqli_query($dbh, $sql)) {
 			$Message = "Terjadi Kesalahan Sistem";
-			$MessageDetail = mysql_error();
+			$MessageDetail = mysqli_error();
 			$FailedFlag = 1;
+			logEvent(mysqli_error($dbh), '/Master/User/Insert.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			echo "<script>$('#loading').hide();</script>";
 			echo returnstate($UserID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}				
-		$row=mysql_fetch_array($result);
+		$row=mysqli_fetch_array($result);
 		
 		if($row['FailedFlag'] == 0 && $_SESSION['UserID'] == $UserID) {
 			$_SESSION['UserPassword'] = $Password;
 			$_SESSION['UserLogin'] = $UserLogin;
 		}
-		
+		mysqli_free_result($result);
+		mysqli_next_result($dbh);
 		echo returnstate($row['ID'], $row['Message'], $row['MessageDetail'], $row['FailedFlag'], $row['State']);
 	}
 	

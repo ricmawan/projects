@@ -15,8 +15,11 @@
 		<link href="assets/css/jquery-ui-1.10.3.custom.min.css" rel="stylesheet" />
 		<link href="assets/js/morris/morris-0.4.3.min.css" rel="stylesheet" />
 		<link href="assets/css/custom.css" rel="stylesheet" />
-		<link href="assets/css/jquery.bootgrid.css" rel="stylesheet" />
-		<link rel="stylesheet" href="assets/css/bootstrap-multiselect.css" type="text/css"/>
+		<!--<link href="assets/css/jquery.bootgrid.css" rel="stylesheet" />-->
+		<link href="assets/css/dataTables.bootstrap.css" rel="stylesheet" />
+		<link href="assets/css/jquery.dataTables.css" rel="stylesheet" />
+		<link href="assets/css/keyTable.bootstrap.css" rel="stylesheet" />
+		<!--<link rel="stylesheet" href="assets/css/bootstrap-multiselect.css" type="text/css"/>-->
 		
 		<link rel="shortcut icon" href="./assets/img/logo.ico">
 		<link rel="apple-touch-icon" sizes="57x57" href="./assets/img/apple-icon-57x57.png">
@@ -36,6 +39,11 @@
 		<meta name="msapplication-config" content="./assets/img/browserconfig.xml">
 		<meta name="msapplication-TileImage" content="./assets/img/ms-icon-144x144.png">
 		<meta name="theme-color" content="#ffffff">
+		<style>
+			.dataTables_scrollBody {
+				min-height: 330px;
+			}
+		</style>
 	</head>
 	<body>
 		<div id="wrapper">
@@ -64,64 +72,50 @@
 						<li>
 							<a href="#" onclick="Reload();"><i class="fa fa-refresh fa-3x"></i> Reload</a>
 						</li>
+						<li>
+							<a class='menu active-menu' href='#' id='Menu1' link='./Home.php'><i class='fa fa-home fa-3x'></i> Home</a>
+						</li>
 						<?php
-							$sql = "SELECT 
-										GroupMenuID,
-										GroupMenuName,
-										Icon,
-										Url
-									FROM
-										master_groupmenu
-									ORDER BY 
-										OrderNo ASC";
+							$sql = "CALL spSelUserMenuNavigation(".$_SESSION['UserID'].")";
 										
 							if (!$result = mysqli_query($dbh, $sql)) {
-								echo mysqli_error($dbh);
+								logEvent(mysqli_error($dbh), '/Home.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+								echo "<script>$('#loading').hide();</script>";
 								return 0;
 							}
 							
+							$PrevGroupMenuID = 0;
 							while($row = mysqli_fetch_array($result)) {
-								echo "<li>";
-								$sql2 = "SELECT
-											MM.MenuID,
-											MM.GroupMenuID,
-											MM.MenuName,
-											MM.Url,
-											MM.Icon
-										 FROM
-											master_menu MM
-											JOIN master_role MR
-												ON MR.MenuID = MM.MenuID
-										WHERE 
-											GroupMenuID = ".$row['GroupMenuID']."
-											AND MR.UserID = ".$_SESSION['UserID']."
-										GROUP BY
-											MM.MenuID
-										ORDER BY
-											MM.OrderNo ASC";
-											
-								if (!$result2 = mysqli_query($dbh, $sql2)) {
-									echo mysqli_error($dbh);
-									return 0;
+								if($PrevGroupMenuID == $row['GroupMenuID']) {
+									//menu dengan group menu yg sama
+									echo "<li>";
+									echo "<a href='#' link='".$row['Url']."' class='menu' > ".$row['MenuName']."</a>";
+									echo "</li>";
 								}
-								
-								$rowcount = mysqli_num_rows($result2);
-								
-								if($rowcount == 0 && $row['GroupMenuID'] == 1) echo "<a class='menu active-menu' href='#' id='Menu".$row['GroupMenuID']."' link='".$row['Url']."'><i class='".$row['Icon']."'></i> ".$row['GroupMenuName']."</a>";
-								else if($rowcount == 0) { }
-								else {
+								else if($PrevGroupMenuID <> $row['GroupMenuID'] && $PrevGroupMenuID == 0) {
+									//Group menu pertama
+									echo "<li>";
 									echo "<a href='#'><i class='".$row['Icon']."'></i>&nbsp; ".$row['GroupMenuName']."<span class='fa arrow'></span></a>";
 									echo "<ul class='nav nav-second-level'>";
-									while($row2 = mysqli_fetch_array($result2)) {
-										echo "<li>";
-										echo "<a href='#' link='".$row2['Url']."' class='menu' ><i class='".$row2['Icon']."'></i> ".$row2['MenuName']."</a>";
-										echo "</li>";
-									}
-									echo "</ul>";
+									echo "<li>";
+									echo "<a href='#' link='".$row['Url']."' class='menu' > ".$row['MenuName']."</a>";
+									echo "</li>";
 								}
-								
-								echo "</li>";
+								else {
+									//Mulai Groupmenu berikutnya, tutup grup menu sebelumnya..
+									echo "</ul>";
+									echo "</li>";
+									echo "<li>";
+									echo "<a href='#'><i class='".$row['Icon']."'></i>&nbsp; ".$row['GroupMenuName']."<span class='fa arrow'></span></a>";
+									echo "<ul class='nav nav-second-level'>";
+									echo "<li>";
+									echo "<a href='#' link='".$row['Url']."' class='menu' > ".$row['MenuName']."</a>";
+									echo "</li>";
+								}
+								$PrevGroupMenuID = $row['GroupMenuID'];
 							}
+							mysqli_free_result($result);
+							mysqli_next_result($dbh);
 						?>
 					</ul>
 				</div>
@@ -130,7 +124,7 @@
 			
 			<div id="page-wrapper">
 				<div id="page-inner" style="overflow-x:hidden;overflow-y:hidden;">
-					<!--<img src="./assets/img/logo.png" style="width:100%;"/>--><h1>Logo here</h1>
+					<img src="./assets/img/logo.png" style="width:100%;"/>
 				</div>
 			</div>
 		</div>
@@ -177,9 +171,12 @@
 		<script src="assets/js/custom.js"></script>
 		<script src="assets/js/notify.js"></script>
 		<script src="assets/js/global.js"></script>
-		<script src="assets/js/jquery.bootgrid.js"></script>
-		<script src="assets/js/bootstrap-multiselect.js"></script>
-		<script src="assets/js/arrow-table.js"></script>
+		<!--<script src="assets/js/jquery.bootgrid.js"></script>-->
+		<!--<script src="assets/js/bootstrap-multiselect.js"></script>-->
+		<script src="assets/js/jquery.dataTables.js"></script>
+		<script src="assets/js/dataTables.bootstrap.js"></script>
+		<script src="assets/js/dataTables.keyTable.js"></script>
+		<script src="assets/js/jQuery.cssParentSelector.js"></script>
 		<a href="#Top" class="scrollup" onclick="return false;">Scroll</a>
 		<div id="loading"></div>
 		<iframe id='excelDownload' src='' style='display:none'></iframe>
@@ -193,7 +190,7 @@
 				$(".panel-default").css ({
 					"min-height" : windowHeight
 				});
-				$("head").append("<style> .panel-default { min-height : " + windowHeight + "px; } .panel-body { min-height : " + (windowHeight - 56) + "px; max-height : " + (windowHeight - 56) + "px } </style>");
+				$("head").append("<style> .panel-default { min-height : " + windowHeight + "px; } .panel-body { overflow-y:auto;min-height : " + (windowHeight - 55) + "px; max-height : " + (windowHeight - 55) + "px } </style>");
 				$("#wrapper").css ({
 					"width" : "calc(100% - 5px)"
 				});
@@ -211,23 +208,6 @@
 						"width" : "calc(100% - 5px)"
 					});
 				});
-				/*$.ajax({
-					url: "./Master/Notification/",
-					type: "POST",
-					data: { },
-					dataType: "html",
-					success: function(data) {
-						$("#page-inner").html(data);
-						$("html, body").animate({
-							scrollTop: 0
-						}, "slow");
-						$("#loading").hide();
-					},
-					error: function(data) {
-						$("#loading").hide();
-						$.notify("Koneksi gagal", "error");
-					}
-				});*/
 			});
 		</script>
 	</body>

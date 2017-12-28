@@ -16,7 +16,7 @@
 	$sql = "CALL spSelParameter('$currentUser')";
 			
 	if(!$result = mysqli_query($dbh, $sql)) {
-		logEvent(mysqli_error($dbh), '/Login.php', mysqli_real_escape_string($dbh, $currentUser));
+		logEvent(mysqli_error($dbh), '/DBConfig.php', mysqli_real_escape_string($dbh, $currentUser));
 		echo "<script>$('#loading').hide();</script>";
 		return 0;
 	}

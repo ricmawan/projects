@@ -27,7 +27,6 @@ StoredProcedure:BEGIN
 	DECLARE MessageDetail VARCHAR(255);
 	DECLARE FailedFlag INT;
 	DECLARE State INT;
-	DECLARE RowCount INT;
 	DECLARE PassValidate INT;
 	
 	DECLARE EXIT HANDLER FOR SQLEXCEPTION
@@ -37,7 +36,7 @@ StoredProcedure:BEGIN
 		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
 		ROLLBACK;
 		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (State ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelUserLogin', pCurrentUser);
+		CALL spInsEventLog(@full_error, 'spInsUser', pCurrentUser);
 	END;
 	
 	SET PassValidate = 1;

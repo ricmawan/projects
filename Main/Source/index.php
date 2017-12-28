@@ -24,7 +24,6 @@
 	{
 		logEvent($e->getMessage(), '/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 	}
-	
 ?>
 
 <!DOCTYPE html>
@@ -79,12 +78,12 @@
 								<br />
 								<div class="form-group input-group">
 									<span class="input-group-addon"><i class="fa fa-user"></i></span>
-									<input id="txtUserLogin" onkeypress="isEnterKey(event, 'SubmitForm');" name="txtUserLogin" type="text" class="form-control" placeholder="Username" required />
+									<input id="txtUserLogin" autocomplete=off onkeypress="isEnterKey(event, 'SubmitForm');" name="txtUserLogin" type="text" class="form-control" placeholder="Username" required />
 								</div>
 
 								<div class="form-group input-group">
 									<span class="input-group-addon"><i class="fa fa-lock"></i></span>
-									<input id="txtPassword" onkeypress="isEnterKey(event, 'SubmitForm');" name="txtPassword" type="password" class="form-control" placeholder="Password" required />
+									<input id="txtPassword" autocomplete=off onkeypress="isEnterKey(event, 'SubmitForm');" name="txtPassword" type="password" class="form-control" placeholder="Password" required />
 								</div>
 								<input type="button" class="btn btn-primary" onclick="SubmitForm();" value="Login">
 							</form>

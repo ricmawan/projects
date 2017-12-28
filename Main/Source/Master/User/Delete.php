@@ -13,16 +13,17 @@
 			try
 			{
 				$UserData = explode("^", $Data[$i]);
-				$UserID = mysql_real_escape_string($UserData[0]);
+				$UserID = mysqli_real_escape_string($dbh, $UserData[0]);
 				$UserName = $UserData[1];
-				$sql = "DELETE FROM master_role WHERE UserID = $UserID";
-				if (! $result=mysql_query($sql, $dbh)) {
+				$sql = "CALL spDelUser($UserID, '".$_SESSION['UserLogin']."')";
+				if (!$result = mysqli_query($dbh, $sql)) {
+					logEvent(mysqli_error($dbh), '/Master/User/Delete.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+					echo "<script>$('#loading').hide();</script>";
+					//return 0;
 					throw new Exception($UserName);
 				}
-				$sql = "DELETE FROM master_user WHERE UserID = $UserID";
-				if (! $result=mysql_query($sql, $dbh)) {
-					throw new Exception($UserName);
-				}
+				mysqli_next_result($dbh);
+				//mysqli_free_result($result);
 				$MessageSuccessDelete .= "$UserName, ";
 			}
 			catch (Exception $e)

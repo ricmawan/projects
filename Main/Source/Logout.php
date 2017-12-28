@@ -2,14 +2,7 @@
 	SESSION_START();
 	include __DIR__ . "/DBConfig.php";
 	if(ISSET($_SESSION['UserLogin']) && ISSET($_SESSION['UserPassword'])) {
-		$sql = "SELECT 
-					1
-				FROM 
-					master_user 
-				WHERE 
-					UserLogin = '".mysqli_real_escape_string($dbh, $_SESSION['UserLogin'])."' 
-					AND UserPassword = '".mysqli_real_escape_string($dbh, $_SESSION['UserPassword'])."'";
-					
+		$sql = "CALL spSelUserLogin('".mysqli_real_escape_string($dbh, $_SESSION['UserLogin'])."', '".mysqli_real_escape_string($dbh, $_SESSION['UserPassword'])."', 1, '".mysqli_real_escape_string($dbh, $_SESSION['UserLogin'])."')";
 		if (!$result = mysqli_query($dbh, $sql)) {
 			logEvent(mysqli_error($dbh), '/Login.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 			echo "<script>$('#loading').hide();</script>";
@@ -25,6 +18,8 @@
 		else {	
 			echo "<script>window.location='./'; </script>";
 		}
+		mysqli_free_result($result);
+		mysqli_next_result($dbh);
 	} 
 	else {
 		echo "<script>window.location='./'; </script>";

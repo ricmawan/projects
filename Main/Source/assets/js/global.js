@@ -709,6 +709,22 @@ function minmax(value, min, max)
 		return max; 
 	else return value;
 }
+
+function chkAll() {
+	if($("#select_all").prop("checked") == true) {
+		$("input:checkbox[name=select]").each(function() {
+			$(this).prop("checked", true);
+			$(this).attr("checked", true);
+		});
+	}
+	else {
+		$("input:checkbox[name=select]").each(function() {
+			$(this).prop("checked", false);
+			$(this).attr("checked", false);
+		});
+	}
+		
+}
 //titlebar(0);
 
 //disable right click

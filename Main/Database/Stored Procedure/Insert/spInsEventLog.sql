@@ -5,7 +5,7 @@ Created Date: 12 November 2017
 Modified Date: 
 ===============================================================*/
 
-ROP PROCEDURE IF EXISTS spInsEventLog;
+DROP PROCEDURE IF EXISTS spInsEventLog;
 
 DELIMITER $$
 CREATE PROCEDURE spInsEventLog (
@@ -15,12 +15,7 @@ CREATE PROCEDURE spInsEventLog (
 )
 StoredProcedure:BEGIN
 
-	DECLARE Message VARCHAR(255);
-	DECLARE MessageDetail VARCHAR(255);
-	DECLARE FailedFlag INT;
 	DECLARE State INT;
-	DECLARE RowCount INT;
-	DECLARE PassValidate INT;
 	
 	DECLARE EXIT HANDLER FOR SQLEXCEPTION
 	BEGIN		
@@ -31,8 +26,6 @@ StoredProcedure:BEGIN
 		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (State ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
 		CALL spInsEventLog(@full_error, 'spInsEventLog', pCurrentUser);
 	END;
-	
-	SET PassValidate = 1;
 	
 	START TRANSACTION;
 	

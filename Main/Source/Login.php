@@ -21,6 +21,7 @@
 			}
 			else echo "Username & Password tidak cocok";
 			mysqli_free_result($result);
+			mysqli_next_result($dbh);
 		}
 	}
 	catch (Exception $e)
