@@ -844,6 +844,10 @@ function keyFunction() {
 			evt.preventDefault();
 			$("#btnAdd").click();
 		}
+		else if(evt.keyCode == 222 || evt.keyCode == 188 || evt.keyCode == 190 || evt.keyCode == 191 || evt.keyCode == 220 || evt.keyCode == 186) {
+			evt.preventDefault();
+			return false;
+		}
 		else {
 			return true;
 		}
