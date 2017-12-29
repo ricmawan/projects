@@ -80,7 +80,7 @@
 										
 							if (!$result = mysqli_query($dbh, $sql)) {
 								logEvent(mysqli_error($dbh), '/Home.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-								echo "<script>$('#loading').hide();</script>";
+								//echo "<script>$('#loading').hide();</script>";
 								return 0;
 							}
 							

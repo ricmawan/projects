@@ -24,18 +24,18 @@
 	//Handles search querystring sent from Bootgrid
 	if (!empty($requestData['search']['value']))
 	{
-		$search = trim($requestData['search']['value']);
+		$search = mysqli_escape_string($dbh, trim($requestData['search']['value']));
 		$where .= " AND ( MU.UserName LIKE '%".$search."%'";
-		$where .= "OR MUT.UserTypeName LIKE '%".$search."%'";
-		$where .= "OR MU.UserLogin LIKE '%".$search."%'";
-		$where .= "OR CASE
+		$where .= " OR MUT.UserTypeName LIKE '%".$search."%'";
+		$where .= " OR MU.UserLogin LIKE '%".$search."%'";
+		$where .= " OR CASE
 						WHEN MU.IsActive = 0
 						THEN 'Tidak Aktif'
 						ELSE 'Aktif'
 					  END LIKE '%".$search."%') ";
 	}
-	
-	$sql = "CALL spSelUser('$where', '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";		
+	$sql = "CALL spSelUser(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
+
 	if (! $result = mysqli_query($dbh, $sql)) {
 		logEvent(mysqli_error($dbh), '/Master/User/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 		echo "<script>$('#loading').hide();</script>";
@@ -62,9 +62,9 @@
 		$row_array[] = "<input type='checkbox' name='select' value='".$row['UserID']."^".$row['UserName']."' />";
 		$row_array[] = $RowNumber;
 		$row_array[] = $row['UserName'];
-		$row_array[] = $row['UserID'];
 		$row_array[] = $row['UserLogin'];
 		$row_array[]= $row['Status'];
+		$row_array[] = $row['UserID'];
 		
 		array_push($return_arr, $row_array);
 	}

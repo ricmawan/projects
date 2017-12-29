@@ -37,8 +37,8 @@ SET State = 1;
 		MU.UserLogin,
 		MU.IsActive
 	FROM
-		master_role MR
-		JOIN master_user MU
+		master_user MU
+		LEFT JOIN master_role MR
 			ON MU.UserID = MR.UserID
 	WHERE
 		MU.UserID = pUserID;

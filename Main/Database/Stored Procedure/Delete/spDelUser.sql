@@ -35,7 +35,7 @@ SET State = 1;
 		WHERE
 			UserID = pUserID;
 			
-SET State = 2
+SET State = 2;
 
 		DELETE FROM
 			master_user

@@ -692,9 +692,9 @@ $.extend( KeyTable.prototype, {
 				break;
 
 			case 37: // left arrow
-				if ( navEnable ) {
+				/*if ( navEnable ) {
 					this._shift( e, 'left' );
-				}
+				}*/
 				break;
 
 			case 38: // up arrow
@@ -704,9 +704,9 @@ $.extend( KeyTable.prototype, {
 				break;
 
 			case 39: // right arrow
-				if ( navEnable ) {
+				/*if ( navEnable ) {
 					this._shift( e, 'right' );
-				}
+				}*/
 				break;
 
 			case 40: // down arrow

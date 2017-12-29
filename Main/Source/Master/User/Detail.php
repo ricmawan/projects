@@ -54,8 +54,8 @@
 							<h5><?php if($IsEdit == 0) echo "Tambah"; else echo "Ubah"; ?> Data User</h5>
 						</span>
 						<span style="width:49%;display:inline-block;text-align:right;">
-							<button type="button" class="btn btn-default" value="Simpan" onclick="SubmitValidate(this.form);" ><i class="fa fa-save"></i> Simpan</button>&nbsp;&nbsp;
-							<button type="button" class="btn btn-default" value="Kembali" onclick='Back();' ><i class="fa fa-arrow-circle-left"></i> Kembali</button>
+							<button type="button" tabindex=6 class="btn btn-default" value="Simpan" onclick="SubmitValidate(this.form);" ><i class="fa fa-save"></i> Simpan</button>&nbsp;&nbsp;
+							<button type="button" tabindex=7 class="btn btn-default" value="Kembali" onclick='Back();' ><i class="fa fa-arrow-circle-left"></i> Kembali</button>
 						</span>
 					</div>
 					<div class="panel-body" style="overflow-y:auto;">
@@ -67,13 +67,13 @@
 									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
 								</div>
 								<div class="col-md-3">
-									<input id="txtUserName" name="txtUserName" type="text" class="form-control-custom" placeholder="Nama " required   <?php echo 'value="'.$UserName.'"'; ?> />
+									<input id="txtUserName" tabindex=1 name="txtUserName" type="text" class="form-control-custom" placeholder="Nama " required   <?php echo 'value="'.$UserName.'"'; ?> />
 								</div>
 								<div class="col-md-2 labelColumn">
 									Username :
 								</div>
 								<div class="col-md-3">
-									<input id="txtUserLogin" name="txtUserLogin" type="text" class="form-control-custom" placeholder="Username" required <?php echo 'value="'.$UserLogin.'"'; ?> />
+									<input id="txtUserLogin" tabindex=2 name="txtUserLogin" type="text" class="form-control-custom" placeholder="Username" required <?php echo 'value="'.$UserLogin.'"'; ?> />
 								</div>
 							</div>
 							<br />
@@ -82,13 +82,13 @@
 									Password :
 								</div>
 								<div class="col-md-3">
-									<input id="txtPassword" name="txtPassword" type="password" class="form-control-custom" placeholder="Password" />
+									<input id="txtPassword" tabindex=3 name="txtPassword" type="password" class="form-control-custom" placeholder="Password" />
 								</div>
 								<div class="col-md-2 labelColumn">
 									Konfirmasi Password:
 								</div>
 								<div class="col-md-3">
-									<input id="txtConfirmPassword" name="txtConfirmPassword" type="password" class="form-control-custom" placeholder="Konfirmasi Password"   />
+									<input id="txtConfirmPassword" tabindex=4 name="txtConfirmPassword" type="password" class="form-control-custom" placeholder="Konfirmasi Password"   />
 								</div>
 							</div>
 							<br />
@@ -96,10 +96,9 @@
 								<div class="col-md-2 labelColumn">
 								</div>
 								<div class="col-md-3">
-									<input type="checkbox" id="chkActive" name="chkActive" value=1 /> Aktif
+									<input type="checkbox" tabindex=5 id="chkActive" name="chkActive" value=1 /> Aktif
 								</div>
 							</div>
-							<br />
 							<br />
 							<div class="row">
 								<div class="col-md-10">
@@ -192,7 +191,9 @@
 		</div>
 		<script>
 			$(document).ready(function () {
+				enterLikeTab();
 				$("#txtUserName").focus();
+				$("#txtUserName").select();
 				var MenuID = $("#hdnMenuID").val().split(", ");
 				var EditMenuID = $("#hdnEditMenuID").val().split(", ");
 				var DeleteMenuID = $("#hdnDeleteMenuID").val().split(", ");

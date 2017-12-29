@@ -406,6 +406,20 @@ function Back() {
 function SubmitForm(url) {
 	$("#save-confirm").dialog({
 		autoOpen: false,
+		open: function() {
+			var btnYes = $(this).parent().find('button:nth-child(1)');
+			var btnNo = $(this).parent().find('button:nth-child(2)');
+			$(document).on('keydown', function(e) {
+				if (e.keyCode === 39) { //right arrow
+					 btnNo.focus();
+				}
+			});
+			$(document).on('keydown', function(e) {
+				if (e.keyCode === 37) { //left arrow
+					 btnYes.focus();
+				}
+			});
+		},
 		show: {
 			effect: "fade",
 			duration: 500
@@ -581,6 +595,68 @@ function UpdatePassword() {
 	}).dialog("open");
 }
 
+function SingleDelete(url, DeleteID) {
+	$("#delete-confirm").dialog({
+		autoOpen: false,
+		open: function() {
+			var btnYes = $(this).parent().find('button:nth-child(1)');
+			var btnNo = $(this).parent().find('button:nth-child(2)');
+			$(document).on('keydown', function(e) {
+				if (e.keyCode === 39) { //right arrow
+					 btnNo.focus();
+				}
+			});
+			$(document).on('keydown', function(e) {
+				if (e.keyCode === 37) { //left arrow
+					 btnYes.focus();
+				}
+			});
+		},
+		show: {
+			effect: "fade",
+			duration: 500
+		},
+		hide: {
+			effect: "fade",
+			duration: 500
+		},
+		resizable: false,
+		height: "auto",
+		width: 400,
+		modal: true,
+		buttons: {
+			"Ya": function() {
+				$(this).dialog("close");
+				$("#loading").show();
+				$.ajax({
+					url: url,
+					type: "POST",
+					data: { ID : DeleteID },
+					dataType: "html",
+					success: function(data) {
+						$("#loading").hide();
+						var datadelete = data.split("+");
+						var berhasil = datadelete[0];
+						var gagal = datadelete [1];
+						if(berhasil!="") $.notify(berhasil, "success");
+						if(gagal!="") $.notify(gagal, "error");
+						Reload();
+					},
+					error: function(data) {
+						$.notify("Koneksi gagal, Cek koneksi internet!", "error");
+						$("#loading").hide();
+					}
+						
+				});
+			},
+			"Tidak": function() {
+				$(this).dialog("close");
+				return false;
+			}
+		}
+	}).dialog("open");
+}
+
 function DeleteData(url) {
 	var DeleteID = new Array();
 	$("input:checkbox[name=select]:checked").each(function() {
@@ -589,6 +665,20 @@ function DeleteData(url) {
 	if(DeleteID.length > 0) {
 		$("#delete-confirm").dialog({
 			autoOpen: false,
+			open: function() {
+				var btnYes = $(this).parent().find('button:nth-child(1)');
+				var btnNo = $(this).parent().find('button:nth-child(2)');
+				$(document).on('keydown', function(e) {
+					if (e.keyCode === 39) { //right arrow
+						 btnNo.focus();
+					}
+				});
+				$(document).on('keydown', function(e) {
+					if (e.keyCode === 37) { //left arrow
+						 btnYes.focus();
+					}
+				});
+			},
 			show: {
 				effect: "fade",
 				duration: 500
@@ -724,6 +814,40 @@ function chkAll() {
 		});
 	}
 		
+}
+
+function enterLikeTab() {
+	$("input").not($(":submit, :button")).keypress(function (evt) {
+		if (evt.keyCode == 13) {
+			evt.preventDefault();
+			var next = $('[tabindex="'+(this.tabIndex+1)+'"]');
+			if(next.length) next.focus();
+			else $('[tabindex="1"]').focus();  
+		}
+	});
+	
+	$(document).keypress(function (evt) {
+		//evt.preventDefault();
+		if (evt.keyCode == 13) {
+			if($(":focus").length == 0) $('[tabindex="1"]').focus();
+		}
+	});
+}
+
+function keyFunction() {
+	$(document).keydown(function (evt) {
+		if (evt.keyCode == 46) {
+			evt.preventDefault();
+			if($(":focus").length == 0) $("#btnDelete").click();
+		}
+		else if (evt.keyCode == 45) {
+			evt.preventDefault();
+			$("#btnAdd").click();
+		}
+		else {
+			return true;
+		}
+	});
 }
 //titlebar(0);
 

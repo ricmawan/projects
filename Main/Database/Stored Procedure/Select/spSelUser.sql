@@ -30,38 +30,42 @@ StoredProcedure:BEGIN
 	
 SET State = 1;
 
-	SELECT
-		COUNT(*) AS nRows
-	FROM
-		master_user MU
-		JOIN master_usertype MUT
-			ON MU.UserTypeID = MUT.UserTypeID
-	WHERE
-		pWhere;
+SET @query = CONCAT("SELECT
+						COUNT(*) AS nRows
+					FROM
+						master_user MU
+						JOIN master_usertype MUT
+							ON MU.UserTypeID = MUT.UserTypeID
+					WHERE ", pWhere);
+						
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
         
 SET State = 2;
-	
-	SELECT
-		MU.UserID,
-		MU.UserName,
-		MU.UserLogin,
-		CASE
-			WHEN MU.IsActive = 0
-			THEN 'Tidak Aktif'
-			ELSE 'Aktif'
-		END AS Status,
-		MU.UserPassword,
-		MUT.UserTypeName
-	FROM
-		master_user MU
-		JOIN master_usertype MUT
-			ON MU.UserTypeID = MUT.UserTypeID
-	WHERE
-		pWhere
-	ORDER BY 
-		pOrder
-	LIMIT
-		pLimit_s, pLimit_l;
+
+SET @query = CONCAT("SELECT
+						MU.UserID,
+						MU.UserName,
+						MU.UserLogin,
+						CASE
+							WHEN MU.IsActive = 0
+							THEN 'Tidak Aktif'
+							ELSE 'Aktif'
+						END AS Status,
+						MU.UserPassword,
+						MUT.UserTypeName
+					FROM
+						master_user MU
+						JOIN master_usertype MUT
+							ON MU.UserTypeID = MUT.UserTypeID
+					WHERE ", pWhere, 
+					" ORDER BY ", pOrder,
+					" LIMIT ", pLimit_s, pLimit_l);
+					
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
         
 END;
 $$

@@ -456,6 +456,7 @@ p {
 
 .labelColumn {
 	margin-top: 3px;
+	text-align: right;
 }
 
 h5 {
