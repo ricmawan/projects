@@ -506,7 +506,7 @@ h5 {
 .form-control-custom {
   display: block;
   width: 100%;
-  height: 24px;
+  height: 30px;
   padding: 3px 12px;
   font-size: 14px;
   line-height: 1.42857143;
@@ -566,45 +566,28 @@ textarea.form-control-custom {
     padding: 8px 12px 8px 37px;
 }
 
-th[data-column-id="RowNumber"]{
-	width: 60px;
+th[data-column-id="RowNumber"] {
+	width: 45px;
 }
 
-th[data-column-id="OrderNumber"]{
+th[data-column-id="QTY"] {
+	width: 50px;
+}
+
+th[data-column-id="SalePrice"] {
+	width: 75px;
+}
+
+th[data-column-id="Discount"] {
+	width: 70px;
+}
+
+th[data-column-id="Total"] {
 	width: 80px;
 }
 
 th[data-column-id="Opsi"] {
-	width: 45px;
-}
-
-th[data-column-id="TransactionDate"] {
-	width: 85px;
-}
-
-th[data-column-id="Total"] {
-	width: 150px;
-}
-
-th[data-column-id="Telephone"] {
-	width: 100px;
-}
-
-th[data-column-id="City"] {
-	width: 80px;
-}
-
-th[data-column-id="BirthDate"] {
-	width: 120px;
-}
-
-th[data-column-id="PatientNumber"] {
-	width: 90px;
-
-}
-
-th[data-column-id="PatientName"] {
-	width: 150px;
+	max-width: 70px;
 }
 
 .ui-dialog-titlebar-close {
