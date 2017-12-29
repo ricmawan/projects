@@ -10,7 +10,13 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						 <h5>Master Data User</h5>
+						 <span style="width:50%;display:inline-block;">
+							 <h5>Master Data User</h5>
+						</span>
+						<span style="width:49%;display:inline-block;text-align:right;">
+							<button id="btnAdd" class="btn btn-primary menu" link="./Master/User/Detail.php?ID=0"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
+							<?php if($DeleteFlag == true) echo '<button id="btnDelete" class="btn btn-danger" onclick="DeleteData(\'./Master/User/Delete.php\');" ><i class="fa fa-close"></i> Hapus</button>'; ?>
+						</span>
 					</div>
 					<div class="panel-body">
 						<div class="table-responsive" style="overflow-x:hidden;">
@@ -28,8 +34,6 @@
 							</table>
 						</div>
 						<br />
-						<button id="btnAdd" class="btn btn-primary menu" link="./Master/User/Detail.php?ID=0"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
-						<?php if($DeleteFlag == true) echo '<button id="btnDelete" class="btn btn-danger" onclick="DeleteData(\'./Master/User/Delete.php\');" ><i class="fa fa-close"></i> Hapus</button>'; ?>
 					</div>
 				</div>
 			</div>
@@ -39,6 +43,7 @@
 				keyFunction();
 				var table = $("#grid-data").DataTable({
 								"keys": true,
+								"scrollY": "330px",
 								"rowId": "UserID",
 								"scrollCollapse": true,
 								"order": [2, "asc"],
