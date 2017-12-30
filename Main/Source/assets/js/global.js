@@ -404,57 +404,57 @@ function Back() {
 }
 
 function SubmitForm(url) {
-	$("#save-confirm").dialog({
-		autoOpen: false,
-		open: function() {
-			var btnYes = $(this).parent().find('button:nth-child(1)');
-			var btnNo = $(this).parent().find('button:nth-child(2)');
-			$(document).on('keydown', function(e) {
-				if (e.keyCode === 39) { //right arrow
-					 btnNo.focus();
-				}
-			});
-			$(document).on('keydown', function(e) {
-				if (e.keyCode === 37) { //left arrow
-					 btnYes.focus();
-				}
-			});
-		},
-		show: {
-			effect: "fade",
-			duration: 500
-		},
-		hide: {
-			effect: "fade",
-			duration: 500
-		},
-		close: function() {
-			$(this).dialog("destroy");
-		},
-		resizable: false,
-		height: "auto",
-		width: 400,
-		modal: true,
-		buttons: {
-			"Ya": function() {
-				$(this).dialog("destroy");
-				$("#loading").show();
-				var PassValidate = 1;
-				var FirstFocus = 0;
-				$(".form-control-custom").each(function() {
-					if($(this).hasAttr('required')) {
-						if($(this).val() == "") {
-							PassValidate = 0;
-							$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-							if(FirstFocus == 0) $(this).focus();
-							FirstFocus = 1;
-							$("html, body").animate({
-								scrollTop: 0
-							}, "slow");
-						}
+	var PassValidate = 1;
+	var FirstFocus = 0;
+	$(".form-control-custom").each(function() {
+		if($(this).hasAttr('required')) {
+			if($(this).val() == "") {
+				PassValidate = 0;
+				$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+				if(FirstFocus == 0) $(this).focus();
+				FirstFocus = 1;
+				$("html, body").animate({
+					scrollTop: 0
+				}, "slow");
+			}
+		}
+	});
+	if(PassValidate == 1) {
+		$("#save-confirm").dialog({
+			autoOpen: false,
+			open: function() {
+				var btnYes = $(this).parent().find('button:nth-child(1)');
+				var btnNo = $(this).parent().find('button:nth-child(2)');
+				$(document).on('keydown', function(e) {
+					if (e.keyCode === 39) { //right arrow
+						 btnNo.focus();
 					}
 				});
-				if(PassValidate == 1) {
+				$(document).on('keydown', function(e) {
+					if (e.keyCode === 37) { //left arrow
+						 btnYes.focus();
+					}
+				});
+			},
+			show: {
+				effect: "fade",
+				duration: 500
+			},
+			hide: {
+				effect: "fade",
+				duration: 500
+			},
+			close: function() {
+				$(this).dialog("destroy");
+			},
+			resizable: false,
+			height: "auto",
+			width: 400,
+			modal: true,
+			buttons: {
+				"Ya": function() {
+					$(this).dialog("destroy");
+					$("#loading").show();
 					$.ajax({
 						url: url,
 						type: "POST",
@@ -500,22 +500,32 @@ function SubmitForm(url) {
 							//$.notify(data.ResponseText, "error");
 						}
 					});
+				},
+				"Tidak": function() {
+					$(this).dialog("destroy");
+					return false;
 				}
-				else {
-					$("#loading").hide();
-				}
-			},
-			"Tidak": function() {
-				$(this).dialog("destroy");
-				return false;
 			}
-		}
-	}).dialog("open");
+		}).dialog("open");
+	}
 }
 
 function UpdatePassword() {
+	enterLikeTab();
 	$("#update-password").dialog({
 		autoOpen: false,
+		open: function() {
+			$(document).on('keydown', function(e) {
+				if (e.keyCode == 39 && $("input:focus").length == 0) { //right arrow
+					 $("#btnCancelSavePassword").focus();
+				}
+			});
+			$(document).on('keydown', function(e) {
+				if (e.keyCode == 37 && $("input:focus").length == 0) { //left arrow
+					 $("#btnSavePassword").focus();
+				}
+			});
+		},
 		show: {
 			effect: "fade",
 			duration: 500
@@ -532,64 +542,72 @@ function UpdatePassword() {
 		width: 450,
 		modal: true,
 		buttons: {
-			"Simpan": function() {
-				var PassValidate = 1;
-				var FirstFocus = 0;
-				if($("#txtCurrentPassword").val() == '') {
-					$("#txtCurrentPassword").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-					if(FirstFocus == 0) $("#txtCurrentPassword").focus();
-					PassValidate = 0;
-					FirstFocus = 1;
-				}
-				if($("#txtNewPassword").val() == '') {
-					$("#txtNewPassword").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-					if(FirstFocus == 0) $("#txtNewPassword").focus();
-					PassValidate = 0;
-					FirstFocus = 1;
-				}
-				if($("#txtConfirmNewPassword").val() == '') {
-					$("#txtConfirmNewPassword").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-					if(FirstFocus == 0) $("#txtConfirmNewPassword").focus();
-					PassValidate = 0;
-					FirstFocus = 1;
-				}
-				
-				if($("#txtConfirmNewPassword").val() != $("#txtNewPassword").val()) {
-					$("#txtConfirmNewPassword").notify("Konfirmasi Password tidak cocok!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-					if(FirstFocus == 0) $("#txtConfirmNewPassword").focus();
-					PassValidate = 0;
-					FirstFocus = 1;
-				}
-				if(PassValidate == 0) return false;
-				$("#loading").show();
-				
-				$.ajax({
-					url: "./UpdatePassword.php",
-					type: "POST",
-					data: $("#UpdatePasswordForm").serialize(),
-					dataType: "json",
-					success: function(data) {
-						$("#loading").hide();
-						if(data.FailedFlag == '0') {
-							$.notify(data.Message, "success");
-							$("#update-password").dialog("destroy");
-						}
-						else {
-							$("#loading").hide();
-							$.notify(data.Message, "error");					
-						}
-						
-					},
-					error: function(data) {
-						$.notify("Koneksi gagal, Cek koneksi internet!", "error");
-						$("#loading").hide();
+			"Simpan": {
+				id: "btnSavePassword",
+				tabindex: 4,
+				click: function() {
+					var PassValidate = 1;
+					var FirstFocus = 0;
+					if($("#txtCurrentPassword").val() == '') {
+						$("#txtCurrentPassword").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+						if(FirstFocus == 0) $("#txtCurrentPassword").focus();
+						PassValidate = 0;
+						FirstFocus = 1;
 					}
-						
-				});
+					if($("#txtNewPassword").val() == '') {
+						$("#txtNewPassword").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+						if(FirstFocus == 0) $("#txtNewPassword").focus();
+						PassValidate = 0;
+						FirstFocus = 1;
+					}
+					if($("#txtConfirmNewPassword").val() == '') {
+						$("#txtConfirmNewPassword").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+						if(FirstFocus == 0) $("#txtConfirmNewPassword").focus();
+						PassValidate = 0;
+						FirstFocus = 1;
+					}
+					
+					if($("#txtConfirmNewPassword").val() != $("#txtNewPassword").val()) {
+						$("#txtConfirmNewPassword").notify("Konfirmasi Password tidak cocok!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+						if(FirstFocus == 0) $("#txtConfirmNewPassword").focus();
+						PassValidate = 0;
+						FirstFocus = 1;
+					}
+					if(PassValidate == 0) return false;
+					$("#loading").show();
+					
+					$.ajax({
+						url: "./UpdatePassword.php",
+						type: "POST",
+						data: $("#UpdatePasswordForm").serialize(),
+						dataType: "json",
+						success: function(data) {
+							$("#loading").hide();
+							if(data.FailedFlag == '0') {
+								$.notify(data.Message, "success");
+								$("#update-password").dialog("destroy");
+							}
+							else {
+								$("#loading").hide();
+								$.notify(data.Message, "error");					
+							}
+							
+						},
+						error: function(data) {
+							$.notify("Koneksi gagal, Cek koneksi internet!", "error");
+							$("#loading").hide();
+						}
+							
+					});
+				}
 			},
-			"Batal": function() {
-				$(this).dialog("destroy");
-				return false;
+			"Batal": {
+				text: "Batal",
+				id: "btnCancelSavePassword",
+				click: function() {
+					$(this).dialog("destroy");
+					return false;
+				}
 			}
 		}
 	}).dialog("open");
@@ -602,12 +620,12 @@ function SingleDelete(url, DeleteID) {
 			var btnYes = $(this).parent().find('button:nth-child(1)');
 			var btnNo = $(this).parent().find('button:nth-child(2)');
 			$(document).on('keydown', function(e) {
-				if (e.keyCode === 39) { //right arrow
+				if (e.keyCode == 39) { //right arrow
 					 btnNo.focus();
 				}
 			});
 			$(document).on('keydown', function(e) {
-				if (e.keyCode === 37) { //left arrow
+				if (e.keyCode == 37) { //left arrow
 					 btnYes.focus();
 				}
 			});
@@ -669,12 +687,12 @@ function DeleteData(url) {
 				var btnYes = $(this).parent().find('button:nth-child(1)');
 				var btnNo = $(this).parent().find('button:nth-child(2)');
 				$(document).on('keydown', function(e) {
-					if (e.keyCode === 39) { //right arrow
+					if (e.keyCode == 39) { //right arrow
 						 btnNo.focus();
 					}
 				});
 				$(document).on('keydown', function(e) {
-					if (e.keyCode === 37) { //left arrow
+					if (e.keyCode == 37) { //left arrow
 						 btnYes.focus();
 					}
 				});
@@ -836,11 +854,11 @@ function enterLikeTab() {
 
 function keyFunction() {
 	$(document).keydown(function (evt) {
-		if (evt.keyCode == 46) {
+		if (evt.keyCode == 46) { //delete button
 			evt.preventDefault();
 			if($(":focus").length == 0) $("#btnDelete").click();
 		}
-		else if (evt.keyCode == 45) {
+		else if (evt.keyCode == 45) { //insert button
 			evt.preventDefault();
 			$("#btnAdd").click();
 		}
