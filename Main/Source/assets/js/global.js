@@ -142,6 +142,7 @@ $(document).ready(function () {
 				error: function(data) {
 					$("#loading").hide();
 					$.notify("Koneksi gagal", "error");
+					return 0;
 				}
 			});
 		}
@@ -189,12 +190,12 @@ function Redirect(link) {
 				$("html, body").animate({
 					scrollTop: 0
 				}, "slow");
-				//alert(data);
 				$("#loading").hide();
 			},
 			error: function(data) {
 				$("#loading").hide();
 				$.notify("Koneksi gagal", "error");
+				return 0;
 			}
 		});
 	}
@@ -241,6 +242,7 @@ function Reload() {
 			error: function(data) {
 				$("#loading").hide();
 				$.notify("Koneksi gagal", "error");
+				return 0;
 			}
 		});
 	}
@@ -398,116 +400,103 @@ function Back() {
 			error: function(data) {
 				$("#loading").hide();
 				$.notify("Koneksi gagal", "error");
+				return 0;
 			}
 		});
 	}
 }
 
 function SubmitForm(url) {
-	var PassValidate = 1;
-	var FirstFocus = 0;
-	$(".form-control-custom").each(function() {
-		if($(this).hasAttr('required')) {
-			if($(this).val() == "") {
-				PassValidate = 0;
-				$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-				if(FirstFocus == 0) $(this).focus();
-				FirstFocus = 1;
-				$("html, body").animate({
-					scrollTop: 0
-				}, "slow");
+	$("#save-confirm").dialog({
+		autoOpen: false,
+		open: function() {
+			var btnYes = $(this).parent().find('button:nth-child(1)');
+			var btnNo = $(this).parent().find('button:nth-child(2)');
+			$(document).on('keydown', function(e) {
+				if (e.keyCode == 39) { //right arrow
+					 btnNo.focus();
+				}
+			});
+			$(document).on('keydown', function(e) {
+				if (e.keyCode == 37) { //left arrow
+					 btnYes.focus();
+				}
+			});
+		},
+		show: {
+			effect: "fade",
+			duration: 500
+		},
+		hide: {
+			effect: "fade",
+			duration: 500
+		},
+		close: function() {
+			$(this).dialog("destroy");
+		},
+		resizable: false,
+		height: "auto",
+		width: 400,
+		modal: true,
+		buttons: {
+			"Ya": function() {
+				$(this).dialog("destroy");
+				$("#loading").show();
+				$.ajax({
+					url: url,
+					type: "POST",
+					data: $("#PostForm").serialize(),
+					dataType: "json",
+					success: function(data) {
+						if(data.FailedFlag == '0') {
+							$("#loading").hide();
+							$.notify(data.Message, "success");
+							//window.location = PrevMenu;
+							/*$("#loading").show();
+							$("#page-inner").html("");
+							if(PrevMenu != "./Home.php") {
+								CurrentMenu = PrevMenu;
+								$.ajax({
+									url: PrevMenu,
+									type: "POST",
+									data: { },
+									dataType: "html",
+									success: function(data) {
+										$("#page-inner").html(data);
+										$("html, body").animate({
+											scrollTop: 0
+										}, "slow");
+										$("#loading").hide();
+									},
+									error: function(data) {
+										$("#loading").hide();
+										$.notify("Koneksi gagal", "error");
+									}
+								});
+							}
+							else $("#loading").hide();*/
+						}
+						else {
+							$("#loading").hide();
+							$.notify(data.Message, "error");
+							return 0;
+						}
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Koneksi gagal", "error");
+						return 0;
+						//$("#error").html(data.responseText);
+						//$.notify(data.ResponseText, "error");
+					}
+				});
+			},
+			"Tidak": function() {
+				$(this).dialog("destroy");
+				return false;
 			}
 		}
-	});
-	if(PassValidate == 1) {
-		$("#save-confirm").dialog({
-			autoOpen: false,
-			open: function() {
-				var btnYes = $(this).parent().find('button:nth-child(1)');
-				var btnNo = $(this).parent().find('button:nth-child(2)');
-				$(document).on('keydown', function(e) {
-					if (e.keyCode === 39) { //right arrow
-						 btnNo.focus();
-					}
-				});
-				$(document).on('keydown', function(e) {
-					if (e.keyCode === 37) { //left arrow
-						 btnYes.focus();
-					}
-				});
-			},
-			show: {
-				effect: "fade",
-				duration: 500
-			},
-			hide: {
-				effect: "fade",
-				duration: 500
-			},
-			close: function() {
-				$(this).dialog("destroy");
-			},
-			resizable: false,
-			height: "auto",
-			width: 400,
-			modal: true,
-			buttons: {
-				"Ya": function() {
-					$(this).dialog("destroy");
-					$("#loading").show();
-					$.ajax({
-						url: url,
-						type: "POST",
-						data: $("#PostForm").serialize(),
-						dataType: "json",
-						success: function(data) {
-							if(data.FailedFlag == '0') {
-								$.notify(data.Message, "success");
-								//window.location = PrevMenu;
-								$("#loading").show();
-								$("#page-inner").html("");
-								if(PrevMenu != "./Home.php") {
-									CurrentMenu = PrevMenu;
-									$.ajax({
-										url: PrevMenu,
-										type: "POST",
-										data: { },
-										dataType: "html",
-										success: function(data) {
-											$("#page-inner").html(data);
-											$("html, body").animate({
-												scrollTop: 0
-											}, "slow");
-											$("#loading").hide();
-										},
-										error: function(data) {
-											$("#loading").hide();
-											$.notify("Koneksi gagal", "error");
-										}
-									});
-								}
-								else $("#loading").hide();
-							}
-							else {
-								$("#loading").hide();
-								$.notify(data.Message, "error");					
-							}
-						},
-						error: function(data) {
-							$("#loading").hide();
-							$.notify("Koneksi gagal", "error");
-							//$("#error").html(data.responseText);
-							//$.notify(data.ResponseText, "error");
-						}
-					});
-				},
-				"Tidak": function() {
-					$(this).dialog("destroy");
-					return false;
-				}
-			}
-		}).dialog("open");
-	}
+	}).dialog("open");
 }
 
 function UpdatePassword() {
@@ -589,13 +578,15 @@ function UpdatePassword() {
 							}
 							else {
 								$("#loading").hide();
-								$.notify(data.Message, "error");					
+								$.notify(data.Message, "error");
+								return 0;
 							}
 							
 						},
 						error: function(data) {
 							$.notify("Koneksi gagal, Cek koneksi internet!", "error");
 							$("#loading").hide();
+							return 0;
 						}
 							
 					});
@@ -663,6 +654,7 @@ function SingleDelete(url, DeleteID) {
 					error: function(data) {
 						$.notify("Koneksi gagal, Cek koneksi internet!", "error");
 						$("#loading").hide();
+						return 0;
 					}
 						
 				});
@@ -730,6 +722,7 @@ function DeleteData(url) {
 						error: function(data) {
 							$.notify("Koneksi gagal, Cek koneksi internet!", "error");
 							$("#loading").hide();
+							return 0;
 						}
 							
 					});
@@ -852,15 +845,22 @@ function enterLikeTab() {
 	});
 }
 
+var counter = 0;
 function keyFunction() {
-	$(document).keydown(function (evt) {
+	$(document).on("keydown", function (evt) {		
+		//console.log(evt.keyCode);
+		//$(this).off(evt);
 		if (evt.keyCode == 46) { //delete button
 			evt.preventDefault();
 			if($(":focus").length == 0) $("#btnDelete").click();
 		}
 		else if (evt.keyCode == 45) { //insert button
 			evt.preventDefault();
-			$("#btnAdd").click();
+			if(counter == 0) {
+				$("#btnAdd").click();
+				counter = 1;
+				setTimeout(function() { counter = 0; } , 1000);
+			}
 		}
 		else if(evt.keyCode == 222 || evt.keyCode == 188 || evt.keyCode == 190 || evt.keyCode == 191 || evt.keyCode == 220 || evt.keyCode == 186) {
 			evt.preventDefault();
@@ -869,6 +869,8 @@ function keyFunction() {
 		else {
 			return true;
 		}
+		
+		//setTimeout(function() { $(this).on(evt); }, 500);
 	});
 }
 //titlebar(0);

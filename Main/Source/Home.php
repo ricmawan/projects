@@ -141,7 +141,7 @@
 						Password Lama :
 					</div>
 					<div class="col-md-6">
-						<input id="txtCurrentPassword" name="txtCurrentPassword" type="password" class="form-control-custom" placeholder="Password Lama" />
+						<input tabindex=1 id="txtCurrentPassword" name="txtCurrentPassword" type="password" class="form-control-custom" placeholder="Password Lama" />
 					</div>
 				</div>
 				<br />
@@ -150,7 +150,7 @@
 						Password Baru :
 					</div>
 					<div class="col-md-6">
-						<input id="txtNewPassword" name="txtNewPassword" type="password" class="form-control-custom" placeholder="Password Baru" />
+						<input tabindex=2 id="txtNewPassword" name="txtNewPassword" type="password" class="form-control-custom" placeholder="Password Baru" />
 					</div>
 				</div>
 				<br />
@@ -159,7 +159,7 @@
 						Konfirmasi Password :
 					</div>
 					<div class="col-md-6">
-						<input id="txtConfirmNewPassword" name="txtConfirmNewPassword" type="password" class="form-control-custom" placeholder="Konfirmasi Password" />
+						<input tabindex=3 id="txtConfirmNewPassword" name="txtConfirmNewPassword" type="password" class="form-control-custom" placeholder="Konfirmasi Password" />
 					</div>
 				</div>
 			</form>

@@ -15,7 +15,10 @@
 						</span>
 						<span style="width:49%;display:inline-block;text-align:right;">
 							<button id="btnAdd" class="btn btn-primary menu" link="./Master/User/Detail.php?ID=0"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
-							<?php if($DeleteFlag == true) echo '<button id="btnDelete" class="btn btn-danger" onclick="DeleteData(\'./Master/User/Delete.php\');" ><i class="fa fa-close"></i> Hapus</button>'; ?>
+							<?php 
+								if($DeleteFlag == true) echo '<button id="btnDelete" class="btn btn-danger" onclick="DeleteData(\'./Master/User/Delete.php\');" ><i class="fa fa-close"></i> Hapus</button>';
+								echo '<input type="hidden" name="hdnEditFlag" id="hdnEditFlag" value="'.$EditFlag.'" />';
+							?>
 						</span>
 					</div>
 					<div class="panel-body">
@@ -28,7 +31,6 @@
 										<th>Nama</th>
 										<th>Username</th>
 										<th>Status</th>
-										<!--<?php if($EditFlag == true) echo '<th data-column-id="Opsi" data-formatter="commands" data-sortable="false">Opsi</th>'; ?>-->
 									</tr>
 								</thead>
 							</table>
@@ -60,7 +62,7 @@
 								"language": {
 									"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
 									"infoFiltered": "",
-									"infoEmpty": "Data tidak ditemukan",
+									"infoEmpty": "",
 									"zeroRecords": "Data tidak ditemukan",
 									"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
 									"search": "Cari",
@@ -77,8 +79,7 @@
 				table.on( 'key', function (e, datatable, key, cell, originalEvent) {
 					var data = datatable.row( cell.index().row ).data();
 					if(key == 13) {
-						//alert("editing data:" + data[5]);
-						if($(".ui-dialog").css("display") == "none" || $("#delete-confirm").css("display") == "none") Redirect("./Master/User/Detail.php?ID=" + data[5]);
+						if(($(".ui-dialog").css("display") == "none" || $("#delete-confirm").css("display") == "none") && $("#hdnEditFlag").val() == "1") Redirect("./Master/User/Detail.php?ID=" + data[5]);
 					}
 					else if(key == 46) {
 						var DeleteID = new Array();
@@ -91,7 +92,6 @@
 							deletedData.push(data[5] + "^" + data[2]);
 							SingleDelete("./Master/User/Delete.php", deletedData);
 							table.keys.enable();
-							//alert(data[5] + "^" + data[2]);
 						}
 						else {
 							$("#btnDelete").click();

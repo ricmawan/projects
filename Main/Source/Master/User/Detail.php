@@ -21,7 +21,7 @@
 			//$Content = "Place the content here";
 			$sql = "CALL spSelUserDetails($UserID, '".$_SESSION['UserLogin']."')";
 			if(!$result = mysqli_query($dbh, $sql)) {
-				logEvent(mysqli_error($dbh), '/Home.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+				logEvent(mysqli_error($dbh), '/Master/User/Detail.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 				echo "<script>$('#loading').hide();</script>";
 				return 0;
 			}
@@ -128,7 +128,7 @@
 																	FROM
 																		master_groupmenu";
 															if (! $result=mysqli_query($dbh, $sql)) {
-																echo mysqli_error();
+																echo mysqli_error($dbh);
 																return 0;
 															}
 															while($row = mysqli_fetch_array($result)) {
@@ -146,7 +146,7 @@
 																		ORDER BY
 																			OrderNo";
 																if (! $result2=mysqli_query($dbh, $sql2)) {
-																	echo mysqli_error();
+																	echo mysqli_error($dbh);
 																	return 0;
 																}
 																$rowcount = mysqli_num_rows($result2);

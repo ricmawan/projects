@@ -7,8 +7,8 @@
 
 	$requestData= $_REQUEST;
 	$columns = array(
-					0 => "UserID",
-					1 => "RowNumber",
+					0 => "CheckBox",  //unorderable
+					1 => "RowNumber", //unorderable
 					2 => "UserName",
 					3 => "UserLogin",
 					4 => "Status"
@@ -41,7 +41,6 @@
 		echo "<script>$('#loading').hide();</script>";
 		return 0;
 	}
-	//$result1 = mysqli_use_result($dbh);
 	$row = mysqli_fetch_array($result);
 	$totalData = $row['nRows'];
 	$totalFiltered = $totalData;
@@ -49,11 +48,6 @@
 	mysqli_next_result($dbh);
 	
 	$result2 = mysqli_use_result($dbh);
-	/*if (! $result = mysqli_query($dbh, $sql)) {
-		logEvent(mysqli_error($dbh), '/Master/User/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-		echo "<script>$('#loading').hide();</script>";
-		return 0;
-	}*/
 	$return_arr = array();
 	$RowNumber = $requestData['start'];
 	while ($row = mysqli_fetch_array($result2)) {
