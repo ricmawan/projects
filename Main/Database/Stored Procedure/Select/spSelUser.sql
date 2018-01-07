@@ -53,15 +53,32 @@ SET @query = CONCAT("SELECT
 							THEN 'Tidak Aktif'
 							ELSE 'Aktif'
 						END AS Status,
-						MU.UserPassword,
-						MUT.UserTypeName
+						MU.IsActive,
+                        MUT.UserTypeID,
+						MUT.UserTypeName,
+                        IFNULL(GC.MenuID, '') MenuID,
+                        IFNULL(GC.EditFlag, '') EditFlag,
+                        IFNULL(GC.DeleteFlag, '') DeleteFlag
 					FROM
 						master_user MU
 						JOIN master_usertype MUT
 							ON MU.UserTypeID = MUT.UserTypeID
+						LEFT JOIN 
+                        (
+							SELECT
+								GC.UserID,
+                                GROUP_CONCAT(MenuID SEPARATOR ', ') MenuID,
+                                GROUP_CONCAT(EditFlag SEPARATOR ', ') EditFlag,
+                                GROUP_CONCAT(DeleteFlag SEPARATOR ', ') DeleteFlag
+							FROM
+								master_role GC
+							GROUP BY
+								GC.UserID
+                        )GC
+							ON MU.UserID = GC.UserID
 					WHERE ", pWhere, 
 					" ORDER BY ", pOrder,
-					" LIMIT ", pLimit_s, pLimit_l);
+					" LIMIT ", pLimit_s, ", ", pLimit_l);
 					
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
