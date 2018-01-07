@@ -16,6 +16,7 @@
 				$_SESSION['Nama'] = $row['UserName'];
 				$_SESSION['UserLogin'] = $row['UserLogin'];
 				$_SESSION['UserPassword'] = $row['UserPassword'];
+				$_SESSION['UserTypeID'] = $row['UserTypeID'];
 				echo "Success";				
 			}
 			else echo "Username & Password tidak cocok";

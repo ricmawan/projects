@@ -36,7 +36,6 @@
 						</script>';
 				}
 				exit;
-				//echo '<meta http-equiv="refresh" content="1">';
 			}
 		}
 		else {

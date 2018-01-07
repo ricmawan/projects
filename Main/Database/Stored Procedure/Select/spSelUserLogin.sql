@@ -33,7 +33,8 @@ SET State = 1;
 		UserID,
 		UserName,
 		UserLogin,
-		UserPassword
+		UserPassword,
+		UserTypeID
 	FROM
 		master_user 
 	WHERE 

@@ -150,7 +150,7 @@
 						},
 						error: function(data) {
 							$("#loading").show();
-							$.notify("Koneksi gagal, Cek koneksi internet!", "error");
+							$.notify("Koneksi gagal!", "error");
 						}
 					});
 				}

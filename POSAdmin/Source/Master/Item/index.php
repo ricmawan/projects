@@ -19,6 +19,7 @@
 								if($DeleteFlag == true) echo '<button id="btnDelete" class="btn btn-danger" onclick="DeleteData(\'./Master/Item/Delete.php\');" ><i class="fa fa-close"></i> Hapus</button>';
 								echo '<input id="hdnEditFlag" name="hdnEditFlag" type="hidden" value="'.$EditFlag.'" />';
 								echo '<input id="hdnDeleteFlag" name="hdnDeleteFlag" type="hidden" value="'.$DeleteFlag.'" />';
+								echo '<input id="hdnUserTypeID" name="hdnUserTypeID" type="hidden" value="'.$_SESSION['UserTypeID'].'" />';
 							?>
 						</span>
 					</div>
@@ -101,7 +102,7 @@
 						Harga Beli :
 					</div>
 					<div class="col-md-4">
-						<input id="txtBuyPrice" name="txtBuyPrice" type="text" tabindex=8 class="form-control-custom text-right" value="0.00" autocomplete=off placeholder="Harga Beli" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" required />
+						<input id="txtBuyPrice" name="txtBuyPrice" type="text" tabindex=8 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Beli" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" required />
 					</div>
 				</div>
 				<br />
@@ -110,7 +111,7 @@
 						Harga Ecer :
 					</div>
 					<div class="col-md-4">
-						<input id="txtRetailPrice" name="txtRetailPrice" type="text" tabindex=9 class="form-control-custom text-right" value="0.00" autocomplete=off placeholder="Harga Ecer" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" required />
+						<input id="txtRetailPrice" name="txtRetailPrice" type="text" tabindex=9 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Ecer" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" required />
 					</div>
 				</div>
 				<br />
@@ -119,7 +120,7 @@
 						Harga Grosir 1 :
 					</div>
 					<div class="col-md-4">
-						<input id="txtPrice1" name="txtPrice1" type="text" tabindex=10 class="form-control-custom text-right" value="0.00" autocomplete=off placeholder="Harga Grosir 1" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" required />
+						<input id="txtPrice1" name="txtPrice1" type="text" tabindex=10 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Grosir 1" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" required />
 					</div>
 					<div class="col-md-2 labelColumn">
 						Qty Grosir 1 :
@@ -134,7 +135,7 @@
 						Harga Grosir 2 :
 					</div>
 					<div class="col-md-4">
-						<input id="txtPrice2" name="txtPrice2" type="text" tabindex=12 class="form-control-custom text-right" value="0.00" autocomplete=off placeholder="Harga Grosir 2" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" required />
+						<input id="txtPrice2" name="txtPrice2" type="text" tabindex=12 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Grosir 2" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" required />
 					</div>
 					<div class="col-md-2 labelColumn">
 						Qty Grosir 2 :
@@ -149,7 +150,7 @@
 						Berat (KG) :
 					</div>
 					<div class="col-md-4">
-						<input id="txtWeight" name="txtWeight" type="text" tabindex=14 class="form-control-custom text-right" value="0.00" autocomplete=off placeholder="Berat (KG)" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" required />
+						<input id="txtWeight" name="txtWeight" type="text" tabindex=14 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Berat (KG)" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" required />
 					</div>
 					<div class="col-md-2 labelColumn">
 						Stok Minimal :
@@ -215,13 +216,13 @@
 						$("#txtItemName").val("");
 						$("#ddlCategory").val("");
 						$("#ddlCategory").next().find("input").val("");
-						$("#txtBuyPrice").val("0.00");
-						$("#txtRetailPrice").val("0.00");
-						$("#txtPrice1").val("0.00");
+						$("#txtBuyPrice").val("0");
+						$("#txtRetailPrice").val("0");
+						$("#txtPrice1").val("0");
 						$("#txtQty1").val(0);
-						$("#txtPrice2").val("0.00");
+						$("#txtPrice2").val("0");
 						$("#txtQty2").val(0);
-						$("#txtWeight").val("0.00");
+						$("#txtWeight").val("0");
 						$("#txtMinimumStock").val(0);
 					},
 					resizable: false,
@@ -251,13 +252,13 @@
 												$("#txtItemName").val("");
 												$("#ddlCategory").val("");
 												$("#ddlCategory").next().find("input").val("");
-												$("#txtBuyPrice").val("0.00");
-												$("#txtRetailPrice").val("0.00");
-												$("#txtPrice1").val("0.00");
+												$("#txtBuyPrice").val("0");
+												$("#txtRetailPrice").val("0");
+												$("#txtPrice1").val("0");
 												$("#txtQty1").val(0);
-												$("#txtPrice2").val("0.00");
+												$("#txtPrice2").val("0");
 												$("#txtQty2").val(0);
-												$("#txtWeight").val("0.00");
+												$("#txtWeight").val("0");
 												$("#txtMinimumStock").val(0);
 												var counter = 0;
 												Lobibox.alert("success",
@@ -333,13 +334,13 @@
 							$("#txtItemName").val("");
 							$("#ddlCategory").val("");
 							$("#ddlCategory").next().find("input").val("");
-							$("#txtBuyPrice").val("0.00");
-							$("#txtRetailPrice").val("0.00");
-							$("#txtPrice1").val("0.00");
+							$("#txtBuyPrice").val("0");
+							$("#txtRetailPrice").val("0");
+							$("#txtPrice1").val("0");
 							$("#txtQty1").val(0);
-							$("#txtPrice2").val("0.00");
+							$("#txtPrice2").val("0");
 							$("#txtQty2").val(0);
-							$("#txtWeight").val("0.00");
+							$("#txtWeight").val("0");
 							$("#txtMinimumStock").val(0);
 							return false;
 						}
@@ -371,6 +372,9 @@
 				enterLikeTab();
 				$("#ddlCategory").combobox();
 				var counterItem = 0;
+				var UserTypeID = $("#hdnUserTypeID").val();
+				var visible = false;
+				if(UserTypeID == "1") visible = true;
 				table = $("#grid-data").DataTable({
 								"keys": true,
 								"scrollY": "330px",
@@ -383,7 +387,7 @@
 									null,
 									null,
 									null,
-									{ "orderable": false, className: "text-right" },
+									{ "orderable": false, className: "text-right", "visible": visible },
 									{ "orderable": false, className: "text-right" },
 									{ "orderable": false, className: "text-right" },
 									{ "orderable": false, className: "text-right" },
