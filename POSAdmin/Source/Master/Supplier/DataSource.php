@@ -41,7 +41,6 @@
 
 	if (! $result = mysqli_query($dbh, $sql)) {
 		logEvent(mysqli_error($dbh), '/Master/Supplier/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-		echo "<script>$('#loading').hide();</script>";
 		return 0;
 	}
 	$row = mysqli_fetch_array($result);

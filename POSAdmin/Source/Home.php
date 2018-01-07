@@ -73,7 +73,7 @@
 							<a class='menu active-menu' href='#' id='Menu1' link='./Home.php'><i class='fa fa-home fa-3x'></i> Home</a>
 						</li>
 						<?php
-							$sql = "CALL spSelUserMenuNavigation(".$_SESSION['UserID'].")";
+							$sql = "CALL spSelUserMenuNavigation(".$_SESSION['UserID'].", '".$_SESSION['UserLogin']."')";
 										
 							if (!$result = mysqli_query($dbh, $sql)) {
 								logEvent(mysqli_error($dbh), '/Home.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
@@ -187,7 +187,7 @@
 				$(".panel-default").css ({
 					"min-height" : windowHeight
 				});
-				$("head").append("<style> .panel-default { min-height : " + windowHeight + "px; } .panel-body { overflow-y:auto;min-height : " + (windowHeight - 55) + "px; max-height : " + (windowHeight - 55) + "px } </style>");
+				$("head").append("<style> .panel-default { min-height : " + windowHeight + "px; } .panel-body { overflow-y:auto;min-height : " + (windowHeight - 60) + "px; max-height : " + (windowHeight - 60) + "px } </style>");
 				$("#wrapper").css ({
 					"width" : "calc(100% - 5px)"
 				});

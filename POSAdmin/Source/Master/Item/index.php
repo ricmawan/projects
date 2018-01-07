@@ -83,12 +83,13 @@
 									$sql = "CALL spSelDDLCategory('".$_SESSION['UserLogin']."')";
 									if (! $result = mysqli_query($dbh, $sql)) {
 										logEvent(mysqli_error($dbh), '/Master/Item/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-										echo "<script>$('#loading').hide();</script>";
 										return 0;
 									}
 									while($row = mysqli_fetch_array($result)) {
 										echo "<option value='".$row['CategoryID']."' >".$row['CategoryCode']." - ".$row['CategoryName']."</option>";
 									}
+									mysqli_free_result($result);
+									mysqli_next_result($dbh);
 								?>
 							</select>
 						</div>
@@ -230,100 +231,93 @@
 					buttons: [
 					{
 						text: "Simpan",
-						id: "btnSaveCategory",
+						id: "btnSaveItem",
 						tabindex: 16,
 						click: function() {
-							var Validation = ValidateForm();
-							if(Validation == 1) {
-								saveConfirm(function(action) {
-									if(action == "Tidak") {
-										$("#txtItemCode").focus();
-									}
-									else {
-										$.ajax({
-											url: "./Master/Item/Insert.php",
-											type: "POST",
-											data: $("#PostForm").serialize(),
-											dataType: "json",
-											success: function(data) {
-												if(data.FailedFlag == '0') {
-													$("#loading").hide();
-													$("#FormData").dialog("destroy");
-													$("#divModal").hide();
-													$("#hdnItemID").val(0);
-													$("#txtItemCode").val("");
-													$("#txtItemName").val("");
-													$("#ddlCategory").val("");
-													$("#ddlCategory").next().find("input").val("");
-													$("#txtBuyPrice").val("0.00");
-													$("#txtRetailPrice").val("0.00");
-													$("#txtPrice1").val("0.00");
-													$("#txtQty1").val(0);
-													$("#txtPrice2").val("0.00");
-													$("#txtQty2").val(0);
-													$("#txtWeight").val("0.00");
-													$("#txtMinimumStock").val(0);
-													var counter = 0;
-													Lobibox.alert("success",
-													{
-														msg: data.Message,
-														width: 320,
-														delay: 2000,
-														beforeClose: function() {
-															if(counter == 0) {
-																table.keys.enable();
-																counter = 1;
-															}
-														},
-														shown: function() {
-															setTimeout(function() {
-																table.ajax.reload(function() {
-																	table.keys.enable();
-																	if(typeof index !== 'undefined') table.cell(index).focus();
-																	table.keys.disable();
-																}, false);
-															}, 0);
-														}
-													});
-												}
-												else {
-													$("#loading").hide();
-													var counter = 0;
-													Lobibox.alert("warning",
-													{
-														msg: data.Message,
-														width: 320,
-														delay: false,
-														beforeClose: function() {
-															if(counter == 0) {
-																$("#txtItemCode").focus();
-																counter = 1;
-															}
-														}
-													});
-													return 0;
-												}
-											},
-											error: function(jqXHR, textStatus, errorThrown) {
+							saveConfirm(function(action) {
+								if(action == "Ya") {
+									$.ajax({
+										url: "./Master/Item/Insert.php",
+										type: "POST",
+										data: $("#PostForm").serialize(),
+										dataType: "json",
+										success: function(data) {
+											if(data.FailedFlag == '0') {
 												$("#loading").hide();
-												var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-												LogEvent(errorMessage, "/Master/Item/index.php");
-												Lobibox.alert("error",
+												$("#FormData").dialog("destroy");
+												$("#divModal").hide();
+												$("#hdnItemID").val(0);
+												$("#txtItemCode").val("");
+												$("#txtItemName").val("");
+												$("#ddlCategory").val("");
+												$("#ddlCategory").next().find("input").val("");
+												$("#txtBuyPrice").val("0.00");
+												$("#txtRetailPrice").val("0.00");
+												$("#txtPrice1").val("0.00");
+												$("#txtQty1").val(0);
+												$("#txtPrice2").val("0.00");
+												$("#txtQty2").val(0);
+												$("#txtWeight").val("0.00");
+												$("#txtMinimumStock").val(0);
+												var counter = 0;
+												Lobibox.alert("success",
 												{
-													msg: errorMessage,
-													width: 320,
+													msg: data.Message,
+													width: 480,
+													delay: 2000,
+													beforeClose: function() {
+														if(counter == 0) {
+															table.keys.enable();
+															counter = 1;
+														}
+													},
 													shown: function() {
 														setTimeout(function() {
-															$(".lobibox-footer").find('button:nth-child(1)').focus();
+															table.ajax.reload(function() {
+																table.keys.enable();
+																if(typeof index !== 'undefined') table.cell(index).focus();
+																table.keys.disable();
+															}, false);
 														}, 0);
+													}
+												});
+											}
+											else {
+												$("#loading").hide();
+												var counter = 0;
+												Lobibox.alert("warning",
+												{
+													msg: data.Message,
+													width: 480,
+													delay: false,
+													beforeClose: function() {
+														if(counter == 0) {
+															$("#txtItemCode").focus();
+															counter = 1;
+														}
 													}
 												});
 												return 0;
 											}
-										});
-									}
-								});
-							}
+										},
+										error: function(jqXHR, textStatus, errorThrown) {
+											$("#loading").hide();
+											var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+											LogEvent(errorMessage, "/Master/Item/index.php");
+											Lobibox.alert("error",
+											{
+												msg: errorMessage,
+												width: 480
+											});
+											return 0;
+										}
+									});
+								}
+								else {
+									$("#txtItemCode").focus();
+									return false;
+								}
+							});
 						}
 					},
 					{
@@ -354,6 +348,25 @@
 			}
 
 			$(document).ready(function() {
+				$.fn.dataTable.ext.errMode = function(settings, techNote, message) { 
+					$("#loading").hide();
+					var errorMessage = "DataTables Error : " + techNote + " (" + message + ")";
+					var counterError = 0;
+					LogEvent(errorMessage, "/Master/Item/index.php");
+					Lobibox.alert("error",
+					{
+						msg: "Terjadi kesalahan. Memuat ulang halaman.",
+						width: 480,
+						delay: 2000,
+						beforeClose: function() {
+							if(counterError == 0) {
+								location.reload();
+								counterError = 1;
+							}
+						}
+					});
+				};
+				
 				keyFunction();
 				enterLikeTab();
 				$("#ddlCategory").combobox();
@@ -401,6 +414,7 @@
 				
 				table.on( 'key', function (e, datatable, key, cell, originalEvent) {
 					var index = table.cell({ focused: true }).index();
+					console.log(counterItem);
 					if(key == 32) { //space
 						var checkbox = $(".focus").find("input:checkbox");
 						if(checkbox.prop("checked") == true) {
@@ -430,8 +444,7 @@
 								var deletedData = new Array();
 								deletedData.push(data[13] + "^" + data[3]);
 								SingleDelete("./Master/Item/Delete.php", deletedData, function(action) {
-									if(action == "Cancel") table.keys.enable();
-									else {
+									if(action == "Ya") {
 										table.ajax.reload(function() {
 											table.keys.enable();
 											if(typeof index !== 'undefined') {
@@ -444,13 +457,16 @@
 											}
 										}, false);
 									}
+									else {
+										table.keys.enable();
+										return false;
+									}
 								});
 							}
 							else {
 								table.keys.disable();
 								DeleteData("./Master/Item/Delete.php", function(action) {
-									if(action == "Cancel") table.keys.enable();
-									else {
+									if(action == "Ya") {
 										$("#select_all").prop("checked", false);
 										table.ajax.reload(function() {
 											table.keys.enable();
@@ -464,6 +480,10 @@
 											}
 										}, false);
 									}
+									else {
+										table.keys.enable();
+										return false;
+									}
 								});
 							}
 						}
@@ -476,12 +496,12 @@
 				});
 				
 				$(document).on("keydown", function (evt) {		
-					if (evt.keyCode == 46 && $("#hdnDeleteFlag").val() == "1") { //delete button
+					var index = table.cell({ focused: true }).index();
+					if (evt.keyCode == 46 && $("#hdnDeleteFlag").val() == "1" && typeof index == 'undefined') { //delete button
 						evt.preventDefault();
 						table.keys.disable();
 						DeleteData("./Master/Item/Delete.php", function(action) {
-							if(action == "Cancel") table.keys.enable();
-							else {
+							if(action == "Ya") {
 								$("#select_all").prop("checked", false);
 								table.ajax.reload(function() {
 									table.keys.enable();
@@ -494,6 +514,10 @@
 										}
 									}
 								}, false);
+							}
+							else {
+								table.keys.enable();
+								return false;
 							}
 						});
 					}

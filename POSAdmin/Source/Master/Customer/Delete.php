@@ -18,11 +18,8 @@
 				$sql = "CALL spDelCustomer($DataID, '".$_SESSION['UserLogin']."')";
 				if (!$result = mysqli_query($dbh, $sql)) {
 					logEvent(mysqli_error($dbh), '/Master/Customer/Delete.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-					echo "<script>$('#loading').hide();</script>";
-					//return 0;
 					throw new Exception($DataName);
 				}
-				//mysqli_free_result($result);
 				mysqli_next_result($dbh);
 				$MessageSuccessDelete .= "$DataName, ";
 			}

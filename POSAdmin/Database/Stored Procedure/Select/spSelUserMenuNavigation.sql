@@ -9,7 +9,8 @@ DROP PROCEDURE IF EXISTS spSelUserMenuNavigation;
 
 DELIMITER $$
 CREATE PROCEDURE spSelUserMenuNavigation (
-	pUserID		BIGINT
+	pUserID			BIGINT,
+	pCurrentUser	VARCHAR(255)
 )
 StoredProcedure:BEGIN
 	

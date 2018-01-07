@@ -7,7 +7,6 @@
 			$sql = "CALL spSelUserLogin('".mysqli_real_escape_string($dbh, $_SESSION['UserLogin'])."', '".mysqli_real_escape_string($dbh, $_SESSION['UserPassword'])."', 1, '".mysqli_real_escape_string($dbh, $_SESSION['UserLogin'])."')";
 			if (!$result = mysqli_query($dbh, $sql)) {
 				logEvent(mysqli_error($dbh), '/index.php', mysqli_real_escape_string($_SESSION['UserLogin']));
-				echo "<script>$('#loading').hide();</script>";
 				return 0;
 			}
 			
@@ -15,8 +14,8 @@
 			mysqli_free_result($result);
 			mysqli_next_result($dbh);
 			if($cek == 1) {
-				echo "<script>window.location='./Home.php'; </script>";
-				die();
+				header("Location: ".$APPLICATION_PATH."Home.php", true, 301);
+				return;
 			}
 		}
 	}
@@ -29,7 +28,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-		<title>Main App</title>
+		<title>POS</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		
@@ -78,36 +77,60 @@
 								<br />
 								<div class="form-group input-group">
 									<span class="input-group-addon"><i class="fa fa-user"></i></span>
-									<input id="txtUserLogin" name="txtUserLogin" type="text" class="form-control" autocomplete=off onkeypress="isEnterKey(event, 'SubmitForm');"  placeholder="Username" required />
+									<input id="txtUserLogin" name="txtUserLogin" type="text" tabindex=1 class="form-control" autocomplete=off onfocus="this.select();" placeholder="Username" required />
 								</div>
 
 								<div class="form-group input-group">
 									<span class="input-group-addon"><i class="fa fa-lock"></i></span>
-									<input id="txtPassword" name="txtPassword" type="password" class="form-control" autocomplete=off onkeypress="isEnterKey(event, 'SubmitForm');" placeholder="Password" required />
+									<input id="txtPassword" name="txtPassword" type="password" tabindex=2 class="form-control" autocomplete=off onfocus="this.select();" placeholder="Password" required />
 								</div>
-								<input type="button" value="Login" class="btn btn-primary" onclick="SubmitForm();" >
+								<input id="btnLogin" name="btnLogin" type="button" tabindex=3 value="Login" class="btn btn-primary" onclick="SubmitForm();" >
 							</form>
 						</div>
 					</div>
 				</div>					
 			</div>
 		</div>
-		<script src="assets/js/jquery-1.10.2.js"></script>
-		<script src="assets/js/jquery-ui-1.10.3.custom.js"></script>
-		<script src="assets/js/bootstrap.min.js"></script>
+		<script src="assets/js/jquery-1.12.4.js"></script>
 		<script src="assets/js/notify.js"></script>
-		<script src="assets/js/global.js"></script>
 		<div id="loading"></div>
 		<script>
-			$("#txtUserLogin").focus();
+			$.fn.hasAttr = function(name) {  
+				return this.attr(name) !== undefined;
+			};
+
+			$(document).ready(function() {
+				$("#txtUserLogin").focus();
+				
+				$("input").not($(":submit, :button")).keypress(function (evt) {
+					if (evt.keyCode == 13) {
+						evt.preventDefault();
+						var next = $('[tabindex="'+(this.tabIndex+1)+'"]');
+						if(next.length) next.focus();
+						else $('[tabindex="1"]').focus();  
+					}
+				});
+				
+				$(document).keypress(function (evt) {
+					//evt.preventDefault();
+					if (evt.keyCode == 13) {
+						if($(":focus").length == 0) $('[tabindex="1"]').focus();
+					}
+				});
+			});
 
 			function SubmitForm() {
 				var cek = 1;
+				var firstFocus = 0;
 				$(".form-control").each(function() {
 					if($(this).hasAttr('required')) {
 						if($(this).val() == "") {
 							cek = 0;
-							$(this).notify("Harus diisi!", { position:"right", className:"warn", autoHideDelay: 2000 });
+							$(this).notify("Harus diisi!", { position:"right", className:"error", autoHideDelay: 2000 });
+							if(firstFocus == 0) {
+								$(this).focus();
+								firstFocus = 1;
+							}
 						}
 					}
 				});

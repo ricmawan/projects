@@ -9,16 +9,28 @@
 				
 	if (!$result = mysqli_query($dbh, $sql)) {
 		logEvent(mysqli_error($dbh), $RequestedPath, mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-		echo "<script>$('#loading').hide();</script>";
 		return 0;
 	}
 	
 	$cek = mysqli_num_rows($result);
 	
 	if($cek == 0) {
-		header($APPLICATION_PATH.'Home.php', true, 200);
-		echo "<script>$('#Menu1').click();</script>";
-		die();
+		echo '<script>
+				var counterError = 0;
+				Lobibox.alert("error",
+				{
+					msg: "User tidak memiliki akses untuk menu ini.",
+					width: 480,
+					delay: false,
+					beforeClose: function() {
+						if(counterError == 0) {
+							location.reload();
+							counterError = 1;
+						}
+					}
+				});
+			</script>';
+		exit;
 	}
 	else {
 		$row = mysqli_fetch_array($result);

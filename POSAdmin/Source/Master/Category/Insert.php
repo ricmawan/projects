@@ -19,7 +19,6 @@
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;
 			logEvent(mysqli_error($dbh), '/Master/Category/Insert.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-			echo "<script>$('#loading').hide();</script>";
 			echo returnstate($CategoryID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}				
