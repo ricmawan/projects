@@ -14,7 +14,7 @@
 							 <h5>Master Data User</h5>
 						</span>
 						<span style="width:49%;display:inline-block;text-align:right;">
-							<button id="btnAdd" class="btn btn-primary menu" link="./Master/User/Detail.php?ID=0"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
+							<button id="btnAdd" class="btn btn-primary" onclick="openDialog(0, 0);"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
 							<?php 
 								if($DeleteFlag == true) echo '<button id="btnDelete" class="btn btn-danger" onclick="DeleteData(\'./Master/User/Delete.php\');" ><i class="fa fa-close"></i> Hapus</button>';
 								echo '<input id="hdnEditFlag" name="hdnEditFlag" type="hidden" value="'.$EditFlag.'" />';
@@ -31,7 +31,7 @@
 										<th>No</th>
 										<th>Nama</th>
 										<th>Username</th>
-										<th>TipeUser</th>
+										<th>Tipe User</th>
 										<th>Status</th>
 									</tr>
 								</thead>
@@ -137,6 +137,7 @@
 												
 												$PrevGroupMenuID = 0;
 												$RowNumber = 1;
+												$tabindex = 7;
 												while($row = mysqli_fetch_array($result)) {
 													if($PrevGroupMenuID == $row['GroupMenuID']) {
 														$RowNumber++;
@@ -144,10 +145,12 @@
 															<tr>
 																<td>$RowNumber.</td>
 																<td>".$row['MenuName']."</td>
-																<td style='text-align:center;'><input class='g".$row['GroupMenuID']."' id='".$row['MenuID']."' name='permission' type='checkbox' value='2' /></td>
-																<td style='text-align:center;'><input class='ge".$row['GroupMenuID']."' id='e".$row['MenuID']."' name='edit' type='checkbox' value='true' /></td>
-																<td style='text-align:center;'><input class='gd".$row['GroupMenuID']."' id='d".$row['MenuID']."' name='delete' type='checkbox' value='true' /></td>
+																<td style='text-align:center;'><input class='g".$row['GroupMenuID']."' id='".$row['MenuID']."' name='permission' type='checkbox' value='2' tabindex=".$tabindex." /></td>
+																<td style='text-align:center;'><input class='ge".$row['GroupMenuID']."' id='e".$row['MenuID']."' name='edit' type='checkbox' value='true' tabindex=".($tabindex + 1)." /></td>
+																<td style='text-align:center;'><input class='gd".$row['GroupMenuID']."' id='d".$row['MenuID']."' name='delete' type='checkbox' value='true' tabindex=".($tabindex + 2)." /></td>
 															</tr>";
+															
+														$tabindex += 3;
 													}
 													else if($PrevGroupMenuID <> $row['GroupMenuID']) {
 														$RowNumber = 1;
@@ -156,24 +159,28 @@
 															<tr>
 																<td></td>
 																<td ><b><u><i>".$row['GroupMenuName']."</i></u></b></td>
-																<td style='text-align:center;'><input id='g".$row['GroupMenuID']."' name='grouppermission' type='checkbox' /></td>
-																<td style='text-align:center;'><input id='ge".$row['GroupMenuID']."' name='groupedit' type='checkbox' value='true' /></td>
-																<td style='text-align:center;'><input id='gd".$row['GroupMenuID']."' name='groupdelete' type='checkbox' value='true' /></td>
+																<td style='text-align:center;'><input id='g".$row['GroupMenuID']."' name='grouppermission' type='checkbox' tabindex=".$tabindex." /></td>
+																<td style='text-align:center;'><input id='ge".$row['GroupMenuID']."' name='groupedit' type='checkbox' value='true' tabindex=".($tabindex + 1)." /></td>
+																<td style='text-align:center;'><input id='gd".$row['GroupMenuID']."' name='groupdelete' type='checkbox' value='true' tabindex=".($tabindex + 2)." /></td>
 															</tr>";
+														$tabindex += 3;
 														
 														echo "
 															<tr>
 																<td>$RowNumber.</td>
 																<td>".$row['MenuName']."</td>
-																<td style='text-align:center;'><input class='g".$row['GroupMenuID']."' id='".$row['MenuID']."' name='permission' type='checkbox' value='2' /></td>
-																<td style='text-align:center;'><input class='ge".$row['GroupMenuID']."' id='e".$row['MenuID']."' name='edit' type='checkbox' value='true' /></td>
-																<td style='text-align:center;'><input class='gd".$row['GroupMenuID']."' id='d".$row['MenuID']."' name='delete' type='checkbox' value='true' /></td>
+																<td style='text-align:center;'><input class='g".$row['GroupMenuID']."' id='".$row['MenuID']."' name='permission' type='checkbox' value='2' tabindex=".$tabindex." /></td>
+																<td style='text-align:center;'><input class='ge".$row['GroupMenuID']."' id='e".$row['MenuID']."' name='edit' type='checkbox' value='true' tabindex=".($tabindex + 1)." /></td>
+																<td style='text-align:center;'><input class='gd".$row['GroupMenuID']."' id='d".$row['MenuID']."' name='delete' type='checkbox' value='true' tabindex=".($tabindex + 2)." /></td>
 															</tr>";
+															
+														$tabindex += 3;
 													}
 													$PrevGroupMenuID = $row['GroupMenuID'];
 												}
 												mysqli_free_result($result);
 												mysqli_next_result($dbh);
+												echo '<input id="hdnTabIndex" name="hdnTabIndex" type="hidden" value="'.$tabindex.'" />';
 											?>
 										</tbody>
 									</table>
@@ -239,6 +246,7 @@
 				}
 				else $("#FormData").attr("title", "Tambah User");
 				var index = table.cell({ focused: true }).index();
+				var btnIndex = $("#hdnTabIndex").val();
 				//console.log(index);
 				$("#FormData").dialog({
 					autoOpen: false,
@@ -313,8 +321,8 @@
 					buttons: [
 					{
 						text: "Simpan",
-						id: "btnSaveItem",
-						tabindex: 16,
+						id: "btnSaveUser",
+						tabindex: btnIndex,
 						click: function() {
 							var PassValidate = ValidateForm();
 							if(PassValidate == 1) {
@@ -432,7 +440,7 @@
 					},
 					{
 						text: "Batal",
-						id: "btnCancelAddItem",
+						id: "btnCancelAddUser",
 						click: function() {
 							$(this).dialog("destroy");
 							$("#divModal").hide();
@@ -642,7 +650,6 @@
 						if(key == 13) {
 							if(($(".ui-dialog").css("display") == "none" || $("#delete-confirm").css("display") == "none") && $("#hdnEditFlag").val() == "1") {
 								openDialog(data, 1);
-								//Redirect("./Master/User/Detail.php?ID=" + data[6]);
 							}
 						}
 						else if(key == 46  && $("#hdnDeleteFlag").val() == "1") {

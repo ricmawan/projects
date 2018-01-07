@@ -892,8 +892,30 @@ function enterLikeTab() {
 		if (evt.keyCode == 13) {
 			evt.preventDefault();
 			var next = $('[tabindex="'+(this.tabIndex+1)+'"]');
+			var nextTabIndex = this.tabIndex+1;
+			if(next.length) {
+				if(next.attr("disabled") == "disabled") {
+					$(document).find(":focusable").each(function() {
+						console.log("element: " + parseInt($(this)[0].tabIndex));
+						console.log("element: " + nextTabIndex);
+						if(parseInt($(this)[0].tabIndex) > nextTabIndex) {
+							$(this).focus();
+							return false;
+						}
+					});
+				}
+				else next.focus();
+			}
+			else $('[tabindex="1"]').focus();
+		}
+	});
+	
+	$("select").keypress(function (evt) {
+		if (evt.keyCode == 13) {
+			evt.preventDefault();
+			var next = $('[tabindex="'+(this.tabIndex+1)+'"]');
 			if(next.length) next.focus();
-			else $('[tabindex="1"]').focus();  
+			else $('[tabindex="1"]').focus();
 		}
 	});
 	

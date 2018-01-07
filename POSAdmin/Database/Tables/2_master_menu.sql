@@ -67,6 +67,60 @@ VALUES
 	NULL,
 	0,
 	5
+),
+(
+	6,
+	3,
+	'Pembelian',
+	'Transaction/Purchase/',
+	NULL,
+	0,
+	1
+),
+(
+	7,
+	3,
+	'Retur Pembelian',
+	'Transaction/PurchaseReturn/',
+	NULL,
+	0,
+	2
+),
+(
+	8,
+	3,
+	'Penjualan',
+	'Transaction/Sale/',
+	NULL,
+	0,
+	3
+),
+(
+	9,
+	3,
+	'Retur Penjualan',
+	'Transaction/SaleReturn/',
+	NULL,
+	0,
+	4
+),
+(
+	10,
+	3,
+	'Mutasi Stok',
+	'Transaction/StockMutation/',
+	NULL,
+	0,
+	5
+),
+(
+	11,
+	3,
+	'Adjust Stok',
+	'Transaction/StockAdjust/',
+	NULL,
+	0,
+	6
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

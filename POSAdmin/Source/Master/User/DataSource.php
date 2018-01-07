@@ -14,7 +14,7 @@
 					4 => "MU.IsActive"
 				);
 
-	$where = " 1=1 AND MUT.UserTypeID = 1 ";
+	$where = " 1=1 ";
 	$order_by = "MU.UserID";
 	$limit_s = $requestData['start'];
 	$limit_l = $requestData['length'];
