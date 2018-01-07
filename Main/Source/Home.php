@@ -12,14 +12,16 @@
 		
 		<link href="assets/css/bootstrap.css" rel="stylesheet" />
 		<link href="assets/css/font-awesome.css" rel="stylesheet" />
-		<link href="assets/css/jquery-ui-1.10.3.custom.min.css" rel="stylesheet" />
+		<!--<link href="assets/css/jquery-ui-1.10.3.custom.min.css" rel="stylesheet" />-->
+		<link href="assets/css/jquery-ui.css" rel="stylesheet" />
+		<link href="assets/css/jquery-ui.structure.css" rel="stylesheet" />
+		<link href="assets/css/jquery-ui.theme.css" rel="stylesheet" />
 		<link href="assets/js/morris/morris-0.4.3.min.css" rel="stylesheet" />
 		<link href="assets/css/custom.css" rel="stylesheet" />
-		<!--<link href="assets/css/jquery.bootgrid.css" rel="stylesheet" />-->
 		<link href="assets/css/dataTables.bootstrap.css" rel="stylesheet" />
 		<link href="assets/css/jquery.dataTables.css" rel="stylesheet" />
 		<link href="assets/css/keyTable.bootstrap.css" rel="stylesheet" />
-		<!--<link rel="stylesheet" href="assets/css/bootstrap-multiselect.css" type="text/css"/>-->
+		<link href="assets/css/lobibox.css" rel="stylesheet" />
 		
 		<link rel="shortcut icon" href="./assets/img/logo.ico">
 		<link rel="apple-touch-icon" sizes="57x57" href="./assets/img/apple-icon-57x57.png">
@@ -39,11 +41,6 @@
 		<meta name="msapplication-config" content="./assets/img/browserconfig.xml">
 		<meta name="msapplication-TileImage" content="./assets/img/ms-icon-144x144.png">
 		<meta name="theme-color" content="#ffffff">
-		<style>
-			.dataTables_scrollBody {
-				min-height: 330px;
-			}
-		</style>
 	</head>
 	<body>
 		<div id="wrapper">
@@ -76,11 +73,10 @@
 							<a class='menu active-menu' href='#' id='Menu1' link='./Home.php'><i class='fa fa-home fa-3x'></i> Home</a>
 						</li>
 						<?php
-							$sql = "CALL spSelUserMenuNavigation(".$_SESSION['UserID'].")";
+							$sql = "CALL spSelUserMenuNavigation(".$_SESSION['UserID'].", '".$_SESSION['UserLogin']."')";
 										
 							if (!$result = mysqli_query($dbh, $sql)) {
 								logEvent(mysqli_error($dbh), '/Home.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-								//echo "<script>$('#loading').hide();</script>";
 								return 0;
 							}
 							
@@ -164,19 +160,20 @@
 				</div>
 			</form>
 		</div>
-		<script src="assets/js/jquery-1.10.2.js"></script>
-		<script src="assets/js/jquery-ui-1.10.3.custom.js"></script>
-		<script src="assets/js/bootstrap.min.js"></script>
+		<div id="divModal"></div>
+		<!--<script src="assets/js/jquery-1.10.2.js"></script>
+		<script src="assets/js/jquery-ui-1.10.3.custom.js"></script>-->
+		<script src="assets/js/jquery-1.12.4.js"></script>
+		<script src="assets/js/bootstrap.js"></script>
+		<script src="assets/js/jquery-ui.js"></script>
 		<script src="assets/js/jquery.metisMenu.js"></script>
 		<script src="assets/js/custom.js"></script>
 		<script src="assets/js/notify.js"></script>
+		<script src="assets/js/lobibox.js"></script>
 		<script src="assets/js/global.js"></script>
-		<!--<script src="assets/js/jquery.bootgrid.js"></script>-->
-		<!--<script src="assets/js/bootstrap-multiselect.js"></script>-->
 		<script src="assets/js/jquery.dataTables.js"></script>
 		<script src="assets/js/dataTables.bootstrap.js"></script>
 		<script src="assets/js/dataTables.keyTable.js"></script>
-		<script src="assets/js/jQuery.cssParentSelector.js"></script>
 		<a href="#Top" class="scrollup" onclick="return false;">Scroll</a>
 		<div id="loading"></div>
 		<iframe id='excelDownload' src='' style='display:none'></iframe>
@@ -190,7 +187,7 @@
 				$(".panel-default").css ({
 					"min-height" : windowHeight
 				});
-				$("head").append("<style> .panel-default { min-height : " + windowHeight + "px; } .panel-body { overflow-y:auto;min-height : " + (windowHeight - 55) + "px; max-height : " + (windowHeight - 55) + "px } </style>");
+				$("head").append("<style> .panel-default { min-height : " + windowHeight + "px; } .panel-body { overflow-y:auto;min-height : " + (windowHeight - 60) + "px; max-height : " + (windowHeight - 60) + "px } </style>");
 				$("#wrapper").css ({
 					"width" : "calc(100% - 5px)"
 				});

@@ -119,6 +119,10 @@ textarea {
     text-align:center;
 }
 
+.text-right {
+    text-align:right;
+}
+
 .no-boder {
     border:1px solid #f3f3f3;
 }
@@ -606,8 +610,8 @@ textarea.form-control-custom {
 }
 
 .ui-dialog-titlebar-close {
-	background-image: url("images/ui-icons_454545_256x240.png");
-	background-position: -96px -128px;
+	/*background-image: url("images/ui-icons_454545_256x240.png") !important;
+	background-position: -96px -128px !important;*/
 }
 /*==============================================
     MEDIA QUERIES     
@@ -665,43 +669,30 @@ h1, .h1, h2, .h2, h3, .h3 {
 	margin: 10px 0;
 }
 
-th[data-column-id="RowNumber"]{
-	width: 60px;
+.ui-widget, .ui-widget input, .ui-widget select, .ui-widget textarea {
+	font-size: 12px !important;
+	font-family: "Open Sans", sans-serif;
 }
 
-th[data-column-id="OrderNumber"]{
-	width: 80px;
-}
-
-th[data-column-id="Opsi"] {
-	width: 45px;
-}
-
-th[data-column-id="TransactionDate"] {
-	width: 85px;
-}
-
-th[data-column-id="Total"] {
-	width: 150px;
-}
-
-th[data-column-id="Telephone"] {
-	width: 100px;
-}
-
-th[data-column-id="City"] {
-	width: 80px;
-}
-
-th[data-column-id="BirthDate"] {
-	width: 120px;
-}
-
-th[data-column-id="PatientNumber"] {
-	width: 90px;
-
-}
-
-th[data-column-id="PatientName"] {
-	width: 150px;
+#divModal {
+	background-attachment: scroll;
+	background-clip: border-box;
+	background-color: rgb(166, 166, 166);
+	background-image: url(../../assets/css/images/ui-bg_dots-small_65_a6a6a6_2x2.png);
+	background-origin: padding-box;
+	background-position-x: 50%;
+	background-position-y: 50%;
+	background-size: auto;
+	box-sizing: border-box;
+	color: rgb(51, 51, 51);
+	filter: none;
+	height: 100%;
+	left: 0px;
+	opacity: 0.4;
+	position: fixed;
+	top: 0px;
+	width: 100%;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	z-index: 99;
+	display:none;
 }

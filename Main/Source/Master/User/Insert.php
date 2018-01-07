@@ -11,9 +11,13 @@
 		$hdnMenuID = mysqli_real_escape_string($dbh, $_POST['hdnMenuID']);
 		$hdnEditMenuID = mysqli_real_escape_string($dbh, $_POST['hdnEditMenuID']);
 		$hdnDeleteMenuID = mysqli_real_escape_string($dbh, $_POST['hdnDeleteMenuID']);
+		$IsActive = mysqli_real_escape_string($dbh, $_POST['ddlStatus']);
+		$UserTypeID = mysqli_real_escape_string($dbh, $_POST['ddlUserType']);
 		$hdnIsEdit = mysqli_real_escape_string($dbh, $_POST['hdnIsEdit']);
-		if(ISSET($_POST['chkActive'])) $chkActive = true;
-		else $chkActive = false;
+		
+		if($IsActive == 1) $IsActive = true;
+		else $IsActive = false;
+		
 		$Message = "Data gagal dimasukkan, cek koneksi internet dan coba lagi!";
 		$MessageDetail = "";
 		$FailedFlag = 0;
@@ -42,14 +46,13 @@
 		}
 		else $Password = MD5($Password);
 
-		$sql = "CALL spInsUser(".$UserID.", '".$UserName."', 1, '".$UserLogin."', '".$Password."', '".$chkActive."', '".$hdnMenuID."', '".$hdnEditMenuID."', '".$hdnDeleteMenuID."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsUser(".$UserID.", '".$UserName."', ".$UserTypeID.", '".$UserLogin."', '".$Password."', '".$IsActive."', '".$hdnMenuID."', '".$hdnEditMenuID."', '".$hdnDeleteMenuID."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
 		
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;
 			logEvent(mysqli_error($dbh), '/Master/User/Insert.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-			echo "<script>$('#loading').hide();</script>";
 			echo returnstate($UserID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}				

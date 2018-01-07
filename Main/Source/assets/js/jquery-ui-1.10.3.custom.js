@@ -5902,6 +5902,19 @@ $.widget( "ui.autocomplete", {
 					this._keyEvent( "next", event );
 					break;
 				case keyCode.ENTER:
+					if( this.menu.active ) {
+						suppressKeyPress = true;
+						event.preventDefault();
+						this.menu.select( event );
+						//console.log("kalo menu buka masuk sini");
+					}
+					else {
+						event.preventDefault();
+						var next = $('[tabindex="'+(this.element[0].tabIndex+1)+'"]');
+						if(next.length) next.focus();
+						else $('[tabindex="1"]').focus();  
+					}
+					break;
 				case keyCode.NUMPAD_ENTER:
 					// when menu is open and has focus
 					if ( this.menu.active ) {

@@ -139,9 +139,15 @@ $(document).ready(function () {
 					}, "slow");
 					$("#loading").hide();
 				},
-				error: function(data) {
+				error: function(jqXHR, textStatus, errorThrown) {
 					$("#loading").hide();
-					$.notify("Koneksi gagal", "error");
+					var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+					LogEvent(errorMessage, "global.js (MenuClick)");
+					Lobibox.alert("error",
+					{
+						msg: errorMessage,
+						width: 480
+					});
 					return 0;
 				}
 			});
@@ -192,9 +198,15 @@ function Redirect(link) {
 				}, "slow");
 				$("#loading").hide();
 			},
-			error: function(data) {
+			error: function(jqXHR, textStatus, errorThrown) {
 				$("#loading").hide();
-				$.notify("Koneksi gagal", "error");
+				var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+				LogEvent(errorMessage, "global.js (Redirect)");
+				Lobibox.alert("error",
+				{
+					msg: errorMessage,
+					width: 480
+				});
 				return 0;
 			}
 		});
@@ -239,9 +251,15 @@ function Reload() {
 				}, "slow");
 				$("#loading").hide();
 			},
-			error: function(data) {
+			error: function(jqXHR, textStatus, errorThrown) {
 				$("#loading").hide();
-				$.notify("Koneksi gagal", "error");
+				var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+				LogEvent(errorMessage, "global.js (Reload)");
+				Lobibox.alert("error",
+				{
+					msg: errorMessage,
+					width: 480
+				});
 				return 0;
 			}
 		});
@@ -329,16 +347,16 @@ function convertRupiah(id, angka){
 		
 		if(angkarev.length > 3) {
 			angka = rupiah.split('',rupiah.length-1).reverse().join('');
-			if(flag == 1) $("#" + id).val(angka + "." + koma);
-			else $("#" + id).val(angka + ".00");
+			if(flag == 1) $("#" + id).val(angka);
+			else $("#" + id).val(angka);
 		}
 		else {
-			if(flag == 1) $("#" + id).val(angka + "." + koma);
-			else $("#" + id).val(angka + ".00");
+			if(flag == 1) $("#" + id).val(angka);
+			else $("#" + id).val(angka);
 		}
 	}
 	else if(angka == "" || angka == ".00") {
-		$("#" + id).val("0.00");
+		$("#" + id).val("0");
 	}
 }
 
@@ -357,16 +375,16 @@ function returnRupiah(angka) {
 		for(var i = 0; i < angkarev.length; i++) if(i%3 == 0) rupiah += angkarev.substr(i,3)+',';
 		if(angkarev.length > 3) {
 			angka = rupiah.split('',rupiah.length-1).reverse().join('');
-			if(flag == 1) angka = angka + "." + koma;
-			else angka = angka + ".00";
+			if(flag == 1) angka = angka;
+			else angka = angka;
 		}
 		else {
-			if(flag == 1) angka = angka + "." + koma;
-			else angka = angka + ".00";
+			if(flag == 1) angka = angka;
+			else angka = angka;
 		}
 	}
 	else if(angka == "" || angka == ".00") {
-		angka = "0.00";
+		angka = "0";
 	}
 	return angka;
 }
@@ -397,106 +415,19 @@ function Back() {
 				}, "slow");
 				$("#loading").hide();
 			},
-			error: function(data) {
+			error: function(jqXHR, textStatus, errorThrown) {
 				$("#loading").hide();
-				$.notify("Koneksi gagal", "error");
+				var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+				LogEvent(errorMessage, "global.js (Back)");
+				Lobibox.alert("error",
+				{
+					msg: errorMessage,
+					width: 480
+				});
 				return 0;
 			}
 		});
 	}
-}
-
-function SubmitForm(url) {
-	$("#save-confirm").dialog({
-		autoOpen: false,
-		open: function() {
-			var btnYes = $(this).parent().find('button:nth-child(1)');
-			var btnNo = $(this).parent().find('button:nth-child(2)');
-			$(document).on('keydown', function(e) {
-				if (e.keyCode == 39) { //right arrow
-					 btnNo.focus();
-				}
-			});
-			$(document).on('keydown', function(e) {
-				if (e.keyCode == 37) { //left arrow
-					 btnYes.focus();
-				}
-			});
-		},
-		show: {
-			effect: "fade",
-			duration: 500
-		},
-		hide: {
-			effect: "fade",
-			duration: 500
-		},
-		close: function() {
-			$(this).dialog("destroy");
-		},
-		resizable: false,
-		height: "auto",
-		width: 400,
-		modal: true,
-		buttons: {
-			"Ya": function() {
-				$(this).dialog("destroy");
-				$("#loading").show();
-				$.ajax({
-					url: url,
-					type: "POST",
-					data: $("#PostForm").serialize(),
-					dataType: "json",
-					success: function(data) {
-						if(data.FailedFlag == '0') {
-							$("#loading").hide();
-							$.notify(data.Message, "success");
-							//window.location = PrevMenu;
-							/*$("#loading").show();
-							$("#page-inner").html("");
-							if(PrevMenu != "./Home.php") {
-								CurrentMenu = PrevMenu;
-								$.ajax({
-									url: PrevMenu,
-									type: "POST",
-									data: { },
-									dataType: "html",
-									success: function(data) {
-										$("#page-inner").html(data);
-										$("html, body").animate({
-											scrollTop: 0
-										}, "slow");
-										$("#loading").hide();
-									},
-									error: function(data) {
-										$("#loading").hide();
-										$.notify("Koneksi gagal", "error");
-									}
-								});
-							}
-							else $("#loading").hide();*/
-						}
-						else {
-							$("#loading").hide();
-							$.notify(data.Message, "error");
-							return 0;
-						}
-					},
-					error: function(data) {
-						$("#loading").hide();
-						$.notify("Koneksi gagal", "error");
-						return 0;
-						//$("#error").html(data.responseText);
-						//$.notify(data.ResponseText, "error");
-					}
-				});
-			},
-			"Tidak": function() {
-				$(this).dialog("destroy");
-				return false;
-			}
-		}
-	}).dialog("open");
 }
 
 function UpdatePassword() {
@@ -504,13 +435,12 @@ function UpdatePassword() {
 	$("#update-password").dialog({
 		autoOpen: false,
 		open: function() {
+			$("#divModal").show();
 			$(document).on('keydown', function(e) {
 				if (e.keyCode == 39 && $("input:focus").length == 0) { //right arrow
 					 $("#btnCancelSavePassword").focus();
 				}
-			});
-			$(document).on('keydown', function(e) {
-				if (e.keyCode == 37 && $("input:focus").length == 0) { //left arrow
+				else if (e.keyCode == 37 && $("input:focus").length == 0) { //left arrow
 					 $("#btnSavePassword").focus();
 				}
 			});
@@ -525,101 +455,119 @@ function UpdatePassword() {
 		},
 		close: function() {
 			$(this).dialog("destroy");
+			$("#divModal").hide();
 		},
 		resizable: false,
-		height: 230,
+		height: 250,
 		width: 450,
-		modal: true,
-		buttons: {
-			"Simpan": {
-				id: "btnSavePassword",
-				tabindex: 4,
-				click: function() {
-					var PassValidate = 1;
-					var FirstFocus = 0;
-					if($("#txtCurrentPassword").val() == '') {
-						$("#txtCurrentPassword").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						if(FirstFocus == 0) $("#txtCurrentPassword").focus();
-						PassValidate = 0;
-						FirstFocus = 1;
-					}
-					if($("#txtNewPassword").val() == '') {
-						$("#txtNewPassword").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						if(FirstFocus == 0) $("#txtNewPassword").focus();
-						PassValidate = 0;
-						FirstFocus = 1;
-					}
-					if($("#txtConfirmNewPassword").val() == '') {
-						$("#txtConfirmNewPassword").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						if(FirstFocus == 0) $("#txtConfirmNewPassword").focus();
-						PassValidate = 0;
-						FirstFocus = 1;
-					}
-					
-					if($("#txtConfirmNewPassword").val() != $("#txtNewPassword").val()) {
-						$("#txtConfirmNewPassword").notify("Konfirmasi Password tidak cocok!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						if(FirstFocus == 0) $("#txtConfirmNewPassword").focus();
-						PassValidate = 0;
-						FirstFocus = 1;
-					}
-					if(PassValidate == 0) return false;
-					$("#loading").show();
-					
-					$.ajax({
-						url: "./UpdatePassword.php",
-						type: "POST",
-						data: $("#UpdatePasswordForm").serialize(),
-						dataType: "json",
-						success: function(data) {
-							$("#loading").hide();
-							if(data.FailedFlag == '0') {
-								$.notify(data.Message, "success");
-								$("#update-password").dialog("destroy");
-							}
-							else {
-								$("#loading").hide();
-								$.notify(data.Message, "error");
-								return 0;
-							}
-							
-						},
-						error: function(data) {
-							$.notify("Koneksi gagal, Cek koneksi internet!", "error");
-							$("#loading").hide();
-							return 0;
+		modal: false,
+		buttons: [
+		{
+			text: "Simpan",
+			id: "btnSavePassword",
+			tabindex: 4,
+			click: function() {
+				var PassValidate = 1;
+				var FirstFocus = 0;
+				if($("#txtCurrentPassword").val() == '') {
+					$("#txtCurrentPassword").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+					if(FirstFocus == 0) $("#txtCurrentPassword").focus();
+					PassValidate = 0;
+					FirstFocus = 1;
+				}
+				if($("#txtNewPassword").val() == '') {
+					$("#txtNewPassword").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+					if(FirstFocus == 0) $("#txtNewPassword").focus();
+					PassValidate = 0;
+					FirstFocus = 1;
+				}
+				if($("#txtConfirmNewPassword").val() == '') {
+					$("#txtConfirmNewPassword").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+					if(FirstFocus == 0) $("#txtConfirmNewPassword").focus();
+					PassValidate = 0;
+					FirstFocus = 1;
+				}
+				
+				if($("#txtConfirmNewPassword").val() != $("#txtNewPassword").val()) {
+					$("#txtConfirmNewPassword").notify("Konfirmasi Password tidak cocok!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+					if(FirstFocus == 0) $("#txtConfirmNewPassword").focus();
+					PassValidate = 0;
+					FirstFocus = 1;
+				}
+				if(PassValidate == 0) return false;
+				$("#loading").show();
+				
+				$.ajax({
+					url: "./UpdatePassword.php",
+					type: "POST",
+					data: $("#UpdatePasswordForm").serialize(),
+					dataType: "json",
+					success: function(data) {
+						$("#loading").hide();
+						if(data.FailedFlag == '0') {
+							//$.notify(data.Message, "success");
+							$("#update-password").dialog("destroy");
+							$("#divModal").hide();
+							Lobibox.alert("success",
+							{
+								msg: data.Message,
+								width: 480,
+								delay: 2000
+							});
 						}
-							
-					});
-				}
-			},
-			"Batal": {
-				text: "Batal",
-				id: "btnCancelSavePassword",
-				click: function() {
-					$(this).dialog("destroy");
-					return false;
-				}
+						else {
+							$("#loading").hide();
+							Lobibox.alert("warning",
+							{
+								msg: data.Message,
+								width: 480,
+								delay: false
+							});
+						}
+						
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						$("#loading").hide();
+						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+						LogEvent(errorMessage, "global.js (UpdatePassword)");
+						Lobibox.alert("error",
+						{
+							msg: errorMessage,
+							width: 480
+						});
+						return 0;
+					}
+				});
 			}
-		}
+		},
+		{
+			text: "Batal",
+			id: "btnCancelSavePassword",
+			click: function() {
+				$(this).dialog("destroy");
+				$("#divModal").hide();
+				return false;
+			}
+		}]
 	}).dialog("open");
 }
 
-function SingleDelete(url, DeleteID) {
+function SingleDelete(url, DeleteID, callback) {
 	$("#delete-confirm").dialog({
 		autoOpen: false,
 		open: function() {
-			var btnYes = $(this).parent().find('button:nth-child(1)');
-			var btnNo = $(this).parent().find('button:nth-child(2)');
 			$(document).on('keydown', function(e) {
 				if (e.keyCode == 39) { //right arrow
-					 btnNo.focus();
+					$("#btnNoDelete").focus();
+				}
+				else if (e.keyCode == 37) { //left arrow
+					 $("#btnYesDelete").focus();
 				}
 			});
-			$(document).on('keydown', function(e) {
-				if (e.keyCode == 37) { //left arrow
-					 btnYes.focus();
-				}
-			});
+		},
+		close: function() {
+			$(this).dialog("destroy");
+			callback("Tidak");
 		},
 		show: {
 			effect: "fade",
@@ -633,9 +581,12 @@ function SingleDelete(url, DeleteID) {
 		height: "auto",
 		width: 400,
 		modal: true,
-		buttons: {
-			"Ya": function() {
-				$(this).dialog("close");
+		buttons: [
+		{
+			text: "Ya",
+			id: "btnYesDelete",
+			click: function() {
+				$(this).dialog("destroy");
 				$("#loading").show();
 				$.ajax({
 					url: url,
@@ -647,27 +598,63 @@ function SingleDelete(url, DeleteID) {
 						var datadelete = data.split("+");
 						var berhasil = datadelete[0];
 						var gagal = datadelete [1];
-						if(berhasil!="") $.notify(berhasil, "success");
-						if(gagal!="") $.notify(gagal, "error");
-						Reload();
+						var counter1 = 0;
+						var counter2 = 0;
+						if(berhasil!="") {
+							Lobibox.alert("success",
+							{
+								msg: berhasil,
+								width: 480,
+								delay: 2000,
+								beforeClose: function() {
+									if(counter1 == 0) {
+										if(gagal=="") callback("Ya");
+										counter1 = 1;
+									}
+								}
+							});
+						}
+						if(gagal!="") {
+							Lobibox.alert("warning",
+							{
+								msg: gagal,
+								width: 480,
+								delay: false,
+								beforeClose: function() {
+									if(counter2 == 0) {
+										callback("Ya");
+										counter2 = 1;
+									}
+								}
+							});
+						}
 					},
-					error: function(data) {
-						$.notify("Koneksi gagal, Cek koneksi internet!", "error");
+					error: function(jqXHR, textStatus, errorThrown) {
 						$("#loading").hide();
-						return 0;
+						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+						LogEvent(errorMessage, "global.js (SingleDelete)");
+						Lobibox.alert("error",
+						{
+							msg: errorMessage,
+							width: 480
+						});
+						callback("Error");
 					}
-						
 				});
-			},
-			"Tidak": function() {
-				$(this).dialog("close");
-				return false;
 			}
-		}
+		},
+		{
+			text: "Tidak",
+			id: "btnNoDelete",
+			click: function() {
+				$(this).dialog("destroy");
+				callback("Tidak");
+			}
+		}]
 	}).dialog("open");
 }
 
-function DeleteData(url) {
+function DeleteData(url, callback) {
 	var DeleteID = new Array();
 	$("input:checkbox[name=select]:checked").each(function() {
 		if($(this).val() != 'all') DeleteID.push($(this).val());
@@ -676,18 +663,18 @@ function DeleteData(url) {
 		$("#delete-confirm").dialog({
 			autoOpen: false,
 			open: function() {
-				var btnYes = $(this).parent().find('button:nth-child(1)');
-				var btnNo = $(this).parent().find('button:nth-child(2)');
 				$(document).on('keydown', function(e) {
 					if (e.keyCode == 39) { //right arrow
-						 btnNo.focus();
+						$("#btnNoDel").focus();
+					}
+					else if (e.keyCode == 37) { //left arrow
+						 $("#btnYesDel").focus();
 					}
 				});
-				$(document).on('keydown', function(e) {
-					if (e.keyCode == 37) { //left arrow
-						 btnYes.focus();
-					}
-				});
+			},
+			close: function() {
+				$(this).dialog("destroy");
+				callback("Tidak");
 			},
 			show: {
 				effect: "fade",
@@ -701,9 +688,12 @@ function DeleteData(url) {
 			height: "auto",
 			width: 400,
 			modal: true,
-			buttons: {
-				"Ya": function() {
-					$(this).dialog("close");
+			buttons: [
+			{
+				text: "Ya",
+				id: "btnYesDel",
+				click: function() {
+					$(this).dialog("destroy");
 					$("#loading").show();
 					$.ajax({
 						url: url,
@@ -715,24 +705,126 @@ function DeleteData(url) {
 							var datadelete = data.split("+");
 							var berhasil = datadelete[0];
 							var gagal = datadelete [1];
-							if(berhasil!="") $.notify(berhasil, "success");
-							if(gagal!="") $.notify(gagal, "error");
-							Reload();
+							var counter1 = 0;
+							var counter2 = 0;
+							if(berhasil!="") {
+								Lobibox.alert("success",
+								{
+									msg: berhasil,
+									width: 480,
+									delay: 2000,
+									beforeClose: function() {
+										if(counter1 == 0) {
+											if(gagal=="") callback("Ya");
+											counter1 = 1;
+										}
+									}
+								});
+							}
+							if(gagal!="") {
+								Lobibox.alert("warning",
+								{
+									msg: gagal,
+									width: 480,
+									delay: false,
+									beforeClose: function() {
+										if(counter2 == 0) {
+											callback("Ya");
+											counter2 = 1;
+										}
+									}
+								});
+							}
 						},
-						error: function(data) {
-							$.notify("Koneksi gagal, Cek koneksi internet!", "error");
+						error: function(jqXHR, textStatus, errorThrown) {
 							$("#loading").hide();
-							return 0;
+							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+							LogEvent(errorMessage, "global.js (DeleteData)");
+							Lobibox.alert("error",
+							{
+								msg: errorMessage,
+								width: 480
+							});
+							callback("Error");
 						}
-							
 					});
-				},
-				"Tidak": function() {
-					$(this).dialog("close");
-					return false;
 				}
-			}
+			},
+			{
+				text: "Tidak",
+				id: "btnNoDel",
+				click: function() {
+					$(this).dialog("close");
+					callback("Tidak");
+				}
+			}]
 		}).dialog("open");
+	}
+}
+
+function saveConfirm(callback) {
+	var PassValidate = 1;
+	var FirstFocus = 0;
+	$(".form-control-custom").each(function() {
+		if($(this).hasAttr('required')) {
+			if($(this).val() == "") {
+				PassValidate = 0;
+				$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+				if(FirstFocus == 0) $(this).focus();
+				FirstFocus = 1;
+			}
+		}
+	});
+	if(PassValidate == 1) {
+		$("#save-confirm").dialog({
+			autoOpen: false,
+			open: function() {
+				$(document).on('keydown', function(e) {
+					if (e.keyCode == 39) { //right arrow
+						 $("#btnNo").focus();
+					}
+					else if (e.keyCode == 37) { //left arrow
+						 $("#btnYes").focus();
+					}
+				});
+			},
+			show: {
+				effect: "fade",
+				duration: 500
+			},
+			hide: {
+				effect: "fade",
+				duration: 500
+			},
+			close: function() {
+				$(this).dialog("destroy");
+				callback("Tidak");
+			},
+			resizable: false,
+			height: "auto",
+			width: 400,
+			modal: true,
+			buttons: [
+			{
+				text: "Ya",
+				id: "btnYes",
+				click: function() {
+					$(this).dialog("destroy");
+					callback("Ya");
+				}
+			},
+			{
+				text: "Tidak",
+				id: "btnNo",
+				click: function() {
+					$(this).dialog("destroy");
+					callback("Tidak");
+				}
+			}]
+		}).dialog("open");
+	}
+	else {
+		callback("Error")
 	}
 }
 
@@ -769,39 +861,6 @@ function GetClock(){
 	setTimeout("GetClock()", 1000);
 }
 
-//marquee title bar
-var rev = "fwd";
-function titlebar(val){
-	var msg  = "Pusat Psikologi Terapan Unika Soegijapranata";
-	var res = " ";
-	var speed = 50;
-	var pos = val;
-	msg = "   | "+msg+" |";
-	var le = msg.length;
-	if(rev == "fwd"){ 
-		if(pos < le){ 
-			pos = pos+1; 
-			scroll = msg.substr(0,pos); 
-			document.title = scroll; 
-			timer = window.setTimeout("titlebar("+pos+")",speed); 
-		} else { 
-			rev = "bwd"; 
-			timer = window.setTimeout("titlebar("+pos+")",speed); 
-		}
-	} else { 
-		if(pos > 0) {
-			pos = pos-1; 
-			var ale = le-pos; 
-			scrol = msg.substr(ale,le); 
-			document.title = scrol; 
-			timer = window.setTimeout("titlebar("+pos+")",speed); 
-		} else { 
-			rev = "fwd"; 
-			timer = window.setTimeout("titlebar("+pos+")",speed); 
-		}
-	}
-}
-
 function minmax(value, min, max) 
 {
 	if(parseInt(value) < 0 || isNaN(value)) 
@@ -827,13 +886,54 @@ function chkAll() {
 		
 }
 
+var enterCounter = 0;
 function enterLikeTab() {
 	$("input").not($(":submit, :button")).keypress(function (evt) {
 		if (evt.keyCode == 13) {
 			evt.preventDefault();
 			var next = $('[tabindex="'+(this.tabIndex+1)+'"]');
+			var nextTabIndex = this.tabIndex+1;
+			if(next.length) {
+				if(next.attr("disabled") == "disabled") {
+					$(document).find(":focusable").each(function() {
+						console.log("element: " + parseInt($(this)[0].tabIndex));
+						console.log("element: " + nextTabIndex);
+						if(parseInt($(this)[0].tabIndex) > nextTabIndex) {
+							$(this).focus();
+							return false;
+						}
+					});
+				}
+				else next.focus();
+			}
+			else $('[tabindex="1"]').focus();
+		}
+	});
+	
+	$("select").keypress(function (evt) {
+		if (evt.keyCode == 13) {
+			evt.preventDefault();
+			var next = $('[tabindex="'+(this.tabIndex+1)+'"]');
 			if(next.length) next.focus();
-			else $('[tabindex="1"]').focus();  
+			else $('[tabindex="1"]').focus();
+		}
+	});
+	
+	$("textarea").keypress(function (evt) {
+		if (evt.keyCode == 13) {
+			if(enterCounter == 0) {
+				enterCounter = 1;
+				setTimeout(function() { enterCounter = 0; }, 1000);
+			}
+			else {
+				evt.preventDefault();
+				var txtAreaValue = $(this).val();
+				txtAreaValue = txtAreaValue.substr(0, txtAreaValue.length - 1);
+				$(this).val(txtAreaValue);
+				var next = $('[tabindex="'+(this.tabIndex+1)+'"]');
+				if(next.length) next.focus();
+				else $('[tabindex="1"]').focus();  
+			}
 		}
 	});
 	
@@ -850,11 +950,12 @@ function keyFunction() {
 	$(document).on("keydown", function (evt) {		
 		//console.log(evt.keyCode);
 		//$(this).off(evt);
-		if (evt.keyCode == 46) { //delete button
+		/*if (evt.keyCode == 46) { //delete button
 			evt.preventDefault();
 			if($(":focus").length == 0) $("#btnDelete").click();
 		}
-		else if (evt.keyCode == 45) { //insert button
+		else*/
+		if (evt.keyCode == 45) { //insert button
 			evt.preventDefault();
 			if(counter == 0) {
 				$("#btnAdd").click();
@@ -862,9 +963,13 @@ function keyFunction() {
 				setTimeout(function() { counter = 0; } , 1000);
 			}
 		}
-		else if(evt.keyCode == 222 || evt.keyCode == 188 || evt.keyCode == 190 || evt.keyCode == 191 || evt.keyCode == 220 || evt.keyCode == 186) {
+		else if(evt.keyCode == 222 /* ' */ || evt.keyCode == 188 /* , */ /*|| evt.keyCode == 190 /* . */|| evt.keyCode == 191 /* / */ || evt.keyCode == 220 /* \ */ || evt.keyCode == 186 /* ; */) {
 			evt.preventDefault();
 			return false;
+		}
+		else if((evt.keyCode == 38 || evt.keyCode == 40 /* up & down */) && $("input:focus").length == 0 && $(".focus").length == 0 ) {
+			evt.preventDefault();
+			$("#grid-data").DataTable().cell( ':eq(0)' ).focus();
 		}
 		else {
 			return true;
@@ -873,6 +978,16 @@ function keyFunction() {
 		//setTimeout(function() { $(this).on(evt); }, 500);
 	});
 }
+
+function LogEvent(Description, Source) {
+	$.ajax({
+		url: "./LogEvent.php",
+		type: "POST",
+		data: { Description : Description, Source : Source },
+		dataType: "html"
+	});
+}
+
 //titlebar(0);
 
 //disable right click
@@ -891,7 +1006,7 @@ function keyFunction() {
 			this.wrapper = $( "<span>" )
 			.addClass( "custom-combobox" )
 			.insertAfter( this.element );
-
+			
 			this.element.hide();
 			this._createAutocomplete();
 			//this._createShowAllButton();
@@ -901,20 +1016,20 @@ function keyFunction() {
 			var selected = this.element.children( ":selected" ),
 			value = selected.val() ? selected.text() : "",
 			placeholder = this.element.attr("placeholder");
+			tabindex = this.element.attr("tabindex");
 			wasOpen = false;
 			this.input = $( "<input style='font-family: Open Sans, sans-serif; font-size: 12px;'>" )
 			.appendTo( this.wrapper )
 			.val( value )
 			.attr( "title", "" )
 			.attr("placeholder", placeholder)
+			.attr("tabindex", tabindex)
+			
 			.addClass( "custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left" )
 			.autocomplete({
 				delay: 0,
 				minLength: 0,
-				source: $.proxy( this, "_source" ),
-				select: function(event, ui) {
-						//$("#txtCP").val($("#ddlKlien").attr("cp"));
-					}
+				source: $.proxy( this, "_source" )
 			})
 			.mousedown(function() {
 				wasOpen = input.autocomplete( "widget" ).is( ":visible" );
@@ -925,12 +1040,21 @@ function keyFunction() {
 				if ( wasOpen ) {
 				return;
 				}
-
+				input.select();
 				// Pass empty string as value to search for, displaying all results
 				input.autocomplete( "search", "" );
 			})
 			.tooltip({
 				tooltipClass: "ui-state-highlight"
+			})
+			.focus(function() {
+				// Close if already visible
+				if ( wasOpen ) {
+				return;
+				}
+				input.select();
+				// Pass empty string as value to search for, displaying all results
+				input.autocomplete( "search", "" );
 			});
 
 			this._on( this.input, {
@@ -955,7 +1079,7 @@ function keyFunction() {
 				if ( wasOpen ) {
 				return;
 				}
-
+				input.select();
 				// Pass empty string as value to search for, displaying all results
 				input.autocomplete( "search", "" );
 			});
@@ -1019,8 +1143,11 @@ function keyFunction() {
 
 $.extend($.ui.autocomplete.prototype.options, {
 	open: function(event, ui) {
+		var dialogIndex = $(".ui-dialog").css("z-index");
+		var newIndex = parseInt(dialogIndex) + 1;
 		$(this).autocomplete("widget").css({
-            "width": ($(this).width() + "px")
+            "width": ($(this).width() + "px !important"),
+			"z-index":  newIndex
         });
     }
 });

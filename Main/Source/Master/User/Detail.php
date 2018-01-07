@@ -22,7 +22,6 @@
 			$sql = "CALL spSelUserDetails($UserID, '".$_SESSION['UserLogin']."')";
 			if(!$result = mysqli_query($dbh, $sql)) {
 				logEvent(mysqli_error($dbh), '/Master/User/Detail.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-				echo "<script>$('#loading').hide();</script>";
 				return 0;
 			}
 			while($row = mysqli_fetch_array($result)) {
@@ -67,13 +66,13 @@
 									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
 								</div>
 								<div class="col-md-3">
-									<input id="txtUserName" tabindex=1 name="txtUserName" type="text" class="form-control-custom" placeholder="Nama " required   <?php echo 'value="'.$UserName.'"'; ?> />
+									<input id="txtUserName" name="txtUserName" type="text" tabindex=1 <?php echo 'value="'.$UserName.'"'; ?> class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Nama " required />
 								</div>
 								<div class="col-md-2 labelColumn">
 									Username :
 								</div>
 								<div class="col-md-3">
-									<input id="txtUserLogin" tabindex=2 name="txtUserLogin" type="text" class="form-control-custom" placeholder="Username" required <?php echo 'value="'.$UserLogin.'"'; ?> />
+									<input id="txtUserLogin" name="txtUserLogin" type="text" tabindex=2 <?php echo 'value="'.$UserLogin.'"'; ?> class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Username" required />
 								</div>
 							</div>
 							<br />
@@ -82,21 +81,45 @@
 									Password :
 								</div>
 								<div class="col-md-3">
-									<input id="txtPassword" tabindex=3 name="txtPassword" type="password" class="form-control-custom" placeholder="Password" />
+									<input id="txtPassword" name="txtPassword" type="password" tabindex=3 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Password" />
 								</div>
 								<div class="col-md-2 labelColumn">
-									Konfirmasi Password:
+									Konfirmasi Password :
 								</div>
 								<div class="col-md-3">
-									<input id="txtConfirmPassword" tabindex=4 name="txtConfirmPassword" type="password" class="form-control-custom" placeholder="Konfirmasi Password"   />
+									<input id="txtConfirmPassword" name="txtConfirmPassword" type="password" tabindex=4 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Konfirmasi Password" />
 								</div>
 							</div>
 							<br />
 							<div class="row">
 								<div class="col-md-2 labelColumn">
+									Tipe User :
 								</div>
 								<div class="col-md-3">
-									<input type="checkbox" tabindex=5 id="chkActive" name="chkActive" value=1 /> Aktif
+									<select id="ddlUserType" name="ddlUserType" tabindex=5 class="form-control-custom"  >
+										<?php
+											$sql = "CALL spSelDDLUserType('".$_SESSION['UserLogin']."')";
+											if (! $result = mysqli_query($dbh, $sql)) {
+												logEvent(mysqli_error($dbh), '/Master/User/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+												return 0;
+											}
+											while($row = mysqli_fetch_array($result)) {
+												echo "<option value='".$row['UserTypeID']."' >".$row['UserTypeName']."</option>";
+											}
+											
+											mysqli_free_result($result);
+											mysqli_next_result($dbh);
+										?>
+									</select>
+								</div>
+								<div class="col-md-2 labelColumn">
+									Status :
+								</div>
+								<div class="col-md-3">
+									<select id="ddlUserType" name="ddlUserType" tabindex=5 class="form-control-custom"  >
+										<option value=1 >Aktif</option>
+										<option value=0 >Tidak Aktif</option>
+									</select>
 								</div>
 							</div>
 							<br />
@@ -120,37 +143,30 @@
 													</thead>
 													<tbody>
 														<?php
-															$sql = "SELECT 
-																		GroupMenuID,
-																		GroupMenuName,
-																		Icon,
-																		Url
-																	FROM
-																		master_groupmenu";
-															if (! $result=mysqli_query($dbh, $sql)) {
-																echo mysqli_error($dbh);
+															$sql = "CALL spSelMenu('".$_SESSION['UserLogin']."')";
+										
+															if (!$result = mysqli_query($dbh, $sql)) {
+																logEvent(mysqli_error($dbh), '/Home.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 																return 0;
 															}
+															
+															$PrevGroupMenuID = 0;
+															$RowNumber = 1;
 															while($row = mysqli_fetch_array($result)) {
-																$RowNumber = 1;
-																$sql2 = "SELECT
-																			MenuID,
-																			GroupMenuID,
-																			MenuName,
-																			Url,
-																			Icon
-																		FROM
-																			master_menu
-																		WHERE 
-																			GroupMenuID = ".$row['GroupMenuID']."
-																		ORDER BY
-																			OrderNo";
-																if (! $result2=mysqli_query($dbh, $sql2)) {
-																	echo mysqli_error($dbh);
-																	return 0;
+																if($PrevGroupMenuID == $row['GroupMenuID']) {
+																	$RowNumber++;
+																	echo "
+																		<tr>
+																			<td>$RowNumber.</td>
+																			<td>".$row['MenuName']."</td>
+																			<td style='text-align:center;'><input class='g".$row['GroupMenuID']."' id='".$row['MenuID']."' name='permission' type='checkbox' value='2' /></td>
+																			<td style='text-align:center;'><input class='ge".$row['GroupMenuID']."' id='e".$row['MenuID']."' name='edit' type='checkbox' value='true' /></td>
+																			<td style='text-align:center;'><input class='gd".$row['GroupMenuID']."' id='d".$row['MenuID']."' name='delete' type='checkbox' value='true' /></td>
+																		</tr>";
 																}
-																$rowcount = mysqli_num_rows($result2);
-																if($rowcount > 0) {
+																else if($PrevGroupMenuID <> $row['GroupMenuID']) {
+																	$RowNumber = 1;
+																	//Group menu
 																	echo "
 																		<tr>
 																			<td></td>
@@ -159,19 +175,20 @@
 																			<td style='text-align:center;'><input id='ge".$row['GroupMenuID']."' name='groupedit' type='checkbox' value='true' /></td>
 																			<td style='text-align:center;'><input id='gd".$row['GroupMenuID']."' name='groupdelete' type='checkbox' value='true' /></td>
 																		</tr>";
-																	while($row2 = mysqli_fetch_array($result2)) {
-																		echo "
-																			<tr>
-																				<td>$RowNumber.</td>
-																				<td>".$row2['MenuName']."</td>
-																				<td style='text-align:center;'><input class='g".$row['GroupMenuID']."' id='".$row2['MenuID']."' name='permission' type='checkbox' value='2' /></td>
-																				<td style='text-align:center;'><input class='ge".$row['GroupMenuID']."' id='e".$row2['MenuID']."' name='edit' type='checkbox' value='true' /></td>
-																				<td style='text-align:center;'><input class='gd".$row['GroupMenuID']."' id='d".$row2['MenuID']."' name='delete' type='checkbox' value='true' /></td>
-																			</tr>";
-																		$RowNumber++;
-																	}
+																	
+																	echo "
+																		<tr>
+																			<td>$RowNumber.</td>
+																			<td>".$row['MenuName']."</td>
+																			<td style='text-align:center;'><input class='g".$row['GroupMenuID']."' id='".$row['MenuID']."' name='permission' type='checkbox' value='2' /></td>
+																			<td style='text-align:center;'><input class='ge".$row['GroupMenuID']."' id='e".$row['MenuID']."' name='edit' type='checkbox' value='true' /></td>
+																			<td style='text-align:center;'><input class='gd".$row['GroupMenuID']."' id='d".$row['MenuID']."' name='delete' type='checkbox' value='true' /></td>
+																		</tr>";
 																}
+																$PrevGroupMenuID = $row['GroupMenuID'];
 															}
+															mysqli_free_result($result);
+															mysqli_next_result($dbh);
 														?>
 													</tbody>
 												</table>
@@ -180,10 +197,10 @@
 									</div>
 								</div>
 							</div>
-							<input type="hidden" name="hdnMenuID" id="hdnMenuID" <?php echo 'value="'.$MenuID.'"'; ?> />
-							<input type="hidden" name="hdnEditMenuID" id="hdnEditMenuID" <?php echo 'value="'.$EditMenuID.'"'; ?> />
-							<input type="hidden" name="hdnDeleteMenuID" id="hdnDeleteMenuID" <?php echo 'value="'.$DeleteMenuID.'"'; ?> />
-							<input type="hidden" name="hdnIsActive" id="hdnIsActive" <?php echo 'value="'.$IsActive.'"'; ?> />
+							<input id="hdnMenuID" name="hdnMenuID" type="hidden" <?php echo 'value="'.$MenuID.'"'; ?> />
+							<input id="hdnEditMenuID" name="hdnEditMenuID" type="hidden" <?php echo 'value="'.$EditMenuID.'"'; ?> />
+							<input id="hdnDeleteMenuID" name="hdnDeleteMenuID" type="hidden" <?php echo 'value="'.$DeleteMenuID.'"'; ?> />
+							<input id="hdnIsActive" name="hdnIsActive" type="hidden" <?php echo 'value="'.$IsActive.'"'; ?> />
 						</form>
 					</div>
 				</div>
@@ -193,7 +210,6 @@
 			$(document).ready(function () {
 				enterLikeTab();
 				$("#txtUserName").focus();
-				$("#txtUserName").select();
 				var MenuID = $("#hdnMenuID").val().split(", ");
 				var EditMenuID = $("#hdnEditMenuID").val().split(", ");
 				var DeleteMenuID = $("#hdnDeleteMenuID").val().split(", ");
@@ -228,6 +244,7 @@
 						$("#d" + $(this).attr("id")).attr("disabled", true);
 					}
 				});
+				
 				$("input:checkbox[name=permission]").click(function() {
 					var i = parseInt($(this).attr('id'));
 					if($(this).prop('checked')) {

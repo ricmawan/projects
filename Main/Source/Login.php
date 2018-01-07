@@ -6,7 +6,6 @@
 			$sql = "CALL spSelUserLogin('".mysqli_real_escape_string($dbh, $_POST['txtUserLogin'])."', MD5('".mysqli_real_escape_string($dbh, $_POST['txtPassword'])."'), 1, '".mysqli_real_escape_string($dbh, $_POST['txtUserLogin'])."')";
 			if (! $result = mysqli_query($dbh, $sql)) {
 				logEvent(mysqli_error($dbh), '/Login.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-				echo "<script>$('#loading').hide();</script>";
 				return 0;
 			}
 			
