@@ -15,9 +15,7 @@ CREATE PROCEDURE spInsUser (
 	pUserLogin 		VARCHAR(100),
 	pPassword 		VARCHAR(255),
 	pIsActive		BIT,
-	pMenuID 		VARCHAR(255),
-	pEditMenuID 	VARCHAR(255),
-	pDeleteMenuID	VARCHAR(255),
+	pRoleValues		TEXT,
 	pIsEdit			INT,
     pCurrentUser	VARCHAR(255)
 )
@@ -128,31 +126,20 @@ SET State = 6;
 				UserID = pID;
 				
 SET State = 7;
+			
+			SET @query = CONCAT("INSERT INTO master_role
+								(
+									UserID,
+									MenuID,
+									EditFlag,
+									DeleteFlag
+								)
+								VALUES", pRoleValues);
+								
+			PREPARE stmt FROM @query;
+			EXECUTE stmt;
+			DEALLOCATE PREPARE stmt;
 
-			loopdata : WHILE pMenuID <> "" DO
-				INSERT INTO master_role
-				(
-					UserID,
-					MenuID,
-					EditFlag,
-					DeleteFlag
-				)
-				VALUES
-				(
-					pID,
-					SUBSTRING(pMenuID, 1, IF((INSTR(pMenuID, ',') - 1) = -1, LENGTH(pMenuID), (INSTR(pMenuID, ',') - 1))),
-					SUBSTRING(pEditMenuID, 1, IF((INSTR(pEditMenuID, ',') - 1) = -1, LENGTH(pEditMenuID), (INSTR(pEditMenuID, ',') - 1))),
-					SUBSTRING(pDeleteMenuID, 1, IF((INSTR(pDeleteMenuID, ',') - 1) = -1, LENGTH(pDeleteMenuID), (INSTR(pDeleteMenuID, ',') - 1)))
-				);
-				
-				IF(INSTR(pMenuID, ',') = 0) THEN SET pMenuID = "";
-				ELSE
-					SET pMenuID = SUBSTRING(pMenuID, INSTR(pMenuID, ',') + 1, LENGTH(pMenuID));
-					SET pEditMenuID = SUBSTRING(pEditMenuID, INSTR(pEditMenuID, ',') + 1, LENGTH(pEditMenuID));
-					SET pDeleteMenuID = SUBSTRING(pDeleteMenuID, INSTR(pDeleteMenuID, ',') + 1, LENGTH(pDeleteMenuID));
-				END IF;
-				
-			END WHILE loopdata; 
 		END IF;
 
 SET State = 8;
