@@ -84,7 +84,9 @@
 									<span class="input-group-addon"><i class="fa fa-lock"></i></span>
 									<input id="txtPassword" name="txtPassword" type="password" tabindex=2 class="form-control" autocomplete=off onfocus="this.select();" placeholder="Password" required />
 								</div>
-								<input id="btnLogin" name="btnLogin" type="button" tabindex=3 value="Login" class="btn btn-primary" onclick="SubmitForm();" >
+								<div style="text-align:right;">
+									<input id="btnLogin" name="btnLogin" type="button" tabindex=3 value="Login" class="btn btn-primary" onclick="SubmitForm();" >
+								</div>
 							</form>
 						</div>
 					</div>

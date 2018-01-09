@@ -5423,7 +5423,7 @@
 	
 		/* Finally set the width's of the header and footer tables */
 		var iOuterWidth = table.outerWidth();
-		divHeaderTable[0].style.width = _fnStringToCss( iOuterWidth + barWidth);
+		divHeaderTable[0].style.width = _fnStringToCss( iOuterWidth + barWidth);  //this is my added code + barWidth
 		divHeaderInnerStyle.width = _fnStringToCss( iOuterWidth );
 	
 		// Figure out if there are scrollbar present - if so then we need a the header and footer to

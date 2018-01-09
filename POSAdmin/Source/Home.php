@@ -161,6 +161,18 @@
 			</form>
 		</div>
 		<div id="divModal"></div>
+		<!-- Sliding div starts here -->
+		<!--<div id="slider" style="right:-300px;">
+			<div id="sidebar" onclick="open_panel()"><img src="assets/img/btnShortcutInfo.png"></button></div>
+			<div id="header">
+				<ul>
+					<li>Double Klik/Enter: Edit.</li>
+					<li>INSERT: Tambah Data.</li>
+					<li>DELETE: Delete.</li>
+				</ul>
+			</div>
+		</div>-->
+		<!-- Sliding div ends here -->
 		<!--<script src="assets/js/jquery-1.10.2.js"></script>
 		<script src="assets/js/jquery-ui-1.10.3.custom.js"></script>-->
 		<script src="assets/js/jquery-1.12.4.js"></script>

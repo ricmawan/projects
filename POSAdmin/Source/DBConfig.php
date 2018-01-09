@@ -22,9 +22,11 @@
 	mysqli_next_result($dbh);
 	function logEvent($message, $source, $user) {
 		mysqli_next_result($GLOBALS['dbh']);
+		$message = mysqli_real_escape_string($GLOBALS['dbh'], $message);
 		$sql = "CALL spInsEventLog('$message', '$source', '$user');";
 		if (!$result = mysqli_query($GLOBALS['dbh'], $sql)) {
 			echo mysqli_error($GLOBALS['dbh']);
 		}
+		mysqli_next_result($GLOBALS['dbh']);
 	}
 ?>

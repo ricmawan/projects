@@ -8,9 +8,9 @@
 		$UserName = mysqli_real_escape_string($dbh, $_POST['txtUserName']);
 		$UserLogin = mysqli_real_escape_string($dbh, $_POST['txtUserLogin']);
 		$Password = mysqli_real_escape_string($dbh, $_POST['txtPassword']);		
-		$hdnMenuID = mysqli_real_escape_string($dbh, $_POST['hdnMenuID']);
-		$hdnEditMenuID = mysqli_real_escape_string($dbh, $_POST['hdnEditMenuID']);
-		$hdnDeleteMenuID = mysqli_real_escape_string($dbh, $_POST['hdnDeleteMenuID']);
+		$hdnMenuID = explode(",", mysqli_real_escape_string($dbh, $_POST['hdnMenuID']));
+		$hdnEditMenuID = explode(",", mysqli_real_escape_string($dbh, $_POST['hdnEditMenuID']));
+		$hdnDeleteMenuID = explode(",", mysqli_real_escape_string($dbh, $_POST['hdnDeleteMenuID']));
 		$IsActive = mysqli_real_escape_string($dbh, $_POST['ddlStatus']);
 		$UserTypeID = mysqli_real_escape_string($dbh, $_POST['ddlUserType']);
 		$hdnIsEdit = mysqli_real_escape_string($dbh, $_POST['hdnIsEdit']);
@@ -45,8 +45,12 @@
 			$Password = $row['UserPassword'];
 		}
 		else $Password = MD5($Password);
-
-		$sql = "CALL spInsUser(".$UserID.", '".$UserName."', ".$UserTypeID.", '".$UserLogin."', '".$Password."', '".$IsActive."', '".$hdnMenuID."', '".$hdnEditMenuID."', '".$hdnDeleteMenuID."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
+		
+		$roleValues = array();
+		for($i=0;$i<count($hdnMenuID);$i++) {
+			$roleValues[] = "(".$UserID.", ".$hdnMenuID[$i].", ".$hdnEditMenuID[$i].", ".$hdnDeleteMenuID[$i].")";
+		}
+		$sql = "CALL spInsUser(".$UserID.", '".$UserName."', ".$UserTypeID.", '".$UserLogin."', '".$Password."', '".$IsActive."', '".implode(",", $roleValues)."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
 		
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$Message = "Terjadi Kesalahan Sistem";

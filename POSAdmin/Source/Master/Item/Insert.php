@@ -21,6 +21,7 @@
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
+		echo $sql;
 		$sql = "CALL spInsItem( ".$ItemID.",
 								'".$ItemCode."',
 								'".$ItemName."',

@@ -31,7 +31,7 @@ StoredProcedure:BEGIN
 SET State = 1;
 
 SET @query = CONCAT("SELECT
-						COUNT(*) AS nRows
+						COUNT(1) AS nRows
 					FROM
 						master_item MI
                         JOIN master_category MC

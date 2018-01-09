@@ -16,9 +16,10 @@
 						<span style="width:49%;display:inline-block;text-align:right;">
 							<button id="btnAdd" class="btn btn-primary" onclick="openDialog(0, 0);"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
 							<?php 
-								if($DeleteFlag == true) echo '<button id="btnDelete" class="btn btn-danger" onclick="DeleteData(\'./Master/User/Delete.php\');" ><i class="fa fa-close"></i> Hapus</button>';
+								if($DeleteFlag == true) echo '<button id="btnDelete" class="btn btn-danger" onclick="fnDeleteData();" ><i class="fa fa-close"></i> Hapus</button>';
 								echo '<input id="hdnEditFlag" name="hdnEditFlag" type="hidden" value="'.$EditFlag.'" />';
 								echo '<input id="hdnDeleteFlag" name="hdnDeleteFlag" type="hidden" value="'.$DeleteFlag.'" />';
+								echo '<input id="hdnSessionUserID" name="hdnSessionUserID" type="hidden" value="'.$_SESSION['UserID'].'" />';
 							?>
 						</span>
 					</div>
@@ -37,7 +38,6 @@
 								</thead>
 							</table>
 						</div>
-						<br />
 					</div>
 				</div>
 			</div>
@@ -200,7 +200,7 @@
 				$("#hdnIsEdit").val(EditFlag);
 				if(EditFlag == 1) {
 					$("#FormData").attr("title", "Edit User");
-					$("#hdnUserID").val(Data[6]);
+					$("#hdnUserID").val(Data[6].toString());
 					$("#txtUserName").val(Data[2]);
 					$("#txtUserLogin").val(Data[3]);
 					$("#ddlStatus").val(Data[10]);
@@ -254,10 +254,10 @@
 						table.keys.disable();
 						$("#divModal").show();
 						$(document).on('keydown', function(e) {
-							if (e.keyCode == 39 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //right arrow
+							if (e.keyCode == 39 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0 && $("select:focus").length == 0) { //right arrow
 								$("#btnCancelAddUser").focus();
 							}
-							else if(e.keyCode == 37 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //left arrow
+							else if(e.keyCode == 37 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0 && $("select:focus").length == 0) { //left arrow
 								$("#btnSaveUser").focus();
 							}
 						});
@@ -275,44 +275,7 @@
 						$("#divModal").hide();
 						table.keys.enable();
 						if(typeof index !== 'undefined') table.cell(index).focus();
-						$("#hdnUserID").val(0);
-						$("#txtUserName").val("");
-						$("#txtUserLogin").val("");
-						$("#ddlStatus").val("");
-						$("#ddlUserType").val("");
-						$("#hdnMenuID").val("");
-						$("#hdnEditMenuID").val("");
-						$("#hdnDeleteMenuID").val("");
-						
-						$("input:checkbox[name=permission]").each(function() {
-							$(this).attr("checked", false);
-							$(this).prop("checked", false);
-						});
-						
-						$("input:checkbox[name=edit]").each(function() {
-							$(this).attr("checked", false);
-							$(this).prop("checked", false);
-						});
-						
-						$("input:checkbox[name=delete]").each(function() {
-							$(this).attr("checked", false);
-							$(this).prop("checked", false);
-						});
-						
-						$("input:checkbox[name=grouppermission]").each(function() {
-							$(this).attr("checked", false);
-							$(this).prop("checked", false);
-						});
-						
-						$("input:checkbox[name=groupedit]").each(function() {
-							$(this).attr("checked", false);
-							$(this).prop("checked", false);
-						});
-						
-						$("input:checkbox[name=groupdelete]").each(function() {
-							$(this).attr("checked", false);
-							$(this).prop("checked", false);
-						});
+						resetForm();
 					},
 					resizable: false,
 					height: 600,
@@ -338,44 +301,8 @@
 													$("#loading").hide();
 													$("#FormData").dialog("destroy");
 													$("#divModal").hide();
-													$("#hdnUserID").val(0);
-													$("#txtUserName").val("");
-													$("#txtUserLogin").val("");
-													$("#ddlStatus").val("");
-													$("#ddlUserType").val("");
-													$("#hdnMenuID").val("");
-													$("#hdnEditMenuID").val("");
-													$("#hdnDeleteMenuID").val("");
-													
-													$("input:checkbox[name=permission]").each(function() {
-														$(this).attr("checked", false);
-														$(this).prop("checked", false);
-													});
-													
-													$("input:checkbox[name=edit]").each(function() {
-														$(this).attr("checked", false);
-														$(this).prop("checked", false);
-													});
-													
-													$("input:checkbox[name=delete]").each(function() {
-														$(this).attr("checked", false);
-														$(this).prop("checked", false);
-													});
-													
-													$("input:checkbox[name=grouppermission]").each(function() {
-														$(this).attr("checked", false);
-														$(this).prop("checked", false);
-													});
-													
-													$("input:checkbox[name=groupedit]").each(function() {
-														$(this).attr("checked", false);
-														$(this).prop("checked", false);
-													});
-													
-													$("input:checkbox[name=groupdelete]").each(function() {
-														$(this).attr("checked", false);
-														$(this).prop("checked", false);
-													});
+													var hdnUserID  = $("#hdnUserID").val();
+													resetForm();
 													var counter = 0;
 													Lobibox.alert("success",
 													{
@@ -384,7 +311,8 @@
 														delay: 2000,
 														beforeClose: function() {
 															if(counter == 0) {
-																table.keys.enable();
+																if(hdnUserID == $("#hdnSessionUserID").val()) location.reload();
+																else table.keys.enable();
 																counter = 1;
 															}
 														},
@@ -409,7 +337,9 @@
 														delay: false,
 														beforeClose: function() {
 															if(counter == 0) {
-																$("#txtUserName").focus();
+																setTimeout(function() {
+																	$("#txtUserName").focus();
+																}, 0);
 																counter = 1;
 															}
 														}
@@ -419,12 +349,21 @@
 											},
 											error: function(jqXHR, textStatus, errorThrown) {
 												$("#loading").hide();
+												var counter = 0;
 												var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
 												LogEvent(errorMessage, "/Master/User/index.php");
 												Lobibox.alert("error",
 												{
 													msg: errorMessage,
-													width: 480
+													width: 480,
+													beforeClose: function() {
+														if(counter == 0) {
+															setTimeout(function() {
+																$("#txtUserName").focus();
+															}, 0);
+															counter = 1;
+														}
+													}
 												});
 												return 0;
 											}
@@ -446,48 +385,84 @@
 							$("#divModal").hide();
 							table.keys.enable();
 							if(typeof index !== 'undefined') table.cell(index).focus();
-							$("#hdnUserID").val(0);
-							$("#txtUserName").val("");
-							$("#txtUserLogin").val("");
-							$("#ddlStatus").val("");
-							$("#ddlUserType").val("");
-							$("#hdnMenuID").val("");
-							$("#hdnEditMenuID").val("");
-							$("#hdnDeleteMenuID").val("");
-							
-							$("input:checkbox[name=permission]").each(function() {
-								$(this).attr("checked", false);
-								$(this).prop("checked", false);
-							});
-							
-							$("input:checkbox[name=edit]").each(function() {
-								$(this).attr("checked", false);
-								$(this).prop("checked", false);
-							});
-							
-							$("input:checkbox[name=delete]").each(function() {
-								$(this).attr("checked", false);
-								$(this).prop("checked", false);
-							});
-							
-							$("input:checkbox[name=grouppermission]").each(function() {
-								$(this).attr("checked", false);
-								$(this).prop("checked", false);
-							});
-							
-							$("input:checkbox[name=groupedit]").each(function() {
-								$(this).attr("checked", false);
-								$(this).prop("checked", false);
-							});
-							
-							$("input:checkbox[name=groupdelete]").each(function() {
-								$(this).attr("checked", false);
-								$(this).prop("checked", false);
-							});
+							resetForm();
 							return false;
 						}
 					}]
 				}).dialog("open");
+			}
+			
+			function resetForm() {
+				$("#hdnUserID").val(0);
+				$("#txtUserName").val("");
+				$("#txtUserLogin").val("");
+				$("#ddlStatus").val(1);
+				$("#ddlUserType").val(1);
+				$("#txtConfirmPassword").val("");
+				$("#txtPassword").val("");
+				$("#hdnMenuID").val("");
+				$("#hdnEditMenuID").val("");
+				$("#hdnDeleteMenuID").val("");
+				
+				$("input:checkbox[name=permission]").each(function() {
+					$(this).attr("checked", false);
+					$(this).prop("checked", false);
+				});
+				
+				$("input:checkbox[name=edit]").each(function() {
+					$(this).attr("checked", false);
+					$(this).prop("checked", false);
+				});
+				
+				$("input:checkbox[name=delete]").each(function() {
+					$(this).attr("checked", false);
+					$(this).prop("checked", false);
+				});
+				
+				$("input:checkbox[name=grouppermission]").each(function() {
+					$(this).attr("checked", false);
+					$(this).prop("checked", false);
+				});
+				
+				$("input:checkbox[name=groupedit]").each(function() {
+					$(this).attr("checked", false);
+					$(this).prop("checked", false);
+				});
+				
+				$("input:checkbox[name=groupdelete]").each(function() {
+					$(this).attr("checked", false);
+					$(this).prop("checked", false);
+				});
+			}
+			
+			function fnDeleteData() {
+				var index = table.cell({ focused: true }).index();
+				table.keys.disable();
+				DeleteData("./Master/User/Delete.php", function(action) {
+					if(action == "Ya") {
+						$("#select_all").prop("checked", false);
+						table.ajax.reload(function() {
+							table.keys.enable();
+							if(typeof index !== 'undefined') {
+								try {
+									table.cell(index).focus();
+								}
+								catch (err) {
+									$("#grid-data").DataTable().cell( ':eq(0)' ).focus();
+								}
+							}
+							if(table.page.info().page == table.page.info().pages) {
+								setTimeout(function() {
+									table.page("previous").draw('page');
+								}, 0);
+							}
+						}, false);
+					}
+					else {
+						table.keys.enable();
+						return false;
+					}
+				});
 			}
 			
 			function ValidateForm() {
@@ -673,6 +648,11 @@
 													$("#grid-data").DataTable().cell( ':eq(0)' ).focus();
 												}
 											}
+											if(table.page.info().page == table.page.info().pages) {
+												setTimeout(function() {
+													table.page("previous").draw('page');
+												}, 0);
+											}
 										}, false);
 									}
 									else {
@@ -682,27 +662,7 @@
 								});
 							}
 							else {
-								table.keys.disable();
-								DeleteData("./Master/User/Delete.php", function(action) {
-									if(action == "Ya") {
-										$("#select_all").prop("checked", false);
-										table.ajax.reload(function() {
-											table.keys.enable();
-											if(typeof index !== 'undefined') {
-												try {
-													table.cell(index).focus();
-												}
-												catch (err) {
-													$("#grid-data").DataTable().cell( ':eq(0)' ).focus();
-												}
-											}
-										}, false);
-									}
-									else {
-										table.keys.enable();
-										return false;
-									}
-								});
+								fnDeleteData();
 							}
 						}
 						setTimeout(function() { counterUser = 0; } , 1000);
@@ -717,27 +677,7 @@
 					var index = table.cell({ focused: true }).index();
 					if (evt.keyCode == 46 && $("#hdnDeleteFlag").val() == "1" && typeof index == 'undefined') { //delete button
 						evt.preventDefault();
-						table.keys.disable();
-						DeleteData("./Master/User/Delete.php", function(action) {
-							if(action == "Ya") {
-								$("#select_all").prop("checked", false);
-								table.ajax.reload(function() {
-									table.keys.enable();
-									if(typeof index !== 'undefined') {
-										try {
-											table.cell(index).focus();
-										}
-										catch (err) {
-											$("#grid-data").DataTable().cell( ':eq(0)' ).focus();
-										}
-									}
-								}, false);
-							}
-							else {
-								table.keys.enable();
-								return false;
-							}
-						});
+						fnDeleteData();
 					}
 				});
 				
@@ -817,6 +757,11 @@
 						$(".gd" + i).attr("checked", false);
 						$(".gd" + i).prop("checked", false);
 					}
+				});
+				
+				$('#grid-data tbody').on('dblclick', 'tr', function () {
+					var data = table.row(this).data();
+					openDialog(data, 1);
 				});
 			});
 		</script>

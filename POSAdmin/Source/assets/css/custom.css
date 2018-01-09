@@ -13,6 +13,7 @@
 =============================================*/
 body {
     font-family: 'Open Sans', sans-serif;
+	overflow-x: hidden;
 }
 
 #loading {
@@ -498,6 +499,10 @@ h5 {
 .ui-autocomplete {
 	font-family: Open Sans, sans-serif; 
 	font-size: 12px;
+	max-height: 230px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	z-index: 101;
 }
 
 .custom-combobox .caret {
@@ -695,4 +700,38 @@ h1, .h1, h2, .h2, h3, .h3 {
 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 	z-index: 99;
 	display:none;
+}
+
+#slider {
+	width:500px;
+	top:100px;
+	position:absolute
+}
+#header {
+	width:300px;
+	height:250px;
+	position:absolute;
+	right:0;
+	border:1px solid #d8d8d8;
+	margin-left:40px;
+	padding:10px 10px;
+	border-radius:3px;
+	box-shadow:0 0 8px gray;
+	background: white;
+}
+#sidebar {
+	position:absolute;
+	top:180px;
+	left:175px;
+}
+#sidebar1 {
+	position:absolute;
+	top:180px;
+	left:175px;
+}
+
+div#title {
+	position:absolute;
+	top:300px;
+	left:650px
 }

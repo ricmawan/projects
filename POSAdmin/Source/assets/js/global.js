@@ -142,7 +142,7 @@ $(document).ready(function () {
 				error: function(jqXHR, textStatus, errorThrown) {
 					$("#loading").hide();
 					var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-					LogEvent(errorMessage, "global.js (MenuClick)");
+					LogEvent(errorMessage, "global.js (fnMenuClick)");
 					Lobibox.alert("error",
 					{
 						msg: errorMessage,
@@ -201,7 +201,7 @@ function Redirect(link) {
 			error: function(jqXHR, textStatus, errorThrown) {
 				$("#loading").hide();
 				var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-				LogEvent(errorMessage, "global.js (Redirect)");
+				LogEvent(errorMessage, "global.js (fnRedirect)");
 				Lobibox.alert("error",
 				{
 					msg: errorMessage,
@@ -254,7 +254,7 @@ function Reload() {
 			error: function(jqXHR, textStatus, errorThrown) {
 				$("#loading").hide();
 				var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-				LogEvent(errorMessage, "global.js (Reload)");
+				LogEvent(errorMessage, "global.js (fnReload)");
 				Lobibox.alert("error",
 				{
 					msg: errorMessage,
@@ -418,7 +418,7 @@ function Back() {
 			error: function(jqXHR, textStatus, errorThrown) {
 				$("#loading").hide();
 				var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-				LogEvent(errorMessage, "global.js (Back)");
+				LogEvent(errorMessage, "global.js (fnBack)");
 				Lobibox.alert("error",
 				{
 					msg: errorMessage,
@@ -507,6 +507,9 @@ function UpdatePassword() {
 						if(data.FailedFlag == '0') {
 							//$.notify(data.Message, "success");
 							$("#update-password").dialog("destroy");
+							$("#txtCurrentPassword").val("");
+							$("#txtNewPassword").val("");
+							$("#txtConfirmNewPassword").val("");
 							$("#divModal").hide();
 							Lobibox.alert("success",
 							{
@@ -529,7 +532,7 @@ function UpdatePassword() {
 					error: function(jqXHR, textStatus, errorThrown) {
 						$("#loading").hide();
 						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-						LogEvent(errorMessage, "global.js (UpdatePassword)");
+						LogEvent(errorMessage, "global.js (fnUpdatePassword)");
 						Lobibox.alert("error",
 						{
 							msg: errorMessage,
@@ -599,40 +602,34 @@ function SingleDelete(url, DeleteID, callback) {
 						var berhasil = datadelete[0];
 						var gagal = datadelete [1];
 						var counter1 = 0;
-						var counter2 = 0;
-						if(berhasil!="") {
-							Lobibox.alert("success",
-							{
-								msg: berhasil,
-								width: 480,
-								delay: 2000,
-								beforeClose: function() {
-									if(counter1 == 0) {
-										if(gagal=="") callback("Ya");
-										counter1 = 1;
-									}
-								}
-							});
+						var alertType;
+						var alertDelay;
+						if(berhasil != "" && gagal == "" ) {
+							alertType = "success";
+							alertDelay = 2000;
 						}
-						if(gagal!="") {
-							Lobibox.alert("warning",
-							{
-								msg: gagal,
-								width: 480,
-								delay: false,
-								beforeClose: function() {
-									if(counter2 == 0) {
-										callback("Ya");
-										counter2 = 1;
-									}
-								}
-							});
+						else {
+							alertType = "warning";
+							alertDelay = false;
 						}
+						
+						Lobibox.alert(alertType,
+						{
+							msg: berhasil + "<br>" + gagal,
+							width: 480,
+							delay: alertDelay,
+							beforeClose: function() {
+								if(counter1 == 0) {
+									callback("Ya");
+									counter1 = 1;
+								}
+							}
+						});
 					},
 					error: function(jqXHR, textStatus, errorThrown) {
 						$("#loading").hide();
 						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-						LogEvent(errorMessage, "global.js (SingleDelete)");
+						LogEvent(errorMessage, "global.js (fnSingleDelete)");
 						Lobibox.alert("error",
 						{
 							msg: errorMessage,
@@ -706,40 +703,34 @@ function DeleteData(url, callback) {
 							var berhasil = datadelete[0];
 							var gagal = datadelete [1];
 							var counter1 = 0;
-							var counter2 = 0;
-							if(berhasil!="") {
-								Lobibox.alert("success",
-								{
-									msg: berhasil,
-									width: 480,
-									delay: 2000,
-									beforeClose: function() {
-										if(counter1 == 0) {
-											if(gagal=="") callback("Ya");
-											counter1 = 1;
-										}
-									}
-								});
+							var alertType;
+							var alertDelay;
+							if(berhasil != "" && gagal == "" ) {
+								alertType = "success";
+								alertDelay = 2000;
 							}
-							if(gagal!="") {
-								Lobibox.alert("warning",
-								{
-									msg: gagal,
-									width: 480,
-									delay: false,
-									beforeClose: function() {
-										if(counter2 == 0) {
-											callback("Ya");
-											counter2 = 1;
-										}
-									}
-								});
+							else {
+								alertType = "warning";
+								alertDelay = false;
 							}
+							
+							Lobibox.alert(alertType,
+							{
+								msg: berhasil + "<br>" + gagal,
+								width: 480,
+								delay: alertDelay,
+								beforeClose: function() {
+									if(counter1 == 0) {
+										callback("Ya");
+										counter1 = 1;
+									}
+								}
+							});
 						},
 						error: function(jqXHR, textStatus, errorThrown) {
 							$("#loading").hide();
 							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-							LogEvent(errorMessage, "global.js (DeleteData)");
+							LogEvent(errorMessage, "global.js (fnDeleteData)");
 							Lobibox.alert("error",
 							{
 								msg: errorMessage,
@@ -967,7 +958,7 @@ function keyFunction() {
 			evt.preventDefault();
 			return false;
 		}
-		else if((evt.keyCode == 38 || evt.keyCode == 40 /* up & down */) && $("input:focus").length == 0 && $(".focus").length == 0 ) {
+		else if((evt.keyCode == 38 || evt.keyCode == 40 /* up & down */) && $("input:focus").length == 0 && $(".focus").length == 0 && $("select:focus").length == 0 ) {
 			evt.preventDefault();
 			$("#grid-data").DataTable().cell( ':eq(0)' ).focus();
 		}
@@ -1017,6 +1008,8 @@ function LogEvent(Description, Source) {
 			value = selected.val() ? selected.text() : "",
 			placeholder = this.element.attr("placeholder");
 			tabindex = this.element.attr("tabindex");
+			var dialogIndex = $(".ui-dialog").css("z-index");
+			var newIndex = parseInt(dialogIndex) + 1;
 			wasOpen = false;
 			this.input = $( "<input style='font-family: Open Sans, sans-serif; font-size: 12px;'>" )
 			.appendTo( this.wrapper )
@@ -1036,6 +1029,11 @@ function LogEvent(Description, Source) {
 			})
 			.click(function() {
 				input.focus();
+				dialogIndex = $(".ui-dialog").css("z-index");
+				newIndex = parseInt(dialogIndex) + 1;
+				$(".ui-autocomplete").css({
+					"z-index":  newIndex
+				});
 				// Close if already visible
 				if ( wasOpen ) {
 				return;
@@ -1066,8 +1064,8 @@ function LogEvent(Description, Source) {
 				},
 				autocompletechange: "_removeIfInvalid"
 			});
-			var input = this.input,
-			wasOpen = false;
+			var input = this.input;
+			//wasOpen = false;
 			this.caret = $ (" <b class='caret' acronym title='Tampilkan Semua' style='cursor: pointer;'></b> " )
 			.appendTo( this.wrapper )
 			.mousedown(function() {
@@ -1075,6 +1073,11 @@ function LogEvent(Description, Source) {
 			})
 			.click(function() {
 				input.focus();
+				dialogIndex = $(".ui-dialog").css("z-index");
+				newIndex = parseInt(dialogIndex) + 1;
+				$(".ui-autocomplete").css({
+					"z-index":  newIndex
+				});
 				// Close if already visible
 				if ( wasOpen ) {
 				return;
@@ -1151,3 +1154,52 @@ $.extend($.ui.autocomplete.prototype.options, {
         });
     }
 });
+
+/*
+------------------------------------------------------------
+Function to activate form button to open the slider.
+------------------------------------------------------------
+*/
+function open_panel() {
+	slideIt();
+	var a = document.getElementById("sidebar");
+	a.setAttribute("id", "sidebar1");
+	a.setAttribute("onclick", "close_panel()");
+}
+/*
+------------------------------------------------------------
+Function to slide the sidebar form (open form)
+------------------------------------------------------------
+*/
+function slideIt() {
+	var slidingDiv = document.getElementById("slider");
+	var stopPosition = 0;
+	if (parseInt(slidingDiv.style.right) < stopPosition) {
+		slidingDiv.style.right = parseInt(slidingDiv.style.right) + 2 + "px";
+		setTimeout(slideIt, 1);
+	}
+}
+/*
+------------------------------------------------------------
+Function to activate form button to close the slider.
+------------------------------------------------------------
+*/
+function close_panel() {
+	slideIn();
+	a = document.getElementById("sidebar1");
+	a.setAttribute("id", "sidebar");
+	a.setAttribute("onclick", "open_panel()");
+}
+/*
+------------------------------------------------------------
+Function to slide the sidebar form (slide in form)
+------------------------------------------------------------
+*/
+function slideIn() {
+	var slidingDiv = document.getElementById("slider");
+	var stopPosition = -300;
+	if (parseInt(slidingDiv.style.right) > stopPosition) {
+		slidingDiv.style.right = parseInt(slidingDiv.style.right) - 2 + "px";
+		setTimeout(slideIn, 1);
+	}
+}

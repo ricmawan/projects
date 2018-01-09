@@ -16,7 +16,7 @@
 						<span style="width:49%;display:inline-block;text-align:right;">
 							<button id="btnAdd" class="btn btn-primary" onclick="openDialog(0, 0);"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
 							<?php
-								if($DeleteFlag == true) echo '<button id="btnDelete" class="btn btn-danger" onclick="DeleteData(\'./Master/Supplier/Delete.php\');" ><i class="fa fa-close"></i> Hapus</button>';
+								if($DeleteFlag == true) echo '<button id="btnDelete" class="btn btn-danger" onclick="fnDeleteData();" ><i class="fa fa-close"></i> Hapus</button>';
 								echo '<input id="hdnEditFlag" name="hdnEditFlag" type="hidden" value="'.$EditFlag.'" />';
 								echo '<input id="hdnDeleteFlag" name="hdnDeleteFlag" type="hidden" value="'.$DeleteFlag.'" />';
 							?>
@@ -39,7 +39,6 @@
 								</thead>
 							</table>
 						</div>
-						<br />
 					</div>
 				</div>
 			</div>
@@ -147,13 +146,7 @@
 						$("#divModal").hide();
 						table.keys.enable();
 						if(typeof index !== 'undefined') table.cell(index).focus();
-						$("#hdnSupplierID").val(0);
-						$("#txtSupplierCode").val("");
-						$("#txtSupplierName").val("");
-						$("#txtTelephone").val("");
-						$("#txtAddress").val("");
-						$("#txtCity").val("");
-						$("#txtRemarks").val("");
+						resetForm();
 					},
 					resizable: false,
 					height: 400,
@@ -177,13 +170,7 @@
 												$("#loading").hide();
 												$("#FormData").dialog("destroy");
 												$("#divModal").hide();
-												$("#hdnSupplierID").val(0);
-												$("#txtSupplierCode").val("");
-												$("#txtSupplierName").val("");
-												$("#txtTelephone").val("");
-												$("#txtAddress").val("");
-												$("#txtCity").val("");
-												$("#txtRemarks").val("");
+												resetForm();
 												var counter = 0;
 												Lobibox.alert("success",
 												{
@@ -217,7 +204,9 @@
 													delay: false,
 													beforeClose: function() {
 														if(counter == 0) {
-															$("#txtSupplierCode").focus();
+															setTimeout(function() {
+																$("#txtSupplierCode").focus();
+															}, 0);
 															counter = 1;
 														}
 													}
@@ -227,12 +216,21 @@
 										},
 										error: function(jqXHR, textStatus, errorThrown) {
 											$("#loading").hide();
+											var counter = 0;
 											var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
 											LogEvent(errorMessage, "/Master/Supplier/index.php");
 											Lobibox.alert("error",
 											{
 												msg: errorMessage,
-												width: 480
+												width: 480,
+												beforeClose: function() {
+													if(counter == 0) {
+														setTimeout(function() {
+															$("#txtSupplierCode").focus();
+														}, 0);
+														counter = 1;
+													}
+												}
 											});
 											return 0;
 										}
@@ -253,17 +251,51 @@
 							$("#divModal").hide();
 							table.keys.enable();
 							if(typeof index !== 'undefined') table.cell(index).focus();
-							$("#hdnSupplierID").val(0);
-							$("#txtSupplierCode").val("");
-							$("#txtSupplierName").val("");
-							$("#txtTelephone").val("");
-							$("#txtAddress").val("");
-							$("#txtCity").val("");
-							$("#txtRemarks").val("");
+							resetForm();
 							return false;
 						}
 					}]
 				}).dialog("open");
+			}
+			
+			function resetForm() {
+				$("#hdnSupplierID").val(0);
+				$("#txtSupplierCode").val("");
+				$("#txtSupplierName").val("");
+				$("#txtTelephone").val("");
+				$("#txtAddress").val("");
+				$("#txtCity").val("");
+				$("#txtRemarks").val("");
+			}
+			
+			function fnDeleteData() {
+				var index = table.cell({ focused: true }).index();
+				table.keys.disable();
+				DeleteData("./Master/Supplier/Delete.php", function(action) {
+					if(action == "Ya") {
+						$("#select_all").prop("checked", false);
+						table.ajax.reload(function() {
+							table.keys.enable();
+							if(typeof index !== 'undefined') {
+								try {
+									table.cell(index).focus();
+								}
+								catch (err) {
+									$("#grid-data").DataTable().cell( ':eq(0)' ).focus();
+								}
+							}
+							if(table.page.info().page == table.page.info().pages) {
+								setTimeout(function() {
+									table.page("previous").draw('page');
+								}, 0);
+							}
+						}, false);
+					}
+					else {
+						table.keys.enable();
+						return false;
+					}
+				});
 			}
 
 			$(document).ready(function() {
@@ -367,6 +399,11 @@
 													$("#grid-data").DataTable().cell( ':eq(0)' ).focus();
 												}
 											}
+											if(table.page.info().page == table.page.info().pages) {
+												setTimeout(function() {
+													table.page("previous").draw('page');
+												}, 0);
+											}
 										}, false);
 									}
 									else {
@@ -376,27 +413,7 @@
 								});
 							}
 							else {
-								table.keys.disable();
-								DeleteData("./Master/Supplier/Delete.php", function(action) {
-									if(action == "Ya") {
-										$("#select_all").prop("checked", false);
-										table.ajax.reload(function() {
-											table.keys.enable();
-											if(typeof index !== 'undefined') {
-												try {
-													table.cell(index).focus();
-												}
-												catch (err) {
-													$("#grid-data").DataTable().cell( ':eq(0)' ).focus();
-												}
-											}
-										}, false);
-									}
-									else {
-										table.keys.enable();
-										return false;
-									}
-								});
+								fnDeleteData();
 							}
 						}
 						setTimeout(function() { counterSupplier = 0; } , 1000);
@@ -411,28 +428,13 @@
 					var index = table.cell({ focused: true }).index();
 					if (evt.keyCode == 46 && $("#hdnDeleteFlag").val() == "1" && typeof index == 'undefined') { //delete button
 						evt.preventDefault();
-						table.keys.disable();
-						DeleteData("./Master/Supplier/Delete.php", function(action) {
-							if(action == "Ya") {
-								$("#select_all").prop("checked", false);
-								table.ajax.reload(function() {
-									table.keys.enable();
-									if(typeof index !== 'undefined') {
-										try {
-											table.cell(index).focus();
-										}
-										catch (err) {
-											$("#grid-data").DataTable().cell( ':eq(0)' ).focus();
-										}
-									}
-								}, false);
-							}
-							else {
-								table.keys.enable();
-								return false;
-							}
-						});
+						fnDeleteData();
 					}
+				});
+				
+				$('#grid-data tbody').on('dblclick', 'tr', function () {
+					var data = table.row(this).data();
+					openDialog(data, 1);
 				});
 			});
 		</script>

@@ -16,7 +16,7 @@
 						<span style="width:49%;display:inline-block;text-align:right;">
 							<button id="btnAdd" class="btn btn-primary" onclick="openDialog(0, 0);"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
 							<?php
-								if($DeleteFlag == true) echo '<button id="btnDelete" class="btn btn-danger" onclick="DeleteData(\'./Master/Item/Delete.php\');" ><i class="fa fa-close"></i> Hapus</button>';
+								if($DeleteFlag == true) echo '<button id="btnDelete" class="btn btn-danger" onclick="fnDeleteData();" ><i class="fa fa-close"></i> Hapus</button>';
 								echo '<input id="hdnEditFlag" name="hdnEditFlag" type="hidden" value="'.$EditFlag.'" />';
 								echo '<input id="hdnDeleteFlag" name="hdnDeleteFlag" type="hidden" value="'.$DeleteFlag.'" />';
 								echo '<input id="hdnUserTypeID" name="hdnUserTypeID" type="hidden" value="'.$_SESSION['UserTypeID'].'" />';
@@ -45,7 +45,6 @@
 								</thead>
 							</table>
 						</div>
-						<br />
 					</div>
 				</div>
 			</div>
@@ -211,19 +210,7 @@
 						$("#divModal").hide();
 						table.keys.enable();
 						if(typeof index !== 'undefined') table.cell(index).focus();
-						$("#hdnItemID").val(0);
-						$("#txtItemCode").val("");
-						$("#txtItemName").val("");
-						$("#ddlCategory").val("");
-						$("#ddlCategory").next().find("input").val("");
-						$("#txtBuyPrice").val("0");
-						$("#txtRetailPrice").val("0");
-						$("#txtPrice1").val("0");
-						$("#txtQty1").val(0);
-						$("#txtPrice2").val("0");
-						$("#txtQty2").val(0);
-						$("#txtWeight").val("0");
-						$("#txtMinimumStock").val(0);
+						resetForm();
 					},
 					resizable: false,
 					height: 440,
@@ -235,90 +222,111 @@
 						id: "btnSaveItem",
 						tabindex: 16,
 						click: function() {
-							saveConfirm(function(action) {
-								if(action == "Ya") {
-									$.ajax({
-										url: "./Master/Item/Insert.php",
-										type: "POST",
-										data: $("#PostForm").serialize(),
-										dataType: "json",
-										success: function(data) {
-											if(data.FailedFlag == '0') {
-												$("#loading").hide();
-												$("#FormData").dialog("destroy");
-												$("#divModal").hide();
-												$("#hdnItemID").val(0);
-												$("#txtItemCode").val("");
-												$("#txtItemName").val("");
-												$("#ddlCategory").val("");
-												$("#ddlCategory").next().find("input").val("");
-												$("#txtBuyPrice").val("0");
-												$("#txtRetailPrice").val("0");
-												$("#txtPrice1").val("0");
-												$("#txtQty1").val(0);
-												$("#txtPrice2").val("0");
-												$("#txtQty2").val(0);
-												$("#txtWeight").val("0");
-												$("#txtMinimumStock").val(0);
-												var counter = 0;
-												Lobibox.alert("success",
-												{
-													msg: data.Message,
-													width: 480,
-													delay: 2000,
-													beforeClose: function() {
-														if(counter == 0) {
-															table.keys.enable();
-															counter = 1;
-														}
-													},
-													shown: function() {
-														setTimeout(function() {
-															table.ajax.reload(function() {
+							var PassValidate = 1;
+							var FirstFocus = 0;
+							$(".form-control-custom").each(function() {
+								if($(this).hasAttr('required')) {
+									if($(this).val() == "") {
+										PassValidate = 0;
+										$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+										if(FirstFocus == 0) $(this).focus();
+										FirstFocus = 1;
+									}
+								}
+							});
+							
+							if($("#ddlCategory").val() == "") {
+								PassValidate = 0;
+								$("#ddlCategory").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+								if(FirstFocus == 0) $("#ddlCategory").next().find("input").focus();
+								FirstFocus = 1;
+							}
+							
+							if(PassValidate == 1) {
+								saveConfirm(function(action) {
+									if(action == "Ya") {
+										$.ajax({
+											url: "./Master/Item/Insert.php",
+											type: "POST",
+											data: $("#PostForm").serialize(),
+											dataType: "json",
+											success: function(data) {
+												if(data.FailedFlag == '0') {
+													$("#loading").hide();
+													$("#FormData").dialog("destroy");
+													$("#divModal").hide();
+													resetForm();
+													var counter = 0;
+													Lobibox.alert("success",
+													{
+														msg: data.Message,
+														width: 480,
+														delay: 2000,
+														beforeClose: function() {
+															if(counter == 0) {
 																table.keys.enable();
-																if(typeof index !== 'undefined') table.cell(index).focus();
-																table.keys.disable();
-															}, false);
-														}, 0);
-													}
-												});
-											}
-											else {
+																counter = 1;
+															}
+														},
+														shown: function() {
+															setTimeout(function() {
+																table.ajax.reload(function() {
+																	table.keys.enable();
+																	if(typeof index !== 'undefined') table.cell(index).focus();
+																	table.keys.disable();
+																}, false);
+															}, 0);
+														}
+													});
+												}
+												else {
+													$("#loading").hide();
+													var counter = 0;
+													Lobibox.alert("warning",
+													{
+														msg: data.Message,
+														width: 480,
+														delay: false,
+														beforeClose: function() {
+															if(counter == 0) {
+																setTimeout(function() {
+																	$("#txtItemCode").focus();
+																}, 0);
+																counter = 1;
+															}
+														}
+													});
+													return 0;
+												}
+											},
+											error: function(jqXHR, textStatus, errorThrown) {
 												$("#loading").hide();
 												var counter = 0;
-												Lobibox.alert("warning",
+												var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+												LogEvent(errorMessage, "/Master/Item/index.php");
+												Lobibox.alert("error",
 												{
-													msg: data.Message,
+													msg: errorMessage,
 													width: 480,
-													delay: false,
 													beforeClose: function() {
 														if(counter == 0) {
-															$("#txtItemCode").focus();
+															setTimeout(function() {
+																$("#txtItemCode").focus();
+															}, 0);
 															counter = 1;
 														}
 													}
 												});
 												return 0;
 											}
-										},
-										error: function(jqXHR, textStatus, errorThrown) {
-											$("#loading").hide();
-											var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-											LogEvent(errorMessage, "/Master/Item/index.php");
-											Lobibox.alert("error",
-											{
-												msg: errorMessage,
-												width: 480
-											});
-											return 0;
-										}
-									});
-								}
-								else {
-									$("#txtItemCode").focus();
-									return false;
-								}
-							});
+										});
+									}
+									else {
+										$("#txtItemCode").focus();
+										return false;
+									}
+								});
+							}
 						}
 					},
 					{
@@ -329,23 +337,58 @@
 							$("#divModal").hide();
 							table.keys.enable();
 							if(typeof index !== 'undefined') table.cell(index).focus();
-							$("#hdnItemID").val(0);
-							$("#txtItemCode").val("");
-							$("#txtItemName").val("");
-							$("#ddlCategory").val("");
-							$("#ddlCategory").next().find("input").val("");
-							$("#txtBuyPrice").val("0");
-							$("#txtRetailPrice").val("0");
-							$("#txtPrice1").val("0");
-							$("#txtQty1").val(0);
-							$("#txtPrice2").val("0");
-							$("#txtQty2").val(0);
-							$("#txtWeight").val("0");
-							$("#txtMinimumStock").val(0);
+							resetForm();
 							return false;
 						}
 					}]
 				}).dialog("open");
+			}
+			
+			function resetForm() {
+				$("#hdnItemID").val(0);
+				$("#txtItemCode").val("");
+				$("#txtItemName").val("");
+				$("#ddlCategory").val("");
+				$("#ddlCategory").next().find("input").val("");
+				$("#txtBuyPrice").val("0");
+				$("#txtRetailPrice").val("0");
+				$("#txtPrice1").val("0");
+				$("#txtQty1").val(0);
+				$("#txtPrice2").val("0");
+				$("#txtQty2").val(0);
+				$("#txtWeight").val("0");
+				$("#txtMinimumStock").val(0);
+			}
+			
+			function fnDeleteData() {
+				var index = table.cell({ focused: true }).index();
+				table.keys.disable();
+				DeleteData("./Master/Item/Delete.php", function(action) {
+					if(action == "Ya") {
+						//console.log(table.page.info());
+						$("#select_all").prop("checked", false);
+						table.ajax.reload(function() {
+							table.keys.enable();
+							if(typeof index !== 'undefined') {
+								try {
+									table.cell(index).focus();
+								}
+								catch (err) {
+									$("#grid-data").DataTable().cell( ':eq(0)' ).focus();
+								}
+							}
+							if(table.page.info().page == table.page.info().pages) {
+								setTimeout(function() {
+									table.page("previous").draw('page');
+								}, 0);
+							}
+						}, false);
+					}
+					else {
+						table.keys.enable();
+						return false;
+					}
+				});
 			}
 
 			$(document).ready(function() {
@@ -418,7 +461,6 @@
 				
 				table.on( 'key', function (e, datatable, key, cell, originalEvent) {
 					var index = table.cell({ focused: true }).index();
-					console.log(counterItem);
 					if(key == 32) { //space
 						var checkbox = $(".focus").find("input:checkbox");
 						if(checkbox.prop("checked") == true) {
@@ -458,6 +500,11 @@
 												catch (err) {
 													$("#grid-data").DataTable().cell( ':eq(0)' ).focus();
 												}
+												if(table.page.info().page == table.page.info().pages) {
+													setTimeout(function() {
+														table.page("previous").draw('page');
+													}, 0);
+												}
 											}
 										}, false);
 									}
@@ -468,27 +515,7 @@
 								});
 							}
 							else {
-								table.keys.disable();
-								DeleteData("./Master/Item/Delete.php", function(action) {
-									if(action == "Ya") {
-										$("#select_all").prop("checked", false);
-										table.ajax.reload(function() {
-											table.keys.enable();
-											if(typeof index !== 'undefined') {
-												try {
-													table.cell(index).focus();
-												}
-												catch (err) {
-													$("#grid-data").DataTable().cell( ':eq(0)' ).focus();
-												}
-											}
-										}, false);
-									}
-									else {
-										table.keys.enable();
-										return false;
-									}
-								});
+								fnDeleteData();
 							}
 						}
 						setTimeout(function() { counterItem = 0; } , 1000);
@@ -503,28 +530,13 @@
 					var index = table.cell({ focused: true }).index();
 					if (evt.keyCode == 46 && $("#hdnDeleteFlag").val() == "1" && typeof index == 'undefined') { //delete button
 						evt.preventDefault();
-						table.keys.disable();
-						DeleteData("./Master/Item/Delete.php", function(action) {
-							if(action == "Ya") {
-								$("#select_all").prop("checked", false);
-								table.ajax.reload(function() {
-									table.keys.enable();
-									if(typeof index !== 'undefined') {
-										try {
-											table.cell(index).focus();
-										}
-										catch (err) {
-											$("#grid-data").DataTable().cell( ':eq(0)' ).focus();
-										}
-									}
-								}, false);
-							}
-							else {
-								table.keys.enable();
-								return false;
-							}
-						});
+						fnDeleteData();
 					}
+				});
+				
+				$('#grid-data tbody').on('dblclick', 'tr', function () {
+					var data = table.row(this).data();
+					openDialog(data, 1);
 				});
 			});
 		</script>
