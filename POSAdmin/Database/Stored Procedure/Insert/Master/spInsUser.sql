@@ -38,7 +38,7 @@ StoredProcedure:BEGIN
 		SELECT
 			pID AS 'ID',
 			'Terjadi kesalahan sistem!' AS 'Message',
-			'' AS 'MessageDetail',
+			@full_error AS 'MessageDetail',
 			1 AS 'FailedFlag',
 			State AS 'State' ;
 	END;
@@ -125,26 +125,28 @@ SET State = 5;
 	
 SET State = 6;
 
-			DELETE 
-			FROM 
-				master_role
-			WHERE
-				UserID = pID;
-				
+				DELETE 
+				FROM 
+					master_role
+				WHERE
+					UserID = pID;
+					
 SET State = 7;
-			
-			SET @query = CONCAT("INSERT INTO master_role
-								(
-									UserID,
-									MenuID,
-									EditFlag,
-									DeleteFlag
-								)
-								VALUES", pRoleValues);
-								
-			PREPARE stmt FROM @query;
-			EXECUTE stmt;
-			DEALLOCATE PREPARE stmt;
+			IF(pRoleValues <> "" ) THEN
+				SET @query = CONCAT("INSERT INTO master_role
+									(
+										UserID,
+										MenuID,
+										EditFlag,
+										DeleteFlag
+									)
+									VALUES", REPLACE(pRoleValues, '(0,', CONCAT('(', pID, ',')));
+									
+				PREPARE stmt FROM @query;
+				EXECUTE stmt;
+				DEALLOCATE PREPARE stmt;
+				
+			END IF;
 
 		END IF;
 

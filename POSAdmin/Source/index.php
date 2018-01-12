@@ -82,7 +82,7 @@
 
 								<div class="form-group input-group">
 									<span class="input-group-addon"><i class="fa fa-lock"></i></span>
-									<input id="txtPassword" name="txtPassword" type="password" tabindex=2 class="form-control" autocomplete=off onfocus="this.select();" placeholder="Password" required />
+									<input id="txtPassword" name="txtPassword" type="password" tabindex=2 class="form-control" autocomplete=off onfocus="this.select();" onkeypress="isEnterKey(event, 'SubmitForm');" placeholder="Password" required />
 								</div>
 								<div style="text-align:right;">
 									<input id="btnLogin" name="btnLogin" type="button" tabindex=3 value="Login" class="btn btn-primary" onclick="SubmitForm();" >
@@ -120,6 +120,12 @@
 					}
 				});
 			});
+			
+			function isEnterKey(evt, fn) {
+				var e = evt || window.event;
+				var charCode = e.which || e.keyCode;
+				if (charCode == 13) window[fn]();
+			}
 
 			function SubmitForm() {
 				var cek = 1;

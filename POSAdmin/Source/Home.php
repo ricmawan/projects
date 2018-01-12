@@ -186,7 +186,6 @@
 		<script src="assets/js/jquery.dataTables.js"></script>
 		<script src="assets/js/dataTables.bootstrap.js"></script>
 		<script src="assets/js/dataTables.keyTable.js"></script>
-		<a href="#Top" class="scrollup" onclick="return false;">Scroll</a>
 		<div id="loading"></div>
 		<iframe id='excelDownload' src='' style='display:none'></iframe>
 		<script type="text/javascript">

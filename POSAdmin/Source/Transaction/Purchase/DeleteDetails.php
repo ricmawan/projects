@@ -12,22 +12,20 @@
 		for($i=0; $i<count($ArrayData); $i++) {
 			try
 			{
-				$Data = explode("^", $ArrayData[$i]);
-				$DataID = mysqli_real_escape_string($dbh, $Data[0]);
-				$DataName = $Data[1];
-				$sql = "CALL spDelPurchase($DataID, '".$_SESSION['UserLogin']."')";
+				$DataID = mysqli_real_escape_string($dbh, $ArrayData[$i]);
+				$sql = "CALL spDelPurchaseDetails($DataID, '".$_SESSION['UserLogin']."')";
 				if (!$result = mysqli_query($dbh, $sql)) {
 					logEvent(mysqli_error($dbh), '/Transaction/Purchase/Delete.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-					throw new Exception($DataName);
+					throw new Exception($DataID);
 				}
 				$row=mysqli_fetch_array($result);
 				
 				if($row['FailedFlag'] == 1) {
-					throw new Exception($DataName);
+					throw new Exception($DataID);
 				}
 				mysqli_free_result($result);
 				mysqli_next_result($dbh);
-				$MessageSuccessDelete .= "$DataName, ";
+				$MessageSuccessDelete .= "$DataID, ";
 			}
 			catch (Exception $e)
 			{
@@ -37,9 +35,9 @@
 		$MessageSuccessDelete = substr($MessageSuccessDelete, 0, -2);
 		$MessageFailedDelete = substr($MessageFailedDelete, 0, -2);
 			
-		if($MessageSuccessDelete !="") $MessageSuccess = "No. Invoice " .$MessageSuccessDelete. " Berhasil Dihapus";
+		if($MessageSuccessDelete !="") $MessageSuccess = "Data Berhasil Dihapus";
 		else $MessageSuccess = "";
-		if($MessageFailedDelete !="") $MessageFailed = "No. Invoice " .$MessageFailedDelete. " Gagal Dihapus";
+		if($MessageFailedDelete !="") $MessageFailed = "Data Gagal Dihapus";
 		else $MessageFailed = "";
 		
 		echo "$MessageSuccess+$MessageFailed";

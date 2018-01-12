@@ -18,7 +18,7 @@
 		if($IsActive == 1) $IsActive = true;
 		else $IsActive = false;
 		
-		$Message = "Data gagal dimasukkan, cek koneksi internet dan coba lagi!";
+		$Message = "Terjadi Kesalahan Sistem!";
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
@@ -35,7 +35,6 @@
 					WHERE
 						UserID = ".$UserID."";
 			if (! $result=mysqli_query($dbh, $sql)) {
-				$Message = "Terjadi Kesalahan Sistem";
 				$MessageDetail = mysqli_error($dbh);
 				$FailedFlag = 1;
 				echo returnstate($UserID, $Message, $MessageDetail, $FailedFlag, $State);
@@ -48,12 +47,12 @@
 		
 		$roleValues = array();
 		for($i=0;$i<count($hdnMenuID);$i++) {
-			$roleValues[] = "(".$UserID.", ".$hdnMenuID[$i].", ".$hdnEditMenuID[$i].", ".$hdnDeleteMenuID[$i].")";
+			if($hdnMenuID[$i] == "") $roleValues[] = "";
+			else $roleValues[] = "(".$UserID.", ".$hdnMenuID[$i].", ".$hdnEditMenuID[$i].", ".$hdnDeleteMenuID[$i].")";
 		}
 		$sql = "CALL spInsUser(".$UserID.", '".$UserName."', ".$UserTypeID.", '".$UserLogin."', '".$Password."', '".$IsActive."', '".implode(",", $roleValues)."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
 		
 		if (! $result=mysqli_query($dbh, $sql)) {
-			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;
 			logEvent(mysqli_error($dbh), '/Master/User/Insert.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));

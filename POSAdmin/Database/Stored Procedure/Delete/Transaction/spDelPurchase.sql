@@ -27,7 +27,7 @@ StoredProcedure:BEGIN
         SELECT
 			pPurchaseID AS 'ID',
 			'Terjadi kesalahan sistem!' AS 'Message',
-			'' AS 'MessageDetail',
+			@full_error AS 'MessageDetail',
 			1 AS 'FailedFlag',
 			State AS 'State' ;
 	END;
@@ -46,7 +46,7 @@ SET State = 1;
 SET State = 2;
 
 		SELECT
-			pItemID AS 'ID',
+			pPurchaseID AS 'ID',
 			'Pembelian berhasil dihapus!' AS 'Message',
 			'' AS 'MessageDetail',
 			0 AS 'FailedFlag',

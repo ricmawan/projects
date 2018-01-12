@@ -20,8 +20,8 @@ StoredProcedure:BEGIN
 	BEGIN		
 		GET DIAGNOSTICS CONDITION 1
 		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
 		CALL spInsEventLog(@full_error, 'spSelItemDetails', pCurrentUser);
 	END;
 	
@@ -30,6 +30,7 @@ SET State = 1;
 	SELECT
 		MI.ItemID,
 		MI.ItemCode,
+		MI.ItemName,
 		MI.BuyPrice,
 		MI.RetailPrice,
 		MI.Price1,

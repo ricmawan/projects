@@ -38,7 +38,7 @@ StoredProcedure:BEGIN
 		SELECT
 			pID AS 'ID',
 			'Terjadi kesalahan sistem!' AS 'Message',
-			'' AS 'MessageDetail',
+			@full_error AS 'MessageDetail',
 			1 AS 'FailedFlag',
 			State AS 'State' ;
 	END;

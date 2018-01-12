@@ -101,7 +101,7 @@
 						Harga Beli :
 					</div>
 					<div class="col-md-4">
-						<input id="txtBuyPrice" name="txtBuyPrice" type="text" tabindex=8 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Beli" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" required />
+						<input id="txtBuyPrice" name="txtBuyPrice" type="text" tabindex=8 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Beli" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" required />
 					</div>
 				</div>
 				<br />
@@ -110,7 +110,7 @@
 						Harga Ecer :
 					</div>
 					<div class="col-md-4">
-						<input id="txtRetailPrice" name="txtRetailPrice" type="text" tabindex=9 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Ecer" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" required />
+						<input id="txtRetailPrice" name="txtRetailPrice" type="text" tabindex=9 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Ecer" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" required />
 					</div>
 				</div>
 				<br />
@@ -119,13 +119,13 @@
 						Harga Grosir 1 :
 					</div>
 					<div class="col-md-4">
-						<input id="txtPrice1" name="txtPrice1" type="text" tabindex=10 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Grosir 1" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" required />
+						<input id="txtPrice1" name="txtPrice1" type="text" tabindex=10 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Grosir 1" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" required />
 					</div>
 					<div class="col-md-2 labelColumn">
 						Qty Grosir 1 :
 					</div>
 					<div class="col-md-2">
-						<input id="txtQty1" name="txtQty1" type="number" tabindex=11 class="form-control-custom" value=0 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 1" required />
+						<input id="txtQty1" name="txtQty1" type="number" tabindex=11 class="form-control-custom" value=0 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 1" onpaste="return false;" required />
 					</div>
 				</div>
 				<br />
@@ -134,13 +134,13 @@
 						Harga Grosir 2 :
 					</div>
 					<div class="col-md-4">
-						<input id="txtPrice2" name="txtPrice2" type="text" tabindex=12 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Grosir 2" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" required />
+						<input id="txtPrice2" name="txtPrice2" type="text" tabindex=12 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Grosir 2" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" required />
 					</div>
 					<div class="col-md-2 labelColumn">
 						Qty Grosir 2 :
 					</div>
 					<div class="col-md-2">
-						<input id="txtQty2" name="txtQty2" type="number" tabindex=13 class="form-control-custom" value=0 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 2" required />
+						<input id="txtQty2" name="txtQty2" type="number" tabindex=13 class="form-control-custom" value=0 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 2" onpaste="return false;" required />
 					</div>
 				</div>
 				<br />
@@ -149,13 +149,13 @@
 						Berat (KG) :
 					</div>
 					<div class="col-md-4">
-						<input id="txtWeight" name="txtWeight" type="text" tabindex=14 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Berat (KG)" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" required />
+						<input id="txtWeight" name="txtWeight" type="text" tabindex=14 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Berat (KG)" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" required />
 					</div>
 					<div class="col-md-2 labelColumn">
 						Stok Minimal :
 					</div>
 					<div class="col-md-2">
-						<input id="txtMinimumStock" name="txtMinimumStock" type="number" tabindex=15 class="form-control-custom" value=0 onfocus="this.select();" autocomplete=off placeholder="Stok Minimal" required />
+						<input id="txtMinimumStock" name="txtMinimumStock" type="number" tabindex=15 class="form-control-custom" value=0 onfocus="this.select();" autocomplete=off placeholder="Stok Minimal" onpaste="return false;" required />
 					</div>
 				</div>
 			</form>
@@ -364,8 +364,7 @@
 				var index = table.cell({ focused: true }).index();
 				table.keys.disable();
 				DeleteData("./Master/Item/Delete.php", function(action) {
-					if(action == "Ya") {
-						//console.log(table.page.info());
+					if(action == "success") {
 						$("#select_all").prop("checked", false);
 						table.ajax.reload(function() {
 							table.keys.enable();
@@ -425,19 +424,19 @@
 								"scrollCollapse": true,
 								"order": [2, "asc"],
 								"columns": [
-									{ "width": "12px", "orderable": false, className: "text-center" },
-									{ "width": "25px", "orderable": false },
-									null,
-									null,
-									null,
-									{ "orderable": false, className: "text-right", "visible": visible },
-									{ "orderable": false, className: "text-right" },
-									{ "orderable": false, className: "text-right" },
-									{ "orderable": false, className: "text-right" },
-									{ "orderable": false, className: "text-right" },
-									{ "orderable": false, className: "text-right" },
-									{ "orderable": false, className: "text-right" },
-									{ "orderable": false, className: "text-right" }							
+									{ "width": "12px", "orderable": false, className: "dt-head-center dt-body-center" },
+									{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
+									{ className: "dt-head-center" },
+									{ className: "dt-head-center" },
+									{ className: "dt-head-center" },
+									{ "orderable": false, className: "dt-head-center dt-body-right", "visible": visible },
+									{ "orderable": false, className: "dt-head-center dt-body-right" },
+									{ "orderable": false, className: "dt-head-center dt-body-right" },
+									{ "orderable": false, className: "dt-head-center dt-body-right" },
+									{ "orderable": false, className: "dt-head-center dt-body-right" },
+									{ "orderable": false, className: "dt-head-center dt-body-right" },
+									{ "orderable": false, className: "dt-head-center dt-body-right" },
+									{ "orderable": false, className: "dt-head-center dt-body-right" }							
 								],
 								"processing": true,
 								"serverSide": true,
@@ -490,7 +489,7 @@
 								var deletedData = new Array();
 								deletedData.push(data[13] + "^" + data[3]);
 								SingleDelete("./Master/Item/Delete.php", deletedData, function(action) {
-									if(action == "Ya") {
+									if(action == "success") {
 										table.ajax.reload(function() {
 											table.keys.enable();
 											if(typeof index !== 'undefined') {
@@ -528,7 +527,7 @@
 				
 				$(document).on("keydown", function (evt) {		
 					var index = table.cell({ focused: true }).index();
-					if (evt.keyCode == 46 && $("#hdnDeleteFlag").val() == "1" && typeof index == 'undefined') { //delete button
+					if (evt.keyCode == 46 && $("#hdnDeleteFlag").val() == "1" && typeof index == 'undefined' && $("#FormData").css("display") == "none") { //delete button
 						evt.preventDefault();
 						fnDeleteData();
 					}

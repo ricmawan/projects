@@ -735,3 +735,17 @@ div#title {
 	top:300px;
 	left:650px
 }
+
+#lblTotal {
+	width: 20%;
+	display:inline-block;
+	float:left;
+	height:5%;
+	min-height:45px;
+	margin:0 0 0 auto;
+	text-align:right;
+	background-color:black;
+	color:#00ff50;
+	font-size:32px;
+	font-weight:bold;
+}

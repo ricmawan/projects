@@ -47,7 +47,7 @@
 				<div class="row">
 					<div class="col-md-2 labelColumn">
 						Nama :
-						<input id="hdnUserID" name="hdnUserID" type="hidden" />
+						<input id="hdnUserID" name="hdnUserID" type="hidden" value=0 />
 						<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
 					</div>
 					<div class="col-md-3">
@@ -114,7 +114,7 @@
 							<div class="panel-heading" style="padding: 5px 15px;" >
 								<h5>Pilih Hak Akses Menu</h5>
 							</div>
-							<div class="panel-body" style="min-height: 320px !important;max-height:320px!important;overflow-y:auto;">
+							<div class="panel-body" style="min-height: 280px !important;max-height:280px!important;overflow-y:auto;">
 								<div class="table-responsive">
 									<table class="table table-striped table-bordered table-hover">
 										<thead>
@@ -439,7 +439,7 @@
 				var index = table.cell({ focused: true }).index();
 				table.keys.disable();
 				DeleteData("./Master/User/Delete.php", function(action) {
-					if(action == "Ya") {
+					if(action == "success") {
 						$("#select_all").prop("checked", false);
 						table.ajax.reload(function() {
 							table.keys.enable();
@@ -579,12 +579,12 @@
 							"scrollCollapse": true,
 							"order": [2, "asc"],
 							"columns": [
-								{ "width": "20px", "orderable": false, className: "text-center" },
-								{ "width": "25px", "orderable": false },
-								null,
-								null,
-								null,
-								null
+								{ "width": "20px", "orderable": false, className: "dt-head-center dt-body-center" },
+								{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
+								{ className: "dt-head-center" },
+								{ className: "dt-head-center" },
+								{ className: "dt-head-center" },
+								{ className: "dt-head-center" }
 							],
 							"processing": true,
 							"serverSide": true,
@@ -637,7 +637,7 @@
 								var deletedData = new Array();
 								deletedData.push(data[6] + "^" + data[2]);
 								SingleDelete("./Master/User/Delete.php", deletedData, function(action) {
-									if(action == "Ya") {
+									if(action == "success") {
 										table.ajax.reload(function() {
 											table.keys.enable();
 											if(typeof index !== 'undefined') {
@@ -675,7 +675,7 @@
 				
 				$(document).on("keydown", function (evt) {
 					var index = table.cell({ focused: true }).index();
-					if (evt.keyCode == 46 && $("#hdnDeleteFlag").val() == "1" && typeof index == 'undefined') { //delete button
+					if (evt.keyCode == 46 && $("#hdnDeleteFlag").val() == "1" && typeof index == 'undefined' && $("#FormData").css("display") == "none") { //delete button
 						evt.preventDefault();
 						fnDeleteData();
 					}

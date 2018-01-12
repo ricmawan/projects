@@ -27,7 +27,7 @@
 	//Handles search querystring sent from Bootgrid
 	if (!empty($requestData['search']['value']))
 	{
-		$search = mysqli_escape_string($dbh, trim($requestData['search']['value']));
+		$search = mysqli_real_escape_string($dbh, trim($requestData['search']['value']));
 		$where .= " AND ( TP.PurchaseNumber LIKE '%".$search."%'";
 		$where .= " OR DATE_FORMAT(TP.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
 		$where .= " OR MS.SupplierName LIKE '%".$search."%' )";
@@ -58,6 +58,8 @@
 		$row_array[] = $row['SupplierName'];
 		$row_array[] = number_format($row['Total'],0,".",",");
 		$row_array[] = $row['PurchaseID'];
+		$row_array[] = $row['SupplierID'];
+		$row_array[] = $row['PlainTransactionDate'];
 		array_push($return_arr, $row_array);
 	}
 	

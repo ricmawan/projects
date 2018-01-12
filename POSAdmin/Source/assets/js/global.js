@@ -5,120 +5,7 @@ $.fn.hasAttr = function(name) {
 var CurrentMenu = "./Home.php";
 var PrevMenu;
 
-$(document).ready(function () {
-	//Date picker option : .DatePickerGlobal, .DatePickerUntilNow, .DatePickerFromNow, .DatePickerMonthYearGlobal, .DatePickerMonthYearUntilNow, .DatePickerMonthYearFromNow
-	$(document).on('focus',".DatePickerGlobal", function(){
-		$(this).datepicker({
-			dateFormat: 'dd-mm-yy'
-		});
-		$(this).attr("readonly", "true");
-		$(this).css({
-			"background-color": "#FFF",
-			"cursor": "text"
-		});
-	});
-	
-	$(document).on('focus',".DatePickerUntilNow", function(){
-		$(this).datepicker({
-			dateFormat: 'dd-mm-yy',
-			maxDate : "+0D"
-		});
-		$(this).attr("readonly", "true");
-		$(this).css({
-			"background-color": "#FFF",
-			"cursor": "text"
-		});
-	});
-	
-	$(document).on('focus',".DatePickerFromNow", function(){
-		$(this).datepicker({
-			dateFormat: 'dd-mm-yy',
-			minDate : "+0D"
-		});
-		$(this).attr("readonly", "true");
-		$(this).css({
-			"background-color": "#FFF",
-			"cursor": "text"
-		});
-	});
-	
-	$(document).on('focus',".DatePickerMonthYearGlobal", function(){
-		$(this).datepicker({
-			dateFormat: 'dd-mm-yy',
-			changeMonth: true,
-			changeYear: true
-		});
-		$(this).attr("readonly", "true");
-		$(this).css({
-			"background-color": "#FFF",
-			"cursor": "text"
-		});
-	});
-	
-	$(document).on('focus',".DatePickerMonthYearUntilNow", function(){
-		$(this).datepicker({ 
-			dateFormat: 'dd-mm-yy',
-			maxDate : "+0D",
-			changeMonth: true,
-			changeYear: true,
-			yearRange: "-100:+0"
-		});
-		$(this).attr("readonly", "true");
-		$(this).css({
-			"background-color": "#FFF",
-			"cursor": "text"
-		});
-	});
-	
-	$(document).on('focus',".DatePickerMonthYearFromNow", function(){
-		$(this).datepicker({ 
-			dateFormat: 'dd-mm-yy',
-			minDate : "+0D",
-			changeMonth: true,
-			changeYear: true,
-			yearRange: "0:+100"
-		});
-		$(this).attr("readonly", "true");
-		$(this).css({
-			"background-color": "#FFF",
-			"cursor": "text"
-		});
-	});
-	
-	$(window).scroll(function () {
-		if ($(this).scrollTop() > 100) {
-			$('.scrollup').fadeIn();
-		} else {
-			$('.scrollup').fadeOut();
-		}
-	});
-	
-	if ($(window).scrollTop() <= 50) {
-		$('.scrolldown').fadeIn();
-	}
-	
-	$(window).scroll(function () {
-		if ($(this).scrollTop() <= 50) {
-			$('.scrolldown').fadeIn();
-		} else {
-			$('.scrolldown').fadeOut();
-		}
-	});
-
-	$('.scrollup').click(function () {
-		$("html, body").animate({
-			scrollTop: 0
-		}, "slow");
-		return false;
-	});
-	
-	$('.scrolldown').click(function () {
-		$("html, body").animate({
-			scrollTop: $(document).height()
-		}, "slow");
-		return false;
-	});
-	
+$(document).ready(function () {	
 	$(document).on("click", ".menu", function() {
 		var MenuClicked = $(this).attr("link");
 		PrevMenu = CurrentMenu;
@@ -294,7 +181,6 @@ function isNumberKey(evt) {
 	if (charCode > 31 && (charCode < 47 || charCode > 57))
 		return false;
 	if (e.shiftKey) return false;
-	//if (charCode == 13) convertRupiah(id, value);
 	return true;
 }
 
@@ -314,6 +200,7 @@ function isNumberKey(evt, id, value) {
 
 function isEnterKey(evt, fn) {
 	var e = evt || window.event;
+	e.stopImmediatePropagation();
 	var charCode = e.which || e.keyCode;
 	if (charCode == 13) window[fn]();
 }
@@ -620,7 +507,7 @@ function SingleDelete(url, DeleteID, callback) {
 							delay: alertDelay,
 							beforeClose: function() {
 								if(counter1 == 0) {
-									callback("Ya");
+									callback(alertType);
 									counter1 = 1;
 								}
 							}
@@ -721,7 +608,7 @@ function DeleteData(url, callback) {
 								delay: alertDelay,
 								beforeClose: function() {
 									if(counter1 == 0) {
-										callback("Ya");
+										callback(alertType);
 										counter1 = 1;
 									}
 								}
@@ -800,6 +687,7 @@ function saveConfirm(callback) {
 				text: "Ya",
 				id: "btnYes",
 				click: function() {
+					$("#loading").show();
 					$(this).dialog("destroy");
 					callback("Ya");
 				}
@@ -821,8 +709,8 @@ function saveConfirm(callback) {
 
 //Clock
 window.onload=GetClock;
-tday  =new Array("Minggu","Senin","Selasa","Rabu","Kamis","Jum'at","Sabtu");
-tmonth=new Array("January","February","Maret","April","Mei","Juni","July","Agustus","September","Oktober","November","Desember");
+tday  =new Array("Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu");
+tmonth=new Array("Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember");
 
 function checkall() {
 	var checkall = $("#check-all").is(':checked'); 
@@ -977,6 +865,13 @@ function LogEvent(Description, Source) {
 		data: { Description : Description, Source : Source },
 		dataType: "html"
 	});
+}
+
+function validateQTY(QTY) {
+	if(QTY == "") {
+		return 1;
+	}
+	else return QTY;
 }
 
 //titlebar(0);

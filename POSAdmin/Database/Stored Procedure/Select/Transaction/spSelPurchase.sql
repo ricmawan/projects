@@ -23,8 +23,8 @@ StoredProcedure:BEGIN
 	BEGIN		
 		GET DIAGNOSTICS CONDITION 1
 		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
 		CALL spInsEventLog(@full_error, 'spSelPurchase', pCurrentUser);
 	END;
 	
@@ -48,6 +48,8 @@ SET @query = CONCAT("SELECT
 						TP.PurchaseID,
                         TP.PurchaseNumber,
                         DATE_FORMAT(TP.TransactionDate, '%d-%m-%Y') TransactionDate,
+                        TransactionDate PlainTransactionDate,
+                        MS.SupplierID,
                         MS.SupplierName,
 						IFNULL(TPD.Total, 0) Total
 					FROM

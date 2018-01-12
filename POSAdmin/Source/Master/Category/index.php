@@ -220,10 +220,11 @@
 			}
 			
 			function fnDeleteData() {
+				console.log("kepanggil");
 				var index = table.cell({ focused: true }).index();
 				table.keys.disable();
 				DeleteData("./Master/Category/Delete.php", function(action) {
-					if(action == "Ya") {
+					if(action == "success") {
 						$("#select_all").prop("checked", false);
 						table.ajax.reload(function() {
 							table.keys.enable();
@@ -279,10 +280,10 @@
 								"scrollCollapse": true,
 								"order": [2, "asc"],
 								"columns": [
-									{ "width": "20px", "orderable": false, className: "text-center" },
-									{ "width": "25px", "orderable": false },
-									null,
-									null
+									{ "width": "20px", "orderable": false, className: "dt-head-center dt-body-center" },
+									{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
+									{ className: "dt-head-center" },
+									{ className: "dt-head-center" }
 								],
 								"processing": true,
 								"serverSide": true,
@@ -335,7 +336,7 @@
 								var deletedData = new Array();
 								deletedData.push(data[4] + "^" + data[3]);
 								SingleDelete("./Master/Category/Delete.php", deletedData, function(action) {
-									if(action == "Ya") {
+									if(action == "success") {
 										table.ajax.reload(function() {
 											table.keys.enable();
 											if(typeof index !== 'undefined') {
@@ -373,7 +374,7 @@
 				
 				$(document).on("keydown", function (evt) {
 					var index = table.cell({ focused: true }).index();
-					if (evt.keyCode == 46 && $("#hdnDeleteFlag").val() == "1" && typeof index == 'undefined') { //delete button
+					if (evt.keyCode == 46 && $("#hdnDeleteFlag").val() == "1" && typeof index == 'undefined' && $("#FormData").css("display") == "none") { //delete button
 						evt.preventDefault();
 						fnDeleteData();
 					}
