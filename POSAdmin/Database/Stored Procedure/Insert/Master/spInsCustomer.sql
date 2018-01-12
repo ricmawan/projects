@@ -26,10 +26,16 @@ StoredProcedure:BEGIN
 	BEGIN		
 		GET DIAGNOSTICS CONDITION 1
 		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
 		ROLLBACK;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (State ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
 		CALL spInsEventLog(@full_error, 'spInsCustomer', pCurrentUser);
+		SELECT
+			pID AS 'ID',
+			'Terjadi kesalahan sistem!' AS 'Message',
+			'' AS 'MessageDetail',
+			1 AS 'FailedFlag',
+			State AS 'State' ;
 	END;
 	
 	SET PassValidate = 1;
