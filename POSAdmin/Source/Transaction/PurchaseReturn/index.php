@@ -18,7 +18,7 @@
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						 <span style="width:50%;display:inline-block;">
-							 <h5>Pembelian</h5>
+							 <h5>Retur Pembelian</h5>
 						</span>
 						<span style="width:49%;display:inline-block;text-align:right;">
 							<button id="btnAdd" class="btn btn-primary" onclick="openDialog(0, 0);"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
@@ -36,7 +36,6 @@
 									<tr>
 										<th><input id="select_all" name="select_all" type="checkbox" onclick="chkAll();" /></th>
 										<th>No</th>
-										<th>No. Invoice</th>
 										<th>Tanggal</th>
 										<th>Supplier</th>
 										<th>Total</th>
@@ -53,19 +52,12 @@
 			<form class="col-md-12" id="PostForm" method="POST" action="" >
 				<div class="row">
 					<div class="col-md-1 labelColumn">
-						No. Invoice :
-						<input id="hdnPurchaseID" name="hdnPurchaseID" type="hidden" value=0 />
-						<input id="hdnPurchaseDetailsID" name="hdnPurchaseDetailsID" type="hidden" value=0 />
+						Tanggal :
+						<input id="hdnPurchaseReturnID" name="hdnPurchaseReturnID" type="hidden" value=0 />
+						<input id="hdnPurchaseReturnDetailsID" name="hdnPurchaseReturnDetailsID" type="hidden" value=0 />
 						<input id="hdnItemID" name="hdnItemID" type="hidden" value=0 />
 						<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
 						<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
-					</div>
-					<div class="col-md-2">
-						<input id="txtPurchaseNumber" name="txtPurchaseNumber" type="text" tabindex=5 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="No. Invoice" required />
-					</div>
-					
-					<div class="col-md-1 labelColumn">
-						Tanggal :
 					</div>
 					<div class="col-md-2">
 						<input id="txtTransactionDate" name="txtTransactionDate" type="text" tabindex=6 class="form-control-custom" style="width: 87%; display: inline-block;margin-right: 5px;" onfocus="this.select();" autocomplete=off placeholder="Tanggal" required />
@@ -79,7 +71,7 @@
 							<?php
 								$sql = "CALL spSelDDLSupplier('".$_SESSION['UserLogin']."')";
 								if (! $result = mysqli_query($dbh, $sql)) {
-									logEvent(mysqli_error($dbh), '/Master/Purchase/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+									logEvent(mysqli_error($dbh), '/Master/PurchaseReturn/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 									return 0;
 								}
 								while($row = mysqli_fetch_array($result)) {
@@ -96,24 +88,21 @@
 					<table class="table table-striped table-hover" style="margin-bottom: 5px;" >
 						<thead>
 							<tr>
-								<th style="width: 14%;text-align: center;" >Cabang</th>
-								<th style="width: 15%;text-align: center;" >Kode Barang</th>
-								<th style="width: 20%;text-align: center;" >Nama Barang</th>
-								<th style="width: 7%;text-align: center;" >Qty</th>
-								<th style="width: 11%;text-align: center;">Harga Beli</th>
-								<th style="width: 11%;text-align: center;">Harga Ecer</th>
-								<th style="width: 11%;text-align: center;">Harga Grosir 1</th>
-								<th style="width: 11%;text-align: center;">Harga Grosir 2</th>
+								<th style="width: 20%;text-align: center;" >Cabang</th>
+								<th style="width: 20%;text-align: center;" >Kode Barang</th>
+								<th style="width: 30%;text-align: center;" >Nama Barang</th>
+								<th style="width: 10%;text-align: center;" >Qty</th>
+								<th style="width: 20%;text-align: center;">Harga Beli</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr>
-								<td style="width: 14%;" >
+								<td style="width: 20%;" >
 									<select id="ddlBranch" name="ddlBranch" tabindex=8 class="form-control-custom" placeholder="Pilih Cabang" >
 										<?php
 											$sql = "CALL spSelDDLBranch('".$_SESSION['UserLogin']."')";
 											if (! $result = mysqli_query($dbh, $sql)) {
-												logEvent(mysqli_error($dbh), '/Master/Purchase/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+												logEvent(mysqli_error($dbh), '/Master/PurchaseReturn/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 												return 0;
 											}
 											while($row = mysqli_fetch_array($result)) {
@@ -124,13 +113,10 @@
 										?>
 									</select>
 								</td>
-								<td style="width: 15%;" ><input id="txtItemCode" name="txtItemCode" type="text" tabindex=9 class="form-control-custom" style="width: 100%;" onfocus="this.select();" onkeypress="isEnterKey(event, 'getItemDetails');" onchange="getItemDetails();" autocomplete=off placeholder="Kode Barang" /></td>
-								<td style="width: 20%;" ><input id="txtItemName" name="txtItemName" type="text" class="form-control-custom" style="width: 100%;" disabled /></td>
-								<td style="width: 7%;" ><input id="txtQTY" name="txtQTY" type="number" tabindex=10 class="form-control-custom" style="width: 100%;" value=1 onchange="this.value = validateQTY(this.value);" onpaste="return false;" onfocus="this.select();" /></td>
-								<td style="width: 11%;" ><input id="txtBuyPrice" name="txtBuyPrice" type="text" tabindex=11 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Beli" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" /></td>
-								<td style="width: 11%;" ><input id="txtRetailPrice" name="txtRetailPrice" type="text" tabindex=12 class="form-control-custom text-right" style="width: 100%;" value="0" autocomplete=off placeholder="Harga Ecer" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" /></td>
-								<td style="width: 11%;" ><input id="txtPrice1" name="txtPrice1" type="text" tabindex=13 class="form-control-custom text-right" style="width: 100%;" value="0" autocomplete=off placeholder="Harga Grosir 1" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" /></td>
-								<td style="width: 11%;" ><input id="txtPrice2" name="txtPrice2" type="text" tabindex=14 class="form-control-custom text-right" style="width: 100%;" value="0" autocomplete=off placeholder="Harga Grosir 2" onkeypress="isEnterKey(event, 'addPurchaseDetails');return isNumberKey(event, this.id, this.value);" onchange="addPurchaseDetails();" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" /></td>
+								<td style="width: 20%;" ><input id="txtItemCode" name="txtItemCode" type="text" tabindex=9 class="form-control-custom" style="width: 100%;" onfocus="this.select();" onkeypress="isEnterKey(event, 'getItemDetails');" onchange="getItemDetails();" autocomplete=off placeholder="Kode Barang" /></td>
+								<td style="width: 30%;" ><input id="txtItemName" name="txtItemName" type="text" class="form-control-custom" style="width: 100%;" disabled /></td>
+								<td style="width: 10%;" ><input id="txtQTY" name="txtQTY" type="number" tabindex=10 class="form-control-custom" style="width: 100%;" value=1 onchange="this.value = validateQTY(this.value);" onpaste="return false;" onfocus="this.select();" /></td>
+								<td style="width: 20%;" ><input id="txtBuyPrice" name="txtBuyPrice" type="text" tabindex=11 class="form-control-custom text-right" style="width: 100%;" value="0" autocomplete=off placeholder="Harga Beli" onkeypress="isEnterKey(event, 'addPurchaseReturnDetails');return isNumberKey(event, this.id, this.value);" onchange="addPurchaseDetails();" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" /></td>
 							</tr>
 						</tbody>
 					</table>
@@ -141,7 +127,7 @@
 						<table id="grid-transaction" style="width: 100% !important;" class="table table-striped table-bordered table-hover" >
 							<thead>
 								<tr>
-									<th>PurchaseDetailsID</th>
+									<th>PurchaseReturnDetailsID</th>
 									<th>ItemID</th>
 									<th>BranchID</th>
 									<th>Cabang</th>
@@ -149,9 +135,6 @@
 									<th>Nama Barang</th>
 									<th>Qty</th>
 									<th>Harga Beli</th>
-									<th>Harga Ecer</th>
-									<th>Harga Grosir 1</th>
-									<th>Harga Grosir 2</th>
 								</tr>
 							</thead>
 						</table>
@@ -174,9 +157,6 @@
 								<th>Kode Barang</th>
 								<th>Nama Barang</th>
 								<th>Harga Beli</th>
-								<th>Harga Ecer</th>
-								<th>Harga Grosir 1</th>
-								<th>Harga Grosir 2</th>
 							</tr>
 						</thead>
 					</table>
@@ -192,31 +172,27 @@
 			var rowEdit;
 			
 			function openDialogEdit(Data) {
-				$("#hdnPurchaseDetailsID").val(Data[0]);
+				$("#hdnPurchaseReturnDetailsID").val(Data[0]);
 				$("#hdnItemID").val(Data[1]);
 				$("#ddlBranch").val(Data[2]);
 				$("#txtItemCode").val(Data[4]);
 				$("#txtItemName").val(Data[5]);
 				$("#txtQTY").val(Data[6]);
 				$("#txtBuyPrice").val(Data[7]);
-				$("#txtRetailPrice").val(Data[8]);
-				$("#txtPrice1").val(Data[9]);
-				$("#txtPrice2").val(Data[10]);
 				setTimeout(function() { $("#txtItemCode").focus(); }, 0);
 			}
 			
 			function openDialog(Data, EditFlag) {
 				$("#hdnIsEdit").val(EditFlag);
 				if(EditFlag == 1) {
-					$("#FormData").attr("title", "Edit Pembelian");
-					$("#hdnPurchaseID").val(Data[6]);
-					$("#ddlSupplier").val(Data[7]);
-					$("#txtPurchaseNumber").val(Data[2]);
-					$("#lblTotal").html(Data[5]);
-					$("#txtTransactionDate").datepicker("setDate", new Date(Data[8]));
-					getPurchaseDetails(Data[6]);
+					$("#FormData").attr("title", "Edit Retur Pembelian");
+					$("#hdnPurchaseReturnID").val(Data[5]);
+					$("#ddlSupplier").val(Data[6]);
+					$("#lblTotal").html(Data[4]);
+					$("#txtTransactionDate").datepicker("setDate", new Date(Data[7]));
+					getPurchaseReturnDetails(Data[5]);
 				}
-				else $("#FormData").attr("title", "Tambah Pembelian");
+				else $("#FormData").attr("title", "Tambah Retur Pembelian");
 				var index = table.cell({ focused: true }).index();
 				$("#FormData").dialog({
 					autoOpen: false,
@@ -234,14 +210,11 @@
 										{ "visible": false },
 										{ "visible": false },
 										{ "visible": false },
-										{ "width": "14%", "orderable": false, className: "dt-head-center" },
-										{ "width": "15%", "orderable": false, className: "dt-head-center" },
 										{ "width": "20%", "orderable": false, className: "dt-head-center" },
-										{ "width": "7%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" }
+										{ "width": "20%", "orderable": false, className: "dt-head-center" },
+										{ "width": "30%", "orderable": false, className: "dt-head-center" },
+										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "20%", "orderable": false, className: "dt-head-center dt-body-right" }
 									],
 									"processing": false,
 									"serverSide": false,
@@ -262,11 +235,11 @@
 									}
 								});
 						table2.columns.adjust();
-						var counterPurchaseDetails = 0;
+						var counterPurchaseReturnDetails = 0;
 						table2.on( 'key', function (e, datatable, key, cell, originalEvent) {
 							var index = table2.cell({ focused: true }).index();
-							if(counterPurchaseDetails == 0) {
-								counterPurchaseDetails = 1;
+							if(counterPurchaseReturnDetails == 0) {
+								counterPurchaseReturnDetails = 1;
 								var data = datatable.row( cell.index().row ).data();
 								if(key == 13) {
 									if(($("#FormEdit").css("display") == "none" || $("#delete-confirm").css("display") == "none") && $("#hdnEditFlag").val() == "1" ) {
@@ -280,7 +253,7 @@
 									table2.keys.disable();
 									var deletedData = new Array();
 									deletedData.push(data[0]);
-									SingleDelete("./Transaction/Purchase/DeleteDetails.php", deletedData, function(action) {
+									SingleDelete("./Transaction/PurchaseReturn/DeleteDetails.php", deletedData, function(action) {
 										if(action == "success") {
 											datatable.row( cell.index().row ).remove().draw();
 											table2.keys.enable();
@@ -301,7 +274,7 @@
 										}
 									});
 								}
-								setTimeout(function() { counterPurchaseDetails = 0; } , 1000);
+								setTimeout(function() { counterPurchaseReturnDetails = 0; } , 1000);
 							}
 						});
 						
@@ -317,7 +290,7 @@
 						$("#divModal").show();
 						$(document).on('keydown', function(e) {
 							if (e.keyCode == 39 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //right arrow
-								//$("#btnCancelAddPurchase").focus();
+								//$("#btnCancelAddPurchaseReturn").focus();
 							}
 						});
 					},
@@ -347,7 +320,7 @@
 					{
 						text: "Tutup",
 						tabindex: 15,
-						id: "btnCancelAddPurchase",
+						id: "btnCancelAddPurchaseReturn",
 						click: function() {
 							$(this).dialog("destroy");
 							$("#divModal").hide();
@@ -371,7 +344,7 @@
 					if(itemCode == "") $("#txtItemCode").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 					else {
 						$.ajax({
-							url: "./Transaction/Purchase/CheckItem.php",
+							url: "./Transaction/PurchaseReturn/CheckItem.php",
 							type: "POST",
 							data: { itemCode : itemCode },
 							dataType: "json",
@@ -381,61 +354,14 @@
 										$("#hdnItemID").val(data.ItemID);
 										$("#txtItemName").val(data.ItemName);
 										$("#txtBuyPrice").val(returnRupiah(data.BuyPrice));
-										$("#txtRetailPrice").val(returnRupiah(data.RetailPrice));
-										$("#txtPrice1").val(returnRupiah(data.Price1));
-										$("#txtPrice2").val(returnRupiah(data.Price2));
 										$("#txtQTY").focus();
 									}
 									else $("#txtQTY").focus();
 								}
 								else {
-									//add new item
+									//item code doesn't valid
 									if(data.ErrorMessage == "") {
-										$("#add-confirm").dialog({
-											autoOpen: false,
-											open: function() {
-												$(document).on('keydown', function(e) {
-													if (e.keyCode == 39) { //right arrow
-														 $("#btnAddNo").focus();
-													}
-													else if (e.keyCode == 37) { //left arrow
-														 $("#btnAddYes").focus();
-													}
-												});
-											},
-											show: {
-												effect: "fade",
-												duration: 500
-											},
-											hide: {
-												effect: "fade",
-												duration: 500
-											},
-											close: function() {
-												$(this).dialog("destroy");
-											},
-											resizable: false,
-											height: "auto",
-											width: 400,
-											modal: true,
-											buttons: [
-											{
-												text: "Ya",
-												id: "btnAddYes",
-												click: function() {
-													$(this).dialog("destroy");
-													addNewItem();
-												}
-											},
-											{
-												text: "Tidak",
-												id: "btnAddNo",
-												click: function() {
-													$(this).dialog("destroy");
-													$("#txtItemCode").focus();
-												}
-											}]
-										}).dialog("open");
+										$("#txtItemCode").notify("Kode barang tidak valid!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 									}
 									else {
 										var counter = 0;
@@ -459,7 +385,7 @@
 							error: function(jqXHR, textStatus, errorThrown) {
 								$("#loading").hide();
 								var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-								LogEvent(errorMessage, "/Transaction/Purchase/index.php");
+								LogEvent(errorMessage, "/Transaction/PurchaseReturn/index.php");
 								Lobibox.alert("error",
 								{
 									msg: errorMessage,
@@ -473,11 +399,11 @@
 				setTimeout(function() { counterGetItem = 0; }, 1000);
 			}
 			
-			function getPurchaseDetails(PurchaseID) {
+			function getPurchaseReturnDetails(PurchaseReturnID) {
 				$.ajax({
-					url: "./Transaction/Purchase/PurchaseDetails.php",
+					url: "./Transaction/PurchaseReturn/PurchaseReturnDetails.php",
 					type: "POST",
-					data: { PurchaseID : PurchaseID },
+					data: { PurchaseReturnID : PurchaseReturnID },
 					dataType: "json",
 					success: function(Data) {
 						if(Data.FailedFlag == '0') {
@@ -508,7 +434,7 @@
 					error: function(jqXHR, textStatus, errorThrown) {
 						$("#loading").hide();
 						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-						LogEvent(errorMessage, "/Transaction/Purchase/index.php");
+						LogEvent(errorMessage, "/Transaction/PurchaseReturn/index.php");
 						Lobibox.alert("error",
 						{
 							msg: errorMessage,
@@ -519,21 +445,18 @@
 				});
 			}
 			
-			var counterAddPurchase = 0;
-			function addPurchaseDetails() {
-				if(counterAddPurchase == 0) {
-					counterAddPurchase = 1;
+			var counterAddPurchaseReturn = 0;
+			function addPurchaseReturnDetails() {
+				if(counterAddPurchaseReturn == 0) {
+					counterAddPurchaseReturn = 1;
 					var branchID = $("#ddlBranch").val();
 					var branchName = $("#ddlBranch option:selected").text();
 					var itemID = $("#hdnItemID").val();
 					var itemCode = $("#txtItemCode").val();
 					var itemName = $("#txtItemName").val();
 					var Qty = $("#txtQTY").val();
-					var buyPrice = $("#txtBuyPrice").val();
-					var retailPrice = $("#txtRetailPrice").val();
-					var price1 = $("#txtPrice1").val();
-					var price2 = returnRupiah($("#txtPrice2").val());
-					$("#txtPrice2").blur();
+					var buyPrice = returnRupiah($("#txtBuyPrice").val());
+					$("#txtBuyPrice").blur();
 					var PassValidate = 1;
 					var FirstFocus = 0;
 					$("#FormData .form-control-custom").each(function() {
@@ -555,40 +478,34 @@
 					
 					if(PassValidate == 1) {
 						$.ajax({
-							url: "./Transaction/Purchase/Insert.php",
+							url: "./Transaction/PurchaseReturn/Insert.php",
 							type: "POST",
 							data: $("#PostForm").serialize(),
 							dataType: "json",
 							success: function(data) {
 								if(data.FailedFlag == '0') {
-									if($("#hdnPurchaseDetailsID").val() == 0) {
+									if($("#hdnPurchaseReturnDetailsID").val() == 0) {
 										table2.row.add([
-											data.PurchaseDetailsID,
+											data.PurchaseReturnDetailsID,
 											itemID,
 											branchID,
 											branchName,
 											itemCode,
 											itemName,
 											Qty,
-											buyPrice,
-											retailPrice,
-											price1,
-											price2
+											buyPrice
 										]).draw();
 									}
 									else {
 										table2.row(rowEdit).data([
-											data.PurchaseDetailsID,
+											data.PurchaseReturnDetailsID,
 											itemID,
 											branchID,
 											branchName,
 											itemCode,
 											itemName,
 											Qty,
-											buyPrice,
-											retailPrice,
-											price1,
-											price2
+											buyPrice
 										]).draw();
 										
 										table2.keys.enable();
@@ -597,12 +514,9 @@
 									$("#txtItemName").val("");
 									$("#txtQTY").val(1);
 									$("#txtBuyPrice").val(0);
-									$("#txtRetailPrice").val(0);
-									$("#txtPrice1").val(0);
-									$("#txtPrice2").val(0);
 									$("#txtItemCode").focus();
-									$("#hdnPurchaseID").val(data.ID);
-									$("#hdnPurchaseDetailsID").val(0);
+									$("#hdnPurchaseReturnID").val(data.ID);
+									$("#hdnPurchaseReturnDetailsID").val(0);
 									$("#hdnItemID").val(0);
 									tableWidthAdjust();
 									Calculate();
@@ -616,7 +530,7 @@
 										beforeClose: function() {
 											if(counter == 0) {
 												setTimeout(function() {
-													if(data.Message == "No. Invoice sudah ada") $("#txtPurchaseNumber").focus();
+													if(data.Message == "No. Invoice sudah ada") $("#txtPurchaseReturnNumber").focus();
 													else $("#txtItemCode").focus();
 												}, 0);
 												counter = 1;
@@ -629,7 +543,7 @@
 							error: function(jqXHR, textStatus, errorThrown) {
 								$("#loading").hide();
 								var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-								LogEvent(errorMessage, "/Transaction/Purchase/index.php");
+								LogEvent(errorMessage, "/Transaction/PurchaseReturn/index.php");
 								Lobibox.alert("error",
 								{
 									msg: errorMessage,
@@ -640,195 +554,7 @@
 						});
 					}
 				}
-				setTimeout(function() { counterAddPurchase = 0; }, 1000);
-			}
-			
-			function addNewItem() {
-				var itemCode = $("#txtItemCode").val();
-				Lobibox.window({
-					title: 'Tambah Barang',
-					url: 'Master/Item/PopUpAddItem.php',
-					width: 780,
-					height: 460,
-					buttons: {
-						Simpan: {
-							'class': 'ui-button ui-corner-all ui-widget',
-							text: "Simpan"
-						},
-						Batal: {
-							'class': 'ui-button ui-corner-all ui-widget',
-							text: "Batal",
-							closeOnClick: true
-						}
-					},
-					buttonsAlign: 'right',
-					onShow: function() {
-						setTimeout(function() {
-							if($("#hdnPermission").length == 0) {
-								$("#txtItemNameAdd").focus();
-								$("#txtItemCodeAdd").val(itemCode);
-								$("#btnSimpan").attr("tabindex", 27);
-								$(document).on('keydown', function(e) {
-									if (e.keyCode == 39 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //right arrow
-										$("#btnBatal").focus();
-									}
-									else if(e.keyCode == 37 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //left arrow
-										$("#btnSimpan").focus();
-									}
-								});
-							}
-							else {
-								$("#btnOK").focus();
-								$("#btnSimpan").css("visibility", "hidden");
-								$("#btnBatal").css("visibility", "hidden");
-							}
-						}, 0);
-					},
-					callback: function(lobibox, type){
-						var btnType;
-						if (type === 'Simpan'){
-							var PassValidate = 1;
-							var FirstFocus = 0;
-							$("#FormItem .form-control-custom").each(function() {
-								if($(this).hasAttr('required')) {
-									if($(this).val() == "") {
-										PassValidate = 0;
-										$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-										if(FirstFocus == 0) $(this).focus();
-										FirstFocus = 1;
-									}
-								}
-							});
-							if(PassValidate == 1) {
-								$("#save-confirm-add").dialog({
-									autoOpen: false,
-									dialogClass: "top-window",
-									open: function() {
-										$(document).on('keydown', function(e) {
-											if (e.keyCode == 39) { //right arrow
-												 $("#btnNo").focus();
-											}
-											else if (e.keyCode == 37) { //left arrow
-												 $("#btnYes").focus();
-											}
-										});
-									},
-									show: {
-										effect: "fade",
-										duration: 500
-									},
-									hide: {
-										effect: "fade",
-										duration: 500
-									},
-									close: function() {
-										$(this).dialog("destroy");
-										//callback("Tidak");
-									},
-									resizable: false,
-									height: "auto",
-									width: 400,
-									modal: true,
-									buttons: [
-									{
-										text: "Ya",
-										id: "btnYes",
-										click: function() {
-											$("#loading").show();
-											$(this).dialog("destroy");
-											//callback("Ya");
-											$.ajax({
-												url: "./Master/Item/InsertFromPurchase.php",
-												type: "POST",
-												data: $("#PostFormItem").serialize(),
-												dataType: "json",
-												success: function(data) {
-													if(data.FailedFlag == '0') {
-														$("#loading").hide();
-														//$("#FormData").dialog("destroy");
-														//$("#divModal").hide();
-														var counter = 0;
-														Lobibox.alert("success",
-														{
-															msg: data.Message,
-															width: 480,
-															delay: 2000,
-															beforeClose: function() {
-																setTimeout(function() {
-																	$("#txtQTY").focus();
-																}, 0);
-															},
-															shown: function() {
-																setTimeout(function() {
-																	$("#hdnItemID").val(data.ID);
-																	$("#txtItemName").val($("#txtItemNameAdd").val());
-																	$("#txtBuyPrice").val($("#txtBuyPriceAdd").val());
-																	$("#txtRetailPrice").val($("#txtRetailPriceAdd").val());
-																	$("#txtPrice1").val($("#txtPrice1Add").val());
-																	$("#txtPrice2").val($("#txtPrice2Add").val());
-																	var lobibox = $('.lobibox-window').data('lobibox');
-																	lobibox.destroy();
-																}, 0);
-															}
-														});
-													}
-													else {
-														$("#loading").hide();
-														var counter = 0;
-														Lobibox.alert("warning",
-														{
-															msg: data.Message,
-															width: 480,
-															delay: false,
-															beforeClose: function() {
-																if(counter == 0) {
-																	setTimeout(function() {
-																		$("#txtItemNameAdd").focus();
-																	}, 0);
-																	counter = 1;
-																}
-															}
-														});
-														return 0;
-													}
-												},
-												error: function(jqXHR, textStatus, errorThrown) {
-													$("#loading").hide();
-													var counter = 0;
-													var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-													LogEvent(errorMessage, "/Master/Item/index.php");
-													Lobibox.alert("error",
-													{
-														msg: errorMessage,
-														width: 480,
-														beforeClose: function() {
-															if(counter == 0) {
-																setTimeout(function() {
-																	$("#txtItemCode").focus();
-																}, 0);
-																counter = 1;
-															}
-														}
-													});
-													return 0;
-												}
-											});
-										}
-									},
-									{
-										text: "Tidak",
-										id: "btnNo",
-										click: function() {
-											$(this).dialog("destroy");
-											$("#txtItemNameAdd").focus();
-											//callback("Tidak");
-										}
-									}]
-								}).dialog("open");
-							}
-						}
-					}
-				});
+				setTimeout(function() { counterAddPurchaseReturn = 0; }, 1000);
 			}
 			
 			function Calculate() {
@@ -850,24 +576,21 @@
 			}
 			
 			function resetForm() {
-				$("#hdnPurchaseID").val(0);
+				$("#hdnPurchaseReturnID").val(0);
 				$("#hdnItemID").val(0);
 				$("#txtTransactionDate").datepicker("setDate", new Date());
-				$("#txtPurchaseNumber").val("");
+				$("#txtPurchaseReturnNumber").val("");
 				$("#txtItemCode").val("");
 				$("#txtItemName").val("");
 				$("#txtQTY").val(1);
 				$("#txtBuyPrice").val(0);
-				$("#txtRetailPrice").val(0);
-				$("#txtPrice1").val(0);
-				$("#txtPrice2").val(0);
 				table2.clear().draw();
 			}
 			
 			function fnDeleteData() {
 				var index = table.cell({ focused: true }).index();
 				table.keys.disable();
-				DeleteData("./Transaction/Purchase/Delete.php", function(action) {
+				DeleteData("./Transaction/PurchaseReturn/Delete.php", function(action) {
 					if(action == "success") {
 						$("#select_all").prop("checked", false);
 						table.ajax.reload(function() {
@@ -911,12 +634,9 @@
 									"columns": [
 										{ "width": "20%", "orderable": false, className: "dt-head-center" },
 										{ "width": "7%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" }
 									],
-									"ajax": "./Transaction/Purchase/ItemList.php",
+									"ajax": "./Transaction/PurchaseReturn/ItemList.php",
 									"processing": true,
 									"serverSide": true,
 									"language": {
@@ -1023,7 +743,7 @@
 					$("#loading").hide();
 					var errorMessage = "DataTables Error : " + techNote + " (" + message + ")";
 					var counterError = 0;
-					LogEvent(errorMessage, "/Transaction/Purchase/index.php");
+					LogEvent(errorMessage, "/Transaction/PurchaseReturn/index.php");
 					Lobibox.alert("error",
 					{
 						msg: "Terjadi kesalahan. Memuat ulang halaman.",
@@ -1066,11 +786,11 @@
 				
 				keyFunction();
 				enterLikeTab();
-				var counterPurchase = 0;
+				var counterPurchaseReturn = 0;
 				table = $("#grid-data").DataTable({
 								"keys": true,
 								"scrollY": "330px",
-								"rowId": "PurchaseID",
+								"rowId": "PurchaseReturnID",
 								"scrollCollapse": true,
 								"order": [2, "asc"],
 								"columns": [
@@ -1078,12 +798,11 @@
 									{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
 									{ className: "dt-head-center" },
 									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
 									{ "orderable": false, className: "dt-head-center dt-body-right" }
 								],
 								"processing": true,
 								"serverSide": true,
-								"ajax": "./Transaction/Purchase/DataSource.php",
+								"ajax": "./Transaction/PurchaseReturn/DataSource.php",
 								"language": {
 									"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
 									"infoFiltered": "",
@@ -1114,8 +833,8 @@
 							checkbox.attr("checked", true);
 						}
 					}
-					else if(counterPurchase == 0) {
-						counterPurchase = 1;
+					else if(counterPurchaseReturn == 0) {
+						counterPurchaseReturn = 1;
 						var data = datatable.row( cell.index().row ).data();
 						if(key == 13) {
 							if(($(".ui-dialog").css("display") == "none" || $("#delete-confirm").css("display") == "none") && $("#hdnEditFlag").val() == "1" ) {
@@ -1131,7 +850,7 @@
 								table.keys.disable();
 								var deletedData = new Array();
 								deletedData.push(data[6] + "^" + data[2]);
-								SingleDelete("./Transaction/Purchase/Delete.php", deletedData, function(action) {
+								SingleDelete("./Transaction/PurchaseReturn/Delete.php", deletedData, function(action) {
 									if(action == "success") {
 										table.ajax.reload(function() {
 											table.keys.enable();
@@ -1160,7 +879,7 @@
 								fnDeleteData();
 							}
 						}
-						setTimeout(function() { counterPurchase = 0; } , 1000);
+						setTimeout(function() { counterPurchaseReturn = 0; } , 1000);
 					}
 				});
 				

@@ -9,9 +9,6 @@
 		$ItemID = 0;
 		$ItemName = "";
 		$BuyPrice = 0;
-		$RetailPrice = 0;
-		$Price1 = 0;
-		$Price2 = 0;
 		$FailedFlag = 0;
 		$ErrorMessage = "";
 		$State = 1;
@@ -21,8 +18,8 @@
 		if (! $result = mysqli_query($dbh, $sql)) {
 			$FailedFlag = 1;
 			$ErrorMessage = "Terjadi kesalahan sistem.";
-			logEvent(mysqli_error($dbh), '/Transaction/Purchase/CheckItem.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-			echo returnstate($ItemID, $ItemName, $BuyPrice, $RetailPrice, $Price1, $Price2, $FailedFlag, $ErrorMessage);
+			logEvent(mysqli_error($dbh), '/Transaction/PurchaseReturn/CheckItem.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			echo returnstate($ItemID, $ItemName, $BuyPrice, $FailedFlag, $ErrorMessage);
 			return 0;
 		}
 		
@@ -31,9 +28,6 @@
 			$ItemID = $row['ItemID'];
 			$ItemName = $row['ItemName'];
 			$BuyPrice = $row['BuyPrice'];
-			$RetailPrice = $row['RetailPrice'];
-			$Price1 = $row['Price1'];
-			$Price2 = $row['Price2'];
 		}
 		else {
 			$FailedFlag = 1;
@@ -42,17 +36,14 @@
 		mysqli_free_result($result);
 		mysqli_next_result($dbh);
 		
-		echo returnstate($ItemID, $ItemName, $BuyPrice, $RetailPrice, $Price1, $Price2, $FailedFlag, $ErrorMessage);
+		echo returnstate($ItemID, $ItemName, $BuyPrice, $FailedFlag, $ErrorMessage);
 	}
 	
-	function returnstate($ItemID, $ItemName, $BuyPrice, $RetailPrice, $Price1, $Price2, $FailedFlag, $ErrorMessage) {
+	function returnstate($ItemID, $ItemName, $BuyPrice, $FailedFlag, $ErrorMessage) {
 		$data = array(
 			"ItemID" => $ItemID, 
 			"ItemName" => $ItemName, 
 			"BuyPrice" => $BuyPrice,
-			"RetailPrice" => $RetailPrice,
-			"Price1" => $Price1,
-			"Price2" => $Price2,
 			"FailedFlag" => $FailedFlag,
 			"ErrorMessage" => $ErrorMessage
 		);

@@ -8,34 +8,32 @@
 	$requestData= $_REQUEST;
 	//kolom di table
 	$columns = array(
-					0 => "PurchaseID", //unorderable
+					0 => "PurchaseReturnID", //unorderable
 					1 => "RowNumber", //unorderable
-					2 => "TP.PurchaseNumber",
-					3 => "TP.TransactionDate",
-					4 => "MS.SupplierName",
-					5 => "TPD.Total"
+					2 => "TPR.TransactionDate",
+					3 => "MS.SupplierName",
+					4 => "TPRD.Total"
 				);
 
 	$where = " 1=1 ";
-	$order_by = "TP.PurchaseID";
+	$order_by = "TRP.PurchaseReturnID";
 	$limit_s = $requestData['start'];
 	$limit_l = $requestData['length'];
 	
 	//Handles Sort querystring sent from Bootgrid
 	$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
-	$order_by .= ", TP.PurchaseID ASC";
+	$order_by .= ", TPR.PurchaseReturnID ASC";
 	//Handles search querystring sent from Bootgrid
 	if (!empty($requestData['search']['value']))
 	{
 		$search = mysqli_real_escape_string($dbh, trim($requestData['search']['value']));
-		$where .= " AND ( TP.PurchaseNumber LIKE '%".$search."%'";
-		$where .= " OR DATE_FORMAT(TP.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
+		$where .= " AND ( DATE_FORMAT(TPR.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
 		$where .= " OR MS.SupplierName LIKE '%".$search."%' )";
 	}
-	$sql = "CALL spSelPurchase(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
+	$sql = "CALL spSelPurchaseReturn(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
 
 	if (! $result = mysqli_query($dbh, $sql)) {
-		logEvent(mysqli_error($dbh), '/Transaction/Purchase/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+		logEvent(mysqli_error($dbh), '/Transaction/PurchaseReturn/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 		return 0;
 	}
 	$row = mysqli_fetch_array($result);
@@ -51,13 +49,12 @@
 		$row_array = array();
 		$RowNumber++;
 		//data yang dikirim ke table
-		$row_array[] = "<input name='select' type='checkbox' value='".$row['PurchaseID']."^".$row['PurchaseNumber']."' />";
+		$row_array[] = "<input name='select' type='checkbox' value='".$row['PurchaseReturnID']."' />";
 		$row_array[] = $RowNumber;
-		$row_array[] = $row['PurchaseNumber'];
 		$row_array[] = $row['TransactionDate'];
 		$row_array[] = $row['SupplierName'];
 		$row_array[] = number_format($row['Total'],0,".",",");
-		$row_array[] = $row['PurchaseID'];
+		$row_array[] = $row['PurchaseReturnID'];
 		$row_array[] = $row['SupplierID'];
 		$row_array[] = $row['PlainTransactionDate'];
 		array_push($return_arr, $row_array);
