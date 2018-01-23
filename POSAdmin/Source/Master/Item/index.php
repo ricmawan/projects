@@ -149,7 +149,7 @@
 						Berat (KG) :
 					</div>
 					<div class="col-md-4">
-						<input id="txtWeight" name="txtWeight" type="text" tabindex=14 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Berat (KG)" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" required />
+						<input id="txtWeight" name="txtWeight" type="text" tabindex=14 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Berat (KG)" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertWeight(this.id, this.value);" onpaste="return false;" required />
 					</div>
 					<div class="col-md-2 labelColumn">
 						Stok Minimal :
@@ -177,7 +177,7 @@
 					$("#txtQty1").val(Data[8]);
 					$("#txtPrice2").val(returnRupiah(Data[9].toString()));
 					$("#txtQty2").val(Data[10]);
-					$("#txtWeight").val(returnRupiah(Data[11].toString()));
+					$("#txtWeight").val(returnWeight(Data[11].toString()));
 					$("#txtMinimumStock").val(Data[12]);
 				}
 				else $("#FormData").attr("title", "Tambah Barang");
@@ -525,12 +525,20 @@
 					$("#select_all").prop("checked", false);
 				});
 				
-				$(document).on("keydown", function (evt) {		
-					var index = table.cell({ focused: true }).index();
-					if (evt.keyCode == 46 && $("#hdnDeleteFlag").val() == "1" && typeof index == 'undefined' && $("#FormData").css("display") == "none") { //delete button
-						evt.preventDefault();
-						fnDeleteData();
+				var counterKeyItem = 0;
+				$(document).on("keydown", function (evt) {
+					if(counterKeyItem == 0) {
+						counterKeyItem = 1;
+						var index = table.cell({ focused: true }).index();
+						if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0) {
+							$("#grid-data_wrapper").find("input[type='search']").focus();
+						}
+						else if (evt.keyCode == 46 && $("#hdnDeleteFlag").val() == "1" && typeof index == 'undefined' && $("#FormData").css("display") == "none") { //delete button
+							evt.preventDefault();
+							fnDeleteData();
+						}
 					}
+					setTimeout(function() { counterKeyItem = 0; } , 1000);
 				});
 				
 				$('#grid-data tbody').on('dblclick', 'tr', function () {

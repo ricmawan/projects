@@ -76,7 +76,7 @@
 		$row_array[] = $row['Qty1'];
 		$row_array[] = number_format($row['Price2'],0,".",",");
 		$row_array[] = $row['Qty2'];
-		$row_array[] = number_format($row['Weight'],0,".",",");
+		$row_array[] = number_format($row['Weight'],2,".",",");
 		$row_array[] = $row['MinimumStock'];
 		$row_array[] = $row['ItemID'];
 		$row_array[] = $row['CategoryID'];

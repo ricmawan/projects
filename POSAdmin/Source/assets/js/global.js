@@ -247,6 +247,35 @@ function convertRupiah(id, angka){
 	}
 }
 
+function convertWeight(id, angka){
+	if(angka.indexOf(",") < 0 && angka != "" && angka != ".00") {
+		var flag = 0;
+		if(angka.indexOf(".") > 0) {
+			var temp = angka.split(".");
+			angka = temp[0];
+			var koma = temp[1];
+			flag = 1;
+		}
+		angka = angka.replace(/\,/g, "");		
+		var rupiah = '';
+		var angkarev = angka.toString().split('').reverse().join('');
+		for(var i = 0; i < angkarev.length; i++) if(i%3 == 0) rupiah += angkarev.substr(i,3)+',';
+		
+		if(angkarev.length > 3) {
+			angka = rupiah.split('',rupiah.length-1).reverse().join('');
+			if(flag == 1) $("#" + id).val(angka + "." + koma);
+			else $("#" + id).val(angka + ".00");
+		}
+		else {
+			if(flag == 1) $("#" + id).val(angka + "." + koma);
+			else $("#" + id).val(angka + ".00");
+		}
+	}
+	else if(angka == "" || angka == ".00") {
+		$("#" + id).val("0.00");
+	}
+}
+
 function returnRupiah(angka) {	
 	if(angka.indexOf(",") < 0 && angka != "" && angka != ".00") {
 		var flag = 0;
@@ -276,6 +305,34 @@ function returnRupiah(angka) {
 	return angka;
 }
 
+function returnWeight(angka) {	
+	if(angka.indexOf(",") < 0 && angka != "" && angka != ".00") {
+		var flag = 0;
+		if(angka.indexOf(".") > 0) {
+			var temp = angka.split(".");
+			angka = temp[0];
+			var koma = temp[1];
+			flag = 1;
+		}
+		angka = angka.replace(/\,/g, "");
+		var rupiah = '';
+		var angkarev = angka.toString().split('').reverse().join('');
+		for(var i = 0; i < angkarev.length; i++) if(i%3 == 0) rupiah += angkarev.substr(i,3)+',';
+		if(angkarev.length > 3) {
+			angka = rupiah.split('',rupiah.length-1).reverse().join('');
+			if(flag == 1) angka = angka + "." + koma;
+			else angka = angka + ".00";
+		}
+		else {
+			if(flag == 1) angka = angka + "." + koma;
+			else angka = angka + ".00";
+		}
+	}
+	else if(angka == "" || angka == ".00") {
+		angka = "0.00";
+	}
+	return angka;
+}
 
 function clearFormat(id, angka) {
 	if($("#" + id).val() == "0.00") $("#" + id).val(".00");
@@ -1042,6 +1099,10 @@ function validateQTY(QTY) {
 $.extend($.ui.autocomplete.prototype.options, {
 	open: function(event, ui) {
 		var dialogIndex = $(".ui-dialog").css("z-index");
+		var windowIndex = $(".lobibox-backdrop").css("z-index");
+		if(typeof windowIndex != 'undefined' && parseInt(windowIndex) > parseInt(dialogIndex)) {
+			dialogIndex = windowIndex;
+		}
 		var newIndex = parseInt(dialogIndex) + 1;
 		$(this).autocomplete("widget").css({
             "width": ($(this).width() + "px !important"),

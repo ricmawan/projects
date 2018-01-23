@@ -749,3 +749,8 @@ div#title {
 	font-size:32px;
 	font-weight:bold;
 }
+
+.lobibox.lobibox-window .lobibox-footer {
+    background-color: #f5f8fd !important;
+    border-top: 1px solid rgb(238, 238, 238) !important;
+}

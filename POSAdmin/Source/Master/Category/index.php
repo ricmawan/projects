@@ -372,12 +372,20 @@
 					$("#select_all").prop("checked", false);
 				});
 				
+				var counterKeyItem = 0;
 				$(document).on("keydown", function (evt) {
-					var index = table.cell({ focused: true }).index();
-					if (evt.keyCode == 46 && $("#hdnDeleteFlag").val() == "1" && typeof index == 'undefined' && $("#FormData").css("display") == "none") { //delete button
-						evt.preventDefault();
-						fnDeleteData();
+					if(counterKeyItem == 0) {
+						counterKeyItem = 1;
+						var index = table.cell({ focused: true }).index();
+						if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0) {
+							$("#grid-data_wrapper").find("input[type='search']").focus();
+						}
+						else if (evt.keyCode == 46 && $("#hdnDeleteFlag").val() == "1" && typeof index == 'undefined' && $("#FormData").css("display") == "none") { //delete button
+							evt.preventDefault();
+							fnDeleteData();
+						}
 					}
+					setTimeout(function() { counterKeyItem = 0; } , 1000);
 				});
 				
 				$('#grid-data tbody').on('dblclick', 'tr', function () {
