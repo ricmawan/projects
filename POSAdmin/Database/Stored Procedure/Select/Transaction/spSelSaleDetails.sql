@@ -1,15 +1,15 @@
 /*=============================================================
 Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select purchase details by PurchaseID
+Description: Stored Procedure for select sale details by SaleID
 Created Date: 12 January 2018
 Modified Date: 
 ===============================================================*/
 
-DROP PROCEDURE IF EXISTS spSelPurchaseDetails;
+DROP PROCEDURE IF EXISTS spSelSaleDetails;
 
 DELIMITER $$
-CREATE PROCEDURE spSelPurchaseDetails (
-	pPurchaseID		BIGINT,
+CREATE PROCEDURE spSelSaleDetails (
+	pSaleID		BIGINT,
     pCurrentUser	VARCHAR(255)
 )
 StoredProcedure:BEGIN
@@ -22,33 +22,36 @@ StoredProcedure:BEGIN
 		@MessageText = MESSAGE_TEXT, 
 		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
 		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelPurchaseDetails', pCurrentUser);
+		CALL spInsEventLog(@full_error, 'spSelSaleDetails', pCurrentUser);
 	END;
 	
 SET State = 1;
 
 	SELECT
-		PD.PurchaseDetailsID,
-        PD.ItemID,
-        PD.BranchID,
-        CONCAT(MB.BranchCode, ' - ', MB.BranchName) BranchName,
+		SD.SaleDetailsID,
+        SD.ItemID,
+        SD.BranchID,
         MI.ItemCode,
         MI.ItemName,
-        PD.Quantity,
-        PD.BuyPrice,
-        PD.RetailPrice,
-        PD.Price1,
-        PD.Price2
+        SD.Quantity,
+        SD.BuyPrice,
+        SD.SalePrice,
+		SD.Discount,
+        MI.Price1,
+        MI.Qty1,
+        MI.Price2,
+        MI.Qty2,
+		MI.Weight
 	FROM
-		transaction_purchasedetails PD
+		transaction_saledetails SD
         JOIN master_branch MB
-			ON MB.BranchID = PD.BranchID
+			ON MB.BranchID = SD.BranchID
 		JOIN master_item MI
-			ON MI.ItemID = PD.ItemID
+			ON MI.ItemID = SD.ItemID
 	WHERE
-		PD.PurchaseID = pPurchaseID
+		SD.SaleID = pSaleID
 	ORDER BY
-		PD.PurchaseDetailsID;
+		SD.SaleDetailsID;
         
 END;
 $$

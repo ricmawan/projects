@@ -1,58 +1,57 @@
-DROP PROCEDURE IF EXISTS spUpdUserPassword;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for delete sale
+Created Date: 9 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spDelSale;
 
 DELIMITER $$
-CREATE PROCEDURE spUpdUserPassword (
-	pID 			BIGINT, 
-	pPassword 		VARCHAR(255),
+CREATE PROCEDURE spDelSale (
+	pSaleID		BIGINT,
 	pCurrentUser	VARCHAR(255)
 )
 StoredProcedure:BEGIN
 
-	DECLARE Message VARCHAR(255);
-	DECLARE MessageDetail VARCHAR(255);
-	DECLARE FailedFlag INT;
 	DECLARE State INT;
-	DECLARE RowCount INT;
-
-	DECLARE PassValidate INT;
 	
 	DECLARE EXIT HANDLER FOR SQLEXCEPTION
 	BEGIN		
 		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
+		@MessageText = MESSAGE_TEXT,
 		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		ROLLBACK;
 		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spUpdUserPassword', pCurrentUser);
+		CALL spInsEventLog(@full_error, 'spDelSale', pCurrentUser);
         SELECT
-			pID AS 'ID',
+			pSaleID AS 'ID',
 			'Terjadi kesalahan sistem!' AS 'Message',
 			@full_error AS 'MessageDetail',
 			1 AS 'FailedFlag',
 			State AS 'State' ;
 	END;
 	
-	SET PassValidate = 1;
-	
 	START TRANSACTION;
 	
 SET State = 1;
-			UPDATE
-				master_user
-			SET
-				UserPassword = pPassword,
-				ModifiedBy = pCurrentUser
-			WHERE
-				UserID = pID;
 
-SET State = 2;
-		SELECT
-			pID AS 'ID',
-			'Password berhasil diubah' AS 'Message',
-			'' AS 'MessageDetail',
-			0 AS 'FailedFlag',
-			State AS 'State';
+		DELETE FROM
+			transaction_sale
+		WHERE
+			SaleID = pSaleID;
 
     COMMIT;
+    
+SET State = 2;
+
+		SELECT
+			pSaleID AS 'ID',
+			'Penjualan berhasil dihapus!' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State' ;
+            
 END;
 $$
 DELIMITER ;

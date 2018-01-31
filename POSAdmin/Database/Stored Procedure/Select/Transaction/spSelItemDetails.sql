@@ -34,7 +34,10 @@ SET State = 1;
 		MI.BuyPrice,
 		MI.RetailPrice,
 		MI.Price1,
-		MI.Price2
+		MI.Qty1,
+		MI.Price2,
+		MI.Qty2,
+		MI.Weight
 	FROM
 		master_item MI
 	WHERE

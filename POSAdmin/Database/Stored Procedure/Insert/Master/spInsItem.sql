@@ -107,7 +107,14 @@ SET State = 3;
 					pCurrentUser
 				);
 			
-SET State = 4;			               
+SET State = 4;
+				SELECT
+					LAST_INSERT_ID()
+				INTO 
+					pID;
+					
+SET State = 5;
+
 				SELECT
 					pID AS 'ID',
 					'Barang Berhasil Ditambahkan' AS 'Message',
@@ -115,7 +122,7 @@ SET State = 4;
 					0 AS 'FailedFlag',
 					State AS 'State';
 			ELSE
-SET State = 5;
+SET State = 6;
 				UPDATE
 					master_item
 				SET
@@ -134,7 +141,7 @@ SET State = 5;
 				WHERE
 					ItemID = pID;
 
-SET State = 6;
+SET State = 7;
 				SELECT
 					pID AS 'ID',
 					'Barang Berhasil Diubah' AS 'Message',

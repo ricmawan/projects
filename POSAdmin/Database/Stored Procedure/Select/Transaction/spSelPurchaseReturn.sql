@@ -1,14 +1,14 @@
 /*=============================================================
 Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select purchase transaction
-Created Date: 3 January 2018
+Description: Stored Procedure for select return purchase transaction
+Created Date: 22 January 2018
 Modified Date: 
 ===============================================================*/
 
-DROP PROCEDURE IF EXISTS spSelPurchase;
+DROP PROCEDURE IF EXISTS spSelPurchaseReturn;
 
 DELIMITER $$
-CREATE PROCEDURE spSelPurchase (
+CREATE PROCEDURE spSelPurchaseReturn (
 	pWhere 			TEXT,
 	pOrder			TEXT,
 	pLimit_s		BIGINT,
@@ -25,7 +25,7 @@ StoredProcedure:BEGIN
 		@MessageText = MESSAGE_TEXT, 
 		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
 		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelPurchase', pCurrentUser);
+		CALL spInsEventLog(@full_error, 'spSelPurchaseReturn', pCurrentUser);
 	END;
 	
 SET State = 1;
@@ -33,9 +33,9 @@ SET State = 1;
 SET @query = CONCAT("SELECT
 						COUNT(1) AS nRows
 					FROM
-						transaction_purchase TP
+						transaction_purchasereturn TPR
                         JOIN master_supplier MS
-							ON MS.SupplierID = TP.SupplierID
+							ON MS.SupplierID = TPR.SupplierID
 					WHERE ", pWhere);
 						
 	PREPARE stmt FROM @query;
@@ -45,34 +45,33 @@ SET @query = CONCAT("SELECT
 SET State = 2;
 
 SET @query = CONCAT("SELECT
-						TP.PurchaseID,
-                        TP.PurchaseNumber,
-                        DATE_FORMAT(TP.TransactionDate, '%d-%m-%Y') TransactionDate,
-                        TP.TransactionDate PlainTransactionDate,
+						TPR.PurchaseReturnID,
+                        DATE_FORMAT(TPR.TransactionDate, '%d-%m-%Y') TransactionDate,
+                        TransactionDate PlainTransactionDate,
                         MS.SupplierID,
                         MS.SupplierName,
-						IFNULL(TPD.Total, 0) Total
+						IFNULL(TPRD.Total, 0) Total
 					FROM
-						transaction_purchase TP
+						transaction_purchasereturn TPR
                         JOIN master_supplier MS
-							ON MS.SupplierID = TP.SupplierID
+							ON MS.SupplierID = TPR.SupplierID
 						LEFT JOIN
                         (
 							SELECT
-								TP.PurchaseID,
-                                SUM(TPD.Quantity * TPD.BuyPrice) Total
+								TPR.PurchaseReturnID,
+                                SUM(TPRD.Quantity * TPRD.BuyPrice) Total
 							FROM
-								transaction_purchase TP
+								transaction_purchasereturn TPR
                                 JOIN master_supplier MS
-									ON MS.SupplierID = TP.SupplierID
-                                LEFT JOIN transaction_purchasedetails TPD
-									ON TP.PurchaseID = TPD.PurchaseID
+									ON MS.SupplierID = TPR.SupplierID
+                                LEFT JOIN transaction_purchasereturndetails TPRD
+									ON TPRD.PurchaseReturnID = TPR.PurchaseReturnID
 							WHERE ", 
 								pWhere, 
                             " GROUP BY
-								TP.PurchaseID
-                        )TPD
-							ON TPD.PurchaseID = TP.PurchaseID
+								TPRD.PurchaseReturnID
+                        )TPRD
+							ON TPR.PurchaseReturnID = TPRD.PurchaseReturnID
 					WHERE ", pWhere, 
 					" ORDER BY ", pOrder,
 					" LIMIT ", pLimit_s, ", ", pLimit_l);

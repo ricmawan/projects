@@ -100,11 +100,9 @@ SET State = 3;
 			
 SET State = 4;			               
 				SELECT
-					MAX(UserID)
+					LAST_INSERT_ID()
 				INTO 
-					pID
-				FROM
-					master_user;
+					pID;
 					
 			ELSE
 			

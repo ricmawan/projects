@@ -1,9 +1,9 @@
-DROP PROCEDURE IF EXISTS spUpdUserPassword;
+DROP PROCEDURE IF EXISTS spUpdSaleDetailsBranch;
 
 DELIMITER $$
-CREATE PROCEDURE spUpdUserPassword (
+CREATE PROCEDURE spUpdSaleDetailsBranch (
 	pID 			BIGINT, 
-	pPassword 		VARCHAR(255),
+	pBranchID 		INT,
 	pCurrentUser	VARCHAR(255)
 )
 StoredProcedure:BEGIN
@@ -22,7 +22,7 @@ StoredProcedure:BEGIN
 		@MessageText = MESSAGE_TEXT, 
 		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
 		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spUpdUserPassword', pCurrentUser);
+		CALL spInsEventLog(@full_error, 'spUpdSaleDetailsBranch', pCurrentUser);
         SELECT
 			pID AS 'ID',
 			'Terjadi kesalahan sistem!' AS 'Message',
@@ -37,17 +37,17 @@ StoredProcedure:BEGIN
 	
 SET State = 1;
 			UPDATE
-				master_user
+				transaction_saledetails
 			SET
-				UserPassword = pPassword,
+				BranchID = pBranchID,
 				ModifiedBy = pCurrentUser
 			WHERE
-				UserID = pID;
+				SaleDetailsID = pID;
 
 SET State = 2;
 		SELECT
 			pID AS 'ID',
-			'Password berhasil diubah' AS 'Message',
+			'Cabang berhasil diubah' AS 'Message',
 			'' AS 'MessageDetail',
 			0 AS 'FailedFlag',
 			State AS 'State';

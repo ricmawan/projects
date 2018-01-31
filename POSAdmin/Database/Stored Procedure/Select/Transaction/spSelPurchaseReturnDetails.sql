@@ -1,15 +1,15 @@
 /*=============================================================
 Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select purchase details by PurchaseID
+Description: Stored Procedure for select return purchase details by PurchaseReturnID
 Created Date: 12 January 2018
 Modified Date: 
 ===============================================================*/
 
-DROP PROCEDURE IF EXISTS spSelPurchaseDetails;
+DROP PROCEDURE IF EXISTS spSelPurchaseReturnDetails;
 
 DELIMITER $$
-CREATE PROCEDURE spSelPurchaseDetails (
-	pPurchaseID		BIGINT,
+CREATE PROCEDURE spSelPurchaseReturnDetails (
+	pPurchaseReturnID		BIGINT,
     pCurrentUser	VARCHAR(255)
 )
 StoredProcedure:BEGIN
@@ -22,33 +22,28 @@ StoredProcedure:BEGIN
 		@MessageText = MESSAGE_TEXT, 
 		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
 		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelPurchaseDetails', pCurrentUser);
+		CALL spInsEventLog(@full_error, 'spSelPurchaseReturnDetails', pCurrentUser);
 	END;
 	
 SET State = 1;
 
 	SELECT
-		PD.PurchaseDetailsID,
-        PD.ItemID,
-        PD.BranchID,
+		TPRD.PurchaseReturnDetailsID,
+        TPRD.ItemID,
+        TPRD.BranchID,
         CONCAT(MB.BranchCode, ' - ', MB.BranchName) BranchName,
         MI.ItemCode,
         MI.ItemName,
-        PD.Quantity,
-        PD.BuyPrice,
-        PD.RetailPrice,
-        PD.Price1,
-        PD.Price2
+        TPRD.Quantity,
+        TPRD.BuyPrice
 	FROM
-		transaction_purchasedetails PD
+		transaction_purchasereturndetails TPRD
         JOIN master_branch MB
-			ON MB.BranchID = PD.BranchID
+			ON MB.BranchID = TPRD.BranchID
 		JOIN master_item MI
-			ON MI.ItemID = PD.ItemID
+			ON MI.ItemID = TPRD.ItemID
 	WHERE
-		PD.PurchaseID = pPurchaseID
-	ORDER BY
-		PD.PurchaseDetailsID;
+		TPRD.PurchaseReturnID = pPurchaseReturnID;
         
 END;
 $$

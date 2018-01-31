@@ -3,10 +3,10 @@ DROP PROCEDURE IF EXISTS spInsPurchase;
 DELIMITER $$
 CREATE PROCEDURE spInsPurchase (
 	pID 				BIGINT,
-	pPurchaseDetailsID	BIGINT,
     pPurchaseNumber		VARCHAR(100),
     pSupplierID			BIGINT,
 	pTransactionDate 	DATETIME,
+	pPurchaseDetailsID	BIGINT,
     pBranchID			INT,
     pItemID				BIGINT,
 	pQuantity			DOUBLE,
