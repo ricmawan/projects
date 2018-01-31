@@ -38,6 +38,10 @@
 								</thead>
 							</table>
 						</div>
+						<br />
+						<div class="row col-md-12" >
+							<h5>INSERT = Tambah Data; ENTER = Edit; DELETE = Hapus; SPASI = Menandai Data;</h5>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -574,7 +578,7 @@
 				var counterUser = 0;
 				table = $("#grid-data").DataTable({
 							"keys": true,
-							"scrollY": "330px",
+							"scrollY": "300px",
 							"rowId": "UserID",
 							"scrollCollapse": true,
 							"order": [2, "asc"],
@@ -678,7 +682,7 @@
 					if(counterKeyItem == 0) {
 						counterKeyItem = 1;
 						var index = table.cell({ focused: true }).index();
-						if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0) {
+						if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0 && $("#FormData").css("display") == "none" && $("#delete-confirm").css("display") == "none") {
 							$("#grid-data_wrapper").find("input[type='search']").focus();
 						}
 						else if (evt.keyCode == 46 && $("#hdnDeleteFlag").val() == "1" && typeof index == 'undefined' && $("#FormData").css("display") == "none") { //delete button

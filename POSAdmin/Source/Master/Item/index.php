@@ -45,6 +45,10 @@
 								</thead>
 							</table>
 						</div>
+						<br />
+						<div class="row col-md-12" >
+							<h5>INSERT = Tambah Data; ENTER = Edit; DELETE = Hapus; SPASI = Menandai Data;</h5>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -125,7 +129,7 @@
 						Qty Grosir 1 :
 					</div>
 					<div class="col-md-2">
-						<input id="txtQty1" name="txtQty1" type="number" tabindex=11 class="form-control-custom" value=0 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 1" onpaste="return false;" required />
+						<input id="txtQty1" name="txtQty1" type="number" tabindex=11 class="form-control-custom" value=1 min=1 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 1" onpaste="return false;" required />
 					</div>
 				</div>
 				<br />
@@ -140,7 +144,7 @@
 						Qty Grosir 2 :
 					</div>
 					<div class="col-md-2">
-						<input id="txtQty2" name="txtQty2" type="number" tabindex=13 class="form-control-custom" value=0 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 2" onpaste="return false;" required />
+						<input id="txtQty2" name="txtQty2" type="number" tabindex=13 class="form-control-custom" value=1 min=1 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 2" onpaste="return false;" required />
 					</div>
 				</div>
 				<br />
@@ -419,7 +423,7 @@
 				if(UserTypeID == "1") visible = true;
 				table = $("#grid-data").DataTable({
 								"keys": true,
-								"scrollY": "330px",
+								"scrollY": "300px",
 								"rowId": "ItemID",
 								"scrollCollapse": true,
 								"order": [2, "asc"],
@@ -530,7 +534,7 @@
 					if(counterKeyItem == 0) {
 						counterKeyItem = 1;
 						var index = table.cell({ focused: true }).index();
-						if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0) {
+						if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0 && $("#FormData").css("display") == "none" && $("#delete-confirm").css("display") == "none") {
 							$("#grid-data_wrapper").find("input[type='search']").focus();
 						}
 						else if (evt.keyCode == 46 && $("#hdnDeleteFlag").val() == "1" && typeof index == 'undefined' && $("#FormData").css("display") == "none") { //delete button

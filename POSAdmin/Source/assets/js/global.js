@@ -928,6 +928,9 @@ function validateQTY(QTY) {
 	if(QTY == "") {
 		return 1;
 	}
+	else if(parseFloat(QTY) == 0 || parseFloat(QTY) < 0) {
+		return 1;
+	}
 	else return QTY;
 }
 

@@ -750,7 +750,26 @@ div#title {
 	font-weight:bold;
 }
 
+#lblWeight{
+	width: 20%;
+	display:inline-block;
+	float:right;
+	height:5%;
+	min-height:45px;
+	margin:0 0 0 auto;
+	text-align:right;
+	background-color:black;
+	color:#ffffff;
+	font-size:32px;
+	font-weight:bold;
+}
+
 .lobibox.lobibox-window .lobibox-footer {
     background-color: #f5f8fd !important;
     border-top: 1px solid rgb(238, 238, 238) !important;
+}
+
+.div-center {
+	margin-left: auto;
+	margin-right: auto;
 }

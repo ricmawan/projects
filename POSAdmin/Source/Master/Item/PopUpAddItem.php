@@ -141,7 +141,7 @@
 						Qty Grosir 1 :
 					</div>
 					<div class="col-md-2">
-						<input id="txtQty1Add" name="txtQty1Add" type="number" tabindex=22 class="form-control-custom" value=0 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 1" required />
+						<input id="txtQty1Add" name="txtQty1Add" type="number" tabindex=22 class="form-control-custom" value=1 min=1 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 1" required />
 					</div>
 				</div>
 				<br />
@@ -156,7 +156,7 @@
 						Qty Grosir 2 :
 					</div>
 					<div class="col-md-2">
-						<input id="txtQty2Add" name="txtQty2Add" type="number" tabindex=24 class="form-control-custom" value=0 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 2" required />
+						<input id="txtQty2Add" name="txtQty2Add" type="number" tabindex=24 class="form-control-custom" value=1 min=1 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 2" required />
 					</div>
 				</div>
 				<br />

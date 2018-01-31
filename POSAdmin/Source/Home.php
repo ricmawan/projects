@@ -22,6 +22,8 @@
 		<link href="assets/css/jquery.dataTables.css" rel="stylesheet" />
 		<link href="assets/css/keyTable.bootstrap.css" rel="stylesheet" />
 		<link href="assets/css/lobibox.css" rel="stylesheet" />
+		<link href="assets/css/toggles.css" rel="stylesheet" />
+		<link href="assets/css/toggles-modern.css" rel="stylesheet" />
 		
 		<link rel="shortcut icon" href="./assets/img/logo.ico">
 		<link rel="apple-touch-icon" sizes="57x57" href="./assets/img/apple-icon-57x57.png">
@@ -186,6 +188,7 @@
 		<script src="assets/js/jquery.dataTables.js"></script>
 		<script src="assets/js/dataTables.bootstrap.js"></script>
 		<script src="assets/js/dataTables.keyTable.js"></script>
+		<script src="assets/js/toggles.js"></script>
 		<div id="loading"></div>
 		<iframe id='excelDownload' src='' style='display:none'></iframe>
 		<script type="text/javascript">
