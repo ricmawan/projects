@@ -37,7 +37,7 @@
 						</div>
 						<br />
 						<div class="row col-md-12" >
-							<h5>INSERT = Tambah Data; ENTER = Edit; DELETE = Hapus; SPASI = Menandai Data;</h5>
+							<h5>INSERT = Tambah Data; ENTER/DOUBLE KLIK = Edit; DELETE = Hapus; SPASI = Menandai Data;</h5>
 						</div>
 					</div>
 				</div>
