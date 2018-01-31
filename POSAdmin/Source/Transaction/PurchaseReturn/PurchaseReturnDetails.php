@@ -32,6 +32,7 @@
 			$row_array[] = $row['ItemName'];
 			$row_array[] = $row['Quantity'];
 			$row_array[] = number_format($row['BuyPrice'],0,".",",");
+			$row_array[] = number_format($row['BuyPrice'] * $row['Quantity'],0,".",",");
 			array_push($return_arr, $row_array);
 		}
 		

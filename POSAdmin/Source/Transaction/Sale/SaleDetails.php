@@ -1,16 +1,16 @@
 <?php
-	if(ISSET($_POST['PurchaseID'])) {
+	if(ISSET($_POST['SaleID'])) {
 		header('Content-Type: application/json');
 		$RequestedPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestedPath);
 		$RequestedPath = str_replace($file, "", $RequestedPath);
 		include "../../GetPermission.php";
-		$PurchaseID = mysqli_real_escape_string($dbh, $_POST['PurchaseID']);
-		$sql = "CALL spSelPurchaseDetails(".$PurchaseID.", '".$_SESSION['UserLogin']."')";
+		$SaleID = mysqli_real_escape_string($dbh, $_POST['SaleID']);
+		$sql = "CALL spSelSaleDetails(".$SaleID.", '".$_SESSION['UserLogin']."')";
 		$FailedFlag = 0;
 
 		if (! $result = mysqli_query($dbh, $sql)) {
-			logEvent(mysqli_error($dbh), '/Transaction/Purchase/PurchaseDetails.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Transaction/Sale/SaleDetails.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 			$FailedFlag = 1;
 			$json_data = array(
 							"FailedFlag" => $FailedFlag
@@ -24,18 +24,22 @@
 		while ($row = mysqli_fetch_array($result)) {
 			$row_array = array();
 			//data yang dikirim ke table
-			$row_array[] = $row['PurchaseDetailsID'];
+			$row_array[] = $row['SaleDetailsID'];
 			$row_array[] = $row['ItemID'];
 			$row_array[] = $row['BranchID'];
-			$row_array[] = $row['BranchName'];
+			$row_array[] = "<div id='toggle-branch-" . $row['SaleDetailsID'] . "' onclick='updateBranch(this.id)' class='div-center toggle-modern' ></div>";
 			$row_array[] = $row['ItemCode'];
 			$row_array[] = $row['ItemName'];
 			$row_array[] = $row['Quantity'];
-			$row_array[] = number_format($row['BuyPrice'],0,".",",");
-			$row_array[] = number_format($row['RetailPrice'],0,".",",");
-			$row_array[] = number_format($row['Price1'],0,".",",");
-			$row_array[] = number_format($row['Price2'],0,".",",");
-			$row_array[] = number_format($row['BuyPrice'] * $row['Quantity'],0,".",",");
+			$row_array[] = number_format($row['SalePrice'],0,".",",");
+			$row_array[] = number_format($row['Discount'],0,".",",");
+			$row_array[] = number_format($row['SalePrice'] * $row['Quantity'],0,".",",");
+			$row_array[] = $row['BuyPrice'];
+			$row_array[] = $row['Price1'];
+			$row_array[] = $row['Qty1'];
+			$row_array[] = $row['Price2'];
+			$row_array[] = $row['Qty2'];
+			$row_array[] = $row['Weight'];
 			array_push($return_arr, $row_array);
 		}
 		

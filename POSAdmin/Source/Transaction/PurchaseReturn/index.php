@@ -44,6 +44,9 @@
 							</table>
 						</div>
 						<br />
+						<div class="row col-md-12" >
+							<h5>INSERT = Tambah Data; ENTER = Edit; DELETE = Hapus; SPASI = Menandai Data;</h5>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -115,7 +118,7 @@
 								</td>
 								<td style="width: 20%;" ><input id="txtItemCode" name="txtItemCode" type="text" tabindex=9 class="form-control-custom" style="width: 100%;" onfocus="this.select();" onkeypress="isEnterKey(event, 'getItemDetails');" onchange="getItemDetails();" autocomplete=off placeholder="Kode Barang" /></td>
 								<td style="width: 30%;" ><input id="txtItemName" name="txtItemName" type="text" class="form-control-custom" style="width: 100%;" disabled /></td>
-								<td style="width: 10%;" ><input id="txtQTY" name="txtQTY" type="number" tabindex=10 class="form-control-custom" style="width: 100%;" value=1 onchange="this.value = validateQTY(this.value);" onpaste="return false;" onfocus="this.select();" /></td>
+								<td style="width: 10%;" ><input id="txtQTY" name="txtQTY" type="number" tabindex=10 class="form-control-custom" style="width: 100%;" value=1 min=1 onchange="this.value = validateQTY(this.value);" onpaste="return false;" onfocus="this.select();" /></td>
 								<td style="width: 20%;" ><input id="txtBuyPrice" name="txtBuyPrice" type="text" tabindex=11 class="form-control-custom text-right" style="width: 100%;" value="0" autocomplete=off placeholder="Harga Beli" onkeypress="isEnterKey(event, 'addPurchaseReturnDetails');return isNumberKey(event, this.id, this.value);" onchange="addPurchaseDetails();" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" /></td>
 							</tr>
 						</tbody>
@@ -135,6 +138,7 @@
 									<th>Nama Barang</th>
 									<th>Qty</th>
 									<th>Harga Beli</th>
+									<th>Sub Total</th>
 								</tr>
 							</thead>
 						</table>
@@ -142,6 +146,10 @@
 				</div>
 				<div class="row" >
 					<h2 style="display: inline-block;float: left;" >TOTAL : &nbsp;</h2><span id="lblTotal" >0</span>
+				</div>
+				<br />
+				<div class="row" >
+					<h5>F12 = Daftar Barang; ESC = Tutup; DELETE = Hapus; ENTER = Edit;</h5>
 				</div>
 			</form>
 		</div>
@@ -210,11 +218,12 @@
 										{ "visible": false },
 										{ "visible": false },
 										{ "visible": false },
+										{ "width": "15%", "orderable": false, className: "dt-head-center" },
 										{ "width": "20%", "orderable": false, className: "dt-head-center" },
-										{ "width": "20%", "orderable": false, className: "dt-head-center" },
-										{ "width": "30%", "orderable": false, className: "dt-head-center" },
+										{ "width": "25%", "orderable": false, className: "dt-head-center" },
 										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "20%", "orderable": false, className: "dt-head-center dt-body-right" }
+										{ "width": "15%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "15%", "orderable": false, className: "dt-head-center dt-body-right" }
 									],
 									"processing": false,
 									"serverSide": false,
@@ -493,7 +502,8 @@
 											itemCode,
 											itemName,
 											Qty,
-											buyPrice
+											buyPrice,
+											returnRupiah((parseFloat(buyPrice.replace(/\,/g, "")) * parseFloat(Qty)).toString())
 										]).draw();
 									}
 									else {
@@ -505,7 +515,8 @@
 											itemCode,
 											itemName,
 											Qty,
-											buyPrice
+											buyPrice,
+											returnRupiah((parseFloat(buyPrice.replace(/\,/g, "")) * parseFloat(Qty)).toString())
 										]).draw();
 										
 										table2.keys.enable();
@@ -584,6 +595,7 @@
 				$("#txtItemName").val("");
 				$("#txtQTY").val(1);
 				$("#txtBuyPrice").val(0);
+				$("#lblTotal").html("0");
 				table2.clear().draw();
 			}
 			
@@ -632,9 +644,9 @@
 									"searching": true,
 									"order": [],
 									"columns": [
-										{ "width": "20%", "orderable": false, className: "dt-head-center" },
-										{ "width": "7%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" }
+										{ "width": "30%", "orderable": false, className: "dt-head-center" },
+										{ "width": "50%", "orderable": false, className: "dt-head-center" },
+										{ "width": "20%", "orderable": false, className: "dt-head-center dt-body-right" }
 									],
 									"ajax": "./Transaction/PurchaseReturn/ItemList.php",
 									"processing": true,
@@ -720,7 +732,7 @@
 					},
 					resizable: false,
 					height: 500,
-					width: 1280,
+					width: 720,
 					modal: true,
 					buttons: [
 					{
@@ -789,7 +801,7 @@
 				var counterPurchaseReturn = 0;
 				table = $("#grid-data").DataTable({
 								"keys": true,
-								"scrollY": "330px",
+								"scrollY": "300px",
 								"rowId": "PurchaseReturnID",
 								"scrollCollapse": true,
 								"order": [2, "asc"],
@@ -907,7 +919,7 @@
 					else if(evt.keyCode == 123) {
 						evt.preventDefault();
 					}
-					else if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0) {
+					else if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0 && $("#FormData").css("display") == "none" && $("#delete-confirm").css("display") == "none") {
 						$("#grid-data_wrapper").find("input[type='search']").focus();
 					}
 					setTimeout(function() { counterKey = 0; } , 1000);

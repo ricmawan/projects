@@ -18,7 +18,7 @@
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						 <span style="width:50%;display:inline-block;">
-							 <h5>Pembelian</h5>
+							 <h5>Penjualan</h5>
 						</span>
 						<span style="width:49%;display:inline-block;text-align:right;">
 							<button id="btnAdd" class="btn btn-primary" onclick="openDialog(0, 0);"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
@@ -38,7 +38,7 @@
 										<th>No</th>
 										<th>No. Invoice</th>
 										<th>Tanggal</th>
-										<th>Supplier</th>
+										<th>Customer</th>
 										<th>Total</th>
 									</tr>
 								</thead>
@@ -57,14 +57,14 @@
 				<div class="row">
 					<div class="col-md-1 labelColumn">
 						No. Invoice :
-						<input id="hdnPurchaseID" name="hdnPurchaseID" type="hidden" value=0 />
-						<input id="hdnPurchaseDetailsID" name="hdnPurchaseDetailsID" type="hidden" value=0 />
+						<input id="hdnSaleID" name="hdnSaleID" type="hidden" value=0 />
+						<input id="hdnSaleDetailsID" name="hdnSaleDetailsID" type="hidden" value=0 />
 						<input id="hdnItemID" name="hdnItemID" type="hidden" value=0 />
 						<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
 						<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
 					</div>
 					<div class="col-md-2">
-						<input id="txtPurchaseNumber" name="txtPurchaseNumber" type="text" tabindex=5 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="No. Invoice" required />
+						<input id="txtSaleNumber" name="txtSaleNumber" type="text" tabindex=5 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="No. Invoice" readonly />
 					</div>
 					
 					<div class="col-md-1 labelColumn">
@@ -75,65 +75,58 @@
 					</div>
 					
 					<div class="col-md-1 labelColumn">
-						Supplier :
+						Pelanggan :
 					</div>
 					<div class="col-md-2">
-						<select id="ddlSupplier" name="ddlSupplier" tabindex=7 class="form-control-custom" placeholder="Pilih Supplier" >
+						<select id="ddlCustomer" name="ddlCustomer" tabindex=7 class="form-control-custom" placeholder="Pilih Pelanggan" >
 							<?php
-								$sql = "CALL spSelDDLSupplier('".$_SESSION['UserLogin']."')";
+								$sql = "CALL spSelDDLCustomer('".$_SESSION['UserLogin']."')";
 								if (! $result = mysqli_query($dbh, $sql)) {
-									logEvent(mysqli_error($dbh), '/Master/Purchase/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+									logEvent(mysqli_error($dbh), '/Master/Sale/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 									return 0;
 								}
 								while($row = mysqli_fetch_array($result)) {
-									echo "<option value='".$row['SupplierID']."' >".$row['SupplierCode']." - ".$row['SupplierName']."</option>";
+									echo "<option value='".$row['CustomerID']."' >".$row['CustomerCode']." - ".$row['CustomerName']."</option>";
 								}
 								mysqli_free_result($result);
 								mysqli_next_result($dbh);
 							?>
 						</select>
 					</div>
+					<div class="col-md-1">
+						<div id="toggle-retail" class="toggle-modern" ></div>
+						<input type="hidden" id="hdnIsRetail" name="hdnIsRetail" value=1 />
+					</div>
 				</div>
 				<hr style="margin: 10px 0;" />
 				<div class="row">
-					<table class="table table-striped table-hover" style="margin-bottom: 5px;" >
+					<table class="table table-striped table-hover" style="margin-bottom: 5px;width:80%;" >
 						<thead>
 							<tr>
-								<th style="width: 14%;text-align: center;" >Cabang</th>
-								<th style="width: 15%;text-align: center;" >Kode Barang</th>
-								<th style="width: 20%;text-align: center;" >Nama Barang</th>
-								<th style="width: 7%;text-align: center;" >Qty</th>
-								<th style="width: 11%;text-align: center;">Harga Beli</th>
-								<th style="width: 11%;text-align: center;">Harga Ecer</th>
-								<th style="width: 11%;text-align: center;">Harga Grosir 1</th>
-								<th style="width: 11%;text-align: center;">Harga Grosir 2</th>
+								<th style="width: 25%;text-align: center;" >Kode Barang</th>
+								<th style="width: 25%;text-align: center;" >Nama Barang</th>
+								<th style="width: 10%;text-align: center;" >Qty</th>
+								<th style="width: 20%;text-align: center;">Harga Jual</th>
+								<th style="width: 20%;text-align: center;">Diskon</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr>
-								<td style="width: 14%;" >
-									<select id="ddlBranch" name="ddlBranch" tabindex=8 class="form-control-custom" placeholder="Pilih Cabang" >
-										<?php
-											$sql = "CALL spSelDDLBranch('".$_SESSION['UserLogin']."')";
-											if (! $result = mysqli_query($dbh, $sql)) {
-												logEvent(mysqli_error($dbh), '/Master/Purchase/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-												return 0;
-											}
-											while($row = mysqli_fetch_array($result)) {
-												echo "<option value='".$row['BranchID']."' >".$row['BranchCode']." - ".$row['BranchName']."</option>";
-											}
-											mysqli_free_result($result);
-											mysqli_next_result($dbh);
-										?>
-									</select>
+								<td style="width: 25%;" ><input id="txtItemCode" name="txtItemCode" type="text" tabindex=8 class="form-control-custom" style="width: 100%;" onfocus="this.select();" onkeypress="isEnterKey(event, 'getItemDetails');" onchange="getItemDetails();" autocomplete=off placeholder="Kode Barang" /></td>
+								<td style="width: 25%;" ><input id="txtItemName" name="txtItemName" type="text" class="form-control-custom" style="width: 100%;" disabled /></td>
+								<td style="width: 10%;" ><input id="txtQTY" name="txtQTY" type="number" tabindex=9 class="form-control-custom" style="width: 100%;" value=1 min=1 onchange="this.value = validateQTY(this.value);Grosir(this.value);" onpaste="return false;" onfocus="this.select();" /></td>
+								<td style="width: 20%;" >
+									<input id="hdnBuyPrice" name="hdnBuyPrice" type="hidden" value=0 />
+									<input id="hdnRetailPrice" name="hdnRetailPrice" type="hidden" value=0 />
+									<input id="hdnPrice1" name="hdnPrice1" type="hidden" value=0 />
+									<input id="hdnQty1" name="hdnQty1" type="hidden" value=0 />
+									<input id="hdnPrice2" name="hdnPrice2" type="hidden" value=0 />
+									<input id="hdnQty2" name="hdnQty2" type="hidden" value=0 />
+									<input id="hdnBranchID" name="hdnBranchID" type="hidden" value=1 />
+									<input id="hdnWeight" name="hdnWeight" type="hidden" value=0 />
+									<input id="txtSalePrice" name="txtSalePrice" type="text" tabindex=10 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Beli" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
 								</td>
-								<td style="width: 15%;" ><input id="txtItemCode" name="txtItemCode" type="text" tabindex=9 class="form-control-custom" style="width: 100%;" onfocus="this.select();" onkeypress="isEnterKey(event, 'getItemDetails');" onchange="getItemDetails();" autocomplete=off placeholder="Kode Barang" /></td>
-								<td style="width: 20%;" ><input id="txtItemName" name="txtItemName" type="text" class="form-control-custom" style="width: 100%;" disabled /></td>
-								<td style="width: 7%;" ><input id="txtQTY" name="txtQTY" type="number" tabindex=10 class="form-control-custom" style="width: 100%;" value=1 min=1 onchange="this.value = validateQTY(this.value);" onpaste="return false;" onfocus="this.select();" /></td>
-								<td style="width: 11%;" ><input id="txtBuyPrice" name="txtBuyPrice" type="text" tabindex=11 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Beli" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" /></td>
-								<td style="width: 11%;" ><input id="txtRetailPrice" name="txtRetailPrice" type="text" tabindex=12 class="form-control-custom text-right" style="width: 100%;" value="0" autocomplete=off placeholder="Harga Ecer" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" /></td>
-								<td style="width: 11%;" ><input id="txtPrice1" name="txtPrice1" type="text" tabindex=13 class="form-control-custom text-right" style="width: 100%;" value="0" autocomplete=off placeholder="Harga Grosir 1" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" /></td>
-								<td style="width: 11%;" ><input id="txtPrice2" name="txtPrice2" type="text" tabindex=14 class="form-control-custom text-right" style="width: 100%;" value="0" autocomplete=off placeholder="Harga Grosir 2" onkeypress="isEnterKey(event, 'addPurchaseDetails');return isNumberKey(event, this.id, this.value);" onchange="addPurchaseDetails();" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" /></td>
+								<td style="width: 20%;" ><input id="txtDiscount" name="txtDiscount" type="text" tabindex=11 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Diskon" onkeypress="isEnterKey(event, 'addSaleDetails');return isNumberKey(event, this.id, this.value);" onchange="addSaleDetails();" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" /></td>
 							</tr>
 						</tbody>
 					</table>
@@ -144,18 +137,22 @@
 						<table id="grid-transaction" style="width: 100% !important;" class="table table-striped table-bordered table-hover" >
 							<thead>
 								<tr>
-									<th>PurchaseDetailsID</th>
+									<th>SaleDetailsID</th>
 									<th>ItemID</th>
 									<th>BranchID</th>
 									<th>Cabang</th>
 									<th>Kode Barang</th>
 									<th>Nama Barang</th>
 									<th>Qty</th>
-									<th>Harga Beli</th>
-									<th>Harga Ecer</th>
-									<th>Harga Grosir 1</th>
-									<th>Harga Grosir 2</th>
+									<th>Harga Jual</th>
+									<th>Diskon</th>
 									<th>Sub Total</th>
+									<th>BuyPrice</th>
+									<th>Price1</th>
+									<th>Qty1</th>
+									<th>Price2</th>
+									<th>Qty2</th>
+									<th>Weight</th>
 								</tr>
 							</thead>
 						</table>
@@ -163,10 +160,11 @@
 				</div>
 				<div class="row" >
 					<h2 style="display: inline-block;float: left;" >TOTAL : &nbsp;</h2><span id="lblTotal" >0</span>
+					</h2><span id="lblWeight" >0</span><h2 style="display: inline-block;float: right;color: #0006ff;" >Berat(KG) : &nbsp;
 				</div>
 				<br />
 				<div class="row" >
-					<h5>F12 = Daftar Barang; ESC = Tutup; DELETE = Hapus; ENTER = Edit;</h5>
+					<h5>F12 = Daftar Barang; F10 = Transaksi Selesai; ESC = Tutup; DELETE = Hapus; ENTER = Edit;</h5>
 				</div>
 			</form>
 		</div>
@@ -181,17 +179,17 @@
 							<tr>
 								<th>Kode Barang</th>
 								<th>Nama Barang</th>
-								<th>Harga Beli</th>
 								<th>Harga Ecer</th>
 								<th>Harga Grosir 1</th>
+								<th>QTY Grosir 1</th>
 								<th>Harga Grosir 2</th>
+								<th>QTY Grosir 2</th>
 							</tr>
 						</thead>
 					</table>
 				</div>
 			</div>
 		</div>
-		
 		<script>
 			var table;
 			var table2;
@@ -200,35 +198,49 @@
 			var rowEdit;
 			
 			function openDialogEdit(Data) {
-				$("#hdnPurchaseDetailsID").val(Data[0]);
+				$("#hdnSaleDetailsID").val(Data[0]);
 				$("#hdnItemID").val(Data[1]);
-				$("#ddlBranch").val(Data[2]);
+				$("#hdnBranchID").val(Data[2]);
 				$("#txtItemCode").val(Data[4]);
 				$("#txtItemName").val(Data[5]);
 				$("#txtQTY").val(Data[6]);
-				$("#txtBuyPrice").val(Data[7]);
-				$("#txtRetailPrice").val(Data[8]);
-				$("#txtPrice1").val(Data[9]);
-				$("#txtPrice2").val(Data[10]);
+				$("#txtSalePrice").val(Data[7]);
+				$("#txtDiscount").val(Data[8]);
+				$("#hdnBuyPrice").val(Data[10]);
+				$("#hdnPrice1").val(Data[11]);
+				$("#hdnQty1").val(Data[12]);
+				$("#hdnPrice2").val(Data[13]);
+				$("#hdnQty2").val(Data[14]);
+				$("#hdnWeight").val(Data[15]);
 				setTimeout(function() { $("#txtItemCode").focus(); }, 0);
 			}
 			
 			function openDialog(Data, EditFlag) {
 				$("#hdnIsEdit").val(EditFlag);
 				if(EditFlag == 1) {
-					$("#FormData").attr("title", "Edit Pembelian");
-					$("#hdnPurchaseID").val(Data[6]);
-					$("#ddlSupplier").val(Data[7]);
-					$("#txtPurchaseNumber").val(Data[2]);
+					$("#toggle-retail").toggleClass('disabled', true);
+					if(Data[9] == 1) {
+						$("#FormData").attr("title", "Edit Penjualan Eceran");
+						$('#toggle-retail').toggles(true);
+					}
+					else {
+						$("#FormData").attr("title", "Edit Penjualan Grosir");
+						$('#toggle-retail').toggles(false);
+					}
+					$("#hdnSaleID").val(Data[6]);
+					$("#ddlCustomer").val(Data[7]);
+					$("#txtSaleNumber").val(Data[2]);
 					$("#lblTotal").html(Data[5]);
 					$("#txtTransactionDate").datepicker("setDate", new Date(Data[8]));
-					getPurchaseDetails(Data[6]);
+					getSaleDetails(Data[6]);
+					$("#lblWeight").html(Data[10]);
 				}
-				else $("#FormData").attr("title", "Tambah Pembelian");
+				else $("#FormData").attr("title", "Tambah Penjualan Eceran");
 				var index = table.cell({ focused: true }).index();
 				$("#FormData").dialog({
 					autoOpen: false,
 					open: function() {
+						$("#txtTransactionDate").focus();
 						table.keys.disable();
 						table2 = $("#grid-transaction").DataTable({
 									"keys": true,
@@ -242,15 +254,19 @@
 										{ "visible": false },
 										{ "visible": false },
 										{ "visible": false },
-										{ "width": "12%", "orderable": false, className: "dt-head-center" },
-										{ "width": "13%", "orderable": false, className: "dt-head-center" },
-										{ "width": "18%", "orderable": false, className: "dt-head-center" },
-										{ "width": "7%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "15%", "orderable": false, className: "dt-head-center dt-body-center" },
+										{ "width": "20%", "orderable": false, className: "dt-head-center" },
+										{ "width": "25%", "orderable": false, className: "dt-head-center" },
 										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" }
+										{ "visible": false },
+										{ "visible": false },
+										{ "visible": false },
+										{ "visible": false },
+										{ "visible": false },
+										{ "visible": false }
 									],
 									"processing": false,
 									"serverSide": false,
@@ -271,11 +287,11 @@
 									}
 								});
 						table2.columns.adjust();
-						var counterPurchaseDetails = 0;
+						var counterSaleDetails = 0;
 						table2.on( 'key', function (e, datatable, key, cell, originalEvent) {
 							var index = table2.cell({ focused: true }).index();
-							if(counterPurchaseDetails == 0) {
-								counterPurchaseDetails = 1;
+							if(counterSaleDetails == 0) {
+								counterSaleDetails = 1;
 								var data = datatable.row( cell.index().row ).data();
 								if(key == 13) {
 									if(($("#FormEdit").css("display") == "none" || $("#delete-confirm").css("display") == "none") && $("#hdnEditFlag").val() == "1" ) {
@@ -289,7 +305,7 @@
 									table2.keys.disable();
 									var deletedData = new Array();
 									deletedData.push(data[0]);
-									SingleDelete("./Transaction/Purchase/DeleteDetails.php", deletedData, function(action) {
+									SingleDelete("./Transaction/Sale/DeleteDetails.php", deletedData, function(action) {
 										if(action == "success") {
 											datatable.row( cell.index().row ).remove().draw();
 											table2.keys.enable();
@@ -310,7 +326,7 @@
 										}
 									});
 								}
-								setTimeout(function() { counterPurchaseDetails = 0; } , 1000);
+								setTimeout(function() { counterSaleDetails = 0; } , 1000);
 							}
 						});
 						
@@ -324,11 +340,6 @@
 						
 						tableWidthAdjust();
 						$("#divModal").show();
-						$(document).on('keydown', function(e) {
-							if (e.keyCode == 39 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //right arrow
-								//$("#btnCancelAddPurchase").focus();
-							}
-						});
 					},
 					show: {
 						effect: "fade",
@@ -349,14 +360,14 @@
 						table2.destroy();
 					},
 					resizable: false,
-					height: 650,
+					height: 685,
 					width: 1280,
 					modal: false,
 					buttons: [
 					{
 						text: "Tutup",
-						tabindex: 15,
-						id: "btnCancelAddPurchase",
+						tabindex: 12,
+						id: "btnCancelAddSale",
 						click: function() {
 							$(this).dialog("destroy");
 							$("#divModal").hide();
@@ -380,7 +391,7 @@
 					if(itemCode == "") $("#txtItemCode").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 					else {
 						$.ajax({
-							url: "./Transaction/Purchase/CheckItem.php",
+							url: "./Transaction/Sale/CheckItem.php",
 							type: "POST",
 							data: { itemCode : itemCode },
 							dataType: "json",
@@ -389,10 +400,14 @@
 									if($("#hdnItemID").val() != data.ItemID) {
 										$("#hdnItemID").val(data.ItemID);
 										$("#txtItemName").val(data.ItemName);
-										$("#txtBuyPrice").val(returnRupiah(data.BuyPrice));
-										$("#txtRetailPrice").val(returnRupiah(data.RetailPrice));
-										$("#txtPrice1").val(returnRupiah(data.Price1));
-										$("#txtPrice2").val(returnRupiah(data.Price2));
+										$("#txtSalePrice").val(returnRupiah(data.RetailPrice));
+										$("#hdnBuyPrice").val(data.BuyPrice);
+										$("#hdnRetailPrice").val(data.RetailPrice);
+										$("#hdnPrice1").val(data.Price1);
+										$("#hdnQty1").val(data.Qty1);
+										$("#hdnPrice2").val(data.Price2);
+										$("#hdnQty2").val(data.Qty2);
+										$("#hdnWeight").val(data.Weight);
 										$("#txtQTY").focus();
 									}
 									else $("#txtQTY").focus();
@@ -468,7 +483,7 @@
 							error: function(jqXHR, textStatus, errorThrown) {
 								$("#loading").hide();
 								var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-								LogEvent(errorMessage, "/Transaction/Purchase/index.php");
+								LogEvent(errorMessage, "/Transaction/Sale/index.php");
 								Lobibox.alert("error",
 								{
 									msg: errorMessage,
@@ -482,11 +497,35 @@
 				setTimeout(function() { counterGetItem = 0; }, 1000);
 			}
 			
-			function getPurchaseDetails(PurchaseID) {
+			function Grosir(Quantity) {
+				if($("#hdnItemID").val() != 0) {
+					var retailPrice = $("#hdnRetailPrice").val();
+					if($('#toggle-retail').data('toggles').active == false) {
+						var qty1 = $("#hdnQty1").val();
+						var price1 = $("#hdnPrice1").val();
+						var qty2 = $("#hdnQty2").val();
+						var price2 = $("#hdnPrice2").val();
+						if(parseFloat(Quantity) >= parseFloat(qty2)) {
+							$("#txtSalePrice").val(returnRupiah(price2));
+						}
+						else if(parseFloat(Quantity) < parseFloat(qty2) && parseFloat(Quantity) >= parseFloat(qty1)) {
+							$("#txtSalePrice").val(returnRupiah(price1));
+						}
+						else {
+							$("#txtSalePrice").val(returnRupiah(retailPrice));
+						}
+					}
+					else {
+						$("#txtSalePrice").val(returnRupiah(retailPrice));
+					}
+				}
+			}
+			
+			function getSaleDetails(SaleID) {
 				$.ajax({
-					url: "./Transaction/Purchase/PurchaseDetails.php",
+					url: "./Transaction/Sale/SaleDetails.php",
 					type: "POST",
-					data: { PurchaseID : PurchaseID },
+					data: { SaleID : SaleID },
 					dataType: "json",
 					success: function(Data) {
 						if(Data.FailedFlag == '0') {
@@ -495,6 +534,29 @@
 							}
 							table2.draw();
 							tableWidthAdjust();
+							
+							for(var i=0;i<Data.data.length;i++) {
+								$("#toggle-branch-" + Data.data[i][0]).toggles({
+									drag: true, // allow dragging the toggle between positions
+									click: true, // allow clicking on the toggle
+									text: {
+										on: 'Toko', // text for the ON position
+										off: 'Gudang' // and off
+									},
+									on: true, // is the toggle ON on init
+									animate: 250, // animation time (ms)
+									easing: 'swing', // animation transition easing function
+									checkbox: null, // the checkbox to toggle (for use in forms)
+									clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
+									width: 80, // width used if not set in css
+									height: 18, // height if not set in css
+									type: 'compact' // if this is set to 'select' then the select style toggle will be used
+								});
+								
+								if(Data.data[i][2] == 1) $("#toggle-branch-" + Data.data[i][0]).toggles(true);
+								else $("#toggle-branch-" + Data.data[i][0]).toggles(false);
+										
+							}
 						}
 						else {
 							var counter = 0;
@@ -517,7 +579,7 @@
 					error: function(jqXHR, textStatus, errorThrown) {
 						$("#loading").hide();
 						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-						LogEvent(errorMessage, "/Transaction/Purchase/index.php");
+						LogEvent(errorMessage, "/Transaction/Sale/index.php");
 						Lobibox.alert("error",
 						{
 							msg: errorMessage,
@@ -528,21 +590,24 @@
 				});
 			}
 			
-			var counterAddPurchase = 0;
-			function addPurchaseDetails() {
-				if(counterAddPurchase == 0) {
-					counterAddPurchase = 1;
-					var branchID = $("#ddlBranch").val();
-					var branchName = $("#ddlBranch option:selected").text();
+			var counterAddSale = 0;
+			function addSaleDetails() {
+				if(counterAddSale == 0) {
+					counterAddSale = 1;
 					var itemID = $("#hdnItemID").val();
 					var itemCode = $("#txtItemCode").val();
 					var itemName = $("#txtItemName").val();
 					var Qty = $("#txtQTY").val();
-					var buyPrice = $("#txtBuyPrice").val();
-					var retailPrice = $("#txtRetailPrice").val();
-					var price1 = $("#txtPrice1").val();
-					var price2 = returnRupiah($("#txtPrice2").val());
-					$("#txtPrice2").blur();
+					var salePrice = $("#txtSalePrice").val();
+					var buyPrice = $("#hdnBuyPrice").val();
+					var price1 = $("#hdnPrice1").val();
+					var qty1 = $("#hdnQty1").val();
+					var price2 = $("#hdnPrice2").val();
+					var qty2 = $("#hdnQty2").val();
+					var discount = $("#txtDiscount").val();
+					var branchID = $("#hdnBranchID").val();
+					var weight = $("#hdnWeight").val();
+					$("#txtDiscount").blur();
 					var PassValidate = 1;
 					var FirstFocus = 0;
 					$("#FormData .form-control-custom").each(function() {
@@ -564,57 +629,108 @@
 					
 					if(PassValidate == 1) {
 						$.ajax({
-							url: "./Transaction/Purchase/Insert.php",
+							url: "./Transaction/Sale/Insert.php",
 							type: "POST",
 							data: $("#PostForm").serialize(),
 							dataType: "json",
 							success: function(data) {
 								if(data.FailedFlag == '0') {
-									if($("#hdnPurchaseDetailsID").val() == 0) {
+									if($("#hdnSaleDetailsID").val() == 0) {
+										$("#toggle-retail").toggleClass('disabled', true);
+										$("#txtSaleNumber").val(data.SaleNumber);
+										var toggleBranch = "<div id='toggle-branch-" + data.SaleDetailsID + "' onclick='updateBranch(this.id)' class='div-center toggle-modern' ></div>";
 										table2.row.add([
-											data.PurchaseDetailsID,
+											data.SaleDetailsID,
 											itemID,
 											branchID,
-											branchName,
+											toggleBranch,
 											itemCode,
 											itemName,
 											Qty,
+											salePrice,
+											discount,
+											returnRupiah((parseFloat(salePrice.replace(/\,/g, "")) * parseFloat(Qty) - parseFloat(discount)).toString()),
 											buyPrice,
-											retailPrice,
 											price1,
+											qty1,
 											price2,
-											returnRupiah((parseFloat(buyPrice.replace(/\,/g, "")) * parseFloat(Qty)).toString())
+											qty2,
+											weight
 										]).draw();
+										
+										$("#toggle-branch-" + data.SaleDetailsID).toggles({
+											drag: true, // allow dragging the toggle between positions
+											click: true, // allow clicking on the toggle
+											text: {
+												on: 'Toko', // text for the ON position
+												off: 'Gudang' // and off
+											},
+											on: true, // is the toggle ON on init
+											animate: 250, // animation time (ms)
+											easing: 'swing', // animation transition easing function
+											checkbox: null, // the checkbox to toggle (for use in forms)
+											clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
+											width: 80, // width used if not set in css
+											height: 18, // height if not set in css
+											type: 'compact' // if this is set to 'select' then the select style toggle will be used
+										});
 									}
 									else {
+										var toggles = $('#toggle-branch-' + data.SaleDetailsID).data('toggles').active;
 										table2.row(rowEdit).data([
-											data.PurchaseDetailsID,
+											data.SaleDetailsID,
 											itemID,
 											branchID,
-											branchName,
+											table2.row( rowEdit ).data()[3],
 											itemCode,
 											itemName,
 											Qty,
+											salePrice,
+											discount,
+											returnRupiah((parseFloat(salePrice.replace(/\,/g, "")) * parseFloat(Qty) - parseFloat(discount)).toString()),
 											buyPrice,
-											retailPrice,
 											price1,
+											qty1,
 											price2,
-											returnRupiah((parseFloat(buyPrice.replace(/\,/g, "")) * parseFloat(Qty)).toString())
+											qty2,
+											weight
 										]).draw();
+										
+										$("#toggle-branch-" + data.SaleDetailsID).toggles({
+											drag: true, // allow dragging the toggle between positions
+											click: true, // allow clicking on the toggle
+											text: {
+												on: 'Toko', // text for the ON position
+												off: 'Gudang' // and off
+											},
+											on: true, // is the toggle ON on init
+											animate: 250, // animation time (ms)
+											easing: 'swing', // animation transition easing function
+											checkbox: null, // the checkbox to toggle (for use in forms)
+											clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
+											width: 80, // width used if not set in css
+											height: 18, // height if not set in css
+											type: 'compact' // if this is set to 'select' then the select style toggle will be used
+										});
+										
+										$("#toggle-branch-" + data.SaleDetailsID).toggles(toggles);
 										
 										table2.keys.enable();
 									}
 									$("#txtItemCode").val("");
 									$("#txtItemName").val("");
 									$("#txtQTY").val(1);
-									$("#txtBuyPrice").val(0);
-									$("#txtRetailPrice").val(0);
-									$("#txtPrice1").val(0);
-									$("#txtPrice2").val(0);
+									$("#txtSalePrice").val(0);
+									$("#hdnBuyPrice").val(0);
+									$("#hdnPrice1").val(0);
+									$("#hdnQty1").val(0);
+									$("#hdnPrice2").val(0);
+									$("#hdnQty2").val(0);
 									$("#txtItemCode").focus();
-									$("#hdnPurchaseID").val(data.ID);
-									$("#hdnPurchaseDetailsID").val(0);
+									$("#hdnSaleID").val(data.ID);
+									$("#hdnSaleDetailsID").val(0);
 									$("#hdnItemID").val(0);
+									$("#hdnWeight").val(0);
 									tableWidthAdjust();
 									Calculate();
 								}
@@ -627,7 +743,7 @@
 										beforeClose: function() {
 											if(counter == 0) {
 												setTimeout(function() {
-													if(data.Message == "No. Invoice sudah ada") $("#txtPurchaseNumber").focus();
+													if(data.Message == "No. Invoice sudah ada") $("#txtSaleNumber").focus();
 													else $("#txtItemCode").focus();
 												}, 0);
 												counter = 1;
@@ -640,7 +756,7 @@
 							error: function(jqXHR, textStatus, errorThrown) {
 								$("#loading").hide();
 								var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-								LogEvent(errorMessage, "/Transaction/Purchase/index.php");
+								LogEvent(errorMessage, "/Transaction/Sale/index.php");
 								Lobibox.alert("error",
 								{
 									msg: errorMessage,
@@ -651,7 +767,51 @@
 						});
 					}
 				}
-				setTimeout(function() { counterAddPurchase = 0; }, 1000);
+				setTimeout(function() { counterAddSale = 0; }, 1000);
+			}
+			
+			function updateBranch(SaleDetailsID) {
+				setTimeout(function() {
+					var BranchID = 1;
+					var str = SaleDetailsID.split("-");
+					if($('#toggle-branch-' + str[2]).data('toggles').active == false) BranchID = 2;
+					$("#loading").show();
+					$.ajax({
+						url: "./Transaction/Sale/UpdateBranch.php",
+						type: "POST",
+						data: { SaleDetailsID : str[2], BranchID : BranchID },
+						dataType: "json",
+						success: function(data) {
+							$("#loading").hide();
+							if(data.FailedFlag == '0') {
+								
+							}
+							else {
+								
+							}
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+							$("#loading").hide();
+							var counter = 0;
+							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+							LogEvent(errorMessage, "/Master/Item/index.php");
+							Lobibox.alert("error",
+							{
+								msg: errorMessage,
+								width: 480,
+								beforeClose: function() {
+									if(counter == 0) {
+										setTimeout(function() {
+											$("#txtItemCode").focus();
+										}, 0);
+										counter = 1;
+									}
+								}
+							});
+							return 0;
+						}
+					});
+				}, 0);
 			}
 			
 			function addNewItem() {
@@ -773,10 +933,13 @@
 																setTimeout(function() {
 																	$("#hdnItemID").val(data.ID);
 																	$("#txtItemName").val($("#txtItemNameAdd").val());
-																	$("#txtBuyPrice").val($("#txtBuyPriceAdd").val());
-																	$("#txtRetailPrice").val($("#txtRetailPriceAdd").val());
-																	$("#txtPrice1").val($("#txtPrice1Add").val());
-																	$("#txtPrice2").val($("#txtPrice2Add").val());
+																	$("#hdnBuyPrice").val($("#txtBuyPriceAdd").val());
+																	$("#txtSalePrice").val($("#txtRetailPriceAdd").val());
+																	$("#hdnPrice1").val($("#txtPrice1Add").val());
+																	$("#hdnQty1").val($("#txtQty1Add").val());
+																	$("#hdnPrice2").val($("#txtPrice2Add").val());
+																	$("#hdnQty2").val($("#txtQty2Add").val());
+																	$("#hdnWeight").val($("#txtWeightAdd").val());
 																	var lobibox = $('.lobibox-window').data('lobibox');
 																	lobibox.destroy();
 																}, 0);
@@ -844,11 +1007,14 @@
 			
 			function Calculate() {
 				var grandTotal = 0;
+				var weight = 0;
 				table2.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
 					var data = this.data();
-					grandTotal += parseFloat(data[7].replace(/\,/g, "")) * parseFloat(data[6]);
+					grandTotal += parseFloat(data[7].replace(/\,/g, "")) * parseFloat(data[6]) - parseFloat(data[8]);
+					weight += parseFloat(data[15]) * parseFloat(data[6]);
 				});
 				$("#lblTotal").html(returnRupiah(grandTotal.toString()));
+				$("#lblWeight").html(returnWeight(weight.toString()));
 			}
 			
 			function tableWidthAdjust() {
@@ -861,25 +1027,29 @@
 			}
 			
 			function resetForm() {
-				$("#hdnPurchaseID").val(0);
+				$("#hdnSaleID").val(0);
 				$("#hdnItemID").val(0);
 				$("#txtTransactionDate").datepicker("setDate", new Date());
-				$("#txtPurchaseNumber").val("");
+				$("#txtSaleNumber").val("");
 				$("#txtItemCode").val("");
 				$("#txtItemName").val("");
 				$("#txtQTY").val(1);
-				$("#txtBuyPrice").val(0);
-				$("#txtRetailPrice").val(0);
-				$("#txtPrice1").val(0);
-				$("#txtPrice2").val(0);
+				$("#txtSalePrice").val(0);
+				$("#hdnBuyPrice").val(0);
+				$("#hdnPrice1").val(0);
+				$("#hdnQty1").val(0);
+				$("#hdnQty2").val(0);
+				$("#toggle-retail").toggleClass('disabled', false);
+				$('#toggle-retail').toggles(true);
 				$("#lblTotal").html("0");
+				$("#lblWeight").html("0");
 				table2.clear().draw();
 			}
 			
 			function fnDeleteData() {
 				var index = table.cell({ focused: true }).index();
 				table.keys.disable();
-				DeleteData("./Transaction/Purchase/Delete.php", function(action) {
+				DeleteData("./Transaction/Sale/Delete.php", function(action) {
 					if(action == "success") {
 						$("#select_all").prop("checked", false);
 						table.ajax.reload(function() {
@@ -922,13 +1092,14 @@
 									"order": [],
 									"columns": [
 										{ "width": "20%", "orderable": false, className: "dt-head-center" },
-										{ "width": "28%", "orderable": false, className: "dt-head-center" },
-										{ "width": "13%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "13%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "13%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "13%", "orderable": false, className: "dt-head-center dt-body-right" }
+										{ "width": "25%", "orderable": false, className: "dt-head-center" },
+										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" }
 									],
-									"ajax": "./Transaction/Purchase/ItemList.php",
+									"ajax": "./Transaction/Sale/ItemList.php",
 									"processing": true,
 									"serverSide": true,
 									"language": {
@@ -1031,11 +1202,39 @@
 			}
 
 			$(document).ready(function() {
+				$('#toggle-retail').toggles({
+					drag: true, // allow dragging the toggle between positions
+					click: true, // allow clicking on the toggle
+					text: {
+						on: 'Eceran', // text for the ON position
+						off: 'Grosir' // and off
+					},
+					on: true, // is the toggle ON on init
+					animate: 250, // animation time (ms)
+					easing: 'swing', // animation transition easing function
+					checkbox: null, // the checkbox to toggle (for use in forms)
+					clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
+					width: 80, // width used if not set in css
+					height: 23, // height if not set in css
+					type: 'compact' // if this is set to 'select' then the select style toggle will be used
+				});
+				
+				$('#toggle-retail').on('toggle', function(e, active) {
+					if (active) {
+						$("#hdnIsRetail").val(1);
+						if($("#FormData").css("display") == "block") $('#FormData').dialog('option', 'title', 'Tambah Penjualan Eceran');
+					} else {
+						$("#hdnIsRetail").val(0);
+						if($("#FormData").css("display") == "block") $('#FormData').dialog('option', 'title', 'Tambah Penjualan Grosir');
+						Grosir($("#txtQTY").val());
+					}
+				});
+				
 				$.fn.dataTable.ext.errMode = function(settings, techNote, message) { 
 					$("#loading").hide();
 					var errorMessage = "DataTables Error : " + techNote + " (" + message + ")";
 					var counterError = 0;
-					LogEvent(errorMessage, "/Transaction/Purchase/index.php");
+					LogEvent(errorMessage, "/Transaction/Sale/index.php");
 					Lobibox.alert("error",
 					{
 						msg: "Terjadi kesalahan. Memuat ulang halaman.",
@@ -1078,11 +1277,11 @@
 				
 				keyFunction();
 				enterLikeTab();
-				var counterPurchase = 0;
+				var counterSale = 0;
 				table = $("#grid-data").DataTable({
 								"keys": true,
 								"scrollY": "300px",
-								"rowId": "PurchaseID",
+								"rowId": "SaleID",
 								"scrollCollapse": true,
 								"order": [2, "asc"],
 								"columns": [
@@ -1095,7 +1294,7 @@
 								],
 								"processing": true,
 								"serverSide": true,
-								"ajax": "./Transaction/Purchase/DataSource.php",
+								"ajax": "./Transaction/Sale/DataSource.php",
 								"language": {
 									"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
 									"infoFiltered": "",
@@ -1126,8 +1325,8 @@
 							checkbox.attr("checked", true);
 						}
 					}
-					else if(counterPurchase == 0) {
-						counterPurchase = 1;
+					else if(counterSale == 0) {
+						counterSale = 1;
 						var data = datatable.row( cell.index().row ).data();
 						if(key == 13) {
 							if(($(".ui-dialog").css("display") == "none" || $("#delete-confirm").css("display") == "none") && $("#hdnEditFlag").val() == "1" ) {
@@ -1143,7 +1342,7 @@
 								table.keys.disable();
 								var deletedData = new Array();
 								deletedData.push(data[6] + "^" + data[2]);
-								SingleDelete("./Transaction/Purchase/Delete.php", deletedData, function(action) {
+								SingleDelete("./Transaction/Sale/Delete.php", deletedData, function(action) {
 									if(action == "success") {
 										table.ajax.reload(function() {
 											table.keys.enable();
@@ -1172,7 +1371,7 @@
 								fnDeleteData();
 							}
 						}
-						setTimeout(function() { counterPurchase = 0; } , 1000);
+						setTimeout(function() { counterSale = 0; } , 1000);
 					}
 				});
 				

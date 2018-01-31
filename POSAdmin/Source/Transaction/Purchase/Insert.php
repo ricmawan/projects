@@ -20,11 +20,11 @@
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
-		$sql = "CALL spInsPurchase(".$PurchaseID.", ".$PurchaseDetailsID.", '".$PurchaseNumber."', ".$SupplierID.", '".$TransactionDate."', ".$BranchID.", ".$ItemID.", ".$Qty.", ".$BuyPrice.", ".$RetailPrice.", ".$Price1.", ".$Price2.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsPurchase(".$PurchaseID.", '".$PurchaseNumber."', ".$SupplierID.", '".$TransactionDate."', ".$PurchaseDetailsID.", ".$BranchID.", ".$ItemID.", ".$Qty.", ".$BuyPrice.", ".$RetailPrice.", ".$Price1.", ".$Price2.", '".$_SESSION['UserLogin']."')";
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;
-			logEvent(mysqli_error($dbh), '/Master/Purchase/Insert.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Transaction/Purchase/Insert.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 			echo returnstate($PurchaseID, $PurchaseDetailsID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}
