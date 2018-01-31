@@ -45,7 +45,7 @@
 						</div>
 						<br />
 						<div class="row col-md-12" >
-							<h5>INSERT = Tambah Data; ENTER = Edit; DELETE = Hapus; SPASI = Menandai Data;</h5>
+							<h5>INSERT = Tambah Data; ENTER/DOUBLE KLIK = Edit; DELETE = Hapus; SPASI = Menandai Data;</h5>
 						</div>
 					</div>
 				</div>
@@ -149,7 +149,7 @@
 				</div>
 				<br />
 				<div class="row" >
-					<h5>F12 = Daftar Barang; ESC = Tutup; DELETE = Hapus; ENTER = Edit;</h5>
+					<h5>F12 = Daftar Barang; ESC = Tutup; DELETE = Hapus; ENTER/DOUBLE KLIK = Edit;</h5>
 				</div>
 			</form>
 		</div>
