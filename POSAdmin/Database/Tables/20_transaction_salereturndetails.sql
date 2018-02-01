@@ -8,6 +8,7 @@ CREATE TABLE transaction_salereturndetails
 	BranchID					INT,
 	Quantity					DOUBLE,
 	BuyPrice					DOUBLE,
+	SalePrice					DOUBLE,
 	CreatedDate 				DATETIME NOT NULL,
 	CreatedBy 					VARCHAR(255) NOT NULL,
 	ModifiedDate 				TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
