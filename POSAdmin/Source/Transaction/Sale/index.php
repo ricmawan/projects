@@ -1202,6 +1202,11 @@
 			}
 
 			$(document).ready(function() {
+				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
+				    console.log("test");
+				    $(this).blur();
+				});
+				
 				$('#toggle-retail').toggles({
 					drag: true, // allow dragging the toggle between positions
 					click: true, // allow clicking on the toggle
@@ -1378,7 +1383,7 @@
 				table.on('page', function() {
 					$("#select_all").prop("checked", false);
 				});
-				
+
 				var counterKey = 0;
 				$(document).on("keydown", function (evt) {
 					var index = table.cell({ focused: true }).index();

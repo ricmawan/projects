@@ -5,7 +5,8 @@ $.fn.hasAttr = function(name) {
 var CurrentMenu = "./Home.php";
 var PrevMenu;
 
-$(document).ready(function () {	
+$(document).ready(function () {
+	
 	$(document).on("click", ".menu", function() {
 		var MenuClicked = $(this).attr("link");
 		PrevMenu = CurrentMenu;
@@ -768,18 +769,6 @@ function saveConfirm(callback) {
 window.onload=GetClock;
 tday  =new Array("Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu");
 tmonth=new Array("Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember");
-
-function checkall() {
-	var checkall = $("#check-all").is(':checked'); 
-	if(checkall == true) {
-		$(".delete").prop('checked', true);
-		$(".delete").attr('checked', true);
-	}
-	else {
-		$(".delete").prop('checked', false);
-		$(".delete").removeAttr('checked');
-	}
-}
 
 function GetClock(){
 	d = new Date();

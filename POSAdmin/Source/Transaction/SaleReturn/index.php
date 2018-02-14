@@ -94,7 +94,7 @@
 									<th>SaleReturnDetailsID</th>
 									<th>ItemID</th>
 									<th>BranchID</th>
-									<th><input type="checkbox" /></th>
+									<th><input id="select_all_salereturn" name="select_all_salereturn" type="checkbox" onclick="checkAllSaleReturn();" /></th>
 									<th>Cabang</th>
 									<th>Kode Barang</th>
 									<th>Nama Barang</th>
@@ -207,8 +207,16 @@
 					modal: false,
 					buttons: [
 					{
-						text: "Tutup",
+						text: "Simpan",
 						tabindex: 12,
+						id: "btnSaveSaleReturn",
+						click: function() {
+							
+						}
+					},
+					{
+						text: "Tutup",
+						tabindex: 13,
 						id: "btnCancelAddSaleReturn",
 						click: function() {
 							$(this).dialog("destroy");
@@ -223,6 +231,21 @@
 						}
 					}]
 				}).dialog("open");
+			}
+
+			function checkAllSaleReturn() {
+				if($("#select_all_salereturn").prop("checked") == true) {
+					$("input:checkbox[name=selectSaleReturn]").each(function() {
+						$(this).prop("checked", true);
+						$(this).attr("checked", true);
+					});
+				}
+				else {
+					$("input:checkbox[name=selectSaleReturn]").each(function() {
+						$(this).prop("checked", false);
+						$(this).attr("checked", false);
+					});
+				}
 			}
 			
 			function getSaleReturnDetails(SaleReturnID) {
@@ -441,6 +464,11 @@
 			}
 			
 			$(document).ready(function() {
+				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
+				    console.log("test");
+				    $(this).blur();
+				});
+				
 				$.fn.dataTable.ext.errMode = function(settings, techNote, message) { 
 					$("#loading").hide();
 					var errorMessage = "DataTables Error : " + techNote + " (" + message + ")";

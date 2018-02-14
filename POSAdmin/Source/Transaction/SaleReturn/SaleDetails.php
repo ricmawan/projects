@@ -27,7 +27,7 @@
 			$row_array[] = $row['SaleDetailsID'];
 			$row_array[] = $row['ItemID'];
 			$row_array[] = $row['BranchID'];
-			$row_array[] = "<input type='checkbox' />";
+			$row_array[] = "<input type='checkbox' name='selectSaleReturn' />";
 			$row_array[] = "<div id='toggle-branch-" . $row['SaleDetailsID'] . "' onclick='updateBranch(this.id)' class='div-center toggle-modern' ></div>";
 			$row_array[] = $row['ItemCode'];
 			$row_array[] = $row['ItemName'];

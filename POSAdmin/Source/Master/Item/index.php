@@ -395,6 +395,11 @@
 			}
 
 			$(document).ready(function() {
+				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
+				    console.log("test");
+				    $(this).blur();
+				});
+				
 				$.fn.dataTable.ext.errMode = function(settings, techNote, message) { 
 					$("#loading").hide();
 					var errorMessage = "DataTables Error : " + techNote + " (" + message + ")";
