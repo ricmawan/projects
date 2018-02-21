@@ -12,6 +12,8 @@
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
+		$BranchID = mysql_real_escape_string($_POST['BranchID']);
+		$DayOfWeek = mysql_real_escape_string($_POST['dayOfWeek']);
 		
 		$sql = "SELECT
 					DATE_FORMAT(OS.ScheduledDate, '%k:%i') unavailableTime,
@@ -23,7 +25,16 @@
 				GROUP BY
 					OS.ScheduledDate
 				HAVING
-					COUNT(1) > 2";
+					COUNT(1) > 2
+				UNION ALL
+				SELECT
+					BusinessHour unavailableTime,
+					1
+				FROM
+					master_exceptionschedule
+				WHERE
+					DayOfWeek = ".$DayOfWeek."
+					AND BranchID = ".$BranchID;
 
 		if (! $result = mysql_query($sql, $dbh)) {
 			echo mysql_error();
