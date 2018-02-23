@@ -28,12 +28,13 @@ StoredProcedure:BEGIN
 SET State = 1;
 
 	SELECT
+		TS.SaleID,
 		SD.SaleDetailsID,
         SD.ItemID,
         SD.BranchID,
         MI.ItemCode,
         MI.ItemName,
-        SD.Quantity,
+        (SD.Quantity - IFNULL(TSR.Quantity, 0)) Quantity,
         SD.BuyPrice,
         SD.SalePrice,
         MC.CustomerName
@@ -47,6 +48,25 @@ SET State = 1;
 			ON MB.BranchID = SD.BranchID
 		JOIN master_item MI
 			ON MI.ItemID = SD.ItemID
+		LEFT JOIN
+		(
+			SELECT
+				SR.SaleID,
+				SRD.ItemID,
+				SRD.BranchID,
+				SUM(SRD.Quantity) Quantity
+			FROM
+				transaction_salereturn SR
+				JOIN transaction_salereturndetails SRD
+					ON SR.SaleReturnID = SRD.SaleReturnID
+			GROUP BY
+				SR.SaleID,
+				SRD.ItemID,
+				SRD.BranchID
+		)TSR
+			ON TSR.SaleID = TS.SaleID
+			AND MI.ItemID = TSR.ItemID
+			AND TSR.BranchID = SD.BranchID
 	WHERE
 		TRIM(TS.SaleNumber) = TRIM(pSaleNumber)
 	ORDER BY

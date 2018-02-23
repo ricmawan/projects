@@ -5,41 +5,39 @@
 		$RequestedPath = str_replace($file, "", $RequestedPath);
 		include "../../GetPermission.php";
 		$SaleID = mysqli_real_escape_string($dbh, $_POST['hdnSaleID']);
-		$SaleDetailsID = mysqli_real_escape_string($dbh, $_POST['hdnSaleDetailsID']);
-		$SaleNumber = "";
+		$SaleReturnID = mysqli_real_escape_string($dbh, $_POST['hdnSaleReturnID']);
 		$TransactionDate = mysqli_real_escape_string($dbh, $_POST['hdnTransactionDate']);
-		$BranchID = mysqli_real_escape_string($dbh, $_POST['hdnBranchID']);
-		$RetailFlag = mysqli_real_escape_string($dbh, $_POST['hdnIsRetail']);
-		$CustomerID = mysqli_real_escape_string($dbh, $_POST['ddlCustomer']);
-		$ItemID = mysqli_real_escape_string($dbh, $_POST['hdnItemID']);
-		$Qty = mysqli_real_escape_string($dbh, $_POST['txtQTY']);
-		$BuyPrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['hdnBuyPrice']));
-		$SalePrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtSalePrice']));
-		$Discount = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtDiscount']));
 		$Message = "Terjadi Kesalahan Sistem!";
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
-		$sql = "CALL spInsSale(".$SaleID.", ".$RetailFlag.", ".$CustomerID.", '".$TransactionDate."', ".$SaleDetailsID.", ".$BranchID.", ".$ItemID.", ".$Qty.", ".$BuyPrice.", ".$SalePrice.", ".$Discount.", ".$_SESSION['UserID'].", '".$_SESSION['UserLogin']."')";
+		$hdnIsEdit = mysqli_real_escape_string($dbh, $_POST['hdnIsEdit']);
+		$SaleReturnData = array();
+		if(ISSET($_POST['chkSaleDetails'])) {
+			foreach($_POST['chkSaleDetails'] as $selected){
+				$SaleReturnData[] = "(".$SaleReturnID.", ".$_POST['hdnItemID'.$selected].", ".$_POST['hdnBranchID'.$selected].", ".$_POST['txtQty'.$selected].", ".$_POST['hdnBuyPrice'.$selected].", ".$_POST['hdnSalePrice'.$selected].", NOW(), UserLogin)";
+			}
+		}
+
+		$sql = "CALL spInsSaleReturn(".$SaleReturnID.", ".$SaleID.", '".$TransactionDate."', '".implode(",", $SaleReturnData)."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
+
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;
-			logEvent(mysqli_error($dbh), '/Transaction/Sale/Insert.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-			echo returnstate($SaleID, $SaleDetailsID, $SaleNumber, $Message, $MessageDetail, $FailedFlag, $State);
+			logEvent(mysqli_error($dbh), '/Transaction/SaleReturn/Insert.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			echo returnstate($SaleReturnID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}
 		$row=mysqli_fetch_array($result);
 		
 		mysqli_free_result($result);
 		mysqli_next_result($dbh);
-		echo returnstate($row['ID'], $row['SaleDetailsID'], $row['SaleNumber'], $row['Message'], $row['MessageDetail'], $row['FailedFlag'], $row['State']);
+		echo returnstate($row['ID'], $row['Message'], $row['MessageDetail'], $row['FailedFlag'], $row['State']);
 	}
 	
-	function returnstate($ID, $SaleDetailsID, $SaleNumber, $Message, $MessageDetail, $FailedFlag, $State) {
+	function returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State) {
 		$data = array(
 			"ID" => $ID, 
-			"SaleDetailsID" => $SaleDetailsID,
-			"SaleNumber" => $SaleNumber,
 			"Message" => $Message,
 			"MessageDetail" => $MessageDetail,
 			"FailedFlag" => $FailedFlag,

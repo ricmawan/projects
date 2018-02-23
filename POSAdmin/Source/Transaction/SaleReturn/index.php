@@ -58,8 +58,7 @@
 					<div class="col-md-1 labelColumn">
 						No. Invoice :
 						<input id="hdnSaleReturnID" name="hdnSaleReturnID" type="hidden" value=0 />
-						<input id="hdnSaleReturnDetailsID" name="hdnSaleReturnDetailsID" type="hidden" value=0 />
-						<input id="hdnItemID" name="hdnItemID" type="hidden" value=0 />
+						<input id="hdnSaleID" name="hdnSaleID" type="hidden" value=0 />
 						<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
 						<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
 					</div>
@@ -79,10 +78,6 @@
 					</div>
 					<div class="col-md-2">
 						<input id="txtCustomerName" name="txtCustomerName" type="text" class="form-control-custom" readonly />
-					</div>
-					<div class="col-md-1">
-						<div id="toggle-retail" class="toggle-modern" ></div>
-						<input type="hidden" id="hdnIsRetail" name="hdnIsRetail" value=1 />
 					</div>
 				</div>
 				<hr style="margin: 10px 0;" />
@@ -141,7 +136,7 @@
 						$("#txtSaleNumber").focus();
 						table.keys.disable();
 						table2 = $("#grid-transaction").DataTable({
-									"keys": true,
+									"keys": false,
 									"scrollY": "295px",
 									"scrollX": false,
 									"scrollCollapse": false,
@@ -211,7 +206,86 @@
 						tabindex: 12,
 						id: "btnSaveSaleReturn",
 						click: function() {
-							
+							if($("input:checkbox[class=chkSaleDetails]:checked").length > 0)
+							{
+								$("#loading").show();
+								$.ajax({
+									url: "./Transaction/SaleReturn/Insert.php",
+									type: "POST",
+									data: $("#PostForm").serialize(),
+									dataType: "json",
+									success: function(data) {
+										if(data.FailedFlag == '0') {
+											$("#loading").hide();
+											$("#FormData").dialog("destroy");
+											$("#divModal").hide();
+											resetForm();
+											table2.destroy();
+											var counter = 0;
+											Lobibox.alert("success",
+											{
+												msg: data.Message,
+												width: 480,
+												delay: 2000,
+												beforeClose: function() {
+													if(counter == 0) {
+														table.keys.enable();
+														counter = 1;
+													}
+												},
+												shown: function() {
+													setTimeout(function() {
+														table.ajax.reload(function() {
+															table.keys.enable();
+															if(typeof index !== 'undefined') table.cell(index).focus();
+															table.keys.disable();
+														}, false);
+													}, 0);
+												}
+											});
+										}
+										else {
+											$("#loading").hide();
+											var counter = 0;
+											Lobibox.alert("warning",
+											{
+												msg: data.Message,
+												width: 480,
+												delay: false,
+												beforeClose: function() {
+													if(counter == 0) {
+														setTimeout(function() {
+															$("#txtItemCode").focus();
+														}, 0);
+														counter = 1;
+													}
+												}
+											});
+											return 0;
+										}
+									},
+									error: function(jqXHR, textStatus, errorThrown) {
+										$("#loading").hide();
+										var counter = 0;
+										var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+										LogEvent(errorMessage, "/Master/Item/index.php");
+										Lobibox.alert("error",
+										{
+											msg: errorMessage,
+											width: 480,
+											beforeClose: function() {
+												if(counter == 0) {
+													setTimeout(function() {
+														$("#txtItemCode").focus();
+													}, 0);
+													counter = 1;
+												}
+											}
+										});
+										return 0;
+									}
+								});
+							}
 						}
 					},
 					{
@@ -233,19 +307,29 @@
 				}).dialog("open");
 			}
 
+			function updateBranch(SaleDetailsID) {
+				setTimeout(function() {
+					var BranchID = 1;
+					var str = SaleDetailsID.split("-");
+					if($('#toggle-branch-' + str[2]).data('toggles').active == false) BranchID = 2;
+					$("#hdnBranchID" + str[2]).val(BranchID);
+				}, 0);
+			}
+
 			function checkAllSaleReturn() {
 				if($("#select_all_salereturn").prop("checked") == true) {
-					$("input:checkbox[name=selectSaleReturn]").each(function() {
+					$("input:checkbox[class=chkSaleDetails]").each(function() {
 						$(this).prop("checked", true);
 						$(this).attr("checked", true);
 					});
 				}
 				else {
-					$("input:checkbox[name=selectSaleReturn]").each(function() {
+					$("input:checkbox[class=chkSaleDetails]").each(function() {
 						$(this).prop("checked", false);
 						$(this).attr("checked", false);
 					});
 				}
+				Calculate();
 			}
 			
 			function getSaleReturnDetails(SaleReturnID) {
@@ -282,7 +366,6 @@
 								
 								if(Data.data[i][2] == 1) $("#toggle-branch-" + Data.data[i][0]).toggles(true);
 								else $("#toggle-branch-" + Data.data[i][0]).toggles(false);
-										
 							}
 						}
 						else {
@@ -332,7 +415,10 @@
 							if(Data.FailedFlag == '0') {
 								table2.clear().draw();
 								for(var i=0;i<Data.data.length;i++) {
-									if(i == 0) $("#txtCustomerName").val(Data.data[i][11]);
+									if(i == 0) {
+										$("#hdnSaleID").val(Data.data[i][12]);
+										$("#txtCustomerName").val(Data.data[i][11]);
+									}
 									table2.row.add(Data.data[i]);
 								}
 								table2.draw();
@@ -359,8 +445,11 @@
 									if(Data.data[i][2] == 1) $("#toggle-branch-" + Data.data[i][0]).toggles(true);
 									else $("#toggle-branch-" + Data.data[i][0]).toggles(false);
 											
+									if(Data.data[i][13] == 0) {
+										$("#toggle-branch-" + Data.data[i][0]).toggles().toggleClass('disabled', true);;
+									}
 								}
-								Calculate();
+								//Calculate();
 								setTimeout(function() {
 									$("#grid-transaction").DataTable().cell( ':eq(3)' ).focus();
 								}, 0);
@@ -400,12 +489,30 @@
 					saleDetailsCounter = 0;
 				}, 1000);
 			}
+
+			function validateQTY(el) {
+				if(parseFloat(el.value) > parseFloat(el.max)) {
+					el.value = el.max;
+					$(el).notify("Maksimal: " + el.max, { position:"right", className:"warn", autoHideDelay: 2000 });
+				}
+				else if(parseFloat(el.value) <=0 ) {
+					el.value = 1;
+					$(el).notify("Minimal: 1", { position:"right", className:"warn", autoHideDelay: 2000 });
+				}
+				Calculate();
+			}
 			
 			function Calculate() {
 				var grandTotal = 0;
-				table2.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
-					var data = this.data();
-					grandTotal += parseFloat(data[8].replace(/\,/g, "")) * parseFloat(data[7]);
+				$("input:checkbox[class=chkSaleDetails]:checked").each(function() {
+					var qty = parseFloat($(this).closest("tr").find("input[type=number]").val());
+					var salePrice = parseFloat($(this).closest("tr").find("label").html().replace(/\,/g, ""));
+					var subTotal = qty * salePrice; 
+					grandTotal += subTotal;
+					$(this).closest("tr").find("td").last().html(returnRupiah(subTotal.toString()));
+				});
+				$("input:checkbox[class=chkSaleDetails]:not(:checked)").each(function() {
+					$(this).closest("tr").find("td").last().html("0");
 				});
 				$("#lblTotal").html(returnRupiah(grandTotal.toString()));
 			}
@@ -421,14 +528,9 @@
 			
 			function resetForm() {
 				$("#hdnSaleReturnID").val(0);
-				$("#hdnItemID").val(0);
+				$("#hdnSaleID").val(0);
 				$("#txtTransactionDate").datepicker("setDate", new Date());
 				$("#txtSaleNumber").val("");
-				$("#txtItemCode").val("");
-				$("#txtItemName").val("");
-				$("#txtQTY").val(1);
-				$("#txtSaleReturnPrice").val(0);
-				$("#hdnBuyPrice").val(0);
 				$("#lblTotal").html("0");
 				table2.clear().draw();
 			}
