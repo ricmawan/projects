@@ -123,12 +123,16 @@
 					$("#FormData").attr("title", "Edit Retur Penjualan");
 					$("#hdnSaleReturnID").val(Data[6]);
 					$("#txtCustomerName").val(Data[4]);
-					$("#txtSaleReturn").val(Data[2]);
+					$("#txtSaleNumber").val(Data[2]);
 					$("#lblTotal").html(Data[5]);
 					$("#txtTransactionDate").datepicker("setDate", new Date(Data[7]));
+					$("#txtSaleNumber").prop("readonly", true);
 					getSaleReturnDetails(Data[6]);
 				}
-				else $("#FormData").attr("title", "Tambah Retur Penjualan");
+				else {
+					$("#FormData").attr("title", "Tambah Retur Penjualan");
+					$("#txtSaleNumber").prop("readonly", false);
+				}
 				var index = table.cell({ focused: true }).index();
 				$("#FormData").dialog({
 					autoOpen: false,
@@ -208,81 +212,88 @@
 						click: function() {
 							if($("input:checkbox[class=chkSaleDetails]:checked").length > 0)
 							{
-								$("#loading").show();
-								$.ajax({
-									url: "./Transaction/SaleReturn/Insert.php",
-									type: "POST",
-									data: $("#PostForm").serialize(),
-									dataType: "json",
-									success: function(data) {
-										if(data.FailedFlag == '0') {
-											$("#loading").hide();
-											$("#FormData").dialog("destroy");
-											$("#divModal").hide();
-											resetForm();
-											table2.destroy();
-											var counter = 0;
-											Lobibox.alert("success",
-											{
-												msg: data.Message,
-												width: 480,
-												delay: 2000,
-												beforeClose: function() {
-													if(counter == 0) {
-														table.keys.enable();
-														counter = 1;
+								saveConfirm(function(action) {
+									if(action == "Ya") {
+										$("#loading").show();
+										$.ajax({
+											url: "./Transaction/SaleReturn/Insert.php",
+											type: "POST",
+											data: $("#PostForm").serialize(),
+											dataType: "json",
+											success: function(data) {
+												if(data.FailedFlag == '0') {
+													$("#loading").hide();
+													$("#FormData").dialog("destroy");
+													$("#divModal").hide();
+													resetForm();
+													table2.destroy();
+													var counter = 0;
+													Lobibox.alert("success",
+													{
+														msg: data.Message,
+														width: 480,
+														delay: 2000,
+														beforeClose: function() {
+															if(counter == 0) {
+																table.keys.enable();
+																counter = 1;
+															}
+														},
+														shown: function() {
+															setTimeout(function() {
+																table.ajax.reload(function() {
+																	table.keys.enable();
+																	if(typeof index !== 'undefined') table.cell(index).focus();
+																	table.keys.disable();
+																}, false);
+															}, 0);
+														}
+													});
+												}
+												else {
+													$("#loading").hide();
+													var counter = 0;
+													Lobibox.alert("warning",
+													{
+														msg: data.Message,
+														width: 480,
+														delay: false,
+														beforeClose: function() {
+															if(counter == 0) {
+																setTimeout(function() {
+																	$("#txtItemCode").focus();
+																}, 0);
+																counter = 1;
+															}
+														}
+													});
+													return 0;
+												}
+											},
+											error: function(jqXHR, textStatus, errorThrown) {
+												$("#loading").hide();
+												var counter = 0;
+												var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+												LogEvent(errorMessage, "/Master/Item/index.php");
+												Lobibox.alert("error",
+												{
+													msg: errorMessage,
+													width: 480,
+													beforeClose: function() {
+														if(counter == 0) {
+															setTimeout(function() {
+																$("#txtItemCode").focus();
+															}, 0);
+															counter = 1;
+														}
 													}
-												},
-												shown: function() {
-													setTimeout(function() {
-														table.ajax.reload(function() {
-															table.keys.enable();
-															if(typeof index !== 'undefined') table.cell(index).focus();
-															table.keys.disable();
-														}, false);
-													}, 0);
-												}
-											});
-										}
-										else {
-											$("#loading").hide();
-											var counter = 0;
-											Lobibox.alert("warning",
-											{
-												msg: data.Message,
-												width: 480,
-												delay: false,
-												beforeClose: function() {
-													if(counter == 0) {
-														setTimeout(function() {
-															$("#txtItemCode").focus();
-														}, 0);
-														counter = 1;
-													}
-												}
-											});
-											return 0;
-										}
-									},
-									error: function(jqXHR, textStatus, errorThrown) {
-										$("#loading").hide();
-										var counter = 0;
-										var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-										LogEvent(errorMessage, "/Master/Item/index.php");
-										Lobibox.alert("error",
-										{
-											msg: errorMessage,
-											width: 480,
-											beforeClose: function() {
-												if(counter == 0) {
-													setTimeout(function() {
-														$("#txtItemCode").focus();
-													}, 0);
-													counter = 1;
-												}
+												});
+												return 0;
 											}
 										});
-										return 0;
+									}
+									else {
+										return false;
 									}
 								});
 							}
@@ -367,6 +378,8 @@
 								if(Data.data[i][2] == 1) $("#toggle-branch-" + Data.data[i][0]).toggles(true);
 								else $("#toggle-branch-" + Data.data[i][0]).toggles(false);
 							}
+
+							$("#select_all_salereturn").click();
 						}
 						else {
 							var counter = 0;
