@@ -21,11 +21,11 @@
 				FROM
 					transaction_onlineschedule OS
 				WHERE
-					DATE_FORMAT(OS.ScheduledDate, '%Y-%m-%e') = '".$StartDate."'
+					DATE_FORMAT(OS.ScheduledDate, '%Y-%c-%e') = '".$StartDate."'
 				GROUP BY
 					OS.ScheduledDate
 				HAVING
-					COUNT(1) > 2
+					COUNT(1) >= $MINUTE_SCHEDULE_LIMIT
 				UNION ALL
 				SELECT
 					BusinessHour unavailableTime,

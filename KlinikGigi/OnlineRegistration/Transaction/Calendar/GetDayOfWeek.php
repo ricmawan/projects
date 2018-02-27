@@ -19,6 +19,7 @@
 					master_schedule
 				WHERE
 					BranchID = ".$BranchID."
+					AND IsAdmin = 0
 				GROUP BY
 					BranchID";
 

@@ -22,7 +22,7 @@
 								Cabang:
 							</div>
 							<div class="col-md-2" >
-								<select id="ddlBranch" name="ddlBranch" class="form-control-custom" onchange="ddlTime();">
+								<select id="ddlBranch" name="ddlBranch" class="form-control-custom" onchange="reloadEvent();">
 									<?php
 										$sql = "SELECT BranchID, BranchName, StartHour, EndHour FROM master_branch";
 										if(!$result = mysql_query($sql, $dbh)) {
@@ -46,7 +46,7 @@
 			<div id="dialog-schedule" title="Pendaftaran Periksa Gigi" style="display: none;">
 				<form class="col-md-12" id="ScheduleForm" method="POST" action="" >
 					<input type="hidden" id="hdnStartDate" name="hdnStartDate" value=0 autofocus="autofocus" />
-					<input type="hidden" id="hdnDDLBranch" name="hdnDDLBranch" value=0 autofocus="autofocus" />
+					<input type="hidden" id="hdnDDLBranch" name="hdnDDLBranch" value=1 autofocus="autofocus" />
 					<div class="row" >
 						<div class="col-md-3 labelColumn" >
 							Tanggal:
@@ -150,8 +150,8 @@
 			</div>
 		</div>
 		<script>
-			var counter = 0;
-			function hideUnavailableTime() {
+			var businessHours;
+			function hideUnavailableTime(dayOfWeek) {
 				var startDate = $("#hdnStartDate").val();
 				$("#ddlTime option").each(function() {
 					$(this).show();
@@ -159,12 +159,11 @@
 				$.ajax({
 					url: "./Transaction/CheckSchedule/UnavailableTime.php",
 					type: "POST",
-					data: { StartDate : startDate },
+					data: { dayOfWeek : dayOfWeek, BranchID : $("#ddlBranch").val(), StartDate : startDate },
 					dataType: "json",
 					success: function(data) {
 						$("#loading").hide();
 						for(var i=0;i<data.length;i++) {
-							console.log(data[i].unavailableTime);
 							$("#ddlTime option[value='" + data[i].unavailableTime + "']").hide();
 						}
 						$("#ddlTime option").each(function() {
@@ -226,33 +225,68 @@
 					}
 				});
 			}
+			function reloadEvent() {
+				$("#hdnDDLBranch").val($("#ddlBranch").val());
+				$('#calendar').fullCalendar('refetchEvents');
+				getDayOfWeek();
+			}
+
+			function getDayOfWeek() {
+				$.ajax({
+					url: "./Transaction/CheckSchedule/GetDayOfWeek.php",
+					type: "POST",
+					data: { BranchID : $("#ddlBranch").val() },
+					dataType: "json",
+					success: function(data) {
+						$("#loading").hide();
+						$('#calendar').fullCalendar('option', {
+							businessHours: {
+								dow: JSON.parse("[" + data[0].dow + "]")
+							}
+						});
+
+						businessHours = JSON.parse("[" + data[0].dow + "]");
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Terjadi kesalahan sistem!", "error");
+					}
+				});
+			}
 			
-			function ddlTime() {
-				counter++;
-				
+			function ddlTime(dayOfWeek) {
 				$("#ddlTime option").each(function() {
 					$(this).remove();
 				});
-				$("#hdnDDLBranch").val($("#ddlBranch").val());
-				if(counter > 1) {
-					$('#calendar').fullCalendar('refetchEvents');
-				}
-				var startHour = parseInt($("#ddlBranch option:selected").attr("startHour"));
-				var endHour = parseInt($("#ddlBranch option:selected").attr("endHour"));
-				var i= startHour;
-				for(var i=startHour;i<=endHour;i++) {
-					var minutes = 0;
-					$("#ddlTime").append("<option value='" + i + ":00' >" + i + ":00</option>");
-					if(i!=endHour) {
-						$("#ddlTime").append("<option value='" + i + ":15' >" + i + ":15</option>");
-						$("#ddlTime").append("<option value='" + i + ":30' >" + i + ":30</option>");
-						$("#ddlTime").append("<option value='" + i + ":45' >" + i + ":45</option>");						
+				
+				$.ajax({
+					url: "./Transaction/CheckSchedule/GetTime.php",
+					type: "POST",
+					data: { dayOfWeek : dayOfWeek, BranchID : $("#ddlBranch").val() },
+					dataType: "json",
+					success: function(data) {
+						$("#loading").hide();
+						for(var i=0;i<data.length;i++) {
+							for(var j=parseInt(data[i].StartHour);j<=parseInt(data[i].EndHour);j++) {
+								$("#ddlTime").append("<option value='" + j + ":00' >" + j + ":00</option>");
+								if(j!=data[i].EndHour) {
+									$("#ddlTime").append("<option value='" + j + ":15' >" + j + ":15</option>");
+									$("#ddlTime").append("<option value='" + j + ":30' >" + j + ":30</option>");
+									$("#ddlTime").append("<option value='" + j + ":45' >" + j + ":45</option>");
+								}
+							}
+						}
+						hideUnavailableTime(dayOfWeek);
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Terjadi kesalahan sistem!", "error");
 					}
-				}
+				});
 			}
 			
 			function dialogSchedule() {
-				hideUnavailableTime();
+				//hideUnavailableTime();
 				$("#dialog-schedule").dialog({
 					autoOpen: false,
 					show: {
@@ -352,7 +386,7 @@
 			}
 			
 			$(document).ready(function() {
-				ddlTime();
+				//ddlTime();
 				$("#ddlPatient").combobox({
 					select: function( event, ui ) {
 						var Telephone = $("#ddlPatient option:selected").attr("telephone");
@@ -389,7 +423,7 @@
 						//$(this).css('border-color', 'red');
 						var date = calEvent.start;
 						var count = 0;
-						if(date.format('e') > 0 && date.format('e') < 6) {
+						if(businessHours.indexOf(parseInt(date.format('e')) ) >= 0) {
 							$('#calendar').fullCalendar('clientEvents', function(event) {
 								if(moment(date).format('YYYY-MM-DD') == moment(event.start._i).format('YYYY-MM-DD') && count == 0) {
 									count++;
@@ -403,6 +437,7 @@
 										$("#lblStartDate").html(startDate.getDate().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getFullYear().toString());
 										$("#hdnStartDate").val(scheduledDate);
 										dialogSchedule();
+										ddlTime(parseInt(date.format('e')));
 									}
 								}
 							});
@@ -412,6 +447,7 @@
 								$("#lblStartDate").html(startDate.getDate().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getFullYear().toString());
 								$("#hdnStartDate").val(scheduledDate);
 								dialogSchedule();
+								ddlTime(parseInt(date.format('e')));
 							}
 						}
 
@@ -441,7 +477,7 @@
 						}
 						$('#calendar').fullCalendar('unselect');*/
 						var count = 0;
-						if(date.format('e') > 0 && date.format('e') < 6) {
+						if(businessHours.indexOf(parseInt(date.format('e')) ) >= 0) {
 							$('#calendar').fullCalendar('clientEvents', function(event) {
 								if(moment(date).format('YYYY-MM-DD') == moment(event.start._i).format('YYYY-MM-DD') && count == 0) {
 									count++;
@@ -455,6 +491,7 @@
 										$("#lblStartDate").html(startDate.getDate().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getFullYear().toString());
 										$("#hdnStartDate").val(scheduledDate);
 										dialogSchedule();
+										ddlTime(parseInt(date.format('e')));
 									}
 								}
 							});
@@ -464,6 +501,7 @@
 								$("#lblStartDate").html(startDate.getDate().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getFullYear().toString());
 								$("#hdnStartDate").val(scheduledDate);
 								dialogSchedule();
+								ddlTime(parseInt(date.format('e')));
 							}
 						}
 					},
@@ -482,11 +520,10 @@
 						}
 					},
 					timeFormat: 'H:mm',
-					businessHours: {
-						// days of week. an array of zero-based day of week integers (0=Sunday)
-						dow: [ 1, 2, 3, 4, 5 ], // Monday - Thursday
-					},
 					selectConstraint: "businessHours",
+					businessHours: {
+						dow : [ 0, 1, 2, 3, 4, 5, 6]
+					},
 					eventLimitClick: function( cellInfo, jsEvent ) {
 						loadSchedule(moment(cellInfo.date).format('YYYY-MM-DD'));
 					},
@@ -494,6 +531,7 @@
 						loadSchedule(date.format('YYYY-MM-DD'));
 					}
 				});
+				getDayOfWeek();
 			});
 		</script>
 	</body>

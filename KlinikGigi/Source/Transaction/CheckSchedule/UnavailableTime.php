@@ -12,18 +12,28 @@
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
-		
+		$BranchID = mysql_real_escape_string($_POST['BranchID']);
+		$DayOfWeek = mysql_real_escape_string($_POST['dayOfWeek']);
 		$sql = "SELECT
 					DATE_FORMAT(CS.ScheduledDate, '%k:%i') unavailableTime,
 					COUNT(1)
 				FROM
 					transaction_checkschedule CS
 				WHERE
-					DATE_FORMAT(CS.ScheduledDate, '%Y-%m-%e') = '".$StartDate."'
+					DATE_FORMAT(CS.ScheduledDate, '%Y-%c-%e') = '".$StartDate."'
 				GROUP BY
 					CS.ScheduledDate
 				HAVING
-					COUNT(1) > 2";
+					COUNT(1) >= $MINUTE_SCHEDULE_LIMIT
+				UNION ALL
+				SELECT
+					BusinessHour unavailableTime,
+					1
+				FROM
+					master_exceptionschedule
+				WHERE
+					DayOfWeek = ".$DayOfWeek."
+					AND BranchID = ".$BranchID;
 
 		if (! $result = mysql_query($sql, $dbh)) {
 			echo mysql_error();

@@ -247,11 +247,10 @@
 			}
 			
 			function ddlTime(dayOfWeek) {
-				
 				$("#ddlTime option").each(function() {
 					$(this).remove();
 				});
-
+				
 				$.ajax({
 					url: "./Transaction/Calendar/GetTime.php",
 					type: "POST",
@@ -431,6 +430,7 @@
 								$("#lblStartDate").html(startDate.getDate().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getFullYear().toString());
 								$("#hdnStartDate").val(scheduledDate);
 								dialogSchedule();
+								ddlTime(parseInt(date.format('e')));
 							}
 						}
 					},
@@ -473,6 +473,7 @@
 										$("#lblStartDate").html(startDate.getDate().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getFullYear().toString());
 										$("#hdnStartDate").val(scheduledDate);
 										dialogSchedule();
+										ddlTime(parseInt(date.format('e')));
 									}
 								}
 							});

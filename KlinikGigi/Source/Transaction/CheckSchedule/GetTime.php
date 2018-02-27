@@ -22,7 +22,7 @@
 				WHERE
 					BranchID = ".$BranchID."
 					AND DayOfWeek = ".$DayOfWeek."
-					AND IsAdmin = 0";
+					AND IsAdmin = 1";
 
 		if (! $result = mysql_query($sql, $dbh)) {
 			echo mysql_error();
