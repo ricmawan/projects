@@ -5,11 +5,11 @@ Created Date: 9 January 2018
 Modified Date: 
 ===============================================================*/
 
-DROP PROCEDURE IF EXISTS spDelSaleDetails;
+DROP PROCEDURE IF EXISTS spDelStockMutationDetails;
 
 DELIMITER $$
-CREATE PROCEDURE spDelSaleDetails (
-	pSaleDetailsID	BIGINT,
+CREATE PROCEDURE spDelStockMutationDetails (
+	pStockMutationDetailsID	BIGINT,
 	pCurrentUser		VARCHAR(255)
 )
 StoredProcedure:BEGIN
@@ -23,9 +23,9 @@ StoredProcedure:BEGIN
 		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
 		ROLLBACK;
 		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spDelSaleDetails', pCurrentUser);
+		CALL spInsEventLog(@full_error, 'spDelStockMutationDetails', pCurrentUser);
         SELECT
-			pSaleDetailsID AS 'ID',
+			pStockMutationDetailsID AS 'ID',
 			'Terjadi kesalahan sistem!' AS 'Message',
 			@full_error AS 'MessageDetail',
 			1 AS 'FailedFlag',
@@ -37,17 +37,17 @@ StoredProcedure:BEGIN
 SET State = 1;
 
 		DELETE FROM
-			transaction_saledetails
+			transaction_stockmutationdetails
 		WHERE
-			SaleDetailsID = pSaleDetailsID;
+			StockMutationDetailsID = pStockMutationDetailsID;
 
     COMMIT;
     
 SET State = 2;
 
 		SELECT
-			pSaleDetailsID AS 'ID',
-			'Penjualan berhasil dihapus!' AS 'Message',
+			pStockMutationDetailsID AS 'ID',
+			'Mutasi Stok berhasil dihapus!' AS 'Message',
 			'' AS 'MessageDetail',
 			0 AS 'FailedFlag',
 			State AS 'State' ;
