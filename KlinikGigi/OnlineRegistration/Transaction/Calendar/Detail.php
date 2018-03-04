@@ -64,7 +64,7 @@
 					CreatedDate ASC";
 					
 		if (! $result = mysql_query($sql, $dbh)) {
-			$Message = "Terjadi Kesalahan Sistem";
+			$Message = "Something went wrong";
 			$MessageDetail = mysql_error();
 			$FailedFlag = 1;
 			echo returnstate($Message, $MessageDetail, $ScheduleDetails, $FailedFlag, $State);

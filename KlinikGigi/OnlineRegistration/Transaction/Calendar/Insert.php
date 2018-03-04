@@ -14,7 +14,7 @@
 		$State = 1;
 		mysql_query("START TRANSACTION", $dbh);
 		mysql_query("SET autocommit=0", $dbh);
-		$Message = "Data Berhasil Disimpan";
+		$Message = "Data has been saved!";
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		//echo $DetailID;		
@@ -88,7 +88,7 @@
 					AND DATE_FORMAT(ScheduledDate, '%Y-%m-%d') = DATE_FORMAT('".$ScheduledDate."', '%Y-%m-%d')";
 		
 		if (! $result = mysql_query($sql, $dbh)) {
-			$Message = "Terjadi Kesalahan Sistem";
+			$Message = "Something went wrong";
 			$MessageDetail = mysql_error();
 			$FailedFlag = 1;
 			echo returnstate($Message, $MessageDetail, $FailedFlag, $State);
@@ -99,7 +99,7 @@
 		$row = mysql_fetch_array($result);
 		
 		if($row['Valid'] == 1) {
-			$Message = "Pasien sudah terdaftar untuk tanggal yang dipilih!";
+			$Message = "Patient has been registered for this date!";
 			$MessageDetail = mysql_error();
 			$FailedFlag = 1;
 			echo returnstate($Message, $MessageDetail, $FailedFlag, $State);
@@ -130,7 +130,7 @@
 					)";
 					
 			if (! $result = mysql_query($sql, $dbh)) {
-				$Message = "Terjadi Kesalahan Sistem";
+				$Message = "Something went wrong";
 				$MessageDetail = mysql_error();
 				$FailedFlag = 1;
 				echo returnstate($Message, $MessageDetail, $FailedFlag, $State);

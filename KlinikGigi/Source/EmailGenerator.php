@@ -19,7 +19,9 @@
 	$mail->isHTML(true);                                  // Set email format to HTML
 	$mail->addReplyTo('noreply@imdentalspecialist.com', 'Information');
 	$monthName = array("Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember");
+	$monthName2 = array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
 	$dayName = array("Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jum'at", "Sabtu");
+	$dayName2 = array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
 
 	//$mail->addCC('cc@example.com');
 	//$mail->addBCC('bcc@example.com');
@@ -49,9 +51,11 @@
 	while ($row = mysql_fetch_array($result)) {
 		$MessageSent = $MessageBody;
 		$MessageSent = str_replace("[Day_Name]", $dayName[$row['DayCount']], $MessageSent);
+		$MessageSent = str_replace("[Day_Name2]", $dayName[$row['DayCount']], $MessageSent);
 		$MessageSent = str_replace("[ScheduledDate]", date("d", strtotime($row['ScheduledDate'])) . " " . $monthName[date("m", strtotime($row['ScheduledDate'])) - 1] . " " . date("Y", strtotime($row['ScheduledDate'])), $MessageSent);
+		$MessageSent = str_replace("[ScheduledDate2]", date("d", $monthName[date("m", strtotime($row['ScheduledDate'])) - 1] . " " . strtotime($row['ScheduledDate'])) . ", " . date("Y", strtotime($row['ScheduledDate'])), $MessageSent);
 		$mail->addAddress($row['Email'], $row['PatientName']);     // Add a recipient
-		$mail->Subject = 'Pengingat Pemeriksaan Gigi';
+		$mail->Subject = 'Dental Examination Reminder';
 		$mail->Body    = str_replace('[Patient_Name]', $row['PatientName'], $MessageSent);
 		//$mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 

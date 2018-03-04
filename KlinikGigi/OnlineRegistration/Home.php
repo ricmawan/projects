@@ -73,9 +73,9 @@
 		<div id="page-inner">
 			<img src="./assets/img/logo.png" style="width:50%;" />
 			<br />
-			<h1>Selamat datang, klik "Daftar" untuk menjadwalkan pemeriksaan gigi.
+			<h1>Welcome, please click "Schedule" to arrange your dental examination.
 			<br />
-			<button class="btn btn-primary" onclick="Schedule();" link="./Transaction/Calendar/"><i class="fa fa-list-alt "></i> Daftar</button>&nbsp;
+			<button class="btn btn-primary" onclick="Schedule();" link="./Transaction/Calendar/"><i class="fa fa-list-alt "></i> Schedule</button>&nbsp;
 		</div>
 		<script src="assets/js/jquery-1.10.2.js"></script>
 		<script src="assets/js/jquery-ui-1.10.3.custom.js"></script>

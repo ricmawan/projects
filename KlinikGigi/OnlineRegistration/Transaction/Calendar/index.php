@@ -15,12 +15,12 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						 <h5>Jadwal Periksa</h5>
+						 <h5>Examination Schedule</h5>
 					</div>
 					<div class="panel-body">
 						<div class="row col-md-12">
 							<div class="col-md-1 labelColumn" >
-								Cabang:
+								Location:
 							</div>
 							<div class="col-md-2" >
 								<select id="ddlBranch" name="ddlBranch" class="form-control-custom" onchange="reloadEvent();">
@@ -50,13 +50,13 @@
 					</div>
 				</div>
 			</div>
-			<div id="dialog-schedule" title="Pendaftaran Periksa Gigi" style="display: none;">
+			<div id="dialog-schedule" title="Registration" style="display: none;">
 				<form class="col-md-12" id="ScheduleForm" method="POST" action="" >
 					<input type="hidden" id="hdnStartDate" name="hdnStartDate" value=0 autofocus="autofocus" />
 					<input type="hidden" id="hdnDDLBranch" name="hdnDDLBranch" value=1 autofocus="autofocus" />
 					<div class="row" >
 						<div class="col-md-3 labelColumn" >
-							Tanggal:
+							Date:
 						</div>
 						<div class="col-md-5" >
 							<span style="font-weight: bold; font-size: 18px; color: red;" id="lblStartDate"></span>
@@ -70,19 +70,19 @@
 					<br />
 					<div class="row" >
 						<div class="col-md-3 labelColumn" >
-							Nama:
+							Name:
 						</div>
 						<div class="col-md-9">
-							<input type="text" placeholder="Nama" required id="txtPatientName" name="txtPatientName" class="form-control-custom" />
+							<input type="text" placeholder="Name" required id="txtPatientName" name="txtPatientName" class="form-control-custom" />
 						</div>
 					</div>
 					<br />
 					<div class="row" >
 						<div class="col-md-3 labelColumn" >
-							No HP:
+							Phone:
 						</div>
 						<div class="col-md-9">
-							<input type="text" placeholder="No HP" required id="txtPhone" name="txtPhone" class="form-control-custom" />
+							<input type="text" placeholder="Phone" required id="txtPhone" name="txtPhone" class="form-control-custom" />
 						</div>
 					</div>
 					<br />
@@ -101,7 +101,7 @@
 			<div id="dialog-confirm" title="Konfirmasi" style="display: none;" class="col-md-12" >
 				<div class="row col-md-12" >
 					<div class="col-md-3 labelColumn" >
-						Nama:
+						Name:
 					</div>
 					<div class="col-md-9">
 						<span id="lblPatientName" style="font-weight: bold; font-size: 15px; color: red;"></span>
@@ -109,7 +109,7 @@
 				</div>
 				<div class="row col-md-12" >
 					<div class="col-md-3 labelColumn" >
-						No HP:
+						Phone:
 					</div>
 					<div class="col-md-9">
 						<span id="lblPhoneNumber" style="font-weight: bold; font-size: 15px; color: red;"></span>
@@ -130,11 +130,11 @@
 				<table class="table table-striped table-bordered table-hover" style="width:auto;padding-right:17px;" id="datainput">
 					<thead style="background-color: black;color:white;height:25px;display:block;width:1085px;">
 						<td align="center" style="width:35px;">No</td>
-						<td align="center" style="width: 200px;" >Nama</td>
-						<td align="center" style="width: 200px;" >No HP</td>
+						<td align="center" style="width: 200px;" >Name</td>
+						<td align="center" style="width: 200px;" >Phone</td>
 						<td align="center" style="width: 250px;" >Email</td>
-						<td align="center" style="width: 200px;" >Jadwal</td>
-						<td align="center" style="width: 200px;" >Cabang</td>
+						<td align="center" style="width: 200px;" >Schedule</td>
+						<td align="center" style="width: 200px;" >Place</td>
 					</thead>
 					<tbody style="display:block;max-height:200px;height:100%;overflow-y:auto;" id="tableContent">
 					</tbody>
@@ -167,7 +167,7 @@
 					},
 					error: function(data) {
 						$("#loading").hide();
-						$.notify("Terjadi kesalahan sistem!", "error");
+						$.notify("Something went wrong!", "error");
 					}
 				});
 			}
@@ -182,7 +182,7 @@
 						$("#loading").hide();
 						if(data.FailedFlag == '0') {
 							if(data.ScheduleDetails == "") {
-								$.notify("Jadwal tidak ditemukan!", "error");
+								$.notify("Can't find schedule!", "error");
 							}
 							else {
 								$("#tableContent").html(data.ScheduleDetails);
@@ -212,7 +212,7 @@
 					},
 					error: function(data) {
 						$("#loading").hide();
-						$.notify("Terjadi kesalahan sistem!", "error");
+						$.notify("Something went wrong!", "error");
 					}
 				});
 			}
@@ -241,7 +241,7 @@
 					},
 					error: function(data) {
 						$("#loading").hide();
-						$.notify("Terjadi kesalahan sistem!", "error");
+						$.notify("Something went wrong!", "error");
 					}
 				});
 			}
@@ -272,7 +272,7 @@
 					},
 					error: function(data) {
 						$("#loading").hide();
-						$.notify("Terjadi kesalahan sistem!", "error");
+						$.notify("Something went wrong!", "error");
 					}
 				});
 			}
@@ -297,7 +297,7 @@
 						$(this).dialog("destroy");
 					},
 					buttons: {
-						"Simpan": function() {
+						"Save": function() {
 							//$(this).dialog("close");
 							$("#lblPatientName").html($("#txtPatientName").val());
 							$("#lblPhoneNumber").html($("#txtPhone").val());
@@ -369,7 +369,7 @@
 								}
 							}).dialog("open");
 						},
-						"Tutup": function() {
+						"Close": function() {
 							$(this).dialog("destroy");
 						}
 					}
