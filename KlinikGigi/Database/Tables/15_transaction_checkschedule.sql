@@ -5,7 +5,7 @@ CREATE TABLE transaction_checkschedule
 	CheckScheduleID		BIGINT PRIMARY KEY AUTO_INCREMENT,
 	MedicationID		BIGINT,
 	PatientID			BIGINT,
-	ScheduledDate		DATE,
+	ScheduledDate		DATETIME,
 	EmailStatus			TEXT,
 	EmailMessage		TEXT,
 	DeliveredDate		DATETIME,
