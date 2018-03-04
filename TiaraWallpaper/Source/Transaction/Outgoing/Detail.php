@@ -873,6 +873,7 @@
 						return false;
 					}
 					else {
+						$("#loading").show();
 						$.ajax({
 							url: "./Transaction/Outgoing/Insert.php",
 							type: "POST",
@@ -880,6 +881,7 @@
 							dataType: "json",
 							success: function(data) {
 								if(data.FailedFlag == '0') {
+									$("#loading").hide();
 									$.notify(data.Message, "success");
 									$("#hdnOutgoingID").val(data.ID);
 									$("#hdnIsEdit").val(1);
