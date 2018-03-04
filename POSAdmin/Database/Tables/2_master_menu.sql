@@ -121,6 +121,15 @@ VALUES
 	NULL,
 	0,
 	6
+),
+(
+	12,
+	3,
+	'Pemesanan',
+	'Transaction/Booking/',
+	NULL,
+	0,
+	7
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

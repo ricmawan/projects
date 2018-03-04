@@ -9,7 +9,7 @@
 	//kolom di table
 
 	$where = " 1=1 ";
-	$order_by = "MI.ItemID";
+	$order_by = "TS.SaleID";
 	$limit_s = 0;
 	$limit_l = 20;
 	
@@ -17,18 +17,14 @@
 	if (!empty($requestData['search']['value']))
 	{
 		$search = mysqli_real_escape_string($dbh, trim($requestData['search']['value']));
-		$where .= " AND ( MI.ItemCode LIKE '%".$search."%'";
-		$where .= " OR MI.ItemName LIKE '%".$search."%'";
-		$where .= " OR MI.RetailPrice LIKE '%".$search."%'";
-		$where .= " OR MI.Price1 LIKE '%".$search."%'";
-		$where .= " OR MI.Qty1 LIKE '%".$search."%'";
-		$where .= " OR MI.Price1 LIKE '%".$search."%'";
-		$where .= " OR MI.Qty2 LIKE '%".$search."%' )";
+		$where .= " AND ( TS.SaleNumber LIKE '%".$search."%'";
+		$where .= " OR DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
+		$where .= " OR MC.CustomerName LIKE '%".$search."%')";
 	}
-	$sql = "CALL spSelItem(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
+	$sql = "CALL spSelSale(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
 
 	if (! $result = mysqli_query($dbh, $sql)) {
-		logEvent(mysqli_error($dbh), '/Transaction/Sale/ItemList.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+		logEvent(mysqli_error($dbh), '/Transaction/saleReturn/TransactionList.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 		return 0;
 	}
 	$row = mysqli_fetch_array($result);
@@ -44,13 +40,10 @@
 		$row_array = array();
 		$RowNumber++;
 		//data yang dikirim ke table
-		$row_array[] = $row['ItemCode'];
-		$row_array[] = $row['ItemName'];
-		$row_array[] = number_format($row['RetailPrice'],0,".",",");
-		$row_array[] = number_format($row['Price1'],0,".",",");
-		$row_array[] = $row['Qty1'];
-		$row_array[] = number_format($row['Price2'],0,".",",");
-		$row_array[] = $row['Qty2'];
+		$row_array[] = $row['SaleNumber'];
+		$row_array[] = $row['TransactionDate'];
+		$row_array[] = $row['CustomerName'];
+		$row_array[] = number_format($row['Total'],0,".",",");
 		array_push($return_arr, $row_array);
 	}
 	

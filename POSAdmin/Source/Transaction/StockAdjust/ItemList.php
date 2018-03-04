@@ -18,17 +18,13 @@
 	{
 		$search = mysqli_real_escape_string($dbh, trim($requestData['search']['value']));
 		$where .= " AND ( MI.ItemCode LIKE '%".$search."%'";
-		$where .= " OR MI.ItemName LIKE '%".$search."%'";
 		$where .= " OR MI.RetailPrice LIKE '%".$search."%'";
-		$where .= " OR MI.Price1 LIKE '%".$search."%'";
-		$where .= " OR MI.Qty1 LIKE '%".$search."%'";
-		$where .= " OR MI.Price1 LIKE '%".$search."%'";
-		$where .= " OR MI.Qty2 LIKE '%".$search."%' )";
+		$where .= " OR MI.ItemName LIKE '%".$search."%' )";
 	}
 	$sql = "CALL spSelItem(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
 
 	if (! $result = mysqli_query($dbh, $sql)) {
-		logEvent(mysqli_error($dbh), '/Transaction/Sale/ItemList.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+		logEvent(mysqli_error($dbh), '/Transaction/StockMutation/ItemList.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 		return 0;
 	}
 	$row = mysqli_fetch_array($result);
@@ -47,10 +43,7 @@
 		$row_array[] = $row['ItemCode'];
 		$row_array[] = $row['ItemName'];
 		$row_array[] = number_format($row['RetailPrice'],0,".",",");
-		$row_array[] = number_format($row['Price1'],0,".",",");
-		$row_array[] = $row['Qty1'];
-		$row_array[] = number_format($row['Price2'],0,".",",");
-		$row_array[] = $row['Qty2'];
+		
 		array_push($return_arr, $row_array);
 	}
 	

@@ -5,12 +5,12 @@ Created Date: 12 January 2018
 Modified Date: 
 ===============================================================*/
 
-DROP PROCEDURE IF EXISTS spSelSaleDetails;
+DROP PROCEDURE IF EXISTS spSelStockAdjustDetails;
 
 DELIMITER $$
-CREATE PROCEDURE spSelSaleDetails (
-	pSaleID		BIGINT,
-    pCurrentUser	VARCHAR(255)
+CREATE PROCEDURE spSelStockAdjustDetails (
+	pStockAdjustID		BIGINT,
+    pCurrentUser		VARCHAR(255)
 )
 StoredProcedure:BEGIN
 
@@ -22,37 +22,33 @@ StoredProcedure:BEGIN
 		@MessageText = MESSAGE_TEXT, 
 		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
 		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelSaleDetails', pCurrentUser);
+		CALL spInsEventLog(@full_error, 'spSelStockAdjustDetails', pCurrentUser);
 	END;
 	
 SET State = 1;
 
 	SELECT
-		SD.SaleDetailsID,
-        SD.ItemID,
-        SD.BranchID,
-        MI.ItemCode,
+		SA.StockAdjustID,
+		SAD.StockAdjustDetailsID,
+		MI.ItemID,
+		SAD.BranchID,
+		CONCAT(MB.BranchCode, ' - ', MB.BranchName) BranchName,
+		MI.ItemCode,
         MI.ItemName,
-        SD.Quantity,
-        SD.BuyPrice,
-        SD.SalePrice,
-		SD.Discount,
-		MI.RetailPrice,
-        MI.Price1,
-        MI.Qty1,
-        MI.Price2,
-        MI.Qty2,
-		MI.Weight
+        SAD.Quantity,
+        SAD.AdjustedQuantity
 	FROM
-		transaction_saledetails SD
+		transaction_stockadjust SA
+		JOIN transaction_stockadjustdetails SAD
+			ON SA.StockAdjustID = SAD.StockAdjustID
         JOIN master_branch MB
-			ON MB.BranchID = SD.BranchID
+			ON MB.BranchID = SAD.BranchID
 		JOIN master_item MI
-			ON MI.ItemID = SD.ItemID
+			ON MI.ItemID = SAD.ItemID
 	WHERE
-		SD.SaleID = pSaleID
+		SA.StockAdjustID = pStockAdjustID
 	ORDER BY
-		SD.SaleDetailsID;
+		SAD.StockAdjustDetailsID;
         
 END;
 $$

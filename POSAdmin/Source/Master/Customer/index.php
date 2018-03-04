@@ -304,8 +304,7 @@
 
 			$(document).ready(function() {
 				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
-				    console.log("test");
-				    $(this).blur();
+					$(this).blur();
 				});
 				
 				$.fn.dataTable.ext.errMode = function(settings, techNote, message) { 
@@ -332,7 +331,7 @@
 				var counterCustomer = 0;
 				table = $("#grid-data").DataTable({
 								"keys": true,
-								"scrollY": "300px",
+								"scrollY": "330px",
 								"rowId": "CustomerID",
 								"scrollCollapse": true,
 								"order": [2, "asc"],

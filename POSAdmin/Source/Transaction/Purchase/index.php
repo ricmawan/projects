@@ -6,8 +6,8 @@
 	<head>
 		<style>
 			#divTableContent {
-				min-height: 360px;
-				max-height: 360px;
+				min-height: 330px;
+				max-height: 330px;
 				overflow-y: auto;
 			}
 		</style>
@@ -232,7 +232,7 @@
 						table.keys.disable();
 						table2 = $("#grid-transaction").DataTable({
 									"keys": true,
-									"scrollY": "295px",
+									"scrollY": "280px",
 									"scrollX": false,
 									"scrollCollapse": false,
 									"paging": false,
@@ -349,7 +349,7 @@
 						table2.destroy();
 					},
 					resizable: false,
-					height: 650,
+					height: 660,
 					width: 1280,
 					modal: false,
 					buttons: [
@@ -1032,7 +1032,6 @@
 
 			$(document).ready(function() {
 				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
-				    console.log("test");
 				    $(this).blur();
 				});
 				
@@ -1086,7 +1085,7 @@
 				var counterPurchase = 0;
 				table = $("#grid-data").DataTable({
 								"keys": true,
-								"scrollY": "300px",
+								"scrollY": "330px",
 								"rowId": "PurchaseID",
 								"scrollCollapse": true,
 								"order": [2, "asc"],

@@ -1,18 +1,18 @@
-DROP PROCEDURE IF EXISTS spInsSale;
+DROP PROCEDURE IF EXISTS spInsBooking;
 
 DELIMITER $$
-CREATE PROCEDURE spInsSale (
+CREATE PROCEDURE spInsBooking (
 	pID 				BIGINT,
-	pSaleNumber			VARCHAR(100),
+	pBookingNumber		VARCHAR(100),
 	pRetailFlag			BIT,
     pCustomerID			BIGINT,
 	pTransactionDate 	DATETIME,
-	pSaleDetailsID		BIGINT,
+	pBookingDetailsID	BIGINT,
     pBranchID			INT,
     pItemID				BIGINT,
 	pQuantity			DOUBLE,
     pBuyPrice			DOUBLE,
-    pSalePrice			DOUBLE,
+    pBookingPrice		DOUBLE,
 	pDiscount			DOUBLE,
 	pUserID				BIGINT,
     pCurrentUser		VARCHAR(255)
@@ -34,11 +34,11 @@ StoredProcedure:BEGIN
 		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
 		ROLLBACK;
 		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spInsSale', pCurrentUser);
+		CALL spInsEventLog(@full_error, 'spInsBooking', pCurrentUser);
 		SELECT
 			pID AS 'ID',
-            pSaleDetailsID AS 'SaleDetailsID',
-			pSaleNumber AS 'SaleNumber',
+            pBookingDetailsID AS 'BookingDetailsID',
+			pBookingNumber AS 'BookingNumber',
 			'Terjadi kesalahan sistem!' AS 'Message',
 			@full_error AS 'MessageDetail',
 			1 AS 'FailedFlag',
@@ -53,19 +53,19 @@ SET State = 1;
 
 		IF(pID = 0)	THEN /*Tambah baru*/
 			SELECT
-				CONCAT(RIGHT(CONCAT('00', pUserID), 2), DATE_FORMAT(NOW(), '%Y%m'), RIGHT(CONCAT('00000', (IFNULL(MAX(CAST(RIGHT(SaleNumber, 5) AS UNSIGNED)), 0) + 1)), 5))
+				CONCAT(RIGHT(CONCAT('00', pUserID), 2), DATE_FORMAT(NOW(), '%Y%m'), RIGHT(CONCAT('00000', (IFNULL(MAX(CAST(RIGHT(BookingNumber, 5) AS UNSIGNED)), 0) + 1)), 5))
 			FROM
-				transaction_sale TS
+				transaction_booking TS
 			WHERE
 				MONTH(TS.TransactionDate) = MONTH(NOW())
 				AND YEAR(TS.TransactionDate) = YEAR(NOW())
 			INTO 
-				pSaleNumber;
+				pBookingNumber;
 				
 SET State = 2;
-			INSERT INTO transaction_sale
+			INSERT INTO transaction_booking
 			(
-				SaleNumber,
+				BookingNumber,
 				RetailFlag,
 				CustomerID,
 				TransactionDate,
@@ -74,7 +74,7 @@ SET State = 2;
 			)
 			VALUES 
 			(
-				pSaleNumber,
+				pBookingNumber,
 				pRetailFlag,
 				pCustomerID,
 				pTransactionDate,
@@ -92,27 +92,27 @@ SET State = 3;
 		
 SET State = 4;
 			UPDATE
-				transaction_sale
+				transaction_booking
 			SET
 				customerID = pCustomerID,
 				TransactionDate = pTransactionDate,
 				ModifiedBy = pCurrentUser
 			WHERE
-				SaleID = pID;
+				BookingID = pID;
 				
 		END IF;
 		
 SET State = 5;
 		
-		IF(pSaleDetailsID = 0) THEN
-			INSERT INTO transaction_saledetails
+		IF(pBookingDetailsID = 0) THEN
+			INSERT INTO transaction_bookingdetails
 			(
-				SaleID,
+				BookingID,
 				ItemID,
 				BranchID,
 				Quantity,
 				BuyPrice,
-				SalePrice,
+				BookingPrice,
 				Discount,
 				CreatedDate,
 				CreatedBy
@@ -124,7 +124,7 @@ SET State = 5;
 				pBranchID,
 				pQuantity,
 				pBuyPrice,
-				pSalePrice,
+				pBookingPrice,
 				pDiscount,
 				NOW(),
 				pCurrentUser
@@ -135,24 +135,24 @@ SET State = 6;
 			SELECT
 				LAST_INSERT_ID()
 			INTO 
-				pSaleDetailsID;
+				pBookingDetailsID;
 		
 		ELSE
 				
 SET State = 7;
 			
 			UPDATE 
-				transaction_saledetails
+				transaction_bookingdetails
 			SET
 				ItemID = pItemID,
 				BranchID = pBranchID,
 				Quantity = pQuantity,
 				BuyPrice = pBuyPrice,
-				SalePrice = pSalePrice,
+				BookingPrice = pBookingPrice,
 				Discount = pDiscount,
 				ModifiedBy = pCurrentUser
 			WHERE
-				SaleDetailsID = pSaleDetailsID;
+				BookingDetailsID = pBookingDetailsID;
 			
 		END IF;
 		
@@ -160,8 +160,8 @@ SET State = 8;
 
 		SELECT
 			pID AS 'ID',
-			pSaleDetailsID AS 'SaleDetailsID',
-			pSaleNumber AS 'SaleNumber',
+			pBookingDetailsID AS 'BookingDetailsID',
+			pBookingNumber AS 'BookingNumber',
 			'Transaksi Berhasil Disimpan' AS 'Message',
 			'' AS 'MessageDetail',
 			0 AS 'FailedFlag',

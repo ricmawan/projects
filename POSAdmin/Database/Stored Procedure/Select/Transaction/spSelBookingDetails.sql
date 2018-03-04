@@ -1,15 +1,15 @@
 /*=============================================================
 Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select sale details by SaleID
+Description: Stored Procedure for select booking details by BookingID
 Created Date: 12 January 2018
 Modified Date: 
 ===============================================================*/
 
-DROP PROCEDURE IF EXISTS spSelSaleDetails;
+DROP PROCEDURE IF EXISTS spSelBookingDetails;
 
 DELIMITER $$
-CREATE PROCEDURE spSelSaleDetails (
-	pSaleID		BIGINT,
+CREATE PROCEDURE spSelBookingDetails (
+	pBookingID		BIGINT,
     pCurrentUser	VARCHAR(255)
 )
 StoredProcedure:BEGIN
@@ -22,21 +22,21 @@ StoredProcedure:BEGIN
 		@MessageText = MESSAGE_TEXT, 
 		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
 		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelSaleDetails', pCurrentUser);
+		CALL spInsEventLog(@full_error, 'spSelBookingDetails', pCurrentUser);
 	END;
 	
 SET State = 1;
 
 	SELECT
-		SD.SaleDetailsID,
-        SD.ItemID,
-        SD.BranchID,
+		BD.BookingDetailsID,
+        BD.ItemID,
+        BD.BranchID,
         MI.ItemCode,
         MI.ItemName,
-        SD.Quantity,
-        SD.BuyPrice,
-        SD.SalePrice,
-		SD.Discount,
+        BD.Quantity,
+        BD.BuyPrice,
+        BD.BookingPrice,
+		BD.Discount,
 		MI.RetailPrice,
         MI.Price1,
         MI.Qty1,
@@ -44,15 +44,15 @@ SET State = 1;
         MI.Qty2,
 		MI.Weight
 	FROM
-		transaction_saledetails SD
+		transaction_bookingdetails SD
         JOIN master_branch MB
-			ON MB.BranchID = SD.BranchID
+			ON MB.BranchID = BD.BranchID
 		JOIN master_item MI
-			ON MI.ItemID = SD.ItemID
+			ON MI.ItemID = BD.ItemID
 	WHERE
-		SD.SaleID = pSaleID
+		BD.BookingID = pBookingID
 	ORDER BY
-		SD.SaleDetailsID;
+		BD.BookingDetailsID;
         
 END;
 $$

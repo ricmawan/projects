@@ -1,21 +1,16 @@
-DROP PROCEDURE IF EXISTS spInsSale;
+DROP PROCEDURE IF EXISTS spInsStockMutation;
 
 DELIMITER $$
-CREATE PROCEDURE spInsSale (
-	pID 				BIGINT,
-	pSaleNumber			VARCHAR(100),
-	pRetailFlag			BIT,
-    pCustomerID			BIGINT,
-	pTransactionDate 	DATETIME,
-	pSaleDetailsID		BIGINT,
-    pBranchID			INT,
-    pItemID				BIGINT,
-	pQuantity			DOUBLE,
-    pBuyPrice			DOUBLE,
-    pSalePrice			DOUBLE,
-	pDiscount			DOUBLE,
-	pUserID				BIGINT,
-    pCurrentUser		VARCHAR(255)
+CREATE PROCEDURE spInsStockMutation (
+	pID 						BIGINT,
+	pSourceID					INT,
+	pDestinationID				INT,
+	pTransactionDate 			DATETIME,
+	pStockMutationDetailsID		BIGINT,
+    pItemID						BIGINT,
+	pQuantity					DOUBLE,
+    pUserID						BIGINT,
+    pCurrentUser				VARCHAR(255)
 )
 StoredProcedure:BEGIN
 
@@ -34,11 +29,10 @@ StoredProcedure:BEGIN
 		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
 		ROLLBACK;
 		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spInsSale', pCurrentUser);
+		CALL spInsEventLog(@full_error, 'spInsStockMutation', pCurrentUser);
 		SELECT
 			pID AS 'ID',
-            pSaleDetailsID AS 'SaleDetailsID',
-			pSaleNumber AS 'SaleNumber',
+            pStockMutationDetailsID AS 'StockMutationDetailsID',
 			'Terjadi kesalahan sistem!' AS 'Message',
 			@full_error AS 'MessageDetail',
 			1 AS 'FailedFlag',
@@ -52,31 +46,14 @@ StoredProcedure:BEGIN
 SET State = 1;
 
 		IF(pID = 0)	THEN /*Tambah baru*/
-			SELECT
-				CONCAT(RIGHT(CONCAT('00', pUserID), 2), DATE_FORMAT(NOW(), '%Y%m'), RIGHT(CONCAT('00000', (IFNULL(MAX(CAST(RIGHT(SaleNumber, 5) AS UNSIGNED)), 0) + 1)), 5))
-			FROM
-				transaction_sale TS
-			WHERE
-				MONTH(TS.TransactionDate) = MONTH(NOW())
-				AND YEAR(TS.TransactionDate) = YEAR(NOW())
-			INTO 
-				pSaleNumber;
-				
-SET State = 2;
-			INSERT INTO transaction_sale
+			INSERT INTO transaction_stockmutation
 			(
-				SaleNumber,
-				RetailFlag,
-				CustomerID,
 				TransactionDate,
 				CreatedDate,
 				CreatedBy
 			)
 			VALUES 
 			(
-				pSaleNumber,
-				pRetailFlag,
-				pCustomerID,
 				pTransactionDate,
 				NOW(),
 				pCurrentUser
@@ -92,40 +69,35 @@ SET State = 3;
 		
 SET State = 4;
 			UPDATE
-				transaction_sale
+				transaction_stockmutation
 			SET
-				customerID = pCustomerID,
 				TransactionDate = pTransactionDate,
 				ModifiedBy = pCurrentUser
 			WHERE
-				SaleID = pID;
+				StockMutationID = pID;
 				
 		END IF;
 		
 SET State = 5;
 		
-		IF(pSaleDetailsID = 0) THEN
-			INSERT INTO transaction_saledetails
+		IF(pStockMutationDetailsID = 0) THEN
+			INSERT INTO transaction_stockmutationdetails
 			(
-				SaleID,
+				StockMutationID,
+				SourceID,
+				DestinationID,
 				ItemID,
-				BranchID,
 				Quantity,
-				BuyPrice,
-				SalePrice,
-				Discount,
 				CreatedDate,
 				CreatedBy
 			)
 			VALUES
 			(
 				pID,
+				pSourceID,
+				pDestinationID,
 				pItemID,
-				pBranchID,
 				pQuantity,
-				pBuyPrice,
-				pSalePrice,
-				pDiscount,
 				NOW(),
 				pCurrentUser
 			);
@@ -135,24 +107,22 @@ SET State = 6;
 			SELECT
 				LAST_INSERT_ID()
 			INTO 
-				pSaleDetailsID;
+				pStockMutationDetailsID;
 		
 		ELSE
 				
 SET State = 7;
 			
 			UPDATE 
-				transaction_saledetails
+				transaction_stockmutationdetails
 			SET
 				ItemID = pItemID,
-				BranchID = pBranchID,
+				SourceID = pSourceID,
+				DestinationID = pDestinationID,
 				Quantity = pQuantity,
-				BuyPrice = pBuyPrice,
-				SalePrice = pSalePrice,
-				Discount = pDiscount,
 				ModifiedBy = pCurrentUser
 			WHERE
-				SaleDetailsID = pSaleDetailsID;
+				StockMutationDetailsID = pStockMutationDetailsID;
 			
 		END IF;
 		
@@ -160,8 +130,7 @@ SET State = 8;
 
 		SELECT
 			pID AS 'ID',
-			pSaleDetailsID AS 'SaleDetailsID',
-			pSaleNumber AS 'SaleNumber',
+			pStockMutationDetailsID AS 'StockMutationDetailsID',
 			'Transaksi Berhasil Disimpan' AS 'Message',
 			'' AS 'MessageDetail',
 			0 AS 'FailedFlag',

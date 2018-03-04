@@ -7,28 +7,35 @@
 
 	$requestData= $_REQUEST;
 	//kolom di table
+	$columns = array(
+					0 => "BookingID", //unorderable
+					1 => "RowNumber", //unorderable
+					2 => "TB.BookingNumber",
+					3 => "TB.TransactionDate",
+					4 => "MC.CustomerName",
+					5 => "TSD.Total"
+				);
 
 	$where = " 1=1 ";
-	$order_by = "MI.ItemID";
-	$limit_s = 0;
-	$limit_l = 20;
+	$order_by = "TB.BookingID";
+	$limit_s = $requestData['start'];
+	$limit_l = $requestData['length'];
 	
+	//Handles Sort querystring sent from Bootgrid
+	$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
+	$order_by .= ", TB.BookingID ASC";
 	//Handles search querystring sent from Bootgrid
 	if (!empty($requestData['search']['value']))
 	{
 		$search = mysqli_real_escape_string($dbh, trim($requestData['search']['value']));
-		$where .= " AND ( MI.ItemCode LIKE '%".$search."%'";
-		$where .= " OR MI.ItemName LIKE '%".$search."%'";
-		$where .= " OR MI.RetailPrice LIKE '%".$search."%'";
-		$where .= " OR MI.Price1 LIKE '%".$search."%'";
-		$where .= " OR MI.Qty1 LIKE '%".$search."%'";
-		$where .= " OR MI.Price1 LIKE '%".$search."%'";
-		$where .= " OR MI.Qty2 LIKE '%".$search."%' )";
+		$where .= " AND ( TB.BookingNumber LIKE '%".$search."%'";
+		$where .= " OR DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
+		$where .= " OR MC.CustomerName LIKE '%".$search."%' )";
 	}
-	$sql = "CALL spSelItem(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
+	$sql = "CALL spSelBooking(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
 
 	if (! $result = mysqli_query($dbh, $sql)) {
-		logEvent(mysqli_error($dbh), '/Transaction/Sale/ItemList.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+		logEvent(mysqli_error($dbh), '/Transaction/Booking/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 		return 0;
 	}
 	$row = mysqli_fetch_array($result);
@@ -44,13 +51,17 @@
 		$row_array = array();
 		$RowNumber++;
 		//data yang dikirim ke table
-		$row_array[] = $row['ItemCode'];
-		$row_array[] = $row['ItemName'];
-		$row_array[] = number_format($row['RetailPrice'],0,".",",");
-		$row_array[] = number_format($row['Price1'],0,".",",");
-		$row_array[] = $row['Qty1'];
-		$row_array[] = number_format($row['Price2'],0,".",",");
-		$row_array[] = $row['Qty2'];
+		$row_array[] = "<input name='select' type='checkbox' value='".$row['BookingID']."^".$row['BookingNumber']."' />";
+		$row_array[] = $RowNumber;
+		$row_array[] = $row['BookingNumber'];
+		$row_array[] = $row['TransactionDate'];
+		$row_array[] = $row['CustomerName'];
+		$row_array[] = number_format($row['Total'],0,".",",");
+		$row_array[] = $row['BookingID'];
+		$row_array[] = $row['CustomerID'];
+		$row_array[] = $row['PlainTransactionDate'];
+		$row_array[] = $row['RetailFlag'];
+		$row_array[] = number_format($row['Weight'],2,".",",");
 		array_push($return_arr, $row_array);
 	}
 	
