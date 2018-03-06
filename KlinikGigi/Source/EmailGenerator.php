@@ -51,9 +51,9 @@
 	while ($row = mysql_fetch_array($result)) {
 		$MessageSent = $MessageBody;
 		$MessageSent = str_replace("[Day_Name]", $dayName[$row['DayCount']], $MessageSent);
-		$MessageSent = str_replace("[Day_Name2]", $dayName[$row['DayCount']], $MessageSent);
+		$MessageSent = str_replace("[Day_Name2]", $dayName2[$row['DayCount']], $MessageSent);
 		$MessageSent = str_replace("[ScheduledDate]", date("d", strtotime($row['ScheduledDate'])) . " " . $monthName[date("m", strtotime($row['ScheduledDate'])) - 1] . " " . date("Y", strtotime($row['ScheduledDate'])), $MessageSent);
-		$MessageSent = str_replace("[ScheduledDate2]", date("d", $monthName[date("m", strtotime($row['ScheduledDate'])) - 1] . " " . strtotime($row['ScheduledDate'])) . ", " . date("Y", strtotime($row['ScheduledDate'])), $MessageSent);
+		$MessageSent = str_replace("[ScheduledDate2]", $monthName2[date("m", strtotime($row['ScheduledDate'])) - 1] . " " . date("d", strtotime($row['ScheduledDate'])) . ", " . date("Y", strtotime($row['ScheduledDate'])), $MessageSent);
 		$mail->addAddress($row['Email'], $row['PatientName']);     // Add a recipient
 		$mail->Subject = 'Dental Examination Reminder';
 		$mail->Body    = str_replace('[Patient_Name]', $row['PatientName'], $MessageSent);
@@ -77,6 +77,7 @@
 		if (! $result2 = mysql_query($sql2, $dbh)) {
 			echo mysql_error();
 		}
+		$mail->clearAddresses();
 	}
 	
 	$sql = "SELECT
@@ -99,9 +100,11 @@
 	while ($row = mysql_fetch_array($result)) {
 		$MessageSent = $MessageBody;
 		$MessageSent = str_replace("[Day_Name]", $dayName[$row['DayCount']], $MessageSent);
+		$MessageSent = str_replace("[Day_Name2]", $dayName2[$row['DayCount']], $MessageSent);
 		$MessageSent = str_replace("[ScheduledDate]", date("d", strtotime($row['ScheduledDate'])) . " " . $monthName[date("m", strtotime($row['ScheduledDate'])) - 1] . " " . date("Y", strtotime($row['ScheduledDate'])), $MessageSent);
+		$MessageSent = str_replace("[ScheduledDate2]", $monthName2[date("m", strtotime($row['ScheduledDate'])) - 1] . " " . date("d", strtotime($row['ScheduledDate'])) . ", " . date("Y", strtotime($row['ScheduledDate'])), $MessageSent);
 		$mail->addAddress($row['Email'], $row['PatientName']);     // Add a recipient
-		$mail->Subject = 'Pengingat Pemeriksaan Gigi';
+		$mail->Subject = 'Dental Examination Reminder';
 		$mail->Body    = str_replace('[Patient_Name]', $row['PatientName'], $MessageSent);
 		//$mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 	
@@ -123,5 +126,6 @@
 		if (! $result2 = mysql_query($sql2, $dbh)) {
 			echo mysql_error();
 		}
+		$mail->clearAddresses();
 	}
 ?>
