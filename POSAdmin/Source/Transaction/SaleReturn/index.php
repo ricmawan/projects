@@ -6,8 +6,8 @@
 	<head>
 		<style>
 			#divTableContent {
-				min-height: 360px;
-				max-height: 360px;
+				min-height: 380px;
+				max-height: 380px;
 				overflow-y: auto;
 			}
 
@@ -162,7 +162,7 @@
 						table.keys.disable();
 						table2 = $("#grid-transaction").DataTable({
 									"keys": false,
-									"scrollY": "310px",
+									"scrollY": "330px",
 									"scrollX": false,
 									"scrollCollapse": false,
 									"paging": false,
@@ -222,7 +222,7 @@
 						table2.destroy();
 					},
 					resizable: false,
-					height: 610,
+					height: 640,
 					width: 1280,
 					modal: false,
 					buttons: [

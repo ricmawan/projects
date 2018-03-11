@@ -54,6 +54,7 @@ SET State = 1;
 				SR.SaleID,
 				SRD.ItemID,
 				SRD.BranchID,
+				SRD.SaleDetailsID,
 				SUM(SRD.Quantity) Quantity
 			FROM
 				transaction_salereturn SR
@@ -62,11 +63,13 @@ SET State = 1;
 			GROUP BY
 				SR.SaleID,
 				SRD.ItemID,
-				SRD.BranchID
+				SRD.BranchID,
+				SRD.SaleDetailsID
 		)TSR
 			ON TSR.SaleID = TS.SaleID
 			AND MI.ItemID = TSR.ItemID
 			AND TSR.BranchID = SD.BranchID
+			AND TSR.SaleDetailsID = SD.SaleDetailsID
 	WHERE
 		TRIM(TS.SaleNumber) = TRIM(pSaleNumber)
 	ORDER BY

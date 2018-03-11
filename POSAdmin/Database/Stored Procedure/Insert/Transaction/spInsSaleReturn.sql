@@ -97,6 +97,7 @@ SET State = 5;
 									Quantity,
 									BuyPrice,
 									SalePrice,
+									SaleDetailsID,
 									CreatedDate,
 									CreatedBy
 								)

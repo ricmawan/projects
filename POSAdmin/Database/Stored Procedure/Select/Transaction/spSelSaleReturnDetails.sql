@@ -31,6 +31,7 @@ SET State = 1;
 		TSR.SaleID,
 		TSR.SaleReturnID,
 		TSRD.SaleReturnDetailsID,
+		TSRD.SaleDetailsID,
         TSRD.ItemID,
         TSRD.BranchID,
         MI.ItemCode,
@@ -71,6 +72,7 @@ SET State = 1;
 				SR.SaleID,
 				SRD.ItemID,
 				SRD.BranchID,
+				SRD.SaleDetailsID,
 				SUM(SRD.Quantity) Quantity
 			FROM
 				transaction_salereturn SR
@@ -79,11 +81,13 @@ SET State = 1;
 			GROUP BY
 				SR.SaleID,
 				SRD.ItemID,
-				SRD.BranchID
+				SRD.BranchID,
+				SRD.SaleDetailsID
 		)SR
 			ON TSR.SaleID = SR.SaleID
 			AND MI.ItemID = SR.ItemID
 			AND SR.BranchID = TSRD.BranchID
+			AND TSRD.SaleDetailsID = SR.SaleDetailsID
 
 	WHERE
 		TSR.SaleReturnID = pSaleReturnID

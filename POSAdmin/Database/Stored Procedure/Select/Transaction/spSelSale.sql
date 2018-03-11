@@ -53,7 +53,8 @@ SET @query = CONCAT("SELECT
                         MC.CustomerName,
 						IFNULL(TSD.Total, 0) Total,
 						IFNULL(TSD.Weight, 0) Weight,
-						TS.RetailFlag
+						TS.RetailFlag,
+						TS.Payment
 					FROM
 						transaction_sale TS
                         JOIN master_customer MC

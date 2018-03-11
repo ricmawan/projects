@@ -62,6 +62,7 @@
 						<input id="hdnItemID" name="hdnItemID" type="hidden" value=0 />
 						<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
 						<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
+						<input id="hdnPayment" name="hdnPayment" type="hidden" />
 					</div>
 					<div class="col-md-2">
 						<input id="txtSaleNumber" name="txtSaleNumber" type="text" tabindex=5 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="No. Invoice" readonly />
@@ -153,6 +154,7 @@
 									<th>Price2</th>
 									<th>Qty2</th>
 									<th>Weight</th>
+									<th>Retail Price</th>
 								</tr>
 							</thead>
 						</table>
@@ -189,6 +191,38 @@
 					</table>
 				</div>
 			</div>
+		</div>
+		<div id="finish-dialog" title="Transaksi Selesai" style="display: none;">
+			<div class="row col-md-12" >
+				<div class="col-md-4 labelColumn">
+					Total :
+				</div>
+				<div class="col-md-8">
+					<input id="txtTotal" name="txtTotal" type="text" class="form-control-custom text-right" value="0" autocomplete=off placeholder="Total" readonly />
+				</div>
+			</div>
+			<br />
+			<div class="row col-md-12" >
+				<div class="col-md-4 labelColumn">
+					Bayar :
+				</div>
+				<div class="col-md-8">
+					<input id="txtPayment" name="txtPayment" type="text" tabindex=14 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" onchange="Change();" />
+				</div>
+			</div>
+			<br />
+			<div class="row col-md-12" >
+				<div class="col-md-4 labelColumn">
+					Kembali :
+				</div>
+				<div class="col-md-8">
+					<input id="txtChange" name="txtChange" type="text" class="form-control-custom text-right" value="0" readonly />
+				</div>
+			</div>
+			<br />
+			<button class="btn btn-primary btn-block" tabindex=15 onclick="printInvoice();" >Cetak Nota</button>
+			<br />
+			<button class="btn btn-danger btn-block" tabindex=16 onclick="printShipment();" >Cetak Surat Jalan</button>
 		</div>
 		<script>
 			var table;
@@ -236,6 +270,7 @@
 					$("#txtTransactionDate").datepicker("setDate", new Date(Data[8]));
 					getSaleDetails(Data[6]);
 					$("#lblWeight").html(Data[10]);
+					$("#hdnPayment").val(Data[11]);
 				}
 				else $("#FormData").attr("title", "Tambah Penjualan Eceran");
 				var index = table.cell({ focused: true }).index();
@@ -263,6 +298,7 @@
 										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "visible": false },
 										{ "visible": false },
 										{ "visible": false },
 										{ "visible": false },
@@ -609,6 +645,7 @@
 					var discount = $("#txtDiscount").val();
 					var branchID = $("#hdnBranchID").val();
 					var weight = $("#hdnWeight").val();
+					var retailPrice = $("#hdnRetailPrice").val();
 					$("#txtDiscount").blur();
 					var PassValidate = 1;
 					var FirstFocus = 0;
@@ -657,7 +694,8 @@
 											qty1,
 											price2,
 											qty2,
-											weight
+											weight,
+											retailPrice
 										]).draw();
 										
 										$("#toggle-branch-" + data.SaleDetailsID).toggles({
@@ -695,7 +733,8 @@
 											qty1,
 											price2,
 											qty2,
-											weight
+											weight,
+											retailPrice
 										]).draw();
 										
 										$("#toggle-branch-" + data.SaleDetailsID).toggles({
@@ -733,6 +772,7 @@
 									$("#hdnSaleDetailsID").val(0);
 									$("#hdnItemID").val(0);
 									$("#hdnWeight").val(0);
+									$("#hdnRetailPrice").val(0);
 									tableWidthAdjust();
 									Calculate();
 								}
@@ -1045,6 +1085,8 @@
 				$('#toggle-retail').toggles(true);
 				$("#lblTotal").html("0");
 				$("#lblWeight").html("0");
+				$("#hdnPayment").html("0");
+				$("#hdnRetailPrice").val(0);
 				table2.clear().draw();
 			}
 			
@@ -1190,7 +1232,7 @@
 					buttons: [
 					{
 						text: "Tutup",
-						tabindex: 15,
+						tabindex: 13,
 						id: "btnCancelPickItem",
 						click: function() {
 							$(this).dialog("destroy");
@@ -1201,6 +1243,129 @@
 						}
 					}]
 				}).dialog("open");
+			}
+
+			function finish() {
+				if($("#hdnSaleID").val() != 0) {
+					$("#finish-dialog").dialog({
+						autoOpen: false,
+						open: function() {
+							table.keys.disable();
+							table2.keys.disable();
+							var Total = $("#lblTotal").html().replace(/\,/g, "");
+							var Payment = $("#hdnPayment").val();
+							if(parseFloat(Payment) != 0) {
+								var Change = parseFloat(Payment) - parseFloat(Total);
+								$("#txtChange").val(returnRupiah(Change.toString()));
+							}
+							$("#txtTotal").val($("#lblTotal").html());
+							$("#txtPayment").val(returnRupiah(Payment.toString()));
+							$("#txtPayment").focus();
+						},
+						show: {
+							effect: "fade",
+							duration: 500
+						},
+						hide: {
+							effect: "fade",
+							duration: 500
+						},
+						close: function() {
+							$(this).dialog("destroy");
+							table.keys.enable();
+							table2.keys.enable();
+						},
+						resizable: false,
+						height: 320,
+						width: 360,
+						modal: true,
+						buttons: [
+						{
+							text: "Tutup",
+							tabindex: 17,
+							id: "btnCancelPickItem",
+							click: function() {
+								$(this).dialog("destroy");
+								table.keys.enable();
+								table2.keys.enable();
+								return false;
+							}
+						}]
+					}).dialog("open");
+				}
+			}
+
+			function Change() {
+				var Total = $("#txtTotal").val().replace(/\,/g, "");
+				var Payment = $("#txtPayment").val().replace(/\,/g, "");
+				if(parseFloat(Payment) == 0) {
+					$("#txtPayment").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+					setTimeout(function() {
+						$("#txtPayment").focus();
+					}, 0);
+				}
+				else {
+					if(parseFloat(Total) > parseFloat(Payment)) {
+						$("#txtPayment").notify("Pembayaran Kurang!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+						setTimeout(function() {
+							$("#txtPayment").focus();
+						}, 0);
+					}
+					else {
+						var saleID = $("#hdnSaleID").val();
+						$("#loading").show();
+						$.ajax({
+							url: "./Transaction/Sale/UpdatePayment.php",
+							type: "POST",
+							data: { SaleID : saleID, Payment : Payment },
+							dataType: "json",
+							success: function(data) {
+								if(data.FailedFlag == '0') {
+									$("#loading").hide();
+								}
+								else {
+									$("#loading").hide();
+									var counter = 0;
+									Lobibox.alert("error",
+									{
+										msg: data.ErrorMessage,
+										width: 480,
+										beforeClose: function() {
+											if(counter == 0) {
+												setTimeout(function() {
+													$("#txtItemCode").focus();
+												}, 0);
+												counter = 1;
+											}
+										}
+									});
+									return 0;
+								}
+							},
+							error: function(jqXHR, textStatus, errorThrown) {
+								$("#loading").hide();
+								var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+								LogEvent(errorMessage, "/Transaction/Sale/index.php");
+								Lobibox.alert("error",
+								{
+									msg: errorMessage,
+									width: 480
+								});
+								return 0;
+							}
+						});
+						var Change = parseFloat(Payment) - parseFloat(Total);
+						$("#txtChange").val(returnRupiah(Change.toString()));
+					}
+				}
+			}
+
+			function printInvoice() {
+				alert("print invoice")
+			}
+
+			function printShipment() {
+				alert("print shipment")
 			}
 
 			$(document).ready(function() {
@@ -1296,7 +1461,8 @@
 									{ className: "dt-head-center" },
 									{ className: "dt-head-center" },
 									{ className: "dt-head-center" },
-									{ "orderable": false, className: "dt-head-center dt-body-right" }
+									{ "orderable": false, className: "dt-head-center dt-body-right" },
+									{ "visible": false }
 								],
 								"processing": true,
 								"serverSide": true,
@@ -1388,14 +1554,14 @@
 				var counterKey = 0;
 				$(document).on("keydown", function (evt) {
 					var index = table.cell({ focused: true }).index();
-					if (evt.keyCode == 46 && $("#hdnDeleteFlag").val() == "1" && typeof index == 'undefined' && $("#FormData").css("display") == "none") { //delete button
+					if (evt.keyCode == 46 && $("#hdnDeleteFlag").val() == "1" && typeof index == 'undefined' && $("#FormData").css("display") == "none" && $(".lobibox").css("display") != "block") { //delete button
 						evt.preventDefault();
 						if(counterKey == 0) {
 							fnDeleteData();
 							counterKey = 1;
 						}
 					}
-					else if(evt.keyCode == 123 && $("#itemList-dialog").css("display") == "none" && $("#FormData").css("display") == "block") {
+					else if(evt.keyCode == 123 && $("#itemList-dialog").css("display") == "none" && $("#finish-dialog").css("display") == "none" && $("#FormData").css("display") == "block"  && $(".lobibox").css("display") != "block") {
 						evt.preventDefault();
 						if(counterKey == 0) {
 							itemList();
@@ -1404,6 +1570,13 @@
 					}
 					else if(evt.keyCode == 123) {
 						evt.preventDefault();
+					}
+					else if(evt.keyCode == 121 && $("#itemList-dialog").css("display") == "none"  && $("#finish-dialog").css("display") == "none" && $("#FormData").css("display") == "block"  && $(".lobibox").css("display") != "block") {
+						evt.preventDefault();
+						if(counterKey == 0) {
+							finish();
+							counterKey = 1;
+						}
 					}
 					else if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0 && $("#FormData").css("display") == "none" && $("#delete-confirm").css("display") == "none") {
 						$("#grid-data_wrapper").find("input[type='search']").focus();

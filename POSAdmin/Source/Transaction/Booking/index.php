@@ -153,6 +153,7 @@
 									<th>Price2</th>
 									<th>Qty2</th>
 									<th>Weight</th>
+									<th>Retail Price</th>
 								</tr>
 							</thead>
 						</table>
@@ -263,6 +264,7 @@
 										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "visible": false },
 										{ "visible": false },
 										{ "visible": false },
 										{ "visible": false },
@@ -609,6 +611,7 @@
 					var discount = $("#txtDiscount").val();
 					var branchID = $("#hdnBranchID").val();
 					var weight = $("#hdnWeight").val();
+					var retailPrice = $("#hdnRetailPrice").val()
 					$("#txtDiscount").blur();
 					var PassValidate = 1;
 					var FirstFocus = 0;
@@ -657,7 +660,8 @@
 											qty1,
 											price2,
 											qty2,
-											weight
+											weight,
+											retailPrice
 										]).draw();
 										
 										$("#toggle-branch-" + data.BookingDetailsID).toggles({
@@ -695,7 +699,8 @@
 											qty1,
 											price2,
 											qty2,
-											weight
+											weight,
+											retailPrice
 										]).draw();
 										
 										$("#toggle-branch-" + data.BookingDetailsID).toggles({
@@ -733,6 +738,7 @@
 									$("#hdnBookingDetailsID").val(0);
 									$("#hdnItemID").val(0);
 									$("#hdnWeight").val(0);
+									$("#hdnRetailPrice").val(0);
 									tableWidthAdjust();
 									Calculate();
 								}
@@ -1045,6 +1051,7 @@
 				$('#toggle-retail').toggles(true);
 				$("#lblTotal").html("0");
 				$("#lblWeight").html("0");
+				$("#hdnRetailPrice").val(0);
 				table2.clear().draw();
 			}
 			

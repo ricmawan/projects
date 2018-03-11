@@ -7,6 +7,7 @@ CREATE TABLE transaction_sale
 	RetailFlag		BIT(1) NOT NULL,
 	CustomerID 		BIGINT,
 	TransactionDate DATETIME NOT NULL,
+	Payment			DOUBLE,
 	Remarks			TEXT,
 	CreatedDate 	DATETIME NOT NULL,
 	CreatedBy 		VARCHAR(255) NOT NULL,

@@ -130,6 +130,60 @@ VALUES
 	NULL,
 	0,
 	7
+),
+(
+	13,
+	4,
+	'Stok',
+	'Report/Stock/',
+	NULL,
+	1,
+	1
+),
+(
+	14,
+	4,
+	'Detail Stok',
+	'Report/StockDetails/',
+	NULL,
+	1,
+	2
+),
+(
+	15,
+	4,
+	'Penjualan',
+	'Report/Sale/',
+	NULL,
+	1,
+	3
+),
+(
+	16,
+	4,
+	'Pembelian',
+	'Report/Purchase/',
+	NULL,
+	1,
+	4
+),
+(
+	17,
+	4,
+	'Pendapatan',
+	'Report/Income/',
+	NULL,
+	1,
+	5
+),
+(
+	18,
+	4,
+	'Omset Pelanggan',
+	'Report/CustomerPurchase/',
+	NULL,
+	1,
+	6
 );
 
 CREATE UNIQUE INDEX MENU_INDEX
