@@ -61,10 +61,13 @@
 										<a href='#' class='menu' link='Transaction/Sale/'><i class='fa fa-cart-plus fa-2'></i> Penjualan</a>
 									</li>
 									<li class='dropdown'>
-										<a href='#' class='menu' link='Transaction/SaleReturn/'><i class='fa fa-sign-out fa-2'></i> Retur Penjualan</a>
+										<a href='#' class='menu' link='Transaction/SaleReturn/'><i class='fa fa-undo fa-2'></i> Retur Penjualan</a>
 									</li>
 									<li class='dropdown'>
-										<a href='#' class='menu' link='Transaction/Booking/'><i class='fa fa-sign-out fa-2'></i> Pemesanan</a>
+										<a href='#' class='menu' link='Transaction/Booking/'><i class='fa fa-hourglass-start fa-2'></i> Pemesanan</a>
+									</li>
+									<li class='dropdown'>
+										<a href='#' class='menu' link='Transaction/Payment/'><i class='fa fa-dollar fa-2'></i> Pembayaran & Pengambilan</a>
 									</li>
 								</ul>
 							</nav>
