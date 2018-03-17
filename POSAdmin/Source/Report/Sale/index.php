@@ -10,32 +10,10 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading" style="padding: 1px 15px;">
-						 <h5>Stok</h5>
+						 <h5>Penjualan</h5>
 					</div>
 					<div class="panel-body">
 						<div class="row">
-							<div class="col-md-1 labelColumn">
-								Kategori:
-							</div>
-							<div class="col-md-3">
-								<div class="ui-widget" style="width: 100%;">
-									<select id="ddlCategory" name="ddlCategory" tabindex=7 class="form-control-custom" placeholder="-- Semua Kategori --" >
-										<option value=0 selected>-- Semua Kategori --</option>
-										<?php
-											$sql = "CALL spSelDDLCategory('".$_SESSION['UserLogin']."')";
-											if (! $result = mysqli_query($dbh, $sql)) {
-												logEvent(mysqli_error($dbh), '/Report/Stock/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-												return 0;
-											}
-											while($row = mysqli_fetch_array($result)) {
-												echo "<option value='".$row['CategoryID']."' >".$row['CategoryCode']." - ".$row['CategoryName']."</option>";
-											}
-											mysqli_free_result($result);
-											mysqli_next_result($dbh);
-										?>
-									</select>
-								</div>
-							</div>
 							<div class="col-md-1 labelColumn">
 								Cabang:
 							</div>
@@ -45,7 +23,7 @@
 									<?php
 										$sql = "CALL spSelDDLBranch('".$_SESSION['UserLogin']."')";
 										if (! $result = mysqli_query($dbh, $sql)) {
-											logEvent(mysqli_error($dbh), '/Report/Stock/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+											logEvent(mysqli_error($dbh), '/Report/Sale/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 											return 0;
 										}
 										while($row = mysqli_fetch_array($result)) {
@@ -55,6 +33,22 @@
 										mysqli_next_result($dbh);
 									?>
 								</select>
+							</div>
+							<div class="col-md-1 labelColumn">
+								Tanggal :
+							</div>
+							<div class="col-md-3">
+								<div class="ui-widget" style="width: 100%;">
+									<input id="txtFromDate" name="txtFromDate" type="text" class="form-control-custom" style="background-color: #FFF;cursor: text;" placeholder="Dari Tanggal" readonly />
+								</div>
+							</div>
+							<div style="float:left;" class="labelColumn">
+								-
+							</div>
+							<div class="col-md-3">
+								<div class="ui-widget" style="width: 100%;">
+									<input id="txtToDate" name="txtToDate" type="text" class="form-control-custom" style="background-color: #FFF;cursor: text;" placeholder="Sampai Tanggal" readonly />
+								</div>
 							</div>
 						</div>
 						<br />
@@ -71,11 +65,10 @@
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
-										<th>Kode</th>
-										<th>Nama</th>
-										<th>Kategori</th>
-										<th>Cabang</th>
-										<th>Stok</th>
+										<th>No. Invoice</th>
+										<th>Tanggal</th>
+										<th>Nama Pelanggan</th>
+										<th>Total</th>
 									</tr>
 								</thead>
 							</table>
@@ -108,15 +101,23 @@
 				}
 			};
 			function Preview() {
-				var CategoryID = $("#ddlCategory").val();
 				var BranchID = $("#ddlBranch").val();
+				var txtFromDate = $("#txtFromDate").val();
+				var txtToDate = $("#txtToDate").val();
 				var PassValidate = 1;
 				var FirstFocus = 0;
-				if(CategoryID == "") {
-					$("#ddlCategory").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-					PassValidate = 0;
-					if(FirstFocus == 0) $("#ddlCategory").next().find("input").focus();
-					FirstFocus = 1;
+			
+				if(txtFromDate != "" && txtToDate != "") {
+					var FromDate = txtFromDate.split("-");
+					FromDate = new Date(FromDate[1] + "-" + FromDate[0] + "-" + FromDate[2]);
+					var ToDate = txtToDate.split("-");
+					ToDate = new Date(ToDate[1] + "-" + ToDate[0] + "-" + ToDate[2]);
+					if(FromDate > ToDate) {
+						$("#txtToDate").notify("Tanggal Akhir harus lebih besar dari tanggal mulai!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+						PassValidate = 0;
+						if(FirstFocus == 0) $("#txtToDate").focus();
+						FirstFocus = 1;
+					}
 				}
 				
 				if(PassValidate == 0) {
@@ -135,15 +136,23 @@
 				}
 			}
 			function ExportExcel() {
-				var CategoryID = $("#ddlCategory").val();
 				var BranchID = $("#ddlBranch").val();
+				var txtFromDate = $("#txtFromDate").val();
+				var txtToDate = $("#txtToDate").val();
 				var PassValidate = 1;
 				var FirstFocus = 0;
-				if(CategoryID == "") {
-					$("#ddlCategory").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-					PassValidate = 0;
-					if(FirstFocus == 0) $("#ddlCategory").next().find("input").focus();
-					FirstFocus = 1;
+			
+				if(txtFromDate != "" && txtToDate != "") {
+					var FromDate = txtFromDate.split("-");
+					FromDate = new Date(FromDate[1] + "-" + FromDate[0] + "-" + FromDate[2]);
+					var ToDate = txtToDate.split("-");
+					ToDate = new Date(ToDate[1] + "-" + ToDate[0] + "-" + ToDate[2]);
+					if(FromDate > ToDate) {
+						$("#txtToDate").notify("Tanggal Akhir harus lebih besar dari tanggal mulai!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+						PassValidate = 0;
+						if(FirstFocus == 0) $("#txtToDate").focus();
+						FirstFocus = 1;
+					}
 				}
 				
 				if(PassValidate == 0) {
@@ -157,7 +166,7 @@
 					$("#loading").show();
 					setCookie('downloadStarted', 0, 100); //Expiration could be anything... As long as we reset the value
 					setTimeout(checkDownloadCookie, 1000); //Initiate the loop to check the cookie.
-					$("#excelDownload").attr("src", "Report/Stock/ExportExcel.php?BranchID=" + BranchID + "&CategoryID=" + CategoryID);
+					$("#excelDownload").attr("src", "Report/Sale/ExportExcel.php?BranchID=" + BranchID + "&FromDate=" + txtFromDate + "&ToDate=" + txtToDate);
 				}
 			}
 
@@ -172,18 +181,18 @@
 				}
 			};
 			$(document).ready(function () {
-				$("#ddlCategory").combobox();
-				$("#ddlCategory").next().find("input").click(function() {
-					$(this).val("");
+				$("#txtToDate, #txtFromDate").datepicker({
+					dateFormat: 'dd-mm-yy',
+					maxDate : "+0D"
 				});
 
 				table = $("#grid-data").DataTable({
 								"keys": true,
-								"scrollY": "330px",
+								"scrollY": "285px",
+								"rowId": "ItemID",
 								"scrollCollapse": true,
 								"order": [2, "asc"],
 								"columns": [
-									{ className: "dt-head-center" },
 									{ className: "dt-head-center" },
 									{ className: "dt-head-center" },
 									{ className: "dt-head-center" },
@@ -192,10 +201,11 @@
 								"processing": true,
 								"serverSide": true,
 								"ajax": {
-									"url": "./Report/Stock/DataSource.php",
+									"url": "./Report/Sale/DataSource.php",
 									"data": function ( d ) {
+										d.FromDate = $("#txtFromDate").val(),
+										d.ToDate = $("#txtToDate").val(),
 										d.BranchID = $("#ddlBranch").val(),
-										d.CategoryID = $("#ddlCategory").val(),
 										d.FirstPass = FirstPass
 									}
 								},

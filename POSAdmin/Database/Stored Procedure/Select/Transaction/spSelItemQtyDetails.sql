@@ -39,7 +39,7 @@ SET State = 1;
 		MI.Price2,
 		MI.Qty2,
 		MI.Weight,
-		(IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) + IFNULL(S.Quantity, 0) + IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) + IFNULL(SA.Quantity, 0)) Quantity
+		(IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) + IFNULL(SA.Quantity, 0)) Quantity
 	FROM
 		master_item MI
 		LEFT JOIN

@@ -224,7 +224,7 @@ SET @query = CONCAT("SELECT
 						MI.ItemName,
 						MC.CategoryName,
 						MB.BranchName,
-						(IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) + IFNULL(S.Quantity, 0) + IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) + IFNULL(SA.Quantity, 0)) Stock
+						(IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) + IFNULL(SA.Quantity, 0)) Stock
 					FROM
 						master_item MI
 						CROSS JOIN master_branch MB

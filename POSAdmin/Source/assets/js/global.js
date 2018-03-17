@@ -1070,7 +1070,7 @@ function validateQTY(QTY) {
 			// Remove invalid value
 			this.input
 			.val( "" )
-			.attr( "title", value + " Tidak Cocok Dengan Pilihan Yang Ada" )
+			//.attr( "title", value + " Tidak Cocok Dengan Pilihan Yang Ada" )
 			.notify("Tidak Cocok Dengan Pilihan Yang Ada!", { position:"bottom left", className:"warn", autoHideDelay: 2000 })
 			this.element.val( "" );
 			/*.tooltip( "open" );
