@@ -6,8 +6,12 @@
 		include "../../GetPermission.php";
 		//echo $_SERVER['REQUEST_URI'];
 		$BranchID = $_GET['BranchID'];
+		$BranchName = $_GET['BranchName'];
+		$FromDate = $_GET['FromDate'];
+		$ToDate = $_GET['ToDate'];
 		if($_GET['FromDate'] == "") {
 			$txtFromDate = "2000-01-01";
+			$FromDate = "01-01-2000";
 		}
 		else {
 			$txtFromDate = explode('-', mysql_real_escape_string($_GET['FromDate']));
@@ -16,6 +20,7 @@
 		}
 		if($_GET['ToDate'] == "") {
 			$txtToDate = date("Y-m-d");
+			$ToDate = date("d-m-Y");
 		}
 		else {
 			$txtToDate = explode('-', mysql_real_escape_string($_GET['ToDate']));
@@ -56,17 +61,41 @@
 		$objPHPExcel->getActiveSheet()->getPageMargins()->setRight(0.787402);
 		$objPHPExcel->getActiveSheet()->getPageMargins()->setLeft(0.393701);
 		$objPHPExcel->getActiveSheet()->getPageMargins()->setBottom(0.787402);
+		$objPHPExcel->getActiveSheet()->getPageSetup()->setFitToWidth(1);
+		$objPHPExcel->getActiveSheet()->getPageSetup()->setFitToHeight(0);    
+		$objPHPExcel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
+		$objPHPExcel->getActiveSheet()->getPageSetup()->setPaperSize(PHPExcel_Worksheet_PageSetup::PAPERSIZE_A4);
+		$objPHPExcel->getActiveSheet()->getPageSetup()->setRowsToRepeatAtTopByStartAndEnd(6, 6);
 		
 		$objPHPExcel->getActiveSheet()->getStyle('A1')->getAlignment()->setWrapText(true);
 		$monthName = array("Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des");
+
+		$period = date("d", strtotime($txtFromDate)) . " " . $monthName[date("m", strtotime($txtFromDate)) - 1] . " " .  date("Y", strtotime($txtFromDate)) . " - " . date("d", strtotime($txtToDate)) . " " . $monthName[date("m", strtotime($txtToDate)) - 1] . " " .  date("Y", strtotime($txtToDate));
 		
-		//set bold
+		//bold title
 		$objPHPExcel->getActiveSheet()->getStyle("A1:A2")->getFont()->setBold(true);
 		$objPHPExcel->getActiveSheet()->getStyle("A1")->getFont()->setSize(16);
+		//merge title
+		$objPHPExcel->getActiveSheet()->mergeCells("A1:J2");
+		//center title
+		$objPHPExcel->getActiveSheet()->getStyle("A1:E2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		
+		$objPHPExcel->setActiveSheetIndex(0)
+					->setCellValue('B3', "Cabang:");
+		$objPHPExcel->setActiveSheetIndex(0)
+					->setCellValue('C3', $BranchName);
+		$objPHPExcel->setActiveSheetIndex(0)
+					->setCellValue('B4', "Tanggal:");
+		$objPHPExcel->setActiveSheetIndex(0)
+					->setCellValue('C4', $period );
+		$objPHPExcel->getActiveSheet()->getStyle("B3:C4")->getFont()->setBold(true);
+
+		//bold title
+		$objPHPExcel->getActiveSheet()->getStyle("A6:J6")->getFont()->setBold(true);
 		//$objPHPExcel->getActiveSheet()->getStyle("I4")->getFont()->setSize(14);
 		//$objPHPExcel->getActiveSheet()->getStyle("I4")->getFont()->setBold(true);
 		//$objPHPExcel->getActiveSheet()->setCellValue("I4", $monthName[date("m", strtotime($txtFromDate)) - 1] . " - " . date("Y", strtotime($txtFromDate)));
-		$rowExcel = 4;
+		$rowExcel = 6;
 		$col = 0;
 		//set color
 		//$objPHPExcel->getFont()->setColor( new PHPExcel_Style_Color( PHPExcel_Style_Color::COLOR_DARKGREEN ) );
@@ -74,7 +103,12 @@
 		$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, "No. Invoice");
 		$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, "Tanggal");
 		$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, "Nama Pelanggan");
-		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Total");
+		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Kode Barang");
+		$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, "Nama Barang");
+		$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, "Quantity");
+		$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, "Harga Jual");
+		$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, "Diskon");
+		$objPHPExcel->getActiveSheet()->setCellValue("J".$rowExcel, "Sub Total");
 		$rowExcel++;
 		
 		$sql = "CALL spSelExportSaleReport(".$BranchID.", '".$txtFromDate."', '".$txtToDate."', '".$_SESSION['UserLogin']."')";
@@ -84,30 +118,66 @@
 			return 0;
 		}
 		$RowNumber = 1;
+		$SaleID = 0;
+		$MergeStart = 0;
+		$Total = 0;
+		$DetailsCounter = 0;
 		while($row = mysqli_fetch_array($result)) {
-			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $RowNumber);
-			$objPHPExcel->getActiveSheet()->setCellValueExplicit("B".$rowExcel, $row['SaleNumber'], PHPExcel_Cell_DataType::TYPE_STRING);
-			$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['TransactionDate']);
-			$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row['CustomerName']);
-			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, $row['Total']);
-			$RowNumber++;
+			if($SaleID != $row['SaleID']) {
+				$DetailsCounter = 0;
+				if ($MergeStart != $rowExcel && $RowNumber != 1) {
+					$objPHPExcel->getActiveSheet()->mergeCells("A".$MergeStart.":D".($rowExcel - 1));
+					$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":I".$rowExcel);
+
+					$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total");
+					$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":J".$rowExcel)->getFont()->setBold(true);
+					$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+					$objPHPExcel->getActiveSheet()->setCellValue("J".$rowExcel, $Total);
+					$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":J".$rowExcel)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('fffa00');
+					$rowExcel++;
+				}
+				$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $RowNumber);
+				$objPHPExcel->getActiveSheet()->setCellValueExplicit("B".$rowExcel, $row['SaleNumber'], PHPExcel_Cell_DataType::TYPE_STRING);
+				$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['TransactionDate']);
+				$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row['CustomerName']);
+				$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":D".$rowExcel)->getFont()->setBold(true);
+				$RowNumber++;
+				$Total = 0;
+				$MergeStart = $rowExcel + 1;
+			}
+			$DetailsCounter++;
+			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, $row['ItemCode']);
+			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['ItemName']);
+			$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, $row['Quantity']);
+			$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, $row['SalePrice']);
+			$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, $row['Discount']);
+			$objPHPExcel->getActiveSheet()->setCellValue("J".$rowExcel, $row['SubTotal']);
+			$Total += $row['SubTotal'];
+			$rowExcel++;
+			$SaleID = $row['SaleID'];
+		}
+		if($DetailsCounter > 1) {
+			$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":I".$rowExcel);
+			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total");
+			$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":J".$rowExcel)->getFont()->setBold(true);
+			$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+			$objPHPExcel->getActiveSheet()->setCellValue("J".$rowExcel, $Total);
+			$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":J".$rowExcel)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('fffa00');
 			$rowExcel++;
 		}
+
 		mysqli_free_result($result);
 		mysqli_next_result($dbh);
-		//merge title
-		$objPHPExcel->getActiveSheet()->mergeCells("A1:E2");
-		$objPHPExcel->getActiveSheet()->getStyle("A4:E4")->getFont()->setBold(true);
-		$objPHPExcel->getActiveSheet()->getStyle("A1:E2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-		$objPHPExcel->getActiveSheet()->getStyle("B4:D".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
-		$objPHPExcel->getActiveSheet()->getStyle("E5:E".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 		
-		$objPHPExcel->getActiveSheet()->getStyle("A4:E4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');
+		$objPHPExcel->getActiveSheet()->getStyle("B6:F".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+		$objPHPExcel->getActiveSheet()->getStyle("G6:J".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+		
+		$objPHPExcel->getActiveSheet()->getStyle("A6:J6")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');
 		//$objPHPExcel->getActiveSheet()->getStyle('B5:B'.$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
 
 		//set all width 
 		$fromCol='A';
-		$toCol= 'F';
+		$toCol= 'K';
 		for($j = $fromCol; $j !== $toCol; $j++) {
 			//$calculatedWidth = $objPHPExcel->getActiveSheet()->getColumnDimension($i)->getWidth();
 			$objPHPExcel->getActiveSheet()->getColumnDimension($j)->setAutoSize(true);
@@ -119,14 +189,13 @@
 			  )
 			)
 		);		
-		$objPHPExcel->getActiveSheet()->getStyle("A4:E".($rowExcel-1))->applyFromArray($styleArray);		
+		$objPHPExcel->getActiveSheet()->getStyle("A6:J".($rowExcel-1))->applyFromArray($styleArray);		
 
-		$title = "Laporan Penjualan";
+		$title = "Laporan Penjualan " . $BranchName . " " . $period;
 		// Rename worksheet
 		//$objPHPExcel->getActiveSheet()->setTitle($title);
 		// Set active sheet index to the first sheet, so Excel opens this as the first sheet
 		$objPHPExcel->setActiveSheetIndex(0);
-
 
 		// Redirect output to a client’s web browser (Excel5)
 		header('Content-Type: application/vnd.ms-excel');

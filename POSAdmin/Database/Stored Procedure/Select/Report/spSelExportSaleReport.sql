@@ -31,22 +31,56 @@ SET State = 1;
 	SELECT
 		TS.SaleID,
 		TS.SaleNumber,
-		DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
-		MC.CustomerName,
-		SUM(SD.Quantity * SD.SalePrice) Total
-	FROM
+        DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
+        MC.CustomerName,
+		MI.ItemID,
+        MI.ItemName,
+        MI.ItemCode,
+        SD.Quantity,
+        SD.SalePrice,
+        SD.Discount,
+        ((SD.Quantity * SD.SalePrice) - SD.Discount) SubTotal
+    FROM
 		transaction_sale TS
-		JOIN transaction_saledetails SD
-			ON SD.SaleID = TS.SaleID
+        JOIN transaction_saledetails SD
+			ON TS.SaleID = SD.SaleID
 		JOIN master_customer MC
 			ON MC.CustomerID = TS.CustomerID
-	GROUP BY
-		TS.SaleID,
-		TS.SaleNumber,
-		TS.TransactionDate,
-		MC.CustomerName
+		JOIN master_item MI
+			ON MI.ItemID = SD.ItemID
+	WHERE
+		SD.BranchID = pBranchID
+		AND CAST(TS.TransactionDate AS DATE) >= pFromDate
+		AND CAST(TS.TransactionDate AS DATE) <= pToDate
+	UNION ALL
+    SELECT
+		TSR.SaleReturnID,
+		CONCAT('R', TS.SaleNumber) SaleNumber,
+        DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') TransactionDate,
+        MC.CustomerName,
+		MI.ItemID,
+        MI.ItemName,
+        MI.ItemCode,
+        SRD.Quantity,
+        SRD.SalePrice,
+        0 Discount,
+        (SRD.Quantity * SRD.SalePrice) SubTotal
+    FROM
+		transaction_salereturn TSR
+		JOIN transaction_sale TS
+			ON TSR.SaleID = TS.SaleID
+        JOIN transaction_salereturndetails SRD
+			ON TSR.SaleReturnID = SRD.SaleReturnID
+		JOIN master_customer MC
+			ON MC.CustomerID = TS.CustomerID
+		JOIN master_item MI
+			ON MI.ItemID = SRD.ItemID
+	WHERE
+		SRD.BranchID = pBranchID
+		AND CAST(TSR.TransactionDate AS DATE) >= pFromDate
+		AND CAST(TSR.TransactionDate AS DATE) <= pToDate
 	ORDER BY
-		TS.SaleNumber;
+		SaleNumber;
 
 END;
 $$

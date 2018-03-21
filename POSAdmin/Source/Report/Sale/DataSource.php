@@ -13,7 +13,7 @@
 		}
 		else {
 			$txtFromDate = explode('-', mysql_real_escape_string($requestData['FromDate']));
-			$requestData['txtFromDate'] = "$txtFromDate[2]-$txtFromDate[1]-$txtFromDate[0]"; 
+			$requestData['FromDate'] = "$txtFromDate[2]-$txtFromDate[1]-$txtFromDate[0]"; 
 			$txtFromDate = $requestData['FromDate'];
 		}
 		if($requestData['ToDate'] == "") {
@@ -26,20 +26,20 @@
 		}
 		//kolom di table
 		$columns = array(
-						0 => "TS.SaleNumber", //unorderable
-						1 => "TS.TransactionDate", //unorderable
-						2 => "MC.CustomerName"
+						0 => "SaleNumber", //unorderable
+						1 => "TransactionDate", //unorderable
+						2 => "CustomerName"
 					);
 
 		$where = " 1=1 ";
-		$order_by = "TS.SaleNumber";
+		$order_by = "SaleNumber";
 		$limit_s = $requestData['start'];
 		$limit_l = $requestData['length'];
 		
 		//Handles Sort querystring sent from Bootgrid
 		$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
 		//Handles search querystring sent from Bootgrid
-		$order_by .= ", TS.SaleNumber ASC";
+		$order_by .= ", SaleNumber ASC";
 		if (!empty($requestData['search']['value']))
 		{
 			$search = mysqli_escape_string($dbh, trim($requestData['search']['value']));
@@ -65,10 +65,12 @@
 		while ($row = mysqli_fetch_array($result2)) {
 			$row_array = array();
 			//data yang dikirim ke table
-			$row_array[] = $row['SaleNumber'];
-			$row_array[] = $row['TransactionDate'];
-			$row_array[] = $row['CustomerName'];
-			$row_array[] = number_format($row['Total'],0,".",",");
+			$row_array["SaleNumber"] = $row['SaleNumber'];
+			$row_array["TransactionDate"] = $row['TransactionDate'];
+			$row_array["CustomerName"] = $row['CustomerName'];
+			$row_array["Total"] = number_format($row['Total'],0,".",",");
+			$row_array["SaleID"] = $row['SaleID'];
+			$row_array["TransactionType"] = $row['TransactionType'];
 			array_push($return_arr, $row_array);
 		}
 		
