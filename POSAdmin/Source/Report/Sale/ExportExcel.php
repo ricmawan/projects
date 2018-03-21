@@ -92,9 +92,7 @@
 
 		//bold title
 		$objPHPExcel->getActiveSheet()->getStyle("A6:J6")->getFont()->setBold(true);
-		//$objPHPExcel->getActiveSheet()->getStyle("I4")->getFont()->setSize(14);
-		//$objPHPExcel->getActiveSheet()->getStyle("I4")->getFont()->setBold(true);
-		//$objPHPExcel->getActiveSheet()->setCellValue("I4", $monthName[date("m", strtotime($txtFromDate)) - 1] . " - " . date("Y", strtotime($txtFromDate)));
+		
 		$rowExcel = 6;
 		$col = 0;
 		//set color

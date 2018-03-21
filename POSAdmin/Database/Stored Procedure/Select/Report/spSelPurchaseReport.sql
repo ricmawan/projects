@@ -45,9 +45,29 @@ SET @query = CONCAT("SELECT
 									ON TP.PurchaseID = PD.PurchaseID
 								JOIN master_supplier MS
 									ON MS.SupplierID = TP.SupplierID
-							WHERE ", pWhere, "
+							WHERE 
+								SD.BranchID = ", pBranchID ,"
+								AND CAST(TS.TransactionDate AS DATE) >= '",pFromDate,"'
+								AND CAST(TS.TransactionDate AS DATE) <= '",pToDate,"'
+								AND ", pWhere, "
 							GROUP BY
 								TP.PurchaseID
+							UNION ALL
+		                    SELECT
+								1
+							FROM
+								transaction_purchasereturn TPR
+								JOIN transaction_purchasereturndetails PRD
+									ON SRD.SaleReturnID = TSR.SaleReturnID
+								JOIN master_customer MC
+									ON MC.CustomerID = TS.CustomerID
+							WHERE 
+								SRD.BranchID = ", pBranchID ,"
+								AND CAST(TSR.TransactionDate AS DATE) >= '",pFromDate,"'
+								AND CAST(TSR.TransactionDate AS DATE) <= '",pToDate,"'
+								AND ", pWhere, "
+		                    GROUP BY
+								TSR.SaleReturnID
 						) TS"
 					);
                        

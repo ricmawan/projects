@@ -6,8 +6,12 @@
 		include "../../GetPermission.php";
 		//echo $_SERVER['REQUEST_URI'];
 		$BranchID = $_GET['BranchID'];
+		$BranchName = $_GET['BranchName'];
+		$FromDate = $_GET['FromDate'];
+		$ToDate = $_GET['ToDate'];
 		if($_GET['FromDate'] == "") {
 			$txtFromDate = "2000-01-01";
+			$FromDate = "01-01-2000";
 		}
 		else {
 			$txtFromDate = explode('-', mysql_real_escape_string($_GET['FromDate']));
@@ -16,6 +20,7 @@
 		}
 		if($_GET['ToDate'] == "") {
 			$txtToDate = date("Y-m-d");
+			$ToDate = date("d-m-Y");
 		}
 		else {
 			$txtToDate = explode('-', mysql_real_escape_string($_GET['ToDate']));
@@ -56,25 +61,50 @@
 		$objPHPExcel->getActiveSheet()->getPageMargins()->setRight(0.787402);
 		$objPHPExcel->getActiveSheet()->getPageMargins()->setLeft(0.393701);
 		$objPHPExcel->getActiveSheet()->getPageMargins()->setBottom(0.787402);
+		$objPHPExcel->getActiveSheet()->getPageSetup()->setFitToWidth(1);
+		$objPHPExcel->getActiveSheet()->getPageSetup()->setFitToHeight(0);    
+		$objPHPExcel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
+		$objPHPExcel->getActiveSheet()->getPageSetup()->setPaperSize(PHPExcel_Worksheet_PageSetup::PAPERSIZE_A4);
+		$objPHPExcel->getActiveSheet()->getPageSetup()->setRowsToRepeatAtTopByStartAndEnd(6, 6);
 		
 		$objPHPExcel->getActiveSheet()->getStyle('A1')->getAlignment()->setWrapText(true);
 		$monthName = array("Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des");
+
+		$period = date("d", strtotime($txtFromDate)) . " " . $monthName[date("m", strtotime($txtFromDate)) - 1] . " " .  date("Y", strtotime($txtFromDate)) . " - " . date("d", strtotime($txtToDate)) . " " . $monthName[date("m", strtotime($txtToDate)) - 1] . " " .  date("Y", strtotime($txtToDate));
 		
-		//set bold
+		//bold title
 		$objPHPExcel->getActiveSheet()->getStyle("A1:A2")->getFont()->setBold(true);
 		$objPHPExcel->getActiveSheet()->getStyle("A1")->getFont()->setSize(16);
-		//$objPHPExcel->getActiveSheet()->getStyle("I4")->getFont()->setSize(14);
-		//$objPHPExcel->getActiveSheet()->getStyle("I4")->getFont()->setBold(true);
-		//$objPHPExcel->getActiveSheet()->setCellValue("I4", $monthName[date("m", strtotime($txtFromDate)) - 1] . " - " . date("Y", strtotime($txtFromDate)));
-		$rowExcel = 4;
+		//merge title
+		$objPHPExcel->getActiveSheet()->mergeCells("A1:I2");
+		//center title
+		$objPHPExcel->getActiveSheet()->getStyle("A1:E2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		
+		$objPHPExcel->setActiveSheetIndex(0)
+					->setCellValue('B3', "Cabang:");
+		$objPHPExcel->setActiveSheetIndex(0)
+					->setCellValue('C3', $BranchName);
+		$objPHPExcel->setActiveSheetIndex(0)
+					->setCellValue('B4', "Tanggal:");
+		$objPHPExcel->setActiveSheetIndex(0)
+					->setCellValue('C4', $period );
+		$objPHPExcel->getActiveSheet()->getStyle("B3:C4")->getFont()->setBold(true);
+
+		//bold title
+		$objPHPExcel->getActiveSheet()->getStyle("A6:I6")->getFont()->setBold(true);
+		
+		$rowExcel = 6;
 		$col = 0;
 		//set color
-		//$objPHPExcel->getFont()->setColor( new PHPExcel_Style_Color( PHPExcel_Style_Color::COLOR_DARKGREEN ) );
 		$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "No");
 		$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, "No. Invoice");
 		$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, "Tanggal");
 		$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, "Nama Supplier");
-		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Total");
+		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Kode Barang");
+		$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, "Nama Barang");
+		$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, "Quantity");
+		$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, "Harga Jual");
+		$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, "Sub Total");
 		$rowExcel++;
 		
 		$sql = "CALL spSelExportPurchaseReport(".$BranchID.", '".$txtFromDate."', '".$txtToDate."', '".$_SESSION['UserLogin']."')";
@@ -84,13 +114,50 @@
 			return 0;
 		}
 		$RowNumber = 1;
+		$PurhaseID = 0;
+		$MergeStart = 0;
+		$Total = 0;
+		$DetailsCounter = 0;
 		while($row = mysqli_fetch_array($result)) {
-			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $RowNumber);
-			$objPHPExcel->getActiveSheet()->setCellValueExplicit("B".$rowExcel, $row['PurchaseNumber'], PHPExcel_Cell_DataType::TYPE_STRING);
-			$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['TransactionDate']);
-			$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row['SupplierName']);
-			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, $row['Total']);
-			$RowNumber++;
+			if($PurhaseID != $row['PurhaseID']) {
+				$DetailsCounter = 0;
+				if ($MergeStart != $rowExcel && $RowNumber != 1) {
+					$objPHPExcel->getActiveSheet()->mergeCells("A".$MergeStart.":D".($rowExcel - 1));
+					$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":H".$rowExcel);
+
+					$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total");
+					$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":H".$rowExcel)->getFont()->setBold(true);
+					$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+					$objPHPExcel->getActiveSheet()->setCellValue("J".$rowExcel, $Total);
+					$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":H".$rowExcel)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('fffa00');
+					$rowExcel++;
+				}
+				$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $RowNumber);
+				$objPHPExcel->getActiveSheet()->setCellValueExplicit("B".$rowExcel, $row['PurchaseNumber'], PHPExcel_Cell_DataType::TYPE_STRING);
+				$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['TransactionDate']);
+				$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row['SupplierName']);
+				$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":D".$rowExcel)->getFont()->setBold(true);
+				$RowNumber++;
+				$Total = 0;
+				$MergeStart = $rowExcel + 1;
+			}
+			$DetailsCounter++;
+			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, $row['ItemCode']);
+			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['ItemName']);
+			$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, $row['Quantity']);
+			$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, $row['BuyPrice']);
+			$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, $row['SubTotal']);
+			$Total += $row['SubTotal'];
+			$rowExcel++;
+			$PurhaseID = $row['PurhaseID'];
+		}
+		if($DetailsCounter > 1) {
+			$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":H".$rowExcel);
+			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total");
+			$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":H".$rowExcel)->getFont()->setBold(true);
+			$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+			$objPHPExcel->getActiveSheet()->setCellValue("J".$rowExcel, $Total);
+			$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":H".$rowExcel)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('fffa00');
 			$rowExcel++;
 		}
 		mysqli_free_result($result);
@@ -107,7 +174,7 @@
 
 		//set all width 
 		$fromCol='A';
-		$toCol= 'F';
+		$toCol= 'J';
 		for($j = $fromCol; $j !== $toCol; $j++) {
 			//$calculatedWidth = $objPHPExcel->getActiveSheet()->getColumnDimension($i)->getWidth();
 			$objPHPExcel->getActiveSheet()->getColumnDimension($j)->setAutoSize(true);
@@ -119,9 +186,9 @@
 			  )
 			)
 		);		
-		$objPHPExcel->getActiveSheet()->getStyle("A4:E".($rowExcel-1))->applyFromArray($styleArray);		
+		$objPHPExcel->getActiveSheet()->getStyle("A6:I".($rowExcel-1))->applyFromArray($styleArray);		
 
-		$title = "Laporan Pembelian";
+		$title = "Laporan Pembelian " . $BranchName . " " . $period;
 		// Rename worksheet
 		//$objPHPExcel->getActiveSheet()->setTitle($title);
 		// Set active sheet index to the first sheet, so Excel opens this as the first sheet

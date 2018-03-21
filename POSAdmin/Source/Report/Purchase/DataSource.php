@@ -26,20 +26,20 @@
 		}
 		//kolom di table
 		$columns = array(
-						0 => "TP.PurchaseNumber", //unorderable
-						1 => "TP.TransactionDate", //unorderable
-						2 => "MS.SupplierName"
+						0 => "PurchaseNumber", //unorderable
+						1 => "TransactionDate", //unorderable
+						2 => "SupplierName"
 					);
 
 		$where = " 1=1 ";
-		$order_by = "TP.PurchaseNumber";
+		$order_by = "PurchaseNumber";
 		$limit_s = $requestData['start'];
 		$limit_l = $requestData['length'];
 		
 		//Handles Sort querystring sent from Bootgrid
 		$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
 		//Handles search querystring sent from Bootgrid
-		$order_by .= ", TP.PurchaseNumber ASC";
+		$order_by .= ", PurchaseNumber ASC";
 		if (!empty($requestData['search']['value']))
 		{
 			$search = mysqli_escape_string($dbh, trim($requestData['search']['value']));
@@ -65,10 +65,12 @@
 		while ($row = mysqli_fetch_array($result2)) {
 			$row_array = array();
 			//data yang dikirim ke table
-			$row_array[] = $row['PurchaseNumber'];
-			$row_array[] = $row['TransactionDate'];
-			$row_array[] = $row['SupplierName'];
-			$row_array[] = number_format($row['Total'],0,".",",");
+			$row_array["PurchaseNumber"] = $row['PurchaseNumber'];
+			$row_array["TransactionDate"] = $row['TransactionDate'];
+			$row_array["SupplierName"] = $row['SupplierName'];
+			$row_array["Total"] = number_format($row['Total'],0,".",",");
+			$row_array["PurchaseID"] = $row['PurchaseID'];
+			$row_array["TransactionType"] = $row['TransactionType'];
 			array_push($return_arr, $row_array);
 		}
 		

@@ -4,6 +4,15 @@
 ?>
 <html>
 	<head>
+		<style>
+			td.details-control {
+			    background: url('./assets/img/details_open.png') no-repeat center center;
+			    cursor: pointer;
+			}
+			tr.shown td.details-control {
+			    background: url('./assets/img/details_close.png') no-repeat center center;
+			}
+		</style>
 	</head>
 	<body>
 		<div class="row">
@@ -65,6 +74,7 @@
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
+										<th></th>
 										<th>No. Invoice</th>
 										<th>Tanggal</th>
 										<th>Nama Supplier</th>
@@ -137,6 +147,7 @@
 			}
 			function ExportExcel() {
 				var BranchID = $("#ddlBranch").val();
+				var BranchName = $("#ddlBranch option:selected").text();
 				var txtFromDate = $("#txtFromDate").val();
 				var txtToDate = $("#txtToDate").val();
 				var PassValidate = 1;
@@ -166,7 +177,7 @@
 					$("#loading").show();
 					setCookie('downloadStarted', 0, 100); //Expiration could be anything... As long as we reset the value
 					setTimeout(checkDownloadCookie, 1000); //Initiate the loop to check the cookie.
-					$("#excelDownload").attr("src", "Report/Purchase/ExportExcel.php?BranchID=" + BranchID + "&FromDate=" + txtFromDate + "&ToDate=" + txtToDate);
+					$("#excelDownload").attr("src", "Report/Purchase/ExportExcel.php?BranchID=" + BranchID + "&BranchName=" + BranchName + "&FromDate=" + txtFromDate + "&ToDate=" + txtToDate);
 				}
 			}
 
@@ -180,6 +191,31 @@
 					downloadTimeout = setTimeout(checkDownloadCookie, 1000); //Re-run this function in 1 second.
 				}
 			};
+
+			function format(rowData) {
+				var div = $('<div/>')
+			        .addClass( 'loading' )
+			        .text( 'Loading...' );
+
+			    $.ajax( {
+			    	url: './Report/Purchase/Details.php',
+			    	type: "POST",
+					data: {
+			            ID: rowData.PurchaseID,
+			            TransactionType: rowData.TransactionType,
+			            BranchID : $("#ddlBranch").val()
+			        },
+			        dataType: 'html',
+			        success: function (data) {
+			            div
+			                .html( data )
+			                .removeClass( 'loading' );
+			        }
+			    });
+			    
+			    return div;
+			}
+
 			$(document).ready(function () {
 				$("#txtToDate, #txtFromDate").datepicker({
 					dateFormat: 'dd-mm-yy',
@@ -193,10 +229,18 @@
 								"scrollCollapse": true,
 								"order": [2, "asc"],
 								"columns": [
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ "orderable": false, className: "dt-head-center dt-body-right" }						
+									{
+						                "className": 'details-control',
+						                "orderable": false,
+						                "data": null,
+						                "defaultContent": ''
+						            },
+									{ "data": "PurchaseNumber", className: "dt-head-center" },
+									{ "data": "TransactionDate", className: "dt-head-center" },
+									{ "data": "SupplierName", className: "dt-head-center" },
+									{ "data": "Total", "orderable": false, className: "dt-head-center dt-body-right" },
+									{ "data": "PurchaseID", "visible": false },
+									{ "data": "TransactionType", "visible": false }				
 								],
 								"processing": true,
 								"serverSide": true,
@@ -225,6 +269,46 @@
 									}
 								}
 							});
+			});
+
+			$('#grid-data tbody').on('click', 'td.details-control', function () {
+			    var tr = $(this).closest('tr');
+			    var row = table.row( tr );
+			 
+			    if ( row.child.isShown() ) {
+			        row.child.hide();
+			        tr.removeClass('shown');
+			    }
+			    else {
+			        row.child( format(row.data()) ).show();
+			        tr.addClass('shown');
+			    }
+			    
+			    var barWidth = table.settings()[0].oScroll.iBarWidth;
+			    var tableBodyWidth = parseFloat($("#grid-data").width()) + 2;
+			    var headerWidth = parseFloat($(".dataTables_scrollHeadInner").width());
+
+			   if(tableBodyWidth == headerWidth) {
+			    	$(".dataTables_scrollHeadInner").css({
+			    		"width" : headerWidth - barWidth,
+			    		"padding-right" : barWidth
+			    	});
+
+			    	$(".dataTables_scrollHeadInner table").css({
+			    		"width" : tableBodyWidth
+			    	});
+			    }
+			    else {
+			    	$(".dataTables_scrollHeadInner").css({
+			    		"width" : headerWidth + barWidth,
+			    		"padding-right" : 0
+			    	});
+
+			    	$(".dataTables_scrollHeadInner table").css({
+			    		"width" : tableBodyWidth
+			    	});
+			    }
+
 			});
 		</script>
 	</body>
