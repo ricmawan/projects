@@ -46,6 +46,7 @@ SET State = 2;
 
 SET @query = CONCAT("SELECT
 						TPR.PurchaseReturnID,
+						TPR.PurchaseReturnNumber,
                         DATE_FORMAT(TPR.TransactionDate, '%d-%m-%Y') TransactionDate,
                         TransactionDate PlainTransactionDate,
                         MS.SupplierID,

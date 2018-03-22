@@ -245,6 +245,7 @@
 				var ItemCode = $("#txtItemCode").val();
 				var ItemName = $("#txtItemName").val();
 				var BranchID = $("#ddlBranch").val();
+				var BranchName = $("#ddlBranch option:selected").text();
 				var txtFromDate = $("#txtFromDate").val();
 				var txtToDate = $("#txtToDate").val();
 				var PassValidate = 1;
@@ -281,7 +282,7 @@
 					$("#loading").show();
 					setCookie('downloadStarted', 0, 100); //Expiration could be anything... As long as we reset the value
 					setTimeout(checkDownloadCookie, 1000); //Initiate the loop to check the cookie.
-					$("#excelDownload").attr("src", "Report/StockDetails/ExportExcel.php?BranchID=" + BranchID + "&ItemCode=" + ItemCode + "&FromDate=" + txtFromDate + "&ToDate=" + txtToDate);
+					$("#excelDownload").attr("src", "Report/StockDetails/ExportExcel.php?BranchID=" + BranchID + "&ItemCode=" + ItemCode + "&ItemName=" + ItemName + "&BranchName=" + BranchName + "&FromDate=" + txtFromDate + "&ToDate=" + txtToDate);
 				}
 			}
 

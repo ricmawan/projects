@@ -36,6 +36,7 @@
 									<tr>
 										<th><input id="select_all" name="select_all" type="checkbox" onclick="chkAll();" /></th>
 										<th>No</th>
+										<th>No. Invoice</th>
 										<th>Tanggal</th>
 										<th>Supplier</th>
 										<th>Total</th>
@@ -54,6 +55,12 @@
 		<div id="FormData" title="Tambah Kategori" style="display: none;">
 			<form class="col-md-12" id="PostForm" method="POST" action="" >
 				<div class="row">
+					<div class="col-md-1 labelColumn">
+						No. Invoice :
+					</div>
+					<div class="col-md-2">
+						<input id="txtPurchaseReturnNumber" name="txtPurchaseReturnNumber" type="text" class="form-control-custom" placeholder="No. Invoice" readonly />
+					</div>
 					<div class="col-md-1 labelColumn">
 						Tanggal :
 						<input id="hdnPurchaseReturnID" name="hdnPurchaseReturnID" type="hidden" value=0 />
@@ -194,11 +201,12 @@
 				$("#hdnIsEdit").val(EditFlag);
 				if(EditFlag == 1) {
 					$("#FormData").attr("title", "Edit Retur Pembelian");
-					$("#hdnPurchaseReturnID").val(Data[5]);
-					$("#ddlSupplier").val(Data[6]);
-					$("#lblTotal").html(Data[4]);
-					$("#txtTransactionDate").datepicker("setDate", new Date(Data[7]));
-					getPurchaseReturnDetails(Data[5]);
+					$("#hdnPurchaseReturnID").val(Data[6]);
+					$("#ddlSupplier").val(Data[7]);
+					$("#lblTotal").html(Data[5]);
+					$("#txtTransactionDate").datepicker("setDate", new Date(Data[8]));
+					$("#txtPurchaseReturnNumber").val(Data[2])
+					getPurchaseReturnDetails(Data[6]);
 				}
 				else $("#FormData").attr("title", "Tambah Retur Pembelian");
 				var index = table.cell({ focused: true }).index();
@@ -494,6 +502,7 @@
 							success: function(data) {
 								if(data.FailedFlag == '0') {
 									if($("#hdnPurchaseReturnDetailsID").val() == 0) {
+										$("#txtPurchaseReturnNumber").val(data.PurchaseReturnNumber);
 										table2.row.add([
 											data.PurchaseReturnDetailsID,
 											itemID,
@@ -596,6 +605,7 @@
 				$("#txtQTY").val(1);
 				$("#txtBuyPrice").val(0);
 				$("#lblTotal").html("0");
+				$("#txtPurchaseReturnNumber").val("");
 				table2.clear().draw();
 			}
 			
@@ -814,6 +824,7 @@
 									{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
 									{ className: "dt-head-center" },
 									{ className: "dt-head-center" },
+									{ className: "dt-head-center" },
 									{ "orderable": false, className: "dt-head-center dt-body-right" }
 								],
 								"processing": true,
@@ -865,7 +876,7 @@
 							if(DeleteID.length == 0) {
 								table.keys.disable();
 								var deletedData = new Array();
-								deletedData.push(data[5]);
+								deletedData.push(data[6] + "^" + data[2]);
 								SingleDelete("./Transaction/PurchaseReturn/Delete.php", deletedData, function(action) {
 									if(action == "success") {
 										table.ajax.reload(function() {

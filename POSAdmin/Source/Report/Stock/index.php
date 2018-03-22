@@ -137,6 +137,8 @@
 			function ExportExcel() {
 				var CategoryID = $("#ddlCategory").val();
 				var BranchID = $("#ddlBranch").val();
+				var BranchName = $("#ddlBranch option:selected").text();
+				var CategoryName = $("#ddlCategory option:selected").text();
 				var PassValidate = 1;
 				var FirstFocus = 0;
 				if(CategoryID == "") {
@@ -157,7 +159,7 @@
 					$("#loading").show();
 					setCookie('downloadStarted', 0, 100); //Expiration could be anything... As long as we reset the value
 					setTimeout(checkDownloadCookie, 1000); //Initiate the loop to check the cookie.
-					$("#excelDownload").attr("src", "Report/Stock/ExportExcel.php?BranchID=" + BranchID + "&CategoryID=" + CategoryID);
+					$("#excelDownload").attr("src", "Report/Stock/ExportExcel.php?BranchID=" + BranchID + "&BranchName=" + BranchName + "&CategoryID=" + CategoryID + "&CategoryName=" + CategoryName);
 				}
 			}
 

@@ -65,7 +65,7 @@
 						<input id="hdnPayment" name="hdnPayment" type="hidden" />
 					</div>
 					<div class="col-md-2">
-						<input id="txtSaleNumber" name="txtSaleNumber" type="text" tabindex=5 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="No. Invoice" readonly />
+						<input id="txtSaleNumber" name="txtSaleNumber" type="text" class="form-control-custom" placeholder="No. Invoice" readonly />
 					</div>
 					
 					<div class="col-md-1 labelColumn">
@@ -687,7 +687,7 @@
 											itemName,
 											Qty,
 											salePrice,
-											discount,
+											returnRupiah(discount.toString()),
 											returnRupiah((parseFloat(salePrice.replace(/\,/g, "")) * parseFloat(Qty) - parseFloat(discount)).toString()),
 											buyPrice,
 											price1,
@@ -726,7 +726,7 @@
 											itemName,
 											Qty,
 											salePrice,
-											discount,
+											returnRupiah(discount.toString()),
 											returnRupiah((parseFloat(salePrice.replace(/\,/g, "")) * parseFloat(Qty) - parseFloat(discount)).toString()),
 											buyPrice,
 											price1,
@@ -762,6 +762,7 @@
 									$("#txtItemName").val("");
 									$("#txtQTY").val(1);
 									$("#txtSalePrice").val(0);
+									$("#txtDiscount").val(0);
 									$("#hdnBuyPrice").val(0);
 									$("#hdnPrice1").val(0);
 									$("#hdnQty1").val(0);

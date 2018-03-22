@@ -584,7 +584,7 @@
 											itemName,
 											Qty,
 											salePrice,
-											discount,
+											returnRupiah(discount.toString()),
 											returnRupiah((parseFloat(salePrice.replace(/\,/g, "")) * parseFloat(Qty) - parseFloat(discount)).toString()),
 											buyPrice,
 											price1,
@@ -623,7 +623,7 @@
 											itemName,
 											Qty,
 											salePrice,
-											discount,
+											returnRupiah(discount.toString()),
 											returnRupiah((parseFloat(salePrice.replace(/\,/g, "")) * parseFloat(Qty) - parseFloat(discount)).toString()),
 											buyPrice,
 											price1,
@@ -657,6 +657,7 @@
 									}
 									$("#txtItemCode").val("");
 									$("#txtItemName").val("");
+									$("#txtDiscount").val(0);
 									$("#txtQTY").val(1);
 									$("#txtSalePrice").val(0);
 									$("#hdnBuyPrice").val(0);

@@ -13,6 +13,7 @@ CREATE PROCEDURE spSelPurchaseReport (
 	pFromDate		DATE,
 	pToDate			DATE,
 	pWhere 			TEXT,
+    pWhere2			TEXT,
 	pOrder			TEXT,
 	pLimit_s		BIGINT,
     pLimit_l		INT,
@@ -46,9 +47,9 @@ SET @query = CONCAT("SELECT
 								JOIN master_supplier MS
 									ON MS.SupplierID = TP.SupplierID
 							WHERE 
-								SD.BranchID = ", pBranchID ,"
-								AND CAST(TS.TransactionDate AS DATE) >= '",pFromDate,"'
-								AND CAST(TS.TransactionDate AS DATE) <= '",pToDate,"'
+								PD.BranchID = ", pBranchID ,"
+								AND CAST(TP.TransactionDate AS DATE) >= '",pFromDate,"'
+								AND CAST(TP.TransactionDate AS DATE) <= '",pToDate,"'
 								AND ", pWhere, "
 							GROUP BY
 								TP.PurchaseID
@@ -58,16 +59,16 @@ SET @query = CONCAT("SELECT
 							FROM
 								transaction_purchasereturn TPR
 								JOIN transaction_purchasereturndetails PRD
-									ON SRD.SaleReturnID = TSR.SaleReturnID
-								JOIN master_customer MC
-									ON MC.CustomerID = TS.CustomerID
+									ON TPR.PurchaseReturnID = PRD.PurchaseReturnID
+								JOIN master_supplier MS
+									ON MS.SupplierID = TPR.SupplierID
 							WHERE 
-								SRD.BranchID = ", pBranchID ,"
-								AND CAST(TSR.TransactionDate AS DATE) >= '",pFromDate,"'
-								AND CAST(TSR.TransactionDate AS DATE) <= '",pToDate,"'
-								AND ", pWhere, "
+								PRD.BranchID = ", pBranchID ,"
+								AND CAST(TPR.TransactionDate AS DATE) >= '",pFromDate,"'
+								AND CAST(TPR.TransactionDate AS DATE) <= '",pToDate,"'
+								AND ", pWhere2, "
 		                    GROUP BY
-								TSR.SaleReturnID
+								TPR.PurchaseReturnID
 						) TS"
 					);
                        
@@ -79,6 +80,7 @@ SET State = 2;
 
 SET @query = CONCAT("SELECT
 						TP.PurchaseID,
+                        'Pembelian' TransactionType,
 						TP.PurchaseNumber,
 						DATE_FORMAT(TP.TransactionDate, '%d-%m-%Y') TransactionDate,
 						MS.SupplierName,
@@ -89,12 +91,40 @@ SET @query = CONCAT("SELECT
 							ON TP.PurchaseID = PD.PurchaseID
 						JOIN master_supplier MS
 							ON MS.SupplierID = TP.SupplierID
-					WHERE ", pWhere, "
+					WHERE 
+						PD.BranchID = ", pBranchID ,"
+						AND CAST(TP.TransactionDate AS DATE) >= '",pFromDate,"'
+						AND CAST(TP.TransactionDate AS DATE) <= '",pToDate,"'
+						AND ", pWhere, "
                     GROUP BY
 						TP.PurchaseID,
 						TP.PurchaseNumber,
 						TP.TransactionDate,
 						MS.SupplierName
+					UNION ALL
+                    SELECT
+						TPR.PurchaseReturnID,
+                        'Retur' TransactionType,
+                        TPR.PurchaseReturnNumber,
+                        DATE_FORMAT(TPR.TransactionDate, '%d-%m-%Y') TransactionDate,
+						MS.SupplierName,
+						SUM(PRD.Quantity * PRD.BuyPrice) Total
+					FROM
+						transaction_purchasereturn TPR
+						JOIN transaction_purchasereturndetails PRD
+							ON TPR.PurchaseReturnID = PRD.PurchaseReturnID
+						JOIN master_supplier MS
+							ON MS.SupplierID = TPR.SupplierID
+					WHERE 
+						PRD.BranchID = ", pBranchID ,"
+						AND CAST(TPR.TransactionDate AS DATE) >= '",pFromDate,"'
+						AND CAST(TPR.TransactionDate AS DATE) <= '",pToDate,"'
+						AND ", pWhere2, "
+					GROUP BY
+						TPR.PurchaseReturnID,
+                        TPR.PurchaseReturnNumber,
+                        TPR.TransactionDate,
+                        MS.SupplierName
 					ORDER BY ", pOrder,
 					" LIMIT ", pLimit_s, ", ", pLimit_l);
                     

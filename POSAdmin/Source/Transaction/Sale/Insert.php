@@ -6,7 +6,7 @@
 		include "../../GetPermission.php";
 		$SaleID = mysqli_real_escape_string($dbh, $_POST['hdnSaleID']);
 		$SaleDetailsID = mysqli_real_escape_string($dbh, $_POST['hdnSaleDetailsID']);
-		$SaleNumber = mysqli_real_escape_string($dbh, $_POST['txtSaleNumber']);;
+		$SaleNumber = mysqli_real_escape_string($dbh, $_POST['txtSaleNumber']);
 		$TransactionDate = mysqli_real_escape_string($dbh, $_POST['hdnTransactionDate']);
 		$BranchID = mysqli_real_escape_string($dbh, $_POST['hdnBranchID']);
 		$RetailFlag = mysqli_real_escape_string($dbh, $_POST['hdnIsRetail']);

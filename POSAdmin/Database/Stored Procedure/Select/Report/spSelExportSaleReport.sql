@@ -64,7 +64,7 @@ SET State = 1;
         SRD.Quantity,
         SRD.SalePrice,
         0 Discount,
-        (SRD.Quantity * SRD.SalePrice) SubTotal
+        -(SRD.Quantity * SRD.SalePrice) SubTotal
     FROM
 		transaction_salereturn TSR
 		JOIN transaction_sale TS
@@ -80,7 +80,8 @@ SET State = 1;
 		AND CAST(TSR.TransactionDate AS DATE) >= pFromDate
 		AND CAST(TSR.TransactionDate AS DATE) <= pToDate
 	ORDER BY
-		SaleNumber;
+		SaleNumber,
+        SaleID;
 
 END;
 $$

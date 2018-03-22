@@ -9,7 +9,7 @@ DROP PROCEDURE IF EXISTS spSelPurchaseDetailsReport;
 
 DELIMITER $$
 CREATE PROCEDURE spSelPurchaseDetailsReport (
-	pSaleID				BIGINT,
+	pPurchaseID			BIGINT,
 	pBranchID			INT,
 	pTransactionType 	VARCHAR(100),
     pCurrentUser		VARCHAR(255)
@@ -34,36 +34,34 @@ SET State = 1;
 		SELECT
 			MI.ItemCode,
 	        MI.ItemName,
-	        SD.Quantity,
-	        SD.SalePrice,
-			SD.Discount,
-			((SD.Quantity * SD.SalePrice) - SD.Discount) SubTotal
+	        PD.Quantity,
+	        PD.BuyPrice,
+			(PD.Quantity * PD.BuyPrice) SubTotal
 		FROM
-			transaction_saledetails SD
+			transaction_purchasedetails PD
 	        JOIN master_item MI
-				ON MI.ItemID = SD.ItemID
+				ON MI.ItemID = PD.ItemID
 		WHERE
-			SD.SaleID = pSaleID
-            AND SD.BranchID = pBranchID
+			PD.PurchaseID = pPurchaseID
+            AND PD.BranchID = pBranchID
 		ORDER BY
-			SD.SaleDetailsID;
+			PD.PurchaseDetailsID;
 	ELSE
 		SELECT
 			MI.ItemCode,
 	        MI.ItemName,
-	        SRD.Quantity,
-	        SRD.SalePrice,
-            0 Discount,
-			(SRD.Quantity * SRD.SalePrice) SubTotal
+	        PRD.Quantity,
+	        PRD.BuyPrice,
+            (PRD.Quantity * PRD.BuyPrice) SubTotal
 		FROM
-			transaction_salereturndetails SRD
+			transaction_purchasereturndetails PRD
 	        JOIN master_item MI
-				ON MI.ItemID = SRD.ItemID
+				ON MI.ItemID = PRD.ItemID
 		WHERE
-			SRD.SaleReturnID = pSaleID
-            AND SRD.BranchID = pBranchID
+			PRD.PurchaseReturnID = pPurchaseID
+            AND PRD.BranchID = pBranchID
 		ORDER BY
-			SRD.SaleReturnDetailsID;
+			PRD.PurchaseReturnDetailsID;
             
 	END IF;
         

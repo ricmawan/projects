@@ -3,6 +3,7 @@ DROP PROCEDURE IF EXISTS spInsPurchaseReturn;
 DELIMITER $$
 CREATE PROCEDURE spInsPurchaseReturn (
 	pID 						BIGINT,
+	pPurchaseReturnNumber		VARCHAR(100),
 	pPurchaseReturnDetailsID	BIGINT,
     pSupplierID					BIGINT,
 	pTransactionDate 			DATETIME,
@@ -10,6 +11,7 @@ CREATE PROCEDURE spInsPurchaseReturn (
     pItemID						BIGINT,
 	pQuantity					DOUBLE,
     pBuyPrice					DOUBLE,
+	pUserID						BIGINT,
     pCurrentUser				VARCHAR(255)
 )
 StoredProcedure:BEGIN
@@ -33,6 +35,7 @@ StoredProcedure:BEGIN
 		SELECT
 			pID AS 'ID',
             pPurchaseReturnDetailsID AS 'PurchaseReturnDetailsID',
+            pPurchaseReturnNumber AS 'PurchaseReturnNumber',
 			'Terjadi kesalahan sistem!' AS 'Message',
 			@full_error AS 'MessageDetail',
 			1 AS 'FailedFlag',
@@ -45,8 +48,19 @@ StoredProcedure:BEGIN
 	
 SET State = 1;
 		IF(pID = 0)	THEN /*Tambah baru*/
+			SELECT
+				CONCAT('RB', RIGHT(CONCAT('00', pUserID), 2), DATE_FORMAT(NOW(), '%Y%m'), RIGHT(CONCAT('00000', (IFNULL(MAX(CAST(RIGHT(PurchaseReturnNumber, 5) AS UNSIGNED)), 0) + 1)), 5))
+			FROM
+				transaction_purchasereturn PR
+			WHERE
+				MONTH(PR.TransactionDate) = MONTH(NOW())
+				AND YEAR(PR.TransactionDate) = YEAR(NOW())
+			INTO 
+				pPurchaseReturnNumber;
+
 			INSERT INTO transaction_purchasereturn
 			(
+				PurchaseReturnNumber,
 				SupplierID,
 				TransactionDate,
 				CreatedDate,
@@ -54,6 +68,7 @@ SET State = 1;
 			)
 			VALUES 
 			(
+				pPurchaseReturnNumber,
 				pSupplierID,
 				pTransactionDate,
 				NOW(),
@@ -133,6 +148,7 @@ SET State = 7;
 		SELECT
 			pID AS 'ID',
 			pPurchaseReturnDetailsID AS 'PurchaseReturnDetailsID',
+			pPurchaseReturnNumber AS 'PurchaseReturnNumber',
 			'Transaksi Berhasil Disimpan' AS 'Message',
 			'' AS 'MessageDetail',
 			0 AS 'FailedFlag',

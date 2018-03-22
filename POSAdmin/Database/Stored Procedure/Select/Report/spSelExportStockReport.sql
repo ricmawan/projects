@@ -212,7 +212,8 @@ SET State = 1;
 				ELSE pBranchID
 			END = MB.BranchID
 	ORDER BY
-		MI.ItemCode ASC;
+		MC.CategoryID ASC,
+        MI.ItemCode ASC;
                     
 END;
 $$

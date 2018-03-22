@@ -6,7 +6,9 @@
 		include "../../GetPermission.php";
 		//echo $_SERVER['REQUEST_URI'];
 		$ItemCode = $_GET['ItemCode'];
+		$ItemName = $_GET['ItemName'];
 		$BranchID = $_GET['BranchID'];
+		$BranchName = $_GET['BranchName'];
 		if($_GET['FromDate'] == "") {
 			$txtFromDate = "2000-01-01";
 		}
@@ -57,17 +59,38 @@
 		$objPHPExcel->getActiveSheet()->getPageMargins()->setRight(0.787402);
 		$objPHPExcel->getActiveSheet()->getPageMargins()->setLeft(0.393701);
 		$objPHPExcel->getActiveSheet()->getPageMargins()->setBottom(0.787402);
+		$objPHPExcel->getActiveSheet()->getPageSetup()->setFitToWidth(1);
+		$objPHPExcel->getActiveSheet()->getPageSetup()->setFitToHeight(0);    
+		$objPHPExcel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
+		$objPHPExcel->getActiveSheet()->getPageSetup()->setPaperSize(PHPExcel_Worksheet_PageSetup::PAPERSIZE_A4);
+		$objPHPExcel->getActiveSheet()->getPageSetup()->setRowsToRepeatAtTopByStartAndEnd(7, 6);
 		
 		$objPHPExcel->getActiveSheet()->getStyle('A1')->getAlignment()->setWrapText(true);
 		$monthName = array("Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des");
+
+		$period = date("d", strtotime($txtFromDate)) . " " . $monthName[date("m", strtotime($txtFromDate)) - 1] . " " .  date("Y", strtotime($txtFromDate)) . " - " . date("d", strtotime($txtToDate)) . " " . $monthName[date("m", strtotime($txtToDate)) - 1] . " " .  date("Y", strtotime($txtToDate));
 		
-		//set bold
+		//bold title
 		$objPHPExcel->getActiveSheet()->getStyle("A1:A2")->getFont()->setBold(true);
 		$objPHPExcel->getActiveSheet()->getStyle("A1")->getFont()->setSize(16);
-		//$objPHPExcel->getActiveSheet()->getStyle("I4")->getFont()->setSize(14);
-		//$objPHPExcel->getActiveSheet()->getStyle("I4")->getFont()->setBold(true);
-		//$objPHPExcel->getActiveSheet()->setCellValue("I4", $monthName[date("m", strtotime($txtFromDate)) - 1] . " - " . date("Y", strtotime($txtFromDate)));
-		$rowExcel = 4;
+		//merge title
+		$objPHPExcel->getActiveSheet()->mergeCells("A1:F2");
+		//center title
+		$objPHPExcel->getActiveSheet()->getStyle("A1:F2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		
+		$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B3', "Barang:");
+		$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C3', $ItemName);
+		$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B4', "Cabang:");
+		$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C4', $BranchName );
+		$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B5', "Tanggal:");
+		$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C5', $period );
+		$objPHPExcel->getActiveSheet()->getStyle("B3:C5")->getFont()->setBold(true);
+
+		//bold title
+		$objPHPExcel->getActiveSheet()->getStyle("A7:F7")->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle("A7:F7")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');
+
+		$rowExcel = 7;
 		$col = 0;
 		//set color
 		//$objPHPExcel->getFont()->setColor( new PHPExcel_Style_Color( PHPExcel_Style_Color::COLOR_DARKGREEN ) );
@@ -100,13 +123,8 @@
 		}
 		mysqli_free_result($result);
 		mysqli_next_result($dbh);
-		//merge title
-		$objPHPExcel->getActiveSheet()->mergeCells("A1:F2");
-		$objPHPExcel->getActiveSheet()->getStyle("A4:F4")->getFont()->setBold(true);
-		$objPHPExcel->getActiveSheet()->getStyle("A1:F2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-		$objPHPExcel->getActiveSheet()->getStyle("B4:E".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
-		$objPHPExcel->getActiveSheet()->getStyle("A4:F4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');
-
+		$objPHPExcel->getActiveSheet()->getStyle("B7:D".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+		
 		//set all width 
 		$fromCol='A';
 		$toCol= 'G';
@@ -121,9 +139,9 @@
 			  )
 			)
 		);		
-		$objPHPExcel->getActiveSheet()->getStyle("A4:F".($rowExcel-1))->applyFromArray($styleArray);		
+		$objPHPExcel->getActiveSheet()->getStyle("A7:F".($rowExcel-1))->applyFromArray($styleArray);		
 
-		$title = "Laporan Detail Stok";
+		$title = "Laporan Detail Stok " . $ItemName . " " . $period;
 		// Rename worksheet
 		//$objPHPExcel->getActiveSheet()->setTitle($title);
 		// Set active sheet index to the first sheet, so Excel opens this as the first sheet

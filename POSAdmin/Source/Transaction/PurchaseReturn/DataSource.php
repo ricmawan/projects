@@ -10,9 +10,10 @@
 	$columns = array(
 					0 => "PurchaseReturnID", //unorderable
 					1 => "RowNumber", //unorderable
-					2 => "TPR.TransactionDate",
-					3 => "MS.SupplierName",
-					4 => "TPRD.Total"
+					2 => "TPR.PurchaseReturnNumber",
+					3 => "TPR.TransactionDate",
+					4 => "MS.SupplierName",
+					5 => "TPRD.Total"
 				);
 
 	$where = " 1=1 ";
@@ -28,6 +29,7 @@
 	{
 		$search = mysqli_real_escape_string($dbh, trim($requestData['search']['value']));
 		$where .= " AND ( DATE_FORMAT(TPR.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
+		$where .= " OR TPR.PurchaseReturnNumber LIKE '%".$search."%'";
 		$where .= " OR MS.SupplierName LIKE '%".$search."%' )";
 	}
 	$sql = "CALL spSelPurchaseReturn(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
@@ -49,8 +51,9 @@
 		$row_array = array();
 		$RowNumber++;
 		//data yang dikirim ke table
-		$row_array[] = "<input name='select' type='checkbox' value='".$row['PurchaseReturnID']."' />";
+		$row_array[] = "<input name='select' type='checkbox' value='".$row['PurchaseReturnID']."^".$row['PurchaseReturnNumber']."' />";
 		$row_array[] = $RowNumber;
+		$row_array[] = $row['PurchaseReturnNumber'];
 		$row_array[] = $row['TransactionDate'];
 		$row_array[] = $row['SupplierName'];
 		$row_array[] = number_format($row['Total'],0,".",",");

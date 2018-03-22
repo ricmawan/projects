@@ -32,6 +32,7 @@
 					);
 
 		$where = " 1=1 ";
+		$where2 = " 1=1 ";
 		$order_by = "PurchaseNumber";
 		$limit_s = $requestData['start'];
 		$limit_l = $requestData['length'];
@@ -46,8 +47,12 @@
 			$where .= " AND ( TP.PurchaseNumber LIKE '%".$search."%'";
 			$where .= " OR DATE_FORMAT(TP.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
 			$where .= " OR MS.SupplierName LIKE '%".$search."%' )";
+
+			$where2 .= " AND ( TPR.PurchaseReturnNumber LIKE '%".$search."%'";
+			$where2 .= " OR DATE_FORMAT(TPR.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
+			$where2 .= " OR MS.SupplierName LIKE '%".$search."%' )";
 		}
-		$sql = "CALL spSelPurchaseReport(".$BranchID.", '".$txtFromDate."', '".$txtToDate."', \"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spSelPurchaseReport(".$BranchID.", '".$txtFromDate."', '".$txtToDate."', \"$where\", \"$where2\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
 
 		if (! $result = mysqli_query($dbh, $sql)) {
 			logEvent(mysqli_error($dbh), '/Report/Purchase/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));

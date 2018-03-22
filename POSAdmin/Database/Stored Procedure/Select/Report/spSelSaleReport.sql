@@ -13,6 +13,7 @@ CREATE PROCEDURE spSelSaleReport (
 	pFromDate		DATE,
 	pToDate			DATE,
 	pWhere 			TEXT,
+    pWhere2			TEXT,
 	pOrder			TEXT,
 	pLimit_s		BIGINT,
     pLimit_l		INT,
@@ -67,7 +68,7 @@ SET @query = CONCAT("SELECT
 								SRD.BranchID = ", pBranchID ,"
 								AND CAST(TSR.TransactionDate AS DATE) >= '",pFromDate,"'
 								AND CAST(TSR.TransactionDate AS DATE) <= '",pToDate,"'
-								AND ", pWhere, "
+								AND ", pWhere2, "
 		                    GROUP BY
 								TSR.SaleReturnID
 						) TS"
@@ -122,7 +123,7 @@ SET @query = CONCAT("SELECT
 						SRD.BranchID = ", pBranchID ,"
 						AND CAST(TSR.TransactionDate AS DATE) >= '",pFromDate,"'
 						AND CAST(TSR.TransactionDate AS DATE) <= '",pToDate,"'
-						AND ", pWhere, "
+						AND ", pWhere2, "
                     GROUP BY
 						TSR.SaleReturnID,
                         TS.SaleNumber,

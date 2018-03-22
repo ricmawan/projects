@@ -33,20 +33,51 @@ SET State = 1;
 		TP.PurchaseNumber,
 		DATE_FORMAT(TP.TransactionDate, '%d-%m-%Y') TransactionDate,
 		MS.SupplierName,
-		SUM(PD.Quantity * PD.BuyPrice) Total
+        MI.ItemID,
+        MI.ItemName,
+        MI.ItemCode,
+        PD.Quantity,
+        PD.BuyPrice,
+		(PD.Quantity * PD.BuyPrice) SubTotal
 	FROM
 		transaction_purchase TP
 		JOIN transaction_purchasedetails PD
 			ON TP.PurchaseID = PD.PurchaseID
 		JOIN master_supplier MS
 			ON MS.SupplierID = TP.SupplierID
-	GROUP BY
-		TP.PurchaseID,
-        TP.PurchaseNumber,
-        TP.TransactionDate,
-        MS.SupplierName
+		JOIN master_item MI
+			ON MI.ItemID = PD.ItemID
+	WHERE
+		PD.BranchID = pBranchID
+		AND CAST(TP.TransactionDate AS DATE) >= pFromDate
+		AND CAST(TP.TransactionDate AS DATE) <= pToDate
+	UNION ALL
+    SELECT
+		TPR.PurchaseReturnID,
+		TPR.PurchaseReturnNumber,
+		DATE_FORMAT(TPR.TransactionDate, '%d-%m-%Y') TransactionDate,
+		MS.SupplierName,
+        MI.ItemID,
+        MI.ItemName,
+        MI.ItemCode,
+        PRD.Quantity,
+        PRD.BuyPrice,
+		-(PRD.Quantity * PRD.BuyPrice) SubTotal
+	FROM
+		transaction_purchasereturn TPR
+		JOIN transaction_purchasereturndetails PRD
+			ON TPR.PurchaseReturnID = PRD.PurchaseReturnID
+		JOIN master_supplier MS
+			ON MS.SupplierID = TPR.SupplierID
+		JOIN master_item MI
+			ON MI.ItemID = PRD.ItemID
+	WHERE
+		PRD.BranchID = pBranchID
+		AND CAST(TPR.TransactionDate AS DATE) >= pFromDate
+		AND CAST(TPR.TransactionDate AS DATE) <= pToDate
 	ORDER BY
-		TP.PurchaseNumber;
+		PurchaseNumber,
+        PurchaseID;
 
 END;
 $$
