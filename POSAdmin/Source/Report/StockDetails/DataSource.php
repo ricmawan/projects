@@ -27,7 +27,7 @@
 		}
 		//kolom di table
 		
-		$sql = "CALL spSelStockDetailsReport(".$ItemCode.", ".$BranchID.", '".$txtFromDate."', '".$txtToDate."', '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spSelStockDetailsReport('".$ItemCode."', ".$BranchID.", '".$txtFromDate."', '".$txtToDate."', '".$_SESSION['UserLogin']."')";
 
 		if (! $result = mysqli_query($dbh, $sql)) {
 			logEvent(mysqli_error($dbh), '/Report/StockDetails/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));

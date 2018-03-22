@@ -113,13 +113,13 @@
 			return 0;
 		}
 		$RowNumber = 1;
-		$PurchaseID = 0;
+		$PurchaseNumber = "";
 		$MergeStart = 0;
 		$Total = 0;
 		$GrandTotal = 0;
 		$DetailsCounter = 0;
 		while($row = mysqli_fetch_array($result)) {
-			if($PurchaseID != $row['PurchaseID']) {
+			if($PurchaseNumber != $row['PurchaseNumber']) {
 				$DetailsCounter = 0;
 				if ($MergeStart != $rowExcel && $RowNumber != 1) {
 					$objPHPExcel->getActiveSheet()->mergeCells("A".$MergeStart.":D".($rowExcel - 1));
@@ -135,22 +135,22 @@
 				$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $RowNumber);
 				$objPHPExcel->getActiveSheet()->setCellValueExplicit("B".$rowExcel, $row['PurchaseNumber'], PHPExcel_Cell_DataType::TYPE_STRING);
 				$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['TransactionDate']);
-				$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row['SupplierName']);
+				$objPHPExcel->getActiveSheet()->setCellValueExplicit("D".$rowExcel, $row['SupplierName'], PHPExcel_Cell_DataType::TYPE_STRING);
 				$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":D".$rowExcel)->getFont()->setBold(true);
 				$RowNumber++;
 				$Total = 0;
 				$MergeStart = $rowExcel + 1;
 			}
 			$DetailsCounter++;
-			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, $row['ItemCode']);
-			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['ItemName']);
+			$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, $row['ItemCode'], PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->getActiveSheet()->setCellValueExplicit("F".$rowExcel, $row['ItemName'], PHPExcel_Cell_DataType::TYPE_STRING);
 			$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, $row['Quantity']);
 			$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, $row['BuyPrice']);
 			$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, $row['SubTotal']);
 			$Total += $row['SubTotal'];
 			$GrandTotal += $row['SubTotal'];
 			$rowExcel++;
-			$PurchaseID = $row['PurchaseID'];
+			$PurchaseNumber = $row['PurchaseNumber'];
 		}
 		if($DetailsCounter > 1) {
 			$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":H".$rowExcel);
@@ -183,6 +183,7 @@
 
 		$objPHPExcel->getActiveSheet()->getStyle("B6:F".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
 		$objPHPExcel->getActiveSheet()->getStyle("G6:I".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+		$rowExcel++;
 		
 		//set all width 
 		$fromCol='A';
