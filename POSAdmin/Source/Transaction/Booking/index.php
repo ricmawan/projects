@@ -165,7 +165,7 @@
 				</div>
 				<br />
 				<div class="row" >
-					<h5 style="margin-top: 5px !important;margin-bottom: 5px !important;">F12 = Daftar Barang; F10 = Transaksi Selesai; ESC = Tutup; DELETE = Hapus; ENTER/DOUBLE KLIK = Edit;</h5>
+					<h5 style="margin-top: 5px !important;margin-bottom: 5px !important;">F10 = Transaksi Selesai; F12 = Daftar Barang; ESC = Tutup; DELETE = Hapus; ENTER/DOUBLE KLIK = Edit;</h5>
 				</div>
 			</form>
 		</div>

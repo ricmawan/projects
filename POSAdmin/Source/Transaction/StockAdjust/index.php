@@ -127,7 +127,7 @@
 					</div>
 				</div>
 				<div class="row" >
-					<h5>F12 = Daftar Barang; ESC = Tutup; DELETE = Hapus; ENTER/DOUBLE KLIK = Edit;</h5>
+					<h5>F10 = Transaksi Selesai; F12 = Daftar Barang; ESC = Tutup; DELETE = Hapus; ENTER/DOUBLE KLIK = Edit;</h5>
 				</div>
 			</form>
 		</div>
@@ -739,6 +739,82 @@
 						}
 					}]
 				}).dialog("open");
+			}
+
+			function finish() {
+				if($("#hdnSaleID").val() != 0) {
+					$("#finish-confirm").dialog({
+						autoOpen: false,
+						open: function() {
+							$(document).on('keydown', function(e) {
+								if (e.keyCode == 39) { //right arrow
+									 $("#btnNo").focus();
+								}
+								else if (e.keyCode == 37) { //left arrow
+									 $("#btnYes").focus();
+								}
+							});
+						},
+						show: {
+							effect: "fade",
+							duration: 500
+						},
+						hide: {
+							effect: "fade",
+							duration: 500
+						},
+						close: function() {
+							$(this).dialog("destroy");
+							//callback("Tidak");
+						},
+						resizable: false,
+						height: "auto",
+						width: 400,
+						modal: true,
+						buttons: [
+						{
+							text: "Ya",
+							id: "btnYes",
+							click: function() {
+								$(this).dialog("destroy");
+								$("#FormData").dialog("destroy");
+								$("#divModal").hide();
+								table.ajax.reload(function() {
+									table.keys.enable();
+									if(typeof index !== 'undefined') table.cell(index).focus();
+								}, false);
+								resetForm();
+								table2.destroy();
+								//$(this).dialog("destroy");
+								//callback("Ya");
+							}
+						},
+						{
+							text: "Tidak",
+							id: "btnNo",
+							click: function() {
+								$(this).dialog("destroy");
+								//callback("Tidak");
+							}
+						}]
+					}).dialog("open");
+				}
+				else {
+					var counter = 0;
+					Lobibox.alert("error",
+					{
+						msg: "Silahkan tambahkan barang terlebih dahulu!",
+						width: 480,
+						beforeClose: function() {
+							if(counter == 0) {
+								setTimeout(function() {
+									$("#txtItemCode").focus();
+								}, 0);
+								counter = 1;
+							}
+						}
+					});
+				}
 			}
 
 			$(document).ready(function() {

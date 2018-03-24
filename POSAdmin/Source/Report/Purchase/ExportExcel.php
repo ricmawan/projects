@@ -122,14 +122,20 @@
 			if($PurchaseNumber != $row['PurchaseNumber']) {
 				$DetailsCounter = 0;
 				if ($MergeStart != $rowExcel && $RowNumber != 1) {
-					$objPHPExcel->getActiveSheet()->mergeCells("A".$MergeStart.":D".($rowExcel - 1));
-					$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":H".$rowExcel);
+					$objPHPExcel->getActiveSheet()->mergeCells("A".($MergeStart - 1).":A".$rowExcel);
+					$objPHPExcel->getActiveSheet()->mergeCells("B".($MergeStart - 1).":B".$rowExcel);
+					$objPHPExcel->getActiveSheet()->mergeCells("C".($MergeStart - 1).":C".$rowExcel);
+					$objPHPExcel->getActiveSheet()->mergeCells("D".($MergeStart - 1).":D".$rowExcel);
+					$objPHPExcel->getActiveSheet()->getStyle("A".($MergeStart - 1).":D".$rowExcel)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
 
-					$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total");
-					$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":I".$rowExcel)->getFont()->setBold(true);
-					$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+					$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Total");
+					$objPHPExcel->getActiveSheet()->getStyle("E".$rowExcel.":I".$rowExcel)->getFont()->setBold(true);
+					$objPHPExcel->getActiveSheet()->mergeCells(	"E".$rowExcel.":H".$rowExcel);
+					$objPHPExcel->getActiveSheet()->getStyle("E".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+
 					$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, $Total);
-					$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":I".$rowExcel)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('fffa00');
+					$objPHPExcel->getActiveSheet()->getStyle("E".$rowExcel.":H".$rowExcel)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('fffa00');
+
 					$rowExcel++;
 				}
 				$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $RowNumber);
@@ -153,12 +159,19 @@
 			$PurchaseNumber = $row['PurchaseNumber'];
 		}
 		if($DetailsCounter > 1) {
-			$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":H".$rowExcel);
-			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total");
-			$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":H".$rowExcel)->getFont()->setBold(true);
-			$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+			$objPHPExcel->getActiveSheet()->mergeCells("A".($MergeStart - 1).":A".$rowExcel);
+			$objPHPExcel->getActiveSheet()->mergeCells("B".($MergeStart - 1).":B".$rowExcel);
+			$objPHPExcel->getActiveSheet()->mergeCells("C".($MergeStart - 1).":C".$rowExcel);
+			$objPHPExcel->getActiveSheet()->mergeCells("D".($MergeStart - 1).":D".$rowExcel);
+			$objPHPExcel->getActiveSheet()->getStyle("A".($MergeStart - 1).":D".$rowExcel)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
+
+			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Total");
+			$objPHPExcel->getActiveSheet()->getStyle("E".$rowExcel.":I".$rowExcel)->getFont()->setBold(true);
+			$objPHPExcel->getActiveSheet()->mergeCells(	"E".$rowExcel.":H".$rowExcel);
+			$objPHPExcel->getActiveSheet()->getStyle("E".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+
 			$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, $Total);
-			$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":H".$rowExcel)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('fffa00');
+			$objPHPExcel->getActiveSheet()->getStyle("E".$rowExcel.":H".$rowExcel)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('fffa00');
 			$rowExcel++;
 		}
 
@@ -181,9 +194,8 @@
 		mysqli_free_result($result);
 		mysqli_next_result($dbh);
 
-		$objPHPExcel->getActiveSheet()->getStyle("B6:F".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+		//$objPHPExcel->getActiveSheet()->getStyle("B6:F".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
 		$objPHPExcel->getActiveSheet()->getStyle("G6:I".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-		$rowExcel++;
 		
 		//set all width 
 		$fromCol='A';

@@ -1294,6 +1294,22 @@
 						}]
 					}).dialog("open");
 				}
+				else {
+					var counter = 0;
+					Lobibox.alert("error",
+					{
+						msg: "Silahkan tambahkan barang terlebih dahulu!",
+						width: 480,
+						beforeClose: function() {
+							if(counter == 0) {
+								setTimeout(function() {
+									$("#txtItemCode").focus();
+								}, 0);
+								counter = 1;
+							}
+						}
+					});
+				}
 			}
 
 			function Change() {
