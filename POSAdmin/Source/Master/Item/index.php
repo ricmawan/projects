@@ -241,7 +241,7 @@
 							
 							if($("#ddlCategory").val() == "") {
 								PassValidate = 0;
-								$("#ddlCategory").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+								$("#ddlCategory").next().find("input").notify("Harus diisi!", { position:"right", className:"warn", autoHideDelay: 2000 });
 								if(FirstFocus == 0) $("#ddlCategory").next().find("input").focus();
 								FirstFocus = 1;
 							}
