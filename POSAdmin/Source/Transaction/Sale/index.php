@@ -903,6 +903,14 @@
 						if (type === 'Simpan'){
 							var PassValidate = 1;
 							var FirstFocus = 0;
+							
+							if($("#ddlCategoryAdd").val() == "") {
+								PassValidate = 0;
+								$("#ddlCategoryAdd").next().find("input").notify("Harus diisi!", { position:"right", className:"warn", autoHideDelay: 2000 });
+								if(FirstFocus == 0) $("#ddlCategoryAdd").next().find("input").focus();
+								FirstFocus = 1;
+							}
+							
 							$("#FormItem .form-control-custom").each(function() {
 								if($(this).hasAttr('required')) {
 									if($(this).val() == "") {
