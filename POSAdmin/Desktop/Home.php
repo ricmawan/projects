@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-		<title>Main App</title>
+		<title>POS</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		
@@ -54,11 +54,11 @@
 						<div class="navigation">
 							<nav>
 								<ul class="nav topnav bold">
-									<li class='dropdown'>
+									<!--<li class='dropdown'>
 										<a href='#' class='menu active-menu' link='./Home.php'><i class='fa fa-home fa-2'></i> Home</a>
-									</li>
+									</li>-->
 									<li class='dropdown'>
-										<a href='#' class='menu' link='Transaction/Sale/'><i class='fa fa-cart-plus fa-2'></i> Penjualan</a>
+										<a href='#' id="menuSale" class='menu' link='Transaction/Sale/'><i class='fa fa-cart-plus fa-2'></i> Penjualan</a>
 									</li>
 									<li class='dropdown'>
 										<a href='#' class='menu' link='Transaction/SaleReturn/'><i class='fa fa-undo fa-2'></i> Retur Penjualan</a>
@@ -68,6 +68,9 @@
 									</li>
 									<li class='dropdown'>
 										<a href='#' class='menu' link='Transaction/Payment/'><i class='fa fa-dollar fa-2'></i> Pembayaran & Pengambilan</a>
+									</li>
+									<li class='dropdown'>
+										<a href='#' class='menu' link='Transaction/Payment/'><i class='fa fa-print fa-2'></i> Cetak Nota & Surat Jalan</a>
 									</li>
 								</ul>
 							</nav>
@@ -131,7 +134,7 @@
 				
 			</div>-->
 			<div id="page-inner" style="overflow-x:hidden;overflow-y:hidden;">
-				<img src="./assets/img/logo.png" style="width:100%;"/>
+				<img src="./assets/img/logo.png" style="width:40%;margin: 40px auto;display:block;"/>
 			</div>
 		</div>
 		<div id="delete-confirm" title="Konfirmasi" style="display: none;">
@@ -171,6 +174,19 @@
 			</form>
 		</div>
 		<div id="divModal"></div>
+		<div id="first-balance" title="Saldo Awal" style="display: none;">
+			<form class="col-md-12" id="FirstBalanceForm" method="POST" action="" >
+				<div class="row">
+					<div class="col-md-5 labelColumn">
+						Saldo Awal :
+					</div>
+					<div class="col-md-6">
+						<input id="txtFirstBalance" tabindex=50; name="txtFirstBalance" type="text" class="form-control-custom" placeholder="Salwo Awal" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" value="0.00" />
+					</div>
+				</div>
+				<br />
+			</form>
+		</div>
 		<!-- Sliding div starts here -->
 		<!--<div id="slider" style="right:-300px;">
 			<div id="sidebar" onclick="open_panel()"><img src="assets/img/btnShortcutInfo.png"></button></div>
@@ -200,8 +216,102 @@
 		<div id="loading"></div>
 		<iframe id='excelDownload' src='' style='display:none'></iframe>
 		<script type="text/javascript">
+			function firstBalance() {
+				$("#first-balance").dialog({
+					autoOpen: false,
+					open: function() {
+						$("#divModal").show();
+						$(document).on('keydown', function(e) {
+							if (e.keyCode == 39 && $("input:focus").length == 0) { //right arrow
+								 $("#btnCancelFirstBalance").focus();
+							}
+							else if (e.keyCode == 37 && $("input:focus").length == 0) { //left arrow
+								 $("#btnSaveFirstBalance").focus();
+							}
+						});
+						$("#txtFirstBalance").focus();
+					},
+					show: {
+						effect: "fade",
+						duration: 500
+					},
+					hide: {
+						effect: "fade",
+						duration: 500
+					},
+					close: function() {
+						$(this).dialog("destroy");
+						$("#divModal").hide();
+					},
+					resizable: false,
+					height: 150,
+					width: 400,
+					modal: false,
+					buttons: [
+					{
+						text: "Simpan",
+						tabindex: 51,
+						id: "btnSaveFirstBalance",
+						click: function() {
+							$.ajax({
+								url: "./InsertFirstBalance.php",
+								type: "POST",
+								data: $("#FirstBalanceForm").serialize(),
+								dataType: "json",
+								success: function(data) {
+									$("#loading").hide();
+									if(data.FailedFlag == '0') {
+										//$.notify(data.Message, "success");
+										$("#first-balance").dialog("destroy");
+										$("#txtFirstBalance").val("0.00");
+										$("#divModal").hide();
+										Lobibox.alert("success",
+										{
+											msg: data.Message,
+											width: 480,
+											delay: 2000
+										});
+									}
+									else {
+										$("#loading").hide();
+										Lobibox.alert("warning",
+										{
+											msg: data.Message,
+											width: 480,
+											delay: false
+										});
+									}
+									
+								},
+								error: function(jqXHR, textStatus, errorThrown) {
+									$("#loading").hide();
+									var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+									LogEvent(errorMessage, "Home.php (fnFirstBalance)");
+									Lobibox.alert("error",
+									{
+										msg: errorMessage,
+										width: 480
+									});
+									return 0;
+								}
+							});
+						}
+					},
+					{
+						text: "Tutup",
+						tabindex: 52,
+						id: "btnCancelFirstBalance",
+						click: function() {
+							$(this).dialog("destroy");
+							$("#divModal").hide();
+							return false;
+						}
+					}]
+				}).dialog("open");
+			}
+
 			$(document).ready(function() {
-				var windowHeight = $( window ).height() - 55;
+				var windowHeight = $( window ).height() - 45;
 				$("#page-inner").css ({
 					"min-height" : windowHeight,
 					"max-height" : windowHeight
@@ -209,7 +319,7 @@
 				$(".panel-default").css ({
 					"min-height" : windowHeight
 				});
-				$("head").append("<style> .panel-default { min-height : " + windowHeight + "px; } .panel-body { overflow-y:auto;min-height : " + (windowHeight - 60) + "px; max-height : " + (windowHeight - 60) + "px } </style>");
+				$("head").append("<style> .panel-default { min-height : " + windowHeight + "px; } .panel-body { overflow-y:auto;min-height : " + (windowHeight - 50) + "px; max-height : " + (windowHeight - 50) + "px } </style>");
 				$("#wrapper").css ({
 					"width" : "calc(100% - 5px)"
 				});
@@ -227,6 +337,48 @@
 						"width" : "calc(100% - 5px)"
 					});
 				});
+
+				$.ajax({
+					url: "./FirstBalance.php",
+					type: "POST",
+					data: { },
+					dataType: "json",
+					success: function(Data) {
+						if(Data.FailedFlag == '0') {
+							if(Data.IsFilled == 0) firstBalance();
+						}
+						else {
+							var counter = 0;
+							Lobibox.alert("error",
+							{
+								msg: "Gagal memuat data",
+								width: 480,
+								beforeClose: function() {
+									if(counter == 0) {
+										setTimeout(function() {
+											//$("#txtItemCode").focus();
+										}, 0);
+										counter = 1;
+									}
+								}
+							});
+							return 0;
+						}
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						$("#loading").hide();
+						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+						LogEvent(errorMessage, "/Home.php");
+						Lobibox.alert("error",
+						{
+							msg: errorMessage,
+							width: 480
+						});
+						return 0;
+					}
+				});
+
+				$("#menuSale").click();
 			});
 		</script>
 	</body>

@@ -26,7 +26,7 @@
 							<div class="col-md-1 labelColumn">
 								Cabang:
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-2">
 								<select id="ddlBranch" name="ddlBranch" tabindex=8 class="form-control-custom" placeholder="Pilih Cabang" >
 									<!--<option value=0 selected >-- Semua Cabang --</option>-->
 									<?php
@@ -46,7 +46,7 @@
 							<div class="col-md-1 labelColumn">
 								Tanggal :
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-2">
 								<div class="ui-widget" style="width: 100%;">
 									<input id="txtFromDate" name="txtFromDate" type="text" class="form-control-custom" style="background-color: #FFF;cursor: text;" placeholder="Dari Tanggal" readonly />
 								</div>
@@ -54,22 +54,17 @@
 							<div style="float:left;" class="labelColumn">
 								-
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-2">
 								<div class="ui-widget" style="width: 100%;">
 									<input id="txtToDate" name="txtToDate" type="text" class="form-control-custom" style="background-color: #FFF;cursor: text;" placeholder="Sampai Tanggal" readonly />
 								</div>
 							</div>
-						</div>
-						<br />
-						<div class="row">
-							<div class="col-md-12">
-								<button class="btn btn-info" id="btnView" onclick="Preview();" ><i class="fa fa-list"></i> Lihat</button>&nbsp;&nbsp;
-								<button class="btn btn-success" id="btnExcel" onclick="ExportExcel();" ><i class="fa fa-file-excel-o "></i> Eksport Excel</button>&nbsp;&nbsp;
+							<div class="col-md-3">
+								<button class="btn btn-info" id="btnView" onclick="Preview();" style="padding-top: 1px;padding-bottom: 1px;" ><i class="fa fa-list"></i> Lihat</button>&nbsp;&nbsp;
+								<button class="btn btn-success" id="btnExcel" onclick="ExportExcel();" style="padding-top: 1px;padding-bottom: 1px;"" ><i class="fa fa-file-excel-o "></i> Eksport Excel</button>&nbsp;&nbsp;
 							</div>
 						</div>
-						<br />
-						<!--Grand Total: <span class="grandtotal"></span>
-						<br />-->
+						<hr style="margin: 10px 0;" />
 						<div class="table-responsive" id="dvTable" style="display: none;">
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
@@ -78,13 +73,13 @@
 										<th>No. Invoice</th>
 										<th>Tanggal</th>
 										<th>Nama Pelanggan</th>
-										<th>Total</th>
+										<th>Sub Total</th>
 									</tr>
 								</thead>
+								<tfoot id="tfootTable">
+								</tfoot>
 							</table>
 						</div>
-						<!--<br />
-						Grand Total: <span class="grandtotal"></span>-->
 					</div>
 				</div>
 			</div>
@@ -140,7 +135,18 @@
 					FirstPass = 0;
 					$("#loading").show();
 					$("#dvTable").show();
-					table.ajax.reload();
+					table.ajax.reload(function(json) {
+						$("#tfootTable").html("<tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Sub Total:</td><td>" + json.SubTotal + "</td></tr><tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Grand Total:</td><td>" + json.GrandTotal + "</td></tr>");
+						$("#tfootTable").find("td").css({
+							"border" : "0",
+							"font-size" : "14px",
+							"font-weight" : "bold",
+							"padding-right" : "10px",
+							"padding-top" : "5px",
+							"padding-bottom" : "5px",
+							"text-align" : "right"
+						});
+					});
 					table.columns.adjust();
 					$("#loading").hide();
 				}
@@ -222,6 +228,13 @@
 					maxDate : "+0D"
 				});
 
+				var panelHeight = $(".panel-body").height();
+				//$("head").append("<style> .panel-body { overflow-y:auto;min-height : " + (panelHeight + 20) + "px; max-height : " + (panelHeight + 20) + "px } </style>");
+				$(".panel-body").css({
+					"min-height" : (panelHeight + 50),
+					"max-height" : (panelHeight + 50)
+				});
+
 				table = $("#grid-data").DataTable({
 								"keys": true,
 								"scrollY": "285px",
@@ -267,7 +280,20 @@
 										"last": "»",
 										"first": "«"
 									}
-								}
+								},
+								"drawCallback": function( settings ) {
+							        var json = table.ajax.json();
+							        $("#tfootTable").html("<tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Sub Total:</td><td>" + json.SubTotal + "</td></tr><tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Grand Total:</td><td>" + json.GrandTotal + "</td></tr>");
+									$("#tfootTable").find("td").css({
+										"border" : "0",
+										"font-size" : "14px",
+										"font-weight" : "bold",
+										"padding-right" : "10px",
+										"padding-top" : "5px",
+										"padding-bottom" : "5px",
+										"text-align" : "right"
+									});
+							    }
 							});
 			});
 

@@ -62,7 +62,7 @@
 						<input id="hdnItemID" name="hdnItemID" type="hidden" value=0 />
 						<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
 						<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
-						<input id="hdnPayment" name="hdnPayment" type="hidden" />
+						<input id="hdnPayment" name="hdnPayment" type="hidden" value=0 />
 					</div>
 					<div class="col-md-2">
 						<input id="txtSaleNumber" name="txtSaleNumber" type="text" class="form-control-custom" placeholder="No. Invoice" readonly />
@@ -332,7 +332,7 @@
 								counterSaleDetails = 1;
 								var data = datatable.row( cell.index().row ).data();
 								if(key == 13) {
-									if(($("#FormEdit").css("display") == "none" || $("#delete-confirm").css("display") == "none") && $("#hdnEditFlag").val() == "1" ) {
+									if(($("#delete-confirm").css("display") == "none") && $("#hdnEditFlag").val() == "1" ) {
 										table2.cell.blur();
 										table2.keys.disable();
 										rowEdit = datatable.row( cell.index().row );

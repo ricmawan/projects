@@ -59,7 +59,7 @@ $(document).ready(function () {
 					$.notify("Koneksi gagal", "error");
 				}
 			});*/
-			$("#page-inner").html('<img src="./assets/img/logo.png" style="width:100%;"/>');
+			$("#page-inner").html('<img src="./assets/img/logo.png" style="width:40%;margin: 40px auto;display:block;"/>');
 			$("#loading").hide();
 		}
 		$(this).addClass("active-menu");
@@ -118,7 +118,7 @@ function Redirect(link) {
 				$.notify("Koneksi gagal", "error");
 			}
 		});*/
-		$("#page-inner").html('<img src="./assets/img/logo.png" style="width:100%;"/>');
+		$("#page-inner").html('<img src="./assets/img/logo.png" style="width:40%;margin: 40px auto;display:block;"/>');
 		$("#loading").hide();
 	}
 }
@@ -171,7 +171,7 @@ function Reload() {
 				$.notify("Koneksi gagal", "error");
 			}
 		});*/
-		$("#page-inner").html('<img src="./assets/img/logo.png" style="width:100%;"/>');
+		$("#page-inner").html('<img src="./assets/img/logo.png" style="width:40%;margin: 40px auto;display:block;"/>');
 		$("#loading").hide();
 	}
 }

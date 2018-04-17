@@ -57,6 +57,7 @@
 		}
 		$row = mysqli_fetch_array($result);
 		$totalData = $row['nRows'];
+		$GrandTotal = $row['GrandTotal'];
 		$totalFiltered = $totalData;
 		mysqli_free_result($result);
 		mysqli_next_result($dbh);
@@ -64,12 +65,14 @@
 		$result2 = mysqli_use_result($dbh);
 		$return_arr = array();
 		$RowNumber = $requestData['start'];
+		$SubTotal = 0;
 		while ($row = mysqli_fetch_array($result2)) {
 			$row_array = array();
 			//data yang dikirim ke table
 			$row_array["SaleNumber"] = $row['SaleNumber'];
 			$row_array["TransactionDate"] = $row['TransactionDate'];
 			$row_array["Total"] = number_format($row['Total'],0,".",",");
+			$SubTotal += $row['Total'];
 			array_push($return_arr, $row_array);
 		}
 		
@@ -80,7 +83,9 @@
 						"draw"				=> intval( $requestData['draw'] ),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw. 
 						"recordsTotal"		=> intval( $totalData ),  // total number of records
 						"recordsFiltered"	=> intval( $totalFiltered ), // total number of records after searching, if there is no searching then totalFiltered = totalData
-						"data"				=> $return_arr
+						"data"				=> $return_arr,
+						"SubTotal" => number_format($SubTotal,0,".",","),
+						"GrandTotal" => number_format($GrandTotal,0,".",",")
 					);
 	}
 	
@@ -89,7 +94,9 @@
 						"draw"				=> intval( $requestData['draw'] ),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw. 
 						"recordsTotal"		=> 0,  // total number of records
 						"recordsFiltered"	=> 0, // total number of records after searching, if there is no searching then totalFiltered = totalData
-						"data"				=> ""
+						"data"				=> "",
+						"SubTotal" => 0,
+						"GrandTotal" => 0
 					);
 	}
 	

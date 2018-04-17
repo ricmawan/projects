@@ -35,11 +35,12 @@ StoredProcedure:BEGIN
 SET State = 1;
 
 SET @query = CONCAT("SELECT
-						COUNT(1) AS nRows
+						COUNT(1) AS nRows,
+						SUM(Total) GrandTotal
 					FROM
 						(
 							SELECT
-								1
+								SUM(PD.Quantity * PD.BuyPrice) Total
 							FROM
 								transaction_purchase TP
 								JOIN transaction_purchasedetails PD
@@ -55,7 +56,7 @@ SET @query = CONCAT("SELECT
 								TP.PurchaseID
 							UNION ALL
 		                    SELECT
-								1
+								-SUM(PRD.Quantity * PRD.BuyPrice) Total
 							FROM
 								transaction_purchasereturn TPR
 								JOIN transaction_purchasereturndetails PRD
@@ -108,7 +109,7 @@ SET @query = CONCAT("SELECT
                         TPR.PurchaseReturnNumber,
                         DATE_FORMAT(TPR.TransactionDate, '%d-%m-%Y') TransactionDate,
 						MS.SupplierName,
-						SUM(PRD.Quantity * PRD.BuyPrice) Total
+						-SUM(PRD.Quantity * PRD.BuyPrice) Total
 					FROM
 						transaction_purchasereturn TPR
 						JOIN transaction_purchasereturndetails PRD

@@ -25,6 +25,10 @@
 							<input id="hdnItemID" name="hdnItemID" type="hidden" value=0 />
 							<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
 							<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
+							<?php
+								echo '<input id="hdnEditFlag" name="hdnEditFlag" type="hidden" value="'.$EditFlag.'" />';
+								echo '<input id="hdnDeleteFlag" name="hdnDeleteFlag" type="hidden" value="'.$DeleteFlag.'" />';
+							?>
 						</div>
 						<div class="col-md-2">
 							<input id="txtBookingNumber" name="txtBookingNumber" type="text" tabindex=5 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="No. Invoice" readonly />
@@ -128,7 +132,7 @@
 					</div>
 					<br />
 					<div class="row col-md-12" >
-						<h5 style="margin-top: 5px !important;margin-bottom: 5px !important;">F12 = Daftar Barang; F10 = Transaksi Selesai; ESC = Tutup; DELETE = Hapus; ENTER/DOUBLE KLIK = Edit;</h5>
+						<h5 style="margin-top: 5px !important;margin-bottom: 5px !important;">F10 = Transaksi Selesai; F12 = Daftar Barang; ESC = Tutup; DELETE = Hapus; ENTER/DOUBLE KLIK = Edit;</h5>
 					</div>
 				</form>
 			</div>
@@ -237,7 +241,7 @@
 						counterBookingDetails = 1;
 						var data = datatable.row( cell.index().row ).data();
 						if(key == 13) {
-							if(($("#FormEdit").css("display") == "none" || $("#delete-confirm").css("display") == "none") && $("#hdnEditFlag").val() == "1" ) {
+							if(($("#delete-confirm").css("display") == "none") && $("#hdnEditFlag").val() == "1" ) {
 								table2.cell.blur();
 								table2.keys.disable();
 								rowEdit = datatable.row( cell.index().row );
@@ -1072,6 +1076,100 @@
 				}).dialog("open");
 			}
 
+			function firstBalance() {
+				$("#first-balance").dialog({
+					autoOpen: false,
+					open: function() {
+						$("#divModal").show();
+						$(document).on('keydown', function(e) {
+							if (e.keyCode == 39 && $("input:focus").length == 0) { //right arrow
+								 $("#btnCancelFirstBalance").focus();
+							}
+							else if (e.keyCode == 37 && $("input:focus").length == 0) { //left arrow
+								 $("#btnSaveFirstBalance").focus();
+							}
+						});
+						$("#txtFirstBalance").focus();
+					},
+					show: {
+						effect: "fade",
+						duration: 500
+					},
+					hide: {
+						effect: "fade",
+						duration: 500
+					},
+					close: function() {
+						$(this).dialog("destroy");
+						$("#divModal").hide();
+					},
+					resizable: false,
+					height: 150,
+					width: 400,
+					modal: false,
+					buttons: [
+					{
+						text: "Simpan",
+						tabindex: 51,
+						id: "btnSaveFirstBalance",
+						click: function() {
+							$.ajax({
+								url: "./InsertFirstBalance.php",
+								type: "POST",
+								data: $("#FirstBalanceForm").serialize(),
+								dataType: "json",
+								success: function(data) {
+									$("#loading").hide();
+									if(data.FailedFlag == '0') {
+										//$.notify(data.Message, "success");
+										$("#first-balance").dialog("destroy");
+										$("#txtFirstBalance").val("0.00");
+										$("#divModal").hide();
+										Lobibox.alert("success",
+										{
+											msg: data.Message,
+											width: 480,
+											delay: 2000
+										});
+									}
+									else {
+										$("#loading").hide();
+										Lobibox.alert("warning",
+										{
+											msg: data.Message,
+											width: 480,
+											delay: false
+										});
+									}
+									
+								},
+								error: function(jqXHR, textStatus, errorThrown) {
+									$("#loading").hide();
+									var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+									LogEvent(errorMessage, "Home.php (fnFirstBalance)");
+									Lobibox.alert("error",
+									{
+										msg: errorMessage,
+										width: 480
+									});
+									return 0;
+								}
+							});
+						}
+					},
+					{
+						text: "Tutup",
+						tabindex: 52,
+						id: "btnCancelFirstBalance",
+						click: function() {
+							$(this).dialog("destroy");
+							$("#divModal").hide();
+							return false;
+						}
+					}]
+				}).dialog("open");
+			}
+
 			$(document).ready(function() {
 				openDialog(0, 0);
 				$('#toggle-retail').toggles({
@@ -1163,6 +1261,46 @@
 						evt.preventDefault();
 					}
 					setTimeout(function() { counterKey = 0; } , 1000);
+				});
+
+				$.ajax({
+					url: "./FirstBalance.php",
+					type: "POST",
+					data: { },
+					dataType: "json",
+					success: function(Data) {
+						if(Data.FailedFlag == '0') {
+							if(Data.IsFilled == 0) firstBalance();
+						}
+						else {
+							var counter = 0;
+							Lobibox.alert("error",
+							{
+								msg: "Gagal memuat data",
+								width: 480,
+								beforeClose: function() {
+									if(counter == 0) {
+										setTimeout(function() {
+											//$("#txtItemCode").focus();
+										}, 0);
+										counter = 1;
+									}
+								}
+							});
+							return 0;
+						}
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						$("#loading").hide();
+						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+						LogEvent(errorMessage, "/Home.php");
+						Lobibox.alert("error",
+						{
+							msg: errorMessage,
+							width: 480
+						});
+						return 0;
+					}
 				});
 			});
 		</script>

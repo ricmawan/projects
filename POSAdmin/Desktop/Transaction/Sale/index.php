@@ -25,7 +25,12 @@
 							<input id="hdnItemID" name="hdnItemID" type="hidden" value=0 />
 							<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
 							<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
-							<input id="hdnPayment" name="hdnPayment" type="hidden" />
+							<input id="hdnPayment" name="hdnPayment" type="hidden" value=0 />
+							<input id="hdnDesktopPath" name="hdnDesktopPath" type="hidden" value='<?php echo $DESKTOP_PATH; ?>' />
+							<?php
+								echo '<input id="hdnEditFlag" name="hdnEditFlag" type="hidden" value="'.$EditFlag.'" />';
+								echo '<input id="hdnDeleteFlag" name="hdnDeleteFlag" type="hidden" value="'.$DeleteFlag.'" />';
+							?>
 						</div>
 						<div class="col-md-2">
 							<input id="txtSaleNumber" name="txtSaleNumber" type="text" tabindex=5 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="No. Invoice" readonly />
@@ -78,7 +83,7 @@
 								<tr>
 									<td style="width: 25%;" ><input id="txtItemCode" name="txtItemCode" type="text" tabindex=8 class="form-control-custom" style="width: 100%;" onfocus="this.select();" onkeypress="isEnterKey(event, 'getItemDetails');" onchange="getItemDetails();" autocomplete=off placeholder="Kode Barang" /></td>
 									<td style="width: 25%;" ><input id="txtItemName" name="txtItemName" type="text" class="form-control-custom" style="width: 100%;" disabled /></td>
-									<td style="width: 10%;" ><input id="txtQTY" name="txtQTY" type="number" tabindex=9 class="form-control-custom" style="width: 100%;" value=1 min=1 onchange="this.value = validateQTY(this.value);Grosir(this.value);" onpaste="return false;" onfocus="this.select();" /></td>
+									<td style="width: 10%;" ><input id="txtQTY" name="txtQTY" type="number" tabindex=9 class="form-control-custom" style="width: 100%;margin: 0;border: 0;" value=1 min=1 onchange="this.value = validateQTY(this.value);Grosir(this.value);" onpaste="return false;" onfocus="this.select();" /></td>
 									<td style="width: 20%;" >
 										<input id="hdnBuyPrice" name="hdnBuyPrice" type="hidden" value=0 />
 										<input id="hdnRetailPrice" name="hdnRetailPrice" type="hidden" value=0 />
@@ -101,6 +106,7 @@
 							<table id="grid-transaction" style="width: 100% !important;" class="table table-striped table-bordered table-hover" >
 								<thead>
 									<tr>
+										<th><input id="select_all" name="select_all" type="checkbox" onclick="chkAll();" style="margin: 0;" /></th>
 										<th>SaleDetailsID</th>
 										<th>ItemID</th>
 										<th>BranchID</th>
@@ -129,7 +135,12 @@
 					</div>
 					<br />
 					<div class="row col-md-12" >
-						<h5 style="margin-top: 5px !important;margin-bottom: 5px !important;">F12 = Daftar Barang; F10 = Transaksi Selesai; ESC = Tutup; DELETE = Hapus; ENTER/DOUBLE KLIK = Edit;</h5>
+						<h5 style="margin-top: 5px !important;margin-bottom: 5px !important;">F9 = Nota Baru; F10 = Transaksi Selesai; F12 = Daftar Barang; DELETE = Hapus; ENTER/DOUBLE KLIK = Edit;</h5>
+					</div>
+					<br />
+					<div class="row col-md-12" >
+						<button type="button" class="btn btn-info" id="btnPrintInvoice" onclick="printInvoice();" style="padding-top: 1px;padding-bottom: 1px;" ><i class="fa fa-print"></i> Cetak Nota</button>&nbsp;&nbsp;
+						<button type="button" class="btn btn-success" id="btnPrintShipment" onclick="printShipment();" style="padding-top: 1px;padding-bottom: 1px;"" ><i class="fa fa-truck "></i> Cetak Surat Jalan</button>&nbsp;&nbsp;
 					</div>
 				</form>
 			</div>
@@ -185,9 +196,9 @@
 				</div>
 			</div>
 			<br />
-			<button class="btn btn-primary btn-block" tabindex=15 onclick="printInvoice();" >Cetak Nota</button>
+			<button class="btn btn-primary btn-block" tabindex=12 onclick="printInvoice();" >Cetak Nota</button>
 			<br />
-			<button class="btn btn-danger btn-block" tabindex=16 onclick="printShipment();" >Cetak Surat Jalan</button>
+			<button class="btn btn-danger btn-block" tabindex=13 onclick="printShipment();" >Cetak Surat Jalan</button>
 		</div>
 		<script>
 			var table2;
@@ -196,21 +207,21 @@
 			var rowEdit;
 			
 			function openDialogEdit(Data) {
-				$("#hdnSaleDetailsID").val(Data[0]);
-				$("#hdnItemID").val(Data[1]);
-				$("#hdnBranchID").val(Data[2]);
-				$("#txtItemCode").val(Data[4]);
-				$("#txtItemName").val(Data[5]);
-				$("#txtQTY").val(Data[6]);
-				$("#txtSalePrice").val(Data[7]);
-				$("#txtDiscount").val(Data[8]);
-				$("#hdnBuyPrice").val(Data[10]);
-				$("#hdnPrice1").val(Data[11]);
-				$("#hdnQty1").val(Data[12]);
-				$("#hdnPrice2").val(Data[13]);
-				$("#hdnQty2").val(Data[14]);
-				$("#hdnWeight").val(Data[15]);
-				$("#hdnRetailPrice").val(Data[16]);
+				$("#hdnSaleDetailsID").val(Data[1]);
+				$("#hdnItemID").val(Data[2]);
+				$("#hdnBranchID").val(Data[3]);
+				$("#txtItemCode").val(Data[5]);
+				$("#txtItemName").val(Data[6]);
+				$("#txtQTY").val(Data[7]);
+				$("#txtSalePrice").val(Data[8]);
+				$("#txtDiscount").val(Data[9]);
+				$("#hdnBuyPrice").val(Data[11]);
+				$("#hdnPrice1").val(Data[12]);
+				$("#hdnQty1").val(Data[13]);
+				$("#hdnPrice2").val(Data[14]);
+				$("#hdnQty2").val(Data[15]);
+				$("#hdnWeight").val(Data[16]);
+				$("#hdnRetailPrice").val(Data[17]);
 
 				setTimeout(function() { $("#txtItemCode").focus(); }, 0);
 			}
@@ -227,10 +238,11 @@
 							"searching": false,
 							"order": [],
 							"columns": [
+								{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-center" },
 								{ "visible": false },
 								{ "visible": false },
 								{ "visible": false },
-								{ "width": "15%", "orderable": false, className: "dt-head-center dt-body-center" },
+								{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-center" },
 								{ "width": "20%", "orderable": false, className: "dt-head-center" },
 								{ "width": "25%", "orderable": false, className: "dt-head-center" },
 								{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
@@ -261,17 +273,33 @@
 									"last": "»",
 									"first": "«"
 								}
+							},
+							"initComplete": function(settings, json) {
+								setTimeout(function() {
+									$("#grid-transaction").find("input:checkbox").remove();
+								}, 0);
 							}
 						});
 				table2.columns.adjust();
 				var counterSaleDetails = 0;
 				table2.on( 'key', function (e, datatable, key, cell, originalEvent) {
 					var index = table2.cell({ focused: true }).index();
-					if(counterSaleDetails == 0) {
+					if(key == 32) { //space
+						var checkbox = $(".focus").find("input:checkbox");
+						if(checkbox.prop("checked") == true) {
+							checkbox.prop("checked", false);
+							checkbox.attr("checked", false);
+						}
+						else {
+							checkbox.prop("checked", true);
+							checkbox.attr("checked", true);
+						}
+					}
+					else if(counterSaleDetails == 0) {
 						counterSaleDetails = 1;
 						var data = datatable.row( cell.index().row ).data();
 						if(key == 13) {
-							if(($("#FormEdit").css("display") == "none" || $("#delete-confirm").css("display") == "none") && $("#hdnEditFlag").val() == "1" ) {
+							if(($("#delete-confirm").css("display") == "none") && $("#hdnEditFlag").val() == "1" ) {
 								table2.cell.blur();
 								table2.keys.disable();
 								rowEdit = datatable.row( cell.index().row );
@@ -281,7 +309,7 @@
 						else if(key == 46 && $("#hdnDeleteFlag").val() == "1") {
 							table2.keys.disable();
 							var deletedData = new Array();
-							deletedData.push(data[0]);
+							deletedData.push(data[1]);
 							SingleDelete("./Transaction/Sale/DeleteDetails.php", deletedData, function(action) {
 								if(action == "success") {
 									datatable.row( cell.index().row ).remove().draw();
@@ -305,6 +333,10 @@
 						}
 						setTimeout(function() { counterSaleDetails = 0; } , 1000);
 					}
+				});
+
+				table2.on('page', function() {
+					$("#select_all").prop("checked", false);
 				});
 				
 				$('#grid-transaction tbody').on('dblclick', 'tr', function () {
@@ -471,7 +503,7 @@
 							tableWidthAdjust();
 							
 							for(var i=0;i<Data.data.length;i++) {
-								$("#toggle-branch-" + Data.data[i][0]).toggles({
+								$("#toggle-branch-" + Data.data[i][1]).toggles({
 									drag: true, // allow dragging the toggle between positions
 									click: true, // allow clicking on the toggle
 									text: {
@@ -488,8 +520,8 @@
 									type: 'compact' // if this is set to 'select' then the select style toggle will be used
 								});
 								
-								if(Data.data[i][2] == 1) $("#toggle-branch-" + Data.data[i][0]).toggles(true);
-								else $("#toggle-branch-" + Data.data[i][0]).toggles(false);
+								if(Data.data[i][3] == 1) $("#toggle-branch-" + Data.data[i][1]).toggles(true);
+								else $("#toggle-branch-" + Data.data[i][1]).toggles(false);
 										
 							}
 						}
@@ -575,7 +607,9 @@
 										$("#toggle-retail").toggleClass('disabled', true);
 										$("#txtSaleNumber").val(data.SaleNumber);
 										var toggleBranch = "<div id='toggle-branch-" + data.SaleDetailsID + "' onclick='updateBranch(this.id)' class='div-center toggle-modern' ></div>";
+										var checkboxData = "<input type='checkbox' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
 										table2.row.add([
+											checkboxData,
 											data.SaleDetailsID,
 											itemID,
 											branchID,
@@ -613,12 +647,15 @@
 										});
 									}
 									else {
+										console.log("test");
 										var toggles = $('#toggle-branch-' + data.SaleDetailsID).data('toggles').active;
+										var checkboxData = "<input type='checkbox' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
 										table2.row(rowEdit).data([
+											checkboxData,
 											data.SaleDetailsID,
 											itemID,
 											branchID,
-											table2.row( rowEdit ).data()[3],
+											table2.row( rowEdit ).data()[4],
 											itemCode,
 											itemName,
 											Qty,
@@ -758,7 +795,7 @@
 				var itemCode = $("#txtItemCode").val();
 				Lobibox.window({
 					title: 'Tambah Barang',
-					url: 'Master/Item/PopUpAddItem.php',
+					url: 'Transaction/Sale/PopUpAddItem.php',
 					width: 780,
 					height: 460,
 					buttons: {
@@ -800,6 +837,14 @@
 						if (type === 'Simpan'){
 							var PassValidate = 1;
 							var FirstFocus = 0;
+
+							if($("#ddlCategoryAdd").val() == "") {
+								PassValidate = 0;
+								$("#ddlCategoryAdd").next().find("input").notify("Harus diisi!", { position:"right", className:"warn", autoHideDelay: 2000 });
+								if(FirstFocus == 0) $("#ddlCategoryAdd").next().find("input").focus();
+								FirstFocus = 1;
+							}
+
 							$("#FormItem .form-control-custom").each(function() {
 								if($(this).hasAttr('required')) {
 									if($(this).val() == "") {
@@ -849,7 +894,7 @@
 											$(this).dialog("destroy");
 											//callback("Ya");
 											$.ajax({
-												url: "./Master/Item/InsertFromPurchase.php",
+												url: "./Transaction/Sale/InsertFromPurchase.php",
 												type: "POST",
 												data: $("#PostFormItem").serialize(),
 												dataType: "json",
@@ -950,8 +995,8 @@
 				var weight = 0;
 				table2.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
 					var data = this.data();
-					grandTotal += parseFloat(data[7].replace(/\,/g, "")) * parseFloat(data[6]) - parseFloat(data[8]);
-					weight += parseFloat(data[15]) * parseFloat(data[6]);
+					grandTotal += parseFloat(data[8].replace(/\,/g, "")) * parseFloat(data[7]) - parseFloat(data[9]);
+					weight += parseFloat(data[16]) * parseFloat(data[7]);
 				});
 				$("#lblTotal").html(returnRupiah(grandTotal.toString()));
 				$("#lblWeight").html(returnWeight(weight.toString()));
@@ -1225,13 +1270,133 @@
 				resetForm();
 				table2.destroy();
 				openDialog(0, 0);
+				$("#finish-dialog").dialog("destroy");
 			}
 
 			function printShipment() {
-				alert("print shipment");
+				//alert("print shipment");
+				var SaleDetailsID = new Array();
+				var SaleID = $("#hdnSaleID").val();
+				$("input:checkbox[name=select]:checked").each(function() {
+					if($(this).val() != 'all') SaleDetailsID.push($(this).val());
+				});
+				if(SaleDetailsID.length > 0) {
+					$("#loading").show();
+					$.ajax({
+						url: "./Transaction/Sale/PrintShipment.php",
+						type: "POST",
+						data: { SaleDetailsID : SaleDetailsID, SaleID : SaleID },
+						dataType: "json",
+						success: function(data) {
+							$("#loading").hide();
+						},
+						error: function(data) {
+							$("#loading").hide();
+							$.notify("Koneksi gagal", "error");
+						}
+					});
+				}
+			}
+
+			function firstBalance() {
+				$("#first-balance").dialog({
+					autoOpen: false,
+					open: function() {
+						$("#divModal").show();
+						$(document).on('keydown', function(e) {
+							if (e.keyCode == 39 && $("input:focus").length == 0) { //right arrow
+								 $("#btnCancelFirstBalance").focus();
+							}
+							else if (e.keyCode == 37 && $("input:focus").length == 0) { //left arrow
+								 $("#btnSaveFirstBalance").focus();
+							}
+						});
+						$("#txtFirstBalance").focus();
+					},
+					show: {
+						effect: "fade",
+						duration: 500
+					},
+					hide: {
+						effect: "fade",
+						duration: 500
+					},
+					close: function() {
+						$(this).dialog("destroy");
+						$("#divModal").hide();
+					},
+					resizable: false,
+					height: 150,
+					width: 400,
+					modal: false,
+					buttons: [
+					{
+						text: "Simpan",
+						tabindex: 51,
+						id: "btnSaveFirstBalance",
+						click: function() {
+							$.ajax({
+								url: "./InsertFirstBalance.php",
+								type: "POST",
+								data: $("#FirstBalanceForm").serialize(),
+								dataType: "json",
+								success: function(data) {
+									$("#loading").hide();
+									if(data.FailedFlag == '0') {
+										//$.notify(data.Message, "success");
+										$("#first-balance").dialog("destroy");
+										$("#txtFirstBalance").val("0.00");
+										$("#divModal").hide();
+										Lobibox.alert("success",
+										{
+											msg: data.Message,
+											width: 480,
+											delay: 2000
+										});
+									}
+									else {
+										$("#loading").hide();
+										Lobibox.alert("warning",
+										{
+											msg: data.Message,
+											width: 480,
+											delay: false
+										});
+									}
+									
+								},
+								error: function(jqXHR, textStatus, errorThrown) {
+									$("#loading").hide();
+									var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+									LogEvent(errorMessage, "Home.php (fnFirstBalance)");
+									Lobibox.alert("error",
+									{
+										msg: errorMessage,
+										width: 480
+									});
+									return 0;
+								}
+							});
+						}
+					},
+					{
+						text: "Tutup",
+						tabindex: 52,
+						id: "btnCancelFirstBalance",
+						click: function() {
+							$(this).dialog("destroy");
+							$("#divModal").hide();
+							return false;
+						}
+					}]
+				}).dialog("open");
 			}
 
 			$(document).ready(function() {
+				$('#grid-transaction').on('click', 'input[type="checkbox"]', function() {
+					$(this).blur();
+				});
+				$("#txtQTY").spinner();
 				openDialog(0, 0);
 				$('#toggle-retail').toggles({
 					drag: true, // allow dragging the toggle between positions
@@ -1322,6 +1487,10 @@
 					else if(evt.keyCode == 123) {
 						evt.preventDefault();
 					}
+					else if(evt.keyCode == 120) {
+						var path = $("#hdnDesktopPath").val();
+						window.open(path, "", "width=1000");
+					}
 					else if(evt.keyCode == 121 && $("#itemList-dialog").css("display") == "none"  && $("#finish-dialog").css("display") == "none" && $(".lobibox").css("display") != "block") {
 						evt.preventDefault();
 						if(counterKey == 0) {
@@ -1330,6 +1499,46 @@
 						}
 					}
 					setTimeout(function() { counterKey = 0; } , 1000);
+				});
+
+				$.ajax({
+					url: "./FirstBalance.php",
+					type: "POST",
+					data: { },
+					dataType: "json",
+					success: function(Data) {
+						if(Data.FailedFlag == '0') {
+							if(Data.IsFilled == 0) firstBalance();
+						}
+						else {
+							var counter = 0;
+							Lobibox.alert("error",
+							{
+								msg: "Gagal memuat data",
+								width: 480,
+								beforeClose: function() {
+									if(counter == 0) {
+										setTimeout(function() {
+											//$("#txtItemCode").focus();
+										}, 0);
+										counter = 1;
+									}
+								}
+							});
+							return 0;
+						}
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						$("#loading").hide();
+						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+						LogEvent(errorMessage, "/Home.php");
+						Lobibox.alert("error",
+						{
+							msg: errorMessage,
+							width: 480
+						});
+						return 0;
+					}
 				});
 			});
 		</script>

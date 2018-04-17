@@ -35,7 +35,8 @@ SET State = 1;
 		DATE_FORMAT(pFromDate, '%d-%m-%Y') TransactionDate,
 		pFromDate DateNoFormat,
 		'' CustomerName,
-		(IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) + IFNULL(SA.Quantity, 0)) Quantity
+		(IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) + IFNULL(SA.Quantity, 0)) Quantity,
+		'0000-00-00' CreatedDate
 	FROM
 		master_item MI
 		LEFT JOIN
@@ -160,7 +161,8 @@ SET State = 1;
 		DATE_FORMAT(TP.TransactionDate, '%d-%m-%Y') TransactionDate,
 		TP.TransactionDate DateNoFormat,
 		MS.SupplierName,
-		TPD.Quantity
+		TPD.Quantity,
+		TP.CreatedDate
 	FROM
 		transaction_purchase TP
 		JOIN transaction_purchasedetails TPD
@@ -180,7 +182,8 @@ SET State = 1;
 		DATE_FORMAT(SR.TransactionDate, '%d-%m-%Y') TransactionDate,
 		SR.TransactionDate DateNoFormat,
 		MC.CustomerName,
-		SRD.Quantity
+		SRD.Quantity,
+		SR.CreatedDate
 	FROM
 		transaction_salereturn SR
 		JOIN transaction_sale TS
@@ -202,7 +205,8 @@ SET State = 1;
 		DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
 		TS.TransactionDate DateNoFormat,
 		MC.CustomerName,
-		-SD.Quantity
+		-SD.Quantity,
+		TS.CreatedDate
 	FROM
 		transaction_sale TS
 		JOIN transaction_saledetails SD
@@ -222,7 +226,8 @@ SET State = 1;
 		DATE_FORMAT(TPR.TransactionDate, '%d-%m-%Y') TransactionDate,
 		TPR.TransactionDate DateNoFormat,
 		MS.SupplierName,
-		-PRD.Quantity
+		-PRD.Quantity,
+		TPR.CreatedDate
 	FROM
 		transaction_purchasereturn TPR
 		JOIN transaction_purchasereturndetails PRD
@@ -242,7 +247,8 @@ SET State = 1;
 		DATE_FORMAT(SM.TransactionDate, '%d-%m-%Y') TransactionDate,
 		SM.TransactionDate DateNoFormat,
 		'',
-		SMD.Quantity
+		SMD.Quantity,
+		SM.CreatedDate
 	FROM
 		transaction_stockmutation SM
 		JOIN transaction_stockmutationdetails SMD
@@ -260,7 +266,8 @@ SET State = 1;
 		DATE_FORMAT(SA.TransactionDate, '%d-%m-%Y') TransactionDate,
 		SA.TransactionDate DateNoFormat,
 		'',
-		(SAD.AdjustedQuantity - SAD.Quantity)
+		(SAD.AdjustedQuantity - SAD.Quantity),
+		SA.CreatedDate
 	FROM
 		transaction_stockadjust SA
 		JOIN transaction_stockadjustdetails SAD
@@ -273,7 +280,8 @@ SET State = 1;
 		AND CAST(SA.TransactionDate AS DATE) >= pFromDate
 		AND CAST(SA.TransactionDate AS DATE) <= pToDate
 	ORDER BY
-		DateNoFormat;
+		DateNoFormat,
+		CreatedDate;
 
         
 END;

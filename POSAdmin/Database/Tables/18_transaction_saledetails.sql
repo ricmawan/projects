@@ -10,6 +10,8 @@ CREATE TABLE transaction_saledetails
 	BuyPrice		DOUBLE,
 	SalePrice		DOUBLE,
 	Discount		DOUBLE,
+	PrintCount		SMALLINT,
+	PrintedDate		DATETIME,
 	CreatedDate 	DATETIME NOT NULL,
 	CreatedBy 		VARCHAR(255) NOT NULL,
 	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,

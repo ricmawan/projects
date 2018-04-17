@@ -122,7 +122,7 @@
 			
 			<div id="page-wrapper">
 				<div id="page-inner" style="overflow-x:hidden;overflow-y:hidden;">
-					<img src="./assets/img/logo.png" style="width:100%;"/>
+					<img src="./assets/img/logo.png" style="width:40%;margin: 40px auto;display:block;"/>
 				</div>
 			</div>
 		</div>
@@ -192,6 +192,9 @@
 		<div id="loading"></div>
 		<iframe id='excelDownload' src='' style='display:none'></iframe>
 		<script type="text/javascript">
+			function openTab() {
+				window.open("http://localhost/Projects/POSAdmin/Source/Home.php#", "", "width=1000");
+			}
 			$(document).ready(function() {
 				var windowHeight = $( window ).height() - 55;
 				$("#page-inner").css ({

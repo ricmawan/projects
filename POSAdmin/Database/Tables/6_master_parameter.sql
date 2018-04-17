@@ -21,4 +21,6 @@ INSERT INTO `master_parameter` (`ParameterID`, `ParameterName`, `ParameterValue`
 (5, 'BACKUP_FOLDER', 'BackupFiles\\\\', 'Backup path', 0, '2016-03-12 00:00:00', 'Admin', '2016-03-12 14:43:21', NULL),
 (6, 'MYSQL_PATH', 'C:\\xampp\\mysql\\bin\\mysql.exe', 'mysql.exe path', 0, '2016-03-12 00:00:00', 'Admin', NULL, NULL),
 (7, 'UPLOAD_PATH', 'C:\\xampp\\htdocs\\Projects\\POSAdmin\\Source\\UploadedFiles\\', 'Upload Path', 0, '2016-03-12 00:00:00', 'Admin', NULL, NULL),
-(8, 'SHARED_PRINTER_ADDRESS', '//localhost/EPSON', 'For shared printer', 0, '2016-03-20 00:00:00', 'Admin', NULL, NULL);
+(8, 'SHARED_PRINTER_ADDRESS', '//localhost/EPSON', 'For shared printer', 0, '2016-03-20 00:00:00', 'Admin', NULL, NULL),
+(9, 'MOBILE_PATH', '/Projects/POSAdmin/Mobile/', 'Location of the application', 0, '2016-03-12 15:01:05', 'System', NULL, NULL),
+(10, 'DESKTOP_PATH', '/Projects/POSAdmin/Desktop/', 'Location of the application', 0, '2016-03-12 15:01:05', 'System', NULL, NULL);

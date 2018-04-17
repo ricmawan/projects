@@ -54,7 +54,7 @@ SET State = 1;
 	        SRD.Quantity,
 	        SRD.SalePrice,
             0 Discount,
-			(SRD.Quantity * SRD.SalePrice) SubTotal
+			-(SRD.Quantity * SRD.SalePrice) SubTotal
 		FROM
 			transaction_salereturndetails SRD
 	        JOIN master_item MI

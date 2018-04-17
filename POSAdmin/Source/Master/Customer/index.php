@@ -65,7 +65,7 @@
 						Nama Pelanggan :
 					</div>
 					<div class="col-md-7">
-						<input id="txtCustomerName" name="txtCustomerName" type="text" tabindex=6 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Nama Pelanggan" required />
+						<input id="txtCustomerName" name="txtCustomerName" type="text" tabindex=6 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Nama Pelanggan" maxlength="30" required />
 					</div>
 				</div>				
 				<br />
@@ -83,7 +83,7 @@
 						Alamat :
 					</div>
 					<div class="col-md-7">
-						<input id="txtAddress" name="txtAddress" type="text" tabindex=8 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Alamat" />
+						<input id="txtAddress" maxlength="30" name="txtAddress" type="text" tabindex=8 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Alamat" />
 					</div>
 				</div>
 				<br />

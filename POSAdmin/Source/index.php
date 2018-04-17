@@ -61,7 +61,7 @@
 				<div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-10 col-xs-offset-1">
 					<br />
 					<br />
-					<img src="assets/img/logo.png" width=300>
+					<img src="assets/img/logo.png" width=150>
 					<br />
 					<br />
 				</div>

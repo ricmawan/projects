@@ -52,7 +52,7 @@ SET State = 1;
 	        MI.ItemName,
 	        PRD.Quantity,
 	        PRD.BuyPrice,
-            (PRD.Quantity * PRD.BuyPrice) SubTotal
+            -(PRD.Quantity * PRD.BuyPrice) SubTotal
 		FROM
 			transaction_purchasereturndetails PRD
 	        JOIN master_item MI

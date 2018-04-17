@@ -69,13 +69,11 @@
 						<br />
 						<div class="row">
 							<div class="col-md-12">
-								<button class="btn btn-info" id="btnView" onclick="Preview();" ><i class="fa fa-list"></i> Lihat</button>&nbsp;&nbsp;
-								<button class="btn btn-success" id="btnExcel" onclick="ExportExcel();" ><i class="fa fa-file-excel-o "></i> Eksport Excel</button>&nbsp;&nbsp;
+								<button class="btn btn-info" id="btnView" onclick="Preview();" style="padding-top: 1px;padding-bottom: 1px;" ><i class="fa fa-list"></i> Lihat</button>&nbsp;&nbsp;
+								<button class="btn btn-success" id="btnExcel" onclick="ExportExcel();" style="padding-top: 1px;padding-bottom: 1px;"" ><i class="fa fa-file-excel-o "></i> Eksport Excel</button>&nbsp;&nbsp;
 							</div>
 						</div>
-						<br />
-						<!--Grand Total: <span class="grandtotal"></span>
-						<br />-->
+						<hr style="margin: 10px 0;" />
 						<div class="table-responsive" id="dvTable" style="display: none;">
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
@@ -89,8 +87,6 @@
 								</thead>
 							</table>
 						</div>
-						<!--<br />
-						Grand Total: <span class="grandtotal"></span>-->
 					</div>
 				</div>
 			</div>
@@ -158,7 +154,6 @@
 				}
 
 				if(ItemName == "") {
-					console.log("test");
 					$("#txtItemCode").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 					PassValidate = 0;
 					if(FirstFocus == 0) $("#txtItemCode").next().find("input").focus();

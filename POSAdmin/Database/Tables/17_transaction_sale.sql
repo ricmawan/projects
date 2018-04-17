@@ -8,6 +8,8 @@ CREATE TABLE transaction_sale
 	CustomerID 		BIGINT,
 	TransactionDate DATETIME NOT NULL,
 	Payment			DOUBLE,
+	PrintCount		SMALLINT,
+	PrintedDate		DATETIME,
 	Remarks			TEXT,
 	CreatedDate 	DATETIME NOT NULL,
 	CreatedBy 		VARCHAR(255) NOT NULL,

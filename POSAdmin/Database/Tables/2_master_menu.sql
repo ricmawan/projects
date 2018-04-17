@@ -184,6 +184,33 @@ VALUES
 	NULL,
 	1,
 	6
+),
+(
+	19,
+	2,
+	'Update Harga',
+	'Master/PriceUpdate/',
+	NULL,
+	0,
+	6
+),
+(
+	20,
+	5,
+	'Backup Data',
+	'Tools/Backup/',
+	NULL,
+	0,
+	1
+),
+(
+	21,
+	5,
+	'Restore Data',
+	'Tools/Restore/',
+	NULL,
+	0,
+	2
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

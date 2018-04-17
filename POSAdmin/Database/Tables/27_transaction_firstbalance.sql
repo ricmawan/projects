@@ -1,0 +1,17 @@
+DROP TABLE IF EXISTS transaction_firstbalance;
+
+CREATE TABLE transaction_firstbalance
+(
+	FirstBalanceID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	UserID				BIGINT,
+	TransactionDate		DATETIME NOT NULL,
+	FirstBalanceAmount	DOUBLE,
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 			VARCHAR(255) NULL,
+	FOREIGN KEY(UserID) REFERENCES master_user(UserID) ON UPDATE CASCADE ON DELETE CASCADE
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX FIRSTBALANCE_INDEX
+ON transaction_firstbalance (FirstBalanceID, UserID);
