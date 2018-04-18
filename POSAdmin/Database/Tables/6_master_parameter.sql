@@ -23,4 +23,5 @@ INSERT INTO `master_parameter` (`ParameterID`, `ParameterName`, `ParameterValue`
 (7, 'UPLOAD_PATH', 'C:\\xampp\\htdocs\\Projects\\POSAdmin\\Source\\UploadedFiles\\', 'Upload Path', 0, '2016-03-12 00:00:00', 'Admin', NULL, NULL),
 (8, 'SHARED_PRINTER_ADDRESS', '//localhost/EPSON', 'For shared printer', 0, '2016-03-20 00:00:00', 'Admin', NULL, NULL),
 (9, 'MOBILE_PATH', '/Projects/POSAdmin/Mobile/', 'Location of the application', 0, '2016-03-12 15:01:05', 'System', NULL, NULL),
-(10, 'DESKTOP_PATH', '/Projects/POSAdmin/Desktop/', 'Location of the application', 0, '2016-03-12 15:01:05', 'System', NULL, NULL);
+(10, 'DESKTOP_PATH', '/Projects/POSAdmin/Desktop/', 'Location of the application', 0, '2016-03-12 15:01:05', 'System', NULL, NULL),
+(11, 'MOBILE_HOME', 'http://192.168.1.21/Projects/POSAdmin/Mobile/Home.php', 'Location of the home for mobile view', 0, '2016-03-12 15:01:05', 'System', NULL, NULL);

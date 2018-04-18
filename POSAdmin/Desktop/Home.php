@@ -49,7 +49,7 @@
 	<body>
 		<div id="wrapper">
 			<header style="height:30px;">
-				<div class="container" style="display:inline-block;" >
+				<div class="container" style="display:inline-block; width: 70%;padding-right: 0" >
 					<div class="navbar navbar-static-top">
 						<div class="navigation">
 							<nav>
@@ -66,18 +66,18 @@
 									<li class='dropdown'>
 										<a href='#' class='menu' link='Transaction/Booking/'><i class='fa fa-hourglass-start fa-2'></i> Pemesanan</a>
 									</li>
-									<li class='dropdown'>
+									<!--<li class='dropdown'>
 										<a href='#' class='menu' link='Transaction/Payment/'><i class='fa fa-dollar fa-2'></i> Pembayaran & Pengambilan</a>
-									</li>
+									</li>-->
 									<li class='dropdown'>
-										<a href='#' class='menu' link='Transaction/Payment/'><i class='fa fa-print fa-2'></i> Cetak Nota & Surat Jalan</a>
+										<a href='#' class='menu' link='Transaction/Print/'><i class='fa fa-print fa-2'></i> Cetak Nota & Surat Jalan</a>
 									</li>
 								</ul>
 							</nav>
 						</div>
 					</div>
 				</div>
-				<div class="container" style="display:inline-block;width: 460px !important;color:white;" >
+				<div class="container" style="display:inline-block;width: 28% !important;color:white;padding-right: 0" >
 					<div class="navbar navbar-static-top" style="float:right;">
 						<div class="navigation" style="margin-bottom: 7px;">
 							<nav>
@@ -181,7 +181,7 @@
 						Saldo Awal :
 					</div>
 					<div class="col-md-6">
-						<input id="txtFirstBalance" tabindex=50; name="txtFirstBalance" type="text" class="form-control-custom" placeholder="Salwo Awal" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" value="0.00" />
+						<input id="txtFirstBalance" tabindex=50; name="txtFirstBalance" type="text" class="form-control-custom text-right" placeholder="Salwo Awal" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" value="0.00" />
 					</div>
 				</div>
 				<br />

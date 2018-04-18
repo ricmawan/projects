@@ -138,6 +138,7 @@
 						<table id="grid-transaction" style="width: 100% !important;" class="table table-striped table-bordered table-hover" >
 							<thead>
 								<tr>
+									<th><input id="select_all" name="select_all" type="checkbox" onclick="chkAll();" style="margin: 0;" /></th>
 									<th>SaleDetailsID</th>
 									<th>ItemID</th>
 									<th>BranchID</th>
@@ -166,7 +167,7 @@
 				</div>
 				<br />
 				<div class="row" >
-					<h5 style="margin-top: 5px !important;margin-bottom: 5px !important;">F12 = Daftar Barang; F10 = Transaksi Selesai; ESC = Tutup; DELETE = Hapus; ENTER/DOUBLE KLIK = Edit;</h5>
+					<h5 style="margin-top: 5px !important;margin-bottom: 5px !important;">F10 = Transaksi Selesai; F12 = Daftar Barang; ESC = Tutup; DELETE = Hapus; ENTER/DOUBLE KLIK = Edit;</h5>
 				</div>
 			</form>
 		</div>
@@ -207,7 +208,7 @@
 					Bayar :
 				</div>
 				<div class="col-md-8">
-					<input id="txtPayment" name="txtPayment" type="text" tabindex=14 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" onchange="Change();" />
+					<input id="txtPayment" name="txtPayment" type="text" tabindex=15 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" onchange="Change();" />
 				</div>
 			</div>
 			<br />
@@ -220,9 +221,9 @@
 				</div>
 			</div>
 			<br />
-			<button class="btn btn-primary btn-block" tabindex=15 onclick="printInvoice();" >Cetak Nota</button>
+			<button class="btn btn-primary btn-block" tabindex=16 onclick="printInvoice();" >Cetak Nota</button>
 			<br />
-			<button class="btn btn-danger btn-block" tabindex=16 onclick="printShipment();" >Cetak Surat Jalan</button>
+			<button class="btn btn-danger btn-block" tabindex=17 onclick="printShipment();" >Cetak Surat Jalan</button>
 		</div>
 		<script>
 			var table;
@@ -232,21 +233,21 @@
 			var rowEdit;
 			
 			function openDialogEdit(Data) {
-				$("#hdnSaleDetailsID").val(Data[0]);
-				$("#hdnItemID").val(Data[1]);
-				$("#hdnBranchID").val(Data[2]);
-				$("#txtItemCode").val(Data[4]);
-				$("#txtItemName").val(Data[5]);
-				$("#txtQTY").val(Data[6]);
-				$("#txtSalePrice").val(Data[7]);
-				$("#txtDiscount").val(Data[8]);
-				$("#hdnBuyPrice").val(Data[10]);
-				$("#hdnPrice1").val(Data[11]);
-				$("#hdnQty1").val(Data[12]);
-				$("#hdnPrice2").val(Data[13]);
-				$("#hdnQty2").val(Data[14]);
-				$("#hdnWeight").val(Data[15]);
-				$("#hdnRetailPrice").val(Data[16]);
+				$("#hdnSaleDetailsID").val(Data[1]);
+				$("#hdnItemID").val(Data[2]);
+				$("#hdnBranchID").val(Data[3]);
+				$("#txtItemCode").val(Data[5]);
+				$("#txtItemName").val(Data[6]);
+				$("#txtQTY").val(Data[7]);
+				$("#txtSalePrice").val(Data[8]);
+				$("#txtDiscount").val(Data[9]);
+				$("#hdnBuyPrice").val(Data[11]);
+				$("#hdnPrice1").val(Data[12]);
+				$("#hdnQty1").val(Data[13]);
+				$("#hdnPrice2").val(Data[14]);
+				$("#hdnQty2").val(Data[15]);
+				$("#hdnWeight").val(Data[16]);
+				$("#hdnRetailPrice").val(Data[17]);
 
 				setTimeout(function() { $("#txtItemCode").focus(); }, 0);
 			}
@@ -288,10 +289,11 @@
 									"searching": false,
 									"order": [],
 									"columns": [
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-center" },
 										{ "visible": false },
 										{ "visible": false },
 										{ "visible": false },
-										{ "width": "15%", "orderable": false, className: "dt-head-center dt-body-center" },
+										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-center" },
 										{ "width": "20%", "orderable": false, className: "dt-head-center" },
 										{ "width": "25%", "orderable": false, className: "dt-head-center" },
 										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
@@ -342,7 +344,7 @@
 								else if(key == 46 && $("#hdnDeleteFlag").val() == "1") {
 									table2.keys.disable();
 									var deletedData = new Array();
-									deletedData.push(data[0]);
+									deletedData.push(data[1]);
 									SingleDelete("./Transaction/Sale/DeleteDetails.php", deletedData, function(action) {
 										if(action == "success") {
 											datatable.row( cell.index().row ).remove().draw();
@@ -403,8 +405,24 @@
 					modal: false,
 					buttons: [
 					{
-						text: "Tutup",
+						text: "Cetak Nota",
 						tabindex: 12,
+						id: "btnPrintInvoice",
+						click: function() {
+							printInvoice();
+						}
+					},
+					{
+						text: "Cetak Surat Jalan",
+						tabindex: 13,
+						id: "btnPrintShipment",
+						click: function() {
+							printShipment();
+						}
+					},
+					{
+						text: "Tutup",
+						tabindex: 14,
 						id: "btnCancelAddSale",
 						click: function() {
 							$(this).dialog("destroy");
@@ -419,6 +437,39 @@
 						}
 					}]
 				}).dialog("open");
+			}
+
+			function printInvoice() {
+				alert("print invoice");
+				resetForm();
+				table2.destroy();
+				openDialog(0, 0);
+				$("#finish-dialog").dialog("destroy");
+			}
+
+			function printShipment() {
+				//alert("print shipment");
+				var SaleDetailsID = new Array();
+				var SaleID = $("#hdnSaleID").val();
+				$("input:checkbox[name=select]:checked").each(function() {
+					if($(this).val() != 'all') SaleDetailsID.push($(this).val());
+				});
+				if(SaleDetailsID.length > 0) {
+					$("#loading").show();
+					$.ajax({
+						url: "./Transaction/Sale/PrintShipment.php",
+						type: "POST",
+						data: { SaleDetailsID : SaleDetailsID, SaleID : SaleID },
+						dataType: "json",
+						success: function(data) {
+							$("#loading").hide();
+						},
+						error: function(data) {
+							$("#loading").hide();
+							$.notify("Koneksi gagal", "error");
+						}
+					});
+				}
 			}
 			
 			var counterGetItem = 0;
@@ -574,7 +625,7 @@
 							tableWidthAdjust();
 							
 							for(var i=0;i<Data.data.length;i++) {
-								$("#toggle-branch-" + Data.data[i][0]).toggles({
+								$("#toggle-branch-" + Data.data[i][1]).toggles({
 									drag: true, // allow dragging the toggle between positions
 									click: true, // allow clicking on the toggle
 									text: {
@@ -591,8 +642,8 @@
 									type: 'compact' // if this is set to 'select' then the select style toggle will be used
 								});
 								
-								if(Data.data[i][2] == 1) $("#toggle-branch-" + Data.data[i][0]).toggles(true);
-								else $("#toggle-branch-" + Data.data[i][0]).toggles(false);
+								if(Data.data[i][3] == 1) $("#toggle-branch-" + Data.data[i][1]).toggles(true);
+								else $("#toggle-branch-" + Data.data[i][1]).toggles(false);
 										
 							}
 						}
@@ -678,7 +729,9 @@
 										$("#toggle-retail").toggleClass('disabled', true);
 										$("#txtSaleNumber").val(data.SaleNumber);
 										var toggleBranch = "<div id='toggle-branch-" + data.SaleDetailsID + "' onclick='updateBranch(this.id)' class='div-center toggle-modern' ></div>";
+										var checkboxData = "<input type='checkbox' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
 										table2.row.add([
+											checkboxData,
 											data.SaleDetailsID,
 											itemID,
 											branchID,
@@ -717,11 +770,13 @@
 									}
 									else {
 										var toggles = $('#toggle-branch-' + data.SaleDetailsID).data('toggles').active;
+										var checkboxData = "<input type='checkbox' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
 										table2.row(rowEdit).data([
+											checkboxData,
 											data.SaleDetailsID,
 											itemID,
 											branchID,
-											table2.row( rowEdit ).data()[3],
+											table2.row( rowEdit ).data()[4],
 											itemCode,
 											itemName,
 											Qty,
@@ -1061,8 +1116,8 @@
 				var weight = 0;
 				table2.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
 					var data = this.data();
-					grandTotal += parseFloat(data[7].replace(/\,/g, "")) * parseFloat(data[6]) - parseFloat(data[8]);
-					weight += parseFloat(data[15]) * parseFloat(data[6]);
+					grandTotal += parseFloat(data[8].replace(/\,/g, "")) * parseFloat(data[7]) - parseFloat(data[9].replace(/\,/g, ""));
+					weight += parseFloat(data[16]) * parseFloat(data[7]);
 				});
 				$("#lblTotal").html(returnRupiah(grandTotal.toString()));
 				$("#lblWeight").html(returnWeight(weight.toString()));
@@ -1241,7 +1296,7 @@
 					buttons: [
 					{
 						text: "Tutup",
-						tabindex: 13,
+						tabindex: 18,
 						id: "btnCancelPickItem",
 						click: function() {
 							$(this).dialog("destroy");
@@ -1291,7 +1346,7 @@
 						buttons: [
 						{
 							text: "Tutup",
-							tabindex: 17,
+							tabindex: 19,
 							id: "btnCancelPickItem",
 							click: function() {
 								$(this).dialog("destroy");
@@ -1385,14 +1440,6 @@
 				}
 			}
 
-			function printInvoice() {
-				alert("print invoice")
-			}
-
-			function printShipment() {
-				alert("print shipment")
-			}
-
 			$(document).ready(function() {
 				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
 				    $(this).blur();
@@ -1419,6 +1466,7 @@
 					if (active) {
 						$("#hdnIsRetail").val(1);
 						if($("#FormData").css("display") == "block") $('#FormData').dialog('option', 'title', 'Tambah Penjualan Eceran');
+						Grosir($("#txtQTY").val());
 					} else {
 						$("#hdnIsRetail").val(0);
 						if($("#FormData").css("display") == "block") $('#FormData').dialog('option', 'title', 'Tambah Penjualan Grosir');

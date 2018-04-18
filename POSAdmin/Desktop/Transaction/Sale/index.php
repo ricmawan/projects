@@ -196,9 +196,9 @@
 				</div>
 			</div>
 			<br />
-			<button class="btn btn-primary btn-block" tabindex=12 onclick="printInvoice();" >Cetak Nota</button>
+			<button class="btn btn-primary btn-block" tabindex=15 onclick="printInvoice();" >Cetak Nota</button>
 			<br />
-			<button class="btn btn-danger btn-block" tabindex=13 onclick="printShipment();" >Cetak Surat Jalan</button>
+			<button class="btn btn-danger btn-block" tabindex=16 onclick="printShipment();" >Cetak Surat Jalan</button>
 		</div>
 		<script>
 			var table2;
@@ -995,7 +995,7 @@
 				var weight = 0;
 				table2.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
 					var data = this.data();
-					grandTotal += parseFloat(data[8].replace(/\,/g, "")) * parseFloat(data[7]) - parseFloat(data[9]);
+					grandTotal += parseFloat(data[8].replace(/\,/g, "")) * parseFloat(data[7]) - parseFloat(data[9].replace(/\,/g, ""));
 					weight += parseFloat(data[16]) * parseFloat(data[7]);
 				});
 				$("#lblTotal").html(returnRupiah(grandTotal.toString()));
@@ -1341,7 +1341,7 @@
 								data: $("#FirstBalanceForm").serialize(),
 								dataType: "json",
 								success: function(data) {
-									$("#loading").hide();
+									$("#divModal").hide();
 									if(data.FailedFlag == '0') {
 										//$.notify(data.Message, "success");
 										$("#first-balance").dialog("destroy");
@@ -1355,7 +1355,7 @@
 										});
 									}
 									else {
-										$("#loading").hide();
+										$("#divModal").hide();
 										Lobibox.alert("warning",
 										{
 											msg: data.Message,
@@ -1366,7 +1366,7 @@
 									
 								},
 								error: function(jqXHR, textStatus, errorThrown) {
-									$("#loading").hide();
+									$("#divModal").hide();
 									var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
 									LogEvent(errorMessage, "Home.php (fnFirstBalance)");
 									Lobibox.alert("error",
@@ -1419,6 +1419,7 @@
 					if (active) {
 						$("#hdnIsRetail").val(1);
 						//if($("#FormData").css("display") == "block") $('#FormData').dialog('option', 'title', 'Tambah Penjualan Eceran');
+						Grosir($("#txtQTY").val());
 					} else {
 						$("#hdnIsRetail").val(0);
 						//if($("#FormData").css("display") == "block") $('#FormData').dialog('option', 'title', 'Tambah Penjualan Grosir');

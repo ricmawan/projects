@@ -8,10 +8,8 @@
 	date_default_timezone_set("Asia/Jakarta");
 	$EditFlag = "";
 	$DeleteFlag = "";
-
-	$RequestedPath = str_replace("Desktop", "Source", $RequestedPath);
 	
-	$sql = "CALL spSelUserMenuPermission('$APPLICATION_PATH', '$RequestedPath', '".$_SESSION['UserID']."')";
+	$sql = "CALL spSelUserMenuPermission('$DESKTOP_PATH', '$RequestedPath', '".$_SESSION['UserID']."')";
 				
 	if (!$result = mysqli_query($dbh, $sql)) {
 		logEvent(mysqli_error($dbh), $RequestedPath, mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));

@@ -1119,7 +1119,7 @@
 								data: $("#FirstBalanceForm").serialize(),
 								dataType: "json",
 								success: function(data) {
-									$("#loading").hide();
+									$("#divModal").hide();
 									if(data.FailedFlag == '0') {
 										//$.notify(data.Message, "success");
 										$("#first-balance").dialog("destroy");
@@ -1133,7 +1133,7 @@
 										});
 									}
 									else {
-										$("#loading").hide();
+										$("#divModal").hide();
 										Lobibox.alert("warning",
 										{
 											msg: data.Message,
@@ -1144,7 +1144,7 @@
 									
 								},
 								error: function(jqXHR, textStatus, errorThrown) {
-									$("#loading").hide();
+									$("#divModal").hide();
 									var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
 									LogEvent(errorMessage, "Home.php (fnFirstBalance)");
 									Lobibox.alert("error",

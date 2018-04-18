@@ -211,6 +211,24 @@ VALUES
 	NULL,
 	0,
 	2
+),
+(
+	22,
+	4,
+	'Cetak Nota & Surat Jalan',
+	'Transaction/Print/',
+	NULL,
+	0,
+	9
+),
+(
+	23,
+	4,
+	'Pembayaran & Pengambilan',
+	'Transaction/Payment/',
+	NULL,
+	0,
+	8
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

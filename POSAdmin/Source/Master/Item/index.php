@@ -394,6 +394,80 @@
 				});
 			}
 
+			function adjustColumns() {
+				//kolom ga cukup dan harus scroll horizontal
+				if($(".dataTables_scrollHeadInner").find("table").width() > $(".dataTables_scrollHead").width()) {
+					var headerWidth = $(".dataTables_scrollHead").find("table").width() + 2;
+					$(".dataTables_scrollBody").find("table").css({
+						"width" : headerWidth + "px"
+					});
+
+					var tableWidth = $(".dataTables_scrollBody").find("table").width();
+					var barWidth = table.settings()[0].oScroll.iBarWidth;
+					var newWidth = tableWidth + barWidth + 2;
+					setTimeout(function() {
+						$(".dataTables_scrollHeadInner").css({
+							"width" : newWidth
+						});
+					}, 0);
+				}
+				//kalo full 1 layar ga ada scroll horizontal tp ada scroll vertical
+				else if($(".dataTables_scrollBody").find("table").height() > 330 && $("#wrapper").width() <= 1280) {
+					var headerDiv = $(".dataTables_scrollHead").width();
+					var headerWidth = $(".dataTables_scrollHead").find("table").width() + 2;
+
+					$(".dataTables_scrollBody").find("table").css({
+						"width" : headerWidth + "px"
+					});
+
+					var tableWidth = $(".dataTables_scrollBody").find("table").width();
+					var barWidth = table.settings()[0].oScroll.iBarWidth;
+					var newWidth = tableWidth - barWidth + 2;
+					setTimeout(function() {
+						$(".dataTables_scrollHeadInner").css({
+							"width" : (headerDiv - barWidth)
+						});
+
+						$(".dataTables_scrollHeadInner").find("table").css({
+							"width" : (headerDiv - barWidth)
+						});
+
+						$(".dataTables_scrollBody").find("table").css({
+							"width" : (headerDiv - barWidth)
+						});
+					}, 0);
+				}
+				else {
+					var headerDiv = $(".dataTables_scrollHead").width();
+					var headerWidth = $(".dataTables_scrollHead").find("table").width() + 2;
+
+					$(".dataTables_scrollBody").find("table").css({
+						"width" : headerWidth + "px"
+					});
+
+					var tableWidth = $(".dataTables_scrollBody").find("table").width();
+					var barWidth = table.settings()[0].oScroll.iBarWidth;
+					var newWidth = tableWidth + barWidth + 2;
+					setTimeout(function() {
+						$(".dataTables_scrollHeadInner").css({
+							"width" : headerDiv
+						});
+
+						$(".dataTables_scrollHeadInner").find("table").css({
+							"width" : headerDiv
+						});
+
+						$(".dataTables_scrollBody").find("table").css({
+							"width" : headerDiv
+						});
+
+						$(".dataTables_scrollHeadInner").css({
+							"width" : newWidth
+						});
+					}, 0);
+				}
+			}
+
 			$(document).ready(function() {
 				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
 					$(this).blur();
@@ -427,6 +501,7 @@
 				if(UserTypeID == "1") visible = true;
 				table = $("#grid-data").DataTable({
 								"keys": true,
+								"scrollX":  true,
 								"scrollY": "330px",
 								"rowId": "ItemID",
 								"scrollCollapse": true,
@@ -463,7 +538,12 @@
 										"last": "»",
 										"first": "«"
 									}
-								}
+								},
+								"drawCallback": function( settings ) {
+							       setTimeout(function() {
+										adjustColumns();
+									}, 0);
+							    }
 							});
 				
 				table.on( 'key', function (e, datatable, key, cell, originalEvent) {
