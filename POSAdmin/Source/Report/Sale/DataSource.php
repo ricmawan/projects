@@ -26,9 +26,10 @@
 		}
 		//kolom di table
 		$columns = array(
-						0 => "SaleNumber", //unorderable
-						1 => "TransactionDate", //unorderable
-						2 => "CustomerName"
+						0 => "Plus",
+						1 => "SaleNumber", //unorderable
+						2 => "TransactionDate", //unorderable
+						3 => "CustomerName"
 					);
 
 		$where = " 1=1 ";
