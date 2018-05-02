@@ -55,117 +55,291 @@
 		</div>
 		<div id="FormData" title="Tambah Item" style="display: none;">
 			<form class="col-md-12" id="PostForm" method="POST" action="" >
-				<div class="row">
-					<div class="col-md-3 labelColumn">
-						Kode Barang :
-						<input id="hdnItemID" name="hdnItemID" type="hidden" value=0 />
-						<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
-					</div>
-					<div class="col-md-4">
-						<input id="txtItemCode" name="txtItemCode" type="text" tabindex=5 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Kode Barang" required />
-					</div>
-				</div>
-				<br />
-				<div class="row">
-					<div class="col-md-3 labelColumn">
-						Nama Barang :
-					</div>
-					<div class="col-md-4">
-						<input id="txtItemName" name="txtItemName" type="text" tabindex=6 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Nama Barang" required />
-					</div>
-				</div>
-				<br />
-				<div class="row">
-					<div class="col-md-3 labelColumn">
-						Kategori Barang :
-					</div>
-					<div class="col-md-4">
-						<div class="ui-widget" style="width: 100%;">
-							<select id="ddlCategory" name="ddlCategory" tabindex=7 class="form-control-custom" placeholder="Pilih Kategori" >
-								<option value="" selected> </option>
-								<?php
-									$sql = "CALL spSelDDLCategory('".$_SESSION['UserLogin']."')";
-									if (! $result = mysqli_query($dbh, $sql)) {
-										logEvent(mysqli_error($dbh), '/Master/Item/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-										return 0;
-									}
-									while($row = mysqli_fetch_array($result)) {
-										echo "<option value='".$row['CategoryID']."' >".$row['CategoryCode']." - ".$row['CategoryName']."</option>";
-									}
-									mysqli_free_result($result);
-									mysqli_next_result($dbh);
-								?>
-							</select>
+				<div id="tabs">
+					<ul>
+						<li><a href="#item-data">Data Barang</a></li>
+						<li><a href="#add-unit" onclick="addTab();" >Tambah Satuan</a></li>
+					</ul>
+					<div id="item-data">
+						<br />
+						<div class="row">
+							<div class="col-md-2 labelColumn">
+								Kode Barang :
+								<input id="hdnItemID" name="hdnItemID" type="hidden" value=0 />
+								<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
+							</div>
+							<div class="col-md-4">
+								<input id="txtItemCode" name="txtItemCode" type="text" tabindex=5 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Kode Barang" required />
+							</div>
+						</div>
+						<br />
+						<div class="row">
+							<div class="col-md-2 labelColumn">
+								Nama Barang :
+							</div>
+							<div class="col-md-4">
+								<input id="txtItemName" name="txtItemName" type="text" tabindex=6 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Nama Barang" required />
+							</div>
+						</div>
+						<br />
+						<div class="row">
+							<div class="col-md-2 labelColumn">
+								Satuan Dasar :
+							</div>
+							<div class="col-md-4">
+								<select id="ddlUnit" name="ddlUnit" tabindex=7 class="form-control-custom" placeholder="Pilih Satuan" >
+									<?php
+										$sql = "CALL spSelDDLUnit('".$_SESSION['UserLogin']."')";
+										if (! $result = mysqli_query($dbh, $sql)) {
+											logEvent(mysqli_error($dbh), '/Master/Item/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+											return 0;
+										}
+										while($row = mysqli_fetch_array($result)) {
+											echo "<option value='".$row['UnitID']."' >".$row['UnitName']."</option>";
+										}
+										mysqli_free_result($result);
+										mysqli_next_result($dbh);
+									?>
+								</select>
+							</div>
+						</div>
+						<br />
+						<div class="row">
+							<div class="col-md-2 labelColumn">
+								Kategori :
+							</div>
+							<div class="col-md-4">
+								<div class="ui-widget" style="width: 100%;">
+									<select id="ddlCategory" name="ddlCategory" tabindex=8 class="form-control-custom" placeholder="Pilih Kategori" >
+										<option value="" selected> </option>
+										<?php
+											$sql = "CALL spSelDDLCategory('".$_SESSION['UserLogin']."')";
+											if (! $result = mysqli_query($dbh, $sql)) {
+												logEvent(mysqli_error($dbh), '/Master/Item/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+												return 0;
+											}
+											while($row = mysqli_fetch_array($result)) {
+												echo "<option value='".$row['CategoryID']."' >".$row['CategoryCode']." - ".$row['CategoryName']."</option>";
+											}
+											mysqli_free_result($result);
+											mysqli_next_result($dbh);
+										?>
+									</select>
+								</div>
+							</div>
+						</div>
+						<br />
+						<div class="row">
+							<div class="col-md-2 labelColumn">
+								Harga Beli :
+							</div>
+							<div class="col-md-4">
+								<input id="txtBuyPrice" name="txtBuyPrice" type="text" tabindex=9 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Beli" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" required />
+							</div>
+						</div>
+						<br />
+						<div class="row">
+							<div class="col-md-2 labelColumn">
+								Harga Ecer :
+							</div>
+							<div class="col-md-4">
+								<input id="txtRetailPrice" name="txtRetailPrice" type="text" tabindex=10 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Ecer" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" required />
+							</div>
+						</div>
+						<br />
+						<div class="row">
+							<div class="col-md-2 labelColumn">
+								Harga Grosir 1 :
+							</div>
+							<div class="col-md-4">
+								<input id="txtPrice1" name="txtPrice1" type="text" tabindex=11 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Grosir 1" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" required />
+							</div>
+							<div class="col-md-2 labelColumn">
+								Qty Grosir 1 :
+							</div>
+							<div class="col-md-2">
+								<input id="txtQty1" name="txtQty1" type="number" tabindex=12 class="form-control-custom text-right" value=1 min=1 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 1" onpaste="return false;" required />
+							</div>
+						</div>
+						<br />
+						<div class="row">
+							<div class="col-md-2 labelColumn">
+								Harga Grosir 2 :
+							</div>
+							<div class="col-md-4">
+								<input id="txtPrice2" name="txtPrice2" type="text" tabindex=13 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Grosir 2" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" required />
+							</div>
+							<div class="col-md-2 labelColumn">
+								Qty Grosir 2 :
+							</div>
+							<div class="col-md-2">
+								<input id="txtQty2" name="txtQty2" type="number" tabindex=14 class="form-control-custom text-right" value=1 min=1 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 2" onpaste="return false;" required />
+							</div>
+						</div>
+						<br />
+						<div class="row">
+							<div class="col-md-2 labelColumn">
+								Berat (KG) :
+							</div>
+							<div class="col-md-4">
+								<input id="txtWeight" name="txtWeight" type="text" tabindex=15 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Berat (KG)" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertWeight(this.id, this.value);" onpaste="return false;" required />
+							</div>
+							<div class="col-md-2 labelColumn">
+								Stok Minimal :
+							</div>
+							<div class="col-md-2">
+								<input id="txtMinimumStock" name="txtMinimumStock" type="number" tabindex=16 class="form-control-custom text-right" value=0 onfocus="this.select();" autocomplete=off placeholder="Stok Minimal" onpaste="return false;" required />
+							</div>
 						</div>
 					</div>
-				</div>
-				<br />
-				<div class="row">
-					<div class="col-md-3 labelColumn">
-						Harga Beli :
-					</div>
-					<div class="col-md-4">
-						<input id="txtBuyPrice" name="txtBuyPrice" type="text" tabindex=8 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Beli" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" required />
+					<div id="add-unit">
+						
 					</div>
 				</div>
-				<br />
-				<div class="row">
-					<div class="col-md-3 labelColumn">
-						Harga Ecer :
-					</div>
-					<div class="col-md-4">
-						<input id="txtRetailPrice" name="txtRetailPrice" type="text" tabindex=9 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Ecer" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" required />
-					</div>
-				</div>
-				<br />
-				<div class="row">
-					<div class="col-md-3 labelColumn">
-						Harga Grosir 1 :
-					</div>
-					<div class="col-md-4">
-						<input id="txtPrice1" name="txtPrice1" type="text" tabindex=10 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Grosir 1" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" required />
-					</div>
-					<div class="col-md-2 labelColumn">
-						Qty Grosir 1 :
-					</div>
-					<div class="col-md-2">
-						<input id="txtQty1" name="txtQty1" type="number" tabindex=11 class="form-control-custom" value=1 min=1 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 1" onpaste="return false;" required />
-					</div>
-				</div>
-				<br />
-				<div class="row">
-					<div class="col-md-3 labelColumn">
-						Harga Grosir 2 :
-					</div>
-					<div class="col-md-4">
-						<input id="txtPrice2" name="txtPrice2" type="text" tabindex=12 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Grosir 2" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" required />
-					</div>
-					<div class="col-md-2 labelColumn">
-						Qty Grosir 2 :
-					</div>
-					<div class="col-md-2">
-						<input id="txtQty2" name="txtQty2" type="number" tabindex=13 class="form-control-custom" value=1 min=1 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 2" onpaste="return false;" required />
-					</div>
-				</div>
-				<br />
-				<div class="row">
-					<div class="col-md-3 labelColumn">
-						Berat (KG) :
-					</div>
-					<div class="col-md-4">
-						<input id="txtWeight" name="txtWeight" type="text" tabindex=14 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Berat (KG)" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertWeight(this.id, this.value);" onpaste="return false;" required />
-					</div>
-					<div class="col-md-2 labelColumn">
-						Stok Minimal :
-					</div>
-					<div class="col-md-2">
-						<input id="txtMinimumStock" name="txtMinimumStock" type="number" tabindex=15 class="form-control-custom" value=0 onfocus="this.select();" autocomplete=off placeholder="Stok Minimal" onpaste="return false;" required />
-					</div>
-				</div>
+				
 			</form>
+		</div>
+		<div id="addUnitTemplate" style="display: none;" >
+			<br />
+			<div class="row">
+				<div class="col-md-2 labelColumn">
+					Kode Barang :
+				</div>
+				<div class="col-md-4">
+					<input id="txtItemCode_" name="txtItemCode_" type="text" class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Kode Barang" required />
+				</div>
+			</div>
+			<br />
+			<div class="row">
+				<div class="col-md-2 labelColumn">
+					Satuan :
+				</div>
+				<div class="col-md-4">
+					<select id="ddlUnit_" name="ddlUnit_" class="form-control-custom" placeholder="Pilih Satuan" >
+						<?php
+							$sql = "CALL spSelDDLUnit('".$_SESSION['UserLogin']."')";
+							if (! $result = mysqli_query($dbh, $sql)) {
+								logEvent(mysqli_error($dbh), '/Master/Item/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+								return 0;
+							}
+							while($row = mysqli_fetch_array($result)) {
+								echo "<option value='".$row['UnitID']."' >".$row['UnitName']."</option>";
+							}
+							mysqli_free_result($result);
+							mysqli_next_result($dbh);
+						?>
+					</select>
+				</div>
+			</div>
+			<br />
+			<div class="row">
+				<div class="col-md-2 labelColumn">
+					Konversi Qty :
+				</div>
+				<div class="col-md-4">
+					<input id="txtConversionQty_" name="txtConversionQty_" type="number" class="form-control-custom text-right" value=1 min=1 onfocus="this.select();" autocomplete=off placeholder="Konversi Qty" onpaste="return false;" required />
+				</div>
+			</div>
+			<br />
+			<div class="row">
+				<div class="col-md-2 labelColumn">
+					Harga Beli :
+				</div>
+				<div class="col-md-4">
+					<input id="txtBuyPrice_" name="txtBuyPrice_" type="text" class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Beli" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" required />
+				</div>
+			</div>
+			<br />
+			<div class="row">
+				<div class="col-md-2 labelColumn">
+					Harga Ecer :
+				</div>
+				<div class="col-md-4">
+					<input id="txtRetailPrice_" name="txtRetailPrice_" type="text" class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Ecer" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" required />
+				</div>
+			</div>
+			<br />
+			<div class="row">
+				<div class="col-md-2 labelColumn">
+					Harga Grosir 1 :
+				</div>
+				<div class="col-md-4">
+					<input id="txtPrice1_" name="txtPrice1_" type="text" class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Grosir 1" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" required />
+				</div>
+				<div class="col-md-2 labelColumn">
+					Qty Grosir 1 :
+				</div>
+				<div class="col-md-2">
+					<input id="txtQty1_" name="txtQty1_" type="number" class="form-control-custom text-right" value=1 min=1 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 1" onpaste="return false;" required />
+				</div>
+			</div>
+			<br />
+			<div class="row">
+				<div class="col-md-2 labelColumn">
+					Harga Grosir 2 :
+				</div>
+				<div class="col-md-4">
+					<input id="txtPrice2_" name="txtPrice2_" type="text" class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Grosir 2" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" required />
+				</div>
+				<div class="col-md-2 labelColumn">
+					Qty Grosir 2 :
+				</div>
+				<div class="col-md-2">
+					<input id="txtQty2_" name="txtQty2_" type="number" class="form-control-custom text-right" value=1 min=1 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 2" onpaste="return false;" required />
+				</div>
+			</div>
+			<br />
+			<div class="row">
+				<div class="col-md-2 labelColumn">
+					Berat (KG) :
+				</div>
+				<div class="col-md-4">
+					<input id="txtWeight_" name="txtWeight_" type="text" class="form-control-custom text-right" value="0" autocomplete=off placeholder="Berat (KG)" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertWeight(this.id, this.value);" onpaste="return false;" required />
+				</div>
+				<div class="col-md-2 labelColumn">
+					Stok Minimal :
+				</div>
+				<div class="col-md-2">
+					<input id="txtMinimumStock_" name="txtMinimumStock_" type="number" class="form-control-custom text-right" value=0 onfocus="this.select();" autocomplete=off placeholder="Stok Minimal" onpaste="return false;" required />
+				</div>
+			</div>
 		</div>
 		<script>
 			var table;
+			var tabsCounter = 0;
+			var tabs;
+
+			function addTab() {
+				tabsCounter++;
+				//console.log("test");
+				$("#add-unit").html($("#addUnitTemplate").html());
+				$("a[href='#add-unit']").html("Satuan " + (tabsCounter + 1));
+				$("a[href='#add-unit']").attr("onclick", "");
+				$("a[href='#add-unit']").attr("href", "#add-unit-" + tabsCounter);
+				$("#add-unit").attr("id", "add-unit-" + tabsCounter);
+				$( "#tabs" ).tabs( "option", "active", tabsCounter );
+
+				var i = 0;
+				var tabIndex = 0;
+				$("#add-unit-" + tabsCounter).find("input, select").each(function() {
+					tabIndex = tabsCounter * 10 + i + 10;
+					$(this).attr("id", $(this).attr("id") + tabsCounter);
+					$(this).attr("name", $(this).attr("name") + tabsCounter);
+					$(this).attr("tabindex", parseInt(tabIndex));
+					i++;
+				});
+
+				if(tabsCounter < 3) {
+					var label = "Tambah Satuan",
+			        id = "add-unit",
+			        li = '<li><a href="#add-unit" onclick="addTab();" >Tambah Satuan</a></li>';
+			        tabContentHtml = "";
+			 
+					tabs.find( ".ui-tabs-nav" ).append( li );
+					tabs.append( "<div id='" + id + "'><p>" + tabContentHtml + "</p></div>" );
+				}
+				tabs.tabs( "refresh" );
+			}
 			function openDialog(Data, EditFlag) {
 				$("#hdnIsEdit").val(EditFlag);
 				if(EditFlag == 1) {
@@ -192,6 +366,19 @@
 					open: function() {
 						table.keys.disable();
 						$("#divModal").show();
+						tabs = $( "#tabs" ).tabs({
+							activate: function( event, ui ) {
+								var active = $("#tabs" ).tabs( "option", "active" );
+								if(active > 0) {
+									setTimeout(function() {
+										$("#txtItemCode_" + active).focus();
+									}, 0);
+								}
+								else {
+									$("#txtItemCode").focus();
+								}
+							}
+						});
 						$(document).on('keydown', function(e) {
 							if (e.keyCode == 39 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //right arrow
 								$("#btnCancelAddItem").focus();
@@ -200,15 +387,11 @@
 								$("#btnSaveItem").focus();
 							}
 						});
+						setTimeout(function() {
+							$("#txtItemCode").focus();
+						}, 0);
 					},
-					show: {
-						effect: "fade",
-						duration: 500
-					},
-					hide: {
-						effect: "fade",
-						duration: 500
-					},
+					
 					close: function() {
 						$(this).dialog("destroy");
 						$("#divModal").hide();
@@ -217,14 +400,14 @@
 						resetForm();
 					},
 					resizable: false,
-					height: 440,
+					height: 540,
 					width: 780,
 					modal: false,
 					buttons: [
 					{
 						text: "Simpan",
 						id: "btnSaveItem",
-						tabindex: 16,
+						tabindex: 17,
 						click: function() {
 							var PassValidate = 1;
 							var FirstFocus = 0;
@@ -350,6 +533,7 @@
 			
 			function resetForm() {
 				$("#hdnItemID").val(0);
+				$("#ddlUnit option")[0].selected = true;
 				$("#txtItemCode").val("");
 				$("#txtItemName").val("");
 				$("#ddlCategory").val("");

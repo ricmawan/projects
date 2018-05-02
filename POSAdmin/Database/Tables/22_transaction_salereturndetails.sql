@@ -21,4 +21,4 @@ CREATE TABLE transaction_salereturndetails
 )ENGINE=InnoDB;
 
 CREATE UNIQUE INDEX SALERETURNDETAILS_INDEX
-ON transaction_salereturndetails (SaleReturnDetailsID, SaleReturnID, ItemID, BranchID);
+ON transaction_salereturndetails (SaleReturnDetailsID, SaleReturnID, SaleDetailsID, ItemID, BranchID);

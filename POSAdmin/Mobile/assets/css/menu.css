@@ -44,7 +44,7 @@ header ul.nav li a {
 }
 header ul.nav li ul {
 	z-index:1000;
-	margin-top:10px;
+	margin-top:0;
 }
 header ul.nav li ul li ul {
 	margin:1px 0 0 1px;
@@ -52,13 +52,18 @@ header ul.nav li ul li ul {
 header ul.nav li a i {	
 	color:#fff;
 }
+
+.navbar {
+  margin-bottom: 0 !important;
+}
+
 .container,
 .navbar-static-top .container{
   width: 940px;
 }
 .container {
   /*margin-right: auto;*/
-  margin-left: 5px;
+  margin-left: 0;
   *zoom: 1;
   padding-left: 0px !important;
 }
@@ -202,7 +207,7 @@ header ul.nav li a i {
 .navbar .nav > li > a {
   float: none;
   font-size:13px;
-  margin-left:10px;
+  margin-left:0;
   margin-right:0;
   text-decoration: none;
   text-shadow: none;

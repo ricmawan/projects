@@ -38,7 +38,9 @@ SET State = 1;
 		MI.Price1,
 		MI.Qty1,
 		MI.Price2,
-		MI.Qty2
+		MI.Qty2,
+		MI.Weight,
+		MI.MinimumStock
 	FROM
 		master_item MI
 		JOIN master_category MC

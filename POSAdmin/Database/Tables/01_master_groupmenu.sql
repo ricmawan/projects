@@ -14,35 +14,35 @@ VALUES
 (
 	1,
 	'Home',
-	'fa fa-home fa-3x',
+	'fa fa-home fa-2x',
 	'./Home.php',
 	1
 ),
 (
 	2,
 	'Master Data',
-	'fa fa-book fa-3x',
+	'fa fa-book fa-2x',
 	NULL,
 	2
 ),
 (
 	3,
 	'Transaksi',
-	'fa fa-cart-plus fa-3x',
+	'fa fa-cart-plus fa-2x',
 	NULL,
 	3
 ),
 (
 	4,
 	'Laporan',
-	'fa fa-line-chart fa-3x',
+	'fa fa-line-chart fa-2x',
 	NULL,
 	4
 ),
 (
 	5,
 	'Tools',
-	'fa fa-gear fa-3x',
+	'fa fa-gear fa-2x',
 	NULL,
 	5
 );

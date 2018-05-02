@@ -390,14 +390,7 @@ function UpdatePassword() {
 				}
 			});
 		},
-		show: {
-			effect: "fade",
-			duration: 500
-		},
-		hide: {
-			effect: "fade",
-			duration: 500
-		},
+		
 		close: function() {
 			$(this).dialog("destroy");
 			$("#divModal").hide();
@@ -517,14 +510,7 @@ function SingleDelete(url, DeleteID, callback) {
 			$(this).dialog("destroy");
 			callback("Tidak");
 		},
-		show: {
-			effect: "fade",
-			duration: 500
-		},
-		hide: {
-			effect: "fade",
-			duration: 500
-		},
+		
 		resizable: false,
 		height: "auto",
 		width: 400,
@@ -620,11 +606,11 @@ function DeleteData(url, callback) {
 			},
 			show: {
 				effect: "fade",
-				duration: 500
+				duration: 0
 			},
 			hide: {
 				effect: "fade",
-				duration: 500
+				duration: 0
 			},
 			resizable: false,
 			height: "auto",
@@ -726,11 +712,11 @@ function saveConfirm(callback) {
 			},
 			show: {
 				effect: "fade",
-				duration: 500
+				duration: 0
 			},
 			hide: {
 				effect: "fade",
-				duration: 500
+				duration: 0
 			},
 			close: function() {
 				$(this).dialog("destroy");

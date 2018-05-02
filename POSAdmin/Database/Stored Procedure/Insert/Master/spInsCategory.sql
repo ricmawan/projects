@@ -2,7 +2,7 @@ DROP PROCEDURE IF EXISTS spInsCategory;
 
 DELIMITER $$
 CREATE PROCEDURE spInsCategory (
-	pID 				BIGINT, 
+	pID 				INT, 
     pCategoryCode		VARCHAR(100),
 	pCategoryName 		VARCHAR(255),
 	pIsEdit				INT,

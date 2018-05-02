@@ -58,6 +58,7 @@ SET State = 1;
 			
 		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
 SET State = 2;
+
 			SELECT
 				pID AS 'ID',
 				'Pelanggan sudah ada' AS 'Message',
@@ -69,6 +70,7 @@ SET State = 2;
 			
 		ELSE /*Data yang diinput valid*/
 SET State = 3;
+
 			IF(pIsEdit = 0)	THEN /*Tambah baru*/
 				INSERT INTO master_customer
 				(
@@ -93,6 +95,14 @@ SET State = 3;
 				);
 			
 SET State = 4;			               
+
+				SELECT
+					LAST_INSERT_ID()
+				INTO 
+					pID;
+
+SET State = 6;
+
 				SELECT
 					pID AS 'ID',
 					'Pelanggan Berhasil Ditambahkan' AS 'Message',
@@ -100,7 +110,8 @@ SET State = 4;
 					0 AS 'FailedFlag',
 					State AS 'State';
 			ELSE
-SET State = 5;
+SET State = 7;
+
 				UPDATE
 					master_customer
 				SET
@@ -114,7 +125,8 @@ SET State = 5;
 				WHERE
 					CustomerID = pID;
 
-SET State = 6;
+SET State = 8;
+
 				SELECT
 					pID AS 'ID',
 					'Pelanggan Berhasil Diubah' AS 'Message',

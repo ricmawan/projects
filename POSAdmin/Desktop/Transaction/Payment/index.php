@@ -229,14 +229,7 @@
 						tableWidthAdjust();
 						$("#divModal").show();
 					},
-					show: {
-						effect: "fade",
-						duration: 500
-					},
-					hide: {
-						effect: "fade",
-						duration: 500
-					},
+					
 					close: function() {
 						$(this).dialog("destroy");
 						$("#divModal").hide();
@@ -566,7 +559,7 @@
 								],
 								"processing": true,
 								"serverSide": true,
-								"ajax": "./Transaction/Print/DataSource.php",
+								"ajax": "./Transaction/Payment/DataSource.php",
 								"language": {
 									"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
 									"infoFiltered": "",

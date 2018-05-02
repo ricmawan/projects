@@ -39,7 +39,7 @@ SET State = 1;
 		MI.Price2,
 		MI.Qty2,
 		MI.Weight,
-		(IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) + IFNULL(SA.Quantity, 0)) Quantity
+		(IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0)) Stock
 	FROM
 		master_item MI
 		LEFT JOIN
@@ -138,6 +138,42 @@ SET State = 1;
 				MI.ItemID
 		)SA
 			ON MI.ItemID = SA.ItemID
+		LEFT JOIN
+		(
+			SELECT
+				BD.ItemID,
+				BD.BranchID,
+				SUM(BD.Quantity) Quantity
+			FROM
+				transaction_bookingdetails BD
+				JOIN master_item MI
+					ON MI.ItemID = BD.ItemID
+			WHERE
+				TRIM(MI.ItemCode) = TRIM(pItemCode)
+				AND pBranchID = BD.BranchID
+			GROUP BY
+				BD.ItemID,
+				BD.BranchID
+		)B
+			ON B.ItemID = MI.ItemID
+		LEFT JOIN
+		(
+			SELECT
+				PD.ItemID,
+				PD.BranchID,
+				SUM(PD.Quantity) Quantity
+			FROM
+				transaction_pickdetails PD
+				JOIN master_item MI
+					ON MI.ItemID = PD.ItemID
+			WHERE
+				TRIM(MI.ItemCode) = TRIM(pItemCode)
+				AND pBranchID = PD.BranchID
+			GROUP BY
+				PD.ItemID,
+				PD.BranchID
+		)P
+			ON P.ItemID = MI.ItemID
 	WHERE
 		TRIM(MI.ItemCode) = TRIM(pItemCode);
         

@@ -40,7 +40,7 @@ SET @query = CONCAT("SELECT
 					FROM
 						(
 							SELECT
-								SUM(SD.Quantity * SD.SalePrice) - SD.Discount Total
+								SUM(SD.Quantity * SD.SalePrice - SD.Discount) Total
 							FROM
 								transaction_sale TS
 								JOIN transaction_saledetails SD
@@ -82,7 +82,7 @@ SET @query = CONCAT("SELECT
 						'Penjualan' TransactionType,
                         TS.SaleNumber,
                         DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
-                        SUM(SD.Quantity * SD.SalePrice) - SD.Discount Total
+                        SUM(SD.Quantity * SD.SalePrice - SD.Discount) Total
 					FROM
 						transaction_sale TS
                         JOIN transaction_saledetails SD

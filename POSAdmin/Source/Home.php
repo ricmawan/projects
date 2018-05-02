@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-		<title>Main App</title>
+		<title>POS Admin</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		
@@ -69,10 +69,10 @@
 							<!--<img src="assets/img/find_user.png" class="user-image img-responsive"/>-->&nbsp;
 						</li>
 						<li>
-							<a href="#" onclick="Reload();"><i class="fa fa-refresh fa-3x"></i> Reload</a>
+							<a href="#" onclick="Reload();"><i class="fa fa-refresh fa-2x"></i> Reload</a>
 						</li>
 						<li>
-							<a class='menu active-menu' href='#' id='Menu1' link='./Home.php'><i class='fa fa-home fa-3x'></i> Home</a>
+							<a class='menu active-menu' href='#' id='Menu1' link='./Home.php'><i class='fa fa-home fa-2x'></i> Home</a>
 						</li>
 						<?php
 							$sql = "CALL spSelUserMenuNavigation(".$_SESSION['UserID'].", '".$_SESSION['UserLogin']."')";
@@ -122,7 +122,7 @@
 			
 			<div id="page-wrapper">
 				<div id="page-inner" style="overflow-x:hidden;overflow-y:hidden;">
-					<img src="./assets/img/logo.png" style="width:40%;margin: 40px auto;display:block;"/>
+					<!--<img src="./assets/img/logo.png" style="width:40%;margin: 40px auto;display:block;"/>-->
 				</div>
 			</div>
 		</div>
@@ -192,9 +192,6 @@
 		<div id="loading"></div>
 		<iframe id='excelDownload' src='' style='display:none'></iframe>
 		<script type="text/javascript">
-			function openTab() {
-				window.open("http://localhost/Projects/POSAdmin/Source/Home.php#", "", "width=1000");
-			}
 			$(document).ready(function() {
 				var windowHeight = $( window ).height() - 55;
 				$("#page-inner").css ({
@@ -221,6 +218,28 @@
 					$("#wrapper").css ({
 						"width" : "calc(100% - 5px)"
 					});
+				});
+
+				$("#loading").show();
+				$.ajax({
+					url: "./Notification/",
+					type: "POST",
+					data: { },
+					dataType: "html",
+					success: function(data) {
+						$("#loading").hide();
+						$("#page-inner").html(data);
+					},
+					error: function(data) {
+						$("#loading").hide();
+						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+						LogEvent(errorMessage, "/Home.php");
+						Lobibox.alert("error",
+						{
+							msg: errorMessage,
+							width: 480
+						});
+					}
 				});
 			});
 		</script>

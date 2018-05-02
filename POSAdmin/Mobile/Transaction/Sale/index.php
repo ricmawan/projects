@@ -10,9 +10,16 @@
 				max-height: 335px;
 				overflow-y: auto;
 			}
-			*::-webkit-selection {
-    background:transparent;
-}
+			
+			.btn {
+				font-size: 10px !important;
+				padding: 0 5px !important;
+			}
+
+			.btn-mobile {
+				height:45px;
+				width:49%;
+			}
 		</style>
 	</head>
 	<body>
@@ -21,14 +28,14 @@
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<span style="width:50%;display:inline-block;">
-							<h5 id="headTitle">Transaksi Penjualan Eceran</h5>
+							<h5 id="headTitle" style="margin-bottom: 5px;margin-top: 5px;">Transaksi Penjualan Eceran</h5>
 						</span>
 						<span style="width:49%;display:inline-block;text-align:right;">
 							<b>No Invoice: <span id="lblSaleNumber" ></span></b>
 						</span>
 					</div>
-					<div class="panel-body">
-						<br />
+					<div class="panel-body" style="margin-top: 5px;">
+						
 						<form id="PostForm" method="POST" action="" >
 							<input id="hdnSaleID" name="hdnSaleID" type="hidden" value=0 />
 							<input id="hdnSaleDetailsID" name="hdnSaleDetailsID" type="hidden" value=0 />
@@ -38,7 +45,7 @@
 							<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
 							<input id="hdnPayment" name="hdnPayment" type="hidden" value=0 />
 							<input type="hidden" id="hdnIsRetail" name="hdnIsRetail" value=1 />
-							<div id="leftSide" class="col-md-12" style="display:inline-block;width:20%;border-right:3px double black;float:left;" >
+							<div id="leftSide" class="col-md-12" style="display:inline-block;width:20%;border-right:3px double black;float:left;font-size: 10px !important;" >
 								<div class="row" >
 									<div class="col-md-12 has-float-label" >
 										<select id="ddlCustomer" name="ddlCustomer" tabindex=7 class="form-control-custom" placeholder="Pilih Pelanggan" >
@@ -108,14 +115,14 @@
 								</div>
 								<input type="text" tabindex=12 onfocus="addSaleDetails();" style="height:0; width: 0;opacity:0;" />
 								<br />
-								<button type="button" style="height:55px;width:49%;" class="btn btn-default" value="Simpan" onclick="finish();" ><i class="fa fa-save fa-2x"></i> Selesai</button>
-								<button type="button" style="height:55px;width:49%;" class="btn btn-default" value="Cetak" onclick="itemList();" ><i class="fa fa-list fa-2x"></i> Daftar<br /> Barang</button>
+								<button type="button" class="btn btn-default btn-mobile" value="Simpan" onclick="finish();" ><i class="fa fa-save fa-2x"></i><br /> Selesai</button>
+								<button type="button" class="btn btn-default btn-mobile" value="Cetak" onclick="itemList();" ><i class="fa fa-list fa-2x"></i><br /> List Barang</button>
 								<br />
-								<button type="button" style="height:55px;width:49%;" class="btn btn-default" value="Cetak" onclick="printInvoice();" ><i class="fa fa-print fa-2x"></i> Cetak<br /> Nota</button>
-								<button type="button" style="height:55px;width:49%;" class="btn btn-default" value="Cetak" onclick="printShipment();" ><i class="fa fa-truck fa-2x"></i> Surat<br /> Jalan</button>
+								<button type="button" class="btn btn-default btn-mobile" value="Cetak" onclick="printInvoice();" ><i class="fa fa-print fa-2x"></i> <br />Cetak Nota</button>
+								<button type="button" class="btn btn-default btn-mobile" value="Cetak" onclick="printShipment();" ><i class="fa fa-truck fa-2x"></i> <br />Surat Jalan</button>
 								<br />
-								<button type="button" style="height:55px;width:49%;" class="btn btn-default" value="Cancel" onclick="newWindow();" ><i class="fa fa-window-restore fa-2x"></i> Nota <br />Baru</button>
-								<button id="btnGrosir" type="button" style="height:55px;width:49%;" class="btn btn-default" value="Cetak" ><i class="fa fa-cart-arrow-down fa-2x"></i> Grosir</button>
+								<button type="button" class="btn btn-default btn-mobile" value="Cancel" onclick="newWindow();" ><i class="fa fa-window-restore fa-2x"></i> <br />Nota Baru</button>
+								<button id="btnGrosir" type="button" class="btn btn-default btn-mobile" value="Cetak" ><i class="fa fa-cart-arrow-down fa-2x"></i> Grosir</button>
 	</button>
 							</div>
 							<div class="col-md-12" style="display:inline-block;width:80%;float:left;" >
@@ -254,7 +261,7 @@
 							"searching": false,
 							"order": [],
 							"columns": [
-								{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-center" },
+								{ "width": "3%", "orderable": false, className: "dt-head-center dt-body-center" },
 								{ "visible": false },
 								{ "visible": false },
 								{ "visible": false },
@@ -272,7 +279,7 @@
 								{ "visible": false },
 								{ "visible": false },
 								{ "visible": false },
-								{ "width" : "5%", "orderable" : false, className: "dt-head-center dt-body-center" }
+								{ "width" : "7%", "orderable" : false, className: "dt-head-center dt-body-center" }
 							],
 							"processing": false,
 							"serverSide": false,
@@ -414,11 +421,11 @@
 											},
 											show: {
 												effect: "fade",
-												duration: 500
+												duration: 0
 											},
 											hide: {
 												effect: "fade",
-												duration: 500
+												duration: 0
 											},
 											close: function() {
 												$(this).dialog("destroy");
@@ -926,11 +933,11 @@
 									},
 									show: {
 										effect: "fade",
-										duration: 500
+										duration: 0
 									},
 									hide: {
 										effect: "fade",
-										duration: 500
+										duration: 0
 									},
 									close: function() {
 										$(this).dialog("destroy");
@@ -1192,14 +1199,7 @@
 							setTimeout(function() { counterKeyItem = 0; } , 1000);
 						});
 					},
-					show: {
-						effect: "fade",
-						duration: 500
-					},
-					hide: {
-						effect: "fade",
-						duration: 500
-					},
+					
 					close: function() {
 						$(this).dialog("destroy");
 						table3.destroy();
@@ -1247,11 +1247,11 @@
 						},
 						show: {
 							effect: "fade",
-							duration: 500
+							duration: 0
 						},
 						hide: {
 							effect: "fade",
-							duration: 500
+							duration: 0
 						},
 						close: function() {
 							$(this).dialog("destroy");
@@ -1392,20 +1392,13 @@
 						});
 						$("#txtFirstBalance").focus();
 					},
-					show: {
-						effect: "fade",
-						duration: 500
-					},
-					hide: {
-						effect: "fade",
-						duration: 500
-					},
+					
 					close: function() {
 						$(this).dialog("destroy");
 						$("#divModal").hide();
 					},
 					resizable: false,
-					height: 150,
+					height: 160,
 					width: 400,
 					modal: false,
 					buttons: [

@@ -65,7 +65,7 @@ SET State = 1;
 SET State = 2;
 			SELECT
 				pID AS 'ID',
-				'Barang sudah ada' AS 'Message',
+				'Barang sudah ada!' AS 'Message',
 				'' AS 'MessageDetail',
 				1 AS 'FailedFlag',
 				State AS 'State' ;
@@ -117,7 +117,7 @@ SET State = 5;
 
 				SELECT
 					pID AS 'ID',
-					'Barang Berhasil Ditambahkan' AS 'Message',
+					'Barang Berhasil Ditambahkan!' AS 'Message',
 					'' AS 'MessageDetail',
 					0 AS 'FailedFlag',
 					State AS 'State';
@@ -144,7 +144,7 @@ SET State = 6;
 SET State = 7;
 				SELECT
 					pID AS 'ID',
-					'Barang Berhasil Diubah' AS 'Message',
+					'Barang Berhasil Diubah!' AS 'Message',
 					'' AS 'MessageDetail',
 					0 AS 'FailedFlag',
 					State AS 'State';

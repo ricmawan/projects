@@ -6,7 +6,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<meta name="mobile-web-app-capable" content="yes">
 		<title>POS</title>
 		<link href="assets/css/bootstrap.css" rel="stylesheet" />
@@ -86,7 +86,7 @@
 	<body> 
 		<div id="wrapper">
 			<header style="height:30px;">
-				<div class="container" style="display:inline-block; width: 70%;padding-right: 0" >
+				<div class="container" style="display:inline-block; width: 70%;padding-right: 0;float:left;" >
 					<div class="navbar navbar-static-top">
 						<div class="navigation">
 							<nav>
@@ -98,23 +98,23 @@
 										<a href='#' id="menuSale" class='menu' link='Transaction/Sale/'><i class='fa fa-cart-plus fa-2'></i> Penjualan</a>
 									</li>
 									<li class='dropdown'>
-										<a href='#' class='menu' link='Transaction/SaleReturn/'><i class='fa fa-undo fa-2'></i> Retur Penjualan</a>
+										<a href='#' class='menu' link='Transaction/SaleReturn/'><i class='fa fa-undo fa-2'></i> Retur</a>
 									</li>
 									<li class='dropdown'>
-										<a href='#' class='menu' link='Transaction/Booking/'><i class='fa fa-hourglass-start fa-2'></i> Pemesanan</a>
+										<a href='#' class='menu' link='Transaction/Booking/'><i class='fa fa-hourglass-start fa-2'></i> D.O</a>
 									</li>
-									<!--<li class='dropdown'>
+									<li class='dropdown'>
 										<a href='#' class='menu' link='Transaction/Payment/'><i class='fa fa-dollar fa-2'></i> Pembayaran & Pengambilan</a>
-									</li>-->
+									</li>
 									<li class='dropdown'>
-										<a href='#' class='menu' link='Transaction/Print/'><i class='fa fa-print fa-2'></i> Cetak Nota & Surat Jalan</a>
+										<a href='#' class='menu' link='Transaction/Print/'><i class='fa fa-print fa-2'></i> Cetak Ulang</a>
 									</li>
 								</ul>
 							</nav>
 						</div>
 					</div>
 				</div>
-				<div class="container" style="display:inline-block;width: 28% !important;color:white;padding-right: 0" >
+				<div class="container" style="display:inline-block;width: 30% !important;color:white;padding-right: 0;margin-top: 5px;float:left;" >
 					<div class="navbar navbar-static-top" style="float:right;">
 						<div class="navigation" style="margin-bottom: 7px;">
 							<nav>
@@ -202,15 +202,15 @@
 			var counter = 0;
 			$(document).on("click", function() {
 				if(counter == 0)	{
-					document.documentElement.webkitRequestFullscreen();
+					//document.documentElement.webkitRequestFullscreen();
 					counter = 1;
 				}
 			});
 
 			$(document).ready(function() {
-				var windowHeight = $( window ).height() - 35;
+				var windowHeight = $( window ).height() - 33;				
 				if(windowHeight < 540) {
-					windowHeight = 540;
+					//windowHeight = 540;
 				}
 				$("#page-inner").css ({
 					"min-height" : windowHeight,
@@ -236,6 +236,16 @@
 				
 				$(window).resize(function() {
 					$("#tableContent").width($("#dvTableContent").width());
+				});
+
+				$("body").on("click", "span.dropdown", function() {
+					if($(this).children("div").css("display") == "block") { 
+						$(this).children("div").toggle();
+					}
+					else if($(this).children("div").css("display") == "none") {
+						$(".dropdown .dropdown-content").hide();
+						$(this).children("div").toggle();
+					}
 				});
 
 				$("#menuSale").click();

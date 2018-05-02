@@ -61,16 +61,16 @@
 										<a href='#' id="menuSale" class='menu' link='Transaction/Sale/'><i class='fa fa-cart-plus fa-2'></i> Penjualan</a>
 									</li>
 									<li class='dropdown'>
-										<a href='#' class='menu' link='Transaction/SaleReturn/'><i class='fa fa-undo fa-2'></i> Retur Penjualan</a>
+										<a href='#' class='menu' link='Transaction/SaleReturn/'><i class='fa fa-undo fa-2'></i> Retur</a>
 									</li>
 									<li class='dropdown'>
-										<a href='#' class='menu' link='Transaction/Booking/'><i class='fa fa-hourglass-start fa-2'></i> Pemesanan</a>
+										<a href='#' class='menu' link='Transaction/Booking/'><i class='fa fa-hourglass-start fa-2'></i> D.O</a>
 									</li>
-									<!--<li class='dropdown'>
+									<li class='dropdown'>
 										<a href='#' class='menu' link='Transaction/Payment/'><i class='fa fa-dollar fa-2'></i> Pembayaran & Pengambilan</a>
-									</li>-->
+									</li>
 									<li class='dropdown'>
-										<a href='#' class='menu' link='Transaction/Print/'><i class='fa fa-print fa-2'></i> Cetak Nota & Surat Jalan</a>
+										<a href='#' class='menu' link='Transaction/Print/'><i class='fa fa-print fa-2'></i> Cetak Ulang</a>
 									</li>
 								</ul>
 							</nav>
@@ -213,6 +213,7 @@
 		<script src="assets/js/dataTables.bootstrap.js"></script>
 		<script src="assets/js/dataTables.keyTable.js"></script>
 		<script src="assets/js/toggles.js"></script>
+		<script src="assets/js/mousetrap.min.js"></script>
 		<div id="loading"></div>
 		<iframe id='excelDownload' src='' style='display:none'></iframe>
 		<script type="text/javascript">
@@ -231,14 +232,7 @@
 						});
 						$("#txtFirstBalance").focus();
 					},
-					show: {
-						effect: "fade",
-						duration: 500
-					},
-					hide: {
-						effect: "fade",
-						duration: 500
-					},
+					
 					close: function() {
 						$(this).dialog("destroy");
 						$("#divModal").hide();

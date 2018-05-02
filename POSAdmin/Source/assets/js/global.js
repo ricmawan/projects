@@ -42,25 +42,26 @@ $(document).ready(function () {
 		}
 		else {
 			$("#loading").show();
-			/*$.ajax({
-				url: "./Master/Notification/",
+			$.ajax({
+				url: "./Notification/",
 				type: "POST",
 				data: { },
 				dataType: "html",
 				success: function(data) {
-					$("#page-inner").html(data);
-					$("html, body").animate({
-						scrollTop: 0
-					}, "slow");
 					$("#loading").hide();
+					$("#page-inner").html(data);
 				},
 				error: function(data) {
 					$("#loading").hide();
-					$.notify("Koneksi gagal", "error");
+					var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+					LogEvent(errorMessage, "/Home.php");
+					Lobibox.alert("error",
+					{
+						msg: errorMessage,
+						width: 480
+					});
 				}
-			});*/
-			$("#page-inner").html('<img src="./assets/img/logo.png" style="width:40%;margin: 40px auto;display:block;"/>');
-			$("#loading").hide();
+			});
 		}
 		$(this).addClass("active-menu");
 	});
@@ -101,25 +102,26 @@ function Redirect(link) {
 	}
 	else {
 		$("#loading").show();
-		/*$.ajax({
-			url: "./Master/Notification/",
+		$.ajax({
+			url: "./Notification/",
 			type: "POST",
 			data: { },
 			dataType: "html",
 			success: function(data) {
-				$("#page-inner").html(data);
-				$("html, body").animate({
-					scrollTop: 0
-				}, "slow");
 				$("#loading").hide();
+				$("#page-inner").html(data);
 			},
 			error: function(data) {
 				$("#loading").hide();
-				$.notify("Koneksi gagal", "error");
+				var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+				LogEvent(errorMessage, "/Home.php");
+				Lobibox.alert("error",
+				{
+					msg: errorMessage,
+					width: 480
+				});
 			}
-		});*/
-		$("#page-inner").html('<img src="./assets/img/logo.png" style="width:40%;margin: 40px auto;display:block;"/>');
-		$("#loading").hide();
+		});
 	}
 }
 
@@ -154,25 +156,26 @@ function Reload() {
 	}
 	else {
 		$("#loading").show();
-		/*$.ajax({
-			url: "./Master/Notification/",
+		$.ajax({
+			url: "./Notification/",
 			type: "POST",
 			data: { },
 			dataType: "html",
 			success: function(data) {
-				$("#page-inner").html(data);
-				$("html, body").animate({
-					scrollTop: 0
-				}, "slow");
 				$("#loading").hide();
+				$("#page-inner").html(data);
 			},
 			error: function(data) {
 				$("#loading").hide();
-				$.notify("Koneksi gagal", "error");
+				var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+				LogEvent(errorMessage, "/Home.php");
+				Lobibox.alert("error",
+				{
+					msg: errorMessage,
+					width: 480
+				});
 			}
-		});*/
-		$("#page-inner").html('<img src="./assets/img/logo.png" style="width:40%;margin: 40px auto;display:block;"/>');
-		$("#loading").hide();
+		});
 	}
 }
 
@@ -373,6 +376,29 @@ function Back() {
 			}
 		});
 	}
+	else {
+		$("#loading").show();
+		$.ajax({
+			url: "./Notification/",
+			type: "POST",
+			data: { },
+			dataType: "html",
+			success: function(data) {
+				$("#loading").hide();
+				$("#page-inner").html(data);
+			},
+			error: function(data) {
+				$("#loading").hide();
+				var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+				LogEvent(errorMessage, "/Home.php");
+				Lobibox.alert("error",
+				{
+					msg: errorMessage,
+					width: 480
+				});
+			}
+		});
+	}
 }
 
 function UpdatePassword() {
@@ -389,14 +415,6 @@ function UpdatePassword() {
 					 $("#btnSavePassword").focus();
 				}
 			});
-		},
-		show: {
-			effect: "fade",
-			duration: 500
-		},
-		hide: {
-			effect: "fade",
-			duration: 500
 		},
 		close: function() {
 			$(this).dialog("destroy");
@@ -517,14 +535,7 @@ function SingleDelete(url, DeleteID, callback) {
 			$(this).dialog("destroy");
 			callback("Tidak");
 		},
-		show: {
-			effect: "fade",
-			duration: 500
-		},
-		hide: {
-			effect: "fade",
-			duration: 500
-		},
+		
 		resizable: false,
 		height: "auto",
 		width: 400,
@@ -620,11 +631,11 @@ function DeleteData(url, callback) {
 			},
 			show: {
 				effect: "fade",
-				duration: 500
+				duration: 0
 			},
 			hide: {
 				effect: "fade",
-				duration: 500
+				duration: 0
 			},
 			resizable: false,
 			height: "auto",
@@ -724,14 +735,6 @@ function saveConfirm(callback) {
 					}
 				});
 			},
-			show: {
-				effect: "fade",
-				duration: 500
-			},
-			hide: {
-				effect: "fade",
-				duration: 500
-			},
 			close: function() {
 				$(this).dialog("destroy");
 				callback("Tidak");
@@ -813,7 +816,7 @@ function chkAll() {
 
 var enterCounter = 0;
 function enterLikeTab() {
-	$("input").not($(":submit, :button")).keypress(function (evt) {
+	$("input").not($(":submit, :button")).on("keypress", function (evt) {
 		if (evt.keyCode == 13) {
 			evt.preventDefault();
 			var next = $('[tabindex="'+(this.tabIndex+1)+'"]');
@@ -829,7 +832,9 @@ function enterLikeTab() {
 						}
 					});
 				}
-				else next.focus();
+				else {
+					next.focus();
+				}
 			}
 			else $('[tabindex="1"]').focus();
 		}

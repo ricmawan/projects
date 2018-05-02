@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS master_category;
 
 CREATE TABLE master_category
 (
-	CategoryID 			BIGINT PRIMARY KEY AUTO_INCREMENT,
+	CategoryID 			INT PRIMARY KEY AUTO_INCREMENT,
 	CategoryCode		VARCHAR(100),
 	CategoryName		VARCHAR(255) NOT NULL,
 	CreatedDate 		DATETIME NOT NULL,

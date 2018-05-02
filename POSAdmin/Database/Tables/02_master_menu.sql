@@ -44,8 +44,8 @@ VALUES
 (
 	3,
 	2,
-	'Barang',
-	'Master/Item/',
+	'Satuan',
+	'Master/Unit/',
 	NULL,
 	0,
 	3
@@ -53,8 +53,8 @@ VALUES
 (
 	4,
 	2,
-	'Supplier',
-	'Master/Supplier/',
+	'Barang',
+	'Master/Item/',
 	NULL,
 	0,
 	4
@@ -62,77 +62,132 @@ VALUES
 (
 	5,
 	2,
-	'Pelanggan',
-	'Master/Customer/',
+	'Supplier',
+	'Master/Supplier/',
 	NULL,
 	0,
 	5
 ),
 (
 	6,
-	3,
-	'Pembelian',
-	'Transaction/Purchase/',
-	NULL,
-	0,
-	1
-),
-(
-	7,
-	3,
-	'Retur Pembelian',
-	'Transaction/PurchaseReturn/',
-	NULL,
-	0,
-	2
-),
-(
-	8,
-	3,
-	'Penjualan',
-	'Transaction/Sale/',
-	NULL,
-	0,
-	3
-),
-(
-	9,
-	3,
-	'Retur Penjualan',
-	'Transaction/SaleReturn/',
-	NULL,
-	0,
-	4
-),
-(
-	10,
-	3,
-	'Mutasi Stok',
-	'Transaction/StockMutation/',
-	NULL,
-	0,
-	5
-),
-(
-	11,
-	3,
-	'Adjust Stok',
-	'Transaction/StockAdjust/',
+	2,
+	'Pelanggan',
+	'Master/Customer/',
 	NULL,
 	0,
 	6
 ),
 (
-	12,
-	3,
-	'Pemesanan',
-	'Transaction/Booking/',
+	7,
+	2,
+	'Upload Barang',
+	'Master/ItemUpload/',
 	NULL,
 	0,
 	7
 ),
 (
+	8,
+	3,
+	'Stok Awal',
+	'Transaction/FirstStock/',
+	NULL,
+	0,
+	1
+),
+(
+	9,
+	3,
+	'Pembelian',
+	'Transaction/Purchase/',
+	NULL,
+	0,
+	2
+),
+(
+	10,
+	3,
+	'Retur Pembelian',
+	'Transaction/PurchaseReturn/',
+	NULL,
+	0,
+	3
+),
+(
+	11,
+	3,
+	'Penjualan',
+	'Transaction/Sale/',
+	NULL,
+	0,
+	4
+),
+(
+	12,
+	3,
+	'Retur Penjualan',
+	'Transaction/SaleReturn/',
+	NULL,
+	0,
+	5
+),
+(
 	13,
+	3,
+	'Mutasi Stok',
+	'Transaction/StockMutation/',
+	NULL,
+	0,
+	6
+),
+(
+	14,
+	3,
+	'Adjust Stok',
+	'Transaction/StockAdjust/',
+	NULL,
+	0,
+	7
+),
+(
+	15,
+	3,
+	'Pemesanan',
+	'Transaction/Booking/',
+	NULL,
+	0,
+	8
+),
+
+(
+	16,
+	3,
+	'Pembayaran',
+	'Transaction/Payment/',
+	NULL,
+	0,
+	9
+),
+(
+	17,
+	3,
+	'Pengambilan',
+	'Transaction/PickUp/',
+	NULL,
+	0,
+	10
+),
+(
+	18,
+	3,
+	'Cetak Nota & Surat Jalan',
+	'Transaction/Print/',
+	NULL,
+	0,
+	11
+),
+(
+	19,
 	4,
 	'Stok',
 	'Report/Stock/',
@@ -141,7 +196,7 @@ VALUES
 	1
 ),
 (
-	14,
+	20,
 	4,
 	'Detail Stok',
 	'Report/StockDetails/',
@@ -150,7 +205,7 @@ VALUES
 	2
 ),
 (
-	15,
+	21,
 	4,
 	'Penjualan',
 	'Report/Sale/',
@@ -159,7 +214,7 @@ VALUES
 	3
 ),
 (
-	16,
+	22,
 	4,
 	'Pembelian',
 	'Report/Purchase/',
@@ -168,7 +223,7 @@ VALUES
 	4
 ),
 (
-	17,
+	23,
 	4,
 	'Pendapatan',
 	'Report/Income/',
@@ -177,7 +232,7 @@ VALUES
 	5
 ),
 (
-	18,
+	24,
 	4,
 	'Omset Pelanggan',
 	'Report/CustomerPurchase/',
@@ -186,16 +241,25 @@ VALUES
 	6
 ),
 (
-	19,
-	2,
-	'Update Harga',
-	'Master/PriceUpdate/',
+	25,
+	4,
+	'Harian',
+	'Report/Daily/',
 	NULL,
-	0,
-	6
+	1,
+	7
 ),
 (
-	20,
+	26,
+	4,
+	'Piutang',
+	'Report/Payment/',
+	NULL,
+	1,
+	8
+),
+(
+	27,
 	5,
 	'Backup Data',
 	'Tools/Backup/',
@@ -204,7 +268,7 @@ VALUES
 	1
 ),
 (
-	21,
+	28,
 	5,
 	'Restore Data',
 	'Tools/Restore/',
@@ -213,22 +277,13 @@ VALUES
 	2
 ),
 (
-	22,
-	4,
-	'Cetak Nota & Surat Jalan',
-	'Transaction/Print/',
+	29,
+	5,
+	'Reset Data',
+	'Tools/Reset/',
 	NULL,
 	0,
-	9
-),
-(
-	23,
-	4,
-	'Pembayaran & Pengambilan',
-	'Transaction/Payment/',
-	NULL,
-	0,
-	8
+	3
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

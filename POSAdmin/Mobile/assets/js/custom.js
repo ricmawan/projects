@@ -36,6 +36,11 @@
 
     $(document).ready(function () {
         mainApp.main_fun();
+        $('ul.nav li.dropdown').hover(function () {
+            $(this).find('.dropdown-nav-menu').stop(true, true).delay(200).slideDown();
+        }, function () {
+            $(this).find('.dropdown-nav-menu').stop(true, true).delay(200).slideUp();
+        });
     });
 
 }(jQuery));

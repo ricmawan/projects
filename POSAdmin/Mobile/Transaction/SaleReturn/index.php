@@ -479,14 +479,7 @@
 							setTimeout(function() { counterKeyTransaction = 0; } , 1000);
 						});
 					},
-					show: {
-						effect: "fade",
-						duration: 500
-					},
-					hide: {
-						effect: "fade",
-						duration: 500
-					},
+					
 					close: function() {
 						$(this).dialog("destroy");
 						table3.destroy();
@@ -526,20 +519,13 @@
 						});
 						$("#txtFirstBalance").focus();
 					},
-					show: {
-						effect: "fade",
-						duration: 500
-					},
-					hide: {
-						effect: "fade",
-						duration: 500
-					},
+					
 					close: function() {
 						$(this).dialog("destroy");
 						$("#divModal").hide();
 					},
 					resizable: false,
-					height: 150,
+					height: 160,
 					width: 400,
 					modal: false,
 					buttons: [

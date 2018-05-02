@@ -40,7 +40,7 @@ SET @query = CONCAT("SELECT
 					FROM
 						(
 							SELECT
-								SUM(((SD.Quantity * SD.SalePrice) - SD.Discount) - (SD.Quantity * SD.BuyPrice)) Total
+								SUM((SD.Quantity * SD.SalePrice - SD.Discount) - (SD.Quantity * SD.BuyPrice)) Total
 							FROM
 								transaction_sale TS
 								JOIN transaction_saledetails SD
@@ -56,7 +56,7 @@ SET @query = CONCAT("SELECT
 								TS.SaleID
 							UNION ALL
 		                    SELECT
-								SUM(((SRD.Quantity * SRD.SalePrice) - (SRD.Quantity * SRD.BuyPrice)))
+								-SUM(((SRD.Quantity * SRD.SalePrice) - (SRD.Quantity * SRD.BuyPrice)))
 							FROM
 								transaction_salereturn TSR
 								JOIN transaction_sale TS
@@ -87,7 +87,7 @@ SET @query = CONCAT("SELECT
                         TS.SaleNumber,
                         DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
                         MC.CustomerName,
-                        SUM(((SD.Quantity * SD.SalePrice) - SD.Discount) - (SD.Quantity * SD.BuyPrice)) Total
+                        SUM((SD.Quantity * SD.SalePrice - SD.Discount) - (SD.Quantity * SD.BuyPrice)) Total
 					FROM
 						transaction_sale TS
                         JOIN transaction_saledetails SD
@@ -111,7 +111,7 @@ SET @query = CONCAT("SELECT
                         CONCAT('R', TS.SaleNumber),
                         DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') TransactionDate,
                         MC.CustomerName,
-                        SUM(((SRD.Quantity * SRD.SalePrice) - (SRD.Quantity * SRD.BuyPrice))) Total
+                        -SUM(((SRD.Quantity * SRD.SalePrice) - (SRD.Quantity * SRD.BuyPrice))) Total
 					FROM
 						transaction_salereturn TSR
 						JOIN transaction_sale TS

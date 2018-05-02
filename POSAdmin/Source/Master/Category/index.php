@@ -91,15 +91,11 @@
 								$("#btnSaveCategory").focus();
 							}
 						});
+						setTimeout(function() {
+							$("#txtCategoryCode").focus();
+						}, 0);
 					},
-					show: {
-						effect: "fade",
-						duration: 500
-					},
-					hide: {
-						effect: "fade",
-						duration: 500
-					},
+					
 					close: function() {
 						$(this).dialog("destroy");
 						$("#divModal").hide();
@@ -224,7 +220,6 @@
 			}
 			
 			function fnDeleteData() {
-				console.log("kepanggil");
 				var index = table.cell({ focused: true }).index();
 				table.keys.disable();
 				DeleteData("./Master/Category/Delete.php", function(action) {

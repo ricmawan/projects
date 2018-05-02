@@ -4,6 +4,7 @@ DELIMITER $$
 CREATE PROCEDURE spUpdSalePayment (
 	pID 			BIGINT, 
 	pPayment 		DOUBLE,
+	pPaymentTypeID	SMALLINT,
 	pCurrentUser	VARCHAR(255)
 )
 StoredProcedure:BEGIN
@@ -36,13 +37,14 @@ StoredProcedure:BEGIN
 	START TRANSACTION;
 	
 SET State = 1;
-			UPDATE
-				transaction_sale
-			SET
-				Payment = pPayment,
-				ModifiedBy = pCurrentUser
-			WHERE
-				SaleID = pID;
+		UPDATE
+			transaction_sale
+		SET
+			Payment = pPayment,
+			PaymentTypeID = pPaymentTypeID,
+			ModifiedBy = pCurrentUser
+		WHERE
+			SaleID = pID;
 
 SET State = 2;
 		SELECT

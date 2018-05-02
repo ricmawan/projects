@@ -32,7 +32,7 @@ SET State = 1;
 		TS.SaleID,
 		TS.SaleNumber,
 		DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
-		SUM(SD.Quantity * SD.SalePrice) - SD.Discount Total
+		SUM(SD.Quantity * SD.SalePrice - SD.Discount) Total
 	FROM
 		transaction_sale TS
 		JOIN transaction_saledetails SD
@@ -50,7 +50,7 @@ SET State = 1;
 		TSR.SaleReturnID,
 		CONCAT('R', TS.SaleNumber),
 		DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') TransactionDate,
-		SUM(SRD.Quantity * SRD.SalePrice) Total
+		-SUM(SRD.Quantity * SRD.SalePrice) Total
 	FROM
 		transaction_salereturn TSR
 		JOIN transaction_sale TS

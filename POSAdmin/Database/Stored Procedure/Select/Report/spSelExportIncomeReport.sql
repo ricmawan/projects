@@ -41,8 +41,8 @@ SET State = 1;
         (SD.Quantity * SD.BuyPrice) TotalBuy,
         SD.SalePrice,
         SD.Discount,
-        ((SD.Quantity * SD.SalePrice) - SD.Discount) TotalSale,
-		(SD.Quantity * SD.SalePrice) - (SD.Quantity * SD.BuyPrice) Income
+        (SD.Quantity * SD.SalePrice - SD.Discount) TotalSale,
+		(SD.Quantity * SD.SalePrice - SD.Discount) - (SD.Quantity * SD.BuyPrice) Income
     FROM
 		transaction_sale TS
         JOIN transaction_saledetails SD

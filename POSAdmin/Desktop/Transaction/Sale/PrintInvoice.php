@@ -6,12 +6,13 @@
 		include "../../GetPermission.php";
 		$SaleID = mysqli_real_escape_string($dbh, $_POST['SaleID']);
 		$Payment = mysqli_real_escape_string($dbh, $_POST['Payment']);
+		$PaymentType = mysqli_real_escape_string($dbh, $_POST['PaymentType']);
 		$Message = "Pembayaran berhasil";
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
 		
-		$sql = "CALL spUpdSalePayment(".$SaleID.", ".$Payment.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spUpdSalePayment(".$SaleID.", ".$Payment.", ".$PaymentType.", '".$_SESSION['UserLogin']."')";
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysqli_error($dbh);

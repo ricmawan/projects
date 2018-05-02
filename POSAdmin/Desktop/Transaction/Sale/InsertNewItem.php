@@ -82,7 +82,7 @@
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;
-			logEvent(mysqli_error($dbh), '/Master/Item/InsertFromPurchase.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Transaction/Sale/InsertNewItem.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 			echo returnstate($CategoryID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}				

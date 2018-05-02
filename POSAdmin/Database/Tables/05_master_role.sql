@@ -1,0 +1,221 @@
+DROP TABLE IF EXISTS master_role;
+
+CREATE TABLE master_role
+(
+	RoleID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	UserID 		BIGINT,
+	MenuID 		BIGINT,
+	EditFlag 	BOOLEAN,
+	DeleteFlag 	BOOLEAN,
+	FOREIGN KEY(UserID) REFERENCES master_user(UserID) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY(MenuID) REFERENCES master_menu(MenuID) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB;
+
+INSERT INTO master_role
+VALUES
+(
+	0,
+	1,
+	1,
+	1,
+	1
+),
+(
+	0,
+	1,
+	2,
+	1,
+	1
+),
+(
+	0,
+	1,
+	3,
+	1,
+	1
+),
+(
+	0,
+	1,
+	4,
+	1,
+	1
+),
+(
+	0,
+	1,
+	5,
+	1,
+	1
+),
+(
+	0,
+	1,
+	6,
+	1,
+	1
+),
+(
+	0,
+	1,
+	7,
+	1,
+	1
+),
+(
+	0,
+	1,
+	8,
+	1,
+	1
+),
+(
+	0,
+	1,
+	9,
+	1,
+	1
+),
+(
+	0,
+	1,
+	10,
+	1,
+	1
+),
+(
+	0,
+	1,
+	11,
+	1,
+	1
+),
+(
+	0,
+	1,
+	12,
+	1,
+	1
+),
+(
+	0,
+	1,
+	13,
+	1,
+	1
+),
+(
+	0,
+	1,
+	14,
+	1,
+	1
+),
+(
+	0,
+	1,
+	15,
+	1,
+	1
+),
+(
+	0,
+	1,
+	16,
+	1,
+	1
+),
+(
+	0,
+	1,
+	17,
+	1,
+	1
+),
+(
+	0,
+	1,
+	18,
+	1,
+	1
+),
+(
+	0,
+	1,
+	19,
+	1,
+	1
+),
+(
+	0,
+	1,
+	20,
+	1,
+	1
+),
+(
+	0,
+	1,
+	21,
+	1,
+	1
+),
+(
+	0,
+	1,
+	22,
+	1,
+	1
+),
+(
+	0,
+	1,
+	23,
+	1,
+	1
+),
+(
+	0,
+	1,
+	24,
+	1,
+	1
+),
+(
+	0,
+	1,
+	25,
+	1,
+	1
+),
+(
+	0,
+	1,
+	26,
+	1,
+	1
+),
+(
+	0,
+	1,
+	27,
+	1,
+	1
+),
+(
+	0,
+	1,
+	28,
+	1,
+	1
+),
+(
+	0,
+	1,
+	29,
+	1,
+	1
+);
+
+CREATE UNIQUE INDEX ROLE_INDEX
+ON master_role (RoleID, UserID, MenuID);

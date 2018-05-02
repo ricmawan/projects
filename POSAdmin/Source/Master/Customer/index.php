@@ -136,15 +136,11 @@
 								$("#btnSaveCustomer").focus();
 							}
 						});
+						setTimeout(function() {
+							$("#txtCustomerCode").focus();
+						}, 0);
 					},
-					show: {
-						effect: "fade",
-						duration: 500
-					},
-					hide: {
-						effect: "fade",
-						duration: 500
-					},
+					
 					close: function() {
 						$(this).dialog("destroy");
 						$("#divModal").hide();

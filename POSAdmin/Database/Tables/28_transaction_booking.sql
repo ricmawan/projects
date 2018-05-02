@@ -7,6 +7,7 @@ CREATE TABLE transaction_booking
 	RetailFlag			BIT(1) NOT NULL,
 	CustomerID 			BIGINT,
 	TransactionDate		DATETIME NOT NULL,
+	Payment				DOUBLE,
 	PrintCount			SMALLINT,
 	PrintedDate			DATETIME,
 	Remarks				TEXT,
