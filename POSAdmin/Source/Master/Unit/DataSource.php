@@ -6,40 +6,31 @@
 	include "../../GetPermission.php";
 
 	$requestData= $_REQUEST;
+	//kolom di table
 	$columns = array(
-					0 => "CheckBox",  //unorderable
+					0 => "MU.UnitID", //unorderable
 					1 => "RowNumber", //unorderable
-					2 => "MU.UserName",
-					3 => "MU.UserLogin",
-					4 => "MUT.UserTypeName",
-					5 => "MU.IsActive"
+					2 => "MU.UnitName"
 				);
 
 	$where = " 1=1 ";
-	$order_by = "MU.UserID";
+	$order_by = "MU.UnitID";
 	$limit_s = $requestData['start'];
 	$limit_l = $requestData['length'];
 	
 	//Handles Sort querystring sent from Bootgrid
 	$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
-	$order_by .= ", MU.UserID ASC";
+	$order_by .= ", MU.UnitID ASC";
 	//Handles search querystring sent from Bootgrid
 	if (!empty($requestData['search']['value']))
 	{
 		$search = mysqli_escape_string($dbh, trim($requestData['search']['value']));
-		$where .= " AND ( MU.UserName LIKE '%".$search."%'";
-		$where .= " OR MUT.UserTypeName LIKE '%".$search."%'";
-		$where .= " OR MU.UserLogin LIKE '%".$search."%'";
-		$where .= " OR CASE
-						WHEN MU.IsActive = 0
-						THEN 'Tidak Aktif'
-						ELSE 'Aktif'
-					  END LIKE '%".$search."%') ";
+		$where .= " AND ( MU.UnitName LIKE '%".$search."%' )";
 	}
-	$sql = "CALL spSelUser(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
-	
+	$sql = "CALL spSelUnit(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
+
 	if (! $result = mysqli_query($dbh, $sql)) {
-		logEvent(mysqli_error($dbh), '/Master/User/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+		logEvent(mysqli_error($dbh), '/Master/Unit/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 		return 0;
 	}
 	$row = mysqli_fetch_array($result);
@@ -54,19 +45,11 @@
 	while ($row = mysqli_fetch_array($result2)) {
 		$row_array = array();
 		$RowNumber++;
-		$row_array[] = "<input type='checkbox' name='select' value='".$row['UserID']."^".$row['UserName']."' />";
+		//data yang dikirim ke table
+		$row_array[] = "<input name='select' type='checkbox' value='".$row['UnitID']."^".$row['UnitName']."' />";
 		$row_array[] = $RowNumber;
-		$row_array[] = $row['UserName'];
-		$row_array[] = $row['UserLogin'];
-		$row_array[] = $row['UserTypeName'];
-		$row_array[]= $row['Status'];
-		$row_array[] = $row['UserID'];
-		$row_array[] = $row['MenuID'];
-		$row_array[] = $row['EditFlag'];
-		$row_array[] = $row['DeleteFlag'];
-		$row_array[] = $row['IsActive'];
-		$row_array[] = $row['UserTypeID'];
-		
+		$row_array[] = $row['UnitName'];
+		$row_array[] = $row['UnitID'];
 		array_push($return_arr, $row_array);
 	}
 	

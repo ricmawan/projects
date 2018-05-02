@@ -11,7 +11,7 @@
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						 <span style="width:50%;display:inline-block;">
-							 <h5>Master Data Supplier</h5>
+							 <h5>Master Data Satuan</h5>
 						</span>
 						<span style="width:49%;display:inline-block;text-align:right;">
 							<button id="btnAdd" class="btn btn-primary" onclick="openDialog(0, 0);"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
@@ -29,12 +29,7 @@
 									<tr>
 										<th><input id="select_all" name="select_all" type="checkbox" onclick="chkAll();" /></th>
 										<th>No</th>
-										<th>Kode Supplier</th>
-										<th>Nama Supplier</th>
-										<th>Telepon</th>
-										<th>Alamat</th>
-										<th>Kota</th>
-										<th>Keterangan</th>
+										<th>Nama Satuan</th>
 									</tr>
 								</thead>
 							</table>
@@ -47,64 +42,18 @@
 				</div>
 			</div>
 		</div>
-		<div id="FormData" title="Tambah Supplier" style="display: none;">
+		<div id="FormData" title="Tambah Satuan" style="display: none;">
 			<form class="col-md-12" id="PostForm" method="POST" action="" >
 				<div class="row">
-					<div class="col-md-3 labelColumn">
-						Kode Supplier :
-						<input id="hdnSupplierID" name="hdnSupplierID" type="hidden" value=0 />
+					<div class="col-md-5 labelColumn">
+						Nama Satuan :
+						<input id="hdnUnitID" name="hdnUnitID" type="hidden" value=0 />
 						<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
 					</div>
-					<div class="col-md-7">
-						<input id="txtSupplierCode" name="txtSupplierCode" type="text" tabindex=5 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Kode Supplier" required />
+					<div class="col-md-6">
+						<input id="txtUnitName" name="txtUnitName" type="text" tabindex=6 class="form-control-custom"onfocus="this.select();" autocomplete=off placeholder="Satuan" required />
 					</div>
 				</div>
-				<br />
-				<div class="row">
-					<div class="col-md-3 labelColumn">
-						Nama Supplier :
-					</div>
-					<div class="col-md-7">
-						<input id="txtSupplierName" name="txtSupplierName" type="text" tabindex=6 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Nama Supplier" required />
-					</div>
-				</div>				
-				<br />
-				<div class="row">
-					<div class="col-md-3 labelColumn">
-						Telepon :
-					</div>
-					<div class="col-md-7">
-						<input id="txtTelephone" name="txtTelephone" type="text" tabindex=7 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Telepon" />
-					</div>
-				</div>
-				<br />
-				<div class="row">
-					<div class="col-md-3 labelColumn">
-						Alamat :
-					</div>
-					<div class="col-md-7">
-						<input id="txtAddress" name="txtAddress" type="text" tabindex=8 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Alamat" />
-					</div>
-				</div>
-				<br />
-				<div class="row">
-					<div class="col-md-3 labelColumn">
-						Kota :
-					</div>
-					<div class="col-md-7">
-						<input id="txtCity" name="txtCity" type="text" tabindex=9 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Kota" />
-					</div>
-				</div>
-				<br />
-				<div class="row">
-					<div class="col-md-3 labelColumn">
-						Keterangan :
-					</div>
-					<div class="col-md-7">
-						<textarea id="txtRemarks" name="txtRemarks" tabindex=10 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Keterangan"></textarea>
-					</div>
-				</div>
-				<br />
 			</form>
 		</div>
 		<script>
@@ -112,16 +61,11 @@
 			function openDialog(Data, EditFlag) {
 				$("#hdnIsEdit").val(EditFlag);
 				if(EditFlag == 1) {
-					$("#FormData").attr("title", "Edit Supplier");
-					$("#hdnSupplierID").val(Data[8]);
-					$("#txtSupplierCode").val(Data[2].toString());
-					$("#txtSupplierName").val(Data[3].toString());
-					$("#txtTelephone").val(Data[4].toString());
-					$("#txtAddress").val(Data[5].toString());
-					$("#txtCity").val(Data[6].toString());
-					$("#txtRemarks").val(Data[7].toString());
+					$("#FormData").attr("title", "Edit Satuan");
+					$("#hdnUnitID").val(Data[3]);
+					$("#txtUnitName").val(Data[2]);
 				}
-				else $("#FormData").attr("title", "Tambah Supplier");
+				else $("#FormData").attr("title", "Tambah Satuan");
 				var index = table.cell({ focused: true }).index();
 				$("#FormData").dialog({
 					autoOpen: false,
@@ -129,15 +73,15 @@
 						table.keys.disable();
 						$("#divModal").show();
 						$(document).on('keydown', function(e) {
-							if (e.keyCode == 39 && $("input:focus").length == 0 && $("textarea:focus").length == 0 && $("#btnOK:focus").length == 0) { //right arrow
-								$("#btnCancelAddSupplier").focus();
+							if (e.keyCode == 39 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //right arrow
+								$("#btnCancelAddUnit").focus();
 							}
-							else if(e.keyCode == 37 && $("input:focus").length == 0 && $("textarea:focus").length == 0 && $("#btnOK:focus").length == 0) { //left arrow
-								$("#btnSaveSupplier").focus();
+							else if (e.keyCode == 37 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //left arrow
+								$("#btnSaveUnit").focus();
 							}
 						});
 						setTimeout(function() {
-							$("#txtSupplierCode").focus();
+							$("#txtUnitName").focus();
 						}, 0);
 					},
 					
@@ -149,19 +93,19 @@
 						resetForm();
 					},
 					resizable: false,
-					height: 400,
-					width: 520,
+					height: 160,
+					width: 400,
 					modal: false,
 					buttons: [
 					{
 						text: "Simpan",
-						id: "btnSaveSupplier",
-						tabindex: 11,
+						id: "btnSaveUnit",
+						tabindex: 7,
 						click: function() {
 							saveConfirm(function(action) {
 								if(action == "Ya") {
 									$.ajax({
-										url: "./Master/Supplier/Insert.php",
+										url: "./Master/Unit/Insert.php",
 										type: "POST",
 										data: $("#PostForm").serialize(),
 										dataType: "json",
@@ -205,7 +149,7 @@
 													beforeClose: function() {
 														if(counter == 0) {
 															setTimeout(function() {
-																$("#txtSupplierCode").focus();
+																$("#txtUnitName").focus();
 															}, 0);
 															counter = 1;
 														}
@@ -218,7 +162,7 @@
 											$("#loading").hide();
 											var counter = 0;
 											var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-											LogEvent(errorMessage, "/Master/Supplier/index.php");
+											LogEvent(errorMessage, "/Master/Unit/index.php");
 											Lobibox.alert("error",
 											{
 												msg: errorMessage,
@@ -226,7 +170,7 @@
 												beforeClose: function() {
 													if(counter == 0) {
 														setTimeout(function() {
-															$("#txtSupplierCode").focus();
+															$("#txtUnitName").focus();
 														}, 0);
 														counter = 1;
 													}
@@ -237,7 +181,7 @@
 									});
 								}
 								else {
-									$("#txtSupplierCode").focus();
+									$("#txtUnitName").focus();
 									return false;
 								}
 							});
@@ -245,7 +189,7 @@
 					},
 					{
 						text: "Batal",
-						id: "btnCancelAddSupplier",
+						id: "btnCancelAddUnit",
 						click: function() {
 							$(this).dialog("destroy");
 							$("#divModal").hide();
@@ -259,19 +203,14 @@
 			}
 			
 			function resetForm() {
-				$("#hdnSupplierID").val(0);
-				$("#txtSupplierCode").val("");
-				$("#txtSupplierName").val("");
-				$("#txtTelephone").val("");
-				$("#txtAddress").val("");
-				$("#txtCity").val("");
-				$("#txtRemarks").val("");
+				$("#hdnUnitID").val(0);
+				$("#txtUnitName").val("");
 			}
 			
 			function fnDeleteData() {
 				var index = table.cell({ focused: true }).index();
 				table.keys.disable();
-				DeleteData("./Master/Supplier/Delete.php", function(action) {
+				DeleteData("./Master/Unit/Delete.php", function(action) {
 					if(action == "success") {
 						$("#select_all").prop("checked", false);
 						table.ajax.reload(function() {
@@ -300,14 +239,14 @@
 
 			$(document).ready(function() {
 				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
-				    $(this).blur();
+					$(this).blur();
 				});
 				
 				$.fn.dataTable.ext.errMode = function(settings, techNote, message) { 
 					$("#loading").hide();
 					var errorMessage = "DataTables Error : " + techNote + " (" + message + ")";
 					var counterError = 0;
-					LogEvent(errorMessage, "/Master/Supplier/index.php");
+					LogEvent(errorMessage, "/Master/Unit/index.php");
 					Lobibox.alert("error",
 					{
 						msg: "Terjadi kesalahan. Memuat ulang halaman.",
@@ -324,42 +263,37 @@
 				
 				keyFunction();
 				enterLikeTab();
-				var counterSupplier = 0;
+				var counterUnit = 0;
 				table = $("#grid-data").DataTable({
-							"keys": true,
-							"scrollY": "330px",
-							"rowId": "SupplierID",
-							"scrollCollapse": true,
-							"order": [2, "asc"],
-							"columns": [
-								{ "width": "20px", "orderable": false, className: "dt-head-center dt-body-center" },
-								{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
-								{ className: "dt-head-center" },
-								{ className: "dt-head-center" },
-								{ className: "dt-head-center" },
-								{ className: "dt-head-center" },
-								{ className: "dt-head-center" },
-								{ className: "dt-head-center" }
-							],
-							"processing": true,
-							"serverSide": true,
-							"ajax": "./Master/Supplier/DataSource.php",
-							"language": {
-								"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-								"infoFiltered": "",
-								"infoEmpty": "",
-								"zeroRecords": "Data tidak ditemukan",
-								"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
-								"search": "Cari",
-								"processing": "Memproses",
-								"paginate": {
-									"next": ">",
-									"previous": "<",
-									"last": "»",
-									"first": "«"
+								"keys": true,
+								"scrollY": "330px",
+								"rowId": "UnitID",
+								"scrollCollapse": true,
+								"order": [2, "asc"],
+								"columns": [
+									{ "width": "20px", "orderable": false, className: "dt-head-center dt-body-center" },
+									{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
+									{ className: "dt-head-center" }
+								],
+								"processing": true,
+								"serverSide": true,
+								"ajax": "./Master/Unit/DataSource.php",
+								"language": {
+									"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+									"infoFiltered": "",
+									"infoEmpty": "",
+									"zeroRecords": "Data tidak ditemukan",
+									"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
+									"search": "Cari",
+									"processing": "Memproses",
+									"paginate": {
+										"next": ">",
+										"previous": "<",
+										"last": "»",
+										"first": "«"
+									}
 								}
-							}
-						});
+							});
 				
 				table.on( 'key', function (e, datatable, key, cell, originalEvent) {
 					var index = table.cell({ focused: true }).index();
@@ -374,15 +308,15 @@
 							checkbox.attr("checked", true);
 						}
 					}
-					else if(counterSupplier == 0) {
-						counterSupplier = 1;
+					else if(counterUnit == 0) {
+						counterUnit = 1;
 						var data = datatable.row( cell.index().row ).data();
-						if(key == 13) { //enter
-							if(($(".ui-dialog").css("display") == "none" || $("#delete-confirm").css("display") == "none") && $("#hdnEditFlag").val() == "1") {
+						if(key == 13) {
+							if(($(".ui-dialog").css("display") == "none" || $("#delete-confirm").css("display") == "none") && $("#hdnEditFlag").val() == "1" ) {
 								openDialog(data, 1);
 							}
 						}
-						else if(key == 46 && $("#hdnDeleteFlag").val() == "1") { //delete
+						else if(key == 46 && $("#hdnDeleteFlag").val() == "1") {
 							var DeleteID = new Array();
 							$("input:checkbox[name=select]:checked").each(function() {
 								if($(this).val() != 'all') DeleteID.push($(this).val());
@@ -390,8 +324,8 @@
 							if(DeleteID.length == 0) {
 								table.keys.disable();
 								var deletedData = new Array();
-								deletedData.push(data[8] + "^" + data[3]);
-								SingleDelete("./Master/Supplier/Delete.php", deletedData, function(action) {
+								deletedData.push(data[3] + "^" + data[2]);
+								SingleDelete("./Master/Unit/Delete.php", deletedData, function(action) {
 									if(action == "success") {
 										table.ajax.reload(function() {
 											table.keys.enable();
@@ -420,7 +354,7 @@
 								fnDeleteData();
 							}
 						}
-						setTimeout(function() { counterSupplier = 0; } , 1000);
+						setTimeout(function() { counterUnit = 0; } , 1000);
 					}
 				});
 				
