@@ -1,0 +1,142 @@
+DROP PROCEDURE IF EXISTS spInsStockAdjust;
+
+DELIMITER $$
+CREATE PROCEDURE spInsStockAdjust (
+	pID 						BIGINT,
+	pBranchID					INT,
+	pTransactionDate 			DATETIME,
+	pStockAdjustDetailsID		BIGINT,
+    pItemID						BIGINT,
+	pQuantity					DOUBLE,
+	pAdjustedQuantity			DOUBLE,
+    pUserID						BIGINT,
+    pCurrentUser				VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE RowCount INT;
+
+	DECLARE PassValidate INT;
+	
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spInsStockAdjust', pCurrentUser);
+		SELECT
+			pID AS 'ID',
+            pStockAdjustDetailsID AS 'StockAdjustDetailsID',
+			'Terjadi kesalahan sistem!' AS 'Message',
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag',
+			State AS 'State' ;
+	END;
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+
+		IF(pID = 0)	THEN /*Tambah baru*/
+			INSERT INTO transaction_stockadjust
+			(
+				TransactionDate,
+				CreatedDate,
+				CreatedBy
+			)
+			VALUES 
+			(
+				pTransactionDate,
+				NOW(),
+				pCurrentUser
+			);
+		
+SET State = 3;	               
+			SELECT
+				LAST_INSERT_ID()
+			INTO 
+				pID;
+				
+		ELSE
+		
+SET State = 4;
+			UPDATE
+				transaction_stockadjust
+			SET
+				TransactionDate = pTransactionDate,
+				ModifiedBy = pCurrentUser
+			WHERE
+				StockAdjustID = pID;
+				
+		END IF;
+		
+SET State = 5;
+		
+		IF(pStockAdjustDetailsID = 0) THEN
+			INSERT INTO transaction_stockadjustdetails
+			(
+				StockAdjustID,
+				BranchID,
+				ItemID,
+				Quantity,
+				AdjustedQuantity,
+				CreatedDate,
+				CreatedBy
+			)
+			VALUES
+			(
+				pID,
+				pBranchID,
+				pItemID,
+				pQuantity,
+				pAdjustedQuantity,
+				NOW(),
+				pCurrentUser
+			);
+			
+SET State = 6;
+			
+			SELECT
+				LAST_INSERT_ID()
+			INTO 
+				pStockAdjustDetailsID;
+		
+		ELSE
+				
+SET State = 7;
+			
+			UPDATE 
+				transaction_stockadjustdetails
+			SET
+				ItemID = pItemID,
+				BranchID = pBranchID,
+				Quantity = pQuantity,
+				AdjustedQuantity = pAdjustedQuantity,
+				ModifiedBy = pCurrentUser
+			WHERE
+				StockAdjustDetailsID = pStockAdjustDetailsID;
+			
+		END IF;
+		
+SET State = 8;
+
+		SELECT
+			pID AS 'ID',
+			pStockAdjustDetailsID AS 'StockAdjustDetailsID',
+			'Transaksi Berhasil Disimpan' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State';
+                
+	COMMIT;
+END;
+$$
+DELIMITER ;
