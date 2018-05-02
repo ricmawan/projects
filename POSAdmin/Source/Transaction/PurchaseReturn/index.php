@@ -311,14 +311,7 @@
 							}
 						});
 					},
-					show: {
-						effect: "fade",
-						duration: 500
-					},
-					hide: {
-						effect: "fade",
-						duration: 500
-					},
+					
 					close: function() {
 						$(this).dialog("destroy");
 						$("#divModal").hide();
@@ -606,6 +599,7 @@
 				$("#txtBuyPrice").val(0);
 				$("#lblTotal").html("0");
 				$("#txtPurchaseReturnNumber").val("");
+				$("#ddlSupplier option")[0].selected = true;
 				table2.clear().draw();
 			}
 			
@@ -726,14 +720,7 @@
 							setTimeout(function() { counterKeyItem = 0; } , 1000);
 						});
 					},
-					show: {
-						effect: "fade",
-						duration: 500
-					},
-					hide: {
-						effect: "fade",
-						duration: 500
-					},
+					
 					close: function() {
 						$(this).dialog("destroy");
 						table3.destroy();
@@ -776,11 +763,11 @@
 						},
 						show: {
 							effect: "fade",
-							duration: 500
+							duration: 0
 						},
 						hide: {
 							effect: "fade",
-							duration: 500
+							duration: 0
 						},
 						close: function() {
 							$(this).dialog("destroy");

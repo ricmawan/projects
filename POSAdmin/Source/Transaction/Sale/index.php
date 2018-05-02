@@ -381,14 +381,7 @@
 						tableWidthAdjust();
 						$("#divModal").show();
 					},
-					show: {
-						effect: "fade",
-						duration: 500
-					},
-					hide: {
-						effect: "fade",
-						duration: 500
-					},
+					
 					close: function() {
 						$(this).dialog("destroy");
 						$("#divModal").hide();
@@ -518,11 +511,11 @@
 											},
 											show: {
 												effect: "fade",
-												duration: 500
+												duration: 0
 											},
 											hide: {
 												effect: "fade",
-												duration: 500
+												duration: 0
 											},
 											close: function() {
 												$(this).dialog("destroy");
@@ -992,11 +985,11 @@
 									},
 									show: {
 										effect: "fade",
-										duration: 500
+										duration: 0
 									},
 									hide: {
 										effect: "fade",
-										duration: 500
+										duration: 0
 									},
 									close: function() {
 										$(this).dialog("destroy");
@@ -1015,7 +1008,7 @@
 											$(this).dialog("destroy");
 											//callback("Ya");
 											$.ajax({
-												url: "./Master/Item/InsertFromPurchase.php",
+												url: "./Master/Item/InsertNewItem.php",
 												type: "POST",
 												data: $("#PostFormItem").serialize(),
 												dataType: "json",
@@ -1151,6 +1144,7 @@
 				$("#lblWeight").html("0");
 				$("#hdnPayment").html("0");
 				$("#hdnRetailPrice").val(0);
+				$("#ddlCustomer option")[0].selected = true;
 				table2.clear().draw();
 			}
 			
@@ -1275,14 +1269,7 @@
 							setTimeout(function() { counterKeyItem = 0; } , 1000);
 						});
 					},
-					show: {
-						effect: "fade",
-						duration: 500
-					},
-					hide: {
-						effect: "fade",
-						duration: 500
-					},
+					
 					close: function() {
 						$(this).dialog("destroy");
 						table3.destroy();
@@ -1328,11 +1315,11 @@
 						},
 						show: {
 							effect: "fade",
-							duration: 500
+							duration: 0
 						},
 						hide: {
 							effect: "fade",
-							duration: 500
+							duration: 0
 						},
 						close: function() {
 							$(this).dialog("destroy");

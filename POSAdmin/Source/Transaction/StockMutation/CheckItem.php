@@ -12,7 +12,7 @@
 		$ErrorMessage = "";
 		$State = 1;
 		
-		$sql = "CALL spSelItemDetails('".$ItemCode."', '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spSelItemQtyDetails('".$ItemCode."', '".$_SESSION['UserLogin']."')";
 
 		if (! $result = mysqli_query($dbh, $sql)) {
 			$FailedFlag = 1;

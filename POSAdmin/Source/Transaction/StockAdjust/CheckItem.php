@@ -28,7 +28,7 @@
 			$row = mysqli_fetch_array($result);
 			$ItemID = $row['ItemID'];
 			$ItemName = $row['ItemName'];
-			$Quantity = $row['Quantity'];
+			$Quantity = $row['Stock'];
 		}
 		else {
 			$FailedFlag = 1;
