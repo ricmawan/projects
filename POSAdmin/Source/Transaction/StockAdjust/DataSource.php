@@ -64,6 +64,7 @@
 		$row_array[] = $row['BranchName'];
 		$row_array[] = $row['ItemCode'];
 		$row_array[] = $row['ItemName'];
+		$row_array[] = $row['UnitName'];
 		$row_array[] = $row['Quantity'];
 		$row_array[] = $row['AdjustedQuantity'];
 		$row_array[] = $row['StockAdjustID'];
@@ -71,6 +72,7 @@
 		$row_array[] = $row['PlainTransactionDate'];
 		$row_array[] = $row['ItemID'];
 		$row_array[] = $row['BranchID'];
+		$row_array[] = $row['UnitID'];
 		array_push($return_arr, $row_array);
 	}
 	

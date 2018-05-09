@@ -12,6 +12,8 @@
 		$ItemName = "";
 		$Quantity = 0;
 		$FailedFlag = 0;
+		$UnitID = 0;
+		$AvailableUnit = "";
 		$ErrorMessage = "";
 		$State = 1;
 		

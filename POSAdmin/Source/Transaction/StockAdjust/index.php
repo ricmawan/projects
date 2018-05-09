@@ -43,6 +43,12 @@
 										<th>Satuan</th>
 										<th>QTY</th>
 										<th>Penyesuaian</th>
+										<th>StockAdjustID</th>
+										<th>StockAdjustDetailsID</th>
+										<th>PlainTransactionDate</th>
+										<th>ItemID</th>
+										<th>BranchID</th>
+										<th>UnitID</th>
 									</tr>
 								</thead>
 							</table>
@@ -216,18 +222,78 @@
 				$("#hdnIsEdit").val(EditFlag);
 				if(EditFlag == 1) {
 					$("#FormData").attr("title", "Edit Adjust Stok");
-					$("#hdnStockAdjustID").val(Data[8]);
-					//$("#lblTotal").html(Data[5]);
-					$("#txtTransactionDate").datepicker("setDate", new Date(Data[10]));
-					getStockAdjustDetails(Data[8], Data[9]);
-					
-					$("#hdnStockAdjustDetailsID").val(Data[9]);
-					$("#hdnItemID").val(Data[11]);
+					$("#hdnStockAdjustID").val(Data[9]);
 					$("#txtItemCode").val(Data[4]);
 					$("#txtItemName").val(Data[5]);
-					$("#txtQTY").val(Data[6]);
-					$("#txtAdjustedQTY").val(Data[7]);
-					$("#ddlBranch").val(Data[12]);
+					$("#ddlBranch").val(Data[13]);
+					//$("#lblTotal").html(Data[5]);
+					$("#txtTransactionDate").datepicker("setDate", new Date(Data[10]));
+					getStockAdjustDetails(Data[9], Data[10]);
+					var itemCode = $("#txtItemCode").val();
+					var branchID = $("#ddlBranch").val();
+					$.ajax({
+						url: "./Transaction/StockAdjust/CheckItem.php",
+						type: "POST",
+						data: { itemCode : itemCode, branchID : branchID },
+						dataType: "json",
+						success: function(data) {
+							if(data.FailedFlag == '0') {
+								//if($("#hdnItemID").val() != data.ItemID) {
+									$("#hdnAvailableUnit").val(JSON.stringify(data.AvailableUnit));
+									$("#hdnItemDetailsID").val(data.ItemDetailsID);
+									if(data.AvailableUnit.length > 0) {
+										$("#ddlUnit").find('option').remove();
+										for(var i=0;i<data.AvailableUnit.length;i++) {
+											$("#ddlUnit").append("<option value=" + data.AvailableUnit[i][0] + " itemdetailsid='" + data.AvailableUnit[i][2] + "' itemcode='" + data.AvailableUnit[i][3] + "' >" + data.AvailableUnit[i][1] + "</option>");
+										}
+									}
+
+									$("#hdnStockAdjustDetailsID").val(Data[10]);
+									$("#hdnItemID").val(Data[12]);
+									$("#txtQTY").val(Data[7]);
+									$("#txtAdjustedQTY").val(Data[8]);
+									$("#ddlBranch").val(Data[13]);
+									$("#ddlUnit").val(Data[14]);
+									$("#txtAdjustedQTY").focus();
+								//}
+								//else $("#txtAdjustedQTY").focus();
+							}
+							else {
+								//add new item
+								if(data.ErrorMessage == "") {
+									 $("#txtItemCode").notify("Kode tidak valid!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+								}
+								else {
+									var counter = 0;
+									Lobibox.alert("error",
+									{
+										msg: data.ErrorMessage,
+										width: 480,
+										beforeClose: function() {
+											if(counter == 0) {
+												setTimeout(function() {
+													$("#txtItemCode").focus();
+												}, 0);
+												counter = 1;
+											}
+										}
+									});
+									return 0;
+								}
+							}
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+							$("#loading").hide();
+							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+							LogEvent(errorMessage, "/Transaction/StockAdjust/index.php");
+							Lobibox.alert("error",
+							{
+								msg: errorMessage,
+								width: 480
+							});
+							return 0;
+						}
+					});
 					setTimeout(function() { $("#txtItemCode").focus(); }, 0);
 				}
 				else {
@@ -948,8 +1014,16 @@
 									{ className: "dt-head-center" },
 									{ className: "dt-head-center" },
 									{ className: "dt-head-center" },
+									{ className: "dt-head-center" },
+									{ className: "dt-head-center" },
 									{ className: "dt-head-cente dt-body-right" },
-									{ className: "dt-head-center dt-body-right" }
+									{ className: "dt-head-center dt-body-right" },
+									{ "visible" : false },
+									{ "visible" : false },
+									{ "visible" : false },
+									{ "visible" : false },
+									{ "visible" : false },
+									{ "visible" : false }
 								],
 								"processing": true,
 								"serverSide": true,

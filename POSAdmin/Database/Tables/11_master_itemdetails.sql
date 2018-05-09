@@ -5,8 +5,8 @@ CREATE TABLE master_itemdetails
 	ItemDetailsID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
 	ItemID 				BIGINT,
 	ItemDetailsCode		VARCHAR(100),
-	SessionID			VARCHAR(100),
-    UnitID				SMALLINT,
+	UnitID				SMALLINT,
+	ConversionQuantity	DOUBLE,
 	BuyPrice			DOUBLE,
 	RetailPrice			DOUBLE,
     Price1				DOUBLE,
@@ -19,8 +19,9 @@ CREATE TABLE master_itemdetails
 	CreatedBy 			VARCHAR(255) NOT NULL,
 	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
 	ModifiedBy			VARCHAR(255) NULL,
-    FOREIGN KEY(CategoryID) REFERENCES master_category(CategoryID) ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY(ItemID) REFERENCES master_item(ItemID) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY(UnitID) REFERENCES master_unit(UnitID) ON UPDATE CASCADE ON DELETE CASCADE
 )ENGINE=InnoDB;
 
-CREATE UNIQUE INDEX ITEM_INDEX
-ON master_item (ItemID, CategoryID);
+CREATE UNIQUE INDEX ITEMDETAILS_INDEX
+ON master_itemdetails (ItemDetailsID, ItemID, UnitID);
