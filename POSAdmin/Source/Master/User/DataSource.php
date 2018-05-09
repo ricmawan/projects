@@ -16,14 +16,15 @@
 				);
 
 	$where = " 1=1 ";
-	$order_by = "MU.UserID";
+	$order_by = "MU.UserID DESC";
 	$limit_s = $requestData['start'];
 	$limit_l = $requestData['length'];
 	
 	//Handles Sort querystring sent from Bootgrid
-	$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
-	$order_by .= ", MU.UserID ASC";
-	//Handles search querystring sent from Bootgrid
+	if(ISSET($requestData['order'])) {
+		$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
+		$order_by .= ", MU.UserID ASC";
+	}//Handles search querystring sent from Bootgrid
 	if (!empty($requestData['search']['value']))
 	{
 		$search = mysqli_escape_string($dbh, trim($requestData['search']['value']));
@@ -37,7 +38,7 @@
 					  END LIKE '%".$search."%') ";
 	}
 	$sql = "CALL spSelUser(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
-	
+
 	if (! $result = mysqli_query($dbh, $sql)) {
 		logEvent(mysqli_error($dbh), '/Master/User/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 		return 0;
@@ -59,7 +60,7 @@
 		$row_array[] = $row['UserName'];
 		$row_array[] = $row['UserLogin'];
 		$row_array[] = $row['UserTypeName'];
-		$row_array[]= $row['Status'];
+		$row_array[] = $row['Status'];
 		$row_array[] = $row['UserID'];
 		$row_array[] = $row['MenuID'];
 		$row_array[] = $row['EditFlag'];

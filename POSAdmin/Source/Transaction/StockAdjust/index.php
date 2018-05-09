@@ -18,7 +18,7 @@
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						 <span style="width:50%;display:inline-block;">
-							 <h5>Adjust Stok</h5>
+							 <h5>Penyesuaian Stok</h5>
 						</span>
 						<span style="width:49%;display:inline-block;text-align:right;">
 							<button id="btnAdd" class="btn btn-primary" onclick="openDialog(0, 0);"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
@@ -37,10 +37,12 @@
 										<th><input id="select_all" name="select_all" type="checkbox" onclick="chkAll();" /></th>
 										<th>No</th>
 										<th>Tanggal</th>
+										<th>Cabang</th>
 										<th>Kode Barang</th>
 										<th>Nama Barang</th>
+										<th>Satuan</th>
 										<th>QTY</th>
-										<th>Adjust</th>
+										<th>Penyesuaian</th>
 									</tr>
 								</thead>
 							</table>
@@ -65,48 +67,71 @@
 						<input id="hdnStockAdjustDetailsID" name="hdnStockAdjustDetailsID" type="hidden" value=0 />
 						<input id="hdnItemID" name="hdnItemID" type="hidden" value=0 />
 						<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
+						<input id="hdnAvailableUnit" name="hdnAvailableUnit" type="hidden" />
+						<input id="hdnItemDetailsID" name="hdnItemDetailsID" type="hidden" value=0 />
 						<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
 					</div>
 				</div>
-				<hr style="margin: 10px 0;" />
+				<br />
 				<div class="row">
 					<table class="table table-striped table-hover" style="margin-bottom: 5px;width:100%;" >
-						<thead>
-							<tr>
-								<th style="width: 15%;text-align: center;" >Cabang</th>
-								<th style="width: 25%;text-align: center;" >Kode Barang</th>
-								<th style="width: 30%;text-align: center;" >Nama Barang</th>
-								<th style="width: 15%;text-align: center;" >Qty</th>
-								<th style="width: 15%;text-align: center;" >Adjusted Qty</th>
-							</tr>
-						</thead>
 						<tbody>
 							<tr>
-								<td style="width: 15%;" >
-									<select id="ddlBranch" name="ddlBranch" tabindex=7 class="form-control-custom" placeholder="Pilih Cabang" >
-										<?php
-											$sql = "CALL spSelDDLBranch('".$_SESSION['UserLogin']."')";
-											if (! $result = mysqli_query($dbh, $sql)) {
-												logEvent(mysqli_error($dbh), '/Transaction/StockAdjust/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-												return 0;
-											}
-											while($row = mysqli_fetch_array($result)) {
-												echo "<option value='".$row['BranchID']."' >".$row['BranchCode']." - ".$row['BranchName']."</option>";
-											}
-											mysqli_free_result($result);
-											mysqli_next_result($dbh);
-										?>
-									</select>
+								<td style="width: 10%;" >
+									<div class="has-float-label" >
+										<select id="ddlBranch" name="ddlBranch" tabindex=7 class="form-control-custom" placeholder="Pilih Cabang" >
+											<?php
+												$sql = "CALL spSelDDLBranch('".$_SESSION['UserLogin']."')";
+												if (! $result = mysqli_query($dbh, $sql)) {
+													logEvent(mysqli_error($dbh), '/Transaction/StockAdjust/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+													return 0;
+												}
+												while($row = mysqli_fetch_array($result)) {
+													echo "<option value='".$row['BranchID']."' >".$row['BranchCode']." - ".$row['BranchName']."</option>";
+												}
+												mysqli_free_result($result);
+												mysqli_next_result($dbh);
+											?>
+										</select>
+										<label for="ddlBranch" class="lblInput" >Cabang</label>
+									</div>
 								</td>
-								<td style="width: 25%;" ><input id="txtItemCode" name="txtItemCode" type="text" tabindex=8 class="form-control-custom" style="width: 100%;" onfocus="this.select();" onkeypress="isEnterKey(event, 'getItemDetails');" onchange="getItemDetails();" autocomplete=off placeholder="Kode Barang" /></td>
-								<td style="width: 30%;" ><input id="txtItemName" name="txtItemName" type="text" class="form-control-custom" style="width: 100%;" disabled /></td>
-								<td style="width: 15%;" ><input id="txtQTY" name="txtQTY" type="number" class="form-control-custom" style="width: 100%;" value=1 min=1 readonly="readonly" /></td>
-								<td style="width: 15%;" ><input id="txtAdjustedQTY" name="txtAdjustedQTY" type="number" tabindex=9 class="form-control-custom" style="width: 100%;" value=1 min=1 onchange="this.value = validateQTY(this.value);" onkeypress="isEnterKey(event, 'addStockAdjustDetails');" onpaste="return false;" onfocus="this.select();" /></td>
+								<td style="width: 20%;" >
+									<div class="has-float-label" >
+										<input id="txtItemCode" name="txtItemCode" type="text" tabindex=8 class="form-control-custom" style="width: 100%;" onfocus="this.select();" onkeypress="isEnterKey(event, 'getItemDetails');" onchange="getItemDetails();" autocomplete=off />
+										<label for="txtItemCode" class="lblInput" >Kode Barang</label>
+									</div>
+								</td>
+								<td style="width: 25%;" >
+									<div class="has-float-label" >
+										<input id="txtItemName" name="txtItemName" type="text" class="form-control-custom" style="width: 100%;" disabled />
+										<label for="txtItemName" class="lblInput" >Nama Barang</label>
+									</div>
+								</td>
+								<td style="width: 15%;" >
+									<div class="has-float-label" >
+										<select id="ddlUnit" name="ddlUnit" tabindex=9 class="form-control-custom" onchange="changeItemCode();" >
+											<option >--</option>
+										</select>
+										<label for="ddlUnit" class="lblInput" >Satuan</label>
+									</div>
+								</td>
+								<td style="width: 15%;" >
+									<div class="has-float-label" >
+										<input id="txtQTY" name="txtQTY" type="number" class="form-control-custom" style="width: 100%;" value=1 min=1 readonly="readonly" />
+										<label for="txtQTY" class="lblInput" >Qty</label>
+									</div>
+								</td>
+								<td style="width: 15%;" >
+									<div class="has-float-label" >
+										<input id="txtAdjustedQTY" name="txtAdjustedQTY" type="number" tabindex=10 class="form-control-custom" style="width: 100%;margin: 0;border: 0;" value=1 min=1 onchange="this.value = validateQTY(this.value);" onkeypress="isEnterKey(event, 'addStockAdjustDetails');" onpaste="return false;" onfocus="this.select();" />
+										<label for="txtAdjustedQTY" class="lblInput" >Penyesuaian</label>
+									</div>
+								</td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
-				<hr style="margin: 10px 0;" />
 				<div class="row" >
 					<div id="divTableContent" class="table-responsive" style="overflow-x:hidden;">
 						<table id="grid-transaction" style="width: 100% !important;" class="table table-striped table-bordered table-hover" >
@@ -120,7 +145,10 @@
 									<th>Kode Barang</th>
 									<th>Nama Barang</th>
 									<th>QTY</th>
-									<th>Adjusted QTY</th>
+									<th>Satuan</th>
+									<th>Penyesuaian QTY</th>
+									<th>UnitID</th>
+									<th>AvailableUnit</th>
 								</tr>
 							</thead>
 						</table>
@@ -152,6 +180,12 @@
 			var table3;
 			var today;
 			var rowEdit;
+
+			function changeItemCode() {
+				var itemCode = $("#ddlUnit option:selected").attr("itemcode");
+				$("#txtItemCode").val(itemCode);
+				getItemDetails();
+			}
 			
 			function openDialogEdit(Data) {
 				$("#hdnStockAdjustDetailsID").val(Data[1]);
@@ -160,7 +194,20 @@
 				$("#txtItemCode").val(Data[5]);
 				$("#txtItemName").val(Data[6]);
 				$("#txtQTY").val(Data[7]);
-				$("#txtAdjustedQTY").val(Data[7]);
+				$("#txtAdjustedQTY").val(Data[9]);
+
+				$("#hdnAvailableUnit").val(Data[10]);
+				$("#hdnItemDetailsID").val(Data[11]);
+				var availableUnit = JSON.parse(Data[10]);
+				if(availableUnit.length > 0) {
+					$("#ddlUnit").find('option').remove();
+					for(var i=0;i<availableUnit.length;i++) {
+						$("#ddlUnit").append("<option value=" + availableUnit[i][0] + " itemdetailsid='" + availableUnit[i][2] + "' >" + availableUnit[i][1] + "</option>");
+					}
+				}
+
+
+				$("#ddlUnit").val(Data[8]);
 
 				setTimeout(function() { $("#txtItemCode").focus(); }, 0);
 			}
@@ -205,11 +252,14 @@
 										{ "visible": false },
 										{ "visible": false },
 										{ "visible": false },
-										{ "width": "15%", "orderable": false, className: "dt-head-center" },
+										{ "width": "10%", "orderable": false, className: "dt-head-center" },
+										{ "width": "20%", "orderable": false, className: "dt-head-center" },
 										{ "width": "25%", "orderable": false, className: "dt-head-center" },
-										{ "width": "30%", "orderable": false, className: "dt-head-center" },
 										{ "width": "15%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "15%", "orderable": false, className: "dt-head-center dt-body-right" }
+										{ "width": "15%", "orderable": false, className: "dt-head-center" },
+										{ "width": "15%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "visible": false },
+										{ "visible": false }
 									],
 									"processing": false,
 									"serverSide": false,
@@ -296,13 +346,13 @@
 						table2.destroy();
 					},
 					resizable: false,
-					height: 620,
-					width: 1180,
+					height: 600,
+					width: 1280,
 					modal: false,
 					buttons: [
 					{
 						text: "Tutup",
-						tabindex: 10,
+						tabindex: 11,
 						id: "btnCancelAddStockAdjust",
 						click: function() {
 							$(this).dialog("destroy");
@@ -334,15 +384,25 @@
 							dataType: "json",
 							success: function(data) {
 								if(data.FailedFlag == '0') {
-									if($("#hdnItemID").val() != data.ItemID) {
+									//if($("#hdnItemID").val() != data.ItemID) {
 										$("#hdnItemID").val(data.ItemID);
 										$("#txtItemName").val(data.ItemName);
 										$("#txtQTY").val(data.Quantity);
 										$("#txtAdjustedQTY").val(data.Quantity);
 										//$("#txtSalePrice").val(returnRupiah(data.RetailPrice));
 										$("#txtAdjustedQTY").focus();
-									}
-									else $("#txtAdjustedQTY").focus();
+
+										$("#hdnAvailableUnit").val(JSON.stringify(data.AvailableUnit));
+										$("#hdnItemDetailsID").val(data.ItemDetailsID);
+										if(data.AvailableUnit.length > 0) {
+											$("#ddlUnit").find('option').remove();
+											for(var i=0;i<data.AvailableUnit.length;i++) {
+												$("#ddlUnit").append("<option value=" + data.AvailableUnit[i][0] + " itemdetailsid='" + data.AvailableUnit[i][2] + "' itemcode='" + data.AvailableUnit[i][3] + "' >" + data.AvailableUnit[i][1] + "</option>");
+											}
+										}
+										$("#ddlUnit").val(data.UnitID);
+									//}
+									//else $("#txtAdjustedQTY").focus();
 								}
 								else {
 									//add new item
@@ -442,6 +502,8 @@
 					var itemID = $("#hdnItemID").val();
 					var itemCode = $("#txtItemCode").val();
 					var itemName = $("#txtItemName").val();
+					var unitID = $("#ddlUnit").val();
+					var unitName = $("#ddlUnit option:selected").text();
 					var branchID = $("#ddlBranch").val();
 					var branchName = $("#ddlBranch option:selected").text();
 					var Qty = $("#txtQTY").val();
@@ -450,6 +512,8 @@
 					$("#txtDiscount").blur();
 					var PassValidate = 1;
 					var FirstFocus = 0;
+					var availableUnit = $("#hdnAvailableUnit").val();
+					var itemDetailsID = $("#hdnItemDetailsID").val();
 					$("#FormData .form-control-custom").each(function() {
 						if($(this).hasAttr('required')) {
 							if($(this).val() == "") {
@@ -485,7 +549,10 @@
 											itemCode,
 											itemName,
 											Qty,
-											adjustedQty
+											unitName,
+											adjustedQty,
+											unitID,
+											itemDetailsID
 										]).draw();
 									}
 									else {
@@ -498,7 +565,10 @@
 											itemCode,
 											itemName,
 											Qty,
-											adjustedQty
+											unitName,
+											adjustedQty,
+											unitID,
+											itemDetailsID
 										]).draw();
 										table2.keys.enable();
 									}
@@ -511,6 +581,10 @@
 									$("#hdnStockAdjustID").val(data.ID);
 									$("#hdnStockAdjustDetailsID").val(0);
 									$("#hdnItemID").val(0);
+									$("#ddlUnit").find('option').remove();
+									$("#ddlUnit").append("<option>--</option>");
+									$("#hdnAvailableUnit").val("");
+									$("#hdnItemDetailsID").val(0);
 									tableWidthAdjust();
 									//Calculate();
 								}
@@ -578,6 +652,10 @@
 				$("#txtItemName").val("");
 				$("#txtQTY").val(1);
 				$("#txtAdjustedQTY").val(1);
+				$("#ddlUnit").find('option').remove();
+				$("#ddlUnit").append("<option>--</option>");
+				$("#hdnAvailableUnit").val("");
+				$("#hdnItemDetailsID").val(0);
 				//$("#txtSalePrice").val(0);
 				//$("#lblTotal").html("0");
 				table2.clear().draw();
@@ -728,8 +806,8 @@
 			}
 
 			function finish() {
-				if($("#hdnSaleID").val() != 0) {
-					$("#finish-confirm").dialog({
+				if($("#hdnStockAdjustID").val() != 0) {
+					$("#save-confirm").dialog({
 						autoOpen: false,
 						open: function() {
 							$(document).on('keydown', function(e) {
@@ -807,6 +885,8 @@
 				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
 				   $(this).blur();
 				});
+
+				$("#txtAdjustedQTY").spinner();
 				
 				$.fn.dataTable.ext.errMode = function(settings, techNote, message) { 
 					$("#loading").hide();
@@ -861,7 +941,7 @@
 								"scrollY": "330px",
 								"rowId": "StockAdjustID",
 								"scrollCollapse": true,
-								"order": [2, "asc"],
+								"order": [],
 								"columns": [
 									{ "width": "20px", "orderable": false, className: "dt-head-center dt-body-center" },
 									{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
@@ -977,6 +1057,13 @@
 					}
 					else if(evt.keyCode == 123) {
 						evt.preventDefault();
+					}
+					else if(evt.keyCode == 121 && $("#itemList-dialog").css("display") == "none"  && $("#save-confirm").css("display") == "none" && $("#FormData").css("display") == "block"  && $(".lobibox").css("display") != "block") {
+						evt.preventDefault();
+						if(counterKey == 0) {
+							finish();
+							counterKey = 1;
+						}
 					}
 					else if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0 && $("#FormData").css("display") == "none" && $("#delete-confirm").css("display") == "none") {
 						$("#grid-data_wrapper").find("input[type='search']").focus();

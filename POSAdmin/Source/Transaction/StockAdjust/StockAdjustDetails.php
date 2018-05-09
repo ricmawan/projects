@@ -32,7 +32,10 @@
 			$row_array[] = $row['ItemCode'];
 			$row_array[] = $row['ItemName'];
 			$row_array[] = $row['Quantity'];
+			$row_array[] = $row['UnitID'];
 			$row_array[] = $row['AdjustedQuantity'];
+			$row_array[] = $row['AvailableUnit'];
+			$row_array[] = $row['ItemDetailsID'];
 			array_push($return_arr, $row_array);
 		}
 		

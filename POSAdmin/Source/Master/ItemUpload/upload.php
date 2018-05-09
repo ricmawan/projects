@@ -36,17 +36,18 @@
 			$ItemCode = $rows['B'];
 			$ItemName = $rows['C'];
 			$CategoryName = $rows['D'];
-			$BuyPrice = str_replace(",", "", $rows['E']);
-			$RetailPrice = str_replace(",", "", $rows['F']);
-			$Price1 = str_replace(",", "", $rows['G']);
-			$Qty1 = str_replace(",", "", $rows['H']);
-			$Price2 = str_replace(",", "", $rows['I']);
-			$Qty2 = str_replace(",", "", $rows['J']);
-			$Weight = str_replace(",", "", $rows['K']);
-			$MinimumStock = str_replace(",", "", $rows['L']);
+			$UnitName = $rows['E'];
+			$BuyPrice = str_replace(",", "", $rows['F']);
+			$RetailPrice = str_replace(",", "", $rows['G']);
+			$Price1 = str_replace(",", "", $rows['H']);
+			$Qty1 = str_replace(",", "", $rows['I']);
+			$Price2 = str_replace(",", "", $rows['J']);
+			$Qty2 = str_replace(",", "", $rows['K']);
+			$Weight = str_replace(",", "", $rows['L']);
+			$MinimumStock = str_replace(",", "", $rows['M']);
 			$remarks = "";
 
-			if (empty($ItemCode) OR empty($ItemName) OR empty($CategoryName) OR empty($BuyPrice) OR empty($RetailPrice) OR empty($Price2) OR empty($Price1) OR empty($Qty1) OR empty($Qty2) OR empty($Weight) OR empty($MinimumStock)) {
+			if (empty($ItemCode) OR empty($ItemName) OR empty($CategoryName) OR empty($UnitName) OR empty($BuyPrice) OR empty($RetailPrice) OR empty($Price2) OR empty($Price1) OR empty($Qty1) OR empty($Qty2) OR empty($Weight) OR empty($MinimumStock)) {
 				$remarks .= "Terdapat kolom yang kosong!";
 			}
 			else if(!is_numeric($BuyPrice) OR !is_numeric($RetailPrice) OR !is_numeric($Price2) OR !is_numeric($Price1) OR !is_numeric($Qty1) OR !is_numeric($Qty2) OR !is_numeric($Weight) OR !is_numeric($MinimumStock)) {
@@ -59,17 +60,45 @@
 					logEvent(mysqli_error($dbh), '/Master/ItemUpload/upload.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 				}
 
-				if(mysqli_num_rows($result) > 0) {
+				$CategoryNumRow = mysqli_num_rows($result);
+
+				if($CategoryNumRow == 0) {
+					$remarks .= "Kategori tidak valid!";
+				}
+				else {
 					$row = mysqli_fetch_array($result);
-					mysqli_free_result($result);
-					mysqli_next_result($dbh);
 					$CategoryID = $row['CategoryID'];
+				}
+
+				mysqli_free_result($result);
+				mysqli_next_result($dbh);
+
+				$sql = "CALL spSelUnitByName('".$UnitName."', '".$_SESSION['UserLogin']."')";
+				if (!$result = mysqli_query($dbh, $sql)) {
+					logEvent(mysqli_error($dbh), '/Master/ItemUpload/upload.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+				}
+
+				$UnitNumRow = mysqli_num_rows($result);
+
+				if($UnitNumRow == 0) {
+					$remarks .= "Satuan tidak valid!";
+				}
+				else {
+					$row = mysqli_fetch_array($result);
+					$UnitID = $row['UnitID'];
+				}
+
+				mysqli_free_result($result);
+				mysqli_next_result($dbh);
+
+				if($CategoryNumRow > 0 && $UnitNumRow > 0) {
 					if($ItemID == '0') $IsEdit = 0;
 					else $IsEdit = 1;
 					$sql = "CALL spInsItem('".$ItemID."',
 											'".$ItemCode."',
 											'".$ItemName."',
 											".$CategoryID.",
+											".$UnitID.",
 											".$BuyPrice.",
 											".$RetailPrice.",
 											".$Price1.",
@@ -78,6 +107,7 @@
 											".$Qty2.",
 											".$Weight.",
 											".$MinimumStock.",
+											'',
 											".$IsEdit.",
 											'".$_SESSION['UserLogin']."'
 										  )";
@@ -91,9 +121,7 @@
 					mysqli_next_result($dbh);
 					$remarks .= $row['Message'];
 				}
-				else {
-					$remarks .= "Kategori tidak valid!";
-				}
+				
 			}
 
 			$table .= "<tr>";

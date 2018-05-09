@@ -6,6 +6,7 @@ CREATE PROCEDURE spInsItem (
     pItemCode			VARCHAR(100),
 	pItemName 			VARCHAR(255),
     pCategoryID			BIGINT,
+    pUnitID				SMALLINT,
     pBuyPrice			DOUBLE,
     pRetailPrice		DOUBLE,
     pPrice1				DOUBLE,
@@ -14,6 +15,7 @@ CREATE PROCEDURE spInsItem (
     pQty2				DOUBLE,
     pWeight				DOUBLE,
 	pMinimumStock		DOUBLE,
+    pItemDetails		TEXT,
 	pIsEdit				INT,
     pCurrentUser		VARCHAR(255)
 )
@@ -35,6 +37,7 @@ StoredProcedure:BEGIN
 		ROLLBACK;
 		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
 		CALL spInsEventLog(@full_error, 'spInsItem', pCurrentUser);
+        DELETE FROM temp_master_itemdetails;
 		SELECT
 			pID AS 'ID',
 			'Terjadi kesalahan sistem!' AS 'Message',
@@ -48,6 +51,51 @@ StoredProcedure:BEGIN
 	START TRANSACTION;
 	
 SET State = 1;
+		
+        CREATE TEMPORARY TABLE IF NOT EXISTS temp_master_itemdetails
+		(
+			ItemDetailsID 		BIGINT,
+			ItemID 				BIGINT,
+			ItemDetailsCode		VARCHAR(100),
+			UnitID				SMALLINT,
+			ConversionQuantity	DOUBLE,
+			BuyPrice			DOUBLE,
+			RetailPrice			DOUBLE,
+			Price1				DOUBLE,
+			Qty1				DOUBLE,
+			Price2				DOUBLE,
+			Qty2				DOUBLE,
+			Weight				DOUBLE,
+			MinimumStock		DOUBLE
+		);
+        
+SET State = 2;
+
+		IF(pItemDetails <> "" ) THEN
+			SET @query = CONCAT("INSERT INTO temp_master_itemdetails
+								(
+									ItemDetailsID,
+									ItemID,
+									ItemDetailsCode,
+									UnitID,
+									ConversionQuantity,
+									BuyPrice,
+									RetailPrice,
+									Price1,
+									Qty1,
+									Price2,
+									Qty2,
+									Weight,
+									MinimumStock
+								)
+								VALUES", pItemDetails);
+								
+			PREPARE stmt FROM @query;
+			EXECUTE stmt;
+			DEALLOCATE PREPARE stmt;
+		END IF;
+
+SET State = 3;
 
 		SELECT 
 			0
@@ -60,9 +108,10 @@ SET State = 1;
             OR TRIM(ItemCode) = TRIM(pItemCode))
 			AND ItemID <> pID
 		LIMIT 1;
-			
+        
+SET State = 4;
+
 		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
-SET State = 2;
 			SELECT
 				pID AS 'ID',
 				'Barang sudah ada!' AS 'Message',
@@ -71,15 +120,118 @@ SET State = 2;
 				State AS 'State' ;
 		
 			LEAVE StoredProcedure;
+		END IF;
+        
+SET State = 5;
+
+        SELECT 
+			0
+		INTO
+			PassValidate
+		FROM 
+			master_itemdetails
+		WHERE
+			TRIM(ItemDetailsCode) = TRIM(pItemCode)
+		LIMIT 1;
+        
+SET State = 6;
+		
+        IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
+			SELECT
+				pID AS 'ID',
+				CONCAT('Kode Barang ', pItemCode, ' sudah ada!') AS 'Message',
+				'' AS 'MessageDetail',
+				1 AS 'FailedFlag',
+				State AS 'State' ;
+		
+			LEAVE StoredProcedure;
+		END IF;
+		
+SET State = 7;
+		
+        SELECT 
+			0
+		INTO
+			PassValidate
+		FROM 
+			master_itemdetails MID
+            JOIN temp_master_itemdetails TMID
+				ON TRIM(MID.ItemDetailsCode) = TRIM(TMID.ItemDetailsCode)
+                AND MID.ItemDetailsID <> TMID.ItemDetailsID
+		LIMIT 1;
+        
+SET State = 8;
+		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
+			SELECT
+				pID AS 'ID',
+				CONCAT('Kode Barang ', GC.ItemDetailsCode, ' sudah ada!') AS 'Message',
+				'' AS 'MessageDetail',
+				1 AS 'FailedFlag',
+				State AS 'State'
+			FROM
+				(
+					SELECT
+						TMID.ItemID,
+						GROUP_CONCAT(TRIM(TMID.ItemDetailsCode) SEPARATOR ', ') ItemDetailsCode
+					FROM
+						master_itemdetails MID
+						JOIN temp_master_itemdetails TMID
+							ON TRIM(MID.ItemDetailsCode) = TRIM(TMID.ItemDetailsCode)
+							AND MID.ItemDetailsID <> TMID.ItemDetailsID
+					GROUP BY
+						TMID.ItemID
+				)GC;
+		
+			LEAVE StoredProcedure;
+		END IF;
+			
+SET State = 9;
+
+		SELECT 
+			0
+		INTO
+			PassValidate
+		FROM 
+			master_item MI
+            JOIN temp_master_itemdetails TMID
+				ON TRIM(MI.ItemCode) = TRIM(TMID.ItemDetailsCode)
+		LIMIT 1;
+
+SET State = 10;
+
+		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
+			SELECT
+				pID AS 'ID',
+				CONCAT('Kode Barang ', GC.ItemDetailsCode, ' sudah ada!') AS 'Message',
+				'' AS 'MessageDetail',
+				1 AS 'FailedFlag',
+				State AS 'State'
+			FROM
+				(
+					SELECT
+						TMID.ItemID,
+						GROUP_CONCAT(TRIM(TMID.ItemDetailsCode) SEPARATOR ', ') ItemDetailsCode
+					FROM
+						master_item MI
+						JOIN temp_master_itemdetails TMID
+							ON TRIM(MI.ItemCode) = TRIM(TMID.ItemDetailsCode)
+					GROUP BY
+						TMID.ItemID
+				)GC;
+		
+			LEAVE StoredProcedure;
 			
 		ELSE /*Data yang diinput valid*/
-SET State = 3;
+        
+SET State = 11;
+
 			IF(pIsEdit = 0)	THEN /*Tambah baru*/
 				INSERT INTO master_item
 				(
                     ItemCode,
                     ItemName,
 					CategoryID,
+                    UnitID,
 					BuyPrice,
 					RetailPrice,
 					Price1,
@@ -95,6 +247,7 @@ SET State = 3;
 					pItemCode,
 					pItemName,
 					pCategoryID,
+                    pUnitID,
 					pBuyPrice,
 					pRetailPrice,
 					pPrice1,
@@ -107,13 +260,62 @@ SET State = 3;
 					pCurrentUser
 				);
 			
-SET State = 4;
+SET State = 12;
+
 				SELECT
 					LAST_INSERT_ID()
 				INTO 
 					pID;
-					
-SET State = 5;
+
+SET State = 13;
+				SET SQL_SAFE_UPDATES = 0;
+                
+				UPDATE temp_master_itemdetails
+                SET ItemID = pID
+                WHERE
+					ItemDetailsID = 0;
+				
+                SET SQL_SAFE_UPDATES = 1;
+                
+SET State = 14;
+				INSERT INTO master_itemdetails
+                (
+					ItemDetailsID,
+					ItemID,
+					ItemDetailsCode,
+					UnitID,
+					ConversionQuantity,
+					BuyPrice,
+					RetailPrice,
+					Price1,
+					Qty1,
+					Price2,
+					Qty2,
+					Weight,
+					MinimumStock,
+                    CreatedDate,
+                    CreatedBy
+                )
+                SELECT
+					ItemDetailsID,
+					ItemID,
+					ItemDetailsCode,
+					UnitID,
+					ConversionQuantity,
+					BuyPrice,
+					RetailPrice,
+					Price1,
+					Qty1,
+					Price2,
+					Qty2,
+					Weight,
+					MinimumStock,
+                    NOW(),
+                    'Admin'
+				FROM
+					temp_master_itemdetails;
+                
+SET State = 15;
 
 				SELECT
 					pID AS 'ID',
@@ -121,14 +323,18 @@ SET State = 5;
 					'' AS 'MessageDetail',
 					0 AS 'FailedFlag',
 					State AS 'State';
+                    
 			ELSE
-SET State = 6;
+            
+SET State = 16;
+
 				UPDATE
 					master_item
 				SET
 					ItemCode = pItemCode,
                     ItemName = pItemName,
 					CategoryID = pCategoryID,
+                    UnitID = pUnitID,
 					BuyPrice = pBuyPrice,
 					RetailPrice = pRetailPrice,
 					Price1 = pPrice1,
@@ -141,15 +347,90 @@ SET State = 6;
 				WHERE
 					ItemID = pID;
 
-SET State = 7;
+SET State = 17;
+
+				UPDATE master_itemdetails MID
+                JOIN temp_master_itemdetails TMID
+					ON TMID.ItemDetailsID = MID.ItemDetailsID
+				SET
+					MID.ItemDetailsCode = TMID.ItemDetailsCode,
+					MID.UnitID = TMID.UnitID,
+					MID.ConversionQuantity = TMID.ConversionQuantity,
+					MID.BuyPrice = TMID.BuyPrice,
+					MID.RetailPrice = TMID.RetailPrice,
+					MID.Price1 = TMID.Price1,
+					MID.Qty1 = TMID.Qty1,
+					MID.Price2 = TMID.Price2,
+					MID.Qty2 = TMID.Qty2,
+					MID.Weight = TMID.Weight,
+					ModifiedBy = pCurrentUser;
+                    
+SET State = 18;
+				
+				DELETE FROM master_itemdetails
+				WHERE 
+					ItemDetailsID NOT IN(
+											SELECT 
+												TMID.ItemDetailsID
+											FROM 
+												temp_master_itemdetails TMID
+										);
+                                
+SET State = 19;
+
+				INSERT INTO master_itemdetails
+                (
+					ItemDetailsID,
+					ItemID,
+					ItemDetailsCode,
+					UnitID,
+					ConversionQuantity,
+					BuyPrice,
+					RetailPrice,
+					Price1,
+					Qty1,
+					Price2,
+					Qty2,
+					Weight,
+					MinimumStock,
+                    CreatedDate,
+                    CreatedBy
+                )
+                SELECT
+					ItemDetailsID,
+					ItemID,
+					ItemDetailsCode,
+					UnitID,
+					ConversionQuantity,
+					BuyPrice,
+					RetailPrice,
+					Price1,
+					Qty1,
+					Price2,
+					Qty2,
+					Weight,
+					MinimumStock,
+                    NOW(),
+                    'Admin'
+				FROM
+					temp_master_itemdetails
+				WHERE
+					ItemDetailsID = 0;
+                    
+SET State = 20;
+
 				SELECT
 					pID AS 'ID',
 					'Barang Berhasil Diubah!' AS 'Message',
 					'' AS 'MessageDetail',
 					0 AS 'FailedFlag',
 					State AS 'State';
+                    
 			END IF;
 		END IF;
+        
+        DROP TEMPORARY TABLE temp_master_itemdetails;
+        
 	COMMIT;
 END;
 $$

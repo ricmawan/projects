@@ -807,8 +807,6 @@ function enterLikeTab() {
 			if(next.length) {
 				if(next.attr("disabled") == "disabled") {
 					$(document).find(":focusable").each(function() {
-						console.log("element: " + parseInt($(this)[0].tabIndex));
-						console.log("element: " + nextTabIndex);
 						if(parseInt($(this)[0].tabIndex) > nextTabIndex) {
 							$(this).focus();
 							return false;

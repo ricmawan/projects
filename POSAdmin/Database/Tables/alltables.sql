@@ -95,8 +95,8 @@ VALUES
 (
 	3,
 	2,
-	'Barang',
-	'Master/Item/',
+	'Satuan',
+	'Master/Unit/',
 	NULL,
 	0,
 	3
@@ -104,8 +104,8 @@ VALUES
 (
 	4,
 	2,
-	'Supplier',
-	'Master/Supplier/',
+	'Barang',
+	'Master/Item/',
 	NULL,
 	0,
 	4
@@ -113,77 +113,132 @@ VALUES
 (
 	5,
 	2,
-	'Pelanggan',
-	'Master/Customer/',
+	'Supplier',
+	'Master/Supplier/',
 	NULL,
 	0,
 	5
 ),
 (
 	6,
-	3,
-	'Pembelian',
-	'Transaction/Purchase/',
-	NULL,
-	0,
-	1
-),
-(
-	7,
-	3,
-	'Retur Pembelian',
-	'Transaction/PurchaseReturn/',
-	NULL,
-	0,
-	2
-),
-(
-	8,
-	3,
-	'Penjualan',
-	'Transaction/Sale/',
-	NULL,
-	0,
-	3
-),
-(
-	9,
-	3,
-	'Retur Penjualan',
-	'Transaction/SaleReturn/',
-	NULL,
-	0,
-	4
-),
-(
-	10,
-	3,
-	'Mutasi Stok',
-	'Transaction/StockMutation/',
-	NULL,
-	0,
-	5
-),
-(
-	11,
-	3,
-	'Adjust Stok',
-	'Transaction/StockAdjust/',
+	2,
+	'Pelanggan',
+	'Master/Customer/',
 	NULL,
 	0,
 	6
 ),
 (
-	12,
-	3,
-	'Pemesanan',
-	'Transaction/Booking/',
+	7,
+	2,
+	'Upload Barang',
+	'Master/ItemUpload/',
 	NULL,
 	0,
 	7
 ),
 (
+	8,
+	3,
+	'Stok Awal',
+	'Transaction/FirstStock/',
+	NULL,
+	0,
+	1
+),
+(
+	9,
+	3,
+	'Pembelian',
+	'Transaction/Purchase/',
+	NULL,
+	0,
+	2
+),
+(
+	10,
+	3,
+	'Retur Pembelian',
+	'Transaction/PurchaseReturn/',
+	NULL,
+	0,
+	3
+),
+(
+	11,
+	3,
+	'Penjualan',
+	'Transaction/Sale/',
+	NULL,
+	0,
+	4
+),
+(
+	12,
+	3,
+	'Retur Penjualan',
+	'Transaction/SaleReturn/',
+	NULL,
+	0,
+	5
+),
+(
 	13,
+	3,
+	'Mutasi Stok',
+	'Transaction/StockMutation/',
+	NULL,
+	0,
+	6
+),
+(
+	14,
+	3,
+	'Adjust Stok',
+	'Transaction/StockAdjust/',
+	NULL,
+	0,
+	7
+),
+(
+	15,
+	3,
+	'Pemesanan',
+	'Transaction/Booking/',
+	NULL,
+	0,
+	8
+),
+
+(
+	16,
+	3,
+	'Pembayaran',
+	'Transaction/Payment/',
+	NULL,
+	0,
+	9
+),
+(
+	17,
+	3,
+	'Pengambilan',
+	'Transaction/PickUp/',
+	NULL,
+	0,
+	10
+),
+(
+	18,
+	3,
+	'Cetak Nota & Surat Jalan',
+	'Transaction/Print/',
+	NULL,
+	0,
+	11
+),
+(
+	19,
 	4,
 	'Stok',
 	'Report/Stock/',
@@ -192,7 +247,7 @@ VALUES
 	1
 ),
 (
-	14,
+	20,
 	4,
 	'Detail Stok',
 	'Report/StockDetails/',
@@ -201,7 +256,7 @@ VALUES
 	2
 ),
 (
-	15,
+	21,
 	4,
 	'Penjualan',
 	'Report/Sale/',
@@ -210,7 +265,7 @@ VALUES
 	3
 ),
 (
-	16,
+	22,
 	4,
 	'Pembelian',
 	'Report/Purchase/',
@@ -219,7 +274,7 @@ VALUES
 	4
 ),
 (
-	17,
+	23,
 	4,
 	'Pendapatan',
 	'Report/Income/',
@@ -228,7 +283,7 @@ VALUES
 	5
 ),
 (
-	18,
+	24,
 	4,
 	'Omset Pelanggan',
 	'Report/CustomerPurchase/',
@@ -237,16 +292,25 @@ VALUES
 	6
 ),
 (
-	19,
-	2,
-	'Update Harga',
-	'Master/PriceUpdate/',
+	25,
+	4,
+	'Harian',
+	'Report/Daily/',
 	NULL,
-	0,
-	6
+	1,
+	7
 ),
 (
-	20,
+	26,
+	4,
+	'Piutang',
+	'Report/Payment/',
+	NULL,
+	1,
+	8
+),
+(
+	27,
 	5,
 	'Backup Data',
 	'Tools/Backup/',
@@ -255,7 +319,7 @@ VALUES
 	1
 ),
 (
-	21,
+	28,
 	5,
 	'Restore Data',
 	'Tools/Restore/',
@@ -264,22 +328,13 @@ VALUES
 	2
 ),
 (
-	22,
-	4,
-	'Cetak Nota & Surat Jalan',
-	'Transaction/Print/',
+	29,
+	5,
+	'Reset Data',
+	'Tools/Reset/',
 	NULL,
 	0,
-	9
-),
-(
-	23,
-	4,
-	'Pembayaran & Pengambilan',
-	'Transaction/Payment/',
-	NULL,
-	0,
-	8
+	3
 );
 
 CREATE UNIQUE INDEX MENU_INDEX
@@ -324,126 +379,6 @@ VALUES
 	1,
 	'System Administrator',
 	'Admin1',
-	MD5('abcdef'),
-	1,
-	NOW(),
-	'System',
-	NULL,
-	NULL
-),
-(
-	0,
-	1,
-	'System Administrator',
-	'Admin2',
-	MD5('abcdef'),
-	1,
-	NOW(),
-	'System',
-	NULL,
-	NULL
-),
-(
-	0,
-	1,
-	'System Administrator',
-	'Admin3',
-	MD5('abcdef'),
-	1,
-	NOW(),
-	'System',
-	NULL,
-	NULL
-),
-(
-	0,
-	1,
-	'System Administrator',
-	'Admin4',
-	MD5('abcdef'),
-	1,
-	NOW(),
-	'System',
-	NULL,
-	NULL
-),
-(
-	0,
-	1,
-	'System Administrator',
-	'Admin5',
-	MD5('abcdef'),
-	1,
-	NOW(),
-	'System',
-	NULL,
-	NULL
-),
-(
-	0,
-	1,
-	'System Administrator',
-	'Admin6',
-	MD5('abcdef'),
-	1,
-	NOW(),
-	'System',
-	NULL,
-	NULL
-),
-(
-	0,
-	1,
-	'System Administrator',
-	'Admin7',
-	MD5('abcdef'),
-	1,
-	NOW(),
-	'System',
-	NULL,
-	NULL
-),
-(
-	0,
-	1,
-	'System Administrator',
-	'Admin8',
-	MD5('abcdef'),
-	1,
-	NOW(),
-	'System',
-	NULL,
-	NULL
-),
-(
-	0,
-	1,
-	'System Administrator',
-	'Admin9',
-	MD5('abcdef'),
-	1,
-	NOW(),
-	'System',
-	NULL,
-	NULL
-),
-(
-	0,
-	1,
-	'System Administrator',
-	'Admin10',
-	MD5('abcdef'),
-	1,
-	NOW(),
-	'System',
-	NULL,
-	NULL
-),
-(
-	0,
-	1,
-	'System Administrator',
-	'Admin11',
 	MD5('abcdef'),
 	1,
 	NOW(),
@@ -503,6 +438,174 @@ VALUES
 	5,
 	1,
 	1
+),
+(
+	0,
+	1,
+	6,
+	1,
+	1
+),
+(
+	0,
+	1,
+	7,
+	1,
+	1
+),
+(
+	0,
+	1,
+	8,
+	1,
+	1
+),
+(
+	0,
+	1,
+	9,
+	1,
+	1
+),
+(
+	0,
+	1,
+	10,
+	1,
+	1
+),
+(
+	0,
+	1,
+	11,
+	1,
+	1
+),
+(
+	0,
+	1,
+	12,
+	1,
+	1
+),
+(
+	0,
+	1,
+	13,
+	1,
+	1
+),
+(
+	0,
+	1,
+	14,
+	1,
+	1
+),
+(
+	0,
+	1,
+	15,
+	1,
+	1
+),
+(
+	0,
+	1,
+	16,
+	1,
+	1
+),
+(
+	0,
+	1,
+	17,
+	1,
+	1
+),
+(
+	0,
+	1,
+	18,
+	1,
+	1
+),
+(
+	0,
+	1,
+	19,
+	1,
+	1
+),
+(
+	0,
+	1,
+	20,
+	1,
+	1
+),
+(
+	0,
+	1,
+	21,
+	1,
+	1
+),
+(
+	0,
+	1,
+	22,
+	1,
+	1
+),
+(
+	0,
+	1,
+	23,
+	1,
+	1
+),
+(
+	0,
+	1,
+	24,
+	1,
+	1
+),
+(
+	0,
+	1,
+	25,
+	1,
+	1
+),
+(
+	0,
+	1,
+	26,
+	1,
+	1
+),
+(
+	0,
+	1,
+	27,
+	1,
+	1
+),
+(
+	0,
+	1,
+	28,
+	1,
+	1
+),
+(
+	0,
+	1,
+	29,
+	1,
+	1
 );
 
 CREATE UNIQUE INDEX ROLE_INDEX
@@ -546,7 +649,7 @@ CREATE TABLE master_eventlog
 
 CREATE TABLE master_category
 (
-	CategoryID 			BIGINT PRIMARY KEY AUTO_INCREMENT,
+	CategoryID 			INT PRIMARY KEY AUTO_INCREMENT,
 	CategoryCode		VARCHAR(100),
 	CategoryName		VARCHAR(255) NOT NULL,
 	CreatedDate 		DATETIME NOT NULL,
@@ -556,12 +659,27 @@ CREATE TABLE master_category
 )ENGINE=InnoDB;
 
 CREATE UNIQUE INDEX CATEGORY_INDEX
-ON master_category (CategoryID);DROP TABLE IF EXISTS master_item;
+ON master_category (CategoryID);DROP TABLE IF EXISTS master_unit;
+
+CREATE TABLE master_unit
+(
+	UnitID 			SMALLINT PRIMARY KEY AUTO_INCREMENT,
+	UnitName		VARCHAR(255) NOT NULL,
+	CreatedDate 	DATETIME NOT NULL,
+	CreatedBy 		VARCHAR(255) NOT NULL,
+	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy		VARCHAR(255) NULL
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX UNIT_INDEX
+ON master_unit (UnitID);DROP TABLE IF EXISTS master_item;
 
 CREATE TABLE master_item
 (
 	ItemID 				BIGINT PRIMARY KEY AUTO_INCREMENT,
-    CategoryID			BIGINT,
+	SessionID			VARCHAR(100),
+    CategoryID			INT,
+	UnitID				SMALLINT,
 	ItemName			VARCHAR(255) NOT NULL,
 	ItemCode			VARCHAR(100),
 	BuyPrice			DOUBLE,
@@ -576,11 +694,38 @@ CREATE TABLE master_item
 	CreatedBy 			VARCHAR(255) NOT NULL,
 	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
 	ModifiedBy			VARCHAR(255) NULL,
-    FOREIGN KEY(CategoryID) REFERENCES master_category(CategoryID) ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY(CategoryID) REFERENCES master_category(CategoryID) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(UnitID) REFERENCES master_unit(UnitID) ON UPDATE CASCADE ON DELETE CASCADE
 )ENGINE=InnoDB;
 
 CREATE UNIQUE INDEX ITEM_INDEX
-ON master_item (ItemID, CategoryID);DROP TABLE IF EXISTS master_supplier;
+ON master_item (ItemID, UnitID, CategoryID);DROP TABLE IF EXISTS master_itemdetails;
+
+CREATE TABLE master_itemdetails
+(
+	ItemDetailsID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	ItemID 				BIGINT,
+	ItemDetailsCode		VARCHAR(100),
+	UnitID				SMALLINT,
+	ConversionQuantity	DOUBLE,
+	BuyPrice			DOUBLE,
+	RetailPrice			DOUBLE,
+    Price1				DOUBLE,
+    Qty1				DOUBLE,
+    Price2				DOUBLE,
+    Qty2				DOUBLE,
+	Weight				DOUBLE,
+	MinimumStock		DOUBLE,
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy			VARCHAR(255) NULL,
+    FOREIGN KEY(ItemID) REFERENCES master_item(ItemID) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY(UnitID) REFERENCES master_unit(UnitID) ON UPDATE CASCADE ON DELETE CASCADE
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX ITEMDETAILS_INDEX
+ON master_itemdetails (ItemDetailsID, ItemID, UnitID);DROP TABLE IF EXISTS master_supplier;
 
 CREATE TABLE master_supplier
 (
@@ -663,6 +808,32 @@ VALUES
 	'Admin',
 	NULL,
 	NULL
+);DROP TABLE IF EXISTS master_paymenttype;
+
+CREATE TABLE master_paymenttype
+(
+	PaymentTypeID 		SMALLINT PRIMARY KEY AUTO_INCREMENT,
+	PaymentTypeName		VARCHAR(100),
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX PAYMENTTYPE_INDEX
+ON master_paymenttype (PaymentTypeID);
+
+INSERT INTO master_paymenttype
+VALUES
+(
+	1,
+	'Tunai',
+	NOW(),
+	'Admin'
+),
+(
+	2,
+	'Tempo',
+	NOW(),
+	'Admin'
 );DROP TABLE IF EXISTS transaction_purchase;
 
 CREATE TABLE transaction_purchase
@@ -687,6 +858,7 @@ CREATE TABLE transaction_purchasedetails
 	PurchaseDetailsID 	BIGINT PRIMARY KEY AUTO_INCREMENT,
 	PurchaseID			BIGINT,
 	ItemID 				BIGINT NOT NULL,
+	ItemDetailsID		BIGINT NULL,
 	BranchID			INT,
 	Quantity			DOUBLE,
 	BuyPrice			DOUBLE,
@@ -726,6 +898,7 @@ CREATE TABLE transaction_purchasereturndetails
 	PurchaseReturnDetailsID 	BIGINT PRIMARY KEY AUTO_INCREMENT,
 	PurchaseReturnID			BIGINT,
 	ItemID 						BIGINT NOT NULL,
+	ItemDetailsID				BIGINT NULL,
 	BranchID					INT,
 	Quantity					DOUBLE,
 	BuyPrice					DOUBLE,
@@ -748,6 +921,7 @@ CREATE TABLE transaction_sale
 	RetailFlag		BIT(1) NOT NULL,
 	CustomerID 		BIGINT,
 	TransactionDate DATETIME NOT NULL,
+	PaymentTypeID	SMALLINT,
 	Payment			DOUBLE,
 	PrintCount		SMALLINT,
 	PrintedDate		DATETIME,
@@ -756,17 +930,19 @@ CREATE TABLE transaction_sale
 	CreatedBy 		VARCHAR(255) NOT NULL,
 	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
 	ModifiedBy 		VARCHAR(255) NULL,
-	FOREIGN KEY(CustomerID) REFERENCES master_customer(CustomerID) ON UPDATE CASCADE ON DELETE CASCADE
+	FOREIGN KEY(CustomerID) REFERENCES master_customer(CustomerID) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(PaymentTypeID) REFERENCES master_paymenttype(PaymentTypeID) ON UPDATE CASCADE ON DELETE CASCADE
 )ENGINE=InnoDB;
 
 CREATE UNIQUE INDEX SALE_INDEX
-ON transaction_sale (SaleID, CustomerID);DROP TABLE IF EXISTS transaction_saledetails;
+ON transaction_sale (SaleID, CustomerID, PaymentTypeID);DROP TABLE IF EXISTS transaction_saledetails;
 
 CREATE TABLE transaction_saledetails
 (
 	SaleDetailsID 	BIGINT PRIMARY KEY AUTO_INCREMENT,
 	SaleID			BIGINT,
 	ItemID 			BIGINT NOT NULL,
+	ItemDetailsID	BIGINT NULL,
 	BranchID		INT,
 	Quantity		DOUBLE,
 	BuyPrice		DOUBLE,
@@ -807,6 +983,7 @@ CREATE TABLE transaction_salereturndetails
 	SaleReturnID				BIGINT,
 	SaleDetailsID 				BIGINT,
 	ItemID 						BIGINT NOT NULL,
+	ItemDetailsID				BIGINT NULL,
 	BranchID					INT,
 	Quantity					DOUBLE,
 	BuyPrice					DOUBLE,
@@ -844,6 +1021,7 @@ CREATE TABLE transaction_stockmutationdetails
 	SourceID					INT,
 	DestinationID				INT,
 	ItemID 						BIGINT NOT NULL,
+	ItemDetailsID				BIGINT NULL,
 	Quantity					DOUBLE,
 	CreatedDate 				DATETIME NOT NULL,
 	CreatedBy 					VARCHAR(255) NOT NULL,
@@ -875,6 +1053,7 @@ CREATE TABLE transaction_stockadjustdetails
 	StockAdjustDetailsID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
 	StockAdjustID				BIGINT,
 	ItemID 						BIGINT NOT NULL,
+	ItemDetailsID				BIGINT NULL,
 	BranchID					INT,
 	Quantity					DOUBLE,
 	AdjustedQuantity			DOUBLE,
@@ -890,7 +1069,23 @@ CREATE TABLE transaction_stockadjustdetails
 )ENGINE=InnoDB;
 
 CREATE UNIQUE INDEX STOCKADJUSTDETAILS_INDEX
-ON transaction_stockadjustdetails (StockAdjustDetailsID, StockAdjustID, ItemID, BranchID);DROP TABLE IF EXISTS transaction_booking;
+ON transaction_stockadjustdetails (StockAdjustDetailsID, StockAdjustID, ItemID, BranchID);DROP TABLE IF EXISTS transaction_firstbalance;
+
+CREATE TABLE transaction_firstbalance
+(
+	FirstBalanceID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	UserID				BIGINT,
+	TransactionDate		DATETIME NOT NULL,
+	FirstBalanceAmount	DOUBLE,
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 			VARCHAR(255) NULL,
+	FOREIGN KEY(UserID) REFERENCES master_user(UserID) ON UPDATE CASCADE ON DELETE CASCADE
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX FIRSTBALANCE_INDEX
+ON transaction_firstbalance (FirstBalanceID, UserID);DROP TABLE IF EXISTS transaction_booking;
 
 CREATE TABLE transaction_booking
 (
@@ -899,6 +1094,7 @@ CREATE TABLE transaction_booking
 	RetailFlag			BIT(1) NOT NULL,
 	CustomerID 			BIGINT,
 	TransactionDate		DATETIME NOT NULL,
+	Payment				DOUBLE,
 	PrintCount			SMALLINT,
 	PrintedDate			DATETIME,
 	Remarks				TEXT,
@@ -917,6 +1113,7 @@ CREATE TABLE transaction_bookingdetails
 	BookingDetailsID 	BIGINT PRIMARY KEY AUTO_INCREMENT,
 	BookingID			BIGINT,
 	ItemID 				BIGINT NOT NULL,
+	ItemDetailsID		BIGINT NULL,
 	BranchID			INT,
 	Quantity			DOUBLE,
 	BuyPrice			DOUBLE,
@@ -932,23 +1129,22 @@ CREATE TABLE transaction_bookingdetails
 )ENGINE=InnoDB;
 
 CREATE UNIQUE INDEX SALEDETAILS_INDEX
-ON transaction_bookingdetails (BookingDetailsID, BookingID, ItemID, BranchID);DROP TABLE IF EXISTS transaction_firstbalance;
+ON transaction_bookingdetails (BookingDetailsID, BookingID, ItemID, BranchID);DROP TABLE IF EXISTS transaction_paymentdetails;
 
-CREATE TABLE transaction_firstbalance
+CREATE TABLE transaction_paymentdetails
 (
-	FirstBalanceID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
-	UserID				BIGINT,
-	TransactionDate		DATETIME NOT NULL,
-	FirstBalanceAmount	DOUBLE,
+	PaymentDetailsID	BIGINT PRIMARY KEY AUTO_INCREMENT,
+	TransactionID		BIGINT,
+	TransactionType 	VARCHAR(1),
+	Amount				DOUBLE,
 	CreatedDate 		DATETIME NOT NULL,
 	CreatedBy 			VARCHAR(255) NOT NULL,
 	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
-	ModifiedBy 			VARCHAR(255) NULL,
-	FOREIGN KEY(UserID) REFERENCES master_user(UserID) ON UPDATE CASCADE ON DELETE CASCADE
+	ModifiedBy			VARCHAR(255) NULL
 )ENGINE=InnoDB;
 
-CREATE UNIQUE INDEX FIRSTBALANCE_INDEX
-ON transaction_firstbalance (FirstBalanceID, UserID);DROP TABLE IF EXISTS transaction_pick;
+CREATE UNIQUE INDEX PAYMENTDETAILS_INDEX
+ON transaction_paymentdetails (PaymentDetailsID, TransactionID);DROP TABLE IF EXISTS transaction_pick;
 
 CREATE TABLE transaction_pick
 (
@@ -971,6 +1167,7 @@ CREATE TABLE transaction_pickdetails
 	PickID				BIGINT,
 	BookingDetailsID 	BIGINT,
 	ItemID 				BIGINT NOT NULL,
+	ItemDetailsID		BIGINT NULL,
 	BranchID			INT,
 	Quantity			DOUBLE,
 	BuyPrice			DOUBLE,
@@ -986,4 +1183,89 @@ CREATE TABLE transaction_pickdetails
 )ENGINE=InnoDB;
 
 CREATE UNIQUE INDEX PICKDETAILS_INDEX
-ON transaction_pickdetails (PickDetailsID, PickID, BookingDetailsID, ItemID, BranchID);
+ON transaction_pickdetails (PickDetailsID, PickID, BookingDetailsID, ItemID, BranchID);DROP TABLE IF EXISTS transaction_firststock;
+
+CREATE TABLE transaction_firststock
+(
+	FirstStockID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	FirstStockNumber	VARCHAR(100) NULL,
+	SupplierID 			BIGINT,
+	TransactionDate 	DATETIME NOT NULL,
+	Remarks				TEXT,
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy 			VARCHAR(255) NULL,
+	FOREIGN KEY(SupplierID) REFERENCES master_supplier(SupplierID) ON UPDATE CASCADE ON DELETE CASCADE
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX FIRSTSTOCK_INDEX
+ON transaction_firststock (FirstStockID, SupplierID);DROP TABLE IF EXISTS transaction_firststockdetails;
+
+CREATE TABLE transaction_purchasedetails
+(
+	FirstStockDetailsID 	BIGINT PRIMARY KEY AUTO_INCREMENT,
+	FirstStockID			BIGINT,
+	ItemID 					BIGINT NOT NULL,
+	ItemDetailsID			BIGINT NULL,
+	BranchID				INT,
+	Quantity				DOUBLE,
+	BuyPrice				DOUBLE,
+	RetailPrice				DOUBLE,
+	Price1					DOUBLE,
+	Price2					DOUBLE,
+	CreatedDate 			DATETIME NOT NULL,
+	CreatedBy 				VARCHAR(255) NOT NULL,
+	ModifiedDate 			TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy				VARCHAR(255) NULL,
+	FOREIGN KEY(FirstStockID) REFERENCES transaction_firststock(FirstStockID) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(ItemID) REFERENCES master_item(ItemID) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(BranchID) REFERENCES master_branch(BranchID) ON UPDATE CASCADE ON DELETE CASCADE
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX FIRSTSTOCKDETAILS_INDEX
+ON transaction_firststockdetails (FirstStockDetailsID, FirstStockID, ItemID, BranchID);DROP TABLE IF EXISTS backup_history;
+
+CREATE TABLE backup_history
+(
+	BackupHistoryID		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	BackupDate			DATE,
+	FilePath			VARCHAR(255),
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy			VARCHAR(255) NULL
+	
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX BACKUPHISTORY_INDEX
+ON backup_history (BackupHistoryID);DROP TABLE IF EXISTS reset_history;
+
+CREATE TABLE reset_history
+(
+	ResetHistoryID		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	ResetDate			DATE,	
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy			VARCHAR(255) NULL
+	
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX RESETHISTORY_INDEX
+ON reset_history (ResetHistoryID);DROP TABLE IF EXISTS restore_history;
+
+CREATE TABLE restore_history
+(
+	RestoreHistoryID		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	RestoreDate			DATE,
+	FilePath			VARCHAR(255),
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy			VARCHAR(255) NULL
+	
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX RESTOREHISTORY_INDEX
+ON restore_history (RestoreHistoryID);

@@ -15,13 +15,15 @@
 				);
 
 	$where = " 1=1 ";
-	$order_by = "MC.CategoryID";
+	$order_by = "MC.CategoryID DESC";
 	$limit_s = $requestData['start'];
 	$limit_l = $requestData['length'];
 	
 	//Handles Sort querystring sent from Bootgrid
-	$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
-	$order_by .= ", MC.CategoryID ASC";
+	if(ISSET($requestData['order'])) {
+		$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
+		$order_by .= ", MC.CategoryID ASC";
+	}
 	//Handles search querystring sent from Bootgrid
 	if (!empty($requestData['search']['value']))
 	{

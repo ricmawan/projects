@@ -36,6 +36,8 @@ SET @query = CONCAT("SELECT
 						master_item MI
                         JOIN master_category MC
 							ON MC.CategoryID = MI.CategoryID
+						JOIN master_unit MU
+							ON MU.UnitID = MI.UnitID
 					WHERE ", pWhere);
 						
 	PREPARE stmt FROM @query;
@@ -57,11 +59,15 @@ SET @query = CONCAT("SELECT
                         MI.Price2,
                         MI.Qty2,
                         MI.Weight,
-                        MI.MinimumStock
+                        MI.MinimumStock,
+                        MU.UnitID,
+                        MU.UnitName
 					FROM
 						master_item MI
                         JOIN master_category MC
 							ON MC.CategoryID = MI.CategoryID
+						JOIN master_unit MU
+							ON MU.UnitID = MI.UnitID
 					WHERE ", pWhere, 
 					" ORDER BY ", pOrder,
 					" LIMIT ", pLimit_s, ", ", pLimit_l);

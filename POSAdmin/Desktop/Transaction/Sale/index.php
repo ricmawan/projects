@@ -908,6 +908,13 @@
 							}
 						}
 					});
+
+					if($("#ddlCustomer").val() == "" || !$("#ddlCustomer").val()) {
+						PassValidate = 0;
+						$("#ddlCustomer").notify("Harus diisi!", { position:"right", className:"warn", autoHideDelay: 2000 });
+						if(FirstFocus == 0) $("#ddlCustomer").focus();
+						FirstFocus = 1;
+					}
 					
 					if($("#hdnItemID").val() == 0) {
 						PassValidate = 0;
@@ -1357,7 +1364,6 @@
 			}
 
 			function addNewCustomer() {
-				var itemCode = $("#txtItemCode").val();
 				Lobibox.window({
 					title: 'Tambah Pelanggan',
 					url: 'Transaction/Sale/PopUpAddCustomer.php',

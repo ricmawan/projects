@@ -7,6 +7,7 @@ CREATE TABLE transaction_stockmutationdetails
 	SourceID					INT,
 	DestinationID				INT,
 	ItemID 						BIGINT NOT NULL,
+	ItemDetailsID				BIGINT NULL,
 	Quantity					DOUBLE,
 	CreatedDate 				DATETIME NOT NULL,
 	CreatedBy 					VARCHAR(255) NOT NULL,

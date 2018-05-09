@@ -62,31 +62,31 @@
 												mysqli_next_result($dbh);
 											?>
 										</select>
-										<label for="txtCustomer" style="font-family:'Open Sans', sans-serif;font-size: 14px;font-weight:400;font-stretch:100%;">Pelanggan</label>
+										<label for="txtCustomer" class="lblInput" >Pelanggan</label>
 									</div>
 								</div>
 								<br />
 								
 								<div class="row" >
 									<div class="col-md-12 has-float-label" >
-										<input tabindex=8 id="txtItemCode" name="txtItemCode" type="text" class="form-control-custom" onfocus="this.select();" onkeypress="isEnterKey(event, 'getItemDetails');" onchange="getItemDetails();" autocomplete=off placeholder="Kode Barang" />
-										<label for="txtItemCode" style="font-family:'Open Sans', sans-serif;font-size: 14px;font-weight:400;font-stretch:100%;">Kode Barang</label>
+										<input tabindex=8 id="txtItemCode" name="txtItemCode" type="text" class="form-control-custom" onfocus="this.select();" onkeypress="isEnterKey(event, 'getItemDetails');" onchange="getItemDetails();" autocomplete=off />
+										<label for="txtItemCode" class="lblInput" >Kode Barang</label>
 									</div>
 								</div>
 								<br />
 								
 								<div class="row" >
 									<div class="col-md-12 has-float-label" >
-										<input disabled id="txtItemName" name="txtItemName" type="text" class="form-control-custom" placeholder="Nama Barang" />
-										<label for="txtItemName" style="font-family:'Open Sans', sans-serif;font-size: 14px;font-weight:400;font-stretch:100%;">Nama Barang</label>
+										<input disabled id="txtItemName" name="txtItemName" type="text" class="form-control-custom" />
+										<label for="txtItemName" class="lblInput" >Nama Barang</label>
 									</div>
 								</div>
 								<br />
 								
 								<div class="row" >
 									<div class="col-md-12 has-float-label" >
-										<input tabindex=9 id="txtQTY" onfocus="this.select();" name="txtQTY" type="number" class="form-control-custom" placeholder="QTY" style="border: 1px solid #ccc !important;margin: 0;" value=1 onchange="this.value = validateQTY(this.value);Grosir(this.value);" onpaste="return false;" onfocus="this.select();" />
-										<label for="txtQTY" style="font-family:'Open Sans', sans-serif;font-size: 14px;font-weight:400;font-stretch:100%;">Qty</label>
+										<input tabindex=9 id="txtQTY" onfocus="this.select();" name="txtQTY" type="number" class="form-control-custom" style="border: 1px solid #ccc !important;margin: 0;" value=1 onchange="this.value = validateQTY(this.value);Grosir(this.value);" onpaste="return false;" onfocus="this.select();" />
+										<label for="txtQTY" class="lblInput" >Qty</label>
 									</div>
 								</div>
 								<br />
@@ -101,16 +101,16 @@
 										<input id="hdnQty2" name="hdnQty2" type="hidden" value=0 />
 										<input id="hdnBranchID" name="hdnBranchID" type="hidden" value=1 />
 										<input id="hdnWeight" name="hdnWeight" type="hidden" value=0 />
-										<input id="txtSalePrice" name="txtSalePrice" type="number" tabindex=10 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Jual" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="this.select();" onpaste="return false;" />
-										<label for="txtSalePrice" style="font-family:'Open Sans', sans-serif;font-size: 14px;font-weight:400;font-stretch:100%;">Harga</label>
+										<input id="txtSalePrice" name="txtSalePrice" type="number" tabindex=10 class="form-control-custom text-right" value="0" autocomplete=off onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="this.select();" onpaste="return false;" />
+										<label for="txtSalePrice" class="lblInput" >Harga</label>
 									</div>
 								</div>
 								<br />
 								
 								<div class="row" >
 									<div class="col-md-12 has-float-label" >
-										<input id="txtDiscount" name="txtDiscount" type="number" tabindex=11 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Diskon" onkeypress="isEnterKey(event, 'addSaleDetails');return isNumberKey(event, this.id, this.value);" onchange="addSaleDetails();" onfocus="this.select();" onpaste="return false;" />
-										<label for="txtDiscount" style="font-family:'Open Sans', sans-serif;font-size: 14px;font-weight:400;font-stretch:100%;">Diskon</label>
+										<input id="txtDiscount" name="txtDiscount" type="number" tabindex=11 class="form-control-custom text-right" value="0" autocomplete=off onkeypress="isEnterKey(event, 'addSaleDetails');return isNumberKey(event, this.id, this.value);" onchange="addSaleDetails();" onfocus="this.select();" onpaste="return false;" />
+										<label for="txtDiscount" class="lblInput" >Diskon</label>
 									</div>
 								</div>
 								<input type="text" tabindex=12 onfocus="addSaleDetails();" style="height:0; width: 0;opacity:0;" />
@@ -389,7 +389,6 @@
 							success: function(data) {
 								if(data.FailedFlag == '0') {
 									if($("#hdnItemID").val() != data.ItemID) {
-										console.log(data.RetailPrice);
 										$("#hdnItemID").val(data.ItemID);
 										$("#txtItemName").val(data.ItemName);
 										$("#txtSalePrice").val(data.RetailPrice);

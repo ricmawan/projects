@@ -11,13 +11,15 @@
 		$BranchID = mysqli_real_escape_string($dbh, $_POST['ddlBranch']);
 		$SupplierID = mysqli_real_escape_string($dbh, $_POST['ddlSupplier']);
 		$ItemID = mysqli_real_escape_string($dbh, $_POST['hdnItemID']);
+		$ItemDetailsID = mysqli_real_escape_string($dbh, $_POST['hdnItemDetailsID']);
+		if($ItemDetailsID == "") $ItemDetailsID = "NULL";
 		$Qty = mysqli_real_escape_string($dbh, $_POST['txtQTY']);
 		$BuyPrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtBuyPrice']));
 		$Message = "Terjadi Kesalahan Sistem!";
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
-		$sql = "CALL spInsPurchaseReturn(".$PurchaseReturnID.", '".$PurchaseReturnNumber."', ".$PurchaseReturnDetailsID.", ".$SupplierID.", '".$TransactionDate."', ".$BranchID.", ".$ItemID.", ".$Qty.", ".$BuyPrice.", ".$_SESSION['UserID'].", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsPurchaseReturn(".$PurchaseReturnID.", '".$PurchaseReturnNumber."', ".$SupplierID.", '".$TransactionDate."', ".$PurchaseReturnDetailsID.", ".$BranchID.", ".$ItemID.", ".$ItemDetailsID.", ".$Qty.", ".$BuyPrice.", ".$_SESSION['UserID'].", '".$_SESSION['UserLogin']."')";
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;

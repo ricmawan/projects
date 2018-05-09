@@ -10,6 +10,7 @@ CREATE PROCEDURE spInsSale (
 	pSaleDetailsID		BIGINT,
     pBranchID			INT,
     pItemID				BIGINT,
+	pItemDetailsID		BIGINT,
 	pQuantity			DOUBLE,
     pBuyPrice			DOUBLE,
     pSalePrice			DOUBLE,
@@ -109,6 +110,7 @@ SET State = 5;
 			(
 				SaleID,
 				ItemID,
+                ItemDetailsID,
 				BranchID,
 				Quantity,
 				BuyPrice,
@@ -121,6 +123,7 @@ SET State = 5;
 			(
 				pID,
 				pItemID,
+				pItemDetailsID,
 				pBranchID,
 				pQuantity,
 				pBuyPrice,
@@ -145,6 +148,7 @@ SET State = 7;
 				transaction_saledetails
 			SET
 				ItemID = pItemID,
+                ItemDetailsID = pItemDetailsID,
 				BranchID = pBranchID,
 				Quantity = pQuantity,
 				BuyPrice = pBuyPrice,

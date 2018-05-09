@@ -5,6 +5,7 @@ CREATE TABLE transaction_purchasereturndetails
 	PurchaseReturnDetailsID 	BIGINT PRIMARY KEY AUTO_INCREMENT,
 	PurchaseReturnID			BIGINT,
 	ItemID 						BIGINT NOT NULL,
+	ItemDetailsID				BIGINT NULL,
 	BranchID					INT,
 	Quantity					DOUBLE,
 	BuyPrice					DOUBLE,

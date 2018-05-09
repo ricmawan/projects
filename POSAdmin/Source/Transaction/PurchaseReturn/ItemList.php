@@ -6,10 +6,12 @@
 	include "../../GetPermission.php";
 
 	$requestData= $_REQUEST;
+
+	$BranchID = mysqli_real_escape_string($dbh, $requestData['BranchID']);
 	//kolom di table
 
 	$where = " 1=1 ";
-	$order_by = "MI.ItemID";
+	$order_by = "ItemID";
 	$limit_s = 0;
 	$limit_l = 20;
 	
@@ -21,7 +23,7 @@
 		$where .= " OR MI.ItemName LIKE '%".$search."%'";
 		$where .= " OR MI.BuyPrice LIKE '%".$search."%' )";
 	}
-	$sql = "CALL spSelItem(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
+	$sql = "CALL spSelItemListBranch(".$BranchID.", \"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
 
 	if (! $result = mysqli_query($dbh, $sql)) {
 		logEvent(mysqli_error($dbh), '/Transaction/PurchaseReturn/ItemList.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
@@ -42,7 +44,13 @@
 		//data yang dikirim ke table
 		$row_array[] = $row['ItemCode'];
 		$row_array[] = $row['ItemName'];
+		$row_array[] = $row['UnitName'];
 		$row_array[] = number_format($row['BuyPrice'],0,".",",");
+		$row_array[] = number_format($row['RetailPrice'],0,".",",");
+		$row_array[] = number_format($row['Price1'],0,".",",");
+		$row_array[] = number_format($row['Price2'],0,".",",");
+		$row_array[] = $row['Stock'];
+		$row_array[] = $row['PhysicalStock'];
 		array_push($return_arr, $row_array);
 	}
 	

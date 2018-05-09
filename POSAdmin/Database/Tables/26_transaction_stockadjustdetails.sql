@@ -5,6 +5,7 @@ CREATE TABLE transaction_stockadjustdetails
 	StockAdjustDetailsID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
 	StockAdjustID				BIGINT,
 	ItemID 						BIGINT NOT NULL,
+	ItemDetailsID				BIGINT NULL,
 	BranchID					INT,
 	Quantity					DOUBLE,
 	AdjustedQuantity			DOUBLE,

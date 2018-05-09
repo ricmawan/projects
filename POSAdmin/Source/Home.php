@@ -18,6 +18,7 @@
 		<link href="assets/css/jquery-ui.theme.css" rel="stylesheet" />
 		<link href="assets/js/morris/morris-0.4.3.min.css" rel="stylesheet" />
 		<link href="assets/css/custom.css" rel="stylesheet" />
+		<link href="assets/css/bootstrap-float-label.min.css" rel="stylesheet" />
 		<link href="assets/css/dataTables.bootstrap.css" rel="stylesheet" />
 		<link href="assets/css/jquery.dataTables.css" rel="stylesheet" />
 		<link href="assets/css/keyTable.bootstrap.css" rel="stylesheet" />
@@ -189,6 +190,8 @@
 		<script src="assets/js/dataTables.bootstrap.js"></script>
 		<script src="assets/js/dataTables.keyTable.js"></script>
 		<script src="assets/js/toggles.js"></script>
+		<script src="assets/js/mousetrap.min.js"></script>
+		<script src="assets/js/jquery.simulate.js"></script>
 		<div id="loading"></div>
 		<iframe id='excelDownload' src='' style='display:none'></iframe>
 		<script type="text/javascript">

@@ -6,6 +6,7 @@ CREATE TABLE transaction_pickdetails
 	PickID				BIGINT,
 	BookingDetailsID 	BIGINT,
 	ItemID 				BIGINT NOT NULL,
+	ItemDetailsID		BIGINT NULL,
 	BranchID			INT,
 	Quantity			DOUBLE,
 	BuyPrice			DOUBLE,

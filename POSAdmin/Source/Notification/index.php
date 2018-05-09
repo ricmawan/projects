@@ -63,7 +63,7 @@
 								"scrollY": "330px",
 								"rowId": "ItemID",
 								"scrollCollapse": true,
-								"order": [2, "asc"],
+								"order": [],
 								"columns": [
 									{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
 									{ className: "dt-head-center" },

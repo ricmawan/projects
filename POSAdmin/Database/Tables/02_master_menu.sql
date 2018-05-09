@@ -143,7 +143,7 @@ VALUES
 (
 	14,
 	3,
-	'Adjust Stok',
+	'Penyesuaian Stok',
 	'Transaction/StockAdjust/',
 	NULL,
 	0,

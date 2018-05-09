@@ -9,6 +9,7 @@ CREATE PROCEDURE spInsPurchase (
 	pPurchaseDetailsID	BIGINT,
     pBranchID			INT,
     pItemID				BIGINT,
+    pItemDetailsID		BIGINT,
 	pQuantity			DOUBLE,
     pBuyPrice			DOUBLE,
     pRetailPrice		DOUBLE,
@@ -119,6 +120,7 @@ SET State = 6;
                 (
 					PurchaseID,
                     ItemID,
+                    ItemDetailsID,
                     BranchID,
                     Quantity,
                     BuyPrice,
@@ -132,6 +134,7 @@ SET State = 6;
                 (
 					pID,
                     pItemID,
+                    pItemDetailsID,
                     pBranchID,
                     pQuantity,
                     pBuyPrice,
@@ -157,6 +160,7 @@ SET State = 8;
 					transaction_purchasedetails
 				SET
 					ItemID = pItemID,
+                    ItemDetailsID = pItemDetailsID,
                     BranchID = pBranchID,
                     Quantity = pQuantity,
                     BuyPrice = pBuyPrice,
@@ -177,11 +181,26 @@ SET State = 9;
 					BuyPrice = pBuyPrice,
 					RetailPrice = pRetailPrice,
 					Price1 = pPrice1,
-					Price2 = pPrice2
+					Price2 = pPrice2,
+					ModifiedBy = pCurrentUser
 				WHERE
-					ItemID = pItemID;
+					ItemID = pItemID
+                    AND pItemDetailsID IS NULL;
+                    
+SET State = 10;
 
-SET State = 9;
+				UPDATE 
+					master_itemdetails
+				SET
+					BuyPrice = pBuyPrice,
+					RetailPrice = pRetailPrice,
+					Price1 = pPrice1,
+					Price2 = pPrice2,
+					ModifiedBy = pCurrentUser
+				WHERE
+					ItemDetailsID = pItemDetailsID
+                    AND pItemDetailsID IS NOT NULL;
+SET State = 11;
 				
 				SELECT
 					pID AS 'ID',

@@ -1282,7 +1282,7 @@
 								"scrollY": "330px",
 								"rowId": "BookingID",
 								"scrollCollapse": true,
-								"order": [2, "asc"],
+								"order": [],
 								"columns": [
 									{ "width": "20px", "orderable": false, className: "dt-head-center dt-body-center" },
 									{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },

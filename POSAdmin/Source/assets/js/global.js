@@ -816,7 +816,7 @@ function chkAll() {
 
 var enterCounter = 0;
 function enterLikeTab() {
-	$("input").not($(":submit, :button")).on("keypress", function (evt) {
+	$(document).not($(":submit, :button")).on("keypress", "input", function (evt) {	
 		if (evt.keyCode == 13) {
 			evt.preventDefault();
 			var next = $('[tabindex="'+(this.tabIndex+1)+'"]');
@@ -824,8 +824,6 @@ function enterLikeTab() {
 			if(next.length) {
 				if(next.attr("disabled") == "disabled") {
 					$(document).find(":focusable").each(function() {
-						console.log("element: " + parseInt($(this)[0].tabIndex));
-						console.log("element: " + nextTabIndex);
 						if(parseInt($(this)[0].tabIndex) > nextTabIndex) {
 							$(this).focus();
 							return false;
@@ -833,6 +831,7 @@ function enterLikeTab() {
 					});
 				}
 				else {
+					if(next.prop("type") == "select-one") next.simulate('mousedown');
 					next.focus();
 				}
 			}
@@ -840,7 +839,7 @@ function enterLikeTab() {
 		}
 	});
 	
-	$("select").keypress(function (evt) {
+	$(document).on("keypress", "select", function (evt) {
 		if (evt.keyCode == 13) {
 			evt.preventDefault();
 			var next = $('[tabindex="'+(this.tabIndex+1)+'"]');
@@ -849,7 +848,7 @@ function enterLikeTab() {
 		}
 	});
 	
-	$("textarea").keypress(function (evt) {
+	$(document).on("keypress", "textarea", function (evt) {
 		if (evt.keyCode == 13) {
 			if(enterCounter == 0) {
 				enterCounter = 1;

@@ -5,6 +5,7 @@ CREATE TABLE transaction_bookingdetails
 	BookingDetailsID 	BIGINT PRIMARY KEY AUTO_INCREMENT,
 	BookingID			BIGINT,
 	ItemID 				BIGINT NOT NULL,
+	ItemDetailsID		BIGINT NULL,
 	BranchID			INT,
 	Quantity			DOUBLE,
 	BuyPrice			DOUBLE,

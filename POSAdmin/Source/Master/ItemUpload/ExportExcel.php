@@ -50,8 +50,8 @@
 		$period = date("d") . " " . $monthName[date("m") - 1] . " " .  date("Y");
 		
 		//bold title
-		$objPHPExcel->getActiveSheet()->getStyle("A1:L1")->getFont()->setBold(true);
-		$objPHPExcel->getActiveSheet()->getStyle("A1:L1")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');
+		$objPHPExcel->getActiveSheet()->getStyle("A1:M1")->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle("A1:M1")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');
 
 		
 
@@ -63,14 +63,15 @@
 		$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, "Kode");
 		$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, "Nama");
 		$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, "Kategori");
-		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Harga Beli");
-		$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, "Harga Ecer");
-		$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, "Harga 1");
-		$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, "Qty 1");
-		$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, "Harga 2");
-		$objPHPExcel->getActiveSheet()->setCellValue("J".$rowExcel, "Qty 2");
-		$objPHPExcel->getActiveSheet()->setCellValue("K".$rowExcel, "Berat");
-		$objPHPExcel->getActiveSheet()->setCellValue("L".$rowExcel, "Stok Minimal");
+		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Satuan");
+		$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, "Harga Beli");
+		$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, "Harga Ecer");
+		$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, "Harga 1");
+		$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, "Qty 1");
+		$objPHPExcel->getActiveSheet()->setCellValue("J".$rowExcel, "Harga 2");
+		$objPHPExcel->getActiveSheet()->setCellValue("K".$rowExcel, "Qty 2");
+		$objPHPExcel->getActiveSheet()->setCellValue("L".$rowExcel, "Berat");
+		$objPHPExcel->getActiveSheet()->setCellValue("M".$rowExcel, "Stok Minimal");
 		$rowExcel++;
 		
 		$sql = "CALL spSelExportItem(".$CategoryID.", '".$_SESSION['UserLogin']."')";
@@ -85,25 +86,26 @@
 			$objPHPExcel->getActiveSheet()->setCellValueExplicit("B".$rowExcel, $row['ItemCode'], PHPExcel_Cell_DataType::TYPE_STRING);
 			$objPHPExcel->getActiveSheet()->setCellValueExplicit("C".$rowExcel, $row['ItemName'], PHPExcel_Cell_DataType::TYPE_STRING);
 			$objPHPExcel->getActiveSheet()->setCellValueExplicit("D".$rowExcel, $row['CategoryName'], PHPExcel_Cell_DataType::TYPE_STRING);
-			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, $row['BuyPrice']);
-			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['RetailPrice']);
-			$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, $row['Price1']);
-			$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, $row['Qty1']);
-			$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, $row['Price2']);
-			$objPHPExcel->getActiveSheet()->setCellValue("J".$rowExcel, $row['Qty2']);
-			$objPHPExcel->getActiveSheet()->setCellValue("K".$rowExcel, $row['Weight']);
-			$objPHPExcel->getActiveSheet()->setCellValue("L".$rowExcel, $row['MinimumStock']);
+			$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, $row['UnitName'], PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['BuyPrice']);
+			$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, $row['RetailPrice']);
+			$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, $row['Price1']);
+			$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, $row['Qty1']);
+			$objPHPExcel->getActiveSheet()->setCellValue("J".$rowExcel, $row['Price2']);
+			$objPHPExcel->getActiveSheet()->setCellValue("K".$rowExcel, $row['Qty2']);
+			$objPHPExcel->getActiveSheet()->setCellValue("L".$rowExcel, $row['Weight']);
+			$objPHPExcel->getActiveSheet()->setCellValue("M".$rowExcel, $row['MinimumStock']);
 			$rowExcel++;
 		}
 		mysqli_free_result($result);
 		mysqli_next_result($dbh);
 		
-		$objPHPExcel->getActiveSheet()->getStyle("B2:D".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
-		$objPHPExcel->getActiveSheet()->getStyle("E2:L".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+		$objPHPExcel->getActiveSheet()->getStyle("B2:E".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+		$objPHPExcel->getActiveSheet()->getStyle("F2:L".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 		
 		//set all width 
 		$fromCol='A';
-		$toCol= 'M';
+		$toCol= 'N';
 		for($j = $fromCol; $j !== $toCol; $j++) {
 			//$calculatedWidth = $objPHPExcel->getActiveSheet()->getColumnDimension($i)->getWidth();
 			$objPHPExcel->getActiveSheet()->getColumnDimension($j)->setAutoSize(true);
@@ -115,7 +117,7 @@
 			  )
 			)
 		);		
-		$objPHPExcel->getActiveSheet()->getStyle("A1:L".($rowExcel-1))->applyFromArray($styleArray);		
+		$objPHPExcel->getActiveSheet()->getStyle("A1:M".($rowExcel-1))->applyFromArray($styleArray);		
 
 		$title = "Data Barang " . $CategoryName . " " . $period;
 		// Rename worksheet

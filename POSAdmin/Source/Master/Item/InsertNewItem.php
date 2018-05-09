@@ -50,6 +50,7 @@
 		$ItemCode = mysqli_real_escape_string($dbh, $_POST['txtItemCodeAdd']);
 		$ItemName = mysqli_real_escape_string($dbh, $_POST['txtItemNameAdd']);
 		$CategoryID = mysqli_real_escape_string($dbh, $_POST['ddlCategoryAdd']);
+		$UnitID = mysqli_real_escape_string($dbh, $_POST['ddlUnitAdd']);
 		$BuyPrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtBuyPriceAdd']));
 		$RetailPrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtRetailPriceAdd']));
 		$Price1 = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtPrice1Add']));
@@ -58,15 +59,37 @@
 		$Qty2 = mysqli_real_escape_string($dbh, $_POST['txtQty2Add']);
 		$Weight = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtWeightAdd']));
 		$MinimumStock = mysqli_real_escape_string($dbh, $_POST['txtMinimumStockAdd']);
+		$hdnTabsCounter = mysqli_real_escape_string($dbh, $_POST['hdnTabsCounter']);
 		$hdnIsEdit = 0;
 		$Message = "Terjadi Kesalahan Sistem!";
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
+
+		$itemDetails = array();
+		for($i=0;$i<$hdnTabsCounter;$i++) {
+			$itemDetails[] = "(".mysqli_real_escape_string($dbh, $_POST['hdnItemDetailsID_'.($i+1)]).",
+								".$ItemID.",
+								\'".mysqli_real_escape_string($dbh, $_POST['txtItemCode_'.($i+1)])."\',
+								".mysqli_real_escape_string($dbh, $_POST['ddlUnit_'.($i+1)]).",
+								".mysqli_real_escape_string($dbh, $_POST['txtConversionQty_'.($i+1)]).",
+								".mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtBuyPrice_'.($i+1)])).",
+								".mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtRetailPrice_'.($i+1)])).",
+								".mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtPrice1_'.($i+1)])).",
+								".mysqli_real_escape_string($dbh, $_POST['txtQty1_'.($i+1)]).",
+								".mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtPrice2_'.($i+1)])).",
+								".mysqli_real_escape_string($dbh, $_POST['txtQty2_'.($i+1)]).",
+								".mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtWeight_'.($i+1)])).",
+								".mysqli_real_escape_string($dbh, $_POST['txtMinimumStock_'.($i+1)])."
+							  )";
+		}
+
+
 		$sql = "CALL spInsItem( ".$ItemID.",
 								'".$ItemCode."',
 								'".$ItemName."',
 								".$CategoryID.",
+								".$UnitID.",
 								".$BuyPrice.",
 								".$RetailPrice.",
 								".$Price1.",
@@ -75,6 +98,7 @@
 								".$Qty2.",
 								".$Weight.",
 								".$MinimumStock.",
+								'".implode(",", $itemDetails)."',
 								".$hdnIsEdit.",
 								'".$_SESSION['UserLogin']."'
 							  )";

@@ -13,24 +13,27 @@
 					2 => "MI.ItemCode",
 					3 => "MI.ItemName",
 					4 => "MC.CategoryName",
-					5 => "MI.BuyPrice",
-					6 => "MI.RetailPrice",
-					7 => "MI.Price1",
-					8 => "MI.Qty1",
-					9 => "MI.Price2",
-					10 => "MI.Qty2",
-					11 => "MI.Weight",
-					12 => "MI.MinimumStock"
+					5 => "MU.UnitName",
+					6 => "MI.BuyPrice",
+					7 => "MI.RetailPrice",
+					8 => "MI.Price1",
+					9 => "MI.Qty1",
+					10 => "MI.Price2",
+					11 => "MI.Qty2",
+					12 => "MI.Weight",
+					13 => "MI.MinimumStock"
 				);
 
 	$where = " 1=1 ";
-	$order_by = "MI.ItemID";
+	$order_by = "MI.ItemID DESC";
 	$limit_s = $requestData['start'];
 	$limit_l = $requestData['length'];
 	
 	//Handles Sort querystring sent from Bootgrid
-	$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
-	$order_by .= ", MI.ItemID ASC";
+	if(ISSET($requestData['order'])) {
+		$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
+		$order_by .= ", MI.ItemID ASC";
+	}
 	//Handles search querystring sent from Bootgrid
 	if (!empty($requestData['search']['value']))
 	{
@@ -45,6 +48,7 @@
 		$where .= " OR MI.Price2 LIKE '%".$search."%'";
 		$where .= " OR MI.Qty2 LIKE '%".$search."%'";
 		$where .= " OR MI.Weight LIKE '%".$search."%'";
+		$where .= " OR MU.UnitName LIKE '%".$search."%'";
 		$where .= " OR MI.MinimumStock LIKE '%".$search."%' )";
 	}
 	$sql = "CALL spSelItem(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
@@ -70,6 +74,7 @@
 		$row_array[] = $row['ItemCode'];
 		$row_array[] = $row['ItemName'];
 		$row_array[] = $row['CategoryName'];
+		$row_array[] = $row['UnitName'];
 		$row_array[] = number_format($row['BuyPrice'],0,".",",");
 		$row_array[] = number_format($row['RetailPrice'],0,".",",");
 		$row_array[] = number_format($row['Price1'],0,".",",");
@@ -80,6 +85,7 @@
 		$row_array[] = $row['MinimumStock'];
 		$row_array[] = $row['ItemID'];
 		$row_array[] = $row['CategoryID'];
+		$row_array[] = $row['UnitID'];
 		array_push($return_arr, $row_array);
 	}
 	

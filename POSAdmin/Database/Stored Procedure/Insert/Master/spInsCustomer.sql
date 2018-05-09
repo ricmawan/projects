@@ -101,7 +101,7 @@ SET State = 4;
 				INTO 
 					pID;
 
-SET State = 6;
+SET State = 5;
 
 				SELECT
 					pID AS 'ID',
@@ -110,7 +110,7 @@ SET State = 6;
 					0 AS 'FailedFlag',
 					State AS 'State';
 			ELSE
-SET State = 7;
+SET State = 6;
 
 				UPDATE
 					master_customer
@@ -125,7 +125,7 @@ SET State = 7;
 				WHERE
 					CustomerID = pID;
 
-SET State = 8;
+SET State = 7;
 
 				SELECT
 					pID AS 'ID',

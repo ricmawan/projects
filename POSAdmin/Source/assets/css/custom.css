@@ -847,7 +847,7 @@ input::-webkit-inner-spin-button {
     transform: rotate(45deg);
 }
 
-.ui-widget.ui-widget-content {
+.ui-tabs {
     border: 0 !important;
 }
 
@@ -862,4 +862,16 @@ input::-webkit-inner-spin-button {
 
 .ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited {
 	color: white !important;
+}
+
+
+.lblInput {
+	font-family:'Open Sans', sans-serif !important;
+	font-size: 11px !important;
+	font-weight:400 !important;
+	font-stretch:100% !important;
+}
+
+.has-float-label input, .has-float-label select {
+	padding-top: 5px !important;
 }

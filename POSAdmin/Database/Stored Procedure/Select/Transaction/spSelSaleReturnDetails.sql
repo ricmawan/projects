@@ -39,13 +39,16 @@ SET State = 1;
         TSRD.Quantity,
         TSRD.BuyPrice,
         TSRD.SalePrice,
-        (IFNULL(TS.Quantity, 0) - IFNULL(SR.Quantity, 0) + IFNULL(TSRD.Quantity, 0)) Maksimum
+        (IFNULL(TS.Quantity, 0) - IFNULL(SR.Quantity, 0) + IFNULL(TSRD.Quantity, 0)) Maksimum,
+        MU.UnitName
 	FROM
 		transaction_salereturn TSR
 		JOIN transaction_salereturndetails TSRD
 			ON TSRD.SaleReturnID = TSR.SaleReturnID
 		JOIN master_item MI
 			ON MI.ItemID = TSRD.ItemID
+		JOIN master_unit MU
+			ON MU.UnitID = MI.UnitID
         LEFT JOIN
 		(
 			SELECT

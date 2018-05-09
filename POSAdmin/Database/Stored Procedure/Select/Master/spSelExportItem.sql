@@ -40,11 +40,14 @@ SET State = 1;
 		MI.Price2,
 		MI.Qty2,
 		MI.Weight,
-		MI.MinimumStock
+		MI.MinimumStock,
+        MU.UnitName
 	FROM
 		master_item MI
 		JOIN master_category MC
 			ON MC.CategoryID = MI.CategoryID
+		JOIN master_unit MU
+			ON MU.UnitID = MI.UnitID
 	WHERE 
 		MC.CategoryID = pCategoryID;
 		

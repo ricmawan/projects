@@ -34,10 +34,11 @@ SET State = 1;
         SD.BranchID,
         MI.ItemCode,
         MI.ItemName,
-        (SD.Quantity - IFNULL(TSR.Quantity, 0)) Quantity,
-        SD.BuyPrice,
-        SD.SalePrice,
-        MC.CustomerName
+        (SD.Quantity * IFNULL(MID.ConversionQuantity, 1) - IFNULL(TSR.Quantity, 0)) Quantity,
+        (SD.BuyPrice / IFNULL(MID.ConversionQuantity, 1)) BuyPrice,
+        (SD.SalePrice / IFNULL(MID.ConversionQuantity, 1)) SalePrice,
+        MC.CustomerName,
+        MU.UnitName
 	FROM
 		transaction_sale TS
 		JOIN master_customer MC
@@ -48,6 +49,10 @@ SET State = 1;
 			ON MB.BranchID = SD.BranchID
 		JOIN master_item MI
 			ON MI.ItemID = SD.ItemID
+		JOIN master_unit MU
+			ON MI.UnitID = MU.UnitID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SD.ItemDetailsID
 		LEFT JOIN
 		(
 			SELECT

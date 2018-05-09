@@ -30,13 +30,17 @@ SET State = 1;
 	SELECT
 		SA.StockAdjustID,
 		SAD.StockAdjustDetailsID,
-		MI.ItemID,
+		SAD.ItemID,
 		SAD.BranchID,
 		CONCAT(MB.BranchCode, ' - ', MB.BranchName) BranchName,
-		MI.ItemCode,
+		IFNULL(MID.ItemDetailsCode, MI.ItemCode) ItemCode,
         MI.ItemName,
         SAD.Quantity,
-        SAD.AdjustedQuantity
+        SAD.AdjustedQuantity,
+        IFNULL(MID.UnitID, MI.UnitID) UnitID,
+        MU.UnitName,
+        CONCAT('[', GROUP_CONCAT(AU.AvailableUnit SEPARATOR ', '), ']') AvailableUnit,
+        SAD.ItemDetailsID
 	FROM
 		transaction_stockadjust SA
 		JOIN transaction_stockadjustdetails SAD
@@ -45,6 +49,35 @@ SET State = 1;
 			ON MB.BranchID = SAD.BranchID
 		JOIN master_item MI
 			ON MI.ItemID = SAD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SAD.ItemDetailsID
+		LEFT JOIN master_unit MU
+			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
+		JOIN 
+        (
+			SELECT
+				MI.ItemID,
+				CONCAT('[', MU.UnitID, ',"', MU.UnitName, '", "NULL", "', MI.ItemCode, ']') AvailableUnit
+			FROM
+				master_unit MU
+				JOIN master_item MI
+					ON MI.UnitID = MU.UnitID
+			GROUP BY
+				MI.ItemID
+			UNION ALL
+			SELECT
+				MI.ItemID,
+				CONCAT('[', MU.UnitID, ',"', MU.UnitName, '",', MID.ItemDetailsID, ',"', MID.ItemDetailsCode, ']') AvailableUnit
+			FROM
+				master_unit MU
+				JOIN master_itemdetails MID
+					ON MID.UnitID = MU.UnitID
+				JOIN master_item MI
+					ON MI.ItemID = MID.ItemID
+			GROUP BY
+				MID.ItemDetailsID
+		)AU
+			ON AU.ItemID = SAD.ItemID
 	WHERE
 		SA.StockAdjustID = pStockAdjustID
 	ORDER BY

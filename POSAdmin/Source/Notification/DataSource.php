@@ -25,8 +25,10 @@
 	$limit_l = $requestData['length'];
 	
 	//Handles Sort querystring sent from Bootgrid
-	$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
-	$order_by .= ", MI.ItemID ASC";
+	if(ISSET($requestData['order'])) {
+		$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
+		$order_by .= ", MI.ItemID ASC";
+	}
 	//Handles search querystring sent from Bootgrid
 	if (!empty($requestData['search']['value']))
 	{

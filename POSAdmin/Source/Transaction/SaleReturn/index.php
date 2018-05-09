@@ -84,7 +84,7 @@
 						<input id="txtCustomerName" name="txtCustomerName" type="text" class="form-control-custom" readonly />
 					</div>
 				</div>
-				<hr style="margin: 10px 0;" />
+				<hr style="margin: 5px 0 0 0;" />
 				<div class="row" >
 					<div id="divTableContent" class="table-responsive" style="overflow-x:hidden;">
 						<table id="grid-transaction" style="width: 100% !important;" class="table table-striped table-bordered table-hover" >
@@ -98,6 +98,7 @@
 									<th>Kode Barang</th>
 									<th>Nama Barang</th>
 									<th>Qty</th>
+									<th>Satuan</th>
 									<th>Harga Jual</th>
 									<th>Sub Total</th>
 									<th>BuyPrice</th>
@@ -173,10 +174,11 @@
 										{ "visible": false },
 										{ "visible": false },
 										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-center" },
-										{ "width": "15%", "orderable": false, className: "dt-head-center dt-body-center" },
-										{ "width": "20%", "orderable": false, className: "dt-head-center" },
+										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-center" },
+										{ "width": "15%", "orderable": false, className: "dt-head-center" },
 										{ "width": "20%", "orderable": false, className: "dt-head-center" },
 										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "10%", "orderable": false, className: "dt-head-center" },
 										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "visible": false }
@@ -215,7 +217,7 @@
 						table2.destroy();
 					},
 					resizable: false,
-					height: 640,
+					height: 620,
 					width: 1280,
 					modal: false,
 					buttons: [
@@ -443,8 +445,8 @@
 								table2.clear().draw();
 								for(var i=0;i<Data.data.length;i++) {
 									if(i == 0) {
-										$("#hdnSaleID").val(Data.data[i][12]);
-										$("#txtCustomerName").val(Data.data[i][11]);
+										$("#hdnSaleID").val(Data.data[i][13]);
+										$("#txtCustomerName").val(Data.data[i][12]);
 									}
 									table2.row.add(Data.data[i]);
 								}
@@ -841,7 +843,7 @@
 								"scrollY": "330px",
 								"rowId": "SaleReturnID",
 								"scrollCollapse": true,
-								"order": [2, "asc"],
+								"order": [],
 								"columns": [
 									{ "width": "20px", "orderable": false, className: "dt-head-center dt-body-center" },
 									{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },

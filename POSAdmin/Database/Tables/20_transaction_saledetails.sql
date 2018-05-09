@@ -5,6 +5,7 @@ CREATE TABLE transaction_saledetails
 	SaleDetailsID 	BIGINT PRIMARY KEY AUTO_INCREMENT,
 	SaleID			BIGINT,
 	ItemID 			BIGINT NOT NULL,
+	ItemDetailsID	BIGINT NULL,
 	BranchID		INT,
 	Quantity		DOUBLE,
 	BuyPrice		DOUBLE,

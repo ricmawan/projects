@@ -1,10 +1,11 @@
 DROP TABLE IF EXISTS transaction_firststockdetails;
 
-CREATE TABLE transaction_purchasedetails
+CREATE TABLE transaction_firststockdetails
 (
 	FirstStockDetailsID 	BIGINT PRIMARY KEY AUTO_INCREMENT,
 	FirstStockID			BIGINT,
 	ItemID 					BIGINT NOT NULL,
+	ItemDetailsID			BIGINT NULL,
 	BranchID				INT,
 	Quantity				DOUBLE,
 	BuyPrice				DOUBLE,

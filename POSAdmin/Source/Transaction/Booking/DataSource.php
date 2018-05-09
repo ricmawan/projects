@@ -17,13 +17,15 @@
 				);
 
 	$where = " 1=1 ";
-	$order_by = "TB.BookingID";
+	$order_by = "TB.BookingID DESC";
 	$limit_s = $requestData['start'];
 	$limit_l = $requestData['length'];
 	
 	//Handles Sort querystring sent from Bootgrid
-	$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
-	$order_by .= ", TB.BookingID ASC";
+	if(ISSET($requestData['order'])) {
+		$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
+		$order_by .= ", TB.BookingID ASC";
+	}
 	//Handles search querystring sent from Bootgrid
 	if (!empty($requestData['search']['value']))
 	{
