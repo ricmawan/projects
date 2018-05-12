@@ -150,11 +150,12 @@
 									<th>Cabang</th>
 									<th>Kode Barang</th>
 									<th>Nama Barang</th>
-									<th>QTY</th>
 									<th>Satuan</th>
+									<th>QTY</th>
 									<th>Penyesuaian QTY</th>
 									<th>UnitID</th>
 									<th>AvailableUnit</th>
+									<th>ItemDetailsID</th>
 								</tr>
 							</thead>
 						</table>
@@ -173,12 +174,38 @@
 							<tr>
 								<th>Kode Barang</th>
 								<th>Nama Barang</th>
-								<th>Harga Jual</th>
+								<th>Satuan</th>
+								<th>H Beli</th>
+								<th>H Ecer</th>
+								<th>H Grosir 1</th>
+								<th>QTY1</th>
+								<th>H Grosir 2</th>
+								<th>QTY2</th>
+								<th>Stok</th>
+								<th>Fisik</th>
 							</tr>
 						</thead>
 					</table>
 				</div>
 			</div>
+		</div>
+		<div id="divBranch" style="display:none;">
+			<select class="form-control-custom" placeholder="Pilih Cabang" onchange="branchChange(this.value);" >
+				<!--<option value=0 selected >-- Semua Cabang --</option>-->
+				<?php
+					$sql = "CALL spSelDDLBranch('".$_SESSION['UserLogin']."')";
+					if (! $result = mysqli_query($dbh, $sql)) {
+						logEvent(mysqli_error($dbh), '/Report/Sale/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+						return 0;
+					}
+					while($row = mysqli_fetch_array($result)) {
+						echo "<option value='".$row['BranchID']."' >".$row['BranchCode']." - ".$row['BranchName']."</option>";
+					}
+					mysqli_free_result($result);
+					mysqli_next_result($dbh);
+				?>
+			</select>
+			<input type="hidden" id="hdnBranchID" name="hdnBranchID" value=1 />
 		</div>
 		<script>
 			var table;
@@ -199,12 +226,12 @@
 				$("#ddlBranch").val(Data[3]);
 				$("#txtItemCode").val(Data[5]);
 				$("#txtItemName").val(Data[6]);
-				$("#txtQTY").val(Data[7]);
+				$("#txtQTY").val(Data[8]);
 				$("#txtAdjustedQTY").val(Data[9]);
 
-				$("#hdnAvailableUnit").val(Data[10]);
-				$("#hdnItemDetailsID").val(Data[11]);
-				var availableUnit = JSON.parse(Data[10]);
+				$("#hdnAvailableUnit").val(Data[11]);
+				$("#hdnItemDetailsID").val(Data[12]);
+				var availableUnit = JSON.parse(Data[11]);
 				if(availableUnit.length > 0) {
 					$("#ddlUnit").find('option').remove();
 					for(var i=0;i<availableUnit.length;i++) {
@@ -213,7 +240,7 @@
 				}
 
 
-				$("#ddlUnit").val(Data[8]);
+				$("#ddlUnit").val(Data[10]);
 
 				setTimeout(function() { $("#txtItemCode").focus(); }, 0);
 			}
@@ -321,9 +348,10 @@
 										{ "width": "10%", "orderable": false, className: "dt-head-center" },
 										{ "width": "20%", "orderable": false, className: "dt-head-center" },
 										{ "width": "25%", "orderable": false, className: "dt-head-center" },
-										{ "width": "15%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "15%", "orderable": false, className: "dt-head-center" },
 										{ "width": "15%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "15%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "visible": false },
 										{ "visible": false },
 										{ "visible": false }
 									],
@@ -451,12 +479,20 @@
 							success: function(data) {
 								if(data.FailedFlag == '0') {
 									//if($("#hdnItemID").val() != data.ItemID) {
+										if($("#hdnStockAdjustDetailsID").val() != 0) {
+											$("#txtQTY").val(table2.row( rowEdit ).data()[8]);
+											$("#txtAdjustedQTY").val(table2.row( rowEdit ).data()[8]);
+										}
+										else {
+											$("#txtQTY").val(data.Quantity);
+											$("#txtAdjustedQTY").val(data.Quantity);
+											//console.log("mlebu 3");
+										}
+
 										$("#hdnItemID").val(data.ItemID);
 										$("#txtItemName").val(data.ItemName);
-										$("#txtQTY").val(data.Quantity);
-										$("#txtAdjustedQTY").val(data.Quantity);
 										//$("#txtSalePrice").val(returnRupiah(data.RetailPrice));
-										$("#txtAdjustedQTY").focus();
+										$("#ddlUnit").focus();
 
 										$("#hdnAvailableUnit").val(JSON.stringify(data.AvailableUnit));
 										$("#hdnItemDetailsID").val(data.ItemDetailsID);
@@ -572,7 +608,7 @@
 					var unitName = $("#ddlUnit option:selected").text();
 					var branchID = $("#ddlBranch").val();
 					var branchName = $("#ddlBranch option:selected").text();
-					var Qty = $("#txtQTY").val();
+					var Qty = parseFloat($("#txtQTY").val()).toFixed(2);
 					var adjustedQty = $("#txtAdjustedQTY").val();
 					var salePrice = $("#txtSalePrice").val();
 					$("#txtDiscount").blur();
@@ -614,10 +650,11 @@
 											branchName,
 											itemCode,
 											itemName,
-											Qty,
 											unitName,
+											Qty,
 											adjustedQty,
 											unitID,
+											availableUnit,
 											itemDetailsID
 										]).draw();
 									}
@@ -630,10 +667,11 @@
 											branchName,
 											itemCode,
 											itemName,
-											Qty,
 											unitName,
+											Qty,
 											adjustedQty,
 											unitID,
+											availableUnit,
 											itemDetailsID
 										]).draw();
 										table2.keys.enable();
@@ -712,6 +750,7 @@
 			
 			function resetForm() {
 				$("#hdnStockAdjustID").val(0);
+				$("#hdnStockAdjustDetailsID").val(0);
 				$("#hdnItemID").val(0);
 				$("#txtTransactionDate").datepicker("setDate", new Date());
 				$("#txtItemCode").val("");
@@ -757,6 +796,11 @@
 				});
 			}
 			
+			function branchChange(BranchID) {
+				$("#ddlBranch").val(BranchID);
+				table3.ajax.reload();
+			}
+
 			function itemList() {
 				$("#itemList-dialog").dialog({
 					autoOpen: false,
@@ -772,11 +816,24 @@
 									"searching": true,
 									"order": [],
 									"columns": [
-										{ "width": "45%", "orderable": false, className: "dt-head-center" },
-										{ "width": "45%", "orderable": false, className: "dt-head-center" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" }
+										{ "width": "15%", "orderable": false, className: "dt-head-center" },
+										{ "width": "20%", "orderable": false, className: "dt-head-center" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" }
 									],
-									"ajax": "./Transaction/StockAdjust/ItemList.php",
+									"ajax": {
+										"url": "./Transaction/StockAdjust/ItemList.php",
+										"data": function ( d ) {
+											d.BranchID = $("#ddlBranch").val()
+										}
+									},
 									"processing": true,
 									"serverSide": true,
 									"language": {
@@ -797,8 +854,16 @@
 									"initComplete": function(settings, json) {
 										table3.columns.adjust();
 										$("#grid-item").DataTable().cell( ':eq(0)' ).focus();
-									}
+									},
+									"sDom": '<"toolbar">frtip'
 								});
+
+						$(".toolbar").css({
+							"display" : "inline-block"
+						});
+
+						$("div.toolbar").html($("#divBranch").html());
+
 						var counterPickItem = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
 							//var index = table3.cell({ focused: true }).index();
@@ -810,7 +875,7 @@
 									getItemDetails();
 									$("#itemList-dialog").dialog("destroy");
 									table3.destroy();
-									table.keys.enable();
+									//table.keys.enable();
 									table2.keys.enable();
 								}
 								setTimeout(function() { counterPickItem = 0; } , 1000);
@@ -824,7 +889,7 @@
 								getItemDetails();
 								$("#itemList-dialog").dialog("destroy");
 								table3.destroy();
-								table.keys.enable();
+								///table.keys.enable();
 								table2.keys.enable();
 							}
 						});
@@ -848,7 +913,7 @@
 					close: function() {
 						$(this).dialog("destroy");
 						table3.destroy();
-						table.keys.enable();
+						//table.keys.enable();
 						table2.keys.enable();
 					},
 					resizable: false,
@@ -863,7 +928,7 @@
 						click: function() {
 							$(this).dialog("destroy");
 							table3.destroy();
-							table.keys.enable();
+							//table.keys.enable();
 							table2.keys.enable();
 							return false;
 						}
@@ -1074,7 +1139,7 @@
 							if(DeleteID.length == 0) {
 								table.keys.disable();
 								var deletedData = new Array();
-								deletedData.push(data[9]);
+								deletedData.push(data[10]);
 								SingleDelete("./Transaction/StockAdjust/Delete.php", deletedData, function(action) {
 									if(action == "success") {
 										table.ajax.reload(function() {

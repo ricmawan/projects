@@ -231,7 +231,9 @@
 								<th>H Beli</th>
 								<th>H Ecer</th>
 								<th>H Grosir 1</th>
+								<th>QTY1</th>
 								<th>H Grosir 2</th>
+								<th>QTY2</th>
 								<th>Stok</th>
 								<th>Fisik</th>
 							</tr>
@@ -1002,12 +1004,12 @@
 															delay: 2000,
 															beforeClose: function() {
 																setTimeout(function() {
+																	getItemDetails();
 																	$("#txtQTY").focus();
 																}, 0);
 															},
 															shown: function() {
 																setTimeout(function() {
-																	getItemDetails();
 																	var lobibox = $('.lobibox-window').data('lobibox');
 																	lobibox.destroy();
 																}, 0);
@@ -1295,6 +1297,7 @@
 				$("#hdnAvailableUnit").val("");
 				$("#hdnItemDetailsID").val(0);
 				$("#txtSubTotal").val(0);
+				$("#hdnPurchaseDetailsID").val(0);
 				table2.clear().draw();
 			}
 			
@@ -1351,10 +1354,12 @@
 										{ "width": "15%", "orderable": false, className: "dt-head-center" },
 										{ "width": "20%", "orderable": false, className: "dt-head-center" },
 										{ "width": "5%", "orderable": false, className: "dt-head-center" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" }
 									],
@@ -1406,7 +1411,7 @@
 									getItemDetails();
 									$("#itemList-dialog").dialog("destroy");
 									table3.destroy();
-									table.keys.enable();
+									//table.keys.enable();
 									table2.keys.enable();
 								}
 								setTimeout(function() { counterPickItem = 0; } , 1000);
@@ -1420,7 +1425,7 @@
 								getItemDetails();
 								$("#itemList-dialog").dialog("destroy");
 								table3.destroy();
-								table.keys.enable();
+								//table.keys.enable();
 								table2.keys.enable();
 							}
 						});
@@ -1444,7 +1449,7 @@
 					close: function() {
 						$(this).dialog("destroy");
 						table3.destroy();
-						table.keys.enable();
+						//table.keys.enable();
 						table2.keys.enable();
 					},
 					resizable: false,
@@ -1458,7 +1463,7 @@
 						click: function() {
 							$(this).dialog("destroy");
 							table3.destroy();
-							table.keys.enable();
+							//table.keys.enable();
 							table2.keys.enable();
 							return false;
 						}

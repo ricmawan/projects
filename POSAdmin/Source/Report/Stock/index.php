@@ -65,11 +65,13 @@
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
+										<th>Cabang</th>
 										<th>Kode</th>
 										<th>Nama</th>
+										<th>Satuan</th>
 										<th>Kategori</th>
-										<th>Cabang</th>
 										<th>Stok</th>
+										<th>Fisik</th>
 									</tr>
 								</thead>
 							</table>
@@ -171,17 +173,38 @@
 					$(this).val("");
 				});
 
+				$.fn.dataTable.ext.errMode = function(settings, techNote, message) { 
+					$("#loading").hide();
+					var errorMessage = "DataTables Error : " + techNote + " (" + message + ")";
+					var counterError = 0;
+					LogEvent(errorMessage, "/Transaction/Sale/index.php");
+					Lobibox.alert("error",
+					{
+						msg: "Terjadi kesalahan. Memuat ulang halaman.",
+						width: 480,
+						//delay: 2000,
+						beforeClose: function() {
+							if(counterError == 0) {
+								//location.reload();
+								counterError = 1;
+							}
+						}
+					});
+				};
+
 				table = $("#grid-data").DataTable({
 								"keys": true,
 								"scrollY": "330px",
 								"scrollCollapse": true,
-								"order": [2, "asc"],
+								"order": [],
 								"columns": [
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ "orderable": false, className: "dt-head-center dt-body-right" }						
+									{ "width": "10%", className: "dt-head-center" },
+									{ "width": "25%", className: "dt-head-center" },
+									{ "width": "30%", className: "dt-head-center" },
+									{ "width": "10%", className: "dt-head-center" },
+									{ "width": "10%", className: "dt-head-center" },
+									{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+									{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" }
 								],
 								"processing": true,
 								"serverSide": true,

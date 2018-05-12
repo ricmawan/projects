@@ -55,6 +55,7 @@ SET State = 1;
 				TS.SaleID,
 				SD.ItemID,
 				SD.BranchID,
+                SD.SaleDetailsID,
 				SUM(SD.Quantity) Quantity
 			FROM
 				transaction_sale TS
@@ -63,12 +64,13 @@ SET State = 1;
 			GROUP BY
 				TS.SaleID,
 				SD.ItemID,
-				SD.BranchID
+				SD.BranchID,
+                SD.SaleDetailsID
 		)TS
 			ON TSR.SaleID = TS.SaleID
 			AND MI.ItemID = TS.ItemID
 			AND TS.BranchID = TSRD.BranchID
-
+			AND TSRD.SaleDetailsID = TS.SaleDetailsID
 		LEFT JOIN
 		(
 			SELECT

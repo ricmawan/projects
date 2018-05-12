@@ -9,13 +9,15 @@
 		$TransactionDate = mysqli_real_escape_string($dbh, $_POST['hdnTransactionDate']);
 		$BranchID = mysqli_real_escape_string($dbh, $_POST['ddlBranch']);
 		$ItemID = mysqli_real_escape_string($dbh, $_POST['hdnItemID']);
+		$ItemDetailsID = mysqli_real_escape_string($dbh, $_POST['hdnItemDetailsID']);
+		if($ItemDetailsID == "") $ItemDetailsID = "NULL";
 		$Qty = mysqli_real_escape_string($dbh, $_POST['txtQTY']);
 		$AdjustedQty = mysqli_real_escape_string($dbh, $_POST['txtAdjustedQTY']);
 		$Message = "Terjadi Kesalahan Sistem!";
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
-		$sql = "CALL spInsStockAdjust(".$StockAdjustID.", ".$BranchID.", '".$TransactionDate."', ".$StockAdjustDetailsID.", ".$ItemID.", ".$Qty.", ".$AdjustedQty.", ".$_SESSION['UserID'].", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsStockAdjust(".$StockAdjustID.", ".$BranchID.", '".$TransactionDate."', ".$StockAdjustDetailsID.", ".$ItemID.", ".$ItemDetailsID.", ".$Qty.", ".$AdjustedQty.", ".$_SESSION['UserID'].", '".$_SESSION['UserLogin']."')";
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;

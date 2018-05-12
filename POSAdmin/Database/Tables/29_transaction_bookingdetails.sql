@@ -11,6 +11,8 @@ CREATE TABLE transaction_bookingdetails
 	BuyPrice			DOUBLE,
 	BookingPrice		DOUBLE,
 	Discount			DOUBLE,
+	PrintCount			SMALLINT,
+	PrintedDate			DATETIME,
 	CreatedDate 		DATETIME NOT NULL,
 	CreatedBy 			VARCHAR(255) NOT NULL,
 	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
@@ -20,5 +22,5 @@ CREATE TABLE transaction_bookingdetails
 	FOREIGN KEY(BranchID) REFERENCES master_branch(BranchID) ON UPDATE CASCADE ON DELETE CASCADE
 )ENGINE=InnoDB;
 
-CREATE UNIQUE INDEX SALEDETAILS_INDEX
+CREATE UNIQUE INDEX BOOKINGDETAILS_INDEX
 ON transaction_bookingdetails (BookingDetailsID, BookingID, ItemID, BranchID);

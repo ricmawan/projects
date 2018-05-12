@@ -34,7 +34,9 @@
 		$search = mysqli_escape_string($dbh, trim($requestData['search']['value']));
 		$where .= " AND ( MB.BranchName LIKE '%".$search."%'";
 		$where .= " OR MI.ItemCode LIKE '%".$search."%'";
+		$where .= " OR MID.ItemDetailsCode LIKE '%".$search."%'";
 		$where .= " OR MI.ItemName LIKE '%".$search."%'";
+		$where .= " OR MU.UnitName LIKE '%".$search."%'";
 		$where .= " OR DATE_FORMAT(SA.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
 		$where .= " OR SAD.AdjustedQuantity LIKE '%".$search."%'";
 		$where .= " OR SAD.Quantity LIKE '%".$search."%' )";

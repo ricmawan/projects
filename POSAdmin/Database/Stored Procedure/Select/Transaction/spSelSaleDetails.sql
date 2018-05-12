@@ -45,7 +45,8 @@ SET State = 1;
         IFNULL(MID.Qty2, MI.Qty2) Qty2,
 		IFNULL(MID.Weight, MI.Weight) Weight,
         CONCAT('[', GROUP_CONCAT(AU.AvailableUnit SEPARATOR ', '), ']') AvailableUnit,
-        SD.ItemDetailsID
+        SD.ItemDetailsID,
+        IFNULL(MID.ConversionQuantity, 1) ConversionQty
 	FROM
 		transaction_saledetails SD
         JOIN master_branch MB
@@ -100,7 +101,8 @@ SET State = 1;
         IFNULL(MID.Price2, MI.Price2),
         IFNULL(MID.Qty2, MI.Qty2),
 		IFNULL(MID.Weight, MI.Weight),
-        SD.ItemDetailsID
+        SD.ItemDetailsID,
+        IFNULL(MID.ConversionQuantity, 1)
 	ORDER BY
 		SD.SaleDetailsID;
         

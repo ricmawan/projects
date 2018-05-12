@@ -21,7 +21,12 @@
 		$search = mysqli_real_escape_string($dbh, trim($requestData['search']['value']));
 		$where .= " AND ( MI.ItemCode LIKE '%".$search."%'";
 		$where .= " OR MI.ItemName LIKE '%".$search."%'";
-		$where .= " OR MI.BuyPrice LIKE '%".$search."%' )";
+		$where .= " OR MI.BuyPrice LIKE '%".$search."%'";
+		$where .= " OR MI.RetailPrice LIKE '%".$search."%'";
+		$where .= " OR MI.Price1 LIKE '%".$search."%'";
+		$where .= " OR MI.Qty1 LIKE '%".$search."%'";
+		$where .= " OR MI.Price1 LIKE '%".$search."%'";
+		$where .= " OR MI.Qty2 LIKE '%".$search."%' )";
 	}
 	$sql = "CALL spSelItemListBranch(".$BranchID.", \"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
 
@@ -48,7 +53,9 @@
 		$row_array[] = number_format($row['BuyPrice'],0,".",",");
 		$row_array[] = number_format($row['RetailPrice'],0,".",",");
 		$row_array[] = number_format($row['Price1'],0,".",",");
+		$row_array[] = $row['Qty1'];
 		$row_array[] = number_format($row['Price2'],0,".",",");
+		$row_array[] = $row['Qty2'];
 		$row_array[] = $row['Stock'];
 		$row_array[] = $row['PhysicalStock'];
 		array_push($return_arr, $row_array);

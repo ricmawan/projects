@@ -36,6 +36,8 @@
 		$where .= " OR DB.BranchName LIKE '%".$search."%'";
 		$where .= " OR MI.ItemName LIKE '%".$search."%'";
 		$where .= " OR MI.ItemCode LIKE '%".$search."%'";
+		$where .= " OR MID.ItemDetailsCode LIKE '%".$search."%'";
+		$where .= " OR MU.UnitName LIKE '%".$search."%'";
 		$where .= " OR DATE_FORMAT(SM.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
 		$where .= " OR SMD.Quantity LIKE '%".$search."%' )";
 	}
@@ -66,12 +68,14 @@
 		$row_array[] = $row['ItemCode'];
 		$row_array[] = $row['ItemName'];
 		$row_array[] = $row['Quantity'];
+		$row_array[] = $row['UnitName'];
 		$row_array[] = $row['StockMutationID'];
 		$row_array[] = $row['StockMutationDetailsID'];
 		$row_array[] = $row['PlainTransactionDate'];
 		$row_array[] = $row['ItemID'];
 		$row_array[] = $row['SourceID'];
 		$row_array[] = $row['DestinationID'];
+		$row_array[] = $row['UnitID'];
 		array_push($return_arr, $row_array);
 	}
 	

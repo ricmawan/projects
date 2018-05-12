@@ -11,20 +11,23 @@
 		$BranchID = $requestData['BranchID'];
 		//kolom di table
 		$columns = array(
-						0 => "MI.ItemCode", //unorderable
-						1 => "MI.ItemName", //unorderable
-						2 => "MC.CategoryName",
-						3 => "MB.BranchName"
+						0 => "ItemCode", //unorderable
+						1 => "ItemName", //unorderable
+						2 => "UnitName", //unorderable
+						3 => "CategoryName",
+						4 => "BranchName"
 					);
 
 		$where = " 1=1 ";
-		$order_by = "MI.ItemCode";
+		$order_by = "ItemCode";
 		$limit_s = $requestData['start'];
 		$limit_l = $requestData['length'];
 		
 		//Handles Sort querystring sent from Bootgrid
-		$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
-		$order_by .= ", MI.ItemCode ASC";
+		if(ISSET($requestData['order'])) {
+			$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
+			$order_by .= ", ItemCode ASC";
+		}
 		//Handles search querystring sent from Bootgrid
 		if (!empty($requestData['search']['value']))
 		{
@@ -52,11 +55,13 @@
 		while ($row = mysqli_fetch_array($result2)) {
 			$row_array = array();
 			//data yang dikirim ke table
+			$row_array[] = $row['BranchName'];
 			$row_array[] = $row['ItemCode'];
 			$row_array[] = $row['ItemName'];
+			$row_array[] = $row['UnitName'];
 			$row_array[] = $row['CategoryName'];
-			$row_array[] = $row['BranchName'];
 			$row_array[] = $row['Stock'];
+			$row_array[] = $row['PhysicalStock'];
 			array_push($return_arr, $row_array);
 		}
 		

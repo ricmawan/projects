@@ -3,16 +3,17 @@ DROP PROCEDURE IF EXISTS spInsBooking;
 DELIMITER $$
 CREATE PROCEDURE spInsBooking (
 	pID 				BIGINT,
-	pBookingNumber		VARCHAR(100),
+	pBookingNumber			VARCHAR(100),
 	pRetailFlag			BIT,
     pCustomerID			BIGINT,
 	pTransactionDate 	DATETIME,
-	pBookingDetailsID	BIGINT,
+	pBookingDetailsID		BIGINT,
     pBranchID			INT,
     pItemID				BIGINT,
+	pItemDetailsID		BIGINT,
 	pQuantity			DOUBLE,
     pBuyPrice			DOUBLE,
-    pBookingPrice		DOUBLE,
+    pBookingPrice			DOUBLE,
 	pDiscount			DOUBLE,
 	pUserID				BIGINT,
     pCurrentUser		VARCHAR(255)
@@ -53,7 +54,7 @@ SET State = 1;
 
 		IF(pID = 0)	THEN /*Tambah baru*/
 			SELECT
-				CONCAT('B', RIGHT(CONCAT('00', pUserID), 2), DATE_FORMAT(NOW(), '%Y%m'), RIGHT(CONCAT('00000', (IFNULL(MAX(CAST(RIGHT(BookingNumber, 5) AS UNSIGNED)), 0) + 1)), 5))
+				CONCAT(RIGHT(CONCAT('00', pUserID), 2), DATE_FORMAT(NOW(), '%Y%m'), RIGHT(CONCAT('00000', (IFNULL(MAX(CAST(RIGHT(BookingNumber, 5) AS UNSIGNED)), 0) + 1)), 5))
 			FROM
 				transaction_booking TS
 			WHERE
@@ -109,6 +110,7 @@ SET State = 5;
 			(
 				BookingID,
 				ItemID,
+                ItemDetailsID,
 				BranchID,
 				Quantity,
 				BuyPrice,
@@ -121,6 +123,7 @@ SET State = 5;
 			(
 				pID,
 				pItemID,
+				pItemDetailsID,
 				pBranchID,
 				pQuantity,
 				pBuyPrice,
@@ -145,6 +148,7 @@ SET State = 7;
 				transaction_bookingdetails
 			SET
 				ItemID = pItemID,
+                ItemDetailsID = pItemDetailsID,
 				BranchID = pBranchID,
 				Quantity = pQuantity,
 				BuyPrice = pBuyPrice,

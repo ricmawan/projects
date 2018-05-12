@@ -34,10 +34,26 @@ SET State = 1;
 SET @query = CONCAT("SELECT
 						COUNT(1) AS nRows
 					FROM
-						master_item MI
-                        JOIN master_category MC
-							ON MC.CategoryID = MI.CategoryID
-					WHERE ", pWhere);
+						(
+							SELECT
+								1
+							FROM
+								master_item MI
+								JOIN master_category MC
+									ON MC.CategoryID = MI.CategoryID
+							WHERE ", pWhere, "
+                            UNION ALL
+                            SELECT
+								1
+							FROM
+								master_itemdetails MID
+                                JOIN master_item MI
+									ON MI.ItemID = MID.ItemID
+								JOIN master_category MC
+									ON MC.CategoryID = MI.CategoryID
+							WHERE ", pWhere, "
+						)A"
+					);
 						
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
@@ -59,8 +75,8 @@ SET @query = CONCAT("SELECT
                         MI.Qty2,
                         MI.Weight,
                         MI.MinimumStock,
-                        (IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0)) Stock,
-                        (IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(P.Quantity, 0)) PhysicalStock,
+                        ROUND((IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0)), 2) Stock,
+                        ROUND((IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(P.Quantity, 0)), 2) PhysicalStock,
                         MU.UnitName
 					FROM
 						master_item MI
@@ -199,7 +215,7 @@ SET @query = CONCAT("SELECT
 								SMD.ItemID,
 								SMD.SourceID
 						)SMM
-							ON MI.ItemID = SM.ItemID
+							ON MI.ItemID = SMM.ItemID
 							AND SMM.SourceID = MB.BranchID
 						LEFT JOIN
 						(
@@ -289,8 +305,8 @@ SET @query = CONCAT("SELECT
                         MID.Qty2,
                         MID.Weight,
                         MID.MinimumStock,
-                        (IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0)) / MID.ConversionQuantity Stock,
-                        (IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(P.Quantity, 0))  / MID.ConversionQuantity PhysicalStock,
+                        ROUND((IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0)) / MID.ConversionQuantity, 2) Stock,
+                        ROUND((IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(P.Quantity, 0))  / MID.ConversionQuantity, 2) PhysicalStock,
                         MU.UnitName
 					FROM
 						master_itemdetails MID
@@ -431,7 +447,7 @@ SET @query = CONCAT("SELECT
 								SMD.ItemID,
 								SMD.SourceID
 						)SMM
-							ON MI.ItemID = SM.ItemID
+							ON MI.ItemID = SMM.ItemID
 							AND SMM.SourceID = MB.BranchID
 						LEFT JOIN
 						(

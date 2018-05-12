@@ -206,12 +206,14 @@
 								<th>Kode Barang</th>
 								<th>Nama Barang</th>
 								<th>Satuan</th>
-								<th>Harga Beli</th>
-								<th>Harga Ecer</th>
-								<th>Harga Grosir 1</th>
-								<th>Harga Grosir 2</th>
+								<th>H Beli</th>
+								<th>H Ecer</th>
+								<th>H Grosir 1</th>
+								<th>QTY1</th>
+								<th>H Grosir 2</th>
+								<th>QTY2</th>
 								<th>Stok</th>
-								<th>Stok Fisik</th>
+								<th>Fisik</th>
 							</tr>
 						</thead>
 					</table>
@@ -936,6 +938,7 @@
 			
 			function resetForm() {
 				$("#hdnPurchaseReturnID").val(0);
+				$("#hdnPurchaseReturnDetailsID").val(0);
 				$("#hdnItemID").val(0);
 				$("#txtTransactionDate").datepicker("setDate", new Date());
 				$("#txtPurchaseReturnNumber").val("");
@@ -1007,10 +1010,12 @@
 										{ "width": "15%", "orderable": false, className: "dt-head-center" },
 										{ "width": "20%", "orderable": false, className: "dt-head-center" },
 										{ "width": "5%", "orderable": false, className: "dt-head-center" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" }
 									],
@@ -1061,7 +1066,7 @@
 									getItemDetails();
 									$("#itemList-dialog").dialog("destroy");
 									table3.destroy();
-									table.keys.enable();
+									//table.keys.enable();
 									table2.keys.enable();
 								}
 								setTimeout(function() { counterPickItem = 0; } , 1000);
@@ -1075,7 +1080,7 @@
 								getItemDetails();
 								$("#itemList-dialog").dialog("destroy");
 								table3.destroy();
-								table.keys.enable();
+								//table.keys.enable();
 								table2.keys.enable();
 							}
 						});
@@ -1099,7 +1104,7 @@
 					close: function() {
 						$(this).dialog("destroy");
 						table3.destroy();
-						table.keys.enable();
+						//table.keys.enable();
 						table2.keys.enable();
 					},
 					resizable: false,
@@ -1114,7 +1119,7 @@
 						click: function() {
 							$(this).dialog("destroy");
 							table3.destroy();
-							table.keys.enable();
+							//table.keys.enable();
 							table2.keys.enable();
 							return false;
 						}

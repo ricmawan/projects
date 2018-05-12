@@ -19,6 +19,8 @@
 		$Weight = 0;
 		$Stock = 0;
 		$UnitID = 0;
+		$ConversionQty = 0;
+		$StockNoConversion = 0;
 		$AvailableUnit = "";
 		$FailedFlag = 0;
 		$ErrorMessage = "";
@@ -30,7 +32,7 @@
 			$FailedFlag = 1;
 			$ErrorMessage = "Terjadi kesalahan sistem.";
 			logEvent(mysqli_error($dbh), '/Transaction/Sale/CheckItem.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-			echo returnstate($ItemID, $ItemDetailsID, $ItemName, $BuyPrice, $RetailPrice, $Price1, $Qty1, $Price2, $Qty2, $UnitID, $AvailableUnit, $Weight, $Stock, $FailedFlag, $ErrorMessage);
+			echo returnstate($ItemID, $ItemDetailsID, $ItemName, $BuyPrice, $RetailPrice, $Price1, $Qty1, $Price2, $Qty2, $UnitID, $AvailableUnit, $Weight, $Stock, $StockNoConversion, $ConversionQty, $FailedFlag, $ErrorMessage);
 			return 0;
 		}
 		
@@ -46,7 +48,9 @@
 			$Price2 = $row['Price2'];
 			$Qty2 = $row['Qty2'];
 			$Weight = $row['Weight'];
+			$ConversionQty = $row['ConversionQty'];
 			$Stock = $row['Stock'];
+			$StockNoConversion = $row['StockNoConversion'];
 			$UnitID = $row['UnitID'];
 		}
 		else {
@@ -78,10 +82,10 @@
 			mysqli_next_result($dbh);
 		}
 		
-		echo returnstate($ItemID, $ItemDetailsID, $ItemName, $BuyPrice, $RetailPrice, $Price1, $Qty1, $Price2, $Qty2, $UnitID, $AvailableUnit, $Weight, $Stock, $FailedFlag, $ErrorMessage);
+		echo returnstate($ItemID, $ItemDetailsID, $ItemName, $BuyPrice, $RetailPrice, $Price1, $Qty1, $Price2, $Qty2, $UnitID, $AvailableUnit, $Weight, $Stock, $StockNoConversion, $ConversionQty, $FailedFlag, $ErrorMessage);
 	}
 	
-	function returnstate($ItemID, $ItemDetailsID, $ItemName, $BuyPrice, $RetailPrice, $Price1, $Qty1, $Price2, $Qty2, $UnitID, $AvailableUnit, $Weight, $Stock, $FailedFlag, $ErrorMessage) {
+	function returnstate($ItemID, $ItemDetailsID, $ItemName, $BuyPrice, $RetailPrice, $Price1, $Qty1, $Price2, $Qty2, $UnitID, $AvailableUnit, $Weight, $Stock, $StockNoConversion, $ConversionQty, $FailedFlag, $ErrorMessage) {
 		$data = array(
 			"ItemID" => $ItemID, 
 			"ItemName" => $ItemName,
@@ -96,6 +100,8 @@
 			"Stock" => $Stock,
 			"AvailableUnit" => $AvailableUnit,
 			"UnitID" => $UnitID,
+			"ConversionQty" => $ConversionQty,
+			"StockNoConversion" => $StockNoConversion,
 			"FailedFlag" => $FailedFlag,
 			"ErrorMessage" => $ErrorMessage
 		);

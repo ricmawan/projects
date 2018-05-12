@@ -10,8 +10,8 @@
 	$columns = array(
 					0 => "BookingID", //unorderable
 					1 => "RowNumber", //unorderable
-					2 => "TB.BookingNumber",
-					3 => "TB.TransactionDate",
+					2 => "TS.BookingNumber",
+					3 => "TS.TransactionDate",
 					4 => "MC.CustomerName",
 					5 => "TSD.Total"
 				);
@@ -64,6 +64,7 @@
 		$row_array[] = $row['PlainTransactionDate'];
 		$row_array[] = $row['RetailFlag'];
 		$row_array[] = number_format($row['Weight'],2,".",",");
+		$row_array[] = $row['Payment'];
 		array_push($return_arr, $row_array);
 	}
 	

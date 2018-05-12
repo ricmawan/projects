@@ -6,8 +6,8 @@
 	<head>
 		<style>
 			#divTableContent {
-				min-height: 335px;
-				max-height: 335px;
+				min-height: 330px;
+				max-height: 330px;
 				overflow-y: auto;
 			}
 		</style>
@@ -60,83 +60,117 @@
 						<input id="hdnBookingID" name="hdnBookingID" type="hidden" value=0 />
 						<input id="hdnBookingDetailsID" name="hdnBookingDetailsID" type="hidden" value=0 />
 						<input id="hdnItemID" name="hdnItemID" type="hidden" value=0 />
+						<input id="hdnItemDetailsID" name="hdnItemDetailsID" type="hidden" value=0 />
 						<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
+						<input id="hdnAvailableUnit" name="hdnAvailableUnit" type="hidden" />
 						<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
+						<input id="hdnPayment" name="hdnPayment" type="hidden" value=0 />
 					</div>
 					<div class="col-md-2">
-						<input id="txtBookingNumber" name="txtBookingNumber" type="text" tabindex=5 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="No. Invoice" readonly />
+						<input id="txtBookingNumber" name="txtBookingNumber" type="text" class="form-control-custom" placeholder="No. Invoice" readonly />
 					</div>
 					
 					<div class="col-md-1 labelColumn">
 						Tanggal :
 					</div>
 					<div class="col-md-2">
-						<input id="txtTransactionDate" name="txtTransactionDate" type="text" tabindex=6 class="form-control-custom" style="width: 87%; display: inline-block;margin-right: 5px;" onfocus="this.select();" autocomplete=off placeholder="Tanggal" required />
+						<input id="txtTransactionDate" name="txtTransactionDate" type="text" tabindex=6 class="form-control-custom mousetrap" style="width: 87%; display: inline-block;margin-right: 5px;" onfocus="this.select();" autocomplete=off placeholder="Tanggal" required />
 					</div>
 					
 					<div class="col-md-1 labelColumn">
 						Pelanggan :
 					</div>
 					<div class="col-md-2">
-						<select id="ddlCustomer" name="ddlCustomer" tabindex=7 class="form-control-custom" placeholder="Pilih Pelanggan" >
-							<?php
-								$sql = "CALL spSelDDLCustomer('".$_SESSION['UserLogin']."')";
-								if (! $result = mysqli_query($dbh, $sql)) {
-									logEvent(mysqli_error($dbh), '/Master/Booking/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-									return 0;
-								}
-								while($row = mysqli_fetch_array($result)) {
-									echo "<option value='".$row['CustomerID']."' >".$row['CustomerCode']." - ".$row['CustomerName']."</option>";
-								}
-								mysqli_free_result($result);
-								mysqli_next_result($dbh);
-							?>
-						</select>
+						<select id="ddlCustomer" name="ddlCustomer" tabindex=7 class="form-control-custom mousetrap" style="width: 80%; display: inline-block;margin-right: 5px;" placeholder="Pilih Pelanggan" onchange="updateHeader();" >
+								<?php
+									$sql = "CALL spSelDDLCustomer('".$_SESSION['UserLogin']."')";
+									if (! $result = mysqli_query($dbh, $sql)) {
+										logEvent(mysqli_error($dbh), '/Master/Booking/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+										return 0;
+									}
+									while($row = mysqli_fetch_array($result)) {
+										echo "<option value='".$row['CustomerID']."' >".$row['CustomerCode']." - ".$row['CustomerName']."</option>";
+									}
+									mysqli_free_result($result);
+									mysqli_next_result($dbh);
+								?>
+							</select>
+							<i class="fa fa-user-plus" style="font-size: 14px;cursor: pointer;" onclick="addNewCustomer();"></i>
 					</div>
 					<div class="col-md-1">
 						<div id="toggle-retail" class="toggle-modern" ></div>
 						<input type="hidden" id="hdnIsRetail" name="hdnIsRetail" value=1 />
 					</div>
 				</div>
-				<hr style="margin: 10px 0;" />
+				<br />
 				<div class="row">
-					<table class="table table-striped table-hover" style="margin-bottom: 5px;width:80%;" >
-						<thead>
-							<tr>
-								<th style="width: 25%;text-align: center;" >Kode Barang</th>
-								<th style="width: 25%;text-align: center;" >Nama Barang</th>
-								<th style="width: 10%;text-align: center;" >Qty</th>
-								<th style="width: 20%;text-align: center;">Harga Jual</th>
-								<th style="width: 20%;text-align: center;">Diskon</th>
-							</tr>
-						</thead>
+					<table class="table table-striped table-hover" style="margin-bottom: 5px;" >
 						<tbody>
 							<tr>
-								<td style="width: 25%;" ><input id="txtItemCode" name="txtItemCode" type="text" tabindex=8 class="form-control-custom" style="width: 100%;" onfocus="this.select();" onkeypress="isEnterKey(event, 'getItemDetails');" onchange="getItemDetails();" autocomplete=off placeholder="Kode Barang" /></td>
-								<td style="width: 25%;" ><input id="txtItemName" name="txtItemName" type="text" class="form-control-custom" style="width: 100%;" disabled /></td>
-								<td style="width: 10%;" ><input id="txtQTY" name="txtQTY" type="number" tabindex=9 class="form-control-custom" style="width: 100%;" value=1 min=1 onchange="this.value = validateQTY(this.value);Grosir(this.value);" onpaste="return false;" onfocus="this.select();" /></td>
-								<td style="width: 20%;" >
-									<input id="hdnBuyPrice" name="hdnBuyPrice" type="hidden" value=0 />
-									<input id="hdnRetailPrice" name="hdnRetailPrice" type="hidden" value=0 />
-									<input id="hdnPrice1" name="hdnPrice1" type="hidden" value=0 />
-									<input id="hdnQty1" name="hdnQty1" type="hidden" value=0 />
-									<input id="hdnPrice2" name="hdnPrice2" type="hidden" value=0 />
-									<input id="hdnQty2" name="hdnQty2" type="hidden" value=0 />
-									<input id="hdnBranchID" name="hdnBranchID" type="hidden" value=1 />
-									<input id="hdnWeight" name="hdnWeight" type="hidden" value=0 />
-									<input id="txtBookingPrice" name="txtBookingPrice" type="text" tabindex=10 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Jual" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
+								<td style="width: 15%;" >
+									<div class="has-float-label" >
+										<input id="txtItemCode" name="txtItemCode" type="text" tabindex=8 class="form-control-custom mousetrap" style="width: 100%;" onfocus="this.select();" onkeypress="isEnterKey(event, 'getItemDetails');" onchange="getItemDetails();" autocomplete=off />
+										<label for="txtItemCode" class="lblInput" >Kode Barang</label>
+									</div>
 								</td>
-								<td style="width: 20%;" ><input id="txtDiscount" name="txtDiscount" type="text" tabindex=11 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Diskon" onkeypress="isEnterKey(event, 'addBookingDetails');return isNumberKey(event, this.id, this.value);" onchange="addBookingDetails();" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" /></td>
+								<td style="width: 20%;" >
+									<div class="has-float-label" >
+										<input id="txtItemName" name="txtItemName" type="text" class="form-control-custom mousetrap" style="width: 100%;" disabled />
+										<label for="txtItemName" class="lblInput" >Nama Barang</label>
+									</div>
+								</td>
+								<td style="width: 10%;" >
+									<div class="has-float-label" >
+										<input id="txtQTY" name="txtQTY" type="number" tabindex=9 class="form-control-custom mousetrap" style="width: 100%;margin: 0;border: 0;" value=1 min=1 onchange="this.value = validateQTY(this.value);Grosir(this.value);" onpaste="return false;" onfocus="this.select();" />
+										<label for="txtQTY" class="lblInput" >Qty</label>
+									</div>
+								</td>
+								<td style="width: 10%;" >
+									<div class="has-float-label" >
+										<select id="ddlUnit" name="ddlUnit" tabindex=10 class="form-control-custom mousetrap" onchange="changeItemCode();" >
+											<option >--</option>
+										</select>
+										<label for="ddlUnit" class="lblInput" >Satuan</label>
+									</div>
+								</td>
+								<td style="width: 15%;" >
+									<div class="has-float-label" >
+										<input id="hdnBuyPrice" name="hdnBuyPrice" type="hidden" value=0 />
+										<input id="hdnRetailPrice" name="hdnRetailPrice" type="hidden" value=0 />
+										<input id="hdnPrice1" name="hdnPrice1" type="hidden" value=0 />
+										<input id="hdnQty1" name="hdnQty1" type="hidden" value=0 />
+										<input id="hdnPrice2" name="hdnPrice2" type="hidden" value=0 />
+										<input id="hdnQty2" name="hdnQty2" type="hidden" value=0 />
+										<input id="hdnBranchID" name="hdnBranchID" type="hidden" value=1 />
+										<input id="hdnWeight" name="hdnWeight" type="hidden" value=0 />
+										<input id="hdnConversionQty" name="hdnConversionQty" type="hidden" value=0 />
+										<input id="hdnStock" name="hdnStock" type="hidden" value=0 />
+										<input id="txtBookingPrice" name="txtBookingPrice" type="text" tabindex=11 class="form-control-custom text-right mousetrap" value="0" autocomplete=off onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
+										<label for="txtBookingPrice" class="lblInput" >Harga Jual</label>
+									</div>
+								</td>
+								<td style="width: 15%;" >
+									<div class="has-float-label" >
+										<input id="txtDiscount" name="txtDiscount" type="text" tabindex=12 class="form-control-custom text-right mousetrap" value="0" autocomplete=off onkeypress="isEnterKey(event, 'addBookingDetails');return isNumberKey(event, this.id, this.value);" onchange="addBookingDetails();" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
+										<label for="txtDiscount" class="lblInput" >Diskon</label>
+									</div>
+								</td>
+								<td style="width: 15%;" >
+									<div class="has-float-label" >
+										<input id="txtSubTotal" name="txtSubTotal" type="text" class="form-control-custom text-right mousetrap" style="width: 100%;" value="0" autocomplete=off onpaste="return false;" disabled />
+										<label for="txtSubTotal" class="lblInput" >Sub Total</label>
+									</div>
+								</td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
-				<hr style="margin: 10px 0;" />
 				<div class="row" >
 					<div id="divTableContent" class="table-responsive" style="overflow-x:hidden;">
 						<table id="grid-transaction" style="width: 100% !important;" class="table table-striped table-bordered table-hover" >
 							<thead>
 								<tr>
+									<th><input id="select_all" name="select_all" type="checkbox" onclick="chkAll();" style="margin: 0;" /></th>
 									<th>BookingDetailsID</th>
 									<th>ItemID</th>
 									<th>BranchID</th>
@@ -144,6 +178,7 @@
 									<th>Kode Barang</th>
 									<th>Nama Barang</th>
 									<th>Qty</th>
+									<th>Satuan</th>
 									<th>Harga Jual</th>
 									<th>Diskon</th>
 									<th>Sub Total</th>
@@ -153,7 +188,11 @@
 									<th>Price2</th>
 									<th>Qty2</th>
 									<th>Weight</th>
-									<th>Retail Price</th>
+									<th>RetailPrice</th>
+									<th>AvailableUnit</th>
+									<th>UnitID</th>
+									<th>ItemDetailsID</th>
+									<th>ConversionQty</th>
 								</tr>
 							</thead>
 						</table>
@@ -165,7 +204,7 @@
 				</div>
 				<br />
 				<div class="row" >
-					<h5 style="margin-top: 5px !important;margin-bottom: 5px !important;">F10 = Transaksi Selesai; F12 = Daftar Barang; ESC = Tutup; DELETE = Hapus; ENTER/DOUBLE KLIK = Edit;</h5>
+					<h5 style="margin: 5px 0 0 0;">F10 = Transaksi Selesai; F12 = Daftar Barang; ESC = Tutup; DELETE = Hapus; ENTER/DOUBLE KLIK = Edit;</h5>
 				</div>
 			</form>
 		</div>
@@ -180,14 +219,114 @@
 							<tr>
 								<th>Kode Barang</th>
 								<th>Nama Barang</th>
-								<th>Harga Ecer</th>
-								<th>Harga Grosir 1</th>
-								<th>QTY Grosir 1</th>
-								<th>Harga Grosir 2</th>
-								<th>QTY Grosir 2</th>
+								<th>Satuan</th>
+								<th>H Beli</th>
+								<th>H Ecer</th>
+								<th>H Grosir 1</th>
+								<th>QTY1</th>
+								<th>H Grosir 2</th>
+								<th>QTY2</th>
+								<th>Stok</th>
+								<th>Fisik</th>
 							</tr>
 						</thead>
 					</table>
+				</div>
+			</div>
+		</div>
+		<div id="finish-dialog" title="Transaksi Selesai" style="display: none;">
+			<div class="row col-md-12" >
+				<div class="col-md-4 labelColumn">
+					Pembayaran :
+				</div>
+				<div class="col-md-8">
+					<select id="ddlPayment" name="ddlPayment" class="form-control-custom" tabindex=14 >
+						<option value=1 >Tunai</option>
+						<option value=2 >Tempo</option>
+					</select>
+				</div>
+			</div>
+			<br />
+			<div class="row col-md-12" >
+				<div class="col-md-4 labelColumn">
+					Total :
+				</div>
+				<div class="col-md-8">
+					<input id="txtTotal" name="txtTotal" type="text" class="form-control-custom text-right" value="0" autocomplete=off placeholder="Total" readonly />
+				</div>
+			</div>
+			<br />
+			<div class="row col-md-12" >
+				<div class="col-md-4 labelColumn">
+					Bayar :
+				</div>
+				<div class="col-md-8">
+					<input id="txtPayment" name="txtPayment" type="text" tabindex=15 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" onchange="Change();" />
+				</div>
+			</div>
+			<br />
+			<div class="row col-md-12" >
+				<div class="col-md-4 labelColumn">
+					Kembali :
+				</div>
+				<div class="col-md-8">
+					<input id="txtChange" name="txtChange" type="text" class="form-control-custom text-right" value="0" readonly />
+				</div>
+			</div>
+			<br />
+			<div class="row col-md-12" >
+				<label class="checkboxContainer" >Cetak Nota
+					<input type="checkbox" id="chkPrint" name="chkPrint" value=1 tabindex=16 checked />
+					<span class="checkmark"></span>
+				</label>
+			</div>
+			<br />
+			<div class="row col-md-12" >
+				<label class="checkboxContainer">Cetak Surat Pengambilan
+					<input type="checkbox" id="chkPrintShipment" name="chkPrintShipment" value=1 tabindex=17 checked />
+					<span class="checkmark"></span>
+				</label>
+			</div>
+			<br />
+			<button type="button" class="btn btn-primary btn-block" onclick="printInvoice();" tabindex=18 >Selesai</button>
+			<!--<br />
+			<button class="btn btn-danger btn-block" tabindex=16 onclick="printShipment();" >Cetak Surat Jalan</button>-->
+		</div>
+		<div id="divBranch" style="display:none;">
+			<select class="form-control-custom" placeholder="Pilih Cabang" onchange="branchChange(this.value);" >
+				<!--<option value=0 selected >-- Semua Cabang --</option>-->
+				<?php
+					$sql = "CALL spSelDDLBranch('".$_SESSION['UserLogin']."')";
+					if (! $result = mysqli_query($dbh, $sql)) {
+						logEvent(mysqli_error($dbh), '/Report/Booking/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+						return 0;
+					}
+					while($row = mysqli_fetch_array($result)) {
+						echo "<option value='".$row['BranchID']."' >".$row['BranchCode']." - ".$row['BranchName']."</option>";
+					}
+					mysqli_free_result($result);
+					mysqli_next_result($dbh);
+				?>
+			</select>
+			<input type="hidden" id="hdnBranchID" name="hdnBranchID" value=1 />
+		</div>
+		<div id="code-dialog" title="Konfirmasi Kode" style="display: none;">
+			<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Stok barang tidak mencukupi, masukkan kode di bawah jika tetap ingin menambahkan!</p>
+			<div class="row col-md-12" >
+				<div class="col-md-4 labelColumn">
+					Kode :
+				</div>
+				<div class="col-md-8">
+					<label id="lblCode" name="lblCode" ></label>
+				</div>
+			</div>
+			<br />
+			<div class="row col-md-12" >
+				<div class="col-md-4 labelColumn">
+					Masukkan Kode :
+				</div>
+				<div class="col-md-6">
+					<input id="txtCode" name="txtCode" type="number" max="999999" tabindex=60 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Kode" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="this.select();" onpaste="return false;" />
 				</div>
 			</div>
 		</div>
@@ -197,23 +336,50 @@
 			var table3;
 			var today;
 			var rowEdit;
+
+			function changeItemCode() {
+				var itemCode = $("#ddlUnit option:selected").attr("itemcode");
+				$("#txtItemCode").val(itemCode);
+				getItemDetails();
+			}
+
+			function CalculateSubTotal() {
+				var buyPrice = parseFloat($("#txtBookingPrice").val().replace(/\,/g, ""));
+				var QTY = parseFloat($("#txtQTY").val());
+				var SubTotal = buyPrice * QTY;
+				$("#txtSubTotal").val(returnRupiah(SubTotal.toString()));
+			}
 			
 			function openDialogEdit(Data) {
-				$("#hdnBookingDetailsID").val(Data[0]);
-				$("#hdnItemID").val(Data[1]);
-				$("#hdnBranchID").val(Data[2]);
-				$("#txtItemCode").val(Data[4]);
-				$("#txtItemName").val(Data[5]);
-				$("#txtQTY").val(Data[6]);
-				$("#txtBookingPrice").val(Data[7]);
-				$("#txtDiscount").val(Data[8]);
-				$("#hdnBuyPrice").val(Data[10]);
-				$("#hdnPrice1").val(Data[11]);
-				$("#hdnQty1").val(Data[12]);
-				$("#hdnPrice2").val(Data[13]);
-				$("#hdnQty2").val(Data[14]);
-				$("#hdnWeight").val(Data[15]);
-				$("#hdnRetailPrice").val(Data[16]);
+				$("#hdnBookingDetailsID").val(Data[1]);
+				$("#hdnItemID").val(Data[2]);
+				$("#hdnBranchID").val(Data[3]);
+				$("#txtItemCode").val(Data[5]);
+				$("#txtItemName").val(Data[6]);
+				$("#txtQTY").val(Data[7]);
+				$("#txtBookingPrice").val(Data[9]);
+				$("#txtDiscount").val(Data[10]);
+				$("#txtSubTotal").val(Data[11]);
+				$("#hdnBuyPrice").val(Data[12]);
+				$("#hdnPrice1").val(Data[13]);
+				$("#hdnQty1").val(Data[14]);
+				$("#hdnPrice2").val(Data[15]);
+				$("#hdnQty2").val(Data[16]);
+				$("#hdnWeight").val(Data[17]);
+				$("#hdnRetailPrice").val(Data[18]);
+
+				$("#hdnAvailableUnit").val(Data[19]);
+				$("#hdnItemDetailsID").val(Data[21]);
+				$("#hdnConversionQty").val(Data[22]);
+
+				var availableUnit = JSON.parse(Data[19]);
+				if(availableUnit.length > 0) {
+					$("#ddlUnit").find('option').remove();
+					for(var i=0;i<availableUnit.length;i++) {
+						$("#ddlUnit").append("<option value=" + availableUnit[i][0] + " itemdetailsid='" + availableUnit[i][2] + "' itemcode='" + availableUnit[i][3] + "' buyprice='" + availableUnit[i][4] + "' retailprice='" + availableUnit[i][5] + "' price1='" + availableUnit[i][6] + "' price2='" + availableUnit[i][7] + "' qty1='" + availableUnit[i][8] + "'  qty2='" + availableUnit[i][9] + "' >" + availableUnit[i][1] + "</option>");
+					}
+				}
+				$("#ddlUnit").val(Data[20]);
 
 				setTimeout(function() { $("#txtItemCode").focus(); }, 0);
 			}
@@ -221,13 +387,13 @@
 			function openDialog(Data, EditFlag) {
 				$("#hdnIsEdit").val(EditFlag);
 				if(EditFlag == 1) {
-					$("#toggle-retail").toggleClass('disabled', true);
+					//$("#toggle-retail").toggleClass('disabled', true);
 					if(Data[9] == 1) {
-						$("#FormData").attr("title", "Edit Penjualan Eceran");
+						$("#FormData").attr("title", "Edit Pemesanan Eceran");
 						$('#toggle-retail').toggles(true);
 					}
 					else {
-						$("#FormData").attr("title", "Edit Penjualan Grosir");
+						$("#FormData").attr("title", "Edit Pemesanan Grosir");
 						$('#toggle-retail').toggles(false);
 					}
 					$("#hdnBookingID").val(Data[6]);
@@ -237,8 +403,9 @@
 					$("#txtTransactionDate").datepicker("setDate", new Date(Data[8]));
 					getBookingDetails(Data[6]);
 					$("#lblWeight").html(Data[10]);
+					$("#hdnPayment").val(Data[11]);
 				}
-				else $("#FormData").attr("title", "Tambah Penjualan Eceran");
+				else $("#FormData").attr("title", "Tambah Pemesanan Eceran");
 				var index = table.cell({ focused: true }).index();
 				$("#FormData").dialog({
 					autoOpen: false,
@@ -247,23 +414,29 @@
 						table.keys.disable();
 						table2 = $("#grid-transaction").DataTable({
 									"keys": true,
-									"scrollY": "290px",
+									"scrollY": "280px",
 									"scrollX": false,
 									"scrollCollapse": false,
 									"paging": false,
 									"searching": false,
 									"order": [],
 									"columns": [
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-center" },
 										{ "visible": false },
 										{ "visible": false },
 										{ "visible": false },
-										{ "width": "15%", "orderable": false, className: "dt-head-center dt-body-center" },
+										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-center" },
+										{ "width": "15%", "orderable": false, className: "dt-head-center" },
 										{ "width": "20%", "orderable": false, className: "dt-head-center" },
-										{ "width": "25%", "orderable": false, className: "dt-head-center" },
+										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "10%", "orderable": false, className: "dt-head-center" },
 										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "visible": false },
+										{ "visible": false },
+										{ "visible": false },
+										{ "visible": false },
 										{ "visible": false },
 										{ "visible": false },
 										{ "visible": false },
@@ -298,7 +471,7 @@
 								counterBookingDetails = 1;
 								var data = datatable.row( cell.index().row ).data();
 								if(key == 13) {
-									if(($("#FormEdit").css("display") == "none" || $("#delete-confirm").css("display") == "none") && $("#hdnEditFlag").val() == "1" ) {
+									if(($("#delete-confirm").css("display") == "none") && $("#hdnEditFlag").val() == "1" ) {
 										table2.cell.blur();
 										table2.keys.disable();
 										rowEdit = datatable.row( cell.index().row );
@@ -308,7 +481,7 @@
 								else if(key == 46 && $("#hdnDeleteFlag").val() == "1") {
 									table2.keys.disable();
 									var deletedData = new Array();
-									deletedData.push(data[0]);
+									deletedData.push(data[1]);
 									SingleDelete("./Transaction/Booking/DeleteDetails.php", deletedData, function(action) {
 										if(action == "success") {
 											datatable.row( cell.index().row ).remove().draw();
@@ -357,13 +530,13 @@
 						table2.destroy();
 					},
 					resizable: false,
-					height: 660,
+					height: 600,
 					width: 1280,
 					modal: false,
 					buttons: [
 					{
 						text: "Tutup",
-						tabindex: 12,
+						tabindex: 14,
 						id: "btnCancelAddBooking",
 						click: function() {
 							$(this).dialog("destroy");
@@ -379,7 +552,7 @@
 					}]
 				}).dialog("open");
 			}
-			
+
 			var counterGetItem = 0;
 			function getItemDetails() {
 				if(counterGetItem == 0) {
@@ -390,11 +563,29 @@
 						$.ajax({
 							url: "./Transaction/Booking/CheckItem.php",
 							type: "POST",
-							data: { itemCode : itemCode },
+							data: { itemCode : itemCode, branchID : $("#hdnBranchID").val() },
 							dataType: "json",
 							success: function(data) {
 								if(data.FailedFlag == '0') {
-									if($("#hdnItemID").val() != data.ItemID) {
+									//if($("#hdnItemID").val() != data.ItemID) {
+										if($("#hdnBookingDetailsID").val() != 0) {
+											var itemDetailsTemp = table2.row( rowEdit ).data()[21];
+											if(itemDetailsTemp == "") itemDetailsTemp = null;
+										}
+
+										if($("#hdnBookingDetailsID").val() != 0 && itemDetailsTemp === data.ItemDetailsID && table2.row( rowEdit ).data()[2] == data.ItemID) {
+											$("#hdnStock").val((parseFloat(data.Stock) + parseFloat(table2.row( rowEdit ).data()[7])).toFixed(2));
+											//console.log("mlebu 1");
+										}
+										else if($("#hdnBookingDetailsID").val() != 0 && itemDetailsTemp !== data.ItemDetailsID && table2.row( rowEdit ).data()[2] == data.ItemID) {
+											var baseQTY = parseFloat(table2.row( rowEdit ).data()[22]) * parseFloat(table2.row( rowEdit ).data()[7]);
+											$("#hdnStock").val((parseFloat(data.Stock) + (baseQTY / parseFloat(data.ConversionQty)) ).toFixed(2));
+											//console.log("mlebu 2");
+										}
+										else {
+											$("#hdnStock").val(parseFloat(data.Stock));
+											//console.log("mlebu 3");
+										}
 										$("#hdnItemID").val(data.ItemID);
 										$("#txtItemName").val(data.ItemName);
 										$("#txtBookingPrice").val(returnRupiah(data.RetailPrice));
@@ -406,8 +597,20 @@
 										$("#hdnQty2").val(data.Qty2);
 										$("#hdnWeight").val(data.Weight);
 										$("#txtQTY").focus();
-									}
-									else $("#txtQTY").focus();
+										$("#txtSubTotal").val(returnRupiah(data.RetailPrice));
+										$("#hdnAvailableUnit").val(JSON.stringify(data.AvailableUnit));
+										$("#hdnItemDetailsID").val(data.ItemDetailsID);
+										if(data.AvailableUnit.length > 0) {
+											$("#ddlUnit").find('option').remove();
+											for(var i=0;i<data.AvailableUnit.length;i++) {
+												$("#ddlUnit").append("<option value=" + data.AvailableUnit[i][0] + " itemdetailsid='" + data.AvailableUnit[i][2] + "' itemcode='" + data.AvailableUnit[i][3] + "' buyprice='" + data.AvailableUnit[i][4] + "' retailprice='" + data.AvailableUnit[i][5] + "' price1='" + data.AvailableUnit[i][6] + "' price2='" + data.AvailableUnit[i][7] + "' qty1='" + data.AvailableUnit[i][8] + "' qty2='" + data.AvailableUnit[i][9] + "' >" + data.AvailableUnit[i][1] + "</option>");
+											}
+										}
+										$("#ddlUnit").val(data.UnitID);
+										Grosir($("#txtQTY").val());
+										CalculateSubTotal();
+									//}
+									//else $("#txtQTY").focus();
 								}
 								else {
 									//add new item
@@ -533,7 +736,7 @@
 							tableWidthAdjust();
 							
 							for(var i=0;i<Data.data.length;i++) {
-								$("#toggle-branch-" + Data.data[i][0]).toggles({
+								$("#toggle-branch-" + Data.data[i][1]).toggles({
 									drag: true, // allow dragging the toggle between positions
 									click: true, // allow clicking on the toggle
 									text: {
@@ -550,8 +753,8 @@
 									type: 'compact' // if this is set to 'select' then the select style toggle will be used
 								});
 								
-								if(Data.data[i][2] == 1) $("#toggle-branch-" + Data.data[i][0]).toggles(true);
-								else $("#toggle-branch-" + Data.data[i][0]).toggles(false);
+								if(Data.data[i][3] == 1) $("#toggle-branch-" + Data.data[i][1]).toggles(true);
+								else $("#toggle-branch-" + Data.data[i][1]).toggles(false);
 										
 							}
 						}
@@ -586,6 +789,256 @@
 					}
 				});
 			}
+
+			function promptCode() {
+				var code = Math.floor(100000 + Math.random() * 900000);
+				$("#lblCode").html(code);
+				$("#code-dialog").dialog({
+					autoOpen: false,
+					open: function() {
+						$("#divModal").show();
+						$(document).on('keydown', function(e) {
+							if (e.keyCode == 39 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //right arrow
+								$("#btnCancelPromptCode").focus();
+							}
+							else if(e.keyCode == 37 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //left arrow
+								$("#btnPromptCode").focus();
+							}
+						});
+					},
+					
+					close: function() {
+						$(this).dialog("destroy");
+						$("#divModal").hide();
+						$("#txtItemCode").focus();
+					},
+					resizable: false,
+					height: 250,
+					width: 450,
+					modal: false,
+					buttons: [
+					{
+						text: "Konfirmasi Kode",
+						id: "btnPromptCode",
+						tabindex: 61,
+						click: function() {
+							var txtCode = $("#txtCode").val();
+							if(txtCode == code) {
+								$(this).dialog("destroy");
+								$("#divModal").hide();
+								$("#txtCode").val("");
+								var itemID = $("#hdnItemID").val();
+								var itemCode = $("#txtItemCode").val();
+								var itemName = $("#txtItemName").val();
+								var unitID = $("#ddlUnit").val();
+								var unitName = $("#ddlUnit option:selected").text();
+								var Qty = $("#txtQTY").val();
+								var bookingPrice = $("#txtBookingPrice").val();
+								var buyPrice = $("#hdnBuyPrice").val();
+								var price1 = $("#hdnPrice1").val();
+								var qty1 = $("#hdnQty1").val();
+								var price2 = $("#hdnPrice2").val();
+								var qty2 = $("#hdnQty2").val();
+								var discount = $("#txtDiscount").val();
+								var branchID = $("#hdnBranchID").val();
+								var weight = $("#hdnWeight").val();
+								var retailPrice = $("#hdnRetailPrice").val();
+								var availableUnit = $("#hdnAvailableUnit").val();
+								var unitID = $("#ddlUnit").val();
+								var itemDetailsID = $("#hdnItemDetailsID").val();
+								$("#txtDiscount").blur();
+								var PassValidate = 1;
+								var FirstFocus = 0;
+								var ConversionQty = $("#hdnConversionQty").val();
+								var Stock = $("#hdnStock").val();
+								$.ajax({
+									url: "./Transaction/Booking/Insert.php",
+									type: "POST",
+									data: $("#PostForm").serialize(),
+									dataType: "json",
+									success: function(data) {
+										if(data.FailedFlag == '0') {
+											if($("#hdnBookingDetailsID").val() == 0) {
+												//$("#toggle-retail").toggleClass('disabled', true);
+												$("#txtBookingNumber").val(data.BookingNumber);
+												var toggleBranch = "<div id='toggle-branch-" + data.BookingDetailsID + "' onclick='updateBranch(this.id)' class='div-center toggle-modern' ></div>";
+												var checkboxData = "<input type='checkbox' name='select' value='" + data.BookingDetailsID + "' style='margin:0;' />"
+												table2.row.add([
+													checkboxData,
+													data.BookingDetailsID,
+													itemID,
+													branchID,
+													toggleBranch,
+													itemCode,
+													itemName,
+													Qty,
+													unitName,
+													bookingPrice,
+													returnRupiah(discount.toString()),
+													returnRupiah((parseFloat(bookingPrice.replace(/\,/g, "")) * parseFloat(Qty) - parseFloat(discount)).toString()),
+													buyPrice,
+													price1,
+													qty1,
+													price2,
+													qty2,
+													weight,
+													retailPrice,
+													availableUnit,
+													unitID,
+													itemDetailsID,
+													ConversionQty
+												]).draw();
+												
+												$("#toggle-branch-" + data.BookingDetailsID).toggles({
+													drag: true, // allow dragging the toggle between positions
+													click: true, // allow clicking on the toggle
+													text: {
+														on: 'Toko', // text for the ON position
+														off: 'Gudang' // and off
+													},
+													on: true, // is the toggle ON on init
+													animate: 250, // animation time (ms)
+													easing: 'swing', // animation transition easing function
+													checkbox: null, // the checkbox to toggle (for use in forms)
+													clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
+													width: 80, // width used if not set in css
+													height: 18, // height if not set in css
+													type: 'compact' // if this is set to 'select' then the select style toggle will be used
+												});
+												if($("#hdnBranchID").val() == 1) {
+													$("#toggle-branch-" + data.BookingDetailsID).toggles(true);
+												}
+												else {
+													$("#toggle-branch-" + data.BookingDetailsID).toggles(false);
+												}
+											}
+											else {
+												var toggles = $('#toggle-branch-' + data.BookingDetailsID).data('toggles').active;
+												var checkboxData = "<input type='checkbox' name='select' value='" + data.BookingDetailsID + "' style='margin:0;' />"
+												table2.row(rowEdit).data([
+													checkboxData,
+													data.BookingDetailsID,
+													itemID,
+													branchID,
+													table2.row( rowEdit ).data()[4],
+													itemCode,
+													itemName,
+													Qty,
+													unitName,
+													bookingPrice,
+													returnRupiah(discount.toString()),
+													returnRupiah((parseFloat(bookingPrice.replace(/\,/g, "")) * parseFloat(Qty) - parseFloat(discount)).toString()),
+													buyPrice,
+													price1,
+													qty1,
+													price2,
+													qty2,
+													weight,
+													retailPrice,
+													availableUnit,
+													unitID,
+													itemDetailsID,
+													ConversionQty
+												]).draw();
+												
+												$("#toggle-branch-" + data.BookingDetailsID).toggles({
+													drag: true, // allow dragging the toggle between positions
+													click: true, // allow clicking on the toggle
+													text: {
+														on: 'Toko', // text for the ON position
+														off: 'Gudang' // and off
+													},
+													on: true, // is the toggle ON on init
+													animate: 250, // animation time (ms)
+													easing: 'swing', // animation transition easing function
+													checkbox: null, // the checkbox to toggle (for use in forms)
+													clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
+													width: 80, // width used if not set in css
+													height: 18, // height if not set in css
+													type: 'compact' // if this is set to 'select' then the select style toggle will be used
+												});
+												
+												$("#toggle-branch-" + data.BookingDetailsID).toggles(toggles);
+												
+												table2.keys.enable();
+											}
+											$("#txtItemCode").val("");
+											$("#txtItemName").val("");
+											$("#txtQTY").val(1);
+											$("#txtBookingPrice").val(0);
+											$("#txtDiscount").val(0);
+											$("#hdnBuyPrice").val(0);
+											$("#hdnPrice1").val(0);
+											$("#hdnQty1").val(0);
+											$("#hdnPrice2").val(0);
+											$("#hdnQty2").val(0);
+											$("#hdnBranchID").val(1);
+											$("#txtItemCode").focus();
+											$("#hdnBookingID").val(data.ID);
+											$("#hdnBookingDetailsID").val(0);
+											$("#hdnItemID").val(0);
+											$("#hdnWeight").val(0);
+											$("#hdnRetailPrice").val(0);
+											$("#txtSubTotal").val(0);
+											$("#hdnStock").val(0);
+											$("#ddlUnit").find('option').remove();
+											$("#ddlUnit").append("<option>--</option>");
+											$("#hdnAvailableUnit").val("");
+											$("#hdnItemDetailsID").val(0);
+											$("#hdnConversionQty").val(0);
+											tableWidthAdjust();
+											Calculate();
+										}
+										else {
+											var counter = 0;
+											Lobibox.alert("error",
+											{
+												msg: data.Message,
+												width: 480,
+												beforeClose: function() {
+													if(counter == 0) {
+														setTimeout(function() {
+															if(data.Message == "No. Invoice sudah ada") $("#txtBookingNumber").focus();
+															else $("#txtItemCode").focus();
+														}, 0);
+														counter = 1;
+													}
+												}
+											});
+											return 0;
+										}
+									},
+									error: function(jqXHR, textStatus, errorThrown) {
+										$("#divModal").hide();
+										var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+										LogEvent(errorMessage, "/Transaction/Booking/index.php");
+										Lobibox.alert("error",
+										{
+											msg: errorMessage,
+											width: 480
+										});
+										return 0;
+									}
+								});
+							}
+							else {
+								$("#txtCode").notify("Kode salah!", { position:"right", className:"warn", autoHideDelay: 2000 });
+								$("#txtCode").focus();
+							}
+						}
+					},
+					{
+						text: "Batal",
+						id: "btnCancelPromptCode",
+						click: function() {
+							$(this).dialog("destroy");
+							$("#divModal").hide();
+							$("#txtItemCode").focus();
+							return false;
+						}
+					}]
+				}).dialog("open");
+			}
 			
 			var counterAddBooking = 0;
 			function addBookingDetails() {
@@ -594,8 +1047,10 @@
 					var itemID = $("#hdnItemID").val();
 					var itemCode = $("#txtItemCode").val();
 					var itemName = $("#txtItemName").val();
-					var Qty = $("#txtQTY").val();
-					var salePrice = $("#txtBookingPrice").val();
+					var unitID = $("#ddlUnit").val();
+					var unitName = $("#ddlUnit option:selected").text();
+					var Qty = parseFloat($("#txtQTY").val());
+					var bookingPrice = $("#txtBookingPrice").val();
 					var buyPrice = $("#hdnBuyPrice").val();
 					var price1 = $("#hdnPrice1").val();
 					var qty1 = $("#hdnQty1").val();
@@ -604,10 +1059,15 @@
 					var discount = $("#txtDiscount").val();
 					var branchID = $("#hdnBranchID").val();
 					var weight = $("#hdnWeight").val();
-					var retailPrice = $("#hdnRetailPrice").val()
+					var retailPrice = $("#hdnRetailPrice").val();
+					var availableUnit = $("#hdnAvailableUnit").val();
+					var unitID = $("#ddlUnit").val();
+					var itemDetailsID = $("#hdnItemDetailsID").val();
 					$("#txtDiscount").blur();
 					var PassValidate = 1;
 					var FirstFocus = 0;
+					var Stock = parseFloat($("#hdnStock").val());
+					var ConversionQty = $("#hdnConversionQty").val();
 					$("#FormData .form-control-custom").each(function() {
 						if($(this).hasAttr('required')) {
 							if($(this).val() == "") {
@@ -618,6 +1078,13 @@
 							}
 						}
 					});
+
+					if($("#ddlCustomer").val() == "" || !$("#ddlCustomer").val()) {
+						PassValidate = 0;
+						$("#ddlCustomer").notify("Harus diisi!", { position:"right", className:"warn", autoHideDelay: 2000 });
+						if(FirstFocus == 0) $("#ddlCustomer").focus();
+						FirstFocus = 1;
+					}
 					
 					if($("#hdnItemID").val() == 0) {
 						PassValidate = 0;
@@ -626,149 +1093,211 @@
 					}
 					
 					if(PassValidate == 1) {
-						$.ajax({
-							url: "./Transaction/Booking/Insert.php",
-							type: "POST",
-							data: $("#PostForm").serialize(),
-							dataType: "json",
-							success: function(data) {
-								if(data.FailedFlag == '0') {
-									if($("#hdnBookingDetailsID").val() == 0) {
-										$("#toggle-retail").toggleClass('disabled', true);
-										$("#txtBookingNumber").val(data.BookingNumber);
-										var toggleBranch = "<div id='toggle-branch-" + data.BookingDetailsID + "' onclick='updateBranch(this.id)' class='div-center toggle-modern' ></div>";
-										table2.row.add([
-											data.BookingDetailsID,
-											itemID,
-											branchID,
-											toggleBranch,
-											itemCode,
-											itemName,
-											Qty,
-											salePrice,
-											discount,
-											returnRupiah((parseFloat(salePrice.replace(/\,/g, "")) * parseFloat(Qty) - parseFloat(discount)).toString()),
-											buyPrice,
-											price1,
-											qty1,
-											price2,
-											qty2,
-											weight,
-											retailPrice
-										]).draw();
-										
-										$("#toggle-branch-" + data.BookingDetailsID).toggles({
-											drag: true, // allow dragging the toggle between positions
-											click: true, // allow clicking on the toggle
-											text: {
-												on: 'Toko', // text for the ON position
-												off: 'Gudang' // and off
-											},
-											on: true, // is the toggle ON on init
-											animate: 250, // animation time (ms)
-											easing: 'swing', // animation transition easing function
-											checkbox: null, // the checkbox to toggle (for use in forms)
-											clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
-											width: 80, // width used if not set in css
-											height: 18, // height if not set in css
-											type: 'compact' // if this is set to 'select' then the select style toggle will be used
-										});
+						if((Stock - Qty) < 0) {
+							promptCode();
+						}
+						else {
+							$.ajax({
+								url: "./Transaction/Booking/Insert.php",
+								type: "POST",
+								data: $("#PostForm").serialize(),
+								dataType: "json",
+								success: function(data) {
+									if(data.FailedFlag == '0') {
+										if($("#hdnBookingDetailsID").val() == 0) {
+											//$("#toggle-retail").toggleClass('disabled', true);
+											$("#txtBookingNumber").val(data.BookingNumber);
+											var toggleBranch = "<div id='toggle-branch-" + data.BookingDetailsID + "' onclick='updateBranch(this.id)' class='div-center toggle-modern' ></div>";
+											var checkboxData = "<input type='checkbox' name='select' value='" + data.BookingDetailsID + "' style='margin:0;' />"
+											table2.row.add([
+												checkboxData,
+												data.BookingDetailsID,
+												itemID,
+												branchID,
+												toggleBranch,
+												itemCode,
+												itemName,
+												Qty,
+												unitName,
+												bookingPrice,
+												returnRupiah(discount.toString()),
+												returnRupiah((parseFloat(bookingPrice.replace(/\,/g, "")) * parseFloat(Qty) - parseFloat(discount)).toString()),
+												buyPrice,
+												price1,
+												qty1,
+												price2,
+												qty2,
+												weight,
+												retailPrice,
+												availableUnit,
+												unitID,
+												itemDetailsID,
+												ConversionQty
+											]).draw();
+											
+											$("#toggle-branch-" + data.BookingDetailsID).toggles({
+												drag: true, // allow dragging the toggle between positions
+												click: true, // allow clicking on the toggle
+												text: {
+													on: 'Toko', // text for the ON position
+													off: 'Gudang' // and off
+												},
+												on: true, // is the toggle ON on init
+												animate: 250, // animation time (ms)
+												easing: 'swing', // animation transition easing function
+												checkbox: null, // the checkbox to toggle (for use in forms)
+												clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
+												width: 80, // width used if not set in css
+												height: 18, // height if not set in css
+												type: 'compact' // if this is set to 'select' then the select style toggle will be used
+											});
+										}
+										else {
+											var toggles = $('#toggle-branch-' + data.BookingDetailsID).data('toggles').active;
+											var checkboxData = "<input type='checkbox' name='select' value='" + data.BookingDetailsID + "' style='margin:0;' />"
+											table2.row(rowEdit).data([
+												checkboxData,
+												data.BookingDetailsID,
+												itemID,
+												branchID,
+												table2.row( rowEdit ).data()[4],
+												itemCode,
+												itemName,
+												Qty,
+												unitName,
+												bookingPrice,
+												returnRupiah(discount.toString()),
+												returnRupiah((parseFloat(bookingPrice.replace(/\,/g, "")) * parseFloat(Qty) - parseFloat(discount)).toString()),
+												buyPrice,
+												price1,
+												qty1,
+												price2,
+												qty2,
+												weight,
+												retailPrice,
+												availableUnit,
+												unitID,
+												itemDetailsID,
+												ConversionQty
+											]).draw();
+											
+											$("#toggle-branch-" + data.BookingDetailsID).toggles({
+												drag: true, // allow dragging the toggle between positions
+												click: true, // allow clicking on the toggle
+												text: {
+													on: 'Toko', // text for the ON position
+													off: 'Gudang' // and off
+												},
+												on: true, // is the toggle ON on init
+												animate: 250, // animation time (ms)
+												easing: 'swing', // animation transition easing function
+												checkbox: null, // the checkbox to toggle (for use in forms)
+												clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
+												width: 80, // width used if not set in css
+												height: 18, // height if not set in css
+												type: 'compact' // if this is set to 'select' then the select style toggle will be used
+											});
+											
+											$("#toggle-branch-" + data.BookingDetailsID).toggles(toggles);
+											
+											table2.keys.enable();
+										}
+										$("#txtItemCode").val("");
+										$("#txtItemName").val("");
+										$("#txtQTY").val(1);
+										$("#txtBookingPrice").val(0);
+										$("#txtDiscount").val(0);
+										$("#hdnBuyPrice").val(0);
+										$("#hdnPrice1").val(0);
+										$("#hdnQty1").val(0);
+										$("#hdnPrice2").val(0);
+										$("#hdnQty2").val(0);
+										$("#hdnBranchID").val(1);
+										$("#txtItemCode").focus();
+										$("#hdnBookingID").val(data.ID);
+										$("#hdnBookingDetailsID").val(0);
+										$("#hdnItemID").val(0);
+										$("#hdnWeight").val(0);
+										$("#hdnRetailPrice").val(0);
+										$("#txtSubTotal").val(0);
+										$("#hdnStock").val(0);
+										$("#ddlUnit").find('option').remove();
+										$("#ddlUnit").append("<option>--</option>");
+										$("#hdnAvailableUnit").val("");
+										$("#hdnItemDetailsID").val(0);
+										$("#hdnConversionQty").val(0);
+										tableWidthAdjust();
+										Calculate();
 									}
 									else {
-										var toggles = $('#toggle-branch-' + data.BookingDetailsID).data('toggles').active;
-										table2.row(rowEdit).data([
-											data.BookingDetailsID,
-											itemID,
-											branchID,
-											table2.row( rowEdit ).data()[3],
-											itemCode,
-											itemName,
-											Qty,
-											salePrice,
-											discount,
-											returnRupiah((parseFloat(salePrice.replace(/\,/g, "")) * parseFloat(Qty) - parseFloat(discount)).toString()),
-											buyPrice,
-											price1,
-											qty1,
-											price2,
-											qty2,
-											weight,
-											retailPrice
-										]).draw();
-										
-										$("#toggle-branch-" + data.BookingDetailsID).toggles({
-											drag: true, // allow dragging the toggle between positions
-											click: true, // allow clicking on the toggle
-											text: {
-												on: 'Toko', // text for the ON position
-												off: 'Gudang' // and off
-											},
-											on: true, // is the toggle ON on init
-											animate: 250, // animation time (ms)
-											easing: 'swing', // animation transition easing function
-											checkbox: null, // the checkbox to toggle (for use in forms)
-											clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
-											width: 80, // width used if not set in css
-											height: 18, // height if not set in css
-											type: 'compact' // if this is set to 'select' then the select style toggle will be used
+										var counter = 0;
+										Lobibox.alert("error",
+										{
+											msg: data.Message,
+											width: 480,
+											beforeClose: function() {
+												if(counter == 0) {
+													setTimeout(function() {
+														if(data.Message == "No. Invoice sudah ada") $("#txtBookingNumber").focus();
+														else $("#txtItemCode").focus();
+													}, 0);
+													counter = 1;
+												}
+											}
 										});
-										
-										$("#toggle-branch-" + data.BookingDetailsID).toggles(toggles);
-										
-										table2.keys.enable();
+										return 0;
 									}
-									$("#txtItemCode").val("");
-									$("#txtItemName").val("");
-									$("#txtQTY").val(1);
-									$("#txtBookingPrice").val(0);
-									$("#hdnBuyPrice").val(0);
-									$("#hdnPrice1").val(0);
-									$("#hdnQty1").val(0);
-									$("#hdnPrice2").val(0);
-									$("#hdnQty2").val(0);
-									$("#txtItemCode").focus();
-									$("#hdnBookingID").val(data.ID);
-									$("#hdnBookingDetailsID").val(0);
-									$("#hdnItemID").val(0);
-									$("#hdnWeight").val(0);
-									$("#hdnRetailPrice").val(0);
-									tableWidthAdjust();
-									Calculate();
-								}
-								else {
-									var counter = 0;
+								},
+								error: function(jqXHR, textStatus, errorThrown) {
+									$("#loading").hide();
+									var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+									LogEvent(errorMessage, "/Transaction/Booking/index.php");
 									Lobibox.alert("error",
 									{
-										msg: data.Message,
-										width: 480,
-										beforeClose: function() {
-											if(counter == 0) {
-												setTimeout(function() {
-													if(data.Message == "No. Invoice sudah ada") $("#txtBookingNumber").focus();
-													else $("#txtItemCode").focus();
-												}, 0);
-												counter = 1;
-											}
-										}
+										msg: errorMessage,
+										width: 480
 									});
 									return 0;
 								}
-							},
-							error: function(jqXHR, textStatus, errorThrown) {
-								$("#loading").hide();
-								var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-								LogEvent(errorMessage, "/Transaction/Booking/index.php");
-								Lobibox.alert("error",
-								{
-									msg: errorMessage,
-									width: 480
-								});
-								return 0;
-							}
-						});
+							});
+						}
 					}
 				}
 				setTimeout(function() { counterAddBooking = 0; }, 1000);
+			}
+
+			function updateHeader() {
+				if($("#hdnBookingID").val() != 0) {
+					var BookingID = $("#hdnBookingID").val();
+					var TransactionDate = $("#hdnTransactionDate").val();
+					var CustomerID = $("#ddlCustomer").val();
+					$.ajax({
+						url: "./Transaction/Booking/UpdateHeader.php",
+						type: "POST",
+						data: { BookingID : BookingID, TransactionDate : TransactionDate, CustomerID : CustomerID },
+						dataType: "json",
+						success: function(data) {
+							$("#loading").hide();
+							if(data.FailedFlag == '0') {
+								
+							}
+							else {
+								
+							}
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+							$("#loading").hide();
+							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+							LogEvent(errorMessage, "/Transaction/Purchase/index.php");
+							Lobibox.alert("error",
+							{
+								msg: errorMessage,
+								width: 480
+							});
+							return 0;
+						}
+					});
+				}
 			}
 			
 			function updateBranch(BookingDetailsID) {
@@ -821,7 +1350,7 @@
 					title: 'Tambah Barang',
 					url: 'Master/Item/PopUpAddItem.php',
 					width: 780,
-					height: 460,
+					height: 540,
 					buttons: {
 						Simpan: {
 							'class': 'ui-button ui-corner-all ui-widget',
@@ -839,7 +1368,7 @@
 							if($("#hdnPermission").length == 0) {
 								$("#txtItemNameAdd").focus();
 								$("#txtItemCodeAdd").val(itemCode);
-								$("#btnSimpan").attr("tabindex", 27);
+								$("#btnSimpan").attr("tabindex", 28);
 								$(document).on('keydown', function(e) {
 									if (e.keyCode == 39 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //right arrow
 										$("#btnBatal").focus();
@@ -861,6 +1390,7 @@
 						if (type === 'Simpan'){
 							var PassValidate = 1;
 							var FirstFocus = 0;
+							
 							$("#FormItem .form-control-custom").each(function() {
 								if($(this).hasAttr('required')) {
 									if($(this).val() == "") {
@@ -871,6 +1401,60 @@
 									}
 								}
 							});
+
+							if($("#ddlCategoryAdd").val() == "") {
+								PassValidate = 0;
+								$("#ddlCategoryAdd").next().find("input").notify("Harus diisi!", { position:"right", className:"warn", autoHideDelay: 2000 });
+								if(FirstFocus == 0) $("#ddlCategoryAdd").next().find("input").focus();
+								FirstFocus = 1;
+							}
+
+							if($("#hdnTabsCounter").val() > 0) {
+								for(var j=1;j<=$("#hdnTabsCounter").val();j++) {
+									if($("#ddlUnitAdd").val() == $("#ddlUnit_" + j).val()) {
+										PassValidate = 0;
+										if(FirstFocus == 0) {
+											tabs.tabs("option", "active", j);
+											$("#ddlUnit_" + j).notify("Tidak boleh sama!", { position:"right", className:"warn", autoHideDelay: 2000 });
+											$("#ddlUnit_" + j).focus();
+											FirstFocus = 1;
+										}
+									}
+									else if($("#txtItemCodeAdd").val() == $("#txtItemCode_" + j).val()) {
+										PassValidate = 0;
+										if(FirstFocus == 0) {
+											tabs.tabs("option", "active", j);
+											$("#txtItemCode_" + j).notify("Tidak boleh sama!", { position:"right", className:"warn", autoHideDelay: 2000 });
+											$("#txtItemCode_" + j).focus();
+											FirstFocus = 1;
+										}
+									}
+								}
+
+								for(var i=1;i<=$("#hdnTabsCounter").val();i++) {
+									for(var j=i+1;j<=$("#hdnTabsCounter").val();j++) {
+										if($("#ddlUnit_" + i).val() == $("#ddlUnit_" + j).val()) {
+											PassValidate = 0;
+											if(FirstFocus == 0) {
+												tabs.tabs("option", "active", j);
+												$("#ddlUnit_" + j).notify("Tidak boleh sama!", { position:"right", className:"warn", autoHideDelay: 2000 });
+												$("#ddlUnit_" + j).focus();
+												FirstFocus = 1;
+											}
+										}
+										else if($("#txtItemCode_" + i).val() == $("#txtItemCode_" + j).val()) {
+											PassValidate = 0;
+											if(FirstFocus == 0) {
+												tabs.tabs("option", "active", j);
+												$("#txtItemCode_" + j).notify("Tidak boleh sama!", { position:"right", className:"warn", autoHideDelay: 2000 });
+												$("#txtItemCode_" + j).focus();
+												FirstFocus = 1;
+											}
+										}
+									}
+								}
+							}
+
 							if(PassValidate == 1) {
 								$("#save-confirm-add").dialog({
 									autoOpen: false,
@@ -910,7 +1494,7 @@
 											$(this).dialog("destroy");
 											//callback("Ya");
 											$.ajax({
-												url: "./Master/Item/InsertFromPurchase.php",
+												url: "./Master/Item/InsertNewItem.php",
 												type: "POST",
 												data: $("#PostFormItem").serialize(),
 												dataType: "json",
@@ -932,15 +1516,7 @@
 															},
 															shown: function() {
 																setTimeout(function() {
-																	$("#hdnItemID").val(data.ID);
-																	$("#txtItemName").val($("#txtItemNameAdd").val());
-																	$("#hdnBuyPrice").val($("#txtBuyPriceAdd").val());
-																	$("#txtBookingPrice").val($("#txtRetailPriceAdd").val());
-																	$("#hdnPrice1").val($("#txtPrice1Add").val());
-																	$("#hdnQty1").val($("#txtQty1Add").val());
-																	$("#hdnPrice2").val($("#txtPrice2Add").val());
-																	$("#hdnQty2").val($("#txtQty2Add").val());
-																	$("#hdnWeight").val($("#txtWeightAdd").val());
+																	getItemDetails();
 																	var lobibox = $('.lobibox-window').data('lobibox');
 																	lobibox.destroy();
 																}, 0);
@@ -1005,14 +1581,199 @@
 					}
 				});
 			}
+
+			function addNewCustomer() {
+				Lobibox.window({
+					title: 'Tambah Pelanggan',
+					url: 'Transaction/Booking/PopUpAddCustomer.php',
+					width: 680,
+					height: 400,
+					buttons: {
+						Simpan: {
+							'class': 'ui-button ui-corner-all ui-widget',
+							text: "Simpan"
+						},
+						Batal: {
+							'class': 'ui-button ui-corner-all ui-widget',
+							text: "Batal",
+							closeOnClick: true
+						}
+					},
+					buttonsAlign: 'right',
+					onShow: function() {
+						setTimeout(function() {
+							if($("#hdnPermission").length == 0) {
+								$("#txtCustomerCodeAdd").focus();
+								$("#btnSimpan").attr("tabindex", 76);
+								$(document).on('keydown', function(e) {
+									if (e.keyCode == 39 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //right arrow
+										$("#btnBatal").focus();
+									}
+									else if(e.keyCode == 37 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //left arrow
+										$("#btnSimpan").focus();
+									}
+								});
+							}
+							else {
+								$("#btnOK").focus();
+								$("#btnSimpan").css("visibility", "hidden");
+								$("#btnBatal").css("visibility", "hidden");
+							}
+						}, 0);
+					},
+					callback: function(lobibox, type){
+						var btnType;
+						if (type === 'Simpan'){
+							var PassValidate = 1;
+							var FirstFocus = 0;
+
+							$("#FormCustomer .form-control-custom").each(function() {
+								if($(this).hasAttr('required')) {
+									if($(this).val() == "") {
+										PassValidate = 0;
+										$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+										if(FirstFocus == 0) $(this).focus();
+										FirstFocus = 1;
+									}
+								}
+							});
+							if(PassValidate == 1) {
+								$("#save-confirm-add").dialog({
+									autoOpen: false,
+									dialogClass: "top-window",
+									open: function() {
+										$(document).on('keydown', function(e) {
+											if (e.keyCode == 39) { //right arrow
+												 $("#btnNo").focus();
+											}
+											else if (e.keyCode == 37) { //left arrow
+												 $("#btnYes").focus();
+											}
+										});
+									},
+									show: {
+										effect: "fade",
+										duration: 0
+									},
+									hide: {
+										effect: "fade",
+										duration: 0
+									},
+									close: function() {
+										$(this).dialog("destroy");
+										//callback("Tidak");
+									},
+									resizable: false,
+									height: "auto",
+									width: 400,
+									modal: true,
+									buttons: [
+									{
+										text: "Ya",
+										id: "btnYes",
+										click: function() {
+											$("#loading").show();
+											$(this).dialog("destroy");
+											//callback("Ya");
+											$.ajax({
+												url: "./Transaction/Booking/InsertNewCustomer.php",
+												type: "POST",
+												data: $("#PostFormCustomer").serialize(),
+												dataType: "json",
+												success: function(data) {
+													if(data.FailedFlag == '0') {
+														$("#loading").hide();
+														//$("#FormData").dialog("destroy");
+														//$("#divModal").hide();
+														var counter = 0;
+														Lobibox.alert("success",
+														{
+															msg: data.Message,
+															width: 480,
+															delay: 2000,
+															beforeClose: function() {
+																setTimeout(function() {
+																	//$("#txtQTY").focus();
+																}, 0);
+															},
+															shown: function() {
+																setTimeout(function() {
+																	$("#ddlCustomer").append("<option value=" + data.ID + " >" + $("#txtCustomerCodeAdd").val() + " - " + $("#txtCustomerNameAdd").val() + "</option>");
+																	$("#ddlCustomer").val(data.ID);
+																	updateHeader();
+
+																	var lobibox = $('.lobibox-window').data('lobibox');
+																	lobibox.destroy();
+																}, 0);
+															}
+														});
+													}
+													else {
+														$("#loading").hide();
+														var counter = 0;
+														Lobibox.alert("warning",
+														{
+															msg: data.Message,
+															width: 480,
+															delay: false,
+															beforeClose: function() {
+																if(counter == 0) {
+																	setTimeout(function() {
+																		$("#txtCustomerCodeAdd").focus();
+																	}, 0);
+																	counter = 1;
+																}
+															}
+														});
+														return 0;
+													}
+												},
+												error: function(jqXHR, textStatus, errorThrown) {
+													$("#loading").hide();
+													var counter = 0;
+													var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+													LogEvent(errorMessage, "/Transaction/Booking/index.php");
+													Lobibox.alert("error",
+													{
+														msg: errorMessage,
+														width: 480,
+														beforeClose: function() {
+															if(counter == 0) {
+																setTimeout(function() {
+																	$("#txtCustomerCodeAdd").focus();
+																}, 0);
+																counter = 1;
+															}
+														}
+													});
+													return 0;
+												}
+											});
+										}
+									},
+									{
+										text: "Tidak",
+										id: "btnNo",
+										click: function() {
+											$(this).dialog("destroy");
+											$("#txtCustomerCodeAdd").focus();
+											//callback("Tidak");
+										}
+									}]
+								}).dialog("open");
+							}
+						}
+					}
+				});
+			}
 			
 			function Calculate() {
 				var grandTotal = 0;
 				var weight = 0;
 				table2.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
 					var data = this.data();
-					grandTotal += parseFloat(data[7].replace(/\,/g, "")) * parseFloat(data[6]) - parseFloat(data[8]);
-					weight += parseFloat(data[15]) * parseFloat(data[6]);
+					grandTotal += parseFloat(data[9].replace(/\,/g, "")) * parseFloat(data[7]) - parseFloat(data[10].replace(/\,/g, ""));
+					weight += parseFloat(data[17]) * parseFloat(data[7]);
 				});
 				$("#lblTotal").html(returnRupiah(grandTotal.toString()));
 				$("#lblWeight").html(returnWeight(weight.toString()));
@@ -1029,6 +1790,7 @@
 			
 			function resetForm() {
 				$("#hdnBookingID").val(0);
+				$("#hdnBookingDetailsID").val(0);
 				$("#hdnItemID").val(0);
 				$("#txtTransactionDate").datepicker("setDate", new Date());
 				$("#txtBookingNumber").val("");
@@ -1040,11 +1802,21 @@
 				$("#hdnPrice1").val(0);
 				$("#hdnQty1").val(0);
 				$("#hdnQty2").val(0);
-				$("#toggle-retail").toggleClass('disabled', false);
+				$("#hdnBranchID").val(1);
+				//$("#toggle-retail").toggleClass('disabled', false);
 				$('#toggle-retail').toggles(true);
 				$("#lblTotal").html("0");
 				$("#lblWeight").html("0");
+				$("#hdnPayment").html("0");
 				$("#hdnRetailPrice").val(0);
+				if( $("#ddlCustomer").has("option").length > 0 ) $("#ddlCustomer option")[0].selected = true;
+				$("#ddlUnit").find('option').remove();
+				$("#ddlUnit").append("<option>--</option>");
+				$("#hdnAvailableUnit").val("");
+				$("#hdnItemDetailsID").val(0);
+				$("#txtSubTotal").val(0);
+				$("#hdnStock").val(0);
+				$("#hdnConversionQty").val(0);
 				table2.clear().draw();
 			}
 			
@@ -1077,6 +1849,11 @@
 					}
 				});
 			}
+
+			function branchChange(BranchID) {
+				$("#hdnBranchID").val(BranchID);
+				table3.ajax.reload();
+			}
 			
 			function itemList() {
 				$("#itemList-dialog").dialog({
@@ -1093,15 +1870,24 @@
 									"searching": true,
 									"order": [],
 									"columns": [
+										{ "width": "15%", "orderable": false, className: "dt-head-center" },
 										{ "width": "20%", "orderable": false, className: "dt-head-center" },
-										{ "width": "25%", "orderable": false, className: "dt-head-center" },
-										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" }
+										{ "width": "5%", "orderable": false, className: "dt-head-center" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" }
 									],
-									"ajax": "./Transaction/Booking/ItemList.php",
+									"ajax": {
+										"url": "./Transaction/Booking/ItemList.php",
+										"data": function ( d ) {
+											d.BranchID = $("#hdnBranchID").val()
+										}
+									},
 									"processing": true,
 									"serverSide": true,
 									"language": {
@@ -1122,8 +1908,16 @@
 									"initComplete": function(settings, json) {
 										table3.columns.adjust();
 										$("#grid-item").DataTable().cell( ':eq(0)' ).focus();
-									}
+									},
+									"sDom": '<"toolbar">frtip'
 								});
+
+						$(".toolbar").css({
+							"display" : "inline-block"
+						});
+
+						$("div.toolbar").html($("#divBranch").html());
+
 						var counterPickItem = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
 							//var index = table3.cell({ focused: true }).index();
@@ -1135,7 +1929,7 @@
 									getItemDetails();
 									$("#itemList-dialog").dialog("destroy");
 									table3.destroy();
-									table.keys.enable();
+									//table.keys.enable();
 									table2.keys.enable();
 								}
 								setTimeout(function() { counterPickItem = 0; } , 1000);
@@ -1149,7 +1943,7 @@
 								getItemDetails();
 								$("#itemList-dialog").dialog("destroy");
 								table3.destroy();
-								table.keys.enable();
+								//table.keys.enable();
 								table2.keys.enable();
 							}
 						});
@@ -1173,7 +1967,7 @@
 					close: function() {
 						$(this).dialog("destroy");
 						table3.destroy();
-						table.keys.enable();
+						//table.keys.enable();
 						table2.keys.enable();
 					},
 					resizable: false,
@@ -1183,12 +1977,12 @@
 					buttons: [
 					{
 						text: "Tutup",
-						tabindex: 15,
+						tabindex: 18,
 						id: "btnCancelPickItem",
 						click: function() {
 							$(this).dialog("destroy");
 							table3.destroy();
-							table.keys.enable();
+						//	table.keys.enable();
 							table2.keys.enable();
 							return false;
 						}
@@ -1196,9 +1990,210 @@
 				}).dialog("open");
 			}
 
+			function finish() {
+				if($("#hdnBookingID").val() != 0) {
+					$("#finish-dialog").dialog({
+						autoOpen: false,
+						open: function() {
+							$("#divModal").show();
+							table2.keys.disable();
+							var Total = $("#lblTotal").html().replace(/\,/g, "");
+							var Payment = $("#hdnPayment").val();
+							if(parseFloat(Payment) != 0) {
+								var Change = parseFloat(Payment) - parseFloat(Total);
+								$("#txtChange").val(returnRupiah(Change.toString()));
+							}
+							$("#txtTotal").val($("#lblTotal").html());
+							$("#txtPayment").val(returnRupiah(Payment.toString()));
+							$("#ddlPayment").focus();
+						},
+						show: {
+							effect: "fade",
+							duration: 0
+						},
+						hide: {
+							effect: "fade",
+							duration: 0
+						},
+						close: function() {
+							$(this).dialog("destroy");
+							table2.keys.enable();
+							$("#divModal").hide();
+						},
+						resizable: false,
+						height: 380,
+						width: 420,
+						modal: false,
+						buttons: [
+						{
+							text: "Tutup",
+							tabindex: 19,
+							id: "btnCancelPickItem",
+							click: function() {
+								$(this).dialog("destroy");
+								table2.keys.enable();
+								$("#divModal").hide();
+								return false;
+							}
+						}]
+					}).dialog("open");
+				}
+				else {
+					var counter = 0;
+					Lobibox.alert("error",
+					{
+						msg: "Silahkan tambahkan barang terlebih dahulu!",
+						width: 480,
+						beforeClose: function() {
+							if(counter == 0) {
+								setTimeout(function() {
+									$("#txtItemCode").focus();
+								}, 0);
+								counter = 1;
+							}
+						}
+					});
+				}
+			}
+
+			function Change() {
+				var Total = $("#txtTotal").val().replace(/\,/g, "");
+				var Payment = $("#txtPayment").val().replace(/\,/g, "");
+				var PaymentType = $("#ddlPayment").val();
+				if(PaymentType == 1) {
+					if(parseFloat(Payment) == 0) {
+						$("#txtPayment").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+						setTimeout(function() {
+							$("#txtPayment").focus();
+						}, 0);
+					}
+					else {
+						if(parseFloat(Total) > parseFloat(Payment)) {
+							$("#txtPayment").notify("Pembayaran Kurang!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+							setTimeout(function() {
+								$("#txtPayment").focus();
+							}, 0);
+						}
+						else {
+							var Change = parseFloat(Payment) - parseFloat(Total);
+							$("#txtChange").val(returnRupiah(Change.toString()));
+						}
+					}
+				}
+				else {
+					if(parseFloat(Total) < parseFloat(Payment)) {
+						$("#txtPayment").notify("Pembayaran Lebih!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+						setTimeout(function() {
+							$("#txtPayment").focus();
+						}, 0);
+					}
+				}
+			}
+
+			function printInvoice() {
+				var bookingID = $("#hdnBookingID").val();
+				var Payment = $("#txtPayment").val().replace(/\,/g, "");
+				var PaymentType = $("#ddlPayment").val();
+				var PrintInvoice = $("#chkPrint").prop("checked");
+				var PrintShipment = $("#chkPrintShipment").prop("checked");
+				$("#loading").show();
+				$.ajax({
+					url: "./Transaction/Booking/PrintInvoice.php",
+					type: "POST",
+					data: { BookingID : bookingID, Payment : Payment, PaymentType : PaymentType, PrintInvoice : PrintInvoice },
+					dataType: "json",
+					success: function(data) {
+						if(data.FailedFlag == '0') {
+							$("#loading").hide();
+							$("#divModal").hide();
+							if(PrintShipment == true) printShipment();
+							resetForm();
+							table2.destroy();
+							$("#finish-dialog").dialog("destroy");
+							openDialog(0, 0);
+							Lobibox.alert("success",
+							{
+								msg: data.Message,
+								width: 480,
+								delay: 2000
+							});
+						}
+						else {
+							$("#loading").hide();
+							$("#divModal").hide();
+							var counter = 0;
+							Lobibox.alert("error",
+							{
+								msg: data.ErrorMessage,
+								width: 480,
+								beforeClose: function() {
+									if(counter == 0) {
+										setTimeout(function() {
+											$("#txtItemCode").focus();
+										}, 0);
+										counter = 1;
+									}
+								}
+							});
+							return 0;
+						}
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						$("#loading").hide();
+						$("#divModal").hide();
+						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+						LogEvent(errorMessage, "/Transaction/Booking/index.php");
+						Lobibox.alert("error",
+						{
+							msg: errorMessage,
+							width: 480
+						});
+						return 0;
+					}
+				});
+			}
+
+			function printShipment() {
+				//alert("print shipment");
+				var BookingDetailsID = new Array();
+				var BookingID = $("#hdnBookingID").val();
+				$("input:checkbox[name=select]:checked").each(function() {
+					if($(this).val() != 'all') BookingDetailsID.push($(this).val());
+				});
+				if(BookingDetailsID.length > 0) {
+					$("#loading").show();
+					$.ajax({
+						url: "./Transaction/Booking/PrintShipment.php",
+						type: "POST",
+						data: { BookingDetailsID : BookingDetailsID, BookingID : BookingID },
+						dataType: "json",
+						success: function(data) {
+							$("#loading").hide();
+						},
+						error: function(data) {
+							$("#loading").hide();
+							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+							LogEvent(errorMessage, "/Transaction/Booking/index.php");
+							Lobibox.alert("error",
+							{
+								msg: errorMessage,
+								width: 480
+							});
+							return 0;
+						}
+					});
+				}
+			}
+
 			$(document).ready(function() {
 				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
 				    $(this).blur();
+				});
+
+				$("#txtQTY").spinner({
+					change: function() {
+						CalculateSubTotal();
+					}
 				});
 				
 				$('#toggle-retail').toggles({
@@ -1221,10 +2216,11 @@
 				$('#toggle-retail').on('toggle', function(e, active) {
 					if (active) {
 						$("#hdnIsRetail").val(1);
-						if($("#FormData").css("display") == "block") $('#FormData').dialog('option', 'title', 'Tambah Penjualan Eceran');
+						if($("#FormData").css("display") == "block") $('#FormData').dialog('option', 'title', 'Tambah Pemesanan Eceran');
+						Grosir($("#txtQTY").val());
 					} else {
 						$("#hdnIsRetail").val(0);
-						if($("#FormData").css("display") == "block") $('#FormData').dialog('option', 'title', 'Tambah Penjualan Grosir');
+						if($("#FormData").css("display") == "block") $('#FormData').dialog('option', 'title', 'Tambah Pemesanan Grosir');
 						Grosir($("#txtQTY").val());
 					}
 				});
@@ -1289,7 +2285,8 @@
 									{ className: "dt-head-center" },
 									{ className: "dt-head-center" },
 									{ className: "dt-head-center" },
-									{ "orderable": false, className: "dt-head-center dt-body-right" }
+									{ "orderable": false, className: "dt-head-center dt-body-right" },
+									{ "visible": false }
 								],
 								"processing": true,
 								"serverSide": true,
@@ -1381,14 +2378,14 @@
 				var counterKey = 0;
 				$(document).on("keydown", function (evt) {
 					var index = table.cell({ focused: true }).index();
-					if (evt.keyCode == 46 && $("#hdnDeleteFlag").val() == "1" && typeof index == 'undefined' && $("#FormData").css("display") == "none") { //delete button
+					if (evt.keyCode == 46 && $("#hdnDeleteFlag").val() == "1" && typeof index == 'undefined' && $("#FormData").css("display") == "none" && $(".lobibox").css("display") != "block") { //delete button
 						evt.preventDefault();
 						if(counterKey == 0) {
 							fnDeleteData();
 							counterKey = 1;
 						}
 					}
-					else if(evt.keyCode == 123 && $("#itemList-dialog").css("display") == "none" && $("#FormData").css("display") == "block") {
+					else if(evt.keyCode == 123 && $("#itemList-dialog").css("display") == "none" && $("#finish-dialog").css("display") == "none" && $("#FormData").css("display") == "block"  && $(".lobibox").css("display") != "block") {
 						evt.preventDefault();
 						if(counterKey == 0) {
 							itemList();
@@ -1398,10 +2395,29 @@
 					else if(evt.keyCode == 123) {
 						evt.preventDefault();
 					}
+					else if(evt.keyCode == 121 && $("#itemList-dialog").css("display") == "none"  && $("#finish-dialog").css("display") == "none" && $("#FormData").css("display") == "block"  && $(".lobibox").css("display") != "block") {
+						evt.preventDefault();
+						if(counterKey == 0) {
+							finish();
+							counterKey = 1;
+						}
+					}
 					else if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0 && $("#FormData").css("display") == "none" && $("#delete-confirm").css("display") == "none") {
 						$("#grid-data_wrapper").find("input[type='search']").focus();
 					}
 					setTimeout(function() { counterKey = 0; } , 1000);
+				});
+
+				Mousetrap.bind('ctrl+g', function(e) {
+					// your function here...
+					e.preventDefault();
+					$('#toggle-retail').toggles(false);
+				});
+
+				Mousetrap.bind('ctrl+e', function(e) {
+					// your function here...
+					e.preventDefault();
+					$('#toggle-retail').toggles(true);
 				});
 				
 				$('#grid-data tbody').on('dblclick', 'tr', function () {

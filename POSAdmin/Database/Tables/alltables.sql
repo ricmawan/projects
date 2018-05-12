@@ -194,7 +194,7 @@ VALUES
 (
 	14,
 	3,
-	'Adjust Stok',
+	'Penyesuaian Stok',
 	'Transaction/StockAdjust/',
 	NULL,
 	0,
@@ -1202,7 +1202,7 @@ CREATE TABLE transaction_firststock
 CREATE UNIQUE INDEX FIRSTSTOCK_INDEX
 ON transaction_firststock (FirstStockID, SupplierID);DROP TABLE IF EXISTS transaction_firststockdetails;
 
-CREATE TABLE transaction_purchasedetails
+CREATE TABLE transaction_firststockdetails
 (
 	FirstStockDetailsID 	BIGINT PRIMARY KEY AUTO_INCREMENT,
 	FirstStockID			BIGINT,
