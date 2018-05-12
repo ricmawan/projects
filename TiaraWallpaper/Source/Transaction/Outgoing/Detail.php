@@ -845,61 +845,68 @@
 				}
 			}
 			
+			var counterInsert = 0;
 			function SubmitValidate() {
-				if($("#recordnew").val() > 0) {
-					var PassValidate = 1;
-					var FirstFocus = 0;
-					$(".form-control-custom").each(function() {
-						if($(this).hasAttr('required')) {
-							if($(this).val() == "") {
-								PassValidate = 0;
-								$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-								if(FirstFocus == 0) $(this).focus();
-								FirstFocus = 1;
-							}
-						}
-					});
-					
-					if($("#ddlCustomer").val() == "") {
-						PassValidate = 0;
-						$("#ddlCustomer").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						if(FirstFocus == 0) $("#ddlCustomer").next().find("input").focus();
-						FirstFocus = 1;
-					}
-					if(PassValidate == 0) {
-						$("html, body").animate({
-							scrollTop: 0
-						}, "slow");
-						return false;
-					}
-					else {
-						$("#loading").show();
-						$.ajax({
-							url: "./Transaction/Outgoing/Insert.php",
-							type: "POST",
-							data: $("#PostForm").serialize(),
-							dataType: "json",
-							success: function(data) {
-								if(data.FailedFlag == '0') {
-									$("#loading").hide();
-									$.notify(data.Message, "success");
-									$("#hdnOutgoingID").val(data.ID);
-									$("#hdnIsEdit").val(1);
-									$("#txtOutgoingNumber").val(data.InvoiceNumber);
-									$("#txtTransactionDate").attr("readonly", "readonly");
+				if(counterInsert == 0) {
+					counterInsert = 1;
+					if($("#recordnew").val() > 0) {
+						var PassValidate = 1;
+						var FirstFocus = 0;
+						$(".form-control-custom").each(function() {
+							if($(this).hasAttr('required')) {
+								if($(this).val() == "") {
+									PassValidate = 0;
+									$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+									if(FirstFocus == 0) $(this).focus();
+									FirstFocus = 1;
 								}
-								else {
-									$("#loading").hide();
-									$.notify(data.Message, "error");					
-								}
-							},
-							error: function(data) {
-								$("#loading").hide();
-								$.notify("Terjadi kesalahan sistem!", "error");
 							}
 						});
+						
+						if($("#ddlCustomer").val() == "") {
+							PassValidate = 0;
+							$("#ddlCustomer").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+							if(FirstFocus == 0) $("#ddlCustomer").next().find("input").focus();
+							FirstFocus = 1;
+						}
+						if(PassValidate == 0) {
+							$("html, body").animate({
+								scrollTop: 0
+							}, "slow");
+							return false;
+						}
+						else {
+							$("#loading").show();
+							$.ajax({
+								url: "./Transaction/Outgoing/Insert.php",
+								type: "POST",
+								data: $("#PostForm").serialize(),
+								dataType: "json",
+								success: function(data) {
+									if(data.FailedFlag == '0') {
+										$("#loading").hide();
+										$.notify(data.Message, "success");
+										$("#hdnOutgoingID").val(data.ID);
+										$("#hdnIsEdit").val(1);
+										$("#txtOutgoingNumber").val(data.InvoiceNumber);
+										$("#txtTransactionDate").attr("readonly", "readonly");
+									}
+									else {
+										$("#loading").hide();
+										$.notify(data.Message, "error");					
+									}
+								},
+								error: function(data) {
+									$("#loading").hide();
+									$.notify("Terjadi kesalahan sistem!", "error");
+								}
+							});
+						}
 					}
 				}
+				setTimeout(function() {
+					counterInsert = 0;
+				}, 1000);
 			}
 			
 			function ValidateQty(row) {
