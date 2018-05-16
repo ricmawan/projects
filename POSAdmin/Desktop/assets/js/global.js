@@ -599,6 +599,9 @@ function DeleteData(url, callback) {
 						 $("#btnYesDel").focus();
 					}
 				});
+				setTimeout(function() {
+					$("#btnYesDel").focus();
+				}, 0);
 			},
 			close: function() {
 				$(this).dialog("destroy");

@@ -618,6 +618,7 @@
 																	table.keys.enable();
 																	if(typeof index !== 'undefined') table.cell(index).focus();
 																	table.keys.disable();
+																	table.columns.adjust();
 																}, false);
 															}, 0);
 														}
@@ -676,6 +677,7 @@
 					{
 						text: "Batal",
 						id: "btnCancelAddItem",
+						tabindex: 18,
 						click: function() {
 							$(this).dialog("destroy");
 							$("#divModal").hide();
@@ -727,6 +729,7 @@
 									table.page("previous").draw('page');
 								}, 0);
 							}
+							table.columns.adjust();
 						}, false);
 					}
 					else {
@@ -811,6 +814,10 @@
 			}
 
 			$(document).ready(function() {
+				$( window ).resize(function() {
+					table.columns.adjust().draw();
+				});
+				
 				tabs = $( "#tabs" ).tabs({
 					activate: function( event, ui ) {
 						var active = $("#tabs" ).tabs( "option", "active" );
@@ -992,6 +999,7 @@
 													}, 0);
 												}
 											}
+											table.columns.adjust();
 										}, false);
 									}
 									else {

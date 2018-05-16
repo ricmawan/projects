@@ -32,6 +32,7 @@
 			$row_array[] = $row['ItemCode'];
 			$row_array[] = $row['ItemName'];
 			$row_array[] = $row['Quantity'];
+			$row_array[] = $row['UnitName'];
 			$row_array[] = number_format($row['SalePrice'],0,".",",");
 			$row_array[] = number_format($row['Discount'],0,".",",");
 			$row_array[] = number_format($row['SalePrice'] * $row['Quantity'],0,".",",");
@@ -42,6 +43,10 @@
 			$row_array[] = $row['Qty2'];
 			$row_array[] = $row['Weight'];
 			$row_array[] = $row['RetailPrice'];
+			$row_array[] = $row['AvailableUnit'];
+			$row_array[] = $row['UnitID'];
+			$row_array[] = $row['ItemDetailsID'];
+			$row_array[] = $row['ConversionQty'];
 			array_push($return_arr, $row_array);
 		}
 		

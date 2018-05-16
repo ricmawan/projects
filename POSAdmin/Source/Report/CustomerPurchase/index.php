@@ -203,6 +203,10 @@
 			};
 
 			$(document).ready(function () {
+				$( window ).resize(function() {
+					table.columns.adjust().draw();
+				});
+				
 				$("#ddlCustomer").combobox();
 				$("#ddlCustomer").next().find("input").click(function() {
 					$(this).val("");

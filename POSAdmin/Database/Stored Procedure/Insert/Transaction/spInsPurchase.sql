@@ -66,7 +66,7 @@ SET State = 2;
 			SELECT
 				pID AS 'ID',
                 pPurchaseDetailsID AS 'PurchaseDetailsID',
-				'No. Invoice sudah ada' AS 'Message',
+				CONCAT('No. Invoice ', pPurchaseNumber, ' sudah ada') AS 'Message',
 				'' AS 'MessageDetail',
 				1 AS 'FailedFlag',
 				State AS 'State' ;

@@ -11,7 +11,7 @@
 				overflow-y: auto;
 			}
 
-			.chkSaleDetails {
+			.chkBookingDetails {
 				margin-top : 0 !important;
 			}
 		</style>
@@ -61,13 +61,13 @@
 				<div class="row">
 					<div class="col-md-1 labelColumn">
 						No. Invoice :
-						<input id="hdnSaleReturnID" name="hdnSaleReturnID" type="hidden" value=0 />
-						<input id="hdnSaleID" name="hdnSaleID" type="hidden" value=0 />
+						<input id="hdnPickUpID" name="hdnPickUpID" type="hidden" value=0 />
+						<input id="hdnBookingID" name="hdnBookingID" type="hidden" value=0 />
 						<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
 						<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
 					</div>
 					<div class="col-md-2">
-						<input id="txtSaleNumber" name="txtSaleNumber" type="text" tabindex=5 class="form-control-custom" onfocus="this.select();" onkeypress="isEnterKey(event, 'getSaleDetails');" onchange="getSaleDetails();" autocomplete=off placeholder="No. Invoice" />
+						<input id="txtBookingNumber" name="txtBookingNumber" type="text" tabindex=5 class="form-control-custom" onfocus="this.select();" onkeypress="isEnterKey(event, 'getBookingDetails');" onchange="getBookingDetails();" autocomplete=off placeholder="No. Invoice" />
 					</div>
 					
 					<div class="col-md-1 labelColumn">
@@ -90,10 +90,10 @@
 						<table id="grid-transaction" style="width: 100% !important;" class="table table-striped table-bordered table-hover" >
 							<thead>
 								<tr>
-									<th>SaleReturnDetailsID</th>
+									<th>PickUpDetailsID</th>
 									<th>ItemID</th>
 									<th>BranchID</th>
-									<th><input id="select_all_salereturn" name="select_all_salereturn" type="checkbox" onclick="checkAllSaleReturn();" /></th>
+									<th><input id="select_all_salereturn" name="select_all_salereturn" type="checkbox" onclick="checkAllPickUp();" /></th>
 									<th>Cabang</th>
 									<th>Kode Barang</th>
 									<th>Nama Barang</th>
@@ -143,23 +143,23 @@
 				$("#hdnIsEdit").val(EditFlag);
 				if(EditFlag == 1) {
 					$("#FormData").attr("title", "Edit Retur Penjualan");
-					$("#hdnSaleReturnID").val(Data[6]);
+					$("#hdnPickUpID").val(Data[6]);
 					$("#txtCustomerName").val(Data[4]);
-					$("#txtSaleNumber").val(Data[2]);
+					$("#txtBookingNumber").val(Data[2]);
 					$("#lblTotal").html(Data[5]);
 					$("#txtTransactionDate").datepicker("setDate", new Date(Data[7]));
-					$("#txtSaleNumber").prop("readonly", true);
-					getSaleReturnDetails(Data[6]);
+					$("#txtBookingNumber").prop("readonly", true);
+					getPickUpDetails(Data[6]);
 				}
 				else {
 					$("#FormData").attr("title", "Tambah Retur Penjualan");
-					$("#txtSaleNumber").prop("readonly", false);
+					$("#txtBookingNumber").prop("readonly", false);
 				}
 				var index = table.cell({ focused: true }).index();
 				$("#FormData").dialog({
 					autoOpen: false,
 					open: function() {
-						$("#txtSaleNumber").focus();
+						$("#txtBookingNumber").focus();
 						table.keys.disable();
 						table2 = $("#grid-transaction").DataTable({
 									"keys": false,
@@ -224,15 +224,15 @@
 					{
 						text: "Simpan",
 						tabindex: 12,
-						id: "btnSaveSaleReturn",
+						id: "btnSavePickUp",
 						click: function() {
-							if($("input:checkbox[class=chkSaleDetails]:checked").length > 0)
+							if($("input:checkbox[class=chkBookingDetails]:checked").length > 0)
 							{
 								saveConfirm(function(action) {
 									if(action == "Ya") {
 										$("#loading").show();
 										$.ajax({
-											url: "./Transaction/SaleReturn/Insert.php",
+											url: "./Transaction/PickUp/Insert.php",
 											type: "POST",
 											data: $("#PostForm").serialize(),
 											dataType: "json",
@@ -318,7 +318,7 @@
 					{
 						text: "Tutup",
 						tabindex: 13,
-						id: "btnCancelAddSaleReturn",
+						id: "btnCancelAddPickUp",
 						click: function() {
 							$(this).dialog("destroy");
 							$("#divModal").hide();
@@ -334,24 +334,24 @@
 				}).dialog("open");
 			}
 
-			function updateBranch(SaleDetailsID) {
+			function updateBranch(BookingDetailsID) {
 				setTimeout(function() {
 					var BranchID = 1;
-					var str = SaleDetailsID.split("-");
+					var str = BookingDetailsID.split("-");
 					if($('#toggle-branch-' + str[2]).data('toggles').active == false) BranchID = 2;
 					$("#hdnBranchID" + str[2]).val(BranchID);
 				}, 0);
 			}
 
-			function checkAllSaleReturn() {
+			function checkAllPickUp() {
 				if($("#select_all_salereturn").prop("checked") == true) {
-					$("input:checkbox[class=chkSaleDetails]").each(function() {
+					$("input:checkbox[class=chkBookingDetails]").each(function() {
 						$(this).prop("checked", true);
 						$(this).attr("checked", true);
 					});
 				}
 				else {
-					$("input:checkbox[class=chkSaleDetails]").each(function() {
+					$("input:checkbox[class=chkBookingDetails]").each(function() {
 						$(this).prop("checked", false);
 						$(this).attr("checked", false);
 					});
@@ -359,11 +359,11 @@
 				Calculate();
 			}
 			
-			function getSaleReturnDetails(SaleReturnID) {
+			function getPickUpDetails(PickUpID) {
 				$.ajax({
-					url: "./Transaction/SaleReturn/SaleReturnDetails.php",
+					url: "./Transaction/PickUp/PickUpDetails.php",
 					type: "POST",
-					data: { SaleReturnID : SaleReturnID },
+					data: { PickUpID : PickUpID },
 					dataType: "json",
 					success: function(Data) {
 						if(Data.FailedFlag == '0') {
@@ -418,7 +418,7 @@
 					error: function(jqXHR, textStatus, errorThrown) {
 						$("#loading").hide();
 						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-						LogEvent(errorMessage, "/Transaction/SaleReturn/index.php");
+						LogEvent(errorMessage, "/Transaction/PickUp/index.php");
 						Lobibox.alert("error",
 						{
 							msg: errorMessage,
@@ -430,22 +430,22 @@
 			}
 
 			var saleDetailsCounter = 0;
-			function getSaleDetails() {
+			function getBookingDetails() {
 				if(saleDetailsCounter == 0) 
 				{
 					saleDetailsCounter = 1;
-					var saleNumber = $("#txtSaleNumber").val();
+					var saleNumber = $("#txtBookingNumber").val();
 					$.ajax({
-						url: "./Transaction/SaleReturn/SaleDetails.php",
+						url: "./Transaction/PickUp/BookingDetails.php",
 						type: "POST",
-						data: { SaleNumber : saleNumber },
+						data: { BookingNumber : saleNumber },
 						dataType: "json",
 						success: function(Data) {
 							if(Data.FailedFlag == '0') {
 								table2.clear().draw();
 								for(var i=0;i<Data.data.length;i++) {
 									if(i == 0) {
-										$("#hdnSaleID").val(Data.data[i][13]);
+										$("#hdnBookingID").val(Data.data[i][13]);
 										$("#txtCustomerName").val(Data.data[i][12]);
 									}
 									table2.row.add(Data.data[i]);
@@ -504,7 +504,7 @@
 						error: function(jqXHR, textStatus, errorThrown) {
 							$("#loading").hide();
 							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-							LogEvent(errorMessage, "/Transaction/SaleReturn/index.php");
+							LogEvent(errorMessage, "/Transaction/PickUp/index.php");
 							Lobibox.alert("error",
 							{
 								msg: errorMessage,
@@ -533,14 +533,14 @@
 			
 			function Calculate() {
 				var grandTotal = 0;
-				$("input:checkbox[class=chkSaleDetails]:checked").each(function() {
+				$("input:checkbox[class=chkBookingDetails]:checked").each(function() {
 					var qty = parseFloat($(this).closest("tr").find("input[type=number]").val());
 					var salePrice = parseFloat($(this).closest("tr").find("label").html().replace(/\,/g, ""));
 					var subTotal = qty * salePrice; 
 					grandTotal += subTotal;
 					$(this).closest("tr").find("td").last().html(returnRupiah(subTotal.toString()));
 				});
-				$("input:checkbox[class=chkSaleDetails]:not(:checked)").each(function() {
+				$("input:checkbox[class=chkBookingDetails]:not(:checked)").each(function() {
 					$(this).closest("tr").find("td").last().html("0");
 				});
 				$("#lblTotal").html(returnRupiah(grandTotal.toString()));
@@ -556,10 +556,10 @@
 			}
 			
 			function resetForm() {
-				$("#hdnSaleReturnID").val(0);
-				$("#hdnSaleID").val(0);
+				$("#hdnPickUpID").val(0);
+				$("#hdnBookingID").val(0);
 				$("#txtTransactionDate").datepicker("setDate", new Date());
-				$("#txtSaleNumber").val("");
+				$("#txtBookingNumber").val("");
 				$("#lblTotal").html("0");
 				table2.clear().draw();
 			}
@@ -567,7 +567,7 @@
 			function fnDeleteData() {
 				var index = table.cell({ focused: true }).index();
 				table.keys.disable();
-				DeleteData("./Transaction/SaleReturn/Delete.php", function(action) {
+				DeleteData("./Transaction/PickUp/Delete.php", function(action) {
 					if(action == "success") {
 						$("#select_all").prop("checked", false);
 						table.ajax.reload(function() {
@@ -614,7 +614,7 @@
 										{ "width": "30%", "orderable": false, className: "dt-head-center" },
 										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" }
 									],
-									"ajax": "./Transaction/SaleReturn/TransactionList.php",
+									"ajax": "./Transaction/PickUp/TransactionList.php",
 									"processing": true,
 									"serverSide": true,
 									"language": {
@@ -644,8 +644,8 @@
 								counterPickTransaction = 1;
 								var data = datatable.row( cell.index().row ).data();
 								if(key == 13 && $("#transactionList-dialog").css("display") == "block") {
-									$("#txtSaleNumber").val(data[0]);
-									getSaleDetails();
+									$("#txtBookingNumber").val(data[0]);
+									getBookingDetails();
 									$("#transactionList-dialog").dialog("destroy");
 									table3.destroy();
 									table.keys.enable();
@@ -658,8 +658,8 @@
 						$('#grid-sale tbody').on('dblclick', 'tr', function () {
 							if( $("#transactionList-dialog").css("display") == "block") {
 								var data = table3.row(this).data();
-								$("#txtSaleNumber").val(data[0]);
-								getSaleDetails();
+								$("#txtBookingNumber").val(data[0]);
+								getBookingDetails();
 								$("#transactionList-dialog").dialog("destroy");
 								table3.destroy();
 								table.keys.enable();
@@ -677,6 +677,11 @@
 								counterKeyTransaction = 1;
 								if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0) {
 									$("#transactionList-dialog").find("input[type='search']").focus();
+								}
+								else if(evt.keyCode == 27 && $("#transactionList-dialog").css("display") == "block") {
+									$("#transactionList-dialog").dialog("destroy");
+									table3.destroy();
+									table2.keys.enable();
 								}
 							}
 							setTimeout(function() { counterKeyTransaction = 0; } , 1000);
@@ -710,8 +715,8 @@
 			}
 
 			function finish() {
-				if($("#hdnSaleID").val() != 0) {
-					$("#finish-confirm").dialog({
+				if($("#hdnBookingID").val() != 0) {
+					$("#save-confirm").dialog({
 						autoOpen: false,
 						open: function() {
 							$(document).on('keydown', function(e) {
@@ -785,7 +790,26 @@
 				}
 			}
 			
+			var counterResize = 0;
 			$(document).ready(function() {
+				$( window ).resize(function() {
+					if(counterResize == 0) {
+						counterResize = 1;
+						table.columns.adjust().draw();
+						if ( $.fn.DataTable.isDataTable( '#grid-transaction' ) ) {
+							setTimeout(function() {
+								tableWidthAdjust();
+							}, 500);
+						}
+						if ( $.fn.DataTable.isDataTable( '#grid-item' ) ) {
+							table3.columns.adjust().draw();
+						}
+						setTimeout(function() {
+							counterResize = 0;
+						}, 1000);
+					}
+				});
+				
 				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
 				    $(this).blur();
 				});
@@ -794,7 +818,7 @@
 					$("#loading").hide();
 					var errorMessage = "DataTables Error : " + techNote + " (" + message + ")";
 					var counterError = 0;
-					LogEvent(errorMessage, "/Transaction/SaleReturn/index.php");
+					LogEvent(errorMessage, "/Transaction/PickUp/index.php");
 					Lobibox.alert("error",
 					{
 						msg: "Terjadi kesalahan. Memuat ulang halaman.",
@@ -812,7 +836,8 @@
 				$("#txtTransactionDate").datepicker({
 					dateFormat: 'DD, dd M yy',
 					dayNames: [ "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu" ],
-					monthNames: [ "Jan", "Feb", "Mar", "Apr", "Mey", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Des" ],
+					monthNames: [ "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember" ],
+					monthNamesShort: [ "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Des" ],
 					maxDate : "+0D",
 					showOn: "button",
 					buttonImage: "./assets/img/calendar.gif",
@@ -837,11 +862,11 @@
 				
 				keyFunction();
 				enterLikeTab();
-				var counterSaleReturn = 0;
+				var counterPickUp = 0;
 				table = $("#grid-data").DataTable({
 								"keys": true,
 								"scrollY": "330px",
-								"rowId": "SaleReturnID",
+								"rowId": "PickUpID",
 								"scrollCollapse": true,
 								"order": [],
 								"columns": [
@@ -854,7 +879,7 @@
 								],
 								"processing": true,
 								"serverSide": true,
-								"ajax": "./Transaction/SaleReturn/DataSource.php",
+								"ajax": "./Transaction/PickUp/DataSource.php",
 								"language": {
 									"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
 									"infoFiltered": "",
@@ -885,8 +910,8 @@
 							checkbox.attr("checked", true);
 						}
 					}
-					else if(counterSaleReturn == 0) {
-						counterSaleReturn = 1;
+					else if(counterPickUp == 0) {
+						counterPickUp = 1;
 						var data = datatable.row( cell.index().row ).data();
 						if(key == 13) {
 							if(($(".ui-dialog").css("display") == "none" || $("#delete-confirm").css("display") == "none") && $("#hdnEditFlag").val() == "1" ) {
@@ -902,7 +927,7 @@
 								table.keys.disable();
 								var deletedData = new Array();
 								deletedData.push(data[6] + "^" + data[2]);
-								SingleDelete("./Transaction/SaleReturn/Delete.php", deletedData, function(action) {
+								SingleDelete("./Transaction/PickUp/Delete.php", deletedData, function(action) {
 									if(action == "success") {
 										table.ajax.reload(function() {
 											table.keys.enable();
@@ -931,7 +956,7 @@
 								fnDeleteData();
 							}
 						}
-						setTimeout(function() { counterSaleReturn = 0; } , 1000);
+						setTimeout(function() { counterPickUp = 0; } , 1000);
 					}
 				});
 				
@@ -959,7 +984,7 @@
 					else if(evt.keyCode == 123) {
 						evt.preventDefault();
 					}
-					else if(evt.keyCode == 121 && $("#itemList-dialog").css("display") == "none"  && $("#finish-dialog").css("display") == "none" && $("#FormData").css("display") == "block"  && $(".lobibox").css("display") != "block") {
+					else if(evt.keyCode == 121 && $("#transactionList-dialog").css("display") == "none"  && $("#finish-dialog").css("display") == "none" && $("#FormData").css("display") == "block"  && $(".lobibox").css("display") != "block") {
 						evt.preventDefault();
 						if(counterKey == 0) {
 							finish();

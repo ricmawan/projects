@@ -36,7 +36,7 @@
 				<input id='hdnSaleDetailsID". $row['SaleReturnDetailsID'] ."' name='hdnSaleDetailsID". $row['SaleReturnDetailsID'] ."' type='hidden' value=".$row['SaleDetailsID']." />";
 			$row_array[] = $row['ItemCode'];
 			$row_array[] = $row['ItemName'];
-			$row_array[] = '<input id="txtQty'. $row['SaleReturnDetailsID'] .'" name="txtQty'. $row['SaleReturnDetailsID'] .'" type="number" class="form-control-custom" value='.$row['Quantity'].' max='.$row['Maksimum'].' min=1 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 1" onpaste="return false;" onchange="validateQTY2(this)" required />';
+			$row_array[] = '<input id="txtQty'. $row['SaleReturnDetailsID'] .'" name="txtQty'. $row['SaleReturnDetailsID'] .'" type="number" class="form-control-custom text-right" value='.$row['Quantity'].' max='.$row['Maksimum'].' min=1 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 1" onpaste="return false;" onchange="validateQTY2(this)" required />';
 			$row_array[] = $row['UnitName'];
 			$row_array[] = "<label style='font-weight:normal !important;'>".number_format($row['SalePrice'],0,".",",")."</label>";
 			$row_array[] = 0;

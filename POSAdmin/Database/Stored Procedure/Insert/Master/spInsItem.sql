@@ -1,3 +1,10 @@
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for insert the item
+Created Date: 12 November 2017
+Modified Date: 
+===============================================================*/
+
 DROP PROCEDURE IF EXISTS spInsItem;
 
 DELIMITER $$
@@ -94,7 +101,7 @@ SET State = 2;
 			EXECUTE stmt;
 			DEALLOCATE PREPARE stmt;
 		END IF;
-
+       
 SET State = 3;
 
 		SELECT 
@@ -104,17 +111,16 @@ SET State = 3;
 		FROM 
 			master_item
 		WHERE
-			(TRIM(ItemName) = TRIM(pItemName)
-            OR TRIM(ItemCode) = TRIM(pItemCode))
+			TRIM(ItemCode) = TRIM(pItemCode)
 			AND ItemID <> pID
 		LIMIT 1;
         
 SET State = 4;
-
+        
 		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
 			SELECT
 				pID AS 'ID',
-				'Barang sudah ada!' AS 'Message',
+				CONCAT('Kode Barang ', pItemCode, ' sudah ada!') AS 'Message',
 				'' AS 'MessageDetail',
 				1 AS 'FailedFlag',
 				State AS 'State' ;
@@ -220,10 +226,37 @@ SET State = 10;
 				)GC;
 		
 			LEAVE StoredProcedure;
+            
+		END IF;
+        
+SET State = 11;
+
+		SELECT 
+			0
+		INTO
+			PassValidate
+		FROM 
+			master_item
+		WHERE
+			TRIM(ItemName) = TRIM(pItemName)
+			AND ItemID <> pID
+		LIMIT 1;
+        
+SET State = 12;
+
+		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
+			SELECT
+				pID AS 'ID',
+				CONCAT('Nama Barang ', pItemName, ' sudah ada!') AS 'Message',
+				'' AS 'MessageDetail',
+				1 AS 'FailedFlag',
+				State AS 'State' ;
+		
+			LEAVE StoredProcedure;
 			
 		ELSE /*Data yang diinput valid*/
         
-SET State = 11;
+SET State = 13;
 
 			IF(pIsEdit = 0)	THEN /*Tambah baru*/
 				INSERT INTO master_item
@@ -260,14 +293,14 @@ SET State = 11;
 					pCurrentUser
 				);
 			
-SET State = 12;
+SET State = 14;
 
 				SELECT
 					LAST_INSERT_ID()
 				INTO 
 					pID;
 
-SET State = 13;
+SET State = 15;
 				SET SQL_SAFE_UPDATES = 0;
                 
 				UPDATE temp_master_itemdetails
@@ -277,7 +310,7 @@ SET State = 13;
 				
                 SET SQL_SAFE_UPDATES = 1;
                 
-SET State = 14;
+SET State = 16;
 				INSERT INTO master_itemdetails
                 (
 					ItemDetailsID,
@@ -315,7 +348,7 @@ SET State = 14;
 				FROM
 					temp_master_itemdetails;
                 
-SET State = 15;
+SET State = 17;
 
 				SELECT
 					pID AS 'ID',
@@ -326,7 +359,7 @@ SET State = 15;
                     
 			ELSE
             
-SET State = 16;
+SET State = 18;
 
 				UPDATE
 					master_item
@@ -347,7 +380,7 @@ SET State = 16;
 				WHERE
 					ItemID = pID;
 
-SET State = 17;
+SET State = 19;
 
 				UPDATE master_itemdetails MID
                 JOIN temp_master_itemdetails TMID
@@ -365,7 +398,7 @@ SET State = 17;
 					MID.Weight = TMID.Weight,
 					ModifiedBy = pCurrentUser;
                     
-SET State = 18;
+SET State = 20;
 				
 				DELETE FROM master_itemdetails
 				WHERE 
@@ -374,9 +407,10 @@ SET State = 18;
 												TMID.ItemDetailsID
 											FROM 
 												temp_master_itemdetails TMID
-										);
+										)
+					AND ItemID = pID;
                                 
-SET State = 19;
+SET State = 21;
 
 				INSERT INTO master_itemdetails
                 (
@@ -417,7 +451,7 @@ SET State = 19;
 				WHERE
 					ItemDetailsID = 0;
                     
-SET State = 20;
+SET State = 22;
 
 				SELECT
 					pID AS 'ID',

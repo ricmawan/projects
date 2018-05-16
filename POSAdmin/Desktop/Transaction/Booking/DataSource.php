@@ -10,20 +10,22 @@
 	$columns = array(
 					0 => "BookingID", //unorderable
 					1 => "RowNumber", //unorderable
-					2 => "TB.BookingNumber",
-					3 => "TB.TransactionDate",
+					2 => "TS.BookingNumber",
+					3 => "TS.TransactionDate",
 					4 => "MC.CustomerName",
 					5 => "TSD.Total"
 				);
 
 	$where = " 1=1 ";
-	$order_by = "TB.BookingID";
+	$order_by = "TB.BookingID DESC";
 	$limit_s = $requestData['start'];
 	$limit_l = $requestData['length'];
 	
 	//Handles Sort querystring sent from Bootgrid
-	$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
-	$order_by .= ", TB.BookingID ASC";
+	if(ISSET($requestData['order'])) {
+		$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
+		$order_by .= ", TB.BookingID ASC";
+	}
 	//Handles search querystring sent from Bootgrid
 	if (!empty($requestData['search']['value']))
 	{
@@ -62,6 +64,7 @@
 		$row_array[] = $row['PlainTransactionDate'];
 		$row_array[] = $row['RetailFlag'];
 		$row_array[] = number_format($row['Weight'],2,".",",");
+		$row_array[] = $row['Payment'];
 		array_push($return_arr, $row_array);
 	}
 	

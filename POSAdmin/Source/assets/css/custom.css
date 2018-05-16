@@ -945,3 +945,28 @@ input::-webkit-inner-spin-button {
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
 }
+
+.panel-user {
+  border-color: #ddd;
+}
+.panel-user > .panel-heading {
+  color: #333;
+  background-color: #f5f5f5;
+  border-color: #ddd;
+}
+.panel-user > .panel-heading + .panel-collapse > .panel-body {
+  border-top-color: #ddd;
+}
+.panel-user > .panel-heading .badge {
+  color: #f5f5f5;
+  background-color: #333;
+}
+.panel-user > .panel-footer + .panel-collapse > .panel-body {
+  border-bottom-color: #ddd;
+}
+
+.ui-datepicker .ui-datepicker-next, .ui-datepicker .ui-datepicker-prev {
+	background: #f6f6f6 url("images/ui-bg_highlight-hard_100_f6f6f6_1x100.png") 50% 50% repeat-x;
+	font-weight: bold;
+	color: #111111;
+}

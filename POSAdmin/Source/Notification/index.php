@@ -37,6 +37,10 @@
 		<script>
 			var table;
 			$(document).ready(function() {
+				$( window ).resize(function() {
+					table.columns.adjust().draw();
+				});
+				
 				$.fn.dataTable.ext.errMode = function(settings, techNote, message) { 
 					$("#loading").hide();
 					var errorMessage = "DataTables Error : " + techNote + " (" + message + ")";

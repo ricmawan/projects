@@ -63,6 +63,7 @@ SET State = 2;
 
 SET @query = CONCAT("SELECT
 						MI.ItemID,
+                        0 ItemDetailsID,
                         MI.ItemCode,
 						MI.ItemName,
                         MC.CategoryID,
@@ -75,8 +76,8 @@ SET @query = CONCAT("SELECT
                         MI.Qty2,
                         MI.Weight,
                         MI.MinimumStock,
-                        ROUND((IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0)), 2) Stock,
-                        ROUND((IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(P.Quantity, 0)), 2) PhysicalStock,
+                        ROUND((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0)), 2) Stock,
+                        ROUND((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(P.Quantity, 0)), 2) PhysicalStock,
                         MU.UnitName
 					FROM
 						master_item MI
@@ -85,6 +86,28 @@ SET @query = CONCAT("SELECT
 							ON MC.CategoryID = MI.CategoryID
 						JOIN master_unit MU
 							ON MU.UnitID = MI.UnitID
+						LEFT JOIN
+						(
+							SELECT
+								FSD.ItemID,
+								FSD.BranchID,
+								SUM(FSD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+							FROM
+								transaction_firststockdetails FSD
+                                LEFT JOIN master_itemdetails MID
+									ON FSD.ItemDetailsID = MID.ItemDetailsID
+							WHERE
+								CASE
+									WHEN ",pBranchID," = 0
+									THEN FSD.BranchID
+									ELSE ",pBranchID,"
+								END = FSD.BranchID
+							GROUP BY
+								FSD.ItemID,
+								FSD.BranchID
+						)FS
+							ON FS.ItemID = MI.ItemID
+							AND MB.BranchID = FS.BranchID
 						LEFT JOIN
 						(
 							SELECT
@@ -293,6 +316,7 @@ SET @query = CONCAT("SELECT
                     UNION ALL
                     SELECT
 						MI.ItemID,
+                        MID.ItemDetailsID,
                         MID.ItemDetailsCode,
 						MI.ItemName,
                         MC.CategoryID,
@@ -305,8 +329,8 @@ SET @query = CONCAT("SELECT
                         MID.Qty2,
                         MID.Weight,
                         MID.MinimumStock,
-                        ROUND((IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0)) / MID.ConversionQuantity, 2) Stock,
-                        ROUND((IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(P.Quantity, 0))  / MID.ConversionQuantity, 2) PhysicalStock,
+                        ROUND((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0)) / MID.ConversionQuantity, 2) Stock,
+                        ROUND((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(P.Quantity, 0))  / MID.ConversionQuantity, 2) PhysicalStock,
                         MU.UnitName
 					FROM
 						master_itemdetails MID
@@ -317,6 +341,28 @@ SET @query = CONCAT("SELECT
 							ON MI.ItemID = MID.ItemID
 						JOIN master_category MC
 							ON MC.CategoryID = MI.CategoryID
+						LEFT JOIN
+                        (
+							SELECT
+								FSD.ItemID,
+								FSD.BranchID,
+								SUM(FSD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+							FROM
+								transaction_firststockdetails FSD
+                                LEFT JOIN master_itemdetails MID
+									ON FSD.ItemDetailsID = MID.ItemDetailsID
+							WHERE
+								CASE
+									WHEN ",pBranchID," = 0
+									THEN FSD.BranchID
+									ELSE ",pBranchID,"
+								END = FSD.BranchID
+							GROUP BY
+								FSD.ItemID,
+								FSD.BranchID
+						)FS
+							ON FS.ItemID = MI.ItemID
+							AND MB.BranchID = FS.BranchID
 						LEFT JOIN
 						(
 							SELECT

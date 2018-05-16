@@ -58,9 +58,9 @@
 		$objPHPExcel->getActiveSheet()->getStyle("A1:A2")->getFont()->setBold(true);
 		$objPHPExcel->getActiveSheet()->getStyle("A1")->getFont()->setSize(16);
 		//merge title
-		$objPHPExcel->getActiveSheet()->mergeCells("A1:F2");
+		$objPHPExcel->getActiveSheet()->mergeCells("A1:H2");
 		//center title
-		$objPHPExcel->getActiveSheet()->getStyle("A1:E2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$objPHPExcel->getActiveSheet()->getStyle("A1:H2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		
 		$objPHPExcel->setActiveSheetIndex(0)
 					->setCellValue('B3', "Kategori:");
@@ -73,8 +73,8 @@
 		$objPHPExcel->getActiveSheet()->getStyle("B3:C4")->getFont()->setBold(true);
 
 		//bold title
-		$objPHPExcel->getActiveSheet()->getStyle("A6:F6")->getFont()->setBold(true);
-		$objPHPExcel->getActiveSheet()->getStyle("A6:F6")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');
+		$objPHPExcel->getActiveSheet()->getStyle("A6:H6")->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle("A6:H6")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');
 
 		
 
@@ -85,9 +85,11 @@
 		$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "No");
 		$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, "Kode");
 		$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, "Nama");
-		$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, "Kategori");
-		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Cabang");
-		$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, "Stok");
+		$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, "Satuan");
+		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Kategori");
+		$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, "Cabang");
+		$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, "Stok");
+		$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, "Fisik");
 		$rowExcel++;
 		
 		$sql = "CALL spSelExportStockReport(".$CategoryID.", ".$BranchID.", '".$_SESSION['UserLogin']."')";
@@ -101,20 +103,24 @@
 			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $RowNumber);
 			$objPHPExcel->getActiveSheet()->setCellValueExplicit("B".$rowExcel, $row['ItemCode'], PHPExcel_Cell_DataType::TYPE_STRING);
 			$objPHPExcel->getActiveSheet()->setCellValueExplicit("C".$rowExcel, $row['ItemName'], PHPExcel_Cell_DataType::TYPE_STRING);
-			$objPHPExcel->getActiveSheet()->setCellValueExplicit("D".$rowExcel, $row['CategoryName'], PHPExcel_Cell_DataType::TYPE_STRING);
-			$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, $row['BranchName'], PHPExcel_Cell_DataType::TYPE_STRING);
-			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['Stock']);
+			$objPHPExcel->getActiveSheet()->setCellValueExplicit("D".$rowExcel, $row['UnitName'], PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, $row['CategoryName'], PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->getActiveSheet()->setCellValueExplicit("F".$rowExcel, $row['BranchName'], PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, $row['Stock']);
+			$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, $row['PhysicalStock']);
 			$RowNumber++;
 			$rowExcel++;
 		}
 		mysqli_free_result($result);
 		mysqli_next_result($dbh);
 		
-		$objPHPExcel->getActiveSheet()->getStyle("B7:E".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+		$objPHPExcel->getActiveSheet()->getStyle("B7:F".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+
+		$objPHPExcel->getActiveSheet()->getStyle("G6:H".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 		
 		//set all width 
 		$fromCol='A';
-		$toCol= 'G';
+		$toCol= 'I';
 		for($j = $fromCol; $j !== $toCol; $j++) {
 			//$calculatedWidth = $objPHPExcel->getActiveSheet()->getColumnDimension($i)->getWidth();
 			$objPHPExcel->getActiveSheet()->getColumnDimension($j)->setAutoSize(true);
@@ -126,7 +132,7 @@
 			  )
 			)
 		);		
-		$objPHPExcel->getActiveSheet()->getStyle("A6:F".($rowExcel-1))->applyFromArray($styleArray);		
+		$objPHPExcel->getActiveSheet()->getStyle("A6:H".($rowExcel-1))->applyFromArray($styleArray);		
 
 		$title = "Laporan Stok " . $CategoryName . " " . $period;
 		// Rename worksheet

@@ -62,7 +62,7 @@
 						</div>
 						<hr style="margin: 10px 0;" />
 						<div class="table-responsive" id="dvTable" style="display: none;">
-							<table id="grid-data" class="table table-striped table-bordered table-hover" >
+							<table id="grid-data" class="table table-striped table-bordered table-hover" style="width: 100%;" >
 								<thead>				
 									<tr>
 										<th>Cabang</th>
@@ -168,6 +168,9 @@
 				}
 			};
 			$(document).ready(function () {
+				$( window ).resize(function() {
+					table.columns.adjust().draw();
+				});
 				$("#ddlCategory").combobox();
 				$("#ddlCategory").next().find("input").click(function() {
 					$(this).val("");

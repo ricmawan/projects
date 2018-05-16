@@ -11,7 +11,7 @@
 	//kolom di table
 
 	$where = " 1=1 ";
-	$order_by = "ItemID";
+	$order_by = "ItemID, ItemDetailsID";
 	$limit_s = 0;
 	$limit_l = 20;
 	
@@ -56,8 +56,8 @@
 		$row_array[] = $row['Qty1'];
 		$row_array[] = number_format($row['Price2'],0,".",",");
 		$row_array[] = $row['Qty2'];
-		$row_array[] = $row['Stock'];
-		$row_array[] = $row['PhysicalStock'];
+		$row_array[] = number_format($row['Stock'],0,".",",");
+		$row_array[] = number_format($row['PhysicalStock'],2,".",",");
 		array_push($return_arr, $row_array);
 	}
 	

@@ -35,12 +35,17 @@ SET State = 1;
 			MI.ItemCode,
 	        MI.ItemName,
 	        PD.Quantity,
+            MU.UnitName,
 	        PD.BuyPrice,
 			(PD.Quantity * PD.BuyPrice) SubTotal
 		FROM
 			transaction_purchasedetails PD
 	        JOIN master_item MI
 				ON MI.ItemID = PD.ItemID
+			LEFT JOIN master_itemdetails MID
+				ON MID.ItemDetailsID = PD.ItemDetailsID
+			LEFT JOIN master_unit MU
+				ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
 		WHERE
 			PD.PurchaseID = pPurchaseID
             AND PD.BranchID = pBranchID
@@ -51,12 +56,17 @@ SET State = 1;
 			MI.ItemCode,
 	        MI.ItemName,
 	        PRD.Quantity,
+            MU.UnitName,
 	        PRD.BuyPrice,
             -(PRD.Quantity * PRD.BuyPrice) SubTotal
 		FROM
 			transaction_purchasereturndetails PRD
 	        JOIN master_item MI
 				ON MI.ItemID = PRD.ItemID
+			LEFT JOIN master_itemdetails MID
+				ON MID.ItemDetailsID = PRD.ItemDetailsID
+			LEFT JOIN master_unit MU
+				ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
 		WHERE
 			PRD.PurchaseReturnID = pPurchaseID
             AND PRD.BranchID = pBranchID

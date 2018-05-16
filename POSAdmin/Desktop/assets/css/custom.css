@@ -855,3 +855,20 @@ input::-webkit-inner-spin-button {
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
 }
+
+.lblInput {
+	font-family:'Open Sans', sans-serif !important;
+	font-size: 11px !important;
+	font-weight:400 !important;
+	font-stretch:100% !important;
+}
+
+.has-float-label input, .has-float-label select {
+	padding-top: 5px !important;
+}
+
+.ui-datepicker .ui-datepicker-next, .ui-datepicker .ui-datepicker-prev {
+	background: #f6f6f6 url("images/ui-bg_highlight-hard_100_f6f6f6_1x100.png") 50% 50% repeat-x;
+	font-weight: bold;
+	color: #111111;
+}

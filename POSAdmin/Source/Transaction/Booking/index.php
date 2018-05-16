@@ -308,7 +308,6 @@
 					mysqli_next_result($dbh);
 				?>
 			</select>
-			<input type="hidden" id="hdnBranchID" name="hdnBranchID" value=1 />
 		</div>
 		<div id="code-dialog" title="Konfirmasi Kode" style="display: none;">
 			<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Stok barang tidak mencukupi, masukkan kode di bawah jika tetap ingin menambahkan!</p>
@@ -1959,6 +1958,11 @@
 								if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0) {
 									$("#itemList-dialog").find("input[type='search']").focus();
 								}
+								else if(evt.keyCode == 27 && $("#itemList-dialog").css("display") == "block") {
+									$("#itemList-dialog").dialog("destroy");
+									table3.destroy();
+									table2.keys.enable();
+								}
 							}
 							setTimeout(function() { counterKeyItem = 0; } , 1000);
 						});
@@ -2110,7 +2114,11 @@
 							resetForm();
 							table2.destroy();
 							$("#finish-dialog").dialog("destroy");
-							openDialog(0, 0);
+							$("#FormData").dialog("destroy");
+							table.ajax.reload(function() {
+								table.keys.enable();
+								if(typeof index !== 'undefined') table.cell(index).focus();
+							}, false);
 							Lobibox.alert("success",
 							{
 								msg: data.Message,
@@ -2185,7 +2193,26 @@
 				}
 			}
 
+			var counterResize = 0;
 			$(document).ready(function() {
+				$( window ).resize(function() {
+					if(counterResize == 0) {
+						counterResize = 1;
+						table.columns.adjust().draw();
+						if ( $.fn.DataTable.isDataTable( '#grid-transaction' ) ) {
+							setTimeout(function() {
+								tableWidthAdjust();
+							}, 500);
+						}
+						if ( $.fn.DataTable.isDataTable( '#grid-item' ) ) {
+							table3.columns.adjust().draw();
+						}
+						setTimeout(function() {
+							counterResize = 0;
+						}, 1000);
+					}
+				});
+
 				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
 				    $(this).blur();
 				});
@@ -2247,7 +2274,8 @@
 				$("#txtTransactionDate").datepicker({
 					dateFormat: 'DD, dd M yy',
 					dayNames: [ "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu" ],
-					monthNames: [ "Jan", "Feb", "Mar", "Apr", "Mey", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Des" ],
+					monthNames: [ "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember" ],
+					monthNamesShort: [ "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Des" ],
 					maxDate : "+0D",
 					showOn: "button",
 					buttonImage: "./assets/img/calendar.gif",

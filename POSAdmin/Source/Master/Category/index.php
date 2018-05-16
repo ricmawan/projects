@@ -201,6 +201,7 @@
 					{
 						text: "Batal",
 						id: "btnCancelAddCategory",
+						tabindex: 8,
 						click: function() {
 							$(this).dialog("destroy");
 							$("#divModal").hide();
@@ -250,6 +251,9 @@
 			}
 
 			$(document).ready(function() {
+				$( window ).resize(function() {
+					table.columns.adjust().draw();
+				});
 				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
 					$(this).blur();
 				});

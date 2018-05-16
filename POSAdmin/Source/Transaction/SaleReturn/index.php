@@ -678,6 +678,11 @@
 								if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0) {
 									$("#transactionList-dialog").find("input[type='search']").focus();
 								}
+								else if(evt.keyCode == 27 && $("#transactionList-dialog").css("display") == "block") {
+									$("#transactionList-dialog").dialog("destroy");
+									table3.destroy();
+									table2.keys.enable();
+								}
 							}
 							setTimeout(function() { counterKeyTransaction = 0; } , 1000);
 						});
@@ -711,7 +716,7 @@
 
 			function finish() {
 				if($("#hdnSaleID").val() != 0) {
-					$("#finish-confirm").dialog({
+					$("#save-confirm").dialog({
 						autoOpen: false,
 						open: function() {
 							$(document).on('keydown', function(e) {
@@ -785,7 +790,26 @@
 				}
 			}
 			
+			var counterResize = 0;
 			$(document).ready(function() {
+				$( window ).resize(function() {
+					if(counterResize == 0) {
+						counterResize = 1;
+						table.columns.adjust().draw();
+						if ( $.fn.DataTable.isDataTable( '#grid-transaction' ) ) {
+							setTimeout(function() {
+								tableWidthAdjust();
+							}, 500);
+						}
+						if ( $.fn.DataTable.isDataTable( '#grid-item' ) ) {
+							table3.columns.adjust().draw();
+						}
+						setTimeout(function() {
+							counterResize = 0;
+						}, 1000);
+					}
+				});
+				
 				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
 				    $(this).blur();
 				});
@@ -812,7 +836,8 @@
 				$("#txtTransactionDate").datepicker({
 					dateFormat: 'DD, dd M yy',
 					dayNames: [ "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu" ],
-					monthNames: [ "Jan", "Feb", "Mar", "Apr", "Mey", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Des" ],
+					monthNames: [ "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember" ],
+					monthNamesShort: [ "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Des" ],
 					maxDate : "+0D",
 					showOn: "button",
 					buttonImage: "./assets/img/calendar.gif",
@@ -959,7 +984,7 @@
 					else if(evt.keyCode == 123) {
 						evt.preventDefault();
 					}
-					else if(evt.keyCode == 121 && $("#itemList-dialog").css("display") == "none"  && $("#finish-dialog").css("display") == "none" && $("#FormData").css("display") == "block"  && $(".lobibox").css("display") != "block") {
+					else if(evt.keyCode == 121 && $("#transactionList-dialog").css("display") == "none"  && $("#finish-dialog").css("display") == "none" && $("#FormData").css("display") == "block"  && $(".lobibox").css("display") != "block") {
 						evt.preventDefault();
 						if(counterKey == 0) {
 							finish();

@@ -114,7 +114,7 @@
 				<br />
 				<div class="row">
 					<div class="col-md-12">
-						<div class="panel panel-default" style="max-height: 340px;min-height: 340px;" >
+						<div class="panel panel-user" style="max-height: 340px !important;min-height: 340px !important;" >
 							<div class="panel-heading" style="padding: 5px 15px;" >
 								<h5>Pilih Hak Akses Menu</h5>
 							</div>
@@ -380,6 +380,7 @@
 					{
 						text: "Batal",
 						id: "btnCancelAddUser",
+						tabindex: (parseInt(btnIndex) + 1),
 						click: function() {
 							$(this).dialog("destroy");
 							$("#divModal").hide();
@@ -499,7 +500,7 @@
 						FirstFocus = 1;
 					}
 					if($("#txtConfirmPassword").val() != $("#txtPassword").val()) {
-						$("#txtConfirmPassword").notify("Konfirmasi Password tidak cocok!", { position:"right", className:"warn", autoHideDelay: 2000 });
+						$("#txtConfirmPassword").notify("Konfirmasi Password tidak cocok!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 						if(FirstFocus == 0) $("#txtConfirmPassword").focus();
 						PassValidate = 0;
 						FirstFocus = 1;
@@ -514,7 +515,7 @@
 							FirstFocus = 1;
 						}
 						if($("#txtConfirmPassword").val() != $("#txtPassword").val()) {
-							$("#txtConfirmPassword").notify("Konfirmasi Password tidak cocok!", { position:"right", className:"warn", autoHideDelay: 2000 });
+							$("#txtConfirmPassword").notify("Konfirmasi Password tidak cocok!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 							if(FirstFocus == 0) $("#txtConfirmPassword").focus();
 							PassValidate = 0;
 							FirstFocus = 1;
@@ -550,6 +551,10 @@
 			}
 			
 			$(document).ready(function() {
+				$( window ).resize(function() {
+					table.columns.adjust().draw();
+				});
+
 				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
 				    $(this).blur();
 				});

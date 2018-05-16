@@ -9,7 +9,7 @@
 	//kolom di table
 
 	$where = " 1=1 ";
-	$order_by = "TS.SaleID";
+	$order_by = "TB.BookingID";
 	$limit_s = 0;
 	$limit_l = 20;
 	
@@ -17,14 +17,14 @@
 	if (!empty($requestData['search']['value']))
 	{
 		$search = mysqli_real_escape_string($dbh, trim($requestData['search']['value']));
-		$where .= " AND ( TS.SaleNumber LIKE '%".$search."%'";
-		$where .= " OR DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
+		$where .= " AND ( TB.BookingNumber LIKE '%".$search."%'";
+		$where .= " OR DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
 		$where .= " OR MC.CustomerName LIKE '%".$search."%')";
 	}
-	$sql = "CALL spSelSale(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
+	$sql = "CALL spSelBooking(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
 
 	if (! $result = mysqli_query($dbh, $sql)) {
-		logEvent(mysqli_error($dbh), '/Transaction/saleReturn/TransactionList.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+		logEvent(mysqli_error($dbh), '/Transaction/PickUp/TransactionList.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 		return 0;
 	}
 	$row = mysqli_fetch_array($result);
@@ -40,7 +40,7 @@
 		$row_array = array();
 		$RowNumber++;
 		//data yang dikirim ke table
-		$row_array[] = $row['SaleNumber'];
+		$row_array[] = $row['BookingNumber'];
 		$row_array[] = $row['TransactionDate'];
 		$row_array[] = $row['CustomerName'];
 		$row_array[] = number_format($row['Total'],0,".",",");

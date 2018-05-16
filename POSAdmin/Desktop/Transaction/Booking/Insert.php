@@ -6,12 +6,14 @@
 		include "../../GetPermission.php";
 		$BookingID = mysqli_real_escape_string($dbh, $_POST['hdnBookingID']);
 		$BookingDetailsID = mysqli_real_escape_string($dbh, $_POST['hdnBookingDetailsID']);
-		$BookingNumber = mysqli_real_escape_string($dbh, $_POST['txtBookingNumber']);;
+		$BookingNumber = mysqli_real_escape_string($dbh, $_POST['txtBookingNumber']);
 		$TransactionDate = mysqli_real_escape_string($dbh, $_POST['hdnTransactionDate']);
 		$BranchID = mysqli_real_escape_string($dbh, $_POST['hdnBranchID']);
 		$RetailFlag = mysqli_real_escape_string($dbh, $_POST['hdnIsRetail']);
 		$CustomerID = mysqli_real_escape_string($dbh, $_POST['ddlCustomer']);
 		$ItemID = mysqli_real_escape_string($dbh, $_POST['hdnItemID']);
+		$ItemDetailsID = mysqli_real_escape_string($dbh, $_POST['hdnItemDetailsID']);
+		if($ItemDetailsID == "") $ItemDetailsID = "NULL";
 		$Qty = mysqli_real_escape_string($dbh, $_POST['txtQTY']);
 		$BuyPrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['hdnBuyPrice']));
 		$BookingPrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtBookingPrice']));
@@ -20,7 +22,7 @@
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
-		$sql = "CALL spInsBooking(".$BookingID.", '".$BookingNumber."', ".$RetailFlag.", ".$CustomerID.", '".$TransactionDate."', ".$BookingDetailsID.", ".$BranchID.", ".$ItemID.", ".$Qty.", ".$BuyPrice.", ".$BookingPrice.", ".$Discount.", ".$_SESSION['UserID'].", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsBooking(".$BookingID.", '".$BookingNumber."', ".$RetailFlag.", ".$CustomerID.", '".$TransactionDate."', ".$BookingDetailsID.", ".$BranchID.", ".$ItemID.", ".$ItemDetailsID.", ".$Qty.", ".$BuyPrice.", ".$BookingPrice.", ".$Discount.", ".$_SESSION['UserID'].", '".$_SESSION['UserLogin']."')";
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;

@@ -23,7 +23,9 @@
 							<input id="hdnSaleID" name="hdnSaleID" type="hidden" value=0 />
 							<input id="hdnSaleDetailsID" name="hdnSaleDetailsID" type="hidden" value=0 />
 							<input id="hdnItemID" name="hdnItemID" type="hidden" value=0 />
+							<input id="hdnItemDetailsID" name="hdnItemDetailsID" type="hidden" value=0 />
 							<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
+							<input id="hdnAvailableUnit" name="hdnAvailableUnit" type="hidden" />
 							<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
 							<input id="hdnPayment" name="hdnPayment" type="hidden" value=0 />
 							<input id="hdnDesktopPath" name="hdnDesktopPath" type="hidden" value='<?php echo $DESKTOP_PATH; ?>' />
@@ -68,24 +70,39 @@
 							<input type="hidden" id="hdnIsRetail" name="hdnIsRetail" value=1 />
 						</div>
 					</div>
-					<hr style="margin: 10px 0;" />
+					<br />
 					<div class="row col-md-12">
 						<table class="table table-striped table-hover" style="margin-bottom: 5px;width:80%;" >
-							<thead>
-								<tr>
-									<th style="width: 25%;text-align: center;" >Kode Barang</th>
-									<th style="width: 25%;text-align: center;" >Nama Barang</th>
-									<th style="width: 10%;text-align: center;" >Qty</th>
-									<th style="width: 20%;text-align: center;">Harga Jual</th>
-									<th style="width: 20%;text-align: center;">Diskon</th>
-								</tr>
-							</thead>
 							<tbody>
 								<tr>
-									<td style="width: 25%;" ><input id="txtItemCode" name="txtItemCode" type="text" tabindex=8 class="form-control-custom" style="width: 100%;" onfocus="this.select();" onkeypress="isEnterKey(event, 'getItemDetails');" onchange="getItemDetails();" autocomplete=off placeholder="Kode Barang" /></td>
-									<td style="width: 25%;" ><input id="txtItemName" name="txtItemName" type="text" class="form-control-custom" style="width: 100%;" disabled /></td>
-									<td style="width: 10%;" ><input id="txtQTY" name="txtQTY" type="number" tabindex=9 class="form-control-custom" style="width: 100%;margin: 0;border: 0;" value=1 min=1 onchange="this.value = validateQTY(this.value);Grosir(this.value);" onpaste="return false;" onfocus="this.select();" /></td>
-									<td style="width: 20%;" >
+									<td style="width: 15%;" >
+									<div class="has-float-label" >
+										<input id="txtItemCode" name="txtItemCode" type="text" tabindex=8 class="form-control-custom mousetrap" style="width: 100%;" onfocus="this.select();" onkeypress="isEnterKey(event, 'getItemDetails');" onchange="getItemDetails();" autocomplete=off />
+										<label for="txtItemCode" class="lblInput" >Kode Barang</label>
+									</div>
+								</td>
+								<td style="width: 20%;" >
+									<div class="has-float-label" >
+										<input id="txtItemName" name="txtItemName" type="text" class="form-control-custom mousetrap" style="width: 100%;" disabled />
+										<label for="txtItemName" class="lblInput" >Nama Barang</label>
+									</div>
+								</td>
+								<td style="width: 10%;" >
+									<div class="has-float-label" >
+										<input id="txtQTY" name="txtQTY" type="number" tabindex=9 class="form-control-custom mousetrap" style="width: 100%;margin: 0;border: 0;" value=1 min=1 onchange="this.value = validateQTY(this.value);Grosir(this.value);" onpaste="return false;" onfocus="this.select();" />
+										<label for="txtQTY" class="lblInput" >Qty</label>
+									</div>
+								</td>
+								<td style="width: 10%;" >
+									<div class="has-float-label" >
+										<select id="ddlUnit" name="ddlUnit" tabindex=10 class="form-control-custom mousetrap" onchange="changeItemCode();" >
+											<option >--</option>
+										</select>
+										<label for="ddlUnit" class="lblInput" >Satuan</label>
+									</div>
+								</td>
+								<td style="width: 15%;" >
+									<div class="has-float-label" >
 										<input id="hdnBuyPrice" name="hdnBuyPrice" type="hidden" value=0 />
 										<input id="hdnRetailPrice" name="hdnRetailPrice" type="hidden" value=0 />
 										<input id="hdnPrice1" name="hdnPrice1" type="hidden" value=0 />
@@ -94,15 +111,28 @@
 										<input id="hdnQty2" name="hdnQty2" type="hidden" value=0 />
 										<input id="hdnBranchID" name="hdnBranchID" type="hidden" value=1 />
 										<input id="hdnWeight" name="hdnWeight" type="hidden" value=0 />
-										<input id="hdnStock" name="hdnStock" type="hidden" value="" />
-										<input id="txtSalePrice" name="txtSalePrice" type="text" tabindex=10 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Jual" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
-									</td>
-									<td style="width: 20%;" ><input id="txtDiscount" name="txtDiscount" type="text" tabindex=11 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Diskon" onkeypress="isEnterKey(event, 'addSaleDetails');return isNumberKey(event, this.id, this.value);" onchange="addSaleDetails();" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" /></td>
+										<input id="hdnConversionQty" name="hdnConversionQty" type="hidden" value=0 />
+										<input id="hdnStock" name="hdnStock" type="hidden" value=0 />
+										<input id="txtSalePrice" name="txtSalePrice" type="text" tabindex=11 class="form-control-custom text-right mousetrap" value="0" autocomplete=off onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
+										<label for="txtSalePrice" class="lblInput" >Harga Jual</label>
+									</div>
+								</td>
+								<td style="width: 15%;" >
+									<div class="has-float-label" >
+										<input id="txtDiscount" name="txtDiscount" type="text" tabindex=12 class="form-control-custom text-right mousetrap" value="0" autocomplete=off onkeypress="isEnterKey(event, 'addSaleDetails');return isNumberKey(event, this.id, this.value);" onchange="addSaleDetails();" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
+										<label for="txtDiscount" class="lblInput" >Diskon</label>
+									</div>
+								</td>
+								<td style="width: 15%;" >
+									<div class="has-float-label" >
+										<input id="txtSubTotal" name="txtSubTotal" type="text" class="form-control-custom text-right mousetrap" style="width: 100%;" value="0" autocomplete=off onpaste="return false;" disabled />
+										<label for="txtSubTotal" class="lblInput" >Sub Total</label>
+									</div>
+								</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<hr style="margin: 10px 0;" />
 					<div class="row col-md-12" >
 						<div id="divTableContent" class="table-responsive" style="overflow-x:hidden;">
 							<table id="grid-transaction" style="width: 100% !important;" class="table table-striped table-bordered table-hover" >
@@ -116,6 +146,7 @@
 										<th>Kode Barang</th>
 										<th>Nama Barang</th>
 										<th>Qty</th>
+										<th>Satuan</th>
 										<th>Harga Jual</th>
 										<th>Diskon</th>
 										<th>Sub Total</th>
@@ -125,7 +156,11 @@
 										<th>Price2</th>
 										<th>Qty2</th>
 										<th>Weight</th>
-										<th>Retail Price</th>
+										<th>RetailPrice</th>
+										<th>AvailableUnit</th>
+										<th>UnitID</th>
+										<th>ItemDetailsID</th>
+										<th>ConversionQty</th>
 									</tr>
 								</thead>
 							</table>
@@ -159,13 +194,15 @@
 							<tr>
 								<th>Kode Barang</th>
 								<th>Nama Barang</th>
-								<th>Harga Ecer</th>
-								<th>Harga Grosir 1</th>
-								<th>QTY Grosir 1</th>
-								<th>Harga Grosir 2</th>
-								<th>QTY Grosir 2</th>
+								<th>Satuan</th>
+								<th>H Beli</th>
+								<th>H Ecer</th>
+								<th>H Grosir 1</th>
+								<th>QTY1</th>
+								<th>H Grosir 2</th>
+								<th>QTY2</th>
 								<th>Stok</th>
-								<th>Stok Fisik</th>
+								<th>Fisik</th>
 							</tr>
 						</thead>
 					</table>
@@ -246,7 +283,6 @@
 					mysqli_next_result($dbh);
 				?>
 			</select>
-			<input type="hidden" id="hdnBranchID" name="hdnBranchID" value=1 />
 		</div>
 		<div id="code-dialog" title="Konfirmasi Kode" style="display: none;">
 			<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Stok barang tidak mencukupi, masukkan kode di bawah jika tetap ingin menambahkan!</p>
@@ -273,6 +309,19 @@
 			var table3;
 			var today;
 			var rowEdit;
+
+			function changeItemCode() {
+				var itemCode = $("#ddlUnit option:selected").attr("itemcode");
+				$("#txtItemCode").val(itemCode);
+				getItemDetails();
+			}
+
+			function CalculateSubTotal() {
+				var buyPrice = parseFloat($("#txtSalePrice").val().replace(/\,/g, ""));
+				var QTY = parseFloat($("#txtQTY").val());
+				var SubTotal = buyPrice * QTY;
+				$("#txtSubTotal").val(returnRupiah(SubTotal.toString()));
+			}
 			
 			function openDialogEdit(Data) {
 				$("#hdnSaleDetailsID").val(Data[1]);
@@ -281,47 +330,39 @@
 				$("#txtItemCode").val(Data[5]);
 				$("#txtItemName").val(Data[6]);
 				$("#txtQTY").val(Data[7]);
-				$("#txtSalePrice").val(Data[8]);
-				$("#txtDiscount").val(Data[9]);
-				$("#hdnBuyPrice").val(Data[11]);
-				$("#hdnPrice1").val(Data[12]);
-				$("#hdnQty1").val(Data[13]);
-				$("#hdnPrice2").val(Data[14]);
-				$("#hdnQty2").val(Data[15]);
-				$("#hdnWeight").val(Data[16]);
-				$("#hdnRetailPrice").val(Data[17]);
+				$("#txtSalePrice").val(Data[9]);
+				$("#txtDiscount").val(Data[10]);
+				$("#txtSubTotal").val(Data[11]);
+				$("#hdnBuyPrice").val(Data[12]);
+				$("#hdnPrice1").val(Data[13]);
+				$("#hdnQty1").val(Data[14]);
+				$("#hdnPrice2").val(Data[15]);
+				$("#hdnQty2").val(Data[16]);
+				$("#hdnWeight").val(Data[17]);
+				$("#hdnRetailPrice").val(Data[18]);
 
-				$.ajax({
-					url: "./Transaction/Sale/CheckItem.php",
-					type: "POST",
-					data: { itemCode : Data[5], branchID : Data[3] },
-					dataType: "json",
-					success: function(data) {
-						if(data.FailedFlag == '0') {
-							$("#hdnStock").val(parseFloat(data.Stock) + parseFloat(Data[7]));
-						}
-					},
-					error: function(jqXHR, textStatus, errorThrown) {
-						$("#loading").hide();
-						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-						LogEvent(errorMessage, "/Transaction/Sale/index.php");
-						Lobibox.alert("error",
-						{
-							msg: errorMessage,
-							width: 480
-						});
-						return 0;
+				$("#hdnAvailableUnit").val(Data[19]);
+				$("#hdnItemDetailsID").val(Data[21]);
+				$("#hdnConversionQty").val(Data[22]);
+
+				var availableUnit = JSON.parse(Data[19]);
+				if(availableUnit.length > 0) {
+					$("#ddlUnit").find('option').remove();
+					for(var i=0;i<availableUnit.length;i++) {
+						$("#ddlUnit").append("<option value=" + availableUnit[i][0] + " itemdetailsid='" + availableUnit[i][2] + "' itemcode='" + availableUnit[i][3] + "' buyprice='" + availableUnit[i][4] + "' retailprice='" + availableUnit[i][5] + "' price1='" + availableUnit[i][6] + "' price2='" + availableUnit[i][7] + "' qty1='" + availableUnit[i][8] + "'  qty2='" + availableUnit[i][9] + "' >" + availableUnit[i][1] + "</option>");
 					}
-				});
+				}
+				$("#ddlUnit").val(Data[20]);
+
 				setTimeout(function() { $("#txtItemCode").focus(); }, 0);
 			}
 			
 			function openDialog(Data, EditFlag) {
 				$("#hdnIsEdit").val(EditFlag);
-				$("#txtTransactionDate").focus();
+				//$("#txtTransactionDate").focus();
 				table2 = $("#grid-transaction").DataTable({
 							"keys": true,
-							"scrollY": "290px",
+							"scrollY": "280px",
 							"scrollX": false,
 							"scrollCollapse": false,
 							"paging": false,
@@ -333,12 +374,17 @@
 								{ "visible": false },
 								{ "visible": false },
 								{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-center" },
+								{ "width": "15%", "orderable": false, className: "dt-head-center" },
 								{ "width": "20%", "orderable": false, className: "dt-head-center" },
-								{ "width": "25%", "orderable": false, className: "dt-head-center" },
+								{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
+								{ "width": "10%", "orderable": false, className: "dt-head-center" },
 								{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
 								{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
 								{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-								{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
+								{ "visible": false },
+								{ "visible": false },
+								{ "visible": false },
+								{ "visible": false },
 								{ "visible": false },
 								{ "visible": false },
 								{ "visible": false },
@@ -454,21 +500,50 @@
 							dataType: "json",
 							success: function(data) {
 								if(data.FailedFlag == '0') {
-									if($("#hdnItemID").val() != data.ItemID) {
-										$("#hdnItemID").val(data.ItemID);
-										$("#txtItemName").val(data.ItemName);
-										$("#txtSalePrice").val(returnRupiah(data.RetailPrice));
-										$("#hdnBuyPrice").val(data.BuyPrice);
-										$("#hdnRetailPrice").val(data.RetailPrice);
-										$("#hdnPrice1").val(data.Price1);
-										$("#hdnQty1").val(data.Qty1);
-										$("#hdnPrice2").val(data.Price2);
-										$("#hdnQty2").val(data.Qty2);
-										$("#hdnWeight").val(data.Weight);
+									//if($("#hdnItemID").val() != data.ItemID) {
+										if($("#hdnSaleDetailsID").val() != 0) {
+											var itemDetailsTemp = table2.row( rowEdit ).data()[21];
+											if(itemDetailsTemp == "") itemDetailsTemp = null;
+										}
+
+										if($("#hdnSaleDetailsID").val() != 0 && itemDetailsTemp === data.ItemDetailsID && table2.row( rowEdit ).data()[2] == data.ItemID) {
+											$("#hdnStock").val((parseFloat(data.Stock) + parseFloat(table2.row( rowEdit ).data()[7])).toFixed(2));
+											//console.log("mlebu 1");
+										}
+										else if($("#hdnSaleDetailsID").val() != 0 && itemDetailsTemp !== data.ItemDetailsID && table2.row( rowEdit ).data()[2] == data.ItemID) {
+											var baseQTY = parseFloat(table2.row( rowEdit ).data()[22]) * parseFloat(table2.row( rowEdit ).data()[7]);
+											$("#hdnStock").val((parseFloat(data.Stock) + (baseQTY / parseFloat(data.ConversionQty)) ).toFixed(2));
+											//console.log("mlebu 2");
+										}
+										else {
+											$("#hdnStock").val(parseFloat(data.Stock));
+											$("#hdnItemID").val(data.ItemID);
+											$("#txtItemName").val(data.ItemName);
+											$("#txtSalePrice").val(returnRupiah(data.RetailPrice));
+											$("#hdnBuyPrice").val(data.BuyPrice);
+											$("#hdnRetailPrice").val(data.RetailPrice);
+											$("#hdnPrice1").val(data.Price1);
+											$("#hdnQty1").val(data.Qty1);
+											$("#hdnPrice2").val(data.Price2);
+											$("#hdnQty2").val(data.Qty2);
+											$("#hdnWeight").val(data.Weight);
+											$("#txtSubTotal").val(returnRupiah(data.RetailPrice));
+											$("#hdnAvailableUnit").val(JSON.stringify(data.AvailableUnit));
+											$("#hdnItemDetailsID").val(data.ItemDetailsID);
+											if(data.AvailableUnit.length > 0) {
+												$("#ddlUnit").find('option').remove();
+												for(var i=0;i<data.AvailableUnit.length;i++) {
+													$("#ddlUnit").append("<option value=" + data.AvailableUnit[i][0] + " itemdetailsid='" + data.AvailableUnit[i][2] + "' itemcode='" + data.AvailableUnit[i][3] + "' buyprice='" + data.AvailableUnit[i][4] + "' retailprice='" + data.AvailableUnit[i][5] + "' price1='" + data.AvailableUnit[i][6] + "' price2='" + data.AvailableUnit[i][7] + "' qty1='" + data.AvailableUnit[i][8] + "' qty2='" + data.AvailableUnit[i][9] + "' >" + data.AvailableUnit[i][1] + "</option>");
+												}
+											}
+											$("#ddlUnit").val(data.UnitID);
+											Grosir($("#txtQTY").val());
+											CalculateSubTotal();
+											//console.log("mlebu 3");
+										}
 										$("#txtQTY").focus();
-										$("#hdnStock").val(data.Stock);
-									}
-									else $("#txtQTY").focus();
+									//}
+									//else $("#txtQTY").focus();
 								}
 								else {
 									//add new item
@@ -563,10 +638,10 @@
 						var price1 = $("#hdnPrice1").val();
 						var qty2 = $("#hdnQty2").val();
 						var price2 = $("#hdnPrice2").val();
-						if(parseFloat(Quantity) >= parseFloat(qty2)) {
+						if(parseFloat(Quantity) >= parseFloat(qty2) && parseFloat(qty2) > 1) {
 							$("#txtSalePrice").val(returnRupiah(price2));
 						}
-						else if(parseFloat(Quantity) < parseFloat(qty2) && parseFloat(Quantity) >= parseFloat(qty1)) {
+						else if(parseFloat(Quantity) < parseFloat(qty2) && parseFloat(Quantity) >= parseFloat(qty1)  && parseFloat(qty2) > 1  && parseFloat(qty1) > 1) {
 							$("#txtSalePrice").val(returnRupiah(price1));
 						}
 						else {
@@ -688,6 +763,8 @@
 								var itemID = $("#hdnItemID").val();
 								var itemCode = $("#txtItemCode").val();
 								var itemName = $("#txtItemName").val();
+								var unitID = $("#ddlUnit").val();
+								var unitName = $("#ddlUnit option:selected").text();
 								var Qty = $("#txtQTY").val();
 								var salePrice = $("#txtSalePrice").val();
 								var buyPrice = $("#hdnBuyPrice").val();
@@ -699,9 +776,13 @@
 								var branchID = $("#hdnBranchID").val();
 								var weight = $("#hdnWeight").val();
 								var retailPrice = $("#hdnRetailPrice").val();
+								var availableUnit = $("#hdnAvailableUnit").val();
+								var unitID = $("#ddlUnit").val();
+								var itemDetailsID = $("#hdnItemDetailsID").val();
 								$("#txtDiscount").blur();
 								var PassValidate = 1;
 								var FirstFocus = 0;
+								var ConversionQty = $("#hdnConversionQty").val();
 								var Stock = $("#hdnStock").val();
 								$.ajax({
 									url: "./Transaction/Sale/Insert.php",
@@ -724,6 +805,7 @@
 													itemCode,
 													itemName,
 													Qty,
+													unitName,
 													salePrice,
 													returnRupiah(discount.toString()),
 													returnRupiah((parseFloat(salePrice.replace(/\,/g, "")) * parseFloat(Qty) - parseFloat(discount)).toString()),
@@ -733,7 +815,11 @@
 													price2,
 													qty2,
 													weight,
-													retailPrice
+													retailPrice,
+													availableUnit,
+													unitID,
+													itemDetailsID,
+													ConversionQty
 												]).draw();
 												
 												$("#toggle-branch-" + data.SaleDetailsID).toggles({
@@ -771,6 +857,7 @@
 													itemCode,
 													itemName,
 													Qty,
+													unitName,
 													salePrice,
 													returnRupiah(discount.toString()),
 													returnRupiah((parseFloat(salePrice.replace(/\,/g, "")) * parseFloat(Qty) - parseFloat(discount)).toString()),
@@ -780,7 +867,11 @@
 													price2,
 													qty2,
 													weight,
-													retailPrice
+													retailPrice,
+													availableUnit,
+													unitID,
+													itemDetailsID,
+													ConversionQty
 												]).draw();
 												
 												$("#toggle-branch-" + data.SaleDetailsID).toggles({
@@ -806,22 +897,28 @@
 											}
 											$("#txtItemCode").val("");
 											$("#txtItemName").val("");
-											$("#txtDiscount").val(0);
 											$("#txtQTY").val(1);
 											$("#txtSalePrice").val(0);
+											$("#txtDiscount").val(0);
 											$("#hdnBuyPrice").val(0);
 											$("#hdnPrice1").val(0);
 											$("#hdnQty1").val(0);
 											$("#hdnPrice2").val(0);
 											$("#hdnQty2").val(0);
+											$("#hdnBranchID").val(1);
 											$("#txtItemCode").focus();
 											$("#hdnSaleID").val(data.ID);
 											$("#hdnSaleDetailsID").val(0);
 											$("#hdnItemID").val(0);
 											$("#hdnWeight").val(0);
 											$("#hdnRetailPrice").val(0);
-											$("#hdnBranchID").val(1);
-											$("#hdnStock").val("");
+											$("#txtSubTotal").val(0);
+											$("#hdnStock").val(0);
+											$("#ddlUnit").find('option').remove();
+											$("#ddlUnit").append("<option>--</option>");
+											$("#hdnAvailableUnit").val("");
+											$("#hdnItemDetailsID").val(0);
+											$("#hdnConversionQty").val(0);
 											tableWidthAdjust();
 											Calculate();
 										}
@@ -883,7 +980,9 @@
 					var itemID = $("#hdnItemID").val();
 					var itemCode = $("#txtItemCode").val();
 					var itemName = $("#txtItemName").val();
-					var Qty = $("#txtQTY").val();
+					var unitID = $("#ddlUnit").val();
+					var unitName = $("#ddlUnit option:selected").text();
+					var Qty = parseFloat($("#txtQTY").val());
 					var salePrice = $("#txtSalePrice").val();
 					var buyPrice = $("#hdnBuyPrice").val();
 					var price1 = $("#hdnPrice1").val();
@@ -894,10 +993,14 @@
 					var branchID = $("#hdnBranchID").val();
 					var weight = $("#hdnWeight").val();
 					var retailPrice = $("#hdnRetailPrice").val();
+					var availableUnit = $("#hdnAvailableUnit").val();
+					var unitID = $("#ddlUnit").val();
+					var itemDetailsID = $("#hdnItemDetailsID").val();
 					$("#txtDiscount").blur();
 					var PassValidate = 1;
 					var FirstFocus = 0;
-					var Stock = $("#hdnStock").val();
+					var Stock = parseFloat($("#hdnStock").val());
+					var ConversionQty = $("#hdnConversionQty").val();
 					$("#FormData .form-control-custom").each(function() {
 						if($(this).hasAttr('required')) {
 							if($(this).val() == "") {
@@ -948,6 +1051,7 @@
 												itemCode,
 												itemName,
 												Qty,
+												unitName,
 												salePrice,
 												returnRupiah(discount.toString()),
 												returnRupiah((parseFloat(salePrice.replace(/\,/g, "")) * parseFloat(Qty) - parseFloat(discount)).toString()),
@@ -957,7 +1061,11 @@
 												price2,
 												qty2,
 												weight,
-												retailPrice
+												retailPrice,
+												availableUnit,
+												unitID,
+												itemDetailsID,
+												ConversionQty
 											]).draw();
 											
 											$("#toggle-branch-" + data.SaleDetailsID).toggles({
@@ -976,12 +1084,6 @@
 												height: 18, // height if not set in css
 												type: 'compact' // if this is set to 'select' then the select style toggle will be used
 											});
-											if($("#hdnBranchID").val() == 1) {
-												$("#toggle-branch-" + data.SaleDetailsID).toggles(true);
-											}
-											else {
-												$("#toggle-branch-" + data.SaleDetailsID).toggles(false);
-											}
 										}
 										else {
 											var toggles = $('#toggle-branch-' + data.SaleDetailsID).data('toggles').active;
@@ -995,6 +1097,7 @@
 												itemCode,
 												itemName,
 												Qty,
+												unitName,
 												salePrice,
 												returnRupiah(discount.toString()),
 												returnRupiah((parseFloat(salePrice.replace(/\,/g, "")) * parseFloat(Qty) - parseFloat(discount)).toString()),
@@ -1004,7 +1107,11 @@
 												price2,
 												qty2,
 												weight,
-												retailPrice
+												retailPrice,
+												availableUnit,
+												unitID,
+												itemDetailsID,
+												ConversionQty
 											]).draw();
 											
 											$("#toggle-branch-" + data.SaleDetailsID).toggles({
@@ -1030,22 +1137,28 @@
 										}
 										$("#txtItemCode").val("");
 										$("#txtItemName").val("");
-										$("#txtDiscount").val(0);
 										$("#txtQTY").val(1);
 										$("#txtSalePrice").val(0);
+										$("#txtDiscount").val(0);
 										$("#hdnBuyPrice").val(0);
 										$("#hdnPrice1").val(0);
 										$("#hdnQty1").val(0);
 										$("#hdnPrice2").val(0);
 										$("#hdnQty2").val(0);
+										$("#hdnBranchID").val(1);
 										$("#txtItemCode").focus();
 										$("#hdnSaleID").val(data.ID);
 										$("#hdnSaleDetailsID").val(0);
 										$("#hdnItemID").val(0);
 										$("#hdnWeight").val(0);
 										$("#hdnRetailPrice").val(0);
-										$("#hdnBranchID").val(1);
-										$("#hdnStock").val("");
+										$("#txtSubTotal").val(0);
+										$("#hdnStock").val(0);
+										$("#ddlUnit").find('option').remove();
+										$("#ddlUnit").append("<option>--</option>");
+										$("#hdnAvailableUnit").val("");
+										$("#hdnItemDetailsID").val(0);
+										$("#hdnConversionQty").val(0);
 										tableWidthAdjust();
 										Calculate();
 									}
@@ -1168,9 +1281,9 @@
 				var itemCode = $("#txtItemCode").val();
 				Lobibox.window({
 					title: 'Tambah Barang',
-					url: 'Transaction/Sale/PopUpAddItem.php',
+					url: 'Master/Item/PopUpAddItem.php',
 					width: 780,
-					height: 460,
+					height: 540,
 					buttons: {
 						Simpan: {
 							'class': 'ui-button ui-corner-all ui-widget',
@@ -1188,7 +1301,7 @@
 							if($("#hdnPermission").length == 0) {
 								$("#txtItemNameAdd").focus();
 								$("#txtItemCodeAdd").val(itemCode);
-								$("#btnSimpan").attr("tabindex", 27);
+								$("#btnSimpan").attr("tabindex", 28);
 								$(document).on('keydown', function(e) {
 									if (e.keyCode == 39 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //right arrow
 										$("#btnBatal").focus();
@@ -1210,14 +1323,7 @@
 						if (type === 'Simpan'){
 							var PassValidate = 1;
 							var FirstFocus = 0;
-
-							if($("#ddlCategoryAdd").val() == "") {
-								PassValidate = 0;
-								$("#ddlCategoryAdd").next().find("input").notify("Harus diisi!", { position:"right", className:"warn", autoHideDelay: 2000 });
-								if(FirstFocus == 0) $("#ddlCategoryAdd").next().find("input").focus();
-								FirstFocus = 1;
-							}
-
+							
 							$("#FormItem .form-control-custom").each(function() {
 								if($(this).hasAttr('required')) {
 									if($(this).val() == "") {
@@ -1228,6 +1334,60 @@
 									}
 								}
 							});
+
+							if($("#ddlCategoryAdd").val() == "") {
+								PassValidate = 0;
+								$("#ddlCategoryAdd").next().find("input").notify("Harus diisi!", { position:"right", className:"warn", autoHideDelay: 2000 });
+								if(FirstFocus == 0) $("#ddlCategoryAdd").next().find("input").focus();
+								FirstFocus = 1;
+							}
+
+							if($("#hdnTabsCounter").val() > 0) {
+								for(var j=1;j<=$("#hdnTabsCounter").val();j++) {
+									if($("#ddlUnitAdd").val() == $("#ddlUnit_" + j).val()) {
+										PassValidate = 0;
+										if(FirstFocus == 0) {
+											tabs.tabs("option", "active", j);
+											$("#ddlUnit_" + j).notify("Tidak boleh sama!", { position:"right", className:"warn", autoHideDelay: 2000 });
+											$("#ddlUnit_" + j).focus();
+											FirstFocus = 1;
+										}
+									}
+									else if($("#txtItemCodeAdd").val() == $("#txtItemCode_" + j).val()) {
+										PassValidate = 0;
+										if(FirstFocus == 0) {
+											tabs.tabs("option", "active", j);
+											$("#txtItemCode_" + j).notify("Tidak boleh sama!", { position:"right", className:"warn", autoHideDelay: 2000 });
+											$("#txtItemCode_" + j).focus();
+											FirstFocus = 1;
+										}
+									}
+								}
+
+								for(var i=1;i<=$("#hdnTabsCounter").val();i++) {
+									for(var j=i+1;j<=$("#hdnTabsCounter").val();j++) {
+										if($("#ddlUnit_" + i).val() == $("#ddlUnit_" + j).val()) {
+											PassValidate = 0;
+											if(FirstFocus == 0) {
+												tabs.tabs("option", "active", j);
+												$("#ddlUnit_" + j).notify("Tidak boleh sama!", { position:"right", className:"warn", autoHideDelay: 2000 });
+												$("#ddlUnit_" + j).focus();
+												FirstFocus = 1;
+											}
+										}
+										else if($("#txtItemCode_" + i).val() == $("#txtItemCode_" + j).val()) {
+											PassValidate = 0;
+											if(FirstFocus == 0) {
+												tabs.tabs("option", "active", j);
+												$("#txtItemCode_" + j).notify("Tidak boleh sama!", { position:"right", className:"warn", autoHideDelay: 2000 });
+												$("#txtItemCode_" + j).focus();
+												FirstFocus = 1;
+											}
+										}
+									}
+								}
+							}
+
 							if(PassValidate == 1) {
 								$("#save-confirm-add").dialog({
 									autoOpen: false,
@@ -1267,7 +1427,7 @@
 											$(this).dialog("destroy");
 											//callback("Ya");
 											$.ajax({
-												url: "./Transaction/Sale/InsertNewItem.php",
+												url: "./Master/Item/InsertNewItem.php",
 												type: "POST",
 												data: $("#PostFormItem").serialize(),
 												dataType: "json",
@@ -1289,15 +1449,7 @@
 															},
 															shown: function() {
 																setTimeout(function() {
-																	$("#hdnItemID").val(data.ID);
-																	$("#txtItemName").val($("#txtItemNameAdd").val());
-																	$("#hdnBuyPrice").val($("#txtBuyPriceAdd").val());
-																	$("#txtSalePrice").val($("#txtRetailPriceAdd").val());
-																	$("#hdnPrice1").val($("#txtPrice1Add").val());
-																	$("#hdnQty1").val($("#txtQty1Add").val());
-																	$("#hdnPrice2").val($("#txtPrice2Add").val());
-																	$("#hdnQty2").val($("#txtQty2Add").val());
-																	$("#hdnWeight").val($("#txtWeightAdd").val());
+																	getItemDetails();
 																	var lobibox = $('.lobibox-window').data('lobibox');
 																	lobibox.destroy();
 																}, 0);
@@ -1328,7 +1480,7 @@
 													$("#loading").hide();
 													var counter = 0;
 													var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-													LogEvent(errorMessage, "/Transaction/Sale/index.php");
+													LogEvent(errorMessage, "/Master/Item/index.php");
 													Lobibox.alert("error",
 													{
 														msg: errorMessage,
@@ -1553,8 +1705,8 @@
 				var weight = 0;
 				table2.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
 					var data = this.data();
-					grandTotal += parseFloat(data[8].replace(/\,/g, "")) * parseFloat(data[7]) - parseFloat(data[9].replace(/\,/g, ""));
-					weight += parseFloat(data[16]) * parseFloat(data[7]);
+					grandTotal += parseFloat(data[9].replace(/\,/g, "")) * parseFloat(data[7]) - parseFloat(data[10].replace(/\,/g, ""));
+					weight += parseFloat(data[17]) * parseFloat(data[7]);
 				});
 				$("#lblTotal").html(returnRupiah(grandTotal.toString()));
 				$("#lblWeight").html(returnWeight(weight.toString()));
@@ -1571,6 +1723,7 @@
 			
 			function resetForm() {
 				$("#hdnSaleID").val(0);
+				$("#hdnSaleDetailsID").val(0);
 				$("#hdnItemID").val(0);
 				$("#txtTransactionDate").datepicker("setDate", new Date());
 				$("#txtSaleNumber").val("");
@@ -1582,13 +1735,21 @@
 				$("#hdnPrice1").val(0);
 				$("#hdnQty1").val(0);
 				$("#hdnQty2").val(0);
+				$("#hdnBranchID").val(1);
 				//$("#toggle-retail").toggleClass('disabled', false);
 				$('#toggle-retail').toggles(true);
 				$("#lblTotal").html("0");
 				$("#lblWeight").html("0");
 				$("#hdnPayment").html("0");
 				$("#hdnRetailPrice").val(0);
-				$("#ddlPayment").val(1);
+				if( $("#ddlCustomer").has("option").length > 0 ) $("#ddlCustomer option")[0].selected = true;
+				$("#ddlUnit").find('option').remove();
+				$("#ddlUnit").append("<option>--</option>");
+				$("#hdnAvailableUnit").val("");
+				$("#hdnItemDetailsID").val(0);
+				$("#txtSubTotal").val(0);
+				$("#hdnStock").val(0);
+				$("#hdnConversionQty").val(0);
 				table2.clear().draw();
 			}
 
@@ -1611,15 +1772,17 @@
 									"searching": true,
 									"order": [],
 									"columns": [
-										{ "width": "14%", "orderable": false, className: "dt-head-center" },
+										{ "width": "15%", "orderable": false, className: "dt-head-center" },
 										{ "width": "20%", "orderable": false, className: "dt-head-center" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "8%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "8%", "orderable": false, className: "dt-head-center dt-body-right" }
+										{ "width": "5%", "orderable": false, className: "dt-head-center" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" }
 									],
 									"ajax": {
 										"url": "./Transaction/Sale/ItemList.php",
@@ -1715,7 +1878,7 @@
 					buttons: [
 					{
 						text: "Tutup",
-						tabindex: 13,
+						tabindex: 18,
 						id: "btnCancelPickItem",
 						click: function() {
 							$(this).dialog("destroy");
@@ -1774,6 +1937,22 @@
 							}
 						}]
 					}).dialog("open");
+				}
+				else {
+					var counter = 0;
+					Lobibox.alert("error",
+					{
+						msg: "Silahkan tambahkan barang terlebih dahulu!",
+						width: 480,
+						beforeClose: function() {
+							if(counter == 0) {
+								setTimeout(function() {
+									$("#txtItemCode").focus();
+								}, 0);
+								counter = 1;
+							}
+						}
+					});
 				}
 			}
 
@@ -1993,11 +2172,35 @@
 				}).dialog("open");
 			}
 
+			var counterResize = 0;
 			$(document).ready(function() {
+				$( window ).resize(function() {
+					if(counterResize == 0) {
+						counterResize = 1;
+						if ( $.fn.DataTable.isDataTable( '#grid-transaction' ) ) {
+							setTimeout(function() {
+								tableWidthAdjust();
+							}, 500);
+						}
+						if ( $.fn.DataTable.isDataTable( '#grid-item' ) ) {
+							table3.columns.adjust().draw();
+						}
+						setTimeout(function() {
+							counterResize = 0;
+						}, 1000);
+					}
+				});
+
 				$('#grid-transaction').on('click', 'input[type="checkbox"]', function() {
 					$(this).blur();
 				});
-				$("#txtQTY").spinner();
+
+				$("#txtQTY").spinner({
+					change: function() {
+						CalculateSubTotal();
+					}
+				});
+
 				openDialog(0, 0);
 				$('#toggle-retail').toggles({
 					drag: true, // allow dragging the toggle between positions
@@ -2050,7 +2253,8 @@
 				$("#txtTransactionDate").datepicker({
 					dateFormat: 'DD, dd M yy',
 					dayNames: [ "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu" ],
-					monthNames: [ "Jan", "Feb", "Mar", "Apr", "Mey", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Des" ],
+					monthNames: [ "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember" ],
+					monthNamesShort: [ "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Des" ],
 					maxDate : "+0D",
 					showOn: "button",
 					buttonImage: "./assets/img/calendar.gif",
@@ -2117,6 +2321,12 @@
 					$('#toggle-retail').toggles(true);
 				});
 
+				Mousetrap.bind('ctrl+n', function(e) {
+					// your function here...
+					e.preventDefault();
+					window.open(path, "", "width=1000");
+				});
+
 				$.ajax({
 					url: "./FirstBalance.php",
 					type: "POST",
@@ -2125,6 +2335,7 @@
 					success: function(Data) {
 						if(Data.FailedFlag == '0') {
 							if(Data.IsFilled == 0) firstBalance();
+							else $("#txtTransactionDate").focus();
 						}
 						else {
 							var counter = 0;

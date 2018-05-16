@@ -1,3 +1,10 @@
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for insert the supplier
+Created Date: 12 November 2017
+Modified Date: 
+===============================================================*/
+
 DROP PROCEDURE IF EXISTS spInsUnit;
 
 DELIMITER $$
@@ -55,7 +62,7 @@ SET State = 1;
 SET State = 2;
 			SELECT
 				pID AS 'ID',
-				'Satuan sudah ada' AS 'Message',
+				CONCAT('Nama satuan ', pUnitName, ' sudah ada') AS 'Message',
 				'' AS 'MessageDetail',
 				1 AS 'FailedFlag',
 				State AS 'State' ;

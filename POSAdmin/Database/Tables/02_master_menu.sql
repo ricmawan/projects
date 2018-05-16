@@ -152,7 +152,7 @@ VALUES
 (
 	15,
 	3,
-	'Pemesanan',
+	'D.O',
 	'Transaction/Booking/',
 	NULL,
 	0,
@@ -253,7 +253,7 @@ VALUES
 	26,
 	4,
 	'Piutang',
-	'Report/Payment/',
+	'Report/Credit/',
 	NULL,
 	1,
 	8

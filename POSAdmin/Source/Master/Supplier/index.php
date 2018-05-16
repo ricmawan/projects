@@ -246,6 +246,7 @@
 					{
 						text: "Batal",
 						id: "btnCancelAddSupplier",
+						tabindex: 12,
 						click: function() {
 							$(this).dialog("destroy");
 							$("#divModal").hide();
@@ -299,6 +300,10 @@
 			}
 
 			$(document).ready(function() {
+				$( window ).resize(function() {
+					table.columns.adjust().draw();
+				});
+				
 				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
 				    $(this).blur();
 				});

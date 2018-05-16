@@ -38,8 +38,7 @@ SET @query = CONCAT("SELECT
 							SELECT
 								TS.SaleID,
 							    IFNULL(TS.Payment, 0) Payment,
-							    IFNULL(TP.Amount, 0) Amount,
-							    0 PickQuantity
+							    IFNULL(TP.Amount, 0) Amount
 							FROM
 								transaction_sale TS
 								JOIN transaction_saledetails SD
@@ -67,13 +66,12 @@ SET @query = CONCAT("SELECT
 								TS.Payment,
 								TP.Amount
 							HAVING
-								SUM(SD.Quantity * SD.SalePrice  - SD.Discount) > (Amount + Payment)
+								SUM(SD.Quantity * SD.SalePrice  - SD.Discount) > (TP.Amount + TS.Payment)
 							UNION ALL
 		                    SELECT
 								TB.BookingID,
 								IFNULL(TB.Payment, 0) Payment,
-								IFNULL(TP.Amount, 0) Amount,
-							    IFNULL(PK.Quantity, 0) PickQuantity
+								IFNULL(TP.Amount, 0) Amount
 							FROM
 								transaction_booking TB
 								JOIN transaction_bookingdetails BD
@@ -93,31 +91,14 @@ SET @query = CONCAT("SELECT
 										TransactionID
 								)TP
 									ON TP.TransactionID = TB.BookingID
-								LEFT JOIN
-							    (
-									SELECT
-										TB.BookingID,
-							            SUM(PD.Quantity) Quantity
-									FROM
-										transaction_pickdetails PD
-							            JOIN transaction_bookingdetails BD
-											ON PD.BookingDetailsID = BD.BookingDetailsID
-										JOIN transaction_booking TB
-											ON TB.BookingID = BD.BookingID
-									GROUP BY
-										TB.BookingID
-								)PK
-									ON TB.BookingID = PK.BookingID
 							WHERE
 								", pWhere2, "
 							GROUP BY
 								TB.BookingID,
 								TB.Payment,
-								TP.Amount,
-								PK.Quantity
+								TP.Amount
 							HAVING
-								SUM(BD.Quantity * BD.BookingPrice  - BD.Discount) > (Amount + Payment)
-							    OR SUM(BD.Quantity) > PickQuantity
+								SUM(BD.Quantity * BD.BookingPrice  - BD.Discount) > (TP.Amount + TB.Payment)
 						) TS"
 					);
                        
@@ -136,9 +117,10 @@ SET @query = CONCAT("SELECT
 						MC.CustomerName,
 						SUM(SD.Quantity * SD.SalePrice  - SD.Discount) Total,
 						IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0) TotalPayment,
-					    IFNULL(TS.Payment, 0) Payment,
-					    IFNULL(TP.Amount, 0) Amount,
-					    0 PickQuantity
+					    SUM(SD.Quantity * SD.SalePrice  - SD.Discount) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0)) Credit,
+                        'S' TransactionType,
+                        IFNULL(TS.Payment, 0) Payment,
+					    IFNULL(TP.Amount, 0) Amount
 					FROM
 						transaction_sale TS
 						JOIN transaction_saledetails SD
@@ -182,9 +164,10 @@ SET @query = CONCAT("SELECT
 						MC.CustomerName,
 						SUM(BD.Quantity * BD.BookingPrice  - BD.Discount) Total,
 						IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) TotalPayment,
+						SUM(BD.Quantity * BD.BookingPrice  - BD.Discount) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0)),
+                        'B' TransactionType,
 						IFNULL(TB.Payment, 0) Payment,
-						IFNULL(TP.Amount, 0) Amount,
-					    IFNULL(PK.Quantity, 0) PickQuantity
+					    IFNULL(TP.Amount, 0) Amount
 					FROM
 						transaction_booking TB
 						JOIN transaction_bookingdetails BD
@@ -204,21 +187,6 @@ SET @query = CONCAT("SELECT
 								TransactionID
 						)TP
 							ON TP.TransactionID = TB.BookingID
-						LEFT JOIN
-					    (
-							SELECT
-								TB.BookingID,
-					            SUM(PD.Quantity) Quantity
-							FROM
-								transaction_pickdetails PD
-					            JOIN transaction_bookingdetails BD
-									ON PD.BookingDetailsID = BD.BookingDetailsID
-								JOIN transaction_booking TB
-									ON TB.BookingID = BD.BookingID
-							GROUP BY
-								TB.BookingID
-						)PK
-							ON TB.BookingID = PK.BookingID
 					WHERE
 						", pWhere2, "
 					GROUP BY
@@ -228,11 +196,9 @@ SET @query = CONCAT("SELECT
 						MC.CustomerID,
 						MC.CustomerName,
 						IFNULL(TB.Payment, 0),
-						IFNULL(TP.Amount, 0),
-					    IFNULL(PK.Quantity, 0)
+						IFNULL(TP.Amount, 0)
 					HAVING
 						SUM(BD.Quantity * BD.BookingPrice  - BD.Discount) > (Amount + Payment)
-					    OR SUM(BD.Quantity) > PickQuantity
 					ORDER BY ", pOrder,
 					" LIMIT ", pLimit_s, ", ", pLimit_l);
 	                

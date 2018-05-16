@@ -530,6 +530,9 @@ function SingleDelete(url, DeleteID, callback) {
 					 $("#btnYesDelete").focus();
 				}
 			});
+			setTimeout(function() {
+				$("#btnYesDelete").focus();
+			}, 0);
 		},
 		close: function() {
 			$(this).dialog("destroy");
@@ -624,6 +627,9 @@ function DeleteData(url, callback) {
 						 $("#btnYesDel").focus();
 					}
 				});
+				setTimeout(function() {
+					$("#btnYesDel").focus();
+				}, 0);
 			},
 			close: function() {
 				$(this).dialog("destroy");
@@ -706,6 +712,9 @@ function DeleteData(url, callback) {
 				}
 			}]
 		}).dialog("open");
+	}
+	else {
+		callback("No Data");
 	}
 }
 
@@ -939,6 +948,7 @@ function validateQTY(QTY) {
 });*/
 
 //combobox autocomplete
+var idBeforeEsc = "";
 (function( $ ) {
 	$.widget( "custom.combobox", {
 		_create: function() {
@@ -950,6 +960,38 @@ function validateQTY(QTY) {
 			this._createAutocomplete();
 			//this._createShowAllButton();
 		},
+		_createShowAllButton: function() {
+			var input = this.input,
+			wasOpen = false;
+
+			$( "<a>" )
+			.attr( "tabIndex", -1 )
+			.attr( "title", "Show All Items" )
+			.tooltip()
+			.appendTo( this.wrapper )
+			.button({
+				icons: {
+					primary: "ui-icon-triangle-1-s"
+				},
+				text: false
+			})
+			.removeClass( "ui-corner-all" )
+			.addClass( "custom-combobox-toggle ui-corner-right" )
+			.on( "mousedown", function() {
+				wasOpen = input.autocomplete( "widget" ).is( ":visible" );
+			})
+			.on( "click", function() {
+				input.trigger( "focus" );
+
+				// Close if already visible
+				if ( wasOpen ) {
+				return;
+				}
+
+				// Pass empty string as value to search for, displaying all results
+				input.autocomplete( "search", "" );
+			});
+		},
 
 		_createAutocomplete: function() {
 			var selected = this.element.children( ":selected" ),
@@ -958,6 +1000,7 @@ function validateQTY(QTY) {
 			tabindex = this.element.attr("tabindex");
 			var dialogIndex = $(".ui-dialog").css("z-index");
 			var newIndex = parseInt(dialogIndex) + 1;
+			var id = this.element.attr("id");
 			wasOpen = false;
 			this.input = $( "<input style='font-family: Open Sans, sans-serif; font-size: 12px;'>" )
 			.appendTo( this.wrapper )
@@ -989,6 +1032,29 @@ function validateQTY(QTY) {
 				input.select();
 				// Pass empty string as value to search for, displaying all results
 				input.autocomplete( "search", "" );
+			})
+			.keydown(function(evt) {
+				if(evt.keyCode == 38 || evt.keyCode == 40) {
+					// Pass empty string as value to search for, displaying all results
+					//input.autocomplete( "search", "" );
+					if($("#" + id).val() != "") {
+						//input.val("");
+						input.trigger( "focus" );
+
+						// Close if already visible
+						if ( wasOpen ) {
+						return;
+						}
+
+						// Pass empty string as value to search for, displaying all results
+						input.autocomplete( "search", "" );
+						idBeforeEsc = $("#" + id).val();
+						$("#" + id).val("");
+					}
+				}
+				else if(evt.keyCode == 27) {
+					$("#" + id).val(idBeforeEsc);
+				}
 			})
 			.tooltip({
 				tooltipClass: "ui-state-highlight"

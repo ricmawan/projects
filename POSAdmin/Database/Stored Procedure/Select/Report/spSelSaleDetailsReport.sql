@@ -35,6 +35,7 @@ SET State = 1;
 			MI.ItemCode,
 	        MI.ItemName,
 	        SD.Quantity,
+            MU.UnitName,
 	        SD.SalePrice,
 			SD.Discount,
 			((SD.Quantity * SD.SalePrice) - SD.Discount) SubTotal
@@ -42,6 +43,10 @@ SET State = 1;
 			transaction_saledetails SD
 	        JOIN master_item MI
 				ON MI.ItemID = SD.ItemID
+			LEFT JOIN master_itemdetails MID
+				ON MID.ItemDetailsID = SD.ItemDetailsID
+			LEFT JOIN master_unit MU
+				ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
 		WHERE
 			SD.SaleID = pSaleID
             AND SD.BranchID = pBranchID
@@ -52,6 +57,7 @@ SET State = 1;
 			MI.ItemCode,
 	        MI.ItemName,
 	        SRD.Quantity,
+            MU.UnitName,
 	        SRD.SalePrice,
             0 Discount,
 			-(SRD.Quantity * SRD.SalePrice) SubTotal
@@ -59,6 +65,10 @@ SET State = 1;
 			transaction_salereturndetails SRD
 	        JOIN master_item MI
 				ON MI.ItemID = SRD.ItemID
+			LEFT JOIN master_itemdetails MID
+				ON MID.ItemDetailsID = SRD.ItemDetailsID
+			LEFT JOIN master_unit MU
+				ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
 		WHERE
 			SRD.SaleReturnID = pSaleID
             AND SRD.BranchID = pBranchID

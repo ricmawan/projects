@@ -222,6 +222,10 @@
 			}
 
 			$(document).ready(function () {
+				$( window ).resize(function() {
+					table.columns.adjust().draw();
+				});
+				
 				$("#txtToDate, #txtFromDate").datepicker({
 					dateFormat: 'dd-mm-yy',
 					maxDate : "+0D"

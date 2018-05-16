@@ -6,12 +6,14 @@
 		include "../../GetPermission.php";
 		$SaleID = mysqli_real_escape_string($dbh, $_POST['hdnSaleID']);
 		$SaleDetailsID = mysqli_real_escape_string($dbh, $_POST['hdnSaleDetailsID']);
-		$SaleNumber = mysqli_real_escape_string($dbh, $_POST['txtSaleNumber']);;
+		$SaleNumber = mysqli_real_escape_string($dbh, $_POST['txtSaleNumber']);
 		$TransactionDate = mysqli_real_escape_string($dbh, $_POST['hdnTransactionDate']);
 		$BranchID = mysqli_real_escape_string($dbh, $_POST['hdnBranchID']);
 		$RetailFlag = mysqli_real_escape_string($dbh, $_POST['hdnIsRetail']);
 		$CustomerID = mysqli_real_escape_string($dbh, $_POST['ddlCustomer']);
 		$ItemID = mysqli_real_escape_string($dbh, $_POST['hdnItemID']);
+		$ItemDetailsID = mysqli_real_escape_string($dbh, $_POST['hdnItemDetailsID']);
+		if($ItemDetailsID == "") $ItemDetailsID = "NULL";
 		$Qty = mysqli_real_escape_string($dbh, $_POST['txtQTY']);
 		$BuyPrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['hdnBuyPrice']));
 		$SalePrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtSalePrice']));
@@ -20,7 +22,7 @@
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
-		$sql = "CALL spInsSale(".$SaleID.", '".$SaleNumber."', ".$RetailFlag.", ".$CustomerID.", '".$TransactionDate."', ".$SaleDetailsID.", ".$BranchID.", ".$ItemID.", ".$Qty.", ".$BuyPrice.", ".$SalePrice.", ".$Discount.", ".$_SESSION['UserID'].", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsSale(".$SaleID.", '".$SaleNumber."', ".$RetailFlag.", ".$CustomerID.", '".$TransactionDate."', ".$SaleDetailsID.", ".$BranchID.", ".$ItemID.", ".$ItemDetailsID.", ".$Qty.", ".$BuyPrice.", ".$SalePrice.", ".$Discount.", ".$_SESSION['UserID'].", '".$_SESSION['UserLogin']."')";
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;

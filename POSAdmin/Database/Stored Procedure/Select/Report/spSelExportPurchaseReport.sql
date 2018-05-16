@@ -37,6 +37,7 @@ SET State = 1;
         MI.ItemName,
         MI.ItemCode,
         PD.Quantity,
+        MU.UnitName,
         PD.BuyPrice,
 		(PD.Quantity * PD.BuyPrice) SubTotal
 	FROM
@@ -47,6 +48,10 @@ SET State = 1;
 			ON MS.SupplierID = TP.SupplierID
 		JOIN master_item MI
 			ON MI.ItemID = PD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = PD.ItemDetailsID
+		LEFT JOIN master_unit MU
+			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
 	WHERE
 		PD.BranchID = pBranchID
 		AND CAST(TP.TransactionDate AS DATE) >= pFromDate
@@ -61,6 +66,7 @@ SET State = 1;
         MI.ItemName,
         MI.ItemCode,
         PRD.Quantity,
+        MU.UnitName,
         PRD.BuyPrice,
 		-(PRD.Quantity * PRD.BuyPrice) SubTotal
 	FROM
@@ -71,6 +77,10 @@ SET State = 1;
 			ON MS.SupplierID = TPR.SupplierID
 		JOIN master_item MI
 			ON MI.ItemID = PRD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = PRD.ItemDetailsID
+		LEFT JOIN master_unit MU
+			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
 	WHERE
 		PRD.BranchID = pBranchID
 		AND CAST(TPR.TransactionDate AS DATE) >= pFromDate
