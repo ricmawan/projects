@@ -289,15 +289,7 @@
 														{
 															msg: data.Message,
 															width: 480,
-															delay: false,
-															beforeClose: function() {
-																if(counter == 0) {
-																	setTimeout(function() {
-																		$("#txtItemCode").focus();
-																	}, 0);
-																	counter = 1;
-																}
-															}
+															delay: false
 														});
 														return 0;
 													}
@@ -310,15 +302,7 @@
 													Lobibox.alert("error",
 													{
 														msg: errorMessage,
-														width: 480,
-														beforeClose: function() {
-															if(counter == 0) {
-																setTimeout(function() {
-																	$("#txtItemCode").focus();
-																}, 0);
-																counter = 1;
-															}
-														}
+														width: 480
 													});
 													return 0;
 												}
@@ -457,15 +441,7 @@
 							Lobibox.alert("error",
 							{
 								msg: "Gagal memuat data",
-								width: 480,
-								beforeClose: function() {
-									if(counter == 0) {
-										setTimeout(function() {
-											//$("#txtItemCode").focus();
-										}, 0);
-										counter = 1;
-									}
-								}
+								width: 480
 							});
 							return 0;
 						}
@@ -572,15 +548,7 @@
 								Lobibox.alert("error",
 								{
 									msg: "Gagal memuat data",
-									width: 480,
-									beforeClose: function() {
-										if(counter == 0) {
-											setTimeout(function() {
-												//$("#txtItemCode").focus();
-											}, 0);
-											counter = 1;
-										}
-									}
+									width: 480
 								});
 								return 0;
 							}
@@ -847,15 +815,7 @@
 											{
 												msg: data.Message,
 												width: 480,
-												delay: false,
-												beforeClose: function() {
-													if(counter == 0) {
-														setTimeout(function() {
-															$("#txtItemCode").focus();
-														}, 0);
-														counter = 1;
-													}
-												}
+												delay: false
 											});
 											return 0;
 										}
@@ -868,15 +828,7 @@
 										Lobibox.alert("error",
 										{
 											msg: errorMessage,
-											width: 480,
-											beforeClose: function() {
-												if(counter == 0) {
-													setTimeout(function() {
-														$("#txtItemCode").focus();
-													}, 0);
-													counter = 1;
-												}
-											}
+											width: 480
 										});
 										return 0;
 									}

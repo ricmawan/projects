@@ -75,9 +75,6 @@
 					<div class="col-md-2">
 						<input id="txtCustomerName" name="txtCustomerName" type="text" class="form-control-custom mousetrap" onfocus="this.select();" autocomplete=off placeholder="Pelanggan" readonly />
 					</div>
-					<div class="col-md-1">
-						<div id="toggle-retail" class="toggle-modern" ></div>
-					</div>
 				</div>
 				<br />
 				<div class="row">

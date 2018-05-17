@@ -180,7 +180,7 @@ VALUES
 (
 	18,
 	3,
-	'Cetak Nota & Surat Jalan',
+	'Cetak Nota & Pengambilan',
 	'Transaction/Print/',
 	NULL,
 	0,

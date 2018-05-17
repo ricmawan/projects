@@ -18,7 +18,7 @@
 
 	$where = " 1=1 ";
 	$where2 = " 1=1 ";
-	$order_by = "SaleID DESC";
+	$order_by = "Credit DESC";
 	$limit_s = $requestData['start'];
 	$limit_l = $requestData['length'];
 	

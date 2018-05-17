@@ -19,15 +19,15 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading" style="padding: 1px 15px;">
-						 <h5>Penjualan</h5>
+						 <h5>Harian</h5>
 					</div>
 					<div class="panel-body">
 						<div class="row">
 							<div class="col-md-1 labelColumn">
-								Cabang:
+								User:
 							</div>
 							<div class="col-md-2">
-								<select id="ddlBranch" name="ddlBranch" tabindex=8 class="form-control-custom" placeholder="Pilih Cabang" >
+								<select id="ddlUser" name="ddlUser" tabindex=8 class="form-control-custom" placeholder="Pilih Cabang" >
 									<!--<option value=0 selected >-- Semua Cabang --</option>-->
 									<?php
 										$sql = "CALL spSelDDLBranch('".$_SESSION['UserLogin']."')";

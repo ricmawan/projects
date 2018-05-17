@@ -22,7 +22,7 @@
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						 <span style="width:50%;display:inline-block;">
-							 <h5>Retur Penjualan</h5>
+							 <h5>Pengambilan</h5>
 						</span>
 						<span style="width:49%;display:inline-block;text-align:right;">
 							<button id="btnAdd" class="btn btn-primary" onclick="openDialog(0, 0);"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
@@ -60,7 +60,7 @@
 			<form class="col-md-12" id="PostForm" method="POST" action="" >
 				<div class="row">
 					<div class="col-md-1 labelColumn">
-						No. Invoice :
+						No. D.O :
 						<input id="hdnPickUpID" name="hdnPickUpID" type="hidden" value=0 />
 						<input id="hdnBookingID" name="hdnBookingID" type="hidden" value=0 />
 						<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
@@ -93,7 +93,7 @@
 									<th>PickUpDetailsID</th>
 									<th>ItemID</th>
 									<th>BranchID</th>
-									<th><input id="select_all_salereturn" name="select_all_salereturn" type="checkbox" onclick="checkAllPickUp();" /></th>
+									<th><input id="select_all_salereturn" name="select_all_salereturn" type="checkbox" onclick="checkAllPickUp();" tabindex=7 /></th>
 									<th>Cabang</th>
 									<th>Kode Barang</th>
 									<th>Nama Barang</th>
@@ -142,7 +142,7 @@
 			function openDialog(Data, EditFlag) {
 				$("#hdnIsEdit").val(EditFlag);
 				if(EditFlag == 1) {
-					$("#FormData").attr("title", "Edit Retur Penjualan");
+					$("#FormData").attr("title", "Edit Pengambilan");
 					$("#hdnPickUpID").val(Data[6]);
 					$("#txtCustomerName").val(Data[4]);
 					$("#txtBookingNumber").val(Data[2]);
@@ -152,7 +152,7 @@
 					getPickUpDetails(Data[6]);
 				}
 				else {
-					$("#FormData").attr("title", "Tambah Retur Penjualan");
+					$("#FormData").attr("title", "Tambah Pengambilan");
 					$("#txtBookingNumber").prop("readonly", false);
 				}
 				var index = table.cell({ focused: true }).index();
@@ -199,6 +199,11 @@
 											"last": "»",
 											"first": "«"
 										}
+									},
+									"initComplete": function(settings, json) {
+										setTimeout(function() {
+											$("#grid-transaction").find("input:checkbox").first().remove()
+										}, 0);
 									}
 								});
 						table2.columns.adjust();
@@ -223,93 +228,110 @@
 					buttons: [
 					{
 						text: "Simpan",
-						tabindex: 12,
 						id: "btnSavePickUp",
 						click: function() {
-							if($("input:checkbox[class=chkBookingDetails]:checked").length > 0)
-							{
-								saveConfirm(function(action) {
-									if(action == "Ya") {
-										$("#loading").show();
-										$.ajax({
-											url: "./Transaction/PickUp/Insert.php",
-											type: "POST",
-											data: $("#PostForm").serialize(),
-											dataType: "json",
-											success: function(data) {
-												if(data.FailedFlag == '0') {
-													$("#loading").hide();
-													$("#FormData").dialog("destroy");
-													$("#divModal").hide();
-													resetForm();
-													table2.destroy();
-													var counter = 0;
-													Lobibox.alert("success",
-													{
-														msg: data.Message,
-														width: 480,
-														delay: 2000,
-														beforeClose: function() {
-															if(counter == 0) {
-																table.keys.enable();
-																counter = 1;
-															}
-														},
-														shown: function() {
-															setTimeout(function() {
-																table.ajax.reload(function() {
+							if($("#hdnSaleID").val() != 0) {
+								if($("input:checkbox[class=chkBookingDetails]:checked").length > 0)
+								{
+									saveConfirm(function(action) {
+										if(action == "Ya") {
+											$("#loading").show();
+											$.ajax({
+												url: "./Transaction/PickUp/Insert.php",
+												type: "POST",
+												data: $("#PostForm").serialize(),
+												dataType: "json",
+												success: function(data) {
+													if(data.FailedFlag == '0') {
+														$("#loading").hide();
+														$("#FormData").dialog("destroy");
+														$("#divModal").hide();
+														resetForm();
+														table2.destroy();
+														var counter = 0;
+														Lobibox.alert("success",
+														{
+															msg: data.Message,
+															width: 480,
+															delay: 2000,
+															beforeClose: function() {
+																if(counter == 0) {
 																	table.keys.enable();
-																	if(typeof index !== 'undefined') table.cell(index).focus();
-																	table.keys.disable();
-																}, false);
-															}, 0);
-														}
-													});
-												}
-												else {
+																	counter = 1;
+																}
+															},
+															shown: function() {
+																setTimeout(function() {
+																	table.ajax.reload(function() {
+																		table.keys.enable();
+																		if(typeof index !== 'undefined') table.cell(index).focus();
+																		table.keys.disable();
+																	}, false);
+																}, 0);
+															}
+														});
+													}
+													else {
+														$("#loading").hide();
+														var counter = 0;
+														Lobibox.alert("warning",
+														{
+															msg: data.Message,
+															width: 480,
+															delay: false
+														});
+														return 0;
+													}
+												},
+												error: function(jqXHR, textStatus, errorThrown) {
 													$("#loading").hide();
 													var counter = 0;
-													Lobibox.alert("warning",
+													var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+													LogEvent(errorMessage, "/Master/Item/index.php");
+													Lobibox.alert("error",
 													{
-														msg: data.Message,
-														width: 480,
-														delay: false,
-														beforeClose: function() {
-															if(counter == 0) {
-																setTimeout(function() {
-																	$("#txtItemCode").focus();
-																}, 0);
-																counter = 1;
-															}
-														}
+														msg: errorMessage,
+														width: 480
 													});
 													return 0;
 												}
-											},
-											error: function(jqXHR, textStatus, errorThrown) {
-												$("#loading").hide();
-												var counter = 0;
-												var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-												LogEvent(errorMessage, "/Master/Item/index.php");
-												Lobibox.alert("error",
-												{
-													msg: errorMessage,
-													width: 480,
-													beforeClose: function() {
-														if(counter == 0) {
-															setTimeout(function() {
-																$("#txtItemCode").focus();
-															}, 0);
-															counter = 1;
-														}
-													}
-												});
-												return 0;
+											});
+										}
+										else {
+											return false;
+										}
+									});
+								}
+								else {
+									var counter = 0;
+									Lobibox.alert("error",
+									{
+										msg: "Minimal pilih 1 data!",
+										width: 480,
+										beforeClose: function() {
+											if(counter == 0) {
+												setTimeout(function() {
+													$("#select_all_salereturn").focus();
+												}, 0);
+												counter = 1;
 											}
-										});
-									}
-									else {
-										return false;
+										}
+									});
+								}
+							}
+							else {
+								var counter = 0;
+								Lobibox.alert("error",
+								{
+									msg: "Silahkan input No. D.O!",
+									width: 480,
+									beforeClose: function() {
+										if(counter == 0) {
+											setTimeout(function() {
+												$("#txtBookingNumber").focus();
+											}, 0);
+											counter = 1;
+										}
 									}
 								});
 							}
@@ -317,7 +339,6 @@
 					},
 					{
 						text: "Tutup",
-						tabindex: 13,
 						id: "btnCancelAddPickUp",
 						click: function() {
 							$(this).dialog("destroy");
@@ -372,6 +393,13 @@
 							}
 							table2.draw();
 							tableWidthAdjust();
+							$("#btnSavePickUp").attr("tabindex", Data.tabindex);
+							$("#btnCancelAddPickUp").attr("tabindex", (parseFloat(Data.tabindex) + 1));
+							setTimeout(function() {
+								$("#grid-transaction").find("input:checkbox").first().remove()
+							}, 0);
+
+							$(".txtQTY").spinner();
 							
 							for(var i=0;i<Data.data.length;i++) {
 								$("#toggle-branch-" + Data.data[i][0]).toggles({
@@ -443,45 +471,74 @@
 						success: function(Data) {
 							if(Data.FailedFlag == '0') {
 								table2.clear().draw();
-								for(var i=0;i<Data.data.length;i++) {
-									if(i == 0) {
-										$("#hdnBookingID").val(Data.data[i][13]);
-										$("#txtCustomerName").val(Data.data[i][12]);
+
+								if(Data.data.length > 0) {
+									for(var i=0;i<Data.data.length;i++) {
+										if(i == 0) {
+											$("#hdnBookingID").val(Data.data[i][13]);
+											$("#txtCustomerName").val(Data.data[i][12]);
+										}
+										table2.row.add(Data.data[i]);
 									}
-									table2.row.add(Data.data[i]);
-								}
-								table2.draw();
-								tableWidthAdjust();
-								
-								for(var i=0;i<Data.data.length;i++) {
-									$("#toggle-branch-" + Data.data[i][0]).toggles({
-										drag: true, // allow dragging the toggle between positions
-										click: true, // allow clicking on the toggle
-										text: {
-											on: 'Toko', // text for the ON position
-											off: 'Gudang' // and off
-										},
-										on: true, // is the toggle ON on init
-										animate: 250, // animation time (ms)
-										easing: 'swing', // animation transition easing function
-										checkbox: null, // the checkbox to toggle (for use in forms)
-										clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
-										width: 80, // width used if not set in css
-										height: 18, // height if not set in css
-										type: 'compact' // if this is set to 'select' then the select style toggle will be used
-									});
+									$("#btnSavePickUp").attr("tabindex", Data.tabindex);
+									$("#btnCancelAddPickUp").attr("tabindex", (parseFloat(Data.tabindex) + 1));
+									table2.draw();
+									tableWidthAdjust();
+									setTimeout(function() {
+										$("#grid-transaction").find("input:checkbox").first().remove()
+									}, 0);
+
+									$(".txtQTY").spinner();
+
+									$("#select_all_salereturn").prop("checked", false);								
 									
-									if(Data.data[i][2] == 1) $("#toggle-branch-" + Data.data[i][0]).toggles(true);
-									else $("#toggle-branch-" + Data.data[i][0]).toggles(false);
-											
-									if(Data.data[i][13] == 0) {
-										$("#toggle-branch-" + Data.data[i][0]).toggles().toggleClass('disabled', true);;
+									for(var i=0;i<Data.data.length;i++) {
+										$("#toggle-branch-" + Data.data[i][0]).toggles({
+											drag: true, // allow dragging the toggle between positions
+											click: true, // allow clicking on the toggle
+											text: {
+												on: 'Toko', // text for the ON position
+												off: 'Gudang' // and off
+											},
+											on: true, // is the toggle ON on init
+											animate: 250, // animation time (ms)
+											easing: 'swing', // animation transition easing function
+											checkbox: null, // the checkbox to toggle (for use in forms)
+											clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
+											width: 80, // width used if not set in css
+											height: 18, // height if not set in css
+											type: 'compact' // if this is set to 'select' then the select style toggle will be used
+										});
+										
+										if(Data.data[i][2] == 1) $("#toggle-branch-" + Data.data[i][0]).toggles(true);
+										else $("#toggle-branch-" + Data.data[i][0]).toggles(false);
+												
+										if(Data.data[i][13] == 0) {
+											$("#toggle-branch-" + Data.data[i][0]).toggles().toggleClass('disabled', true);;
+										}
 									}
+									//Calculate();
+									setTimeout(function() {
+										$("#grid-transaction").DataTable().cell( ':eq(3)' ).focus();
+									}, 0);
 								}
-								//Calculate();
-								setTimeout(function() {
-									$("#grid-transaction").DataTable().cell( ':eq(3)' ).focus();
-								}, 0);
+								else {
+									var counter = 0;
+									Lobibox.alert("error",
+									{
+										msg: "No. Invoice tidak valid!",
+										width: 480,
+										beforeClose: function() {
+											if(counter == 0) {
+												setTimeout(function() {
+													$("#txtBookingNumber").focus();
+												}, 0);
+												counter = 1;
+											}
+										}
+									});
+									return 0;
+								}
 							}
 							else {
 								var counter = 0;
@@ -715,73 +772,105 @@
 			}
 
 			function finish() {
-				if($("#hdnBookingID").val() != 0) {
-					$("#save-confirm").dialog({
-						autoOpen: false,
-						open: function() {
-							$(document).on('keydown', function(e) {
-								if (e.keyCode == 39) { //right arrow
-									 $("#btnNo").focus();
-								}
-								else if (e.keyCode == 37) { //left arrow
-									 $("#btnYes").focus();
-								}
-							});
-						},
-						show: {
-							effect: "fade",
-							duration: 0
-						},
-						hide: {
-							effect: "fade",
-							duration: 0
-						},
-						close: function() {
-							$(this).dialog("destroy");
-							//callback("Tidak");
-						},
-						resizable: false,
-						height: "auto",
-						width: 400,
-						modal: true,
-						buttons: [
-						{
-							text: "Ya",
-							id: "btnYes",
-							click: function() {
-								$(this).dialog("destroy");
-								$("#FormData").dialog("destroy");
-								$("#divModal").hide();
-								table.ajax.reload(function() {
-									table.keys.enable();
-									if(typeof index !== 'undefined') table.cell(index).focus();
-								}, false);
-								resetForm();
-								table2.destroy();
-								//$(this).dialog("destroy");
-								//callback("Ya");
+				if($("#hdnSaleID").val() != 0) {
+					if($("input:checkbox[class=chkBookingDetails]:checked").length > 0)
+					{
+						saveConfirm(function(action) {
+							if(action == "Ya") {
+								$("#loading").show();
+								$.ajax({
+									url: "./Transaction/PickUp/Insert.php",
+									type: "POST",
+									data: $("#PostForm").serialize(),
+									dataType: "json",
+									success: function(data) {
+										if(data.FailedFlag == '0') {
+											$("#loading").hide();
+											$("#FormData").dialog("destroy");
+											$("#divModal").hide();
+											resetForm();
+											table2.destroy();
+											var counter = 0;
+											Lobibox.alert("success",
+											{
+												msg: data.Message,
+												width: 480,
+												delay: 2000,
+												beforeClose: function() {
+													if(counter == 0) {
+														table.keys.enable();
+														counter = 1;
+													}
+												},
+												shown: function() {
+													setTimeout(function() {
+														table.ajax.reload(function() {
+															table.keys.enable();
+															if(typeof index !== 'undefined') table.cell(index).focus();
+															table.keys.disable();
+														}, false);
+													}, 0);
+												}
+											});
+										}
+										else {
+											$("#loading").hide();
+											var counter = 0;
+											Lobibox.alert("warning",
+											{
+												msg: data.Message,
+												width: 480,
+												delay: false
+											});
+											return 0;
+										}
+									},
+									error: function(jqXHR, textStatus, errorThrown) {
+										$("#loading").hide();
+										var counter = 0;
+										var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+										LogEvent(errorMessage, "/Master/Item/index.php");
+										Lobibox.alert("error",
+										{
+											msg: errorMessage,
+											width: 480
+										});
+										return 0;
+									}
+								});
 							}
-						},
-						{
-							text: "Tidak",
-							id: "btnNo",
-							click: function() {
-								$(this).dialog("destroy");
-								//callback("Tidak");
+							else {
+								return false;
 							}
-						}]
-					}).dialog("open");
+						});
+					}
+					else {
+						var counter = 0;
+						Lobibox.alert("error",
+						{
+							msg: "Minimal pilih 1 data!",
+							width: 480,
+							beforeClose: function() {
+								if(counter == 0) {
+									setTimeout(function() {
+										$("#select_all_salereturn").focus();
+									}, 0);
+									counter = 1;
+								}
+							}
+						});
+					}
 				}
 				else {
 					var counter = 0;
 					Lobibox.alert("error",
 					{
-						msg: "Silahkan tambahkan barang terlebih dahulu!",
+						msg: "Silahkan input No. D.O!",
 						width: 480,
 						beforeClose: function() {
 							if(counter == 0) {
 								setTimeout(function() {
-									$("#txtItemCode").focus();
+									$("#txtBookingNumber").focus();
 								}, 0);
 								counter = 1;
 							}
@@ -992,7 +1081,7 @@
 					else if(evt.keyCode == 123) {
 						evt.preventDefault();
 					}
-					else if(evt.keyCode == 121 && $("#transactionList-dialog").css("display") == "none"  && $("#finish-dialog").css("display") == "none" && $("#FormData").css("display") == "block"  && $(".lobibox").css("display") != "block") {
+					else if(evt.keyCode == 121 && $("#transactionList-dialog").css("display") == "none"  && $("#FormData").css("display") == "block"  && $(".lobibox").css("display") != "block") {
 						evt.preventDefault();
 						if(counterKey == 0) {
 							finish();
