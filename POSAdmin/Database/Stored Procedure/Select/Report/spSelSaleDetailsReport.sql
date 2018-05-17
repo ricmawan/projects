@@ -49,7 +49,11 @@ SET State = 1;
 				ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
 		WHERE
 			SD.SaleID = pSaleID
-            AND SD.BranchID = pBranchID
+            AND CASE
+					WHEN pBranchID = 0
+					THEN SD.BranchID
+					ELSE pBranchID
+				END = SD.BranchID
 		ORDER BY
 			SD.SaleDetailsID;
 	ELSE
@@ -71,7 +75,11 @@ SET State = 1;
 				ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
 		WHERE
 			SRD.SaleReturnID = pSaleID
-            AND SRD.BranchID = pBranchID
+            AND CASE
+					WHEN pBranchID = 0
+					THEN SRD.BranchID
+					ELSE pBranchID
+				END = SRD.BranchID
 		ORDER BY
 			SRD.SaleReturnDetailsID;
             

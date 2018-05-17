@@ -48,7 +48,11 @@ SET @query = CONCAT("SELECT
 								JOIN master_customer MC
 									ON MC.CustomerID = TS.CustomerID
 							WHERE 
-								SD.BranchID = ", pBranchID ,"
+								CASE
+									WHEN ",pBranchID," = 0
+									THEN SD.BranchID
+									ELSE ",pBranchID,"
+								END = SD.BranchID
 								AND CAST(TS.TransactionDate AS DATE) >= '",pFromDate,"'
 								AND CAST(TS.TransactionDate AS DATE) <= '",pToDate,"'
 								AND ", pWhere, "
@@ -66,7 +70,11 @@ SET @query = CONCAT("SELECT
 								JOIN master_customer MC
 									ON MC.CustomerID = TS.CustomerID
 							WHERE 
-								SRD.BranchID = ", pBranchID ,"
+								CASE
+									WHEN ",pBranchID," = 0
+									THEN SRD.BranchID
+									ELSE ",pBranchID,"
+								END = SRD.BranchID
 								AND CAST(TSR.TransactionDate AS DATE) >= '",pFromDate,"'
 								AND CAST(TSR.TransactionDate AS DATE) <= '",pToDate,"'
 								AND ", pWhere2, "
@@ -95,7 +103,11 @@ SET @query = CONCAT("SELECT
 						JOIN master_customer MC
 							ON MC.CustomerID = TS.CustomerID
 					WHERE 
-						SD.BranchID = ", pBranchID ,"
+						CASE
+							WHEN ",pBranchID," = 0
+							THEN SD.BranchID
+							ELSE ",pBranchID,"
+						END = SD.BranchID
 						AND CAST(TS.TransactionDate AS DATE) >= '",pFromDate,"'
 						AND CAST(TS.TransactionDate AS DATE) <= '",pToDate,"'
 						AND ", pWhere, "
@@ -121,7 +133,11 @@ SET @query = CONCAT("SELECT
 						JOIN master_customer MC
 							ON MC.CustomerID = TS.CustomerID
 					WHERE 
-						SRD.BranchID = ", pBranchID ,"
+						CASE
+							WHEN ",pBranchID," = 0
+							THEN SRD.BranchID
+							ELSE ",pBranchID,"
+						END = SRD.BranchID
 						AND CAST(TSR.TransactionDate AS DATE) >= '",pFromDate,"'
 						AND CAST(TSR.TransactionDate AS DATE) <= '",pToDate,"'
 						AND ", pWhere2, "

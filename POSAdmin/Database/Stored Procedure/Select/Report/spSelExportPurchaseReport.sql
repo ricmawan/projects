@@ -53,7 +53,11 @@ SET State = 1;
 		LEFT JOIN master_unit MU
 			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
 	WHERE
-		PD.BranchID = pBranchID
+		CASE
+			WHEN pBranchID = 0
+			THEN PD.BranchID
+			ELSE pBranchID
+		END = PD.BranchID
 		AND CAST(TP.TransactionDate AS DATE) >= pFromDate
 		AND CAST(TP.TransactionDate AS DATE) <= pToDate
 	UNION ALL
@@ -82,7 +86,11 @@ SET State = 1;
 		LEFT JOIN master_unit MU
 			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
 	WHERE
-		PRD.BranchID = pBranchID
+		CASE
+			WHEN pBranchID = 0
+			THEN PRD.BranchID
+			ELSE pBranchID
+		END = PRD.BranchID
 		AND CAST(TPR.TransactionDate AS DATE) >= pFromDate
 		AND CAST(TPR.TransactionDate AS DATE) <= pToDate
 	ORDER BY

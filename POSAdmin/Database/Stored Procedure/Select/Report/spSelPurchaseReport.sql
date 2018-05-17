@@ -48,7 +48,11 @@ SET @query = CONCAT("SELECT
 								JOIN master_supplier MS
 									ON MS.SupplierID = TP.SupplierID
 							WHERE 
-								PD.BranchID = ", pBranchID ,"
+								CASE
+									WHEN ",pBranchID," = 0
+									THEN PD.BranchID
+									ELSE ",pBranchID,"
+								END = PD.BranchID
 								AND CAST(TP.TransactionDate AS DATE) >= '",pFromDate,"'
 								AND CAST(TP.TransactionDate AS DATE) <= '",pToDate,"'
 								AND ", pWhere, "
@@ -64,7 +68,11 @@ SET @query = CONCAT("SELECT
 								JOIN master_supplier MS
 									ON MS.SupplierID = TPR.SupplierID
 							WHERE 
-								PRD.BranchID = ", pBranchID ,"
+								CASE
+									WHEN ",pBranchID," = 0
+									THEN PRD.BranchID
+									ELSE ",pBranchID,"
+								END = PRD.BranchID
 								AND CAST(TPR.TransactionDate AS DATE) >= '",pFromDate,"'
 								AND CAST(TPR.TransactionDate AS DATE) <= '",pToDate,"'
 								AND ", pWhere2, "
@@ -93,7 +101,11 @@ SET @query = CONCAT("SELECT
 						JOIN master_supplier MS
 							ON MS.SupplierID = TP.SupplierID
 					WHERE 
-						PD.BranchID = ", pBranchID ,"
+						CASE
+							WHEN ",pBranchID," = 0
+							THEN PD.BranchID
+							ELSE ",pBranchID,"
+						END = PD.BranchID
 						AND CAST(TP.TransactionDate AS DATE) >= '",pFromDate,"'
 						AND CAST(TP.TransactionDate AS DATE) <= '",pToDate,"'
 						AND ", pWhere, "
@@ -117,7 +129,11 @@ SET @query = CONCAT("SELECT
 						JOIN master_supplier MS
 							ON MS.SupplierID = TPR.SupplierID
 					WHERE 
-						PRD.BranchID = ", pBranchID ,"
+						CASE
+							WHEN ",pBranchID," = 0
+							THEN PRD.BranchID
+							ELSE ",pBranchID,"
+						END = PRD.BranchID
 						AND CAST(TPR.TransactionDate AS DATE) >= '",pFromDate,"'
 						AND CAST(TPR.TransactionDate AS DATE) <= '",pToDate,"'
 						AND ", pWhere2, "
