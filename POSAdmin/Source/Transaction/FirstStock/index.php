@@ -1054,8 +1054,8 @@
 			}
 			
 			function tableWidthAdjust() {
-				var tableWidth = $("#divTableContent").find("table").width();
-				var barWidth = table2.settings()[0].oScroll.iBarWidth;
+				var tableWidth = parseFloat($("#divTableContent").find("table").width());
+				var barWidth = parseFloat(table2.settings()[0].oScroll.iBarWidth);
 				var newWidth = tableWidth - barWidth + 2;
 				$("#divTableContent").find("table").css({
 					"width": newWidth + "px"
@@ -1333,24 +1333,32 @@
 				}
 			}
 
-			var counterResize = 0;
+			var waitForFinalEvent = (function () {
+		        var timers = {};
+		        return function (callback, ms, uniqueId) {
+		            if (!uniqueId) {
+		                uniqueId = "Don't call this twice without a uniqueId";
+		            }
+		            if (timers[uniqueId]) {
+		                clearTimeout(timers[uniqueId]);
+		            }
+		            timers[uniqueId] = setTimeout(callback, ms);
+		        };
+		    })();
+			
 			$(document).ready(function() {
 				$( window ).resize(function() {
-					if(counterResize == 0) {
-						counterResize = 1;
-						table.columns.adjust().draw();
-						if ( $.fn.DataTable.isDataTable( '#grid-transaction' ) ) {
-							setTimeout(function() {
+					waitForFinalEvent(function () {
+		               	setTimeout(function() {
+							table.columns.adjust().draw();
+							if ( $.fn.DataTable.isDataTable( '#grid-transaction' ) ) {
 								tableWidthAdjust();
-							}, 500);
-						}
-						if ( $.fn.DataTable.isDataTable( '#grid-item' ) ) {
-							table3.columns.adjust().draw();
-						}
-						setTimeout(function() {
-							counterResize = 0;
-						}, 1000);
-					}
+							}
+							if ( $.fn.DataTable.isDataTable( '#grid-item' ) ) {
+								table3.columns.adjust().draw();
+							}
+						}, 0);
+		            }, 500, "resizeWindow");
 				});
 				
 				$('#grid-data').on('click', 'input[type="checkbox"]', function() {

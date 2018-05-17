@@ -56,7 +56,7 @@
 		$row_array[] = $row['Qty1'];
 		$row_array[] = number_format($row['Price2'],0,".",",");
 		$row_array[] = $row['Qty2'];
-		$row_array[] = number_format($row['Stock'],0,".",",");
+		$row_array[] = number_format($row['Stock'],2,".",",");
 		$row_array[] = number_format($row['PhysicalStock'],2,".",",");
 		array_push($return_arr, $row_array);
 	}

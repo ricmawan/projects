@@ -28,6 +28,7 @@
 							</div>
 							<div class="col-md-2">
 								<select id="ddlBranch" name="ddlBranch" tabindex=8 class="form-control-custom" placeholder="Pilih Cabang" >
+									<option value=0 selected >-- Semua Cabang --</option>
 									<?php
 										$sql = "CALL spSelDDLBranch('".$_SESSION['UserLogin']."')";
 										if (! $result = mysqli_query($dbh, $sql)) {
