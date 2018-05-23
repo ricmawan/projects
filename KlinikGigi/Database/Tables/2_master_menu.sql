@@ -166,6 +166,24 @@ VALUES
 	NULL,
 	0,
 	4
+),
+(
+	17,
+	2,
+	'Jadwal Praktek',
+	'Master/Schedule/',
+	NULL,
+	0,
+	6
+),
+(
+	18,
+	2,
+	'Pengecualian Praktek',
+	'Master/ExceptionSchedule/',
+	NULL,
+	0,
+	7
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

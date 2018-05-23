@@ -139,10 +139,11 @@
 					<thead style="background-color: black;color:white;height:25px;display:block;width:1085px;">
 						<td align="center" style="width:35px;">No</td>
 						<td align="center" style="width: 200px;" >Nama</td>
-						<td align="center" style="width: 200px;" >No HP</td>
+						<td align="center" style="width: 150px;" >No HP</td>
 						<td align="center" style="width: 250px;" >Email</td>
 						<td align="center" style="width: 200px;" >Jadwal</td>
 						<td align="center" style="width: 200px;" >Cabang</td>
+						<td align="center" style="width: 50px;" >Opsi</td>
 					</thead>
 					<tbody style="display:block;max-height:200px;height:100%;overflow-y:auto;" id="tableContent">
 					</tbody>
@@ -151,6 +152,7 @@
 		</div>
 		<script>
 			var businessHours;
+			var startDateGlobal;
 			function hideUnavailableTime(dayOfWeek) {
 				var startDate = $("#hdnStartDate").val();
 				$("#ddlTime option").each(function() {
@@ -384,6 +386,54 @@
 					}
 				}).dialog("open");
 			}
+
+			function deleteSchedule(ScheduleID, OnlineFlag) {
+				$("#delete-confirm").dialog({
+					autoOpen: false,
+					show: {
+						effect: "fade",
+						duration: 500
+					},
+					hide: {
+						effect: "fade",
+						duration: 500
+					},
+					resizable: false,
+					height: "auto",
+					width: 400,
+					modal: true,
+					buttons: {
+						"Ya": function() {
+							$(this).dialog("close");
+							$("#loading").show();
+							$.ajax({
+								url: "./Transaction/CheckSchedule/Delete.php",
+								type: "POST",
+								data: { ID : ScheduleID, OnlineFlag : OnlineFlag },
+								dataType: "html",
+								success: function(data) {
+									$("#loading").hide();
+									var datadelete = data.split("+");
+									var berhasil = datadelete[0];
+									var gagal = datadelete [1];
+									if(berhasil!="") $.notify(berhasil, "success");
+									if(gagal!="") $.notify(gagal, "error");
+									loadSchedule(startDateGlobal);
+								},
+								error: function(data) {
+									$.notify("Koneksi gagal, Cek koneksi internet!", "error");
+									$("#loading").hide();
+								}
+									
+							});
+						},
+						"Tidak": function() {
+							$(this).dialog("close");
+							return false;
+						}
+					}
+				}).dialog("open");
+			}
 			
 			$(document).ready(function() {
 				//ddlTime();
@@ -526,9 +576,11 @@
 					},
 					eventLimitClick: function( cellInfo, jsEvent ) {
 						loadSchedule(moment(cellInfo.date).format('YYYY-MM-DD'));
+						startDateGlobal = moment(cellInfo.date).format('YYYY-MM-DD');
 					},
 					navLinkDayClick: function(date, jsEvent) {
 						loadSchedule(date.format('YYYY-MM-DD'));
+						startDateGlobal = date.format('YYYY-MM-DD');
 					}
 				});
 				getDayOfWeek();

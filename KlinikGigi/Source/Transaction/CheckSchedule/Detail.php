@@ -15,6 +15,7 @@
 		
 		$sql = "SELECT
 					DATA.ScheduleID,
+					DATA.OnlineFlag,
 					DATA.PatientName,
 					DATA.ScheduledDate,
 					DATA.PhoneNumber,
@@ -27,6 +28,7 @@
 				(
 					SELECT
 						OS.OnlineScheduleID ScheduleID,
+						1 OnlineFlag,
 						OS.PatientName,
 						DATE_FORMAT(OS.ScheduledDate, '%d-%m-%Y %H:%i:%S') ScheduledDate,
 						OS.PhoneNumber,
@@ -44,6 +46,7 @@
 					UNION ALL
 					SELECT
 						CS.CheckScheduleID,
+						0,
 						MP.PatientName,
 						DATE_FORMAT(CS.ScheduledDate, '%d-%m-%Y %H:%i:%S') ScheduledDate,
 						MP.Telephone,
@@ -75,10 +78,11 @@
 			$ScheduleDetails .= "<tr>";
 			$ScheduleDetails .= "<td align='center' style='width: 35px;' >$RowNumber</td>";
 			$ScheduleDetails .= "<td align='left' style='width: 200px;' >".$row['PatientName']."</td>";
-			$ScheduleDetails .= "<td align='left' style='width: 200px;' >".$row['PhoneNumber']."</td>";
+			$ScheduleDetails .= "<td align='left' style='width: 150px;' >".$row['PhoneNumber']."</td>";
 			$ScheduleDetails .= "<td align='left' style='width: 250px;' >".$row['Email']."</td>";
 			$ScheduleDetails .= "<td align='left' style='width: 200px;' >".$row['ScheduledDate']."</td>";
 			$ScheduleDetails .= "<td align='left' style='width: 200px;' >".$row['BranchName']."</td>";
+			$ScheduleDetails .= "<td align='left' style='width: 50px;' ><i style='cursor:pointer;' onclick='deleteSchedule(".$row['ScheduleID'].", ".$row['OnlineFlag'].");' class='fa fa-close' acronym title='Batal'>&nbsp;</i></td>";
 			$ScheduleDetails .= "</tr>";
 			$RowNumber++;
 		}

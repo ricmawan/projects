@@ -5,41 +5,41 @@
 		$RequestPath = str_replace($file, "", $RequestPath);
 		include "../../GetPermission.php";
 		//echo $_SERVER['REQUEST_URI'];		
-		$ScheduleID = mysql_real_escape_string($_GET['ID']);
+		$ExceptionScheduleID = mysql_real_escape_string($_GET['ID']);
 		$BranchID = 1;
 		$DayOfWeek = 0;
-		$StartHour = 0;
-		$EndHour = 0;
+		$Hour = 0;
+		$Minute = "00";
 		$IsAdmin = 1;
 		$IsEdit = 0;
 		
-		if($ScheduleID != 0) {
+		if($ExceptionScheduleID != 0) {
 			$IsEdit = 1;
 			//$Content = "Place the content here";
 			$sql = "SELECT
-						MS.ScheduleID,
+						ME.ExceptionScheduleID,
 						MB.BranchID,
-						MS.DayOfWeek,
-						MS.StartHour,
-						MS.EndHour,
-						MS.IsAdmin
+						ME.DayOfWeek,
+						ME.BusinessHour,
+						ME.IsAdmin
 					FROM
-						master_schedule MS
+						master_exceptionschedule ME
 						JOIN master_branch MB
-							ON MB.BranchID = MS.BranchID
+							ON MB.BranchID = ME.BranchID
 					WHERE
-						ScheduleID = $ScheduleID";
+						ExceptionScheduleID = $ExceptionScheduleID";
 						
 			if (! $result=mysql_query($sql, $dbh)) {
 				echo mysql_error();
 				return 0;
 			}				
 			$row=mysql_fetch_array($result);
-			$ScheduleID = $row['ScheduleID'];
+			$BusinessHour = explode(":", $row['BusinessHour']);
+			$ExceptionScheduleID = $row['ExceptionScheduleID'];
 			$BranchID = $row['BranchID'];
 			$DayOfWeek = $row['DayOfWeek'];
-			$StartHour = $row['StartHour'];
-			$EndHour = $row['EndHour'];
+			$Hour = $BusinessHour[0];
+			$Minute = $BusinessHour[1];
 			$IsAdmin = $row['IsAdmin'];
 		}
 	}
@@ -61,12 +61,12 @@
 									Cabang :
 								</div>
 								<div class="col-md-3">
-									<input id="hdnScheduleID" name="hdnScheduleID" type="hidden" <?php echo 'value="'.$ScheduleID.'"'; ?> />
+									<input id="hdnExceptionScheduleID" name="hdnExceptionScheduleID" type="hidden" <?php echo 'value="'.$ExceptionScheduleID.'"'; ?> />
 									<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" <?php echo 'value="'.$IsEdit.'"'; ?> />
 									<input id="hdnBranchID" name="hdnBranchID" type="hidden" <?php echo 'value="'.$BranchID.'"'; ?> />
 									<input id="hdnDayOfWeek" name="hdnDayOfWeek" type="hidden" <?php echo 'value="'.$DayOfWeek.'"'; ?> />
-									<input id="hdnStartHour" name="hdnStartHour" type="hidden" <?php echo 'value="'.$StartHour.'"'; ?> />
-									<input id="hdnEndHour" name="hdnEndHour" type="hidden" <?php echo 'value="'.$EndHour.'"'; ?> />
+									<input id="hdnHour" name="hdnHour" type="hidden" <?php echo 'value="'.$Hour.'"'; ?> />
+									<input id="hdnMinute" name="hdnMinute" type="hidden" <?php echo 'value="'.$Minute.'"'; ?> />
 									<input id="hdnIsAdmin" name="hdnIsAdmin" type="hidden" <?php echo 'value="'.$IsAdmin.'"'; ?> />
 									<select id="ddlBranch" name="ddlBranch" class="form-control-custom">
 										<?php
@@ -114,10 +114,10 @@
 							<br />
 							<div class="row">
 								<div class="col-md-2 labelColumn">
-									Dari :
+									Jam :
 								</div>
 								<div class="col-md-1">
-									<select id="ddlStartHour" name="ddlStartHour" class="form-control-custom" >
+									<select id="ddlHour" name="ddlHour" class="form-control-custom" >
 										<option value=0>00</option>
 										<option value=1>01</option>
 										<option value=2>02</option>
@@ -148,36 +148,16 @@
 									-
 								</div>
 								<div class="col-md-1">
-									<select id="ddlEndHour" name="ddlEndHour" class="form-control-custom" >
-										<option value=0>00</option>
-										<option value=1>01</option>
-										<option value=2>02</option>
-										<option value=3>03</option>
-										<option value=4>04</option>
-										<option value=5>05</option>
-										<option value=6>06</option>
-										<option value=7>07</option>
-										<option value=8>08</option>
-										<option value=9>09</option>
-										<option value=10>10</option>
-										<option value=11>11</option>
-										<option value=12>12</option>
-										<option value=13>13</option>
-										<option value=14>14</option>
+									<select id="ddlMinute" name="ddlMinute" class="form-control-custom" >
+										<option value=00>00</option>
 										<option value=15>15</option>
-										<option value=16>16</option>
-										<option value=17>17</option>
-										<option value=18>18</option>
-										<option value=19>19</option>
-										<option value=20>20</option>
-										<option value=21>21</option>
-										<option value=22>22</option>
-										<option value=23>23</option>
+										<option value=30>30</option>
+										<option value=45>45</option>
 									</select>
 								</div>
 							</div>
 							<br />
-							<button type="button" class="btn btn-default" value="Simpan" onclick="SubmitValidate(this.form);" ><i class="fa fa-save"></i> Simpan</button>&nbsp;&nbsp;
+							<button type="button" class="btn btn-default" value="Simpan" onclick="SubmitForm('./Master/ExceptionSchedule/Insert.php');" ><i class="fa fa-save"></i> Simpan</button>&nbsp;&nbsp;
 							<button type="button" class="btn btn-default" value="Kembali" onclick='Back();' ><i class="fa fa-arrow-circle-left"></i> Kembali</button>
 						</form>
 					</div>
@@ -189,38 +169,15 @@
 				var BranchID = $("#hdnBranchID").val();
 				var IsAdmin = $("#hdnIsAdmin").val();
 				var DayOfWeek = $("#hdnDayOfWeek").val();
-				var StartHour = $("#hdnStartHour").val();
-				var EndHour = $("#hdnEndHour").val();
+				var Hour = $("#hdnHour").val();
+				var Minute = $("#hdnMinute").val();
 
 				$("#ddlBranch").val(BranchID);
 				$("#ddlPage").val(IsAdmin);
 				$("#ddlDayOfWeek").val(DayOfWeek);
-				$("#ddlStartHour").val(StartHour);
-				$("#ddlEndHour").val(EndHour);
+				$("#ddlHour").val(Hour);
+				$("#ddlMinute").val(Minute);
 			});
-			function SubmitValidate(form) {
-				var isedit = $("#hdnIsEdit").val();
-				var PassValidate = 1;
-				var FirstFocus = 0;
-				$(".form-control-custom").each(function() {
-					if($(this).hasAttr('required')) {
-						if($(this).val() == "") {
-							PassValidate = 0;
-							$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-							if(FirstFocus == 0) $(this).focus();
-							FirstFocus = 1;
-						}
-					}
-				});
-				if(parseInt($("#ddlEndHour").val()) <= parseInt($("#ddlStartHour").val())) {
-					$("#ddlEndHour").notify("Harus lebih besar dari jam mulai!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-					if(FirstFocus == 0) $("#ddlEndHour").focus();
-					PassValidate = 0;
-				}
-				
-				if(PassValidate == 0) return false;
-				SubmitForm("./Master/Schedule/Insert.php");
-			}
 		</script>
 	</body>
 </html>

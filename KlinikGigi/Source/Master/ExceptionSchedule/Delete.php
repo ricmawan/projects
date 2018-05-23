@@ -12,7 +12,7 @@
 		for($i=0; $i<count($Data); $i++) {
 			try
 			{
-				$sql = "DELETE FROM master_schedule WHERE ScheduleID = ".$Data[$i];
+				$sql = "DELETE FROM master_exceptionschedule WHERE ExceptionScheduleID = ".$Data[$i];
 				if (! $result=mysql_query($sql, $dbh)) {
 					throw new Exception($Data[$i]);
 				}
@@ -26,9 +26,9 @@
 		$MessageSuccessDelete = substr($MessageSuccessDelete, 0, -2);
 		$MessageFailedDelete = substr($MessageFailedDelete, 0, -2);
 			
-		if($MessageSuccessDelete !="") $MessageSuccess = "Jadwal Praktek Berhasil Dihapus";
+		if($MessageSuccessDelete !="") $MessageSuccess = "Pengecualian Jadwal Berhasil Dihapus";
 		else $MessageSuccess = "";
-		if($MessageFailedDelete !="") $MessageFailed = "Jadwal Praktek Gagal Dihapus";
+		if($MessageFailedDelete !="") $MessageFailed = "Pengecualian Jadwal Gagal Dihapus";
 		else $MessageFailed = "";
 		
 		echo "$MessageSuccess+$MessageFailed";
