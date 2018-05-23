@@ -692,7 +692,7 @@
 			
 			function resetForm() {
 				$("#hdnItemID").val(0);
-				$("#ddlUnit option")[0].selected = true;
+				if( $("#ddlUnit").has("option").length > 0 ) $("#ddlUnit option")[0].selected = true;
 				$("#txtItemCode").val("");
 				$("#txtItemName").val("");
 				$("#ddlCategory").val("");

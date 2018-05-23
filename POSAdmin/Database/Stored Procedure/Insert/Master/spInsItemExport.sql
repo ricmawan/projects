@@ -5,10 +5,10 @@ Created Date: 12 November 2017
 Modified Date: 
 ===============================================================*/
 
-DROP PROCEDURE IF EXISTS spInsItem;
+DROP PROCEDURE IF EXISTS spInsItemExport;
 
 DELIMITER $$
-CREATE PROCEDURE spInsItem (
+CREATE PROCEDURE spInsItemExport (
 	pID 				BIGINT, 
     pItemCode			VARCHAR(100),
 	pItemName 			VARCHAR(255),
@@ -22,7 +22,6 @@ CREATE PROCEDURE spInsItem (
     pQty2				DOUBLE,
     pWeight				DOUBLE,
 	pMinimumStock		DOUBLE,
-    pItemDetails		TEXT,
 	pIsEdit				INT,
     pCurrentUser		VARCHAR(255)
 )
@@ -43,7 +42,7 @@ StoredProcedure:BEGIN
 		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
 		ROLLBACK;
 		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spInsItem', pCurrentUser);
+		CALL spInsEventLog(@full_error, 'spInsItemExport', pCurrentUser);
         DELETE FROM temp_master_itemdetails;
 		SELECT
 			pID AS 'ID',
@@ -59,52 +58,7 @@ StoredProcedure:BEGIN
 	
 SET State = 1;
 		
-        CREATE TEMPORARY TABLE IF NOT EXISTS temp_master_itemdetails
-		(
-			ItemDetailsID 		BIGINT,
-			ItemID 				BIGINT,
-			ItemDetailsCode		VARCHAR(100),
-			UnitID				SMALLINT,
-			ConversionQuantity	DOUBLE,
-			BuyPrice			DOUBLE,
-			RetailPrice			DOUBLE,
-			Price1				DOUBLE,
-			Qty1				DOUBLE,
-			Price2				DOUBLE,
-			Qty2				DOUBLE,
-			Weight				DOUBLE,
-			MinimumStock		DOUBLE
-		);
-        
-SET State = 2;
-
-		IF(pItemDetails <> "" ) THEN
-			SET @query = CONCAT("INSERT INTO temp_master_itemdetails
-								(
-									ItemDetailsID,
-									ItemID,
-									ItemDetailsCode,
-									UnitID,
-									ConversionQuantity,
-									BuyPrice,
-									RetailPrice,
-									Price1,
-									Qty1,
-									Price2,
-									Qty2,
-									Weight,
-									MinimumStock
-								)
-								VALUES", pItemDetails);
-								
-			PREPARE stmt FROM @query;
-			EXECUTE stmt;
-			DEALLOCATE PREPARE stmt;
-		END IF;
-       
-SET State = 3;
-
-		SELECT 
+       SELECT 
 			0
 		INTO
 			PassValidate

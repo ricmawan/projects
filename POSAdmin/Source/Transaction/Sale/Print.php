@@ -1,12 +1,16 @@
 <?php
+	$RequestedPath = "$_SERVER[REQUEST_URI]";
+	$file = basename($RequestedPath);
+	$RequestedPath = str_replace($file, "", $RequestedPath);
+	include "../../GetPermission.php";
     require "../../assets/lib/escpos-php/autoload.php";
     use Mike42\Escpos\Printer;
     use Mike42\Escpos\EscposImage;
-    use Mike42\Escpos\PrintConnectors\FilePrintConnector;
+    use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
     /* Fill in your own connector here */
-    $connector = new FilePrintConnector("php://stdout");
+    $connector = new WindowsPrintConnector("smb://192.168.43.249/printer1");
 
-    $ID = $_GET['ID'];
+    $SaleID = $_GET['ID'];
     /* Information for the receipt */
     $items = array(
         new item("Example item #1", "4.00"),
@@ -28,7 +32,8 @@
     //$printer -> graphics($logo);
     /* Name of shop */
     $printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
-    $printer -> text("TOKO MUDA.\n");
+    $printer -> setJustification(Printer::JUSTIFY_CENTER);
+    $printer -> text("TOKO MUDA\n");
     $printer -> selectPrintMode();
     $printer -> text("Jl. Raya Bojong\n");
     $printer -> feed();

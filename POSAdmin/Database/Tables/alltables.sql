@@ -203,7 +203,7 @@ VALUES
 (
 	15,
 	3,
-	'Pemesanan',
+	'D.O',
 	'Transaction/Booking/',
 	NULL,
 	0,
@@ -231,7 +231,7 @@ VALUES
 (
 	18,
 	3,
-	'Cetak Nota & Surat Jalan',
+	'Cetak Nota & Pengambilan',
 	'Transaction/Print/',
 	NULL,
 	0,
@@ -304,7 +304,7 @@ VALUES
 	26,
 	4,
 	'Piutang',
-	'Report/Payment/',
+	'Report/Credit/',
 	NULL,
 	1,
 	8
@@ -1119,6 +1119,8 @@ CREATE TABLE transaction_bookingdetails
 	BuyPrice			DOUBLE,
 	BookingPrice		DOUBLE,
 	Discount			DOUBLE,
+	PrintCount			SMALLINT,
+	PrintedDate			DATETIME,
 	CreatedDate 		DATETIME NOT NULL,
 	CreatedBy 			VARCHAR(255) NOT NULL,
 	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
@@ -1128,7 +1130,7 @@ CREATE TABLE transaction_bookingdetails
 	FOREIGN KEY(BranchID) REFERENCES master_branch(BranchID) ON UPDATE CASCADE ON DELETE CASCADE
 )ENGINE=InnoDB;
 
-CREATE UNIQUE INDEX SALEDETAILS_INDEX
+CREATE UNIQUE INDEX BOOKINGDETAILS_INDEX
 ON transaction_bookingdetails (BookingDetailsID, BookingID, ItemID, BranchID);DROP TABLE IF EXISTS transaction_paymentdetails;
 
 CREATE TABLE transaction_paymentdetails
@@ -1136,7 +1138,9 @@ CREATE TABLE transaction_paymentdetails
 	PaymentDetailsID	BIGINT PRIMARY KEY AUTO_INCREMENT,
 	TransactionID		BIGINT,
 	TransactionType 	VARCHAR(1),
+    PaymentDate			DATETIME,
 	Amount				DOUBLE,
+    Remarks				TEXT,
 	CreatedDate 		DATETIME NOT NULL,
 	CreatedBy 			VARCHAR(255) NOT NULL,
 	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,

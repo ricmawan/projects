@@ -53,10 +53,13 @@ SET State = 1;
 				SUM(FSD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_firststockdetails FSD
+                JOIN master_item MI
+					ON FSD.ItemID = MI.ItemID
 				LEFT JOIN master_itemdetails MID
 					ON FSD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = FSD.BranchID
+                AND TRIM(pItemCode) = MI.ItemCode
 			GROUP BY
 				FSD.ItemID
 		)FS
@@ -68,10 +71,13 @@ SET State = 1;
 				SUM(TPD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_purchasedetails TPD
+                JOIN master_item MI
+					ON TPD.ItemID = MI.ItemID
 				LEFT JOIN master_itemdetails MID
 					ON TPD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = TPD.BranchID
+                AND TRIM(pItemCode) = MI.ItemCode
 			GROUP BY
 				TPD.ItemID
 		)TP
@@ -83,10 +89,13 @@ SET State = 1;
 				SUM(SRD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_salereturndetails SRD
+                JOIN master_item MI
+					ON SRD.ItemID = MI.ItemID
 				LEFT JOIN master_itemdetails MID
 					ON SRD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = SRD.BranchID
+                AND TRIM(pItemCode) = MI.ItemCode
 			GROUP BY
 				SRD.ItemID
 		)SR
@@ -98,10 +107,13 @@ SET State = 1;
 				SUM(SD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_saledetails SD
+                JOIN master_item MI
+					ON SD.ItemID = MI.ItemID
 				LEFT JOIN master_itemdetails MID
 					ON SD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = SD.BranchID
+                AND TRIM(pItemCode) = MI.ItemCode
 			GROUP BY
 				SD.ItemID
 		)S
@@ -113,10 +125,13 @@ SET State = 1;
 				SUM(PRD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_purchasereturndetails PRD
+                JOIN master_item MI
+					ON PRD.ItemID = MI.ItemID
 				LEFT JOIN master_itemdetails MID
 					ON PRD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = PRD.BranchID
+                AND TRIM(pItemCode) = MI.ItemCode
 			GROUP BY
 				PRD.ItemID
 		)PR
@@ -128,10 +143,13 @@ SET State = 1;
 				SUM(SMD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_stockmutationdetails SMD
+                JOIN master_item MI
+					ON SMD.ItemID = MI.ItemID
 				LEFT JOIN master_itemdetails MID
 					ON SMD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = SMD.DestinationID
+                AND TRIM(pItemCode) = MI.ItemCode
 			GROUP BY
 				SMD.ItemID,
 				SMD.DestinationID
@@ -144,10 +162,13 @@ SET State = 1;
 				SUM(SMD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_stockmutationdetails SMD
+                JOIN master_item MI
+					ON SMD.ItemID = MI.ItemID
 				LEFT JOIN master_itemdetails MID
 					ON SMD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = SMD.SourceID
+                AND TRIM(pItemCode) = MI.ItemCode
 			GROUP BY
 				SMD.ItemID
 		)SMM
@@ -159,10 +180,13 @@ SET State = 1;
 				SUM((SAD.AdjustedQuantity - SAD.Quantity) * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_stockadjustdetails SAD
+                JOIN master_item MI
+					ON SAD.ItemID = MI.ItemID
 				LEFT JOIN master_itemdetails MID
 					ON SAD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = SAD.BranchID
+                AND TRIM(pItemCode) = MI.ItemCode
 			GROUP BY
 				SAD.ItemID
 		)SA
@@ -174,10 +198,13 @@ SET State = 1;
 				SUM(BD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_bookingdetails BD
+                JOIN master_item MI
+					ON BD.ItemID = MI.ItemID
 				LEFT JOIN master_itemdetails MID
 					ON BD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = BD.BranchID
+                AND TRIM(pItemCode) = MI.ItemCode
 			GROUP BY
 				BD.ItemID,
 				BD.BranchID
@@ -190,10 +217,13 @@ SET State = 1;
 				SUM(PD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_pickdetails PD
+                JOIN master_item MI
+					ON PD.ItemID = MI.ItemID
 				LEFT JOIN master_itemdetails MID
 					ON PD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = PD.BranchID
+                AND TRIM(pItemCode) = MI.ItemCode
 			GROUP BY
 				PD.ItemID
 		)P
@@ -232,6 +262,7 @@ SET State = 1;
 					ON FSD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = FSD.BranchID
+                AND TRIM(MID.ItemDetailsCode) = TRIM(pItemCode)
 			GROUP BY
 				FSD.ItemID
 		)FS
@@ -247,6 +278,7 @@ SET State = 1;
 					ON TPD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = TPD.BranchID
+                AND TRIM(MID.ItemDetailsCode) = TRIM(pItemCode)
 			GROUP BY
 				TPD.ItemID
 		)TP
@@ -262,6 +294,7 @@ SET State = 1;
 					ON SRD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = SRD.BranchID
+                AND TRIM(MID.ItemDetailsCode) = TRIM(pItemCode)
 			GROUP BY
 				SRD.ItemID
 		)SR
@@ -277,6 +310,7 @@ SET State = 1;
 					ON SD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = SD.BranchID
+                AND TRIM(MID.ItemDetailsCode) = TRIM(pItemCode)
 			GROUP BY
 				SD.ItemID
 		)S
@@ -292,6 +326,7 @@ SET State = 1;
 					ON PRD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = PRD.BranchID
+                AND TRIM(MID.ItemDetailsCode) = TRIM(pItemCode)
 			GROUP BY
 				PRD.ItemID
 		)PR
@@ -307,6 +342,7 @@ SET State = 1;
 					ON SMD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = SMD.DestinationID
+                AND TRIM(MID.ItemDetailsCode) = TRIM(pItemCode)
 			GROUP BY
 				SMD.ItemID,
 				SMD.DestinationID
@@ -323,6 +359,7 @@ SET State = 1;
 					ON SMD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = SMD.SourceID
+                AND TRIM(MID.ItemDetailsCode) = TRIM(pItemCode)
 			GROUP BY
 				SMD.ItemID
 		)SMM
@@ -338,6 +375,7 @@ SET State = 1;
 					ON SAD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = SAD.BranchID
+                AND TRIM(MID.ItemDetailsCode) = TRIM(pItemCode)
 			GROUP BY
 				SAD.ItemID
 		)SA
@@ -353,6 +391,7 @@ SET State = 1;
 					ON BD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = BD.BranchID
+                AND TRIM(MID.ItemDetailsCode) = TRIM(pItemCode)
 			GROUP BY
 				BD.ItemID,
 				BD.BranchID
@@ -369,6 +408,7 @@ SET State = 1;
 					ON PD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = PD.BranchID
+                AND TRIM(MID.ItemDetailsCode) = TRIM(pItemCode)
 			GROUP BY
 				PD.ItemID
 		)P

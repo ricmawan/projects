@@ -10,24 +10,24 @@
 	//kolom di table
 	$columns = array(
 					0 => "RowNumber", //unorderable
-					1 => "MB.BranchName", //unorderable
-					2 => "MI.ItemCode", //unorderable
-					3 => "MI.ItemName",
-					4 => "MC.CategoryName",
-					5 => "MI.MinimumStock",
+					1 => "BranchName", //unorderable
+					2 => "ItemCode", //unorderable
+					3 => "ItemName",
+					4 => "CategoryName",
+					5 => "MinimumStock",
 					6 => "Stock",
 					7 => "PhysicalStock"
 				);
 
-	$where = " 1=1 ";
-	$order_by = "MI.ItemID";
+	$where = " 1=1 ";	
+	$order_by = "ItemID";
 	$limit_s = $requestData['start'];
 	$limit_l = $requestData['length'];
 	
 	//Handles Sort querystring sent from Bootgrid
 	if(ISSET($requestData['order'])) {
 		$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
-		$order_by .= ", MI.ItemID ASC";
+		$order_by .= ", ItemID ASC";
 	}
 	//Handles search querystring sent from Bootgrid
 	if (!empty($requestData['search']['value']))
@@ -61,9 +61,9 @@
 		$row_array[] = $row['ItemCode'];
 		$row_array[] = $row['ItemName'];
 		$row_array[] = $row['CategoryName'];
-		$row_array[] = number_format($row['MinimumStock'],0,".",",");
-		$row_array[] = number_format($row['Stock'],0,".",",");
-		$row_array[] = number_format($row['PhysicalStock'],0,".",",");
+		$row_array[] = number_format($row['MinimumStock'],2,".",",");
+		$row_array[] = number_format($row['Stock'],2,".",",");
+		$row_array[] = number_format($row['PhysicalStock'],2,".",",");
 		array_push($return_arr, $row_array);
 	}
 	
