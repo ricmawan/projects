@@ -33,7 +33,7 @@ SET State = 1;
 SET @query = CONCAT("SELECT
 						COUNT(1) AS nRows
 					FROM
-						transaction_firststock TP
+						transaction_firststock FS
 					WHERE ", pWhere);
 						
 	PREPARE stmt FROM @query;
@@ -43,28 +43,30 @@ SET @query = CONCAT("SELECT
 SET State = 2;
 
 SET @query = CONCAT("SELECT
-						TP.FirstStockID,
-                        TP.FirstStockNumber,
-                        DATE_FORMAT(TP.TransactionDate, '%d-%m-%Y') TransactionDate,
-                        TP.TransactionDate PlainTransactionDate,
-                        IFNULL(TPD.Total, 0) Total
+						FS.FirstStockID,
+                        FS.FirstStockNumber,
+                        DATE_FORMAT(FS.TransactionDate, '%d-%m-%Y') TransactionDate,
+                        FS.TransactionDate PlainTransactionDate,
+                        IFNULL(FSD.Total, 0) Total
 					FROM
-						transaction_firststock TP
-                       LEFT JOIN
+						transaction_firststock FS
+						LEFT JOIN
                         (
 							SELECT
-								TP.FirstStockID,
-                                SUM(TPD.Quantity * TPD.BuyPrice) Total
+								FS.FirstStockID,
+                                SUM(FSD.Quantity * FSD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) Total
 							FROM
-								transaction_firststock TP
-                                LEFT JOIN transaction_firststockdetails TPD
-									ON TP.FirstStockID = TPD.FirstStockID
+								transaction_firststock FS
+                                LEFT JOIN transaction_firststockdetails FSD
+									ON FS.FirstStockID = FSD.FirstStockID
+								LEFT JOIN master_itemdetails MID
+									ON MID.ItemDetailsID = FSD.ItemDetailsID
 							WHERE ", 
 								pWhere, 
                             " GROUP BY
-								TP.FirstStockID
-                        )TPD
-							ON TPD.FirstStockID = TP.FirstStockID
+								FS.FirstStockID
+                        )FSD
+							ON FSD.FirstStockID = FS.FirstStockID
 					WHERE ", pWhere, 
 					" ORDER BY ", pOrder,
 					" LIMIT ", pLimit_s, ", ", pLimit_l);

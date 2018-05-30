@@ -13,10 +13,10 @@
 		$ItemDetailsID = mysqli_real_escape_string($dbh, $_POST['hdnItemDetailsID']);
 		if($ItemDetailsID == "") $ItemDetailsID = "NULL";
 		$Qty = mysqli_real_escape_string($dbh, $_POST['txtQTY']);
-		$BuyPrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtBuyPrice']));
-		$RetailPrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtRetailPrice']));
-		$Price1 = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtPrice1']));
-		$Price2 = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtPrice2']));
+		$BuyPrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['hdnBuyPrice']));
+		$RetailPrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['hdnRetailPrice']));
+		$Price1 = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['hdnPrice1']));
+		$Price2 = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['hdnPrice2']));
 		$Message = "Terjadi Kesalahan Sistem!";
 		$MessageDetail = "";
 		$FailedFlag = 0;

@@ -60,13 +60,15 @@ SET @query = CONCAT("SELECT
                         (
 							SELECT
 								TP.PurchaseID,
-                                SUM(TPD.Quantity * TPD.BuyPrice) Total
+                                SUM(TPD.Quantity * TPD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) Total
 							FROM
 								transaction_purchase TP
                                 JOIN master_supplier MS
 									ON MS.SupplierID = TP.SupplierID
                                 LEFT JOIN transaction_purchasedetails TPD
 									ON TP.PurchaseID = TPD.PurchaseID
+								LEFT JOIN master_itemdetails MID
+									ON MID.ItemDetailsID = TPD.ItemDetailsID
 							WHERE ", 
 								pWhere, 
                             " GROUP BY

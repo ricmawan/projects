@@ -10,27 +10,27 @@
 	$columns = array(
 					0 => "FirstStockID", //unorderable
 					1 => "RowNumber", //unorderable
-					2 => "TP.FirstStockNumber",
-					3 => "TP.TransactionDate",
-					4 => "TPD.Total"
+					2 => "FS.FirstStockNumber",
+					3 => "FS.TransactionDate",
+					4 => "FSD.Total"
 				);
 
 	$where = " 1=1 ";
-	$order_by = "TP.FirstStockID DESC";
+	$order_by = "FS.FirstStockID DESC";
 	$limit_s = $requestData['start'];
 	$limit_l = $requestData['length'];
 	
 	//Handles Sort querystring sent from Bootgrid
 	if(ISSET($requestData['order'])) {
 		$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
-		$order_by .= ", TP.FirstStockID ASC";
+		$order_by .= ", FS.FirstStockID ASC";
 	}
 	//Handles search querystring sent from Bootgrid
 	if (!empty($requestData['search']['value']))
 	{
 		$search = mysqli_real_escape_string($dbh, trim($requestData['search']['value']));
-		$where .= " AND ( TP.FirstStockNumber LIKE '%".$search."%'";
-		$where .= " OR DATE_FORMAT(TP.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%')";
+		$where .= " AND ( FS.FirstStockNumber LIKE '%".$search."%'";
+		$where .= " OR DATE_FORMAT(FS.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%')";
 	}
 	$sql = "CALL spSelFirstStock(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
 

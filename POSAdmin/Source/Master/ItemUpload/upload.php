@@ -94,7 +94,7 @@
 				if($CategoryNumRow > 0 && $UnitNumRow > 0) {
 					if($ItemID == '0') $IsEdit = 0;
 					else $IsEdit = 1;
-					$sql = "CALL spInsItem('".$ItemID."',
+					$sql = "CALL spInsItemImport('".$ItemID."',
 											'".$ItemCode."',
 											'".$ItemName."',
 											".$CategoryID.",
@@ -107,7 +107,6 @@
 											".$Qty2.",
 											".$Weight.",
 											".$MinimumStock.",
-											'',
 											".$IsEdit.",
 											'".$_SESSION['UserLogin']."'
 										  )";

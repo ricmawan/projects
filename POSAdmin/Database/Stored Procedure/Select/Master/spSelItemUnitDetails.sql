@@ -32,15 +32,15 @@ SET State = 1;
 		ItemID,
 		ItemDetailsCode,
 		UnitID,
-		ConversionQuantity,
-		BuyPrice,
+		ConversionQuantity
+		/*BuyPrice,
 		RetailPrice,
 		Price1,
 		Qty1,
 		Price2,
 		Qty2,
 		Weight,
-		MinimumStock
+		MinimumStock*/
 	FROM
 		master_itemdetails MID
 	WHERE

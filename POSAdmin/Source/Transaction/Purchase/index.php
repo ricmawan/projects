@@ -64,6 +64,11 @@
 						<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
 						<input id="hdnAvailableUnit" name="hdnAvailableUnit" type="hidden" />
 						<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
+						<input id="hdnBuyPrice" name="hdnBuyPrice" type="hidden" />
+						<input id="hdnRetailPrice" name="hdnRetailPrice" type="hidden" />
+						<input id="hdnPrice1" name="hdnPrice1" type="hidden" />
+						<input id="hdnPrice2" name="hdnPrice2" type="hidden" />
+						<input id="hdnPriceFlag" name="hdnPriceFlag" type="hidden" />
 					</div>
 					<div class="col-md-2">
 						<input id="txtPurchaseNumber" name="txtPurchaseNumber" type="text" tabindex=5 class="form-control-custom" onfocus="this.select();" onchange="updateHeader();" autocomplete=off placeholder="No. Invoice" required />
@@ -149,25 +154,25 @@
 								</td>
 								<td style="width: 10%;" >
 									<div class="has-float-label" >
-										<input id="txtBuyPrice" name="txtBuyPrice" type="text" tabindex=12 class="form-control-custom text-right" value="0" autocomplete=off onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
+										<input id="txtBuyPrice" name="txtBuyPrice" type="text" tabindex=12 class="form-control-custom text-right" value="0" autocomplete=off onchange="CalculatePrice();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
 										<label for="txtBuyPrice" class="lblInput" >Harga Beli</label>
 									</div>
 								</td>
 								<td style="width: 10%;" >
 									<div class="has-float-label" >
-										<input id="txtRetailPrice" name="txtRetailPrice" type="text" tabindex=13 class="form-control-custom text-right" style="width: 100%;" value="0" autocomplete=off onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
+										<input id="txtRetailPrice" name="txtRetailPrice" type="text" tabindex=13 class="form-control-custom text-right" style="width: 100%;" value="0" autocomplete=off onchange="CalculatePrice();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
 										<label for="txtRetailPrice" class="lblInput" >Harga Ecer</label>
 									</div>
 								</td>
 								<td style="width: 10%;" >
 									<div class="has-float-label" >
-										<input id="txtPrice1" name="txtPrice1" type="text" tabindex=14 class="form-control-custom text-right" style="width: 100%;" value="0" autocomplete=off onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
+										<input id="txtPrice1" name="txtPrice1" type="text" tabindex=14 class="form-control-custom text-right" style="width: 100%;" value="0" autocomplete=off onchange="CalculatePrice();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
 										<label for="txtPrice1" class="lblInput" >Harga 1</label>
 									</div>
 								</td>
 								<td style="width: 10%;" >
 									<div class="has-float-label" >
-										<input id="txtPrice2" name="txtPrice2" type="text" tabindex=15 class="form-control-custom text-right" style="width: 100%;" value="0" autocomplete=off onkeypress="isEnterKey(event, 'addPurchaseDetails');return isNumberKey(event, this.id, this.value);" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
+										<input id="txtPrice2" name="txtPrice2" type="text" tabindex=15 class="form-control-custom text-right" style="width: 100%;" value="0" autocomplete=off onchange="CalculatePrice();" onkeypress="isEnterKey(event, 'addPurchaseDetails');return isNumberKey(event, this.id, this.value);" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
 										<label for="txtPrice2" class="lblInput" >Harga 2</label>
 									</div>
 								</td>
@@ -274,12 +279,39 @@
 				var retailPrice = $("#ddlUnit option:selected").attr("retailprice");
 				var price1 = $("#ddlUnit option:selected").attr("price1");
 				var price2 = $("#ddlUnit option:selected").attr("price2");
+
+				var qty1 = $("#ddlUnit option:selected").attr("qty1");
+				var qty2 = $("#ddlUnit option:selected").attr("qty2");
+				var conversionQuantity = $("#ddlUnit option:selected").attr("conversionQuantity");
+				
 				$("#hdnItemDetailsID").val(itemDetailsID);
 				$("#txtItemCode").val(itemCode);
-				$("#txtBuyPrice").val(returnRupiah(buyPrice));
-				$("#txtRetailPrice").val(returnRupiah(retailPrice));
-				$("#txtPrice1").val(returnRupiah(price1));
-				$("#txtPrice2").val(returnRupiah(price2));
+				$("#txtBuyPrice").val(returnRupiah((parseFloat(buyPrice) * parseFloat(conversionQuantity)).toString()));
+
+				if(parseFloat(conversionQuantity) >= parseFloat(qty2) && parseFloat(qty2) > 1) {
+					$("#txtRetailPrice").val(returnRupiah((parseFloat(price2) * parseFloat(conversionQuantity)).toString()));
+					$("#txtPrice1").val(returnRupiah((parseFloat(price2) * parseFloat(conversionQuantity)).toString()));
+					$("#txtPrice2").val(returnRupiah((parseFloat(price2) * parseFloat(conversionQuantity)).toString()));
+					$("#hdnPriceFlag").val(2);
+				}
+				else if(parseFloat(conversionQuantity) >= parseFloat(qty1) && parseFloat(qty1) > 1) {
+					$("#txtRetailPrice").val(returnRupiah((parseFloat(price1) * parseFloat(conversionQuantity)).toString()));
+					$("#txtPrice1").val(returnRupiah((parseFloat(price1) * parseFloat(conversionQuantity)).toString()));
+					$("#txtPrice2").val(returnRupiah((parseFloat(price1) * parseFloat(conversionQuantity)).toString()));
+					$("#hdnPriceFlag").val(1);
+				}
+				else {
+					$("#txtRetailPrice").val(returnRupiah((parseFloat(retailPrice) * parseFloat(conversionQuantity)).toString()));
+					$("#txtPrice1").val(returnRupiah((parseFloat(price1) * parseFloat(conversionQuantity)).toString()));
+					$("#txtPrice2").val(returnRupiah((parseFloat(price2) * parseFloat(conversionQuantity)).toString()));
+					$("#hdnPriceFlag").val(0);
+				}
+
+				$("#hdnBuyPrice").val(buyPrice);
+				$("#hdnRetailPrice").val(retailPrice);
+				$("#hdnPrice1").val(price1);
+				$("#hdnPrice2").val(price2);
+
 				CalculateSubTotal();
 			}
 
@@ -290,6 +322,28 @@
 				$("#txtSubTotal").val(returnRupiah(SubTotal.toString()));
 			}
 			
+			function CalculatePrice() {
+				var conversionQuantity = parseFloat($("#ddlUnit option:selected").attr("conversionQuantity"));
+				var buyPrice = parseFloat($("#txtBuyPrice").val().replace(/\,/g, ""));
+				var retailPrice = parseFloat($("#txtRetailPrice").val().replace(/\,/g, ""));
+				var price1 = parseFloat($("#txtPrice1").val().replace(/\,/g, ""));
+				var price2 = parseFloat($("#txtPrice2").val().replace(/\,/g, ""));
+				var priceFlag = $("#hdnPriceFlag").val();
+
+				$("#hdnBuyPrice").val(buyPrice/conversionQuantity);
+				if(priceFlag == "0") {
+					$("#hdnRetailPrice").val(retailPrice/conversionQuantity);
+					$("#hdnPrice1").val(price1);
+					$("#hdnPrice2").val(price2);
+				}
+				else if(priceFlag == "1") { 
+					$("#hdnPrice1").val(retailPrice/conversionQuantity);
+				}
+				else {
+					$("#hdnPrice2").val(retailPrice/conversionQuantity);	
+				}
+			}
+			
 			function openDialogEdit(Data) {
 				$("#hdnPurchaseDetailsID").val(Data[0]);
 				$("#hdnItemID").val(Data[1]);
@@ -298,9 +352,13 @@
 				$("#txtItemName").val(Data[5]);
 				$("#txtQTY").val(Data[6]);
 				$("#txtBuyPrice").val(Data[8]);
+				$("#hdnBuyPrice").val(parseFloat(Data[8])/parseFloat(Data[16]));
 				$("#txtRetailPrice").val(Data[9]);
+				$("#hdnRetailPrice").val(parseFloat(Data[9])/parseFloat(Data[16]));
 				$("#txtPrice1").val(Data[10]);
+				$("#hdnPrice1").val(parseFloat(Data[10])/parseFloat(Data[16]));
 				$("#txtPrice2").val(Data[11]);
+				$("#hdnPrice2").val(parseFloat(Data[11])/parseFloat(Data[16]));
 				$("#txtSubTotal").val(Data[12]);
 				$("#hdnAvailableUnit").val(Data[13]);
 				$("#hdnItemDetailsID").val(Data[15]);
@@ -308,7 +366,7 @@
 				if(availableUnit.length > 0) {
 					$("#ddlUnit").find('option').remove();
 					for(var i=0;i<availableUnit.length;i++) {
-						$("#ddlUnit").append("<option value=" + availableUnit[i][0] + " itemdetailsid='" + availableUnit[i][2] + "' itemcode='" + availableUnit[i][3] + "' buyprice='" + availableUnit[i][4] + "' retailprice='" + availableUnit[i][5] + "' price1='" + availableUnit[i][6] + "' price2='" + availableUnit[i][7] + "'>" + availableUnit[i][1] + "</option>");
+						$("#ddlUnit").append("<option value=" + availableUnit[i][0] + " itemdetailsid='" + availableUnit[i][2] + "' itemcode='" + availableUnit[i][3] + "' buyprice='" + availableUnit[i][4] + "' retailprice='" + availableUnit[i][5] + "' price1='" + availableUnit[i][6] + "' price2='" + availableUnit[i][7] + "' qty1='" + availableUnit[i][8] + "' qty2='" + availableUnit[i][9] + "' conversionQuantity='" + availableUnit[i][10] + "' >" + availableUnit[i][1] + "</option>");
 					}
 				}
 				$("#ddlUnit").val(Data[14]);
@@ -485,13 +543,35 @@
 							dataType: "json",
 							success: function(data) {
 								if(data.FailedFlag == '0') {
-									if($("#hdnItemID").val() != data.ItemID) {
+									//if($("#hdnItemID").val() != data.ItemID) {
 										$("#hdnItemID").val(data.ItemID);
 										$("#txtItemName").val(data.ItemName);
-										$("#txtBuyPrice").val(returnRupiah(data.BuyPrice));
-										$("#txtRetailPrice").val(returnRupiah(data.RetailPrice));
-										$("#txtPrice1").val(returnRupiah(data.Price1));
-										$("#txtPrice2").val(returnRupiah(data.Price2));
+										$("#txtBuyPrice").val(returnRupiah((parseFloat(data.BuyPrice) * parseFloat(data.ConversionQuantity)).toString()));
+										$("#txtRetailPrice").val(returnRupiah((parseFloat(data.RetailPrice) * parseFloat(data.ConversionQuantity)).toString()));
+										if(parseFloat(data.ConversionQuantity) >= parseFloat(data.Qty2) && parseFloat(data.Qty2) > 1) {
+											$("#txtRetailPrice").val(returnRupiah((parseFloat(data.Price2) * parseFloat(data.ConversionQuantity)).toString()));
+											$("#txtPrice1").val(returnRupiah((parseFloat(data.Price2) * parseFloat(data.ConversionQuantity)).toString()));
+											$("#txtPrice2").val(returnRupiah((parseFloat(data.Price2) * parseFloat(data.ConversionQuantity)).toString()));
+											$("#hdnPriceFlag").val(2);
+										}
+										else if(parseFloat(data.ConversionQuantity) >= parseFloat(data.Qty1) && parseFloat(data.Qty1) > 1) {
+											$("#txtRetailPrice").val(returnRupiah((parseFloat(data.Price1) * parseFloat(data.ConversionQuantity)).toString()));
+											$("#txtPrice1").val(returnRupiah((parseFloat(data.Price1) * parseFloat(data.ConversionQuantity)).toString()));
+											$("#txtPrice2").val(returnRupiah((parseFloat(data.Price1) * parseFloat(data.ConversionQuantity)).toString()));
+											$("#hdnPriceFlag").val(1);
+										}
+										else {
+											$("#txtRetailPrice").val(returnRupiah((parseFloat(data.RetailPrice) * parseFloat(data.ConversionQuantity)).toString()));
+											$("#txtPrice1").val(returnRupiah((parseFloat(data.Price1) * parseFloat(data.ConversionQuantity)).toString()));
+											$("#txtPrice2").val(returnRupiah((parseFloat(data.Price2) * parseFloat(data.ConversionQuantity)).toString()));
+											$("#hdnPriceFlag").val(0);
+										}
+
+										$("#hdnBuyPrice").val(data.BuyPrice);
+										$("#hdnRetailPrice").val(data.RetailPrice);
+										$("#hdnPrice1").val(data.Price1);
+										$("#hdnPrice2").val(data.Price2);
+
 										$("#txtQTY").focus();
 										$("#txtSubTotal").val(returnRupiah(data.BuyPrice));
 										$("#hdnAvailableUnit").val(JSON.stringify(data.AvailableUnit));
@@ -499,12 +579,12 @@
 										if(data.AvailableUnit.length > 0) {
 											$("#ddlUnit").find('option').remove();
 											for(var i=0;i<data.AvailableUnit.length;i++) {
-												$("#ddlUnit").append("<option value=" + data.AvailableUnit[i][0] + " itemdetailsid='" + data.AvailableUnit[i][2] + "' itemcode='" + data.AvailableUnit[i][3] + "' buyprice='" + data.AvailableUnit[i][4] + "' retailprice='" + data.AvailableUnit[i][5] + "' price1='" + data.AvailableUnit[i][6] + "' price2='" + data.AvailableUnit[i][7] + "'>" + data.AvailableUnit[i][1] + "</option>");
+												$("#ddlUnit").append("<option value=" + data.AvailableUnit[i][0] + " itemdetailsid='" + data.AvailableUnit[i][2] + "' itemcode='" + data.AvailableUnit[i][3] + "' buyprice='" + data.AvailableUnit[i][4] + "' retailprice='" + data.AvailableUnit[i][5] + "' price1='" + data.AvailableUnit[i][6] + "' price2='" + data.AvailableUnit[i][7] + "' qty1='" + data.AvailableUnit[i][8] + "' qty2='" + data.AvailableUnit[i][9] + "' conversionQuantity='" + data.AvailableUnit[i][10] + "' >" + data.AvailableUnit[i][1] + "</option>");
 											}
 										}
 										$("#ddlUnit").val(data.UnitID);
-									}
-									else $("#txtQTY").focus();
+									//}
+									//else $("#txtQTY").focus();
 								}
 								else {
 									//add new item
@@ -744,6 +824,11 @@
 									$("#hdnPurchaseID").val(data.ID);
 									$("#hdnPurchaseDetailsID").val(0);
 									$("#hdnItemID").val(0);
+									$("#hdnBuyPrice").val(0);
+									$("#hdnRetailPrice").val(0);
+									$("#hdnPrice1").val(0);
+									$("#hdnPrice2").val(0);
+									$("#hdnPriceFlag").val(0);
 									$("#txtSubTotal").val(0);
 									$("#ddlUnit").find('option').remove();
 									$("#ddlUnit").append("<option>--</option>");
@@ -1298,6 +1383,11 @@
 				$("#hdnItemDetailsID").val(0);
 				$("#txtSubTotal").val(0);
 				$("#hdnPurchaseDetailsID").val(0);
+				$("#hdnBuyPrice").val(0);
+				$("#hdnRetailPrice").val(0);
+				$("#hdnPrice1").val(0);
+				$("#hdnPrice2").val(0);
+				$("#hdnPriceFlag").val(0);
 				table2.clear().draw();
 			}
 			
@@ -1404,19 +1494,18 @@
 
 						var counterPickItem = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
-							//var index = table3.cell({ focused: true }).index();
-							if(counterPickItem == 0) {
-								counterPickItem = 1;
-								var data = datatable.row( cell.index().row ).data();
-								if(key == 13 && $("#itemList-dialog").css("display") == "block") {
+							if(key == 13 && $("#itemList-dialog").css("display") == "block") {
+								if(counterPickItem == 0) {
+									counterPickItem = 1;
+									var data = datatable.row( table3.cell({ focused: true }).index().row ).data();
 									$("#txtItemCode").val(data[0]);
 									getItemDetails();
 									$("#itemList-dialog").dialog("destroy");
 									table3.destroy();
 									//table.keys.enable();
 									table2.keys.enable();
+									setTimeout(function() { counterPickItem = 0; } , 1000);
 								}
-								setTimeout(function() { counterPickItem = 0; } , 1000);
 							}
 						});
 						

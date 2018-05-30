@@ -243,70 +243,7 @@
 					Konversi Qty :
 				</div>
 				<div class="col-md-4">
-					<input id="txtConversionQty_" name="txtConversionQty_" type="number" class="form-control-custom text-right" value=1 min=1 onfocus="this.select();" autocomplete=off placeholder="Konversi Qty" onpaste="return false;" />
-				</div>
-			</div>
-			<br />
-			<div class="row">
-				<div class="col-md-2 labelColumn">
-					Harga Beli :
-				</div>
-				<div class="col-md-4">
-					<input id="txtBuyPrice_" name="txtBuyPrice_" type="text" class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Beli" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
-				</div>
-			</div>
-			<br />
-			<div class="row">
-				<div class="col-md-2 labelColumn">
-					Harga Ecer :
-				</div>
-				<div class="col-md-4">
-					<input id="txtRetailPrice_" name="txtRetailPrice_" type="text" class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Ecer" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
-				</div>
-			</div>
-			<br />
-			<div class="row">
-				<div class="col-md-2 labelColumn">
-					Harga Grosir 1 :
-				</div>
-				<div class="col-md-4">
-					<input id="txtPrice1_" name="txtPrice1_" type="text" class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Grosir 1" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
-				</div>
-				<div class="col-md-2 labelColumn">
-					Qty Grosir 1 :
-				</div>
-				<div class="col-md-2">
-					<input id="txtQty1_" name="txtQty1_" type="number" class="form-control-custom text-right" value=1 min=1 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 1" onpaste="return false;" />
-				</div>
-			</div>
-			<br />
-			<div class="row">
-				<div class="col-md-2 labelColumn">
-					Harga Grosir 2 :
-				</div>
-				<div class="col-md-4">
-					<input id="txtPrice2_" name="txtPrice2_" type="text" class="form-control-custom text-right" value="0" autocomplete=off placeholder="Harga Grosir 2" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
-				</div>
-				<div class="col-md-2 labelColumn">
-					Qty Grosir 2 :
-				</div>
-				<div class="col-md-2">
-					<input id="txtQty2_" name="txtQty2_" type="number" class="form-control-custom text-right" value=1 min=1 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 2" onpaste="return false;" />
-				</div>
-			</div>
-			<br />
-			<div class="row">
-				<div class="col-md-2 labelColumn">
-					Berat (KG) :
-				</div>
-				<div class="col-md-4">
-					<input id="txtWeight_" name="txtWeight_" type="text" class="form-control-custom text-right" value="0" autocomplete=off placeholder="Berat (KG)" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertWeight(this.id, this.value);" onpaste="return false;" />
-				</div>
-				<div class="col-md-2 labelColumn">
-					Stok Minimal :
-				</div>
-				<div class="col-md-2">
-					<input id="txtMinimumStock_" name="txtMinimumStock_" onkeypress="isEnterKey(event, 'focusToSave');" type="number" class="form-control-custom text-right" value=0 onfocus="this.select();" autocomplete=off placeholder="Stok Minimal" onpaste="return false;" />
+					<input id="txtConversionQty_" name="txtConversionQty_" type="number" onkeypress="isEnterKey(event, 'focusToSave');" class="form-control-custom text-right" value=1 min=1 onfocus="this.select();" autocomplete=off placeholder="Konversi Qty" onpaste="return false;" />
 				</div>
 			</div>
 		</div>
@@ -422,14 +359,6 @@
 								$("#txtItemCode_" + (i + 1)).val(Data.data[i][1]);
 								$("#ddlUnit_" + (i + 1)).val(Data.data[i][2]);
 								$("#txtConversionQty_" + (i + 1)).val(Data.data[i][3]);
-								$("#txtBuyPrice_" + (i + 1)).val(Data.data[i][4]);
-								$("#txtRetailPrice_" + (i + 1)).val(Data.data[i][5]);
-								$("#txtPrice1_" + (i + 1)).val(Data.data[i][6]);
-								$("#txtQty1_" + (i + 1)).val(Data.data[i][7]);
-								$("#txtPrice2_" + (i + 1)).val(Data.data[i][8]);
-								$("#txtQty2_" + (i + 1)).val(Data.data[i][9]);
-								$("#txtWeight_" + (i + 1)).val(Data.data[i][10]);
-								$("#txtMinimumStock_" + (i + 1)).val(Data.data[i][11]);
 								tabs.tabs("option", "active", 0);
 							}
 						}
@@ -536,6 +465,14 @@
 								PassValidate = 0;
 								$("#ddlCategory").next().find("input").notify("Harus diisi!", { position:"right", className:"warn", autoHideDelay: 2000 });
 								if(FirstFocus == 0) $("#ddlCategory").next().find("input").focus();
+								FirstFocus = 1;
+								tabs.tabs("option", "active", 0);
+							}
+
+							if(parseFloat($("#txtQty1").val()) > 1 && parseFloat($("#txtQty2").val()) > 1 && parseFloat($("#txtQty1").val()) > parseFloat($("#txtQty2").val()) ) { 
+								PassValidate = 0;
+								$("#txtQty1").notify("Qty 1 harus lebih kecil dari Qty 2!", { position:"right", className:"warn", autoHideDelay: 2000 });
+								if(FirstFocus == 0) $("#txtQty1").focus();
 								FirstFocus = 1;
 								tabs.tabs("option", "active", 0);
 							}

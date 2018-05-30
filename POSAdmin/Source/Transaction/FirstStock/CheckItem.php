@@ -17,6 +17,9 @@
 		$AvailableUnit = "";
 		$FailedFlag = 0;
 		$ErrorMessage = "";
+		$ConversionQuantity = 1;
+		$Qty1 = 1;
+		$Qty2 = 1;
 		$State = 1;
 		
 		$sql = "CALL spSelItemDetails('".$ItemCode."', '".$_SESSION['UserLogin']."')";
@@ -25,7 +28,7 @@
 			$FailedFlag = 1;
 			$ErrorMessage = "Terjadi kesalahan sistem.";
 			logEvent(mysqli_error($dbh), '/Transaction/FirstStock/CheckItem.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-			echo returnstate($ItemID, $ItemDetailsID, $ItemName, $BuyPrice, $RetailPrice, $Price1, $Price2, $UnitID, $AvailableUnit, $FailedFlag, $ErrorMessage);
+			echo returnstate($ItemID, $ItemDetailsID, $ItemName, $BuyPrice, $RetailPrice, $Price1, $Price2, $UnitID, $AvailableUnit, $ConversionQuantity, $Qty1, $Qty2, $FailedFlag, $ErrorMessage);
 			return 0;
 		}
 		
@@ -39,6 +42,9 @@
 			$Price1 = $row['Price1'];
 			$Price2 = $row['Price2'];
 			$UnitID = $row['UnitID'];
+			$ConversionQuantity = $row['ConversionQuantity'];
+			$Qty1 = $row['Qty1'];
+			$Qty2 = $row['Qty2'];
 		}
 		else {
 			$FailedFlag = 1;
@@ -60,6 +66,9 @@
 				$row_unit[] = $row['RetailPrice'];
 				$row_unit[] = $row['Price1'];
 				$row_unit[] = $row['Price2'];
+				$row_unit[] = $row['Qty1'];
+				$row_unit[] = $row['Qty2'];
+				$row_unit[] = $row['ConversionQuantity'];
 				array_push($AvailableUnit, $row_unit);
 			}
 
@@ -67,10 +76,10 @@
 			mysqli_next_result($dbh);
 		}
 		
-		echo returnstate($ItemID, $ItemDetailsID, $ItemName, $BuyPrice, $RetailPrice, $Price1, $Price2, $UnitID, $AvailableUnit, $FailedFlag, $ErrorMessage);
+		echo returnstate($ItemID, $ItemDetailsID, $ItemName, $BuyPrice, $RetailPrice, $Price1, $Price2, $UnitID, $AvailableUnit, $ConversionQuantity, $Qty1, $Qty2, $FailedFlag, $ErrorMessage);
 	}
 	
-	function returnstate($ItemID, $ItemDetailsID, $ItemName, $BuyPrice, $RetailPrice, $Price1, $Price2, $UnitID, $AvailableUnit, $FailedFlag, $ErrorMessage) {
+	function returnstate($ItemID, $ItemDetailsID, $ItemName, $BuyPrice, $RetailPrice, $Price1, $Price2, $UnitID, $AvailableUnit, $ConversionQuantity, $Qty1, $Qty2, $FailedFlag, $ErrorMessage) {
 		$data = array(
 			"ItemID" => $ItemID, 
 			"ItemName" => $ItemName, 
@@ -81,6 +90,9 @@
 			"Price2" => $Price2,
 			"AvailableUnit" => $AvailableUnit,
 			"UnitID" => $UnitID,
+			"ConversionQuantity" => $ConversionQuantity,
+			"Qty1" => $Qty1,
+			"Qty2" => $Qty2,
 			"FailedFlag" => $FailedFlag,
 			"ErrorMessage" => $ErrorMessage
 		);

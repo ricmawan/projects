@@ -39,7 +39,8 @@ SET State = 1;
 		MI.Price2,
 		MI.Qty2,
 		MI.Weight,
-        MI.UnitID
+        MI.UnitID,
+        1 ConversionQuantity
 	FROM
 		master_item MI
 	WHERE
@@ -50,14 +51,15 @@ SET State = 1;
         MID.ItemDetailsID,
 		MID.ItemDetailsCode,
 		MI.ItemName,
-		MID.BuyPrice,
-		MID.RetailPrice,
-		MID.Price1,
-		MID.Qty1,
-		MID.Price2,
-		MID.Qty2,
-		MID.Weight,
-        MID.UnitID
+		MI.BuyPrice,
+		MI.RetailPrice,
+		MI.Price1,
+		MI.Qty1,
+		MI.Price2,
+		MI.Qty2,
+		MI.Weight,
+        MID.UnitID,
+        MID.ConversionQuantity
 	FROM
 		master_itemdetails MID
         JOIN master_item MI
@@ -78,7 +80,8 @@ SET State = 2;
 		MI.Qty1,
 		MI.Price2,
 		MI.Qty2,
-		MI.Weight
+		MI.Weight,
+        1 ConversionQuantity
 	FROM
 		master_unit MU
 		JOIN master_item MI
@@ -91,13 +94,14 @@ SET State = 2;
         MID.ItemDetailsCode,
     	MU.UnitID,
 		MU.UnitName,
-        MID.BuyPrice,
-		MID.RetailPrice,
-		MID.Price1,
-		MID.Qty1,
-		MID.Price2,
-		MID.Qty2,
-		MID.Weight
+        MI.BuyPrice,
+		MI.RetailPrice,
+		MI.Price1,
+		MI.Qty1,
+		MI.Price2,
+		MI.Qty2,
+		MI.Weight,
+        MID.ConversionQuantity
     FROM
 		master_unit MU
 		JOIN master_itemdetails MID
@@ -118,7 +122,8 @@ SET State = 2;
 		MI.Qty1,
 		MI.Price2,
 		MI.Qty2,
-		MI.Weight
+		MI.Weight,
+        1 ConversionQuantity
 	FROM
 		master_unit MU
 		JOIN master_item MI
@@ -133,21 +138,30 @@ SET State = 2;
         MID.ItemDetailsCode,
     	MU.UnitID,
 		MU.UnitName,
-        MID.BuyPrice,
-		MID.RetailPrice,
-		MID.Price1,
-		MID.Qty1,
-		MID.Price2,
-		MID.Qty2,
-		MID.Weight
+        MI.BuyPrice,
+		MI.RetailPrice,
+		MI.Price1,
+		MI.Qty1,
+		MI.Price2,
+		MI.Qty2,
+		MI.Weight,
+        MID.ConversionQuantity
     FROM
 		master_unit MU
 		JOIN master_itemdetails MID
 			ON MID.UnitID = MU.UnitID
+		JOIN 
+        (
+			SELECT
+				MID.ItemID
+			FROM
+				master_itemdetails MID
+			WHERE
+				TRIM(MID.ItemDetailsCode) = TRIM(pItemCode)
+        )A
+			ON A.ItemID = MID.ItemID
 		JOIN master_item MI
-			ON MI.ItemID = MID.ItemID
-	WHERE
-        TRIM(MID.ItemDetailsCode) = TRIM(pItemCode);
+			ON MI.ItemID = A.ItemID;
 
 END;
 $$

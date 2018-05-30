@@ -343,9 +343,10 @@
 			}
 
 			function CalculateSubTotal() {
-				var buyPrice = parseFloat($("#txtSalePrice").val().replace(/\,/g, ""));
+				var salePrice = parseFloat($("#txtSalePrice").val().replace(/\,/g, ""));
+				var discount = parseFloat($("#txtDiscount").val().replace(/\,/g, ""));
 				var QTY = parseFloat($("#txtQTY").val());
-				var SubTotal = buyPrice * QTY;
+				var SubTotal = (salePrice - discount) * QTY;
 				$("#txtSubTotal").val(returnRupiah(SubTotal.toString()));
 			}
 			
@@ -707,7 +708,7 @@
 						if(parseFloat(Quantity) >= parseFloat(qty2) && parseFloat(qty2) > 1) {
 							$("#txtSalePrice").val(returnRupiah(price2));
 						}
-						else if(parseFloat(Quantity) < parseFloat(qty2) && parseFloat(Quantity) >= parseFloat(qty1)  && parseFloat(qty2) > 1  && parseFloat(qty1) > 1) {
+						else if(parseFloat(Quantity) >= parseFloat(qty1) && parseFloat(qty1) > 1) {
 							$("#txtSalePrice").val(returnRupiah(price1));
 						}
 						else {
@@ -1778,7 +1779,7 @@
 				var weight = 0;
 				table2.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
 					var data = this.data();
-					grandTotal += parseFloat(data[9].replace(/\,/g, "")) * parseFloat(data[7]) - parseFloat(data[10].replace(/\,/g, ""));
+					grandTotal += (parseFloat(data[9].replace(/\,/g, "")) - parseFloat(data[10].replace(/\,/g, ""))) * parseFloat(data[7]);
 					weight += parseFloat(data[17]) * parseFloat(data[7]);
 				});
 				$("#lblTotal").html(returnRupiah(grandTotal.toString()));

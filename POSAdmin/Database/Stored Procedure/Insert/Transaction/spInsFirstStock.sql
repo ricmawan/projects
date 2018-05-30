@@ -180,24 +180,10 @@ SET State = 9;
 					Price2 = pPrice2,
 					ModifiedBy = pCurrentUser
 				WHERE
-					ItemID = pItemID
-                    AND pItemDetailsID IS NULL;
+					ItemID = pItemID;
                     
 SET State = 10;
-
-				UPDATE 
-					master_itemdetails
-				SET
-					BuyPrice = pBuyPrice,
-					RetailPrice = pRetailPrice,
-					Price1 = pPrice1,
-					Price2 = pPrice2,
-					ModifiedBy = pCurrentUser
-				WHERE
-					ItemDetailsID = pItemDetailsID
-                    AND pItemDetailsID IS NOT NULL;
-SET State = 11;
-				
+			
 				SELECT
 					pID AS 'ID',
                     pFirstStockDetailsID AS 'FirstStockDetailsID',

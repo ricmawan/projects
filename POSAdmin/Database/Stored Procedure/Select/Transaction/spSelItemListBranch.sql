@@ -321,12 +321,30 @@ SET @query = CONCAT("SELECT
 						MI.ItemName,
                         MC.CategoryID,
 						MC.CategoryName,
-                        MID.BuyPrice,
-						MID.RetailPrice,
-                        MID.Price1,
-                        MID.Qty1,
-                        MID.Price2,
-                        MID.Qty2,
+                        IFNULL(MID.ConversionQuantity, 1) * MI.BuyPrice BuyPrice,
+                        CASE
+							WHEN IFNULL(MID.ConversionQuantity, 1) >= MI.Qty2 AND MI.Qty2 > 1
+                            THEN IFNULL(MID.ConversionQuantity, 1) * MI.Price2
+                            WHEN IFNULL(MID.ConversionQuantity, 1) >= MI.Qty1 AND MI.Qty1 > 1
+                            THEN IFNULL(MID.ConversionQuantity, 1) * MI.Price1
+                            ELSE IFNULL(MID.ConversionQuantity, 1) * MI.RetailPrice
+						END RetailPrice,
+                        CASE
+							WHEN IFNULL(MID.ConversionQuantity, 1) >= MI.Qty2 AND MI.Qty2 > 1
+                            THEN IFNULL(MID.ConversionQuantity, 1) * MI.Price2
+                            WHEN IFNULL(MID.ConversionQuantity, 1) >= MI.Qty1 AND MI.Qty1 > 1
+                            THEN IFNULL(MID.ConversionQuantity, 1) * MI.Price1
+                            ELSE IFNULL(MID.ConversionQuantity, 1) * MI.RetailPrice
+						END Price1,
+                        MI.Qty1,
+                        CASE
+							WHEN IFNULL(MID.ConversionQuantity, 1) >= MI.Qty2 AND MI.Qty2 > 1
+                            THEN IFNULL(MID.ConversionQuantity, 1) * MI.Price2
+                            WHEN IFNULL(MID.ConversionQuantity, 1) >= MI.Qty1 AND MI.Qty1 > 1
+                            THEN IFNULL(MID.ConversionQuantity, 1) * MI.Price1
+                            ELSE IFNULL(MID.ConversionQuantity, 1) * MI.RetailPrice
+						END Price2,
+                        MI.Qty2,
                         MID.Weight,
                         MID.MinimumStock,
                         ROUND((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0)) / MID.ConversionQuantity, 2) Stock,

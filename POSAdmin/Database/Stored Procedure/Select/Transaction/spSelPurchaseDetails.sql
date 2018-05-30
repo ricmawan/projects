@@ -37,10 +37,35 @@ SET State = 1;
         PD.Quantity,
         IFNULL(MID.UnitID, MI.UnitID) UnitID,
         MU.UnitName,
-        PD.BuyPrice,
-        PD.RetailPrice,
-        PD.Price1,
-        PD.Price2,
+        IFNULL(MID.ConversionQuantity, 1) ConversionQuantity,
+        IFNULL(MID.ConversionQuantity, 1) * PD.BuyPrice BuyPrice,
+        CASE
+			WHEN IFNULL(MID.ConversionQuantity, 1) >= MI.Qty2 AND MI.Qty2 > 1
+			THEN IFNULL(MID.ConversionQuantity, 1) * PD.Price2
+			WHEN IFNULL(MID.ConversionQuantity, 1) >= MI.Qty1 AND MI.Qty1 > 1
+			THEN IFNULL(MID.ConversionQuantity, 1) * PD.Price1
+            WHEN MID.ConversionQuantity IS NULL
+			THEN PD.RetailPrice
+			ELSE IFNULL(MID.ConversionQuantity, 1) * PD.RetailPrice
+		END RetailPrice,
+        CASE
+			WHEN IFNULL(MID.ConversionQuantity, 1) >= MI.Qty2 AND MI.Qty2 > 1
+			THEN IFNULL(MID.ConversionQuantity, 1) * PD.Price2
+			WHEN IFNULL(MID.ConversionQuantity, 1) >= MI.Qty1 AND MI.Qty1 > 1
+			THEN IFNULL(MID.ConversionQuantity, 1) * PD.Price1
+            WHEN MID.ConversionQuantity IS NULL
+			THEN PD.Price1
+			ELSE IFNULL(MID.ConversionQuantity, 1) * PD.RetailPrice
+		END Price1,
+        CASE
+			WHEN IFNULL(MID.ConversionQuantity, 1) >= MI.Qty2 AND MI.Qty2 > 1
+			THEN IFNULL(MID.ConversionQuantity, 1) * PD.Price2
+			WHEN IFNULL(MID.ConversionQuantity, 1) >= MI.Qty1 AND MI.Qty1 > 1
+			THEN IFNULL(MID.ConversionQuantity, 1) * PD.Price1
+            WHEN MID.ConversionQuantity IS NULL
+			THEN PD.Price2
+			ELSE IFNULL(MID.ConversionQuantity, 1) * PD.RetailPrice
+		END Price2,
         CONCAT('[', GROUP_CONCAT(AU.AvailableUnit SEPARATOR ', '), ']') AvailableUnit,
         PD.ItemDetailsID
 	FROM
@@ -57,7 +82,19 @@ SET State = 1;
         (
 			SELECT
 				MI.ItemID,
-				CONCAT('[', MU.UnitID, ',"', MU.UnitName, '", "NULL", "', MI.ItemCode, '", ', MI.BuyPrice, ', ', MI.RetailPrice, ', ', MI.Price1, ', ', MI.Price2 ,']') AvailableUnit
+				CONCAT('[', 
+							MU.UnitID, ',"', 
+                            MU.UnitName, '", 
+                            "NULL", "', 
+                            MI.ItemCode, '", ', 
+                            MI.BuyPrice, ', ', 
+                            MI.RetailPrice, ', ', 
+                            MI.Price1, ', ', 
+                            MI.Price2 , ', ', 
+                            MI.Qty1, ', ', 
+                            MI.Qty2, ', ', 
+                            1, 
+						']') AvailableUnit
 			FROM
 				master_unit MU
 				JOIN master_item MI
@@ -67,7 +104,19 @@ SET State = 1;
 			UNION ALL
 			SELECT
 				MI.ItemID,
-				CONCAT('[', MU.UnitID, ',"', MU.UnitName, '",', MID.ItemDetailsID, ',"', MID.ItemDetailsCode, '", ', MID.BuyPrice, ', ', MID.RetailPrice, ', ', MID.Price1, ', ', MID.Price2 ,']') AvailableUnit
+				CONCAT('[', 
+							MU.UnitID, ',"', 
+							MU.UnitName, '",', 
+                            MID.ItemDetailsID, ',"', 
+                            MID.ItemDetailsCode, '", ', 
+                            MI.BuyPrice, ', ', 
+                            MI.RetailPrice, ', ', 
+                            MI.Price1, ', ', 
+                            MI.Price2, ', ', 
+                            MI.Qty1, ', ', 
+                            MI.Qty2, ', ', 
+                            MID.ConversionQuantity,
+						']') AvailableUnit
 			FROM
 				master_unit MU
 				JOIN master_itemdetails MID
@@ -95,7 +144,8 @@ SET State = 1;
         PD.RetailPrice,
         PD.Price1,
         PD.Price2,
-        PD.ItemDetailsID
+        PD.ItemDetailsID,
+        IFNULL(MID.ConversionQuantity, 1)
 	ORDER BY
 		PD.PurchaseDetailsID;
         

@@ -85,15 +85,7 @@ SET State = 2;
 									ItemID,
 									ItemDetailsCode,
 									UnitID,
-									ConversionQuantity,
-									BuyPrice,
-									RetailPrice,
-									Price1,
-									Qty1,
-									Price2,
-									Qty2,
-									Weight,
-									MinimumStock
+									ConversionQuantity
 								)
 								VALUES", pItemDetails);
 								
@@ -318,14 +310,6 @@ SET State = 16;
 					ItemDetailsCode,
 					UnitID,
 					ConversionQuantity,
-					BuyPrice,
-					RetailPrice,
-					Price1,
-					Qty1,
-					Price2,
-					Qty2,
-					Weight,
-					MinimumStock,
                     CreatedDate,
                     CreatedBy
                 )
@@ -335,14 +319,6 @@ SET State = 16;
 					ItemDetailsCode,
 					UnitID,
 					ConversionQuantity,
-					BuyPrice,
-					RetailPrice,
-					Price1,
-					Qty1,
-					Price2,
-					Qty2,
-					Weight,
-					MinimumStock,
                     NOW(),
                     'Admin'
 				FROM
@@ -389,14 +365,6 @@ SET State = 19;
 					MID.ItemDetailsCode = TMID.ItemDetailsCode,
 					MID.UnitID = TMID.UnitID,
 					MID.ConversionQuantity = TMID.ConversionQuantity,
-					MID.BuyPrice = TMID.BuyPrice,
-					MID.RetailPrice = TMID.RetailPrice,
-					MID.Price1 = TMID.Price1,
-					MID.Qty1 = TMID.Qty1,
-					MID.Price2 = TMID.Price2,
-					MID.Qty2 = TMID.Qty2,
-					MID.Weight = TMID.Weight,
-                    MID.MinimumStock = TMID.MinimumStock,
 					ModifiedBy = pCurrentUser;
                     
 SET State = 20;
@@ -420,14 +388,6 @@ SET State = 21;
 					ItemDetailsCode,
 					UnitID,
 					ConversionQuantity,
-					BuyPrice,
-					RetailPrice,
-					Price1,
-					Qty1,
-					Price2,
-					Qty2,
-					Weight,
-					MinimumStock,
                     CreatedDate,
                     CreatedBy
                 )
@@ -437,14 +397,6 @@ SET State = 21;
 					ItemDetailsCode,
 					UnitID,
 					ConversionQuantity,
-					BuyPrice,
-					RetailPrice,
-					Price1,
-					Qty1,
-					Price2,
-					Qty2,
-					Weight,
-					MinimumStock,
                     NOW(),
                     'Admin'
 				FROM

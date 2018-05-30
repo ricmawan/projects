@@ -30,15 +30,7 @@
 								".$ItemID.",
 								\'".mysqli_real_escape_string($dbh, $_POST['txtItemCode_'.($i+1)])."\',
 								".mysqli_real_escape_string($dbh, $_POST['ddlUnit_'.($i+1)]).",
-								".mysqli_real_escape_string($dbh, $_POST['txtConversionQty_'.($i+1)]).",
-								".mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtBuyPrice_'.($i+1)])).",
-								".mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtRetailPrice_'.($i+1)])).",
-								".mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtPrice1_'.($i+1)])).",
-								".mysqli_real_escape_string($dbh, $_POST['txtQty1_'.($i+1)]).",
-								".mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtPrice2_'.($i+1)])).",
-								".mysqli_real_escape_string($dbh, $_POST['txtQty2_'.($i+1)]).",
-								".mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtWeight_'.($i+1)])).",
-								".mysqli_real_escape_string($dbh, $_POST['txtMinimumStock_'.($i+1)])."
+								".mysqli_real_escape_string($dbh, $_POST['txtConversionQty_'.($i+1)])."
 							  )";
 		}
 		$sql = "CALL spInsItem( ".$ItemID.",
