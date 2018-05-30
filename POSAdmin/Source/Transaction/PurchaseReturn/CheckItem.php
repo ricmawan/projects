@@ -17,6 +17,7 @@
 		$AvailableUnit = "";
 		$FailedFlag = 0;
 		$ErrorMessage = "";
+		$ConversionQuantity = 1;
 		$State = 1;
 		
 		$sql = "CALL spSelItemDetails('".$ItemCode."', '".$_SESSION['UserLogin']."')";
@@ -25,7 +26,7 @@
 			$FailedFlag = 1;
 			$ErrorMessage = "Terjadi kesalahan sistem.";
 			logEvent(mysqli_error($dbh), '/Transaction/Purchase/CheckItem.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-			echo returnstate($ItemID, $ItemDetailsID, $ItemName, $BuyPrice, $UnitID, $AvailableUnit, $FailedFlag, $ErrorMessage);
+			echo returnstate($ItemID, $ItemDetailsID, $ItemName, $BuyPrice, $UnitID, $AvailableUnit, $ConversionQuantity, $FailedFlag, $ErrorMessage);
 			return 0;
 		}
 		
@@ -36,6 +37,7 @@
 			$ItemName = $row['ItemName'];
 			$BuyPrice = $row['BuyPrice'];
 			$UnitID = $row['UnitID'];
+			$ConversionQuantity = $row['ConversionQuantity'];
 		}
 		else {
 			$FailedFlag = 1;
@@ -54,6 +56,7 @@
 				$row_unit[] = $row['ItemDetailsID'];
 				$row_unit[] = $row['ItemCode'];
 				$row_unit[] = $row['BuyPrice'];
+				$row_unit[] = $row['ConversionQuantity'];
 				array_push($AvailableUnit, $row_unit);
 			}
 
@@ -61,10 +64,10 @@
 			mysqli_next_result($dbh);
 		}
 		
-		echo returnstate($ItemID, $ItemDetailsID, $ItemName, $BuyPrice, $UnitID, $AvailableUnit, $FailedFlag, $ErrorMessage);
+		echo returnstate($ItemID, $ItemDetailsID, $ItemName, $BuyPrice, $UnitID, $AvailableUnit, $ConversionQuantity, $FailedFlag, $ErrorMessage);
 	}
 	
-	function returnstate($ItemID, $ItemDetailsID, $ItemName, $BuyPrice, $UnitID, $AvailableUnit, $FailedFlag, $ErrorMessage) {
+	function returnstate($ItemID, $ItemDetailsID, $ItemName, $BuyPrice, $UnitID, $AvailableUnit, $ConversionQuantity, $FailedFlag, $ErrorMessage) {
 		$data = array(
 			"ItemID" => $ItemID, 
 			"ItemName" => $ItemName, 
@@ -72,6 +75,7 @@
 			"BuyPrice" => $BuyPrice,
 			"AvailableUnit" => $AvailableUnit,
 			"UnitID" => $UnitID,
+			"ConversionQuantity" => $ConversionQuantity,
 			"FailedFlag" => $FailedFlag,
 			"ErrorMessage" => $ErrorMessage
 		);

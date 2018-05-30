@@ -37,7 +37,8 @@ SET State = 1;
         TPRD.Quantity,
         IFNULL(MID.UnitID, MI.UnitID) UnitID,
         MU.UnitName,
-        TPRD.BuyPrice,
+        IFNULL(MID.ConversionQuantity, 1) ConversionQuantity,
+        IFNULL(MID.ConversionQuantity, 1) * TPRD.BuyPrice BuyPrice,
         CONCAT('[', GROUP_CONCAT(AU.AvailableUnit SEPARATOR ', '), ']') AvailableUnit,
         TPRD.ItemDetailsID
 	FROM
@@ -54,7 +55,17 @@ SET State = 1;
         (
 			SELECT
 				MI.ItemID,
-				CONCAT('[', MU.UnitID, ',"', MU.UnitName, '", "NULL", "', MI.ItemCode, '", ', MI.BuyPrice, ', ', MI.RetailPrice, ', ', MI.Price1, ', ', MI.Price2 ,']') AvailableUnit
+				CONCAT('[', 
+							MU.UnitID, ',"', 
+                            MU.UnitName, '", 
+                            "NULL", "', 
+                            MI.ItemCode, '", ', 
+                            MI.BuyPrice, ', ', 
+                            MI.RetailPrice, ', ', 
+                            MI.Price1, ', ', 
+                            MI.Price2, ', ',
+                            1,
+						']') AvailableUnit
 			FROM
 				master_unit MU
 				JOIN master_item MI
@@ -64,7 +75,17 @@ SET State = 1;
 			UNION ALL
 			SELECT
 				MI.ItemID,
-				CONCAT('[', MU.UnitID, ',"', MU.UnitName, '",', MID.ItemDetailsID, ',"', MID.ItemDetailsCode, '", ', MID.BuyPrice, ', ', MID.RetailPrice, ', ', MID.Price1, ', ', MID.Price2 ,']') AvailableUnit
+				CONCAT('[',
+							MU.UnitID, ',"', 
+                            MU.UnitName, '",', 
+                            MID.ItemDetailsID, ',"', 
+                            MID.ItemDetailsCode, '", ', 
+                            MI.BuyPrice, ', ', 
+                            MI.RetailPrice, ', ', 
+                            MI.Price1, ', ', 
+                            MI.Price2 ,
+                            MID.ConversionQuantity,
+						']') AvailableUnit
 			FROM
 				master_unit MU
 				JOIN master_itemdetails MID
@@ -89,7 +110,8 @@ SET State = 1;
         IFNULL(MID.UnitID, MI.UnitID),
 		MU.UnitName,
 		TPRD.BuyPrice,
-		TPRD.ItemDetailsID
+		TPRD.ItemDetailsID,
+        IFNULL(MID.ConversionQuantity, 1)
 	ORDER BY
 		TPRD.PurchaseReturnDetailsID;
         

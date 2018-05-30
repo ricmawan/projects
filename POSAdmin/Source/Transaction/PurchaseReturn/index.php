@@ -70,6 +70,7 @@
 						<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
 						<input id="hdnAvailableUnit" name="hdnAvailableUnit" type="hidden" />
 						<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
+						<input id="hdnBuyPrice" name="hdnBuyPrice" type="hidden" />
 					</div>
 					<div class="col-md-2">
 						<input id="txtTransactionDate" name="txtTransactionDate" type="text" tabindex=6 class="form-control-custom" style="width: 87%; display: inline-block;margin-right: 5px;" onfocus="this.select();" autocomplete=off placeholder="Tanggal" required />
@@ -148,7 +149,7 @@
 								</td>
 								<td style="width: 15%;" >
 									<div class="has-float-label" >
-										<input id="txtBuyPrice" name="txtBuyPrice" type="text" tabindex=12 class="form-control-custom text-right" value="0" autocomplete=off onkeypress="isEnterKey(event, 'addPurchaseReturnDetails');return isNumberKey(event, this.id, this.value);" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
+										<input id="txtBuyPrice" name="txtBuyPrice" type="text" tabindex=12 class="form-control-custom text-right" value="0" autocomplete=off onchange="CalculatePrice();" onkeypress="isEnterKey(event, 'addPurchaseReturnDetails');return isNumberKey(event, this.id, this.value);" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
 										<label for="txtBuyPrice" class="lblInput" >Harga Beli</label>
 									</div>
 								</td>
@@ -250,9 +251,14 @@
 				var itemDetailsID  = $("#ddlUnit option:selected").attr("itemdetailsid");
 				var itemCode = $("#ddlUnit option:selected").attr("itemcode");
 				var buyPrice = $("#ddlUnit option:selected").attr("buyprice");
+				var conversionQuantity = $("#ddlUnit option:selected").attr("conversionQuantity");
+
 				$("#hdnItemDetailsID").val(itemDetailsID);
 				$("#txtItemCode").val(itemCode);
-				$("#txtBuyPrice").val(returnRupiah(buyPrice));
+				$("#txtBuyPrice").val(returnRupiah((parseFloat(buyPrice) * parseFloat(conversionQuantity)).toString()));
+
+				$("#hdnBuyPrice").val(buyPrice);
+
 				CalculateSubTotal();
 			}
 
@@ -261,6 +267,13 @@
 				var QTY = parseFloat($("#txtQTY").val());
 				var SubTotal = buyPrice * QTY;
 				$("#txtSubTotal").val(returnRupiah(SubTotal.toString()));
+			}
+
+			function CalculatePrice() {
+				var conversionQuantity = parseFloat($("#ddlUnit option:selected").attr("conversionQuantity"));
+				var buyPrice = parseFloat($("#txtBuyPrice").val().replace(/\,/g, ""));
+				
+				$("#hdnBuyPrice").val(buyPrice/conversionQuantity);
 			}
 			
 			function openDialogEdit(Data) {
@@ -278,7 +291,7 @@
 				if(availableUnit.length > 0) {
 					$("#ddlUnit").find('option').remove();
 					for(var i=0;i<availableUnit.length;i++) {
-						$("#ddlUnit").append("<option value=" + availableUnit[i][0] + " itemdetailsid='" + availableUnit[i][2] + "' itemcode='" + availableUnit[i][3] + "' buyprice='" + availableUnit[i][4] + "' >" + availableUnit[i][1] + "</option>");
+						$("#ddlUnit").append("<option value=" + availableUnit[i][0] + " itemdetailsid='" + availableUnit[i][2] + "' itemcode='" + availableUnit[i][3] + "' buyprice='" + availableUnit[i][4] + "' conversionQuantity='" + availableUnit[i][5] + "' >" + availableUnit[i][1] + "</option>");
 					}
 				}
 				$("#ddlUnit").val(Data[11]);
@@ -454,23 +467,24 @@
 							dataType: "json",
 							success: function(data) {
 								if(data.FailedFlag == '0') {
-									if($("#hdnItemID").val() != data.ItemID) {
+									//if($("#hdnItemID").val() != data.ItemID) {
 										$("#hdnItemID").val(data.ItemID);
 										$("#txtItemName").val(data.ItemName);
-										$("#txtBuyPrice").val(returnRupiah(data.BuyPrice));
+										$("#txtBuyPrice").val(returnRupiah((parseFloat(data.BuyPrice) * parseFloat(data.ConversionQuantity)).toString()));
 										$("#txtQTY").focus();
-										$("#txtSubTotal").val(returnRupiah(data.BuyPrice));
+										$("#txtSubTotal").val(returnRupiah((parseFloat(data.BuyPrice) * parseFloat(data.ConversionQuantity)).toString()));
 										$("#hdnAvailableUnit").val(JSON.stringify(data.AvailableUnit));
 										$("#hdnItemDetailsID").val(data.ItemDetailsID);
+										$("#hdnBuyPrice").val(data.BuyPrice);
 										if(data.AvailableUnit.length > 0) {
 											$("#ddlUnit").find('option').remove();
 											for(var i=0;i<data.AvailableUnit.length;i++) {
-												$("#ddlUnit").append("<option value=" + data.AvailableUnit[i][0] + " itemdetailsid='" + data.AvailableUnit[i][2] + "' itemcode='" + data.AvailableUnit[i][3] + "' buyprice='" + data.AvailableUnit[i][4] + "' >" + data.AvailableUnit[i][1] + "</option>");
+												$("#ddlUnit").append("<option value=" + data.AvailableUnit[i][0] + " itemdetailsid='" + data.AvailableUnit[i][2] + "' itemcode='" + data.AvailableUnit[i][3] + "' buyprice='" + data.AvailableUnit[i][4] + "' conversionQuantity='" + data.AvailableUnit[i][5] + "' >" + data.AvailableUnit[i][1] + "</option>");
 											}
 										}
 										$("#ddlUnit").val(data.UnitID);
-									}
-									else $("#txtQTY").focus();
+									//}
+									//else $("#txtQTY").focus();
 								}
 								else {
 									//item code doesn't valid
@@ -657,6 +671,7 @@
 									$("#hdnItemID").val(0);
 									$("#txtSubTotal").val(0);
 									$("#ddlUnit").find('option').remove();
+									$("#hdnBuyPrice").val(0);
 									$("#ddlUnit").append("<option>--</option>");
 									$("#hdnAvailableUnit").val("");
 									$("#hdnItemDetailsID").val(0);
@@ -954,6 +969,7 @@
 				$("#hdnAvailableUnit").val("");
 				$("#txtSubTotal").val(0);
 				$("#hdnItemDetailsID").val(0);
+				$("#hdnBuyPrice").val(0);
 				table2.clear().draw();
 			}
 			
@@ -1058,19 +1074,18 @@
 
 						var counterPickItem = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
-							//var index = table3.cell({ focused: true }).index();
-							if(counterPickItem == 0) {
-								counterPickItem = 1;
-								var data = datatable.row( cell.index().row ).data();
-								if(key == 13 && $("#itemList-dialog").css("display") == "block") {
+							if(key == 13 && $("#itemList-dialog").css("display") == "block") {
+								if(counterPickItem == 0) {
+									counterPickItem = 1;
+									var data = datatable.row( table3.cell({ focused: true }).index().row ).data();
 									$("#txtItemCode").val(data[0]);
 									getItemDetails();
 									$("#itemList-dialog").dialog("destroy");
 									table3.destroy();
 									//table.keys.enable();
 									table2.keys.enable();
+									setTimeout(function() { counterPickItem = 0; } , 1000);
 								}
-								setTimeout(function() { counterPickItem = 0; } , 1000);
 							}
 						});
 						

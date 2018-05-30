@@ -573,7 +573,7 @@
 										$("#hdnPrice2").val(data.Price2);
 
 										$("#txtQTY").focus();
-										$("#txtSubTotal").val(returnRupiah(data.BuyPrice));
+										$("#txtSubTotal").val(returnRupiah((parseFloat(data.BuyPrice) * parseFloat(data.ConversionQuantity)).toString()));
 										$("#hdnAvailableUnit").val(JSON.stringify(data.AvailableUnit));
 										$("#hdnItemDetailsID").val(data.ItemDetailsID);
 										if(data.AvailableUnit.length > 0) {
