@@ -83,7 +83,7 @@ SET State = 1;
                             MI.BuyPrice, ', ', 
                             MI.RetailPrice, ', ', 
                             MI.Price1, ', ', 
-                            MI.Price2 ,
+                            MI.Price2 , ', ',
                             MID.ConversionQuantity,
 						']') AvailableUnit
 			FROM
