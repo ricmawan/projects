@@ -55,11 +55,13 @@ SET State = 1;
 				TS.SaleID,
 				SD.ItemID,
 				SD.SaleDetailsID,
-				SUM(SD.Quantity) Quantity
+				SUM(SD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_sale TS
 				JOIN transaction_saledetails SD
 					ON TS.SaleID = SD.SaleID
+				LEFT JOIN master_itemdetails MID
+					ON MID.ItemDetailsID = SD.ItemDetailsID
 			GROUP BY
 				TS.SaleID,
 				SD.ItemID,

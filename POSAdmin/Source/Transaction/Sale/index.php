@@ -136,6 +136,7 @@
 								<td style="width: 15%;" >
 									<div class="has-float-label" >
 										<input id="hdnBuyPrice" name="hdnBuyPrice" type="hidden" value=0 />
+										<input id="hdnSalePrice" name="hdnSalePrice" type="hidden" value=0 />
 										<input id="hdnRetailPrice" name="hdnRetailPrice" type="hidden" value=0 />
 										<input id="hdnPrice1" name="hdnPrice1" type="hidden" value=0 />
 										<input id="hdnQty1" name="hdnQty1" type="hidden" value=0 />
@@ -145,7 +146,7 @@
 										<input id="hdnWeight" name="hdnWeight" type="hidden" value=0 />
 										<input id="hdnConversionQty" name="hdnConversionQty" type="hidden" value=0 />
 										<input id="hdnStock" name="hdnStock" type="hidden" value=0 />
-										<input id="txtSalePrice" name="txtSalePrice" type="text" tabindex=11 class="form-control-custom text-right mousetrap" value="0" autocomplete=off onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
+										<input id="txtSalePrice" name="txtSalePrice" type="text" tabindex=11 class="form-control-custom text-right mousetrap" value="0" autocomplete=off onchange="CalculatePrice();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
 										<label for="txtSalePrice" class="lblInput" >Harga Jual</label>
 									</div>
 								</td>
@@ -349,6 +350,12 @@
 				var SubTotal = (salePrice - discount) * QTY;
 				$("#txtSubTotal").val(returnRupiah(SubTotal.toString()));
 			}
+
+			function CalculatePrice() {
+				var conversionQuantity = parseFloat($("#ddlUnit option:selected").attr("conversionQuantity"));
+				var salePrice = parseFloat($("#txtSalePrice").val().replace(/\,/g, ""));
+				$("#hdnSalePrice").val(salePrice/conversionQuantity);
+			}
 			
 			function openDialogEdit(Data) {
 				$("#hdnSaleDetailsID").val(Data[1]);
@@ -358,6 +365,7 @@
 				$("#txtItemName").val(Data[6]);
 				$("#txtQTY").val(Data[7]);
 				$("#txtSalePrice").val(Data[9]);
+				$("#hdnSalePrice").val(parseFloat(Data[9].replace(/\,/g, "")) / parseFloat(Data[22]));
 				$("#txtDiscount").val(Data[10]);
 				$("#txtSubTotal").val(Data[11]);
 				$("#hdnBuyPrice").val(Data[12]);
@@ -376,7 +384,7 @@
 				if(availableUnit.length > 0) {
 					$("#ddlUnit").find('option').remove();
 					for(var i=0;i<availableUnit.length;i++) {
-						$("#ddlUnit").append("<option value=" + availableUnit[i][0] + " itemdetailsid='" + availableUnit[i][2] + "' itemcode='" + availableUnit[i][3] + "' buyprice='" + availableUnit[i][4] + "' retailprice='" + availableUnit[i][5] + "' price1='" + availableUnit[i][6] + "' price2='" + availableUnit[i][7] + "' qty1='" + availableUnit[i][8] + "'  qty2='" + availableUnit[i][9] + "' >" + availableUnit[i][1] + "</option>");
+						$("#ddlUnit").append("<option value=" + availableUnit[i][0] + " itemdetailsid='" + availableUnit[i][2] + "' itemcode='" + availableUnit[i][3] + "' buyprice='" + availableUnit[i][4] + "' retailprice='" + availableUnit[i][5] + "' price1='" + availableUnit[i][6] + "' price2='" + availableUnit[i][7] + "' qty1='" + availableUnit[i][8] + "'  qty2='" + availableUnit[i][9] + "' conversionQuantity='" + availableUnit[i][10] + "' >" + availableUnit[i][1] + "</option>");
 					}
 				}
 				$("#ddlUnit").val(Data[20]);
@@ -587,6 +595,7 @@
 											$("#hdnItemID").val(data.ItemID);
 											$("#txtItemName").val(data.ItemName);
 											$("#txtSalePrice").val(returnRupiah(data.RetailPrice));
+											$("#hdnSalePrice").val(data.RetailPrice);
 											$("#hdnBuyPrice").val(data.BuyPrice);
 											$("#hdnRetailPrice").val(data.RetailPrice);
 											$("#hdnPrice1").val(data.Price1);
@@ -597,15 +606,15 @@
 											$("#txtSubTotal").val(returnRupiah(data.RetailPrice));
 											$("#hdnAvailableUnit").val(JSON.stringify(data.AvailableUnit));
 											$("#hdnItemDetailsID").val(data.ItemDetailsID);
+											$("#hdnConversionQty").val(data.ConversionQty);
 											if(data.AvailableUnit.length > 0) {
 												$("#ddlUnit").find('option').remove();
 												for(var i=0;i<data.AvailableUnit.length;i++) {
-													$("#ddlUnit").append("<option value=" + data.AvailableUnit[i][0] + " itemdetailsid='" + data.AvailableUnit[i][2] + "' itemcode='" + data.AvailableUnit[i][3] + "' buyprice='" + data.AvailableUnit[i][4] + "' retailprice='" + data.AvailableUnit[i][5] + "' price1='" + data.AvailableUnit[i][6] + "' price2='" + data.AvailableUnit[i][7] + "' qty1='" + data.AvailableUnit[i][8] + "' qty2='" + data.AvailableUnit[i][9] + "' >" + data.AvailableUnit[i][1] + "</option>");
+													$("#ddlUnit").append("<option value=" + data.AvailableUnit[i][0] + " itemdetailsid='" + data.AvailableUnit[i][2] + "' itemcode='" + data.AvailableUnit[i][3] + "' buyprice='" + data.AvailableUnit[i][4] + "' retailprice='" + data.AvailableUnit[i][5] + "' price1='" + data.AvailableUnit[i][6] + "' price2='" + data.AvailableUnit[i][7] + "' qty1='" + data.AvailableUnit[i][8] + "' qty2='" + data.AvailableUnit[i][9] + "' conversionQuantity='" + data.AvailableUnit[i][10] + "' >" + data.AvailableUnit[i][1] + "</option>");
 												}
 											}
 											$("#ddlUnit").val(data.UnitID);
 											Grosir($("#txtQTY").val());
-											CalculateSubTotal();
 											//console.log("mlebu 3");
 										}
 										$("#txtQTY").focus();
@@ -698,26 +707,33 @@
 			}
 			
 			function Grosir(Quantity) {
+				console.log("masuk kok");
 				if($("#hdnItemID").val() != 0) {
-					var retailPrice = $("#hdnRetailPrice").val();
+					var retailPrice = parseFloat($("#hdnRetailPrice").val());
+					var conversionQuantity = parseFloat($("#ddlUnit option:selected").attr("conversionQuantity"));
 					if($('#toggle-retail').data('toggles').active == false) {
-						var qty1 = $("#hdnQty1").val();
-						var price1 = $("#hdnPrice1").val();
-						var qty2 = $("#hdnQty2").val();
-						var price2 = $("#hdnPrice2").val();
-						if(parseFloat(Quantity) >= parseFloat(qty2) && parseFloat(qty2) > 1) {
-							$("#txtSalePrice").val(returnRupiah(price2));
+						var qty1 = parseFloat($("#hdnQty1").val());
+						var price1 = parseFloat($("#hdnPrice1").val());
+						var qty2 = parseFloat($("#hdnQty2").val());
+						var price2 = parseFloat($("#hdnPrice2").val());
+						if((Quantity * conversionQuantity) >= qty2 && qty2 > 1) {
+							$("#txtSalePrice").val(returnRupiah((price2 * conversionQuantity).toString()));
+							$("#hdnSalePrice").val(price2);
 						}
-						else if(parseFloat(Quantity) >= parseFloat(qty1) && parseFloat(qty1) > 1) {
-							$("#txtSalePrice").val(returnRupiah(price1));
+						else if((Quantity * conversionQuantity) >= qty1 && qty1 > 1) {
+							$("#txtSalePrice").val(returnRupiah((price1 * conversionQuantity).toString()));
+							$("#hdnSalePrice").val(price1);
 						}
 						else {
-							$("#txtSalePrice").val(returnRupiah(retailPrice));
+							$("#txtSalePrice").val(returnRupiah((retailPrice * conversionQuantity).toString()));
+							$("#hdnSalePrice").val(retailPrice);
 						}
 					}
 					else {
-						$("#txtSalePrice").val(returnRupiah(retailPrice));
+						$("#txtSalePrice").val(returnRupiah((retailPrice * conversionQuantity).toString()));
+						$("#hdnSalePrice").val(retailPrice);
 					}
+					CalculateSubTotal();
 				}
 			}
 			
@@ -875,7 +891,7 @@
 													unitName,
 													salePrice,
 													returnRupiah(discount.toString()),
-													returnRupiah(((parseFloat(salePrice.replace(/\,/g, "")) * parseFloat(Qty)) - parseFloat(discount.replace(/\,/g, ""))).toString()),
+													returnRupiah(((parseFloat(salePrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, "")) ) * parseFloat(Qty)).toString()),
 													buyPrice,
 													price1,
 													qty1,
@@ -927,7 +943,7 @@
 													unitName,
 													salePrice,
 													returnRupiah(discount.toString()),
-													returnRupiah(((parseFloat(salePrice.replace(/\,/g, "")) * parseFloat(Qty)) - parseFloat(discount.replace(/\,/g, ""))).toString()),
+													returnRupiah(((parseFloat(salePrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, "")) ) * parseFloat(Qty)).toString()),
 													buyPrice,
 													price1,
 													qty1,
@@ -1044,6 +1060,7 @@
 			function addSaleDetails() {
 				if(counterAddSale == 0) {
 					counterAddSale = 1;
+					CalculateSubTotal();
 					var itemID = $("#hdnItemID").val();
 					var itemCode = $("#txtItemCode").val();
 					var itemName = $("#txtItemName").val();
@@ -1121,7 +1138,7 @@
 												unitName,
 												salePrice,
 												returnRupiah(discount.toString()),
-												returnRupiah(((parseFloat(salePrice.replace(/\,/g, "")) * parseFloat(Qty)) - parseFloat(discount.replace(/\,/g, ""))).toString()),
+												returnRupiah(((parseFloat(salePrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, "")) ) * parseFloat(Qty)).toString()),
 												buyPrice,
 												price1,
 												qty1,
@@ -1174,7 +1191,7 @@
 												unitName,
 												salePrice,
 												returnRupiah(discount.toString()),
-												returnRupiah(((parseFloat(salePrice.replace(/\,/g, "")) * parseFloat(Qty)) - parseFloat(discount.replace(/\,/g, ""))).toString()),
+												returnRupiah(((parseFloat(salePrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, "")) ) * parseFloat(Qty)).toString()),
 												buyPrice,
 												price1,
 												qty1,
@@ -1780,10 +1797,11 @@
 				table2.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
 					var data = this.data();
 					grandTotal += (parseFloat(data[9].replace(/\,/g, "")) - parseFloat(data[10].replace(/\,/g, ""))) * parseFloat(data[7]);
-					weight += parseFloat(data[17]) * parseFloat(data[7]);
+					weight += (parseFloat(data[17]) * parseFloat(data[7]) * parseFloat(data[22]));
+					console.log(weight);
 				});
 				$("#lblTotal").html(returnRupiah(grandTotal.toString()));
-				$("#lblWeight").html(returnWeight(weight.toString()));
+				$("#lblWeight").html(returnWeight(weight.toFixed(2).toString()));
 			}
 			
 			function tableWidthAdjust() {
@@ -1806,6 +1824,8 @@
 				$("#txtQTY").val(1);
 				$("#txtSalePrice").val(0);
 				$("#hdnBuyPrice").val(0);
+				$("#hdnSalePrice").val(0);
+				$("#hdnWeight").val(0);
 				$("#hdnPrice1").val(0);
 				$("#hdnQty1").val(0);
 				$("#hdnQty2").val(0);
@@ -1928,19 +1948,18 @@
 
 						var counterPickItem = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
-							//var index = table3.cell({ focused: true }).index();
-							if(counterPickItem == 0) {
-								counterPickItem = 1;
-								var data = datatable.row( cell.index().row ).data();
-								if(key == 13 && $("#itemList-dialog").css("display") == "block") {
+							if(key == 13 && $("#itemList-dialog").css("display") == "block") {
+								if(counterPickItem == 0) {
+									counterPickItem = 1;
+									var data = datatable.row( table3.cell({ focused: true }).index().row ).data();
 									$("#txtItemCode").val(data[0]);
 									getItemDetails();
 									$("#itemList-dialog").dialog("destroy");
 									table3.destroy();
 									//table.keys.enable();
 									table2.keys.enable();
+									setTimeout(function() { counterPickItem = 0; } , 1000);
 								}
-								setTimeout(function() { counterPickItem = 0; } , 1000);
 							}
 						});
 						

@@ -35,8 +35,8 @@ SET State = 1;
         MI.ItemCode,
         MI.ItemName,
         (SD.Quantity * IFNULL(MID.ConversionQuantity, 1) - IFNULL(TSR.Quantity, 0)) Quantity,
-        (SD.BuyPrice / IFNULL(MID.ConversionQuantity, 1)) BuyPrice,
-        (SD.SalePrice / IFNULL(MID.ConversionQuantity, 1)) SalePrice,
+        SD.BuyPrice,
+        SD.SalePrice,
         MC.CustomerName,
         MU.UnitName
 	FROM

@@ -35,7 +35,7 @@
 			$row_array[] = $row['UnitName'];
 			$row_array[] = number_format($row['SalePrice'],0,".",",");
 			$row_array[] = number_format($row['Discount'],0,".",",");
-			$row_array[] = number_format($row['SalePrice'] * $row['Quantity'],0,".",",");
+			$row_array[] = number_format(($row['SalePrice'] - $row['Discount']) * $row['Quantity'],0,".",",");
 			$row_array[] = $row['BuyPrice'];
 			$row_array[] = $row['Price1'];
 			$row_array[] = $row['Qty1'];
