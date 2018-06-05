@@ -40,13 +40,15 @@ SET @query = CONCAT("SELECT
 					FROM
 						(
 							SELECT
-								SUM((SD.Quantity * SD.SalePrice - SD.Discount) - (SD.Quantity * SD.BuyPrice)) Total
+								SUM((SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (SD.Quantity * SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) Total
 							FROM
 								transaction_sale TS
 								JOIN transaction_saledetails SD
 									ON SD.SaleID = TS.SaleID
 								JOIN master_customer MC
 									ON MC.CustomerID = TS.CustomerID
+								LEFT JOIN master_itemdetails MID
+									ON MID.ItemDetailsID = SD.ItemDetailsID
 							WHERE 
 								CASE
 									WHEN ",pBranchID," = 0
@@ -60,7 +62,7 @@ SET @query = CONCAT("SELECT
 								TS.SaleID
 							UNION ALL
 		                    SELECT
-								-SUM(((SRD.Quantity * SRD.SalePrice) - (SRD.Quantity * SRD.BuyPrice)))
+								-SUM(((SRD.Quantity * SRD.SalePrice * IFNULL(MID.ConversionQuantity, 1)) - (SRD.Quantity * SRD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))))
 							FROM
 								transaction_salereturn TSR
 								JOIN transaction_sale TS
@@ -69,6 +71,8 @@ SET @query = CONCAT("SELECT
 									ON SRD.SaleReturnID = TSR.SaleReturnID
 								JOIN master_customer MC
 									ON MC.CustomerID = TS.CustomerID
+								LEFT JOIN master_itemdetails MID
+									ON MID.ItemDetailsID = SRD.ItemDetailsID
 							WHERE 
 								CASE
 									WHEN ",pBranchID," = 0
@@ -95,13 +99,15 @@ SET @query = CONCAT("SELECT
                         TS.SaleNumber,
                         DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
                         MC.CustomerName,
-                        SUM((SD.Quantity * SD.SalePrice - SD.Discount) - (SD.Quantity * SD.BuyPrice)) Total
+                        SUM((SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (SD.Quantity * SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) Total
 					FROM
 						transaction_sale TS
                         JOIN transaction_saledetails SD
 							ON SD.SaleID = TS.SaleID
 						JOIN master_customer MC
 							ON MC.CustomerID = TS.CustomerID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = SD.ItemDetailsID
 					WHERE 
 						CASE
 							WHEN ",pBranchID," = 0
@@ -123,7 +129,7 @@ SET @query = CONCAT("SELECT
                         CONCAT('R', TS.SaleNumber),
                         DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') TransactionDate,
                         MC.CustomerName,
-                        -SUM(((SRD.Quantity * SRD.SalePrice) - (SRD.Quantity * SRD.BuyPrice))) Total
+                        -SUM(((SRD.Quantity * SRD.SalePrice * IFNULL(MID.ConversionQuantity, 1)) - (SRD.Quantity * SRD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)))) Total
 					FROM
 						transaction_salereturn TSR
 						JOIN transaction_sale TS
@@ -132,6 +138,8 @@ SET @query = CONCAT("SELECT
 							ON SRD.SaleReturnID = TSR.SaleReturnID
 						JOIN master_customer MC
 							ON MC.CustomerID = TS.CustomerID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = SRD.ItemDetailsID
 					WHERE 
 						CASE
 							WHEN ",pBranchID," = 0

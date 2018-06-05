@@ -38,8 +38,8 @@ SET State = 1;
         MI.ItemCode,
         PD.Quantity,
         MU.UnitName,
-        PD.BuyPrice,
-		(PD.Quantity * PD.BuyPrice) SubTotal
+        PD.BuyPrice * IFNULL(MID.ConversionQuantity, 1) BuyPrice,
+		(PD.Quantity * PD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) SubTotal
 	FROM
 		transaction_purchase TP
 		JOIN transaction_purchasedetails PD
@@ -71,8 +71,8 @@ SET State = 1;
         MI.ItemCode,
         PRD.Quantity,
         MU.UnitName,
-        PRD.BuyPrice,
-		-(PRD.Quantity * PRD.BuyPrice) SubTotal
+        PRD.BuyPrice * IFNULL(MID.ConversionQuantity, 1) BuyPrice,
+		-(PRD.Quantity * PRD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) SubTotal
 	FROM
 		transaction_purchasereturn TPR
 		JOIN transaction_purchasereturndetails PRD

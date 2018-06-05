@@ -36,14 +36,14 @@ SET State = 1;
         IFNULL(MID.UnitID, MI.UnitID) UnitID,
         MU.UnitName,
         SD.BuyPrice,
-        SD.BookingPrice,
+		IFNULL(MID.ConversionQuantity, 1) * SD.BookingPrice BookingPrice,
 		SD.Discount,
-		IFNULL(MID.RetailPrice, MI.RetailPrice) RetailPrice,
-        IFNULL(MID.Price1, MI.Price1) Price1,
-        IFNULL(MID.Qty1, MI.Qty1) Qty1,
-        IFNULL(MID.Price2, MI.Price2) Price2,
-        IFNULL(MID.Qty2, MI.Qty2) Qty2,
-		IFNULL(MID.Weight, MI.Weight) Weight,
+		MI.RetailPrice,
+        MI.Price1,
+        MI.Qty1,
+        MI.Price2,
+        MI.Qty2,
+		MI.Weight,
         CONCAT('[', GROUP_CONCAT(AU.AvailableUnit SEPARATOR ', '), ']') AvailableUnit,
         SD.ItemDetailsID,
         IFNULL(MID.ConversionQuantity, 1) ConversionQty
@@ -61,7 +61,19 @@ SET State = 1;
         (
 			SELECT
 				MI.ItemID,
-				CONCAT('[', MU.UnitID, ',"', MU.UnitName, '", "NULL", "', MI.ItemCode, '", ', MI.BuyPrice, ', ', MI.RetailPrice, ', ', MI.Price1, ', ', MI.Price2, ', ', MI.Qty1, ', ', MI.Qty2, ']') AvailableUnit
+				CONCAT('[', 
+							MU.UnitID, ',"', 
+                            MU.UnitName, '", 
+                            "NULL", "', 
+                            MI.ItemCode, '", ', 
+                            MI.BuyPrice, ', ', 
+                            MI.RetailPrice, ', ', 
+                            MI.Price1, ', ', 
+                            MI.Price2, ', ', 
+                            MI.Qty1, ', ', 
+                            MI.Qty2, ', ',
+                            1,
+						']') AvailableUnit
 			FROM
 				master_unit MU
 				JOIN master_item MI
@@ -71,7 +83,19 @@ SET State = 1;
 			UNION ALL
 			SELECT
 				MI.ItemID,
-				CONCAT('[', MU.UnitID, ',"', MU.UnitName, '",', MID.ItemDetailsID, ',"', MID.ItemDetailsCode, '", ', MID.BuyPrice, ', ', MID.RetailPrice, ', ', MID.Price1, ', ', MID.Price2, ', ', MID.Qty1, ', ', MID.Qty2, ']') AvailableUnit
+				CONCAT('[', 
+							MU.UnitID, ',"', 
+                            MU.UnitName, '",', 
+                            MID.ItemDetailsID, ',"', 
+                            MID.ItemDetailsCode, '", ', 
+                            MI.BuyPrice, ', ', 
+                            MI.RetailPrice, ', ', 
+                            MI.Price1, ', ', 
+                            MI.Price2, ', ', 
+                            MI.Qty1, ', ', 
+                            MI.Qty2, ', ', 
+                            MID.ConversionQuantity,
+						']') AvailableUnit
 			FROM
 				master_unit MU
 				JOIN master_itemdetails MID
@@ -95,12 +119,12 @@ SET State = 1;
         SD.BuyPrice,
         SD.BookingPrice,
 		SD.Discount,
-		IFNULL(MID.RetailPrice, MI.RetailPrice),
-        IFNULL(MID.Price1, MI.Price1),
-        IFNULL(MID.Qty1, MI.Qty1),
-        IFNULL(MID.Price2, MI.Price2),
-        IFNULL(MID.Qty2, MI.Qty2),
-		IFNULL(MID.Weight, MI.Weight),
+		MI.RetailPrice,
+        MI.Price1,
+        MI.Qty1,
+        MI.Price2,
+        MI.Qty2,
+		MI.Weight,
         SD.ItemDetailsID,
         IFNULL(MID.ConversionQuantity, 1)
 	ORDER BY

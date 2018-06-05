@@ -60,8 +60,8 @@
 			$row_array[] = $row['ItemName'];
 			$row_array[] = $row['UnitName'];
 			$row_array[] = $row['CategoryName'];
-			$row_array[] = $row['Stock'];
-			$row_array[] = $row['PhysicalStock'];
+			$row_array[] = number_format($row['Stock'],2,".",",");
+			$row_array[] = number_format($row['PhysicalStock'],2,".",",");
 			array_push($return_arr, $row_array);
 		}
 		

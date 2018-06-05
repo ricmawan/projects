@@ -40,11 +40,13 @@ SET @query = CONCAT("SELECT
 					FROM
 						(
 							SELECT
-								SUM(SD.Quantity * SD.SalePrice - SD.Discount) Total
+								SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) Total
 							FROM
 								transaction_sale TS
 								JOIN transaction_saledetails SD
 									ON SD.SaleID = TS.SaleID
+								LEFT JOIN master_itemdetails MID
+									ON MID.ItemDetailsID = SD.ItemDetailsID
 							WHERE 
 								TS.CustomerID = ", pCustomerID ,"
 								AND CAST(TS.TransactionDate AS DATE) >= '", pFromDate, "'
@@ -82,11 +84,13 @@ SET @query = CONCAT("SELECT
 						'Penjualan' TransactionType,
                         TS.SaleNumber,
                         DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
-                        SUM(SD.Quantity * SD.SalePrice - SD.Discount) Total
+                        SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) Total
 					FROM
 						transaction_sale TS
                         JOIN transaction_saledetails SD
 							ON SD.SaleID = TS.SaleID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = SD.ItemDetailsID
 					WHERE 
 						TS.CustomerID = ", pCustomerID ,"
 						AND CAST(TS.TransactionDate AS DATE) >= '",pFromDate,"'

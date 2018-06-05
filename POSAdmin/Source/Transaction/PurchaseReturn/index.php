@@ -291,7 +291,7 @@
 				if(availableUnit.length > 0) {
 					$("#ddlUnit").find('option').remove();
 					for(var i=0;i<availableUnit.length;i++) {
-						$("#ddlUnit").append("<option value=" + availableUnit[i][0] + " itemdetailsid='" + availableUnit[i][2] + "' itemcode='" + availableUnit[i][3] + "' buyprice='" + availableUnit[i][4] + "' conversionQuantity='" + availableUnit[i][8] + "' >" + availableUnit[i][1] + "</option>");
+						$("#ddlUnit").append("<option value=" + availableUnit[i][0] + " itemdetailsid='" + availableUnit[i][2] + "' itemcode='" + availableUnit[i][3] + "' buyprice='" + availableUnit[i][4] + "' conversionQuantity='" + availableUnit[i][5] + "' >" + availableUnit[i][1] + "</option>");
 					}
 				}
 				$("#ddlUnit").val(Data[11]);
@@ -430,9 +430,9 @@
 						table2.destroy();
 					},
 					resizable: false,
-					height: 600,
+					height: 560,
 					width: 1280,
-					modal: false,
+					modal: false /*,
 					buttons: [
 					{
 						text: "Tutup",
@@ -449,7 +449,7 @@
 							table2.destroy();
 							return false;
 						}
-					}]
+					}]*/
 				}).dialog("open");
 			}
 			
@@ -479,7 +479,7 @@
 										if(data.AvailableUnit.length > 0) {
 											$("#ddlUnit").find('option').remove();
 											for(var i=0;i<data.AvailableUnit.length;i++) {
-												$("#ddlUnit").append("<option value=" + data.AvailableUnit[i][0] + " itemdetailsid='" + data.AvailableUnit[i][2] + "' itemcode='" + data.AvailableUnit[i][3] + "' buyprice='" + data.AvailableUnit[i][4] + "' conversionQuantity='" + data.AvailableUnit[i][8] + "' >" + data.AvailableUnit[i][1] + "</option>");
+												$("#ddlUnit").append("<option value=" + data.AvailableUnit[i][0] + " itemdetailsid='" + data.AvailableUnit[i][2] + "' itemcode='" + data.AvailableUnit[i][3] + "' buyprice='" + data.AvailableUnit[i][4] + "' conversionQuantity='" + data.AvailableUnit[i][5] + "' >" + data.AvailableUnit[i][1] + "</option>");
 											}
 										}
 										$("#ddlUnit").val(data.UnitID);

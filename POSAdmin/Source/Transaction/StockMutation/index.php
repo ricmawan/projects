@@ -449,9 +449,9 @@
 						table2.destroy();
 					},
 					resizable: false,
-					height: 560,
+					height: 500,
 					width: 1280,
-					modal: false,
+					modal: false /*,
 					buttons: [
 					{
 						text: "Tutup",
@@ -468,7 +468,7 @@
 							table2.destroy();
 							return false;
 						}
-					}]
+					}]*/
 				}).dialog("open");
 			}
 			

@@ -28,9 +28,9 @@
 		while ($row = mysqli_fetch_array($result)) {
 			$table .= "<tr><td>";
 			$table .= $row['ItemCode'] ."</td><td>";
-			$table .= $row['ItemName'] ."</td><td>";
+			$table .= $row['ItemName'] ."</td><td align='right'>";
+			$table .= number_format($row['Quantity'],2,".",",") ."</td><td>";
 			$table .= $row['UnitName'] ."</td><td align='right'>";
-			$table .= $row['Quantity'] ."</td><td align='right'>";
 			$table .= number_format($row['BuyPrice'],0,".",",") ."</td><td align='right'>";
 			$table .= number_format($row['SubTotal'],0,".",",") ."</td></tr>";
 		}

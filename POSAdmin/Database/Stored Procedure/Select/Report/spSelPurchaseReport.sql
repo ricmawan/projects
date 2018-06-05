@@ -40,13 +40,15 @@ SET @query = CONCAT("SELECT
 					FROM
 						(
 							SELECT
-								SUM(PD.Quantity * PD.BuyPrice) Total
+								SUM(PD.Quantity * PD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) Total
 							FROM
 								transaction_purchase TP
 								JOIN transaction_purchasedetails PD
 									ON TP.PurchaseID = PD.PurchaseID
 								JOIN master_supplier MS
 									ON MS.SupplierID = TP.SupplierID
+								LEFT JOIN master_itemdetails MID
+									ON MID.ItemDetailsID = PD.ItemDetailsID
 							WHERE 
 								CASE
 									WHEN ",pBranchID," = 0
@@ -60,13 +62,15 @@ SET @query = CONCAT("SELECT
 								TP.PurchaseID
 							UNION ALL
 		                    SELECT
-								-SUM(PRD.Quantity * PRD.BuyPrice) Total
+								-SUM(PRD.Quantity * PRD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) Total
 							FROM
 								transaction_purchasereturn TPR
 								JOIN transaction_purchasereturndetails PRD
 									ON TPR.PurchaseReturnID = PRD.PurchaseReturnID
 								JOIN master_supplier MS
 									ON MS.SupplierID = TPR.SupplierID
+								LEFT JOIN master_itemdetails MID
+									ON MID.ItemDetailsID = PRD.ItemDetailsID
 							WHERE 
 								CASE
 									WHEN ",pBranchID," = 0
@@ -93,13 +97,15 @@ SET @query = CONCAT("SELECT
 						TP.PurchaseNumber,
 						DATE_FORMAT(TP.TransactionDate, '%d-%m-%Y') TransactionDate,
 						MS.SupplierName,
-						SUM(PD.Quantity * PD.BuyPrice) Total
+						SUM(PD.Quantity * PD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) Total
 					FROM
 						transaction_purchase TP
 						JOIN transaction_purchasedetails PD
 							ON TP.PurchaseID = PD.PurchaseID
 						JOIN master_supplier MS
 							ON MS.SupplierID = TP.SupplierID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = PD.ItemDetailsID
 					WHERE 
 						CASE
 							WHEN ",pBranchID," = 0
@@ -121,13 +127,15 @@ SET @query = CONCAT("SELECT
                         TPR.PurchaseReturnNumber,
                         DATE_FORMAT(TPR.TransactionDate, '%d-%m-%Y') TransactionDate,
 						MS.SupplierName,
-						-SUM(PRD.Quantity * PRD.BuyPrice) Total
+						-SUM(PRD.Quantity * PRD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) Total
 					FROM
 						transaction_purchasereturn TPR
 						JOIN transaction_purchasereturndetails PRD
 							ON TPR.PurchaseReturnID = PRD.PurchaseReturnID
 						JOIN master_supplier MS
 							ON MS.SupplierID = TPR.SupplierID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = PRD.ItemDetailsID
 					WHERE 
 						CASE
 							WHEN ",pBranchID," = 0

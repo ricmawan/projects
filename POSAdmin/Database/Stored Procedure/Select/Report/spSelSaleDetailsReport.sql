@@ -36,9 +36,9 @@ SET State = 1;
 	        MI.ItemName,
 	        SD.Quantity,
             MU.UnitName,
-	        SD.SalePrice,
+	        SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) SalePrice,
 			SD.Discount,
-			((SD.Quantity * SD.SalePrice) - SD.Discount) SubTotal
+			SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount) SubTotal
 		FROM
 			transaction_saledetails SD
 	        JOIN master_item MI

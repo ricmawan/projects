@@ -88,8 +88,8 @@
 		$objPHPExcel->getActiveSheet()->getStyle("B3:C4")->getFont()->setBold(true);
 
 		//bold title
-		$objPHPExcel->getActiveSheet()->getStyle("A6:I6")->getFont()->setBold(true);
-		$objPHPExcel->getActiveSheet()->getStyle("A6:I6")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');
+		$objPHPExcel->getActiveSheet()->getStyle("A6:J6")->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle("A6:J6")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');
 
 		$rowExcel = 6;
 		$col = 0;

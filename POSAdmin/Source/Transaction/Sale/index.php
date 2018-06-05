@@ -146,13 +146,13 @@
 										<input id="hdnWeight" name="hdnWeight" type="hidden" value=0 />
 										<input id="hdnConversionQty" name="hdnConversionQty" type="hidden" value=0 />
 										<input id="hdnStock" name="hdnStock" type="hidden" value=0 />
-										<input id="txtSalePrice" name="txtSalePrice" type="text" tabindex=11 class="form-control-custom text-right mousetrap" value="0" autocomplete=off onchange="CalculatePrice();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
+										<input id="txtSalePrice" name="txtSalePrice" type="text" class="form-control-custom text-right mousetrap" value="0" autocomplete=off onchange="CalculatePrice();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" readonly />
 										<label for="txtSalePrice" class="lblInput" >Harga Jual</label>
 									</div>
 								</td>
 								<td style="width: 15%;" >
 									<div class="has-float-label" >
-										<input id="txtDiscount" name="txtDiscount" type="text" tabindex=12 class="form-control-custom text-right mousetrap" value="0" autocomplete=off onkeypress="isEnterKey(event, 'addSaleDetails');return isNumberKey(event, this.id, this.value);" onchange="addSaleDetails();" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
+										<input id="txtDiscount" name="txtDiscount" type="text" tabindex=11 class="form-control-custom text-right mousetrap" value="0" autocomplete=off onkeypress="isEnterKey(event, 'addSaleDetails');return isNumberKey(event, this.id, this.value);" onchange="addSaleDetails();" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
 										<label for="txtDiscount" class="lblInput" >Diskon</label>
 									</div>
 								</td>
@@ -538,9 +538,9 @@
 						table2.destroy();
 					},
 					resizable: false,
-					height: 600,
+					height: 560,
 					width: 1280,
-					modal: false,
+					modal: false /*,
 					buttons: [
 					{
 						text: "Tutup",
@@ -557,7 +557,7 @@
 							table2.destroy();
 							return false;
 						}
-					}]
+					}]*/
 				}).dialog("open");
 			}
 
@@ -707,7 +707,6 @@
 			}
 			
 			function Grosir(Quantity) {
-				console.log("masuk kok");
 				if($("#hdnItemID").val() != 0) {
 					var retailPrice = parseFloat($("#hdnRetailPrice").val());
 					var conversionQuantity = parseFloat($("#ddlUnit option:selected").attr("conversionQuantity"));
@@ -984,6 +983,7 @@
 											$("#txtSalePrice").val(0);
 											$("#txtDiscount").val(0);
 											$("#hdnBuyPrice").val(0);
+											$("#hdnSalePrice").val(0);
 											$("#hdnPrice1").val(0);
 											$("#hdnQty1").val(0);
 											$("#hdnPrice2").val(0);
@@ -1232,6 +1232,7 @@
 										$("#txtSalePrice").val(0);
 										$("#txtDiscount").val(0);
 										$("#hdnBuyPrice").val(0);
+										$("#hdnSalePrice").val(0);
 										$("#hdnPrice1").val(0);
 										$("#hdnQty1").val(0);
 										$("#hdnPrice2").val(0);
@@ -1886,7 +1887,6 @@
 				$("#itemList-dialog").dialog({
 					autoOpen: false,
 					open: function() {
-						//$("#itemList-dialog").focus();
 						table.keys.disable();
 						table2.keys.disable();
 						table3 = $("#grid-item").DataTable({
@@ -2053,9 +2053,9 @@
 							$("#divModal").hide();
 						},
 						resizable: false,
-						height: 380,
+						height: 340,
 						width: 420,
-						modal: false,
+						modal: false /*,
 						buttons: [
 						{
 							text: "Tutup",
@@ -2067,7 +2067,7 @@
 								$("#divModal").hide();
 								return false;
 							}
-						}]
+						}]*/
 					}).dialog("open");
 				}
 				else {
@@ -2123,70 +2123,111 @@
 			}
 
 			function printInvoice() {
-				var saleID = $("#hdnSaleID").val();
+				var Total = $("#txtTotal").val().replace(/\,/g, "");
 				var Payment = $("#txtPayment").val().replace(/\,/g, "");
 				var PaymentType = $("#ddlPayment").val();
-				var PrintInvoice = $("#chkPrint").prop("checked");
-				var PrintShipment = $("#chkPrintShipment").prop("checked");
-				$("#loading").show();
-				$.ajax({
-					url: "./Transaction/Sale/PrintInvoice.php",
-					type: "POST",
-					data: { SaleID : saleID, Payment : Payment, PaymentType : PaymentType, PrintInvoice : PrintInvoice },
-					dataType: "json",
-					success: function(data) {
-						if(data.FailedFlag == '0') {
-							$("#loading").hide();
-							$("#divModal").hide();
-							if(PrintShipment == true) printShipment();
-							resetForm();
-							table2.destroy();
-							$("#finish-dialog").dialog("destroy");
-							$("#FormData").dialog("destroy");
-							table.ajax.reload(function() {
-								table.keys.enable();
-								if(typeof index !== 'undefined') table.cell(index).focus();
-							}, false);
-							Lobibox.alert("success",
-							{
-								msg: data.Message,
-								width: 480,
-								delay: 2000
-							});
+				var PassValidate = 1;
+				if(PaymentType == 1) {
+					if(parseFloat(Payment) == 0) {
+						$("#txtPayment").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+						setTimeout(function() {
+							$("#txtPayment").focus();
+						}, 0);
+						PassValidate = 0;
+					}
+					else {
+						if(parseFloat(Total) > parseFloat(Payment)) {
+							$("#txtPayment").notify("Pembayaran Kurang!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+							setTimeout(function() {
+								$("#txtPayment").focus();
+							}, 0);
+							PassValidate = 0;
 						}
 						else {
+							var Change = parseFloat(Payment) - parseFloat(Total);
+							$("#txtChange").val(returnRupiah(Change.toString()));
+						}
+					}
+				}
+				else {
+					if(parseFloat(Total) < parseFloat(Payment)) {
+						$("#txtPayment").notify("Pembayaran Lebih!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+						setTimeout(function() {
+							$("#txtPayment").focus();
+						}, 0);
+						PassValidate = 0;
+					}
+				}
+
+				if(PassValidate == 1) {
+					var saleID = $("#hdnSaleID").val();
+					var Payment = $("#txtPayment").val().replace(/\,/g, "");
+					var PaymentType = $("#ddlPayment").val();
+					var PrintInvoice = $("#chkPrint").prop("checked");
+					var PrintShipment = $("#chkPrintShipment").prop("checked");
+					$("#loading").show();
+					$.ajax({
+						url: "./Transaction/Sale/PrintInvoice.php",
+						type: "POST",
+						data: { SaleID : saleID, Payment : Payment, PaymentType : PaymentType, PrintInvoice : PrintInvoice },
+						dataType: "json",
+						success: function(data) {
+							if(data.FailedFlag == '0') {
+								$("#loading").hide();
+								$("#divModal").hide();
+								if(PrintShipment == true) printShipment();
+								resetForm();
+								table2.destroy();
+								$("#finish-dialog").dialog("destroy");
+								$("#FormData").dialog("destroy");
+								var paymentInfo = "<table><tr><td align='right'>Pembayaran :&nbsp;</td><td>" + $("#ddlPayment option:selected").text() + "</td></tr>";
+								paymentInfo += "<tr><td align='right'>Total :&nbsp;</td><td align='right'>" + returnRupiah(Total) + "</td></tr>";
+								paymentInfo += "<tr><td align='right'>Bayar :&nbsp;</td><td align='right'>" + returnRupiah(Payment) + "</td></tr>";
+								paymentInfo += "<tr><td align='right'>Kembali :&nbsp;</td><td align='right'>" + $("#txtChange").val() + "</td></tr></table>";
+								table.ajax.reload(function() {
+									table.keys.enable();
+									if(typeof index !== 'undefined') table.cell(index).focus();
+								}, false);
+								Lobibox.alert("success",
+								{
+									msg: paymentInfo,
+									width: 480
+								});
+							}
+							else {
+								$("#loading").hide();
+								$("#divModal").hide();
+								var counter = 0;
+								Lobibox.alert("error",
+								{
+									msg: data.ErrorMessage,
+									width: 480,
+									beforeClose: function() {
+										if(counter == 0) {
+											setTimeout(function() {
+												$("#txtItemCode").focus();
+											}, 0);
+											counter = 1;
+										}
+									}
+								});
+								return 0;
+							}
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
 							$("#loading").hide();
 							$("#divModal").hide();
-							var counter = 0;
+							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+							LogEvent(errorMessage, "/Transaction/Sale/index.php");
 							Lobibox.alert("error",
 							{
-								msg: data.ErrorMessage,
-								width: 480,
-								beforeClose: function() {
-									if(counter == 0) {
-										setTimeout(function() {
-											$("#txtItemCode").focus();
-										}, 0);
-										counter = 1;
-									}
-								}
+								msg: errorMessage,
+								width: 480
 							});
 							return 0;
 						}
-					},
-					error: function(jqXHR, textStatus, errorThrown) {
-						$("#loading").hide();
-						$("#divModal").hide();
-						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-						LogEvent(errorMessage, "/Transaction/Sale/index.php");
-						Lobibox.alert("error",
-						{
-							msg: errorMessage,
-							width: 480
-						});
-						return 0;
-					}
-				});
+					});
+				}
 			}
 
 			function printShipment() {

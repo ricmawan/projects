@@ -36,12 +36,12 @@ SET State = 1;
 	        MI.ItemName,
 	        SD.Quantity,
             MU.UnitName,
-            SD.BuyPrice,
-            (SD.Quantity * SD.BuyPrice) TotalBuy,
-	        SD.SalePrice,
+            SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1) BuyPrice,
+            (SD.Quantity * SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) TotalBuy,
+	        SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) SalePrice,
 			SD.Discount,
-			((SD.Quantity * SD.SalePrice) - SD.Discount) TotalSale,
-            ((SD.Quantity * SD.SalePrice) - SD.Discount) - (SD.Quantity * SD.BuyPrice) Income
+			(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) TotalSale,
+            (SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount))  - (SD.Quantity * SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) Income
 		FROM
 			transaction_saledetails SD
 	        JOIN master_item MI

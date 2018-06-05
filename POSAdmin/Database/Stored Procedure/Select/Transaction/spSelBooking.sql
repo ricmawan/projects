@@ -63,8 +63,8 @@ SET @query = CONCAT("SELECT
                         (
 							SELECT
 								TB.BookingID,
-                                SUM(TBD.Quantity * TBD.BookingPrice - TBD.Discount) Total,
-								SUM(TBD.Quantity * MI.Weight) Weight
+                                SUM(TBD.Quantity * (TBD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - TBD.Discount)) Total,
+								SUM(TBD.Quantity * MI.Weight * IFNULL(MID.ConversionQuantity, 1)) Weight
 							FROM
 								transaction_booking TB
                                 JOIN master_customer MC
@@ -73,6 +73,8 @@ SET @query = CONCAT("SELECT
 									ON TB.BookingID = TBD.BookingID
 								LEFT JOIN master_item MI
 									ON MI.ItemID = TBD.ItemID
+								LEFT JOIN master_itemdetails MID
+									ON MID.ItemDetailsID = TBD.ItemDetailsID
 							WHERE ", 
 								pWhere, 
                             " GROUP BY

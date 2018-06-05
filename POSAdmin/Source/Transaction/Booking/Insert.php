@@ -16,7 +16,7 @@
 		if($ItemDetailsID == "") $ItemDetailsID = "NULL";
 		$Qty = mysqli_real_escape_string($dbh, $_POST['txtQTY']);
 		$BuyPrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['hdnBuyPrice']));
-		$BookingPrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtBookingPrice']));
+		$BookingPrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['hdnBookingPrice']));
 		$Discount = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtDiscount']));
 		$Message = "Terjadi Kesalahan Sistem!";
 		$MessageDetail = "";
