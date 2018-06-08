@@ -748,13 +748,14 @@
 					close: function() {
 						$(this).dialog("destroy");
 						table3.destroy();
-						table.keys.enable();
+						//table.keys.enable();
 						table2.keys.enable();
+						$("#txtBookingNumber").focus();
 					},
 					resizable: false,
 					height: 500,
 					width: 1280,
-					modal: true,
+					modal: true /*,
 					buttons: [
 					{
 						text: "Tutup",
@@ -767,7 +768,7 @@
 							table2.keys.enable();
 							return false;
 						}
-					}]
+					}]*/
 				}).dialog("open");
 			}
 

@@ -13,7 +13,15 @@
 					2 => "TS.SaleNumber",
 					3 => "TS.TransactionDate",
 					4 => "MC.CustomerName",
-					5 => "TSD.Total"
+					5 => "TSD.Total",
+					6 => "SaleID",
+					7 => "CustomerID",
+					8 => "PlainTransactionDate",
+					9 => "RetailFlag",
+					10 => "Weight",
+					11 => "Payment",
+					12 => "Status",
+					13 => "PaymentTypeName"
 				);
 
 	$where = " 1=1 ";
@@ -65,6 +73,9 @@
 		$row_array[] = $row['RetailFlag'];
 		$row_array[] = number_format($row['Weight'],2,".",",");
 		$row_array[] = $row['Payment'];
+		$row_array[] = $row['Status'];
+		$row_array[] = $row['PaymentTypeName'];
+		$row_array[] = $row['PaymentTypeID'];
 		array_push($return_arr, $row_array);
 	}
 	

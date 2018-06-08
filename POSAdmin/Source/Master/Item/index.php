@@ -83,7 +83,7 @@
 								Nama Barang :
 							</div>
 							<div class="col-md-4">
-								<input id="txtItemName" name="txtItemName" type="text" tabindex=6 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Nama Barang" required />
+								<input id="txtItemName" name="txtItemName" type="text" tabindex=6 class="form-control-custom" onfocus="this.select();" maxlength="37" autocomplete=off placeholder="Nama Barang" required />
 							</div>
 						</div>
 						<br />

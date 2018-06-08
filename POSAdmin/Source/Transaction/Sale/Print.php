@@ -7,49 +7,41 @@
     use Mike42\Escpos\Printer;
     use Mike42\Escpos\EscposImage;
     use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
+    use Mike42\Escpos\PrintConnectors\DummyPrintConnector;
     /* Fill in your own connector here */
-    $connector = new WindowsPrintConnector("smb://192.168.43.249/printer1");
+    //$connector = new WindowsPrintConnector("smb://192.168.43.249/printer1");
+    $connector = new DummyPrintConnector();
+    $file =  "PrintInvoice.txt";  # nama file temporary yang akan dicetak
+    $handle = fopen($file, 'w');
 
     $SaleID = $_GET['ID'];
-    /* Information for the receipt */
-    $items = array(
-        new item("Example item #1", "4.00"),
-        new item("Another thing", "3.50"),
-        new item("Something else", "1.00"),
-        new item("A final item", "4.45"),
-    );
-    $subtotal = new item('Subtotal', '12.95');
-    $tax = new item('A local tax', '1.30');
-    $total = new item('Total', '14.25', true);
-    /* Date is kept the same for testing */
-    // $date = date('l jS \of F Y h:i:s A');
-    $date = "Monday 6th of April 2015 02:56:25 PM";
-    /* Start the printer */
-    //$logo = EscposImage::load("resources/escpos-php.png", false);
+    $TransactionDate = date($_GET['TransactionDate']);
+    $Payment = mysqli_real_escape_string($dbh, $_GET['Payment']);
+    $Change = mysqli_real_escape_string($dbh, $_GET['Change']);
+    $SaleNumber = mysqli_real_escape_string($dbh, $_GET['SaleNumber']);
+    $PaymentMethod = mysqli_real_escape_string($dbh, $_GET['PaymentMethod']);
+    $dayName = array("Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu");
+    $monthName = array("Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des");
+
     $printer = new Printer($connector);
-    /* Print top logo */
-    //$printer -> setJustification(Printer::JUSTIFY_CENTER);
-    //$printer -> graphics($logo);
-    /* Name of shop */
+   
     $printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
     $printer -> setJustification(Printer::JUSTIFY_CENTER);
     $printer -> text("TOKO MUDA\n");
-    $printer -> selectPrintMode();
+    $printer -> selectPrintMode(Printer::MODE_FONT_A);
     $printer -> text("Jl. Raya Bojong\n");
     $printer -> feed();
-    /* Title of receipt */
     $printer -> setEmphasis(true);
     $printer -> text("NOTA PENJUALAN\n");
     $printer -> setEmphasis(false);
-    /* Items */
+    
     $printer -> setJustification(Printer::JUSTIFY_LEFT);
-    //$printer -> setEmphasis(true);
-    //$printer -> text(new item('', 'Rp'));
-    //$printer -> setEmphasis(false);
-    //foreach ($items as $item) {
-        //$printer -> text($item);
-    //}
 
+    $printer -> text($dayName[date("w", strtotime($TransactionDate))] . ", " . date("d", strtotime($TransactionDate)) . " " . $monthName[date("n", strtotime($TransactionDate)) - 1] . " " . date("Y", strtotime($TransactionDate)) . "/" . date("H") . ":" . date("i") . "\n");
+
+    $printer -> selectPrintMode(Printer::MODE_FONT_B);
+    $printer -> text(str_pad("", 39, "-") . "\n");
+    
     $sql = "CALL spSelSaleDetails(".$SaleID.", '".$_SESSION['UserLogin']."')";
     $FailedFlag = 0;
 
@@ -63,58 +55,47 @@
         echo json_encode($json_data);
         return 0;
     }
-
+    $Discount = 0;
+    $GrandTotal = 0;
+    $rowPrice = "";
     while ($row = mysqli_fetch_array($result)) {
-        $printer -> text($row['ItemName']);
-        $printer -> text(new item());
+        $rowPrice .= number_format($row['Quantity'],0,".",",") . " " . $row['UnitName'] . " @ " . number_format($row['SalePrice'],0,".",",");
+        if($row['Discount'] != 0) $rowPrice += " - " . number_format($row['Discount'],0,".",",");
+        $printer -> text(" " . $row['ItemName'] . "\n");
+        $printer -> text(" " . str_pad($rowPrice , 26, " ") . " ");
+        $printer -> text(str_pad(number_format(($row['SalePrice'] - $row['Discount']) * $row['Quantity'],0,".",","), 11, " ", STR_PAD_LEFT) . "\n");
+        //$printer -> text("  " . str_pad(number_format($row['Quantity'],0,".",","), 5, " ", STR_PAD_LEFT) . " " . str_pad($row['UnitName'], 6, " ") . " @ " . str_pad(number_format($row['SalePrice'],0,".",","), 10, " ") . " " . str_pad(number_format($row['SalePrice'] * $row['Quantity'],0,".",","), 11, " ", STR_PAD_LEFT) . "\n");
+        //$Discount += $row['Discount'] * $row['Quantity'];
+        $GrandTotal += ($row['SalePrice'] - $row['Discount']) * $row['Quantity'];
+        $rowPrice = "";
     }
 
+    //$printer -> text("DISKON" . str_pad("", 22, " ") . str_pad("(" . number_format($Discount ,0,".",",") . ")" , 11, " ", STR_PAD_LEFT) . "\n");
+
+    $printer -> text(str_pad("", 39, "-") . "\n");
+
+    //$printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
     $printer -> setEmphasis(true);
-    $printer -> text($subtotal);
+    $printer -> text("PEMBAYARAN     : " . $PaymentMethod ."\n" );
+    $printer -> text("TOTAL          : " . str_pad(number_format($GrandTotal ,0,".",","), 16, " ", STR_PAD_LEFT) ."\n" );
+    $printer -> text("BAYAR          : " . str_pad(number_format($Payment ,0,".",","), 16, " ", STR_PAD_LEFT) ."\n" );
+    if($PaymentMethod == "Tunai") $printer -> text("KEMBALI        : " . str_pad(number_format($Change ,0,".",","), 16, " ", STR_PAD_LEFT) . "\n" );
+    else $printer -> text("KEKURANGAN     : " . str_pad(number_format($Change ,0,".",","), 16, " ", STR_PAD_LEFT) . "\n" );
     $printer -> setEmphasis(false);
-    $printer -> feed();
-    /* Tax and total */
-    $printer -> text($tax);
-    $printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
-    $printer -> text($total);
-    $printer -> selectPrintMode();
-    /* Footer */
-    $printer -> feed(2);
+
+    $printer -> text("Kasir : " . str_pad($_SESSION['UserLogin'] . ", ", 10, " ") . " No : " . str_pad($SaleNumber, 14, " ") . "\n");
+    $printer -> text(str_pad("", 39, "-") . "\n");
     $printer -> setJustification(Printer::JUSTIFY_CENTER);
-    $printer -> text("Thank you for shopping at ExampleMart\n");
-    $printer -> text("For trading hours, please visit example.com\n");
-    $printer -> feed(2);
-    $printer -> text($date . "\n");
+    $printer -> text("KAMI TIDAK MELAYANI PENUKARAN BARANG\n");
+    $printer -> text("TANPA DISERTAI NOTA ASLI\n");
+    $printer -> text("TERIMAKASIH ATAS KUNJUNGAN ANDA\n");
+
+    $data = $connector -> getData();
+    fwrite($handle, $data);
+    fclose($handle);
+
     /* Cut the receipt and open the cash drawer */
-    $printer -> cut();
+    //$printer -> cut();
     $printer -> pulse();
     $printer -> close();
-
-    /* A wrapper to do organise item names & prices into columns */
-    class item
-    {
-        private $name;
-        private $price;
-        private $dollarSign;
-        public function __construct($name = '', $price = '', $dollarSign = false)
-        {
-            $this -> name = $name;
-            $this -> price = $price;
-            $this -> dollarSign = $dollarSign;
-        }
-        
-        public function __toString()
-        {
-            $rightCols = 10;
-            $leftCols = 38;
-            if ($this -> dollarSign) {
-                $leftCols = $leftCols / 2 - $rightCols / 2;
-            }
-            $left = str_pad($this -> name, $leftCols) ;
-            
-            $sign = ($this -> dollarSign ? '$ ' : '');
-            $right = str_pad($sign . $this -> price, $rightCols, ' ', STR_PAD_LEFT);
-            return "$left$right\n";
-        }
-    }
 ?>

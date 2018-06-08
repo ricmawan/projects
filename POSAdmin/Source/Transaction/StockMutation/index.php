@@ -822,7 +822,7 @@
 						table2.keys.disable();
 						table3 = $("#grid-item").DataTable({
 									"keys": true,
-									"scrollY": "295px",
+									"scrollY": "280px",
 									"scrollX": false,
 									"scrollCollapse": false,
 									"paging": false,
@@ -934,11 +934,12 @@
 						table3.destroy();
 						//table.keys.enable();
 						table2.keys.enable();
+						$("#txtItemCode").focus();
 					},
 					resizable: false,
-					height: 500,
+					height: 420,
 					width: 1280,
-					modal: true,
+					modal: true /*,
 					buttons: [
 					{
 						text: "Tutup",
@@ -951,7 +952,7 @@
 							table2.keys.enable();
 							return false;
 						}
-					}]
+					}]*/
 				}).dialog("open");
 			}
 

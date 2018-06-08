@@ -5,6 +5,7 @@ CREATE PROCEDURE spInsSale (
 	pID 				BIGINT,
 	pSaleNumber			VARCHAR(100),
 	pRetailFlag			BIT,
+    pFinishFlag			BIT,
     pCustomerID			BIGINT,
 	pTransactionDate 	DATETIME,
 	pSaleDetailsID		BIGINT,
@@ -68,6 +69,7 @@ SET State = 2;
 			(
 				SaleNumber,
 				RetailFlag,
+                FinishFlag,
 				CustomerID,
 				TransactionDate,
 				CreatedDate,
@@ -77,6 +79,7 @@ SET State = 2;
 			(
 				pSaleNumber,
 				pRetailFlag,
+                pFinishFlag,
 				pCustomerID,
 				pTransactionDate,
 				NOW(),

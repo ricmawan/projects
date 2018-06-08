@@ -10,6 +10,7 @@ CREATE TABLE transaction_booking
 	Payment				DOUBLE,
 	PrintCount			SMALLINT,
 	PrintedDate			DATETIME,
+    FinishFlag 			BIT,
 	Remarks				TEXT,
 	CreatedDate 		DATETIME NOT NULL,
 	CreatedBy 			VARCHAR(255) NOT NULL,

@@ -104,12 +104,15 @@ SET State = 1;
 				SUM(SD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_saledetails SD
+                /*JOIN transaction_sale TS
+					ON TS.SaleID = SD.SaleID*/
                 JOIN master_item MI
 					ON SD.ItemID = MI.ItemID
 				LEFT JOIN master_itemdetails MID
 					ON SD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = SD.BranchID
+                /*AND TS.FinishFlag = 1*/
 			GROUP BY
 				SD.ItemID
 		)S
@@ -190,12 +193,15 @@ SET State = 1;
 				SUM(BD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_bookingdetails BD
+                /*JOIN transaction_booking TB
+					ON TB.BookingID = BD.BookingID*/
                 JOIN master_item MI
 					ON BD.ItemID = MI.ItemID
 				LEFT JOIN master_itemdetails MID
 					ON BD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = BD.BranchID
+                /*AND TB.FinishFlag = 1*/
 			GROUP BY
 				BD.ItemID,
 				BD.BranchID
@@ -299,12 +305,15 @@ SET State = 1;
 				SUM(SD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_saledetails SD
+				/*JOIN transaction_sale TS
+					ON TS.SaleID = SD.SaleID*/
                 JOIN master_item MI
 					ON MI.ItemID = SD.ItemID
 				LEFT JOIN master_itemdetails MID
 					ON SD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = SD.BranchID
+                /*AND TS.FinishFlag = 1*/
 			GROUP BY
 				SD.ItemID
 		)S
@@ -385,12 +394,15 @@ SET State = 1;
 				SUM(BD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_bookingdetails BD
+                /*JOIN transaction_booking TB
+					ON TB.BookingID = BD.BookingID*/
                 JOIN master_item MI
 					ON MI.ItemID = BD.ItemID
 				LEFT JOIN master_itemdetails MID
 					ON BD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = BD.BranchID
+                /*AND TB.FinishFlag = 1*/
 			GROUP BY
 				BD.ItemID,
 				BD.BranchID

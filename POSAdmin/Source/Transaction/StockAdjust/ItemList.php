@@ -34,16 +34,16 @@
 		logEvent(mysqli_error($dbh), '/Transaction/StockAdjust/ItemList.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 		return 0;
 	}
-	$row = mysqli_fetch_array($result);
-	$totalData = $row['nRows'];
-	$totalFiltered = $totalData;
-	mysqli_free_result($result);
-	mysqli_next_result($dbh);
+	//$row = mysqli_fetch_array($result);
+	$totalData = 20;
+	$totalFiltered = 20;
+	//mysqli_free_result($result);
+	//mysqli_next_result($dbh);
 	
-	$result2 = mysqli_use_result($dbh);
+	//$result2 = mysqli_use_result($dbh);
 	$return_arr = array();
 	$RowNumber = $requestData['start'];
-	while ($row = mysqli_fetch_array($result2)) {
+	while ($row = mysqli_fetch_array($result)) {
 		$row_array = array();
 		$RowNumber++;
 		//data yang dikirim ke table
@@ -61,7 +61,7 @@
 		array_push($return_arr, $row_array);
 	}
 	
-	mysqli_free_result($result2);
+	mysqli_free_result($result);
 	mysqli_next_result($dbh);
 
 	$json_data = array(

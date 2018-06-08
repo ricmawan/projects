@@ -197,6 +197,8 @@ SET @query = CONCAT("SELECT
 								SUM(SD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 							FROM
 								transaction_saledetails SD
+                                JOIN transaction_sale TS
+									ON TS.SaleID = SD.SaleID
 								JOIN master_item MI
 									ON SD.ItemID = MI.ItemID
 								LEFT JOIN master_itemdetails MID
@@ -212,6 +214,7 @@ SET @query = CONCAT("SELECT
 										THEN SD.BranchID
 										ELSE ",pBranchID,"
 									END = SD.BranchID
+								AND TS.FinishFlag = 1
 							GROUP BY
 								MI.ItemID,
 								SD.BranchID
@@ -342,6 +345,8 @@ SET @query = CONCAT("SELECT
 								SUM(BD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 							FROM
 								transaction_bookingdetails BD
+                                JOIN transaction_booking TB
+									ON TB.BookingID = BD.BookingID
                                 JOIN master_item MI
 									ON MI.ItemID = BD.ItemID
                                 LEFT JOIN master_itemdetails MID
@@ -357,6 +362,7 @@ SET @query = CONCAT("SELECT
 										THEN BD.BranchID
 										ELSE ",pBranchID,"
 									END = BD.BranchID
+								AND TB.FinishFlag = 1
 							GROUP BY
 								BD.ItemID,
 								BD.BranchID
@@ -516,6 +522,8 @@ SET @query = CONCAT("SELECT
 								SUM(SD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 							FROM
 								transaction_saledetails SD
+								JOIN transaction_sale TS
+									ON TS.SaleID = SD.SaleID
 								JOIN master_item MI
 									ON SD.ItemID = MI.ItemID
 								LEFT JOIN master_itemdetails MID
@@ -531,6 +539,7 @@ SET @query = CONCAT("SELECT
 										THEN SD.BranchID
 										ELSE ",pBranchID,"
 									END = SD.BranchID
+								AND TS.FinishFlag = 1
 							GROUP BY
 								MI.ItemID,
 								SD.BranchID
@@ -661,6 +670,8 @@ SET @query = CONCAT("SELECT
 								SUM(BD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 							FROM
 								transaction_bookingdetails BD
+                                JOIN transaction_booking TB
+									ON TB.BookingID = BD.BookingID
                                 JOIN master_item MI
 									ON MI.ItemID = BD.ItemID
                                 LEFT JOIN master_itemdetails MID
@@ -676,6 +687,7 @@ SET @query = CONCAT("SELECT
 										THEN BD.BranchID
 										ELSE ",pBranchID,"
 									END = BD.BranchID
+								AND TB.FinishFlag = 1
 							GROUP BY
 								BD.ItemID,
 								BD.BranchID

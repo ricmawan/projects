@@ -91,7 +91,7 @@
 								Nama Barang :
 							</div>
 							<div class="col-md-4">
-								<input id="txtItemNameAdd" name="txtItemNameAdd" type="text" tabindex=17 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Nama Barang" required />
+								<input id="txtItemNameAdd" name="txtItemNameAdd" type="text" tabindex=17 class="form-control-custom" onfocus="this.select();" maxlength="37" autocomplete=off placeholder="Nama Barang" required />
 							</div>
 						</div>
 						<br />

@@ -160,6 +160,8 @@ SET @query = CONCAT("SELECT
 								SUM(SD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 							FROM
 								transaction_saledetails SD
+                                /*JOIN transaction_sale TS
+									ON TS.SaleID = SD.SaleID*/
                                 LEFT JOIN master_itemdetails MID
 									ON SD.ItemDetailsID = MID.ItemDetailsID
 							WHERE
@@ -168,6 +170,7 @@ SET @query = CONCAT("SELECT
 									THEN SD.BranchID
 									ELSE ",pBranchID,"
 								END = SD.BranchID
+                                /*AND TS.FinishFlag = 1*/
 							GROUP BY
 								SD.ItemID,
 								SD.BranchID
@@ -270,6 +273,8 @@ SET @query = CONCAT("SELECT
 								SUM(BD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 							FROM
 								transaction_bookingdetails BD
+                                /*JOIN transaction_booking TB
+									ON TB.BookingID = BD.BookingID*/
                                 LEFT JOIN master_itemdetails MID
 									ON BD.ItemDetailsID = MID.ItemDetailsID
 							WHERE
@@ -278,6 +283,7 @@ SET @query = CONCAT("SELECT
 									THEN BD.BranchID
 									ELSE ",pBranchID,"
 								END = BD.BranchID
+                                /*AND TB.FinishFlag = 1*/
 							GROUP BY
 								BD.ItemID,
 								BD.BranchID
@@ -433,6 +439,8 @@ SET @query = CONCAT("SELECT
 								SUM(SD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 							FROM
 								transaction_saledetails SD
+                                /*JOIN transaction_sale TS
+									ON TS.SaleID = SD.SaleID*/
                                 LEFT JOIN master_itemdetails MID
 									ON SD.ItemDetailsID = MID.ItemDetailsID
 							WHERE
@@ -441,6 +449,7 @@ SET @query = CONCAT("SELECT
 									THEN SD.BranchID
 									ELSE ",pBranchID,"
 								END = SD.BranchID
+                                /*AND TS.FinishFlag = 1*/
 							GROUP BY
 								SD.ItemID,
 								SD.BranchID
@@ -543,6 +552,8 @@ SET @query = CONCAT("SELECT
 								SUM(BD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 							FROM
 								transaction_bookingdetails BD
+                                /*JOIN transaction_booking TB
+									ON TB.BookingID = BD.BookingID*/
                                 LEFT JOIN master_itemdetails MID
 									ON BD.ItemDetailsID = MID.ItemDetailsID
 							WHERE
@@ -551,6 +562,7 @@ SET @query = CONCAT("SELECT
 									THEN BD.BranchID
 									ELSE ",pBranchID,"
 								END = BD.BranchID
+                                /*AND TB.FinishFlag = 1*/
 							GROUP BY
 								BD.ItemID,
 								BD.BranchID

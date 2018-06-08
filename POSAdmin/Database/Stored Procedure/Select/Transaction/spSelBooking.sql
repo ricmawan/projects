@@ -30,6 +30,14 @@ StoredProcedure:BEGIN
 	
 SET State = 1;
 
+	DELETE FROM 
+		transaction_booking
+    WHERE
+		FinishFlag = 0
+        AND DATE_FORMAT(TransactionDate, '%Y-%m-%d') <> DATE_FORMAT(NOW(), '%Y-%m-%d');
+
+SET State = 2;
+
 SET @query = CONCAT("SELECT
 						COUNT(1) AS nRows
 					FROM
@@ -54,7 +62,12 @@ SET @query = CONCAT("SELECT
 						IFNULL(TBD.Total, 0) Total,
 						IFNULL(TBD.Weight, 0) Weight,
 						TB.RetailFlag,
-                        TB.Payment
+                        TB.Payment,
+                        CASE
+							WHEN FinishFlag = 0
+                            THEN 'Belum Selesai'
+                            ELSE 'Selesai'
+						END Status
 					FROM
 						transaction_booking TB
                         JOIN master_customer MC

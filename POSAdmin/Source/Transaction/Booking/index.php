@@ -40,6 +40,13 @@
 										<th>Tanggal</th>
 										<th>Customer</th>
 										<th>Total</th>
+										<th>SaleID</th>
+										<th>CustomerID</th>
+										<th>PlainTransactionDate</th>
+										<th>RetailFlag</th>
+										<th>Weight</th>
+										<th>Payment</th>
+										<th>Status</th>
 									</tr>
 								</thead>
 							</table>
@@ -332,6 +339,7 @@
 		</div>
 		<script>
 			var table;
+			var tableIndex;
 			var table2;
 			var table3;
 			var today;
@@ -592,7 +600,6 @@
 										}
 										else {
 											$("#hdnStock").val(parseFloat(data.Stock));
-											//console.log("mlebu 3");
 										}
 										$("#hdnItemID").val(data.ItemID);
 										$("#txtItemName").val(data.ItemName);
@@ -605,10 +612,10 @@
 										$("#hdnPrice2").val(data.Price2);
 										$("#hdnQty2").val(data.Qty2);
 										$("#hdnWeight").val(data.Weight);
-										$("#txtQTY").focus();
 										$("#txtSubTotal").val(returnRupiah(data.RetailPrice));
 										$("#hdnAvailableUnit").val(JSON.stringify(data.AvailableUnit));
 										$("#hdnItemDetailsID").val(data.ItemDetailsID);
+										$("#hdnConversionQty").val(data.ConversionQty);
 										if(data.AvailableUnit.length > 0) {
 											$("#ddlUnit").find('option').remove();
 											for(var i=0;i<data.AvailableUnit.length;i++) {
@@ -618,6 +625,7 @@
 										$("#ddlUnit").val(data.UnitID);
 										Grosir($("#txtQTY").val());
 										CalculateSubTotal();
+										$("#txtQTY").focus();
 									//}
 									//else $("#txtQTY").focus();
 								}
@@ -1891,7 +1899,7 @@
 						table2.keys.disable();
 						table3 = $("#grid-item").DataTable({
 									"keys": true,
-									"scrollY": "295px",
+									"scrollY": "280px",
 									"scrollX": false,
 									"scrollCollapse": false,
 									"paging": false,
@@ -1901,7 +1909,7 @@
 										{ "width": "15%", "orderable": false, className: "dt-head-center" },
 										{ "width": "20%", "orderable": false, className: "dt-head-center" },
 										{ "width": "5%", "orderable": false, className: "dt-head-center" },
-										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "visible": false, "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
@@ -1911,10 +1919,10 @@
 										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" }
 									],
 									"ajax": {
-										"url": "./Transaction/Booking/ItemList.php",
+										"url": "./Transaction/Sale/ItemList.php" /*,
 										"data": function ( d ) {
 											d.BranchID = $("#hdnBranchID").val()
-										}
+										}*/
 									},
 									"processing": true,
 									"serverSide": true,
@@ -1936,15 +1944,15 @@
 									"initComplete": function(settings, json) {
 										table3.columns.adjust();
 										$("#grid-item").DataTable().cell( ':eq(0)' ).focus();
-									},
-									"sDom": '<"toolbar">frtip'
+									} /*,
+									"sDom": '<"toolbar">frtip' */
 								});
 
-						$(".toolbar").css({
+						/*$(".toolbar").css({
 							"display" : "inline-block"
 						});
 
-						$("div.toolbar").html($("#divBranch").html());
+						$("div.toolbar").html($("#divBranch").html());*/
 
 						var counterPickItem = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
@@ -2001,11 +2009,12 @@
 						table3.destroy();
 						//table.keys.enable();
 						table2.keys.enable();
+						$("#txtItemCode").focus();
 					},
 					resizable: false,
-					height: 500,
+					height: 420,
 					width: 1280,
-					modal: true,
+					modal: true /*,
 					buttons: [
 					{
 						text: "Tutup",
@@ -2018,7 +2027,7 @@
 							table2.keys.enable();
 							return false;
 						}
-					}]
+					}]*/
 				}).dialog("open");
 			}
 
@@ -2143,15 +2152,22 @@
 							table2.destroy();
 							$("#finish-dialog").dialog("destroy");
 							$("#FormData").dialog("destroy");
-							table.ajax.reload(function() {
-								table.keys.enable();
-								if(typeof index !== 'undefined') table.cell(index).focus();
-							}, false);
 							Lobibox.alert("success",
 							{
-								msg: data.Message,
+								msg: paymentInfo,
 								width: 480,
-								delay: 2000
+								beforeClose: function() {
+									if(counter == 0) {
+										setTimeout(function() {
+											table.ajax.reload(function() {
+												table.keys.enable();
+												console.log(tableIndex);
+												if(typeof tableIndex !== 'undefined') table.cell(tableIndex).focus();
+											}, false);
+										}, 0);
+										counter = 1;
+									}
+								}
 							});
 						}
 						else {
@@ -2350,7 +2366,13 @@
 									{ className: "dt-head-center" },
 									{ className: "dt-head-center" },
 									{ "orderable": false, className: "dt-head-center dt-body-right" },
-									{ "visible": false }
+									{ "visible": false },
+									{ "visible": false },
+									{ "visible": false },
+									{ "visible": false },
+									{ "visible": false },
+									{ "visible": false },
+									{ className: "dt-head-center" }
 								],
 								"processing": true,
 								"serverSide": true,
@@ -2374,6 +2396,7 @@
 				
 				table.on( 'key', function (e, datatable, key, cell, originalEvent) {
 					var index = table.cell({ focused: true }).index();
+					tableIndex = index;
 					if(key == 32) { //space
 						var checkbox = $(".focus").find("input:checkbox");
 						if(checkbox.prop("checked") == true) {
@@ -2442,6 +2465,7 @@
 				var counterKey = 0;
 				$(document).on("keydown", function (evt) {
 					var index = table.cell({ focused: true }).index();
+					tableIndex = index;
 					if (evt.keyCode == 46 && $("#hdnDeleteFlag").val() == "1" && typeof index == 'undefined' && $("#FormData").css("display") == "none" && $(".lobibox").css("display") != "block") { //delete button
 						evt.preventDefault();
 						if(counterKey == 0) {
@@ -2509,6 +2533,7 @@
 				
 				$('#grid-data tbody').on('dblclick', 'tr', function () {
 					var data = table.row(this).data();
+					tableIndex = table.row(this).index();
 					openDialog(data, 1);
 				});
 			});
