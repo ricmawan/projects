@@ -7,6 +7,7 @@ CREATE TABLE transaction_booking
 	RetailFlag			BIT(1) NOT NULL,
 	CustomerID 			BIGINT,
 	TransactionDate		DATETIME NOT NULL,
+	PaymentTypeID		SMALLINT,
 	Payment				DOUBLE,
 	PrintCount			SMALLINT,
 	PrintedDate			DATETIME,
@@ -16,7 +17,8 @@ CREATE TABLE transaction_booking
 	CreatedBy 			VARCHAR(255) NOT NULL,
 	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
 	ModifiedBy 			VARCHAR(255) NULL,
-	FOREIGN KEY(CustomerID) REFERENCES master_customer(CustomerID) ON UPDATE CASCADE ON DELETE CASCADE
+	FOREIGN KEY(CustomerID) REFERENCES master_customer(CustomerID) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(PaymentTypeID) REFERENCES master_paymenttype(PaymentTypeID) ON UPDATE CASCADE ON DELETE CASCADE
 )ENGINE=InnoDB;
 
 CREATE UNIQUE INDEX SALE_INDEX

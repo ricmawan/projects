@@ -62,16 +62,20 @@ SET @query = CONCAT("SELECT
 						IFNULL(TBD.Total, 0) Total,
 						IFNULL(TBD.Weight, 0) Weight,
 						TB.RetailFlag,
-                        TB.Payment,
+                        IFNULL(TB.Payment, 0) Payment,
+                        IFNULL(PT.PaymentTypeName, '') PaymentTypeName,
                         CASE
 							WHEN FinishFlag = 0
                             THEN 'Belum Selesai'
                             ELSE 'Selesai'
-						END Status
+						END Status,
+                        IFNULL(PT.PaymentTypeID, 1) PaymentTypeID
 					FROM
 						transaction_booking TB
                         JOIN master_customer MC
 							ON MC.CustomerID = TB.CustomerID
+						LEFT JOIN master_paymenttype PT
+							ON PT.PaymentTypeID = TB.PaymentTypeID
 						LEFT JOIN
                         (
 							SELECT

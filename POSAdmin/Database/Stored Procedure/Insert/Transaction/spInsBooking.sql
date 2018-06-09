@@ -3,17 +3,18 @@ DROP PROCEDURE IF EXISTS spInsBooking;
 DELIMITER $$
 CREATE PROCEDURE spInsBooking (
 	pID 				BIGINT,
-	pBookingNumber			VARCHAR(100),
+	pBookingNumber		VARCHAR(100),
 	pRetailFlag			BIT,
+    pFinishFlag			BIT,
     pCustomerID			BIGINT,
 	pTransactionDate 	DATETIME,
-	pBookingDetailsID		BIGINT,
+	pBookingDetailsID	BIGINT,
     pBranchID			INT,
     pItemID				BIGINT,
 	pItemDetailsID		BIGINT,
 	pQuantity			DOUBLE,
     pBuyPrice			DOUBLE,
-    pBookingPrice			DOUBLE,
+    pBookingPrice		DOUBLE,
 	pDiscount			DOUBLE,
 	pUserID				BIGINT,
     pCurrentUser		VARCHAR(255)
@@ -68,6 +69,7 @@ SET State = 2;
 			(
 				BookingNumber,
 				RetailFlag,
+                FinishFlag,
 				CustomerID,
 				TransactionDate,
 				CreatedDate,
@@ -77,6 +79,7 @@ SET State = 2;
 			(
 				pBookingNumber,
 				pRetailFlag,
+                pFinishFlag,
 				pCustomerID,
 				pTransactionDate,
 				NOW(),

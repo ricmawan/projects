@@ -18,11 +18,12 @@
 		$BuyPrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['hdnBuyPrice']));
 		$BookingPrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['hdnBookingPrice']));
 		$Discount = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtDiscount']));
+		$FinishFlag = $FINSH_DEFAULT;
 		$Message = "Terjadi Kesalahan Sistem!";
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
-		$sql = "CALL spInsBooking(".$BookingID.", '".$BookingNumber."', ".$RetailFlag.", ".$CustomerID.", '".$TransactionDate."', ".$BookingDetailsID.", ".$BranchID.", ".$ItemID.", ".$ItemDetailsID.", ".$Qty.", ".$BuyPrice.", ".$BookingPrice.", ".$Discount.", ".$_SESSION['UserID'].", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsBooking(".$BookingID.", '".$BookingNumber."', ".$RetailFlag.", ".$FinishFlag.", ".$CustomerID.", '".$TransactionDate."', ".$BookingDetailsID.", ".$BranchID.", ".$ItemID.", ".$ItemDetailsID.", ".$Qty.", ".$BuyPrice.", ".$BookingPrice.", ".$Discount.", ".$_SESSION['UserID'].", '".$_SESSION['UserLogin']."')";
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;

@@ -20,7 +20,8 @@
 					9 => "RetailFlag",
 					10 => "Weight",
 					11 => "Payment",
-					12 => "Status"
+					12 => "Status",
+					13 => "PaymentTypeName"
 				);
 
 	$where = " 1=1 ";
@@ -73,6 +74,8 @@
 		$row_array[] = number_format($row['Weight'],2,".",",");
 		$row_array[] = $row['Payment'];
 		$row_array[] = $row['Status'];
+		$row_array[] = $row['PaymentTypeName'];
+		$row_array[] = $row['PaymentTypeID'];
 		array_push($return_arr, $row_array);
 	}
 	
