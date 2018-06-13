@@ -2076,6 +2076,7 @@
 							//$("#divModal").hide();
 							$("#txtPayment").val(0);
 							$("#ddlPayment").val(1);
+							$("#txtChange").val(0);
 						},
 						resizable: false,
 						height: 340,
@@ -2263,6 +2264,7 @@
 								var counter = 0;
 								$("#txtPayment").val(0);
 								$("#ddlPayment").val(1);
+								$("#txtChange").val(0);
 								Lobibox.alert("success",
 								{
 									msg: paymentInfo,

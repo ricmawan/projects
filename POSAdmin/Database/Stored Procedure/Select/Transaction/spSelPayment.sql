@@ -52,7 +52,8 @@ SET @query = CONCAT("SELECT
 								JOIN master_customer MC
 									ON MC.CustomerID = TB.CustomerID
 							WHERE
-								", pWhere2, "
+								TB.PaymentTypeID = 2
+								AND ", pWhere2, "
 						) TS"
 					);
                        
@@ -69,9 +70,9 @@ SET @query = CONCAT("SELECT
 						TS.TransactionDate PlainTransactionDate,
 						MC.CustomerID,
 						MC.CustomerName,
-						SUM(SD.Quantity * SD.SalePrice  - SD.Discount) Total,
+						SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1)  - SD.Discount)) Total,
 						IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0) TotalPayment,
-					    SUM(SD.Quantity * SD.SalePrice  - SD.Discount) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0)) Credit,
+					    SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0)) Credit,
                         'S' TransactionType,
                         IFNULL(TS.Payment, 0) Payment,
 					    IFNULL(TP.Amount, 0) Amount
@@ -81,6 +82,8 @@ SET @query = CONCAT("SELECT
 							ON SD.SaleID = TS.SaleID
 						JOIN master_customer MC
 							ON MC.CustomerID = TS.CustomerID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = SD.ItemDetailsID
 						LEFT JOIN
 						(
 							SELECT
@@ -114,9 +117,9 @@ SET @query = CONCAT("SELECT
 						TB.TransactionDate PlainTransactionDate,
 						MC.CustomerID,
 						MC.CustomerName,
-						SUM(BD.Quantity * BD.BookingPrice  - BD.Discount) Total,
+						SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) Total,
 						IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) TotalPayment,
-						SUM(BD.Quantity * BD.BookingPrice  - BD.Discount) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0)),
+						SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0)),
                         'B' TransactionType,
 						IFNULL(TB.Payment, 0) Payment,
 					    IFNULL(TP.Amount, 0) Amount
@@ -126,6 +129,8 @@ SET @query = CONCAT("SELECT
 							ON BD.BookingID = TB.BookingID
 						JOIN master_customer MC
 							ON MC.CustomerID = TB.CustomerID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = BD.ItemDetailsID
 						LEFT JOIN
 						(
 							SELECT
@@ -140,7 +145,8 @@ SET @query = CONCAT("SELECT
 						)TP
 							ON TP.TransactionID = TB.BookingID
 					WHERE
-						", pWhere2, "
+						TB.PaymentTypeID = 2
+						AND ", pWhere2, "
 					GROUP BY
 						TB.BookingID,
 						TB.BookingNumber,

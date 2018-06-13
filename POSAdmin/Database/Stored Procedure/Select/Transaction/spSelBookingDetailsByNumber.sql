@@ -9,7 +9,7 @@ DROP PROCEDURE IF EXISTS spSelBookingDetailsByNumber;
 
 DELIMITER $$
 CREATE PROCEDURE spSelBookingDetailsByNumber (
-	pBookingNumber		VARCHAR(100),
+	pBookingNumber	VARCHAR(100),
     pCurrentUser	VARCHAR(255)
 )
 StoredProcedure:BEGIN
@@ -31,15 +31,17 @@ SET State = 1;
 		TS.BookingID,
 		SD.BookingDetailsID,
         SD.ItemID,
-        MID.ItemDetailsID,
+        IFNULL(MID.ItemDetailsID, '') ItemDetailsID,
         SD.BranchID,
         MI.ItemCode,
         MI.ItemName,
         SD.Quantity - IFNULL(TSR.Quantity, 0) Quantity,
         SD.BuyPrice,
-        SD.BookingPrice,
+        SD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount BookingPrice,
+        SD.Discount,
         MC.CustomerName,
-        MU.UnitName
+        MU.UnitName,
+        IFNULL(MID.ConversionQuantity, 1) ConversionQuantity
 	FROM
 		transaction_booking TS
 		JOIN master_customer MC

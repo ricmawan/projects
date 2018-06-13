@@ -6,6 +6,8 @@ CREATE TABLE transaction_purchase
 	PurchaseNumber	VARCHAR(100) NULL,
 	SupplierID 		BIGINT,
 	TransactionDate DATETIME NOT NULL,
+	PaymentTypeID	SMALLINT,
+	Payment			DOUBLE,
 	Remarks			TEXT,
 	CreatedDate 	DATETIME NOT NULL,
 	CreatedBy 		VARCHAR(255) NOT NULL,

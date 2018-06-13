@@ -162,7 +162,7 @@ VALUES
 (
 	16,
 	3,
-	'Pembayaran',
+	'Pembayaran Piutang',
 	'Transaction/Payment/',
 	NULL,
 	0,
@@ -284,6 +284,15 @@ VALUES
 	NULL,
 	0,
 	3
+),
+(
+	30,
+	3,
+	'Pembayaran Hutang',
+	'Transaction/Payment/',
+	NULL,
+	0,
+	10
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

@@ -39,17 +39,20 @@ SET State = 1;
         MI.ItemName,
         TSRD.Quantity,
         TSRD.BuyPrice,
-        TSRD.SalePrice,
+        TSRD.SalePrice * IFNULL(MID.ConversionQuantity, 1) SalePrice,
         (IFNULL(TS.Quantity, 0) - IFNULL(SR.Quantity, 0) + IFNULL(TSRD.Quantity, 0)) Maksimum,
-        MU.UnitName
+        MU.UnitName,
+        IFNULL(MID.ConversionQuantity, 1) ConversionQuantity
 	FROM
 		transaction_pick TSR
 		JOIN transaction_pickdetails TSRD
 			ON TSRD.PickID = TSR.PickID
 		JOIN master_item MI
 			ON MI.ItemID = TSRD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = TSRD.ItemDetailsID
 		JOIN master_unit MU
-			ON MU.UnitID = MI.UnitID
+			ON IFNULL(MID.UnitID, MI.UnitID) = MU.UnitID
         LEFT JOIN
 		(
 			SELECT

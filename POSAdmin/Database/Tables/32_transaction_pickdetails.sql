@@ -11,6 +11,7 @@ CREATE TABLE transaction_pickdetails
 	Quantity			DOUBLE,
 	BuyPrice			DOUBLE,
 	SalePrice			DOUBLE,
+	Discount			DOUBLE,
 	CreatedDate 		DATETIME NOT NULL,
 	CreatedBy 			VARCHAR(255) NOT NULL,
 	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,

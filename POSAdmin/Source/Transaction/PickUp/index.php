@@ -220,6 +220,7 @@
 						}, false);
 						resetForm();
 						table2.destroy();
+						$("#select_all_salereturn").prop("checked", false);
 					},
 					resizable: false,
 					height: 620,
@@ -248,6 +249,7 @@
 														$("#divModal").hide();
 														resetForm();
 														table2.destroy();
+														$("#select_all_salereturn").prop("checked", false);
 														var counter = 0;
 														Lobibox.alert("success",
 														{
@@ -349,6 +351,7 @@
 							}, false);
 							resetForm();
 							table2.destroy();
+							$("#select_all_salereturn").prop("checked", false);
 							return false;
 						}
 					}]
@@ -396,7 +399,7 @@
 							$("#btnSavePickUp").attr("tabindex", Data.tabindex);
 							$("#btnCancelAddPickUp").attr("tabindex", (parseFloat(Data.tabindex) + 1));
 							setTimeout(function() {
-								$("#grid-transaction").find("input:checkbox").first().remove()
+								//$("#grid-transaction").find("input:checkbox").first().remove()
 							}, 0);
 
 							$(".txtQTY").spinner();
@@ -996,6 +999,7 @@
 							});
 				
 				table.on( 'key', function (e, datatable, key, cell, originalEvent) {
+					console.log(e);
 					var index = table.cell({ focused: true }).index();
 					if(key == 32) { //space
 						var checkbox = $(".focus").find("input:checkbox");
@@ -1013,6 +1017,7 @@
 						var data = datatable.row( cell.index().row ).data();
 						if(key == 13) {
 							if(($(".ui-dialog").css("display") == "none" || $("#delete-confirm").css("display") == "none") && $("#hdnEditFlag").val() == "1" ) {
+								saleDetailsCounter = 1;
 								openDialog(data, 1);
 							}
 						}

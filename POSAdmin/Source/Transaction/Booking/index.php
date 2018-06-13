@@ -1811,7 +1811,6 @@
 					var data = this.data();
 					grandTotal += (parseFloat(data[9].replace(/\,/g, "")) - parseFloat(data[10].replace(/\,/g, ""))) * parseFloat(data[7]);
 					weight += (parseFloat(data[17]) * parseFloat(data[7]) * parseFloat(data[22]));
-					console.log(weight);
 				});
 				$("#lblTotal").html(returnRupiah(grandTotal.toString()));
 				$("#lblWeight").html(returnWeight(weight.toFixed(2).toString()));
@@ -2040,7 +2039,7 @@
 					$("#finish-dialog").dialog({
 						autoOpen: false,
 						open: function() {
-							$("#divModal").show();
+							//$("#divModal").show();
 							table2.keys.disable();
 							var Total = $("#lblTotal").html().replace(/\,/g, "");
 							var Payment = $("#hdnPayment").val();
@@ -2077,9 +2076,10 @@
 							//$("#divModal").hide();
 							$("#txtPayment").val(0);
 							$("#ddlPayment").val(1);
+							$("#txtChange").val(0);
 						},
 						resizable: false,
-						height: 380,
+						height: 340,
 						width: 420,
 						modal: true /*,
 						buttons: [
@@ -2147,6 +2147,7 @@
 					}
 				}
 			}
+			
 			function Change() {
 				var Total = $("#txtTotal").val().replace(/\,/g, "");
 				var Payment = $("#txtPayment").val().replace(/\,/g, "");
@@ -2263,6 +2264,7 @@
 								var counter = 0;
 								$("#txtPayment").val(0);
 								$("#ddlPayment").val(1);
+								$("#txtChange").val(0);
 								Lobibox.alert("success",
 								{
 									msg: paymentInfo,

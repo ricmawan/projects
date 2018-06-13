@@ -8,12 +8,11 @@
 	$requestData= $_REQUEST;
 	//kolom di table
 	$columns = array(
-					0 => "SaleID", //unorderable
-					1 => "RowNumber", //unorderable
-					2 => "SaleNumber",
-					3 => "TransactionDate",
-					4 => "CustomerName",
-					5 => "Total"
+					0 => "RowNumber", //unorderable
+					1 => "SaleNumber", //unorderable
+					2 => "TransactionDate",
+					3 => "CustomerName",
+					4 => "Total"
 				);
 
 	$where = " 1=1 ";
@@ -35,9 +34,9 @@
 		$where .= " OR DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
 		$where .= " OR MC.CustomerName LIKE '%".$search."%' )";
 
-		$where .= " AND ( TB.BookingNumberNumber LIKE '%".$search."%'";
-		$where .= " OR DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
-		$where .= " OR MC.CustomerName LIKE '%".$search."%' )";
+		$where2 .= " AND ( TB.BookingNumber LIKE '%".$search."%'";
+		$where2 .= " OR DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
+		$where2 .= " OR MC.CustomerName LIKE '%".$search."%' )";
 	}
 	$sql = "CALL spSelPayment(\"$where\", \"$where2\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
 

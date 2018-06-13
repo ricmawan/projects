@@ -10,10 +10,10 @@
 	$columns = array(
 					0 => "BookingID", //unorderable
 					1 => "RowNumber", //unorderable
-					2 => "TS.BookingNumber",
-					3 => "TS.TransactionDate",
+					2 => "TB.BookingNumber",
+					3 => "TB.TransactionDate",
 					4 => "MC.CustomerName",
-					5 => "TSD.Total",
+					5 => "TBD.Total",
 					6 => "BookingID",
 					7 => "CustomerID",
 					8 => "PlainTransactionDate",

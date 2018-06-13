@@ -33,9 +33,10 @@
 			$row_array[] = "<div id='toggle-branch-" . $row['BookingDetailsID'] . "' class='div-center toggle-modern' onclick='updateBranch(this.id)' ></div>
 				<input id='hdnBranchID". $row['BookingDetailsID'] ."' name='hdnBranchID". $row['BookingDetailsID'] ."' type='hidden' value=".$row['BranchID']." />
 				<input id='hdnItemID". $row['BookingDetailsID'] ."' name='hdnItemID". $row['BookingDetailsID'] ."' type='hidden' value=".$row['ItemID']." />
-				<input id='hdnItemDetailsID". $row['BookingDetailsID'] ."' name='hdnItemDetailsID". $row['BookingDetailsID'] ."' type='hidden' value=".$row['ItemDetailsID']." />
+				<input id='hdnItemDetailsID". $row['BookingDetailsID'] ."' name='hdnItemDetailsID". $row['BookingDetailsID'] ."' type='hidden' value='".$row['ItemDetailsID']."' />
 				<input id='hdnBuyPrice". $row['BookingDetailsID'] ."' name='hdnBuyPrice". $row['BookingDetailsID'] ."' type='hidden' value=".$row['BuyPrice']." />
-				<input id='hdnBookingPrice". $row['BookingDetailsID'] ."' name='hdnBookingPrice". $row['BookingDetailsID'] ."' type='hidden' value=".$row['BookingPrice']." />
+				<input id='hdnBookingPrice". $row['BookingDetailsID'] ."' name='hdnBookingPrice". $row['BookingDetailsID'] ."' type='hidden' value=".$row['BookingPrice'] / $row['ConversionQuantity']." />
+				<input id='hdnDiscount". $row['BookingDetailsID'] ."' name='hdnDiscount". $row['BookingDetailsID'] ."' type='hidden' value=".$row['Discount']." />
 				<input id='hdnBookingDetailsID". $row['BookingDetailsID'] ."' name='hdnBookingDetailsID". $row['BookingDetailsID'] ."' type='hidden' value=".$row['BookingDetailsID']." />";
 			$row_array[] = $row['ItemCode'];
 			$row_array[] = $row['ItemName'];

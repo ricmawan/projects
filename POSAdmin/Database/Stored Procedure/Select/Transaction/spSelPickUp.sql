@@ -64,7 +64,7 @@ SET @query = CONCAT("SELECT
                         (
 							SELECT
 								TSR.PickID,
-                                SUM(TSRD.Quantity * TSRD.SalePrice) Total
+                                SUM(TSRD.Quantity * (TSRD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - TSRD.Discount)) Total
 							FROM
 								transaction_booking TS
                                 JOIN master_customer MC
@@ -75,6 +75,8 @@ SET @query = CONCAT("SELECT
 									ON TSR.PickID = TSRD.PickID
 								LEFT JOIN master_item MI
 									ON MI.ItemID = TSRD.ItemID
+								LEFT JOIN master_itemdetails MID
+									ON MID.ItemDetailsID = TSRD.ItemDetailsID
 							WHERE ", 
 								pWhere, 
                             " GROUP BY

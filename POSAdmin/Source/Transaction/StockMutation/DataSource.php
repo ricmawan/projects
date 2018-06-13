@@ -16,6 +16,7 @@
 					5 => "MI.ItemCode",
 					6 => "MI.ItemName",
 					7 => "SMD.Quantity",
+					8 => "MU.Unitname"
 				);
 
 	$where = " 1=1 ";

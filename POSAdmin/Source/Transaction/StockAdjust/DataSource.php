@@ -14,8 +14,9 @@
 					3 => "MB.BranchName",
 					4 => "MI.ItemCode",
 					5 => "MI.ItemName",
-					6 => "SAD.Quantity",
-					6 => "SAD.AdjustedQuantity"
+					6 => "MU.UnitName",
+					7 => "SAD.Quantity",
+					8 => "SAD.AdjustedQuantity"
 				);
 
 	$where = " 1=1 ";
