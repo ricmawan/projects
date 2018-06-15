@@ -148,6 +148,7 @@
 					$("#txtBookingNumber").val(Data[2]);
 					$("#lblTotal").html(Data[5]);
 					$("#txtTransactionDate").datepicker("setDate", new Date(Data[7]));
+					$("#hdnTransactionDate").val(Data[7]);
 					$("#txtBookingNumber").prop("readonly", true);
 					getPickUpDetails(Data[6]);
 				}

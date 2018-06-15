@@ -9,22 +9,18 @@
 		$file = basename($RequestedPath);
 		$RequestedPath = str_replace($file, "", $RequestedPath);
 		include "../../GetPermission.php";
-		$SaleID = mysqli_real_escape_string($dbh, $_POST['SaleID']);
-		$Payment = mysqli_real_escape_string($dbh, $_POST['Payment']);
-		$PaymentType = mysqli_real_escape_string($dbh, $_POST['PaymentType']);
-		$PrintInvoice = mysqli_real_escape_string($dbh, $_POST['PrintInvoice']);
-		$Message = "Pembayaran berhasil";
+		$Message = "Cetak berhasil";
 		$FinishFlag = 1;
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
 		
-		$sql = "CALL spUpdSalePayment(".$SaleID.", ".$Payment.", ".$PaymentType.", ".$FinishFlag.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spSelDailyReport(".$_SESSION['UserID'].", '".$_SESSION['UserLogin']."')";
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;
-			logEvent(mysqli_error($dbh), '/Transaction/Sale/UpdatePayment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), './PrintDailyReport', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 			echo returnstate($SaleID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}

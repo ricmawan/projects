@@ -6,6 +6,8 @@ CREATE PROCEDURE spUpdPurchase (
     pPurchaseNumber		VARCHAR(100),
 	pSupplierID 		BIGINT,
 	pTransactionDate	DATETIME,
+    pDeadline			DATETIME,
+    pPaymentTypeID		SMALLINT,
 	pCurrentUser		VARCHAR(255)
 )
 StoredProcedure:BEGIN
@@ -44,6 +46,8 @@ SET State = 1;
 				PurchaseNumber = pPurchaseNumber,
 				SupplierID = pSupplierID,
 				TransactionDate = pTransactionDate,
+                Deadline = pDeadline,
+                PaymentTypeID = pPaymentTypeID,
 				ModifiedBy = pCurrentUser
 			WHERE
 				PurchaseID = pID;

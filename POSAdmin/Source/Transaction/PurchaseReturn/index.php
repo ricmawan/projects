@@ -306,6 +306,7 @@
 					$("#ddlSupplier").val(Data[7]);
 					$("#lblTotal").html(Data[5]);
 					$("#txtTransactionDate").datepicker("setDate", new Date(Data[8]));
+					$("#hdnTransactionDate").val(Data[8]);
 					$("#txtPurchaseReturnNumber").val(Data[2])
 					getPurchaseReturnDetails(Data[6]);
 				}

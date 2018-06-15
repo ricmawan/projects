@@ -213,7 +213,7 @@ VALUES
 (
 	16,
 	3,
-	'Pembayaran',
+	'Pembayaran Piutang',
 	'Transaction/Payment/',
 	NULL,
 	0,
@@ -231,7 +231,7 @@ VALUES
 (
 	18,
 	3,
-	'Cetak Nota & Pengambilan',
+	'Cetak Nota',
 	'Transaction/Print/',
 	NULL,
 	0,
@@ -335,6 +335,24 @@ VALUES
 	NULL,
 	0,
 	3
+),
+(
+	30,
+	3,
+	'Pembayaran Hutang',
+	'Transaction/DebtPayment/',
+	NULL,
+	0,
+	10
+),
+(
+	31,
+	4,
+	'Hutang',
+	'Report/Debt/',
+	NULL,
+	1,
+	9
 );
 
 CREATE UNIQUE INDEX MENU_INDEX
@@ -635,7 +653,8 @@ INSERT INTO `master_parameter` (`ParameterID`, `ParameterName`, `ParameterValue`
 (8, 'SHARED_PRINTER_ADDRESS', '//localhost/EPSON', 'For shared printer', 0, '2016-03-20 00:00:00', 'Admin', NULL, NULL),
 (9, 'MOBILE_PATH', '/Projects/POSAdmin/Mobile/', 'Location of the application', 0, '2016-03-12 15:01:05', 'System', NULL, NULL),
 (10, 'DESKTOP_PATH', '/Projects/POSAdmin/Desktop/', 'Location of the application', 0, '2016-03-12 15:01:05', 'System', NULL, NULL),
-(11, 'MOBILE_HOME', 'http://192.168.1.21/Projects/POSAdmin/Mobile/Home.php', 'Location of the home for mobile view', 0, '2016-03-12 15:01:05', 'System', NULL, NULL);DROP TABLE IF EXISTS master_eventlog;
+(11, 'MOBILE_HOME', 'http://192.168.1.21/Projects/POSAdmin/Mobile/Home.php', 'Location of the home for mobile view', 0, '2016-03-12 15:01:05', 'System', NULL, NULL),
+(12, 'FINSH_DEFAULT', '0', 'Default value for finish flag', 0, '2016-03-12 15:01:05', 'System', NULL, NULL);DROP TABLE IF EXISTS master_eventlog;
 
 CREATE TABLE master_eventlog
 (
@@ -842,6 +861,8 @@ CREATE TABLE transaction_purchase
 	PurchaseNumber	VARCHAR(100) NULL,
 	SupplierID 		BIGINT,
 	TransactionDate DATETIME NOT NULL,
+	PaymentTypeID	SMALLINT,
+	Deadline		DATETIME,
 	Remarks			TEXT,
 	CreatedDate 	DATETIME NOT NULL,
 	CreatedBy 		VARCHAR(255) NOT NULL,
@@ -925,6 +946,7 @@ CREATE TABLE transaction_sale
 	Payment			DOUBLE,
 	PrintCount		SMALLINT,
 	PrintedDate		DATETIME,
+    FinishFlag		BIT,
 	Remarks			TEXT,
 	CreatedDate 	DATETIME NOT NULL,
 	CreatedBy 		VARCHAR(255) NOT NULL,
@@ -1094,15 +1116,18 @@ CREATE TABLE transaction_booking
 	RetailFlag			BIT(1) NOT NULL,
 	CustomerID 			BIGINT,
 	TransactionDate		DATETIME NOT NULL,
+	PaymentTypeID		SMALLINT,
 	Payment				DOUBLE,
 	PrintCount			SMALLINT,
 	PrintedDate			DATETIME,
+    FinishFlag 			BIT,
 	Remarks				TEXT,
 	CreatedDate 		DATETIME NOT NULL,
 	CreatedBy 			VARCHAR(255) NOT NULL,
 	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
 	ModifiedBy 			VARCHAR(255) NULL,
-	FOREIGN KEY(CustomerID) REFERENCES master_customer(CustomerID) ON UPDATE CASCADE ON DELETE CASCADE
+	FOREIGN KEY(CustomerID) REFERENCES master_customer(CustomerID) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(PaymentTypeID) REFERENCES master_paymenttype(PaymentTypeID) ON UPDATE CASCADE ON DELETE CASCADE
 )ENGINE=InnoDB;
 
 CREATE UNIQUE INDEX SALE_INDEX
@@ -1176,6 +1201,7 @@ CREATE TABLE transaction_pickdetails
 	Quantity			DOUBLE,
 	BuyPrice			DOUBLE,
 	SalePrice			DOUBLE,
+	Discount			DOUBLE,
 	CreatedDate 		DATETIME NOT NULL,
 	CreatedBy 			VARCHAR(255) NOT NULL,
 	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,

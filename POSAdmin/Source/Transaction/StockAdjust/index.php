@@ -255,6 +255,7 @@
 					$("#ddlBranch").val(Data[13]);
 					//$("#lblTotal").html(Data[5]);
 					$("#txtTransactionDate").datepicker("setDate", new Date(Data[10]));
+					$("#hdnTransactionDate").val(Data[10]);
 					getStockAdjustDetails(Data[9], Data[10]);
 					var itemCode = $("#txtItemCode").val();
 					var branchID = $("#ddlBranch").val();

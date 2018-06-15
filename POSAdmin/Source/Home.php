@@ -59,7 +59,8 @@
 				</div>
 				<span id="Clock" style="color: white; padding: 5px 20px 0px 20px; float: left; font-size: 16px;"></span>
 				<div style="color: white; padding: 5px 20px 0px 50px; float: right; font-size: 16px;"> 
-					 Selamat Datang, <a href="#" style="color: white;font-size: 16px;" onclick="UpdatePassword();"><?php echo $_SESSION['Nama']; ?>!</a> &nbsp;&nbsp;&nbsp;<a href="#" class="menu" link="./Logout.php"><img src="./assets/img/logout.png" width="20px" border="0" acronym title="Logout" /></a>
+					 Selamat Datang, <a href="#" style="color: white;font-size: 16px;" onclick="UpdatePassword();"><?php echo $_SESSION['Nama']; ?>!</a> &nbsp;&nbsp;&nbsp;<a href="#" onclick="printDailyReport();"><img src="./assets/img/logout.png" width="20px" border="0" acronym title="Logout" /></a>
+					 <input type="hidden" id="hdnLogout" class="menu" link="./Logout.php" />
 				</div>
 			</nav>   
 			<!-- /. NAV TOP  -->
@@ -132,6 +133,9 @@
 		</div>
 		<div id="save-confirm" title="Konfirmasi" style="display: none;">
 			<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Apakah anda yakin data yang diinput sudah benar?</p>
+		</div>
+		<div id="print-confirm" title="Konfirmasi" style="display: none;">
+			<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Apakah anda ingin mencetak laporan harian?</p>
 		</div>
 		<div id="update-password" title="Ganti Password" style="display: none;">
 			<form class="col-md-12" id="UpdatePasswordForm" method="POST" action="" >

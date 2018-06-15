@@ -42,9 +42,7 @@
 		    $file =  "PrintInvoice.txt";  # nama file temporary yang akan dicetak
 		    $handle = fopen($file, 'w');
 
-		    $BookingID = $_POST['BookingID'];
 		    $TransactionDate = date($_POST['TransactionDate']);
-		    $Payment = mysqli_real_escape_string($dbh, $_POST['Payment']);
 		    $Change = mysqli_real_escape_string($dbh, $_POST['Change']);
 		    $BookingNumber = mysqli_real_escape_string($dbh, $_POST['BookingNumber']);
 		    $PaymentMethod = mysqli_real_escape_string($dbh, $_POST['PaymentMethod']);

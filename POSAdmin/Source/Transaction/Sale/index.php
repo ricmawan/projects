@@ -181,7 +181,7 @@
 						<table id="grid-transaction" style="width: 100% !important;" class="table table-striped table-bordered table-hover" >
 							<thead>
 								<tr>
-									<th><input id="select_all" name="select_all" type="checkbox" onclick="chkAll();" style="margin: 0;" /></th>
+									<th><input id="select_all_sale" name="select_all_sale" type="checkbox" onclick="chkAllSale();" style="margin: 0;" /></th>
 									<th>SaleDetailsID</th>
 									<th>ItemID</th>
 									<th>BranchID</th>
@@ -420,6 +420,7 @@
 					$("#txtSaleNumber").val(Data[2]);
 					$("#lblTotal").html(Data[5]);
 					$("#txtTransactionDate").datepicker("setDate", new Date(Data[8]));
+					$("#hdnTransactionDate").val(Data[8]);
 					getSaleDetails(Data[6]);
 					$("#lblWeight").html(Data[10]);
 					$("#hdnPayment").val(Data[11]);
@@ -571,6 +572,22 @@
 						}
 					}]*/
 				}).dialog("open");
+			}
+
+			function chkAllSale() {
+				if($("#select_all_sale").prop("checked") == true) {
+					$("input:checkbox[class=chkSaleDetails]").each(function() {
+						$(this).prop("checked", true);
+						$(this).attr("checked", true);
+					});
+				}
+				else {
+					$("input:checkbox[class=chkSaleDetails]").each(function() {
+						$(this).prop("checked", false);
+						$(this).attr("checked", false);
+					});
+				}
+				//Calculate();
 			}
 
 			var counterGetItem = 0;
@@ -889,7 +906,7 @@
 												//$("#toggle-retail").toggleClass('disabled', true);
 												$("#txtSaleNumber").val(data.SaleNumber);
 												var toggleBranch = "<div id='toggle-branch-" + data.SaleDetailsID + "' onclick='updateBranch(this.id)' class='div-center toggle-modern' ></div>";
-												var checkboxData = "<input type='checkbox' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
+												var checkboxData = "<input type='checkbox' class='chkSaleDetails' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
 												table2.row.add([
 													checkboxData,
 													data.SaleDetailsID,
@@ -941,7 +958,7 @@
 											}
 											else {
 												var toggles = $('#toggle-branch-' + data.SaleDetailsID).data('toggles').active;
-												var checkboxData = "<input type='checkbox' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
+												var checkboxData = "<input type='checkbox' class='chkSaleDetails' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
 												table2.row(rowEdit).data([
 													checkboxData,
 													data.SaleDetailsID,
@@ -1137,7 +1154,7 @@
 											//$("#toggle-retail").toggleClass('disabled', true);
 											$("#txtSaleNumber").val(data.SaleNumber);
 											var toggleBranch = "<div id='toggle-branch-" + data.SaleDetailsID + "' onclick='updateBranch(this.id)' class='div-center toggle-modern' ></div>";
-											var checkboxData = "<input type='checkbox' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
+											var checkboxData = "<input type='checkbox' class='chkSaleDetails' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
 											table2.row.add([
 												checkboxData,
 												data.SaleDetailsID,
@@ -1190,7 +1207,7 @@
 										}
 										else {
 											var toggles = $('#toggle-branch-' + data.SaleDetailsID).data('toggles').active;
-											var checkboxData = "<input type='checkbox' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
+											var checkboxData = "<input type='checkbox' class='chkSaleDetails' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
 											table2.row(rowEdit).data([
 												checkboxData,
 												data.SaleDetailsID,

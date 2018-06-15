@@ -151,6 +151,7 @@
 					$("#txtSaleNumber").val(Data[2]);
 					$("#lblTotal").html(Data[5]);
 					$("#txtTransactionDate").datepicker("setDate", new Date(Data[7]));
+					$("#hdnTransactionDate").val(Data[7]);
 					$("#txtSaleNumber").prop("readonly", true);
 					getSaleReturnDetails(Data[6]);
 				}

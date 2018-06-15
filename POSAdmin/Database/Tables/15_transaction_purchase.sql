@@ -7,7 +7,7 @@ CREATE TABLE transaction_purchase
 	SupplierID 		BIGINT,
 	TransactionDate DATETIME NOT NULL,
 	PaymentTypeID	SMALLINT,
-	Payment			DOUBLE,
+	Deadline		DATETIME,
 	Remarks			TEXT,
 	CreatedDate 	DATETIME NOT NULL,
 	CreatedBy 		VARCHAR(255) NOT NULL,

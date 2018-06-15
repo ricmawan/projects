@@ -262,6 +262,7 @@
 					$("#txtItemCode").val(Data[5]);
 					$("#txtItemName").val(Data[6]);
 					$("#txtTransactionDate").datepicker("setDate", new Date(Data[11]));
+					$("#hdnTransactionDate").val(Data[11]);
 					getStockMutationDetails(Data[9], Data[10]);
 
 					var itemCode = $("#txtItemCode").val();

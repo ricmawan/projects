@@ -8,12 +8,14 @@
 		$PurchaseNumber = mysqli_real_escape_string($dbh, $_POST['PurchaseNumber']);
 		$SupplierID = mysqli_real_escape_string($dbh, $_POST['SupplierID']);
 		$TransactionDate = mysqli_real_escape_string($dbh, $_POST['TransactionDate']);
+		$Deadline = mysqli_real_escape_string($dbh, $_POST['Deadline']);
+		$PaymentType = mysqli_real_escape_string($dbh, $_POST['PaymentType']);
 		$Message = "Cabang berhasil diubah";
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
 		
-		$sql = "CALL spUpdPurchase(".$PurchaseID.", '".$PurchaseNumber."', ".$SupplierID.", '".$TransactionDate."', '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spUpdPurchase(".$PurchaseID.", '".$PurchaseNumber."', ".$SupplierID.", '".$TransactionDate."', '".$Deadline."', ".$PaymentType.", '".$_SESSION['UserLogin']."')";
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysqli_error($dbh);

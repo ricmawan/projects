@@ -24,7 +24,7 @@
 		while ($row = mysqli_fetch_array($result)) {
 			$row_array = array();
 			//data yang dikirim ke table
-			$row_array[] = "<input type='checkbox' style='margin:0;' name='select' value='".$row['SaleDetailsID']."' />";
+			$row_array[] = "<input type='checkbox' class='chkSaleDetails' style='margin:0;' name='select' value='".$row['SaleDetailsID']."' />";
 			$row_array[] = $row['SaleDetailsID'];
 			$row_array[] = $row['ItemID'];
 			$row_array[] = $row['BranchID'];

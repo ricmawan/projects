@@ -13,28 +13,34 @@
 		</style>
 	</head>
 	<body>
-		<br />
 		<div class="row">
 			<div class="col-md-12">
-				<div class="table-responsive col-md-12" style="overflow-x:hidden;">
-					<table id="grid-data" class="table table-striped table-bordered table-hover" >
-						<thead>				
-							<tr>
-								<th>No</th>
-								<th>No. Invoice</th>
-								<th>Tanggal</th>
-								<th>Customer</th>
-								<th>Total</th>
-								<th>SaleID</th>
-								<th>CustomerID</th>
-								<th>PlainTransactionDate</th>
-								<th>RetailFlag</th>
-								<th>Weight</th>
-								<th>Payment</th>
-								<th>Opsi</th>
-							</tr>
-						</thead>
-					</table>
+				<div class="panel panel-default">
+					<div class="panel-heading" style="padding: 1px 15px;">
+						<h5>Cetak Nota</h5>
+					</div>
+					<div class="panel-body">
+						<div class="table-responsive col-md-12" style="overflow-x:hidden;">
+							<table id="grid-data" class="table table-striped table-bordered table-hover" >
+								<thead>				
+									<tr>
+										<th>No</th>
+										<th>No. Invoice</th>
+										<th>Tanggal</th>
+										<th>Customer</th>
+										<th>Total</th>
+										<th>SaleID</th>
+										<th>CustomerID</th>
+										<th>PlainTransactionDate</th>
+										<th>RetailFlag</th>
+										<th>Weight</th>
+										<th>Payment</th>
+										<th>Opsi</th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -49,6 +55,9 @@
 						<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
 						<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
 						<input id="hdnPayment" name="hdnPayment" type="hidden" value=0 />
+						<input id="hdnTransactionID" name="hdnTransactionID" type="hidden" value=0 />
+						<input id="hdnTransactionType" name="hdnTransactionType" type="hidden" value=0 />
+						<input id="hdnTransactionNumber" name="hdnTransactionNumber" type="hidden" value=0 />
 					</div>
 					<div class="col-md-2">
 						<input id="txtSaleNumber" name="txtSaleNumber" type="text" class="form-control-custom" placeholder="No. Invoice" readonly />
@@ -205,6 +214,7 @@
 					$("#txtSaleNumber").val(Data[2]);
 					$("#lblTotal").html(Data[5]);
 					$("#txtTransactionDate").datepicker("setDate", new Date(Data[8]));
+					$("#hdnTransactionDate").val(Data[8]);
 					getSaleDetails(Data[6]);
 					$("#lblWeight").html(Data[10]);
 					$("#hdnPayment").val(Data[11]);
@@ -318,16 +328,18 @@
 				}).dialog("open");
 			}
 
-			function finish(TransactionID, TransactionType) {
+			function finish(TransactionID, TransactionType, Total, Payment, PaymentType, TransactionDate, TransactionNumber) {
 				if(TransactionID != 0) {
+					$("#hdnTransactionID").val(TransactionID);
+					$("#hdnTransactionType").val(TransactionType);
+					$("#hdnTransactionDate").val(TransactionDate);
+					$("#hdnTransactionNumber").val(TransactionNumber);
+
 					$("#finish-dialog").dialog({
 						autoOpen: false,
 						open: function() {
 							//$("#divModal").show();
-							table2.keys.disable();
-							var Total = $("#lblTotal").html().replace(/\,/g, "");
-							var Payment = $("#hdnPayment").val();
-							var PaymentType = $("#hdnPaymentType").val();
+							//table2.keys.disable();
 							var Change = 0;
 							if(parseFloat(Payment) != 0) {
 								if(PaymentType == 1) {
@@ -341,7 +353,7 @@
 								$("#txtChange").val(returnRupiah(Change.toString()));
 							}
 							if(parseFloat(PaymentType) == 0) PaymentType = 1;
-							$("#txtTotal").val($("#lblTotal").html());
+							$("#txtTotal").val(returnRupiah(Total.toString()));
 							$("#txtPayment").val(returnRupiah(Payment.toString()));
 							$("#ddlPayment").val(PaymentType);
 							$("#ddlPayment").focus();
@@ -356,7 +368,7 @@
 						},
 						close: function() {
 							$(this).dialog("destroy");
-							table2.keys.enable();
+							//table2.keys.enable();
 							//$("#divModal").hide();
 							$("#txtPayment").val(0);
 							$("#ddlPayment").val(1);
@@ -500,8 +512,8 @@
 				}
 
 				if(PassValidate == 1) {
-					var bookingID = $("#hdnBookingID").val();
-					var BookingNumber = $("#txtBookingNumber").val();
+					var transactionID = $("#hdnTransactionID").val();
+					var transactionNumber = $("#hdnTransactionNumber").val();
 					var Payment = $("#txtPayment").val().replace(/\,/g, "");
 					var PaymentType = $("#ddlPayment").val();
 					var PrintInvoice = $("#chkPrint").prop("checked");
@@ -509,21 +521,24 @@
 					var Change = $("#txtChange").val().replace(/\,/g, "");
 					var PaymentMethod = $("#ddlPayment option:selected").text();
 					var TransactionDate = $("#hdnTransactionDate").val();
+					var urlPrint = "";
+					if($("#hdnTransactionType").val() == 1)  urlPrint = "./Transaction/Sale/PrintInvoice.php";
+					else urlPrint = "./Transaction/Booking/PrintInvoice.php";
 					$("#loading").show();
 					$.ajax({
-						url: "./Transaction/Booking/PrintInvoice.php",
+						url: urlPrint,
 						type: "POST",
-						data: { BookingID : bookingID, Payment : Payment, PaymentType : PaymentType, PrintInvoice : PrintInvoice, Change: Change, BookingNumber : BookingNumber, PaymentMethod : PaymentMethod, TransactionDate : TransactionDate },
+						data: { BookingID : transactionID, SaleID : transactionID, Payment : Payment, PaymentType : PaymentType, PrintInvoice : PrintInvoice, Change: Change, BookingNumber : transactionNumber, SaleNumber : transactionNumber, PaymentMethod : PaymentMethod, TransactionDate : TransactionDate },
 						dataType: "json",
 						success: function(data) {
 							if(data.FailedFlag == '0') {
 								$("#loading").hide();
 								$("#divModal").hide();
 								if(PrintShipment == true) printShipment();
-								resetForm();
-								table2.destroy();
+								//resetForm();
+								//table2.destroy();
 								$("#finish-dialog").dialog("destroy");
-								$("#FormData").dialog("destroy");
+								//$("#FormData").dialog("destroy");
 								var paymentInfo = "<table><tr><td align='right'>Pembayaran :&nbsp;</td><td>" + $("#ddlPayment option:selected").text() + "</td></tr>";
 								paymentInfo += "<tr><td align='right'>Total :&nbsp;</td><td align='right'>" + returnRupiah(Total) + "</td></tr>";
 								paymentInfo += "<tr><td align='right'>Bayar :&nbsp;</td><td align='right'>" + returnRupiah(Payment) + "</td></tr>";
@@ -828,33 +843,7 @@
 						}
 					});
 				};
-				
-				$("#txtTransactionDate").datepicker({
-					dateFormat: 'DD, dd M yy',
-					dayNames: [ "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu" ],
-					monthNames: [ "Jan", "Feb", "Mar", "Apr", "Mey", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Des" ],
-					maxDate : "+0D",
-					showOn: "button",
-					buttonImage: "./assets/img/calendar.gif",
-					buttonImageOnly: true,
-					buttonText: "Pilih Tanggal",
-					onSelect: function(dateText, obj) {
-						transactionDate = obj.selectedYear + "-" + ("0" + (obj.selectedMonth + 1)).slice(-2) + "-" + ("0" + obj.selectedDay).slice(-2);
-						$("#hdnTransactionDate").val(transactionDate);
-					}
-				}).datepicker("setDate", new Date());
-				
-				$("#txtTransactionDate").attr("readonly", "true");
-				$("#txtTransactionDate").css({
-					"background-color": "#FFF",
-					"cursor": "text"
-				});
-				
-				var transactionDate = new Date();
-				transactionDate = transactionDate.getFullYear() + "-" + ("0" + (transactionDate.getMonth() + 1)).slice(-2) + "-" + ("0" + transactionDate.getDate()).slice(-2);
-				today = transactionDate;
-				$("#hdnTransactionDate").val(transactionDate);
-				
+
 				keyFunction();
 				enterLikeTab();
 				var counterSale = 0;

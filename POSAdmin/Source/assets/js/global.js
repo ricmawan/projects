@@ -1224,3 +1224,67 @@ function slideIn() {
 		setTimeout(slideIn, 1);
 	}
 }
+
+function printDailyReport() {
+	$("#print-confirm").dialog({
+		autoOpen: false,
+		open: function() {
+			$(document).on('keydown', function(e) {
+				if (e.keyCode == 39) { //right arrow
+					$("#btnNoPrint").focus();
+				}
+				else if (e.keyCode == 37) { //left arrow
+					 $("#btnYesPrint").focus();
+				}
+			});
+			setTimeout(function() {
+				$("#btnYesPrint").focus();
+			}, 0);
+		},
+		close: function() {
+			$(this).dialog("destroy");
+		},
+		
+		resizable: false,
+		height: "auto",
+		width: 400,
+		modal: true,
+		buttons: [
+		{
+			text: "Ya",
+			id: "btnYesPrint",
+			click: function() {
+				$(this).dialog("destroy");
+				$("#loading").show();
+				$.ajax({
+					url: "./PrintDailyReport.php",
+					type: "POST",
+					data: { },
+					dataType: "json",
+					success: function(data) {
+						$("#loading").hide();
+						$("#hdnLogout").click();
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						$("#loading").hide();
+						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+						LogEvent(errorMessage, "global.js (fnSingleDelete)");
+						Lobibox.alert("error",
+						{
+							msg: errorMessage,
+							width: 480
+						});
+					}
+				});
+			}
+		},
+		{
+			text: "Tidak",
+			id: "btnNoPrint",
+			click: function() {
+				$(this).dialog("destroy");
+				$("#hdnLogout").click();
+			}
+		}]
+	}).dialog("open");
+}

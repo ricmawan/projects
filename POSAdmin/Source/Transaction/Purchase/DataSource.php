@@ -57,11 +57,14 @@
 		$row_array[] = $RowNumber;
 		$row_array[] = $row['PurchaseNumber'];
 		$row_array[] = $row['TransactionDate'];
+		$row_array[] = $row['Deadline'];
 		$row_array[] = $row['SupplierName'];
 		$row_array[] = number_format($row['Total'],0,".",",");
 		$row_array[] = $row['PurchaseID'];
 		$row_array[] = $row['SupplierID'];
 		$row_array[] = $row['PlainTransactionDate'];
+		$row_array[] = $row['PlainDeadline'];
+		$row_array[] = $row['PaymentTypeID'];
 		array_push($return_arr, $row_array);
 	}
 	

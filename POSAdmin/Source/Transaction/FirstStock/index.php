@@ -358,6 +358,7 @@
 					$("#txtFirstStockNumber").val(Data[2]);
 					$("#lblTotal").html(Data[4]);
 					$("#txtTransactionDate").datepicker("setDate", new Date(Data[6]));
+					$("#hdnTransactionDate").val(Data[6]);
 					getFirstStockDetails(Data[5]);
 				}
 				else $("#FormData").attr("title", "Tambah Stok Awal");

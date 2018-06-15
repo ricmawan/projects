@@ -48,10 +48,17 @@ SET @query = CONCAT("SELECT
 						TP.PurchaseID,
                         TP.PurchaseNumber,
                         DATE_FORMAT(TP.TransactionDate, '%d-%m-%Y') TransactionDate,
+                        CASE
+							WHEN TP.PaymentTypeID = 2 
+                            THEN DATE_FORMAT(TP.Deadline, '%d-%m-%Y')
+                            ELSE '-'
+						END Deadline,
                         TP.TransactionDate PlainTransactionDate,
                         MS.SupplierID,
                         MS.SupplierName,
-						IFNULL(TPD.Total, 0) Total
+						IFNULL(TPD.Total, 0) Total,
+                        TP.Deadline PlainDeadline,
+                        TP.PaymentTypeID
 					FROM
 						transaction_purchase TP
                         JOIN master_supplier MS

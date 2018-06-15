@@ -15,6 +15,8 @@ CREATE PROCEDURE spInsPurchase (
     pRetailPrice		DOUBLE,
     pPrice1				DOUBLE,
     pPrice2				DOUBLE,
+    pDeadline			DATETIME,
+    pPaymentTypeID		SMALLINT,
     pCurrentUser		VARCHAR(255)
 )
 StoredProcedure:BEGIN
@@ -81,6 +83,8 @@ SET State = 3;
                     PurchaseNumber,
                     SupplierID,
 					TransactionDate,
+                    Deadline,
+                    PaymentTypeID,
 					CreatedDate,
 					CreatedBy
 				)
@@ -89,6 +93,8 @@ SET State = 3;
 					pPurchaseNumber,
 					pSupplierID,
 					pTransactionDate,
+                    pDeadline,
+                    pPaymentTypeID,
 					NOW(),
 					pCurrentUser
 				);
@@ -107,6 +113,8 @@ SET State = 5;
 					PurchaseNumber = pPurchaseNumber,
                     SupplierID = pSupplierID,
 					TransactionDate = pTransactionDate,
+                    PaymentTypeID = pPaymentTypeID,
+                    Deadline = pDeadline,
 					ModifiedBy = pCurrentUser
 				WHERE
 					PurchaseID = pID;

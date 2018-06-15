@@ -38,6 +38,7 @@
 										<th>No</th>
 										<th>No. Invoice</th>
 										<th>Tanggal</th>
+										<th>Jatuh Tempo</th>
 										<th>Supplier</th>
 										<th>Total</th>
 									</tr>
@@ -55,51 +56,66 @@
 		<div id="FormData" title="Tambah Pembelian" style="display: none;">
 			<form class="col-md-12" id="PostForm" method="POST" action="" >
 				<div class="row">
-					<div class="col-md-1 labelColumn">
-						No. Invoice :
-						<input id="hdnPurchaseID" name="hdnPurchaseID" type="hidden" value=0 />
-						<input id="hdnPurchaseDetailsID" name="hdnPurchaseDetailsID" type="hidden" value=0 />
-						<input id="hdnItemID" name="hdnItemID" type="hidden" value=0 />
-						<input id="hdnItemDetailsID" name="hdnItemDetailsID" type="hidden" value=0 />
-						<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
-						<input id="hdnAvailableUnit" name="hdnAvailableUnit" type="hidden" />
-						<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
-						<input id="hdnBuyPrice" name="hdnBuyPrice" type="hidden" />
-						<input id="hdnRetailPrice" name="hdnRetailPrice" type="hidden" />
-						<input id="hdnPrice1" name="hdnPrice1" type="hidden" />
-						<input id="hdnPrice2" name="hdnPrice2" type="hidden" />
-						<input id="hdnPriceFlag" name="hdnPriceFlag" type="hidden" />
+					<div class="col-md-2">
+						<div class="has-float-label" >
+							<input id="txtPurchaseNumber" name="txtPurchaseNumber" type="text" tabindex=5 class="form-control-custom" onfocus="this.select();" onchange="updateHeader();" autocomplete=off placeholder="No. Invoice" required />
+							<label for="txtPurchaseNumber" class="lblInput" >No. Invoice</label>
+							<input id="hdnPurchaseID" name="hdnPurchaseID" type="hidden" value=0 />
+							<input id="hdnPurchaseDetailsID" name="hdnPurchaseDetailsID" type="hidden" value=0 />
+							<input id="hdnItemID" name="hdnItemID" type="hidden" value=0 />
+							<input id="hdnItemDetailsID" name="hdnItemDetailsID" type="hidden" value=0 />
+							<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
+							<input id="hdnDeadline" name="hdnDeadline" type="hidden" />
+							<input id="hdnAvailableUnit" name="hdnAvailableUnit" type="hidden" />
+							<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
+							<input id="hdnBuyPrice" name="hdnBuyPrice" type="hidden" />
+							<input id="hdnRetailPrice" name="hdnRetailPrice" type="hidden" />
+							<input id="hdnPrice1" name="hdnPrice1" type="hidden" />
+							<input id="hdnPrice2" name="hdnPrice2" type="hidden" />
+							<input id="hdnPriceFlag" name="hdnPriceFlag" type="hidden" />
+						</div>
 					</div>
 					<div class="col-md-2">
-						<input id="txtPurchaseNumber" name="txtPurchaseNumber" type="text" tabindex=5 class="form-control-custom" onfocus="this.select();" onchange="updateHeader();" autocomplete=off placeholder="No. Invoice" required />
-					</div>
-					
-					<div class="col-md-1 labelColumn">
-						Tanggal :
-					</div>
-					<div class="col-md-2">
-						<input id="txtTransactionDate" name="txtTransactionDate" type="text" tabindex=6 class="form-control-custom" style="width: 87%; display: inline-block;margin-right: 5px;" onfocus="this.select();" autocomplete=off placeholder="Tanggal" required />
-					</div>
-					
-					<div class="col-md-1 labelColumn">
-						Supplier :
+						<div class="has-float-label" >
+							<select id="ddlPayment" name="ddlPayment" tabindex=6 onchange="updateHeader();" class="form-control-custom" placeholder="
+							Pembayaran" >
+								<option value=1>Tunai</option>
+								<option value=2>Tempo</option>
+							</select>
+							<label for="ddlPayment" class="lblInput" >Pembayaran</label>
+						</div>
 					</div>
 					<div class="col-md-2">
-						<select id="ddlSupplier" name="ddlSupplier" tabindex=7 class="form-control-custom" style="width: 80%; display: inline-block;margin-right: 5px;" placeholder="Pilih Supplier" onchange="updateHeader();" >
-							<?php
-								$sql = "CALL spSelDDLSupplier('".$_SESSION['UserLogin']."')";
-								if (! $result = mysqli_query($dbh, $sql)) {
-									logEvent(mysqli_error($dbh), '/Master/Purchase/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-									return 0;
-								}
-								while($row = mysqli_fetch_array($result)) {
-									echo "<option value='".$row['SupplierID']."' >".$row['SupplierCode']." - ".$row['SupplierName']."</option>";
-								}
-								mysqli_free_result($result);
-								mysqli_next_result($dbh);
-							?>
-						</select>
-						<i class="fa fa-user-plus" style="font-size: 14px;cursor: pointer;" onclick="addNewSupplier();"></i>
+						<div class="has-float-label" >
+							<input id="txtTransactionDate" name="txtTransactionDate" type="text" tabindex=7 class="form-control-custom" style="width: 87%; display: inline-block;margin-right: 5px;" onfocus="this.select();" autocomplete=off placeholder="Tanggal" required />
+							<label for="txtTransactionDate" class="lblInput" >Tanggal</label>
+						</div>
+					</div>
+					<div class="col-md-2">
+						<div class="has-float-label" >
+							<input id="txtDeadline" name="txtDeadline" type="text" tabindex=8 class="form-control-custom" style="width: 87%; display: inline-block;margin-right: 5px;" onfocus="this.select();" autocomplete=off placeholder="Jatuh Tempo" required />
+							<label for="txtDeadline" class="lblInput" >Jatuh Tempo</label>
+						</div>
+					</div>
+					<div class="col-md-2">
+						<div class="has-float-label" >
+							<select id="ddlSupplier" name="ddlSupplier" tabindex=9 class="form-control-custom" style="width: 80%; display: inline-block;margin-right: 5px;" placeholder="Pilih Supplier" onchange="updateHeader();" >
+								<?php
+									$sql = "CALL spSelDDLSupplier('".$_SESSION['UserLogin']."')";
+									if (! $result = mysqli_query($dbh, $sql)) {
+										logEvent(mysqli_error($dbh), '/Master/Purchase/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+										return 0;
+									}
+									while($row = mysqli_fetch_array($result)) {
+										echo "<option value='".$row['SupplierID']."' >".$row['SupplierCode']." - ".$row['SupplierName']."</option>";
+									}
+									mysqli_free_result($result);
+									mysqli_next_result($dbh);
+								?>
+							</select>
+							<i class="fa fa-user-plus" style="font-size: 14px;cursor: pointer;" onclick="addNewSupplier();"></i>
+							<label for="ddlSupplier" class="lblInput" >Supplier</label>
+						</div>
 					</div>
 				</div>
 				<br />
@@ -109,7 +125,7 @@
 							<tr>
 								<td style="width: 10%;" >
 									<div class="has-float-label" >
-										<select id="ddlBranch" name="ddlBranch" tabindex=8 class="form-control-custom" placeholder="Pilih Cabang" >
+										<select id="ddlBranch" name="ddlBranch" tabindex=10 class="form-control-custom" placeholder="Pilih Cabang" >
 											<?php
 												$sql = "CALL spSelDDLBranch('".$_SESSION['UserLogin']."')";
 												if (! $result = mysqli_query($dbh, $sql)) {
@@ -128,7 +144,7 @@
 								</td>
 								<td style="width: 11%;" >
 									<div class="has-float-label" >
-										<input id="txtItemCode" name="txtItemCode" type="text" tabindex=9 class="form-control-custom" style="width: 100%;" onfocus="this.select();" onkeypress="isEnterKey(event, 'getItemDetails');" autocomplete=off />
+										<input id="txtItemCode" name="txtItemCode" type="text" tabindex=11 class="form-control-custom" style="width: 100%;" onfocus="this.select();" onkeypress="isEnterKey(event, 'getItemDetails');" autocomplete=off />
 										<label for="txtItemCode" class="lblInput" >Kode Barang</label>
 									</div>
 								</td>
@@ -140,13 +156,13 @@
 								</td>
 								<td style="width: 7%;" >
 									<div class="has-float-label" >
-										<input id="txtQTY" name="txtQTY" type="number" tabindex=10 class="form-control-custom" style="width: 100%;margin: 0;border: 0;" value=1 min=1 onchange="this.value = validateQTY(this.value);" onpaste="return false;" onfocus="this.select();" />
+										<input id="txtQTY" name="txtQTY" type="number" tabindex=12 class="form-control-custom" style="width: 100%;margin: 0;border: 0;" value=1 min=1 onchange="this.value = validateQTY(this.value);" onpaste="return false;" onfocus="this.select();" />
 										<label for="txtQTY" class="lblInput" >Qty</label>
 									</div>
 								</td>
 								<td style="width: 7%;" >
 									<div class="has-float-label" >
-										<select id="ddlUnit" name="ddlUnit" tabindex=11 class="form-control-custom" onchange="changeItemCode();" >
+										<select id="ddlUnit" name="ddlUnit" tabindex=13 class="form-control-custom" onchange="changeItemCode();" >
 											<option >--</option>
 										</select>
 										<label for="ddlUnit" class="lblInput" >Satuan</label>
@@ -154,25 +170,25 @@
 								</td>
 								<td style="width: 10%;" >
 									<div class="has-float-label" >
-										<input id="txtBuyPrice" name="txtBuyPrice" type="text" tabindex=12 class="form-control-custom text-right" value="0" autocomplete=off onchange="CalculatePrice();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
+										<input id="txtBuyPrice" name="txtBuyPrice" type="text" tabindex=14 class="form-control-custom text-right" value="0" autocomplete=off onchange="CalculatePrice();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
 										<label for="txtBuyPrice" class="lblInput" >Harga Beli</label>
 									</div>
 								</td>
 								<td style="width: 10%;" >
 									<div class="has-float-label" >
-										<input id="txtRetailPrice" name="txtRetailPrice" type="text" tabindex=13 class="form-control-custom text-right" style="width: 100%;" value="0" autocomplete=off onchange="CalculatePrice();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
+										<input id="txtRetailPrice" name="txtRetailPrice" type="text" tabindex=15 class="form-control-custom text-right" style="width: 100%;" value="0" autocomplete=off onchange="CalculatePrice();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
 										<label for="txtRetailPrice" class="lblInput" >Harga Ecer</label>
 									</div>
 								</td>
 								<td style="width: 10%;" >
 									<div class="has-float-label" >
-										<input id="txtPrice1" name="txtPrice1" type="text" tabindex=14 class="form-control-custom text-right" style="width: 100%;" value="0" autocomplete=off onchange="CalculatePrice();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
+										<input id="txtPrice1" name="txtPrice1" type="text" tabindex=16 class="form-control-custom text-right" style="width: 100%;" value="0" autocomplete=off onchange="CalculatePrice();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
 										<label for="txtPrice1" class="lblInput" >Harga 1</label>
 									</div>
 								</td>
 								<td style="width: 10%;" >
 									<div class="has-float-label" >
-										<input id="txtPrice2" name="txtPrice2" type="text" tabindex=15 class="form-control-custom text-right" style="width: 100%;" value="0" autocomplete=off onchange="CalculatePrice();" onkeypress="isEnterKey(event, 'addPurchaseDetails');return isNumberKey(event, this.id, this.value);" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
+										<input id="txtPrice2" name="txtPrice2" type="text" tabindex=17 class="form-control-custom text-right" style="width: 100%;" value="0" autocomplete=off onchange="CalculatePrice();" onkeypress="isEnterKey(event, 'addPurchaseDetails');return isNumberKey(event, this.id, this.value);" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
 										<label for="txtPrice2" class="lblInput" >Harga 2</label>
 									</div>
 								</td>
@@ -377,12 +393,16 @@
 				$("#hdnIsEdit").val(EditFlag);
 				if(EditFlag == 1) {
 					$("#FormData").attr("title", "Edit Pembelian");
-					$("#hdnPurchaseID").val(Data[6]);
-					$("#ddlSupplier").val(Data[7]);
+					$("#hdnPurchaseID").val(Data[7]);
+					$("#ddlSupplier").val(Data[8]);
 					$("#txtPurchaseNumber").val(Data[2]);
-					$("#lblTotal").html(Data[5]);
-					$("#txtTransactionDate").datepicker("setDate", new Date(Data[8]));
-					getPurchaseDetails(Data[6]);
+					$("#lblTotal").html(Data[6]);
+					$("#txtTransactionDate").datepicker("setDate", new Date(Data[9]));
+					$("#hdnTransactionDate").val(Data[9]);
+					$("#txtDeadline").datepicker("setDate", new Date(Data[10]));
+					$("#hdnDeadline").val(Data[10]);
+					$("#ddlPayment").val(Data[11]);
+					getPurchaseDetails(Data[7]);
 				}
 				else $("#FormData").attr("title", "Tambah Pembelian");
 				var index = table.cell({ focused: true }).index();
@@ -878,11 +898,13 @@
 					var PurchaseNumber = $("#txtPurchaseNumber").val();
 					var PurchaseID = $("#hdnPurchaseID").val();
 					var TransactionDate = $("#hdnTransactionDate").val();
+					var Deadline = $("#hdnDeadline").val();
+					var PaymentType = $("#ddlPayment").val();
 					var SupplierID = $("#ddlSupplier").val();
 					$.ajax({
 						url: "./Transaction/Purchase/UpdateHeader.php",
 						type: "POST",
-						data: { PurchaseID : PurchaseID, PurchaseNumber : PurchaseNumber, TransactionDate : TransactionDate, SupplierID : SupplierID },
+						data: { PurchaseID : PurchaseID, PurchaseNumber : PurchaseNumber, TransactionDate : TransactionDate, SupplierID : SupplierID, Deadline : Deadline, PaymentType : PaymentType },
 						dataType: "json",
 						success: function(data) {
 							$("#loading").hide();
@@ -1724,6 +1746,34 @@
 				transactionDate = transactionDate.getFullYear() + "-" + ("0" + (transactionDate.getMonth() + 1)).slice(-2) + "-" + ("0" + transactionDate.getDate()).slice(-2);
 				today = transactionDate;
 				$("#hdnTransactionDate").val(transactionDate);
+
+				$("#txtDeadline").datepicker({
+					dateFormat: 'DD, dd M yy',
+					dayNames: [ "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu" ],
+					monthNames: [ "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember" ],
+					monthNamesShort: [ "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Des" ],
+					minDate : "+0D",
+					showOn: "button",
+					buttonImage: "./assets/img/calendar.gif",
+					buttonImageOnly: true,
+					buttonText: "Pilih Tanggal",
+					onSelect: function(dateText, obj) {
+						transactionDate = obj.selectedYear + "-" + ("0" + (obj.selectedMonth + 1)).slice(-2) + "-" + ("0" + obj.selectedDay).slice(-2);
+						$("#hdnDeadline").val(transactionDate);
+						updateHeader();
+					}
+				}).datepicker("setDate", new Date());
+				
+				$("#txtDeadline").attr("readonly", "true");
+				$("#txtDeadline").css({
+					"background-color": "#FFF",
+					"cursor": "text"
+				});
+				
+				var Deadline = new Date();
+				Deadline = Deadline.getFullYear() + "-" + ("0" + (Deadline.getMonth() + 1)).slice(-2) + "-" + ("0" + Deadline.getDate()).slice(-2);
+				today = Deadline;
+				$("#hdnDeadline").val(Deadline);
 				
 				keyFunction();
 				enterLikeTab();
@@ -1737,6 +1787,7 @@
 								"columns": [
 									{ "width": "20px", "orderable": false, className: "dt-head-center dt-body-center" },
 									{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
+									{ className: "dt-head-center" },
 									{ className: "dt-head-center" },
 									{ className: "dt-head-center" },
 									{ className: "dt-head-center" },

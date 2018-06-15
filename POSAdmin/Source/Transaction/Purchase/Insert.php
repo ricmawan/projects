@@ -8,6 +8,8 @@
 		$PurchaseDetailsID = mysqli_real_escape_string($dbh, $_POST['hdnPurchaseDetailsID']);
 		$PurchaseNumber = mysqli_real_escape_string($dbh, $_POST['txtPurchaseNumber']);
 		$TransactionDate = mysqli_real_escape_string($dbh, $_POST['hdnTransactionDate']);
+		$Deadline = mysqli_real_escape_string($dbh, $_POST['hdnDeadline']);
+		$PaymentTypeID = mysqli_real_escape_string($dbh, $_POST['ddlPayment']);
 		$BranchID = mysqli_real_escape_string($dbh, $_POST['ddlBranch']);
 		$SupplierID = mysqli_real_escape_string($dbh, $_POST['ddlSupplier']);
 		$ItemID = mysqli_real_escape_string($dbh, $_POST['hdnItemID']);
@@ -22,7 +24,7 @@
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
-		$sql = "CALL spInsPurchase(".$PurchaseID.", '".$PurchaseNumber."', ".$SupplierID.", '".$TransactionDate."', ".$PurchaseDetailsID.", ".$BranchID.", ".$ItemID.", ".$ItemDetailsID.", ".$Qty.", ".$BuyPrice.", ".$RetailPrice.", ".$Price1.", ".$Price2.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsPurchase(".$PurchaseID.", '".$PurchaseNumber."', ".$SupplierID.", '".$TransactionDate."', ".$PurchaseDetailsID.", ".$BranchID.", ".$ItemID.", ".$ItemDetailsID.", ".$Qty.", ".$BuyPrice.", ".$RetailPrice.", ".$Price1.", ".$Price2.", '".$Deadline."', ".$PaymentTypeID.", '".$_SESSION['UserLogin']."')";
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;
