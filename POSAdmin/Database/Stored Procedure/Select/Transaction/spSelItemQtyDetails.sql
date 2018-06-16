@@ -42,8 +42,8 @@ SET State = 1;
 		MI.Weight,
         MI.UnitID,
         1 ConversionQty,
-		ROUND((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0)), 2) Stock,
-        ROUND((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0)), 2) StockNoConversion
+		ROUND((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0) - IFNULL(BN.Quantity, 0)), 2) Stock,
+        ROUND((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0) - IFNULL(BN.Quantity, 0)), 2) StockNoConversion
 	FROM
 		master_item MI
         LEFT JOIN
@@ -190,7 +190,7 @@ SET State = 1;
 		(
 			SELECT
 				BD.ItemID,
-				SUM(BD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+				SUM((BD.Quantity - IFNULL(PD.Quantity, 0)) * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_bookingdetails BD
                 /*JOIN transaction_booking TB
@@ -199,6 +199,9 @@ SET State = 1;
 					ON BD.ItemID = MI.ItemID
 				LEFT JOIN master_itemdetails MID
 					ON BD.ItemDetailsID = MID.ItemDetailsID
+				LEFT JOIN transaction_pickdetails PD
+					ON PD.BookingDetailsID = BD.BookingDetailsID
+					AND PD.BranchID <> BD.BranchID
 			WHERE
 				pBranchID = BD.BranchID
                 /*AND TB.FinishFlag = 1*/
@@ -224,6 +227,25 @@ SET State = 1;
 				PD.ItemID
 		)P
 			ON P.ItemID = MI.ItemID
+		LEFT JOIN
+		(
+			SELECT
+				BD.ItemID,
+				SUM(PD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+			FROM
+				transaction_bookingdetails BD
+				LEFT JOIN master_itemdetails MID
+					ON BD.ItemDetailsID = MID.ItemDetailsID
+				LEFT JOIN transaction_pickdetails PD
+					ON PD.BookingDetailsID = BD.BookingDetailsID
+					AND PD.BranchID <> BD.BranchID
+			WHERE
+				pBranchID = PD.BranchID
+				/*AND TB.FinishFlag = 1*/
+			GROUP BY
+				BD.ItemID
+		)BN
+			ON BN.ItemID = MI.ItemID
 	WHERE
 		TRIM(MI.ItemCode) = TRIM(pItemCode)
 	UNION ALL
@@ -391,7 +413,7 @@ SET State = 1;
 		(
 			SELECT
 				BD.ItemID,
-				SUM(BD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+				SUM((BD.Quantity - IFNULL(PD.Quantity, 0)) * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_bookingdetails BD
                 /*JOIN transaction_booking TB
@@ -400,6 +422,9 @@ SET State = 1;
 					ON MI.ItemID = BD.ItemID
 				LEFT JOIN master_itemdetails MID
 					ON BD.ItemDetailsID = MID.ItemDetailsID
+				LEFT JOIN transaction_pickdetails PD
+					ON PD.BookingDetailsID = BD.BookingDetailsID
+					AND PD.BranchID <> BD.BranchID
 			WHERE
 				pBranchID = BD.BranchID
                 /*AND TB.FinishFlag = 1*/
@@ -425,6 +450,25 @@ SET State = 1;
 				PD.ItemID
 		)P
 			ON P.ItemID = MI.ItemID
+		LEFT JOIN
+		(
+			SELECT
+				BD.ItemID,
+				SUM(PD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+			FROM
+				transaction_bookingdetails BD
+				LEFT JOIN master_itemdetails MID
+					ON BD.ItemDetailsID = MID.ItemDetailsID
+				LEFT JOIN transaction_pickdetails PD
+					ON PD.BookingDetailsID = BD.BookingDetailsID
+					AND PD.BranchID <> BD.BranchID
+			WHERE
+				pBranchID = PD.BranchID
+				/*AND TB.FinishFlag = 1*/
+			GROUP BY
+				BD.ItemID
+		)BN
+			ON BN.ItemID = MI.ItemID
 	WHERE
 		TRIM(MID.ItemDetailsCode) = TRIM(pItemCode);
 

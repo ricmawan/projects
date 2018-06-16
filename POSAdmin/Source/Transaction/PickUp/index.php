@@ -1016,13 +1016,13 @@
 					else if(counterPickUp == 0) {
 						counterPickUp = 1;
 						var data = datatable.row( cell.index().row ).data();
-						if(key == 13) {
+						/*if(key == 13) {
 							if(($(".ui-dialog").css("display") == "none" || $("#delete-confirm").css("display") == "none") && $("#hdnEditFlag").val() == "1" ) {
 								saleDetailsCounter = 1;
 								openDialog(data, 1);
 							}
 						}
-						else if(key == 46 && $("#hdnDeleteFlag").val() == "1") {
+						else */if(key == 46 && $("#hdnDeleteFlag").val() == "1") {
 							var DeleteID = new Array();
 							$("input:checkbox[name=select]:checked").each(function() {
 								if($(this).val() != 'all') DeleteID.push($(this).val());
@@ -1101,10 +1101,10 @@
 					setTimeout(function() { counterKey = 0; } , 1000);
 				});
 				
-				$('#grid-data tbody').on('dblclick', 'tr', function () {
+				/*$('#grid-data tbody').on('dblclick', 'tr', function () {
 					var data = table.row(this).data();
 					openDialog(data, 1);
-				});
+				});*/
 			});
 		</script>
 	</body>

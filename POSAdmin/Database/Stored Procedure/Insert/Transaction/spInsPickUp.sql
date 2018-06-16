@@ -98,6 +98,7 @@ SET State = 5;
 									Quantity,
 									BuyPrice,
 									SalePrice,
+                                    Discount,
 									BookingDetailsID,
 									CreatedDate,
 									CreatedBy

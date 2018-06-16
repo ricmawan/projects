@@ -39,9 +39,10 @@ SET State = 1;
         MI.ItemName,
         TSRD.Quantity,
         TSRD.BuyPrice,
-        TSRD.SalePrice * IFNULL(MID.ConversionQuantity, 1) SalePrice,
+        TSRD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - TSRD.Discount SalePrice,
         (IFNULL(TS.Quantity, 0) - IFNULL(SR.Quantity, 0) + IFNULL(TSRD.Quantity, 0)) Maksimum,
         MU.UnitName,
+        TSRD.Discount,
         IFNULL(MID.ConversionQuantity, 1) ConversionQuantity
 	FROM
 		transaction_pick TSR

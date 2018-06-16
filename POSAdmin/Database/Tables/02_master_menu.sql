@@ -292,7 +292,7 @@ VALUES
 	'Transaction/DebtPayment/',
 	NULL,
 	0,
-	10
+	12
 ),
 (
 	31,

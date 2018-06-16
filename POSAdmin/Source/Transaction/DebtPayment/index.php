@@ -17,7 +17,7 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading" style="padding: 1px 15px;">
-						<h5>Pembayaran Piutang</h5>
+						<h5>Pembayaran Hutang</h5>
 						<?php
 							echo '<input id="hdnEditFlag" name="hdnEditFlag" type="hidden" value="'.$EditFlag.'" />';
 							echo '<input id="hdnDeleteFlag" name="hdnDeleteFlag" type="hidden" value="'.$DeleteFlag.'" />';
@@ -31,7 +31,7 @@
 										<th>No</th>
 										<th>No. Invoice</th>
 										<th>Tanggal</th>
-										<th>Customer</th>
+										<th>Supplier</th>
 										<th>Total</th>
 										<th>Pembayaran</th>
 										<th>Kekurangan</th>
@@ -70,10 +70,10 @@
 					</div>
 					
 					<div class="col-md-1 labelColumn">
-						Pelanggan :
+						Supplier :
 					</div>
 					<div class="col-md-2">
-						<input id="txtCustomerName" name="txtCustomerName" type="text" class="form-control-custom mousetrap" onfocus="this.select();" autocomplete=off placeholder="Pelanggan" readonly />
+						<input id="txtSupplierName" name="txtSupplierName" type="text" class="form-control-custom mousetrap" onfocus="this.select();" autocomplete=off placeholder="Supplier" readonly />
 					</div>
 				</div>
 				<br />
@@ -147,7 +147,7 @@
 				$("#hdnIsEdit").val(EditFlag);
 				$("#FormData").attr("title", "Edit Pembayaran");
 				$("#hdnTransactionID").val(Data[7]);
-				$("#txtCustomerName").val(Data[3]);
+				$("#txtSupplierName").val(Data[3]);
 				$("#txtPaymentNumber").val(Data[1]);
 				$("#txtTransactionDate").datepicker("setDate", new Date(Data[8]));
 				$("#txtPaymentDate").datepicker("setDate", new Date());
@@ -674,7 +674,7 @@
 								],
 								"processing": true,
 								"serverSide": true,
-								"ajax": "./Transaction/Payment/DataSource.php",
+								"ajax": "./Transaction/DebtPayment/DataSource.php",
 								"language": {
 									"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
 									"infoFiltered": "",

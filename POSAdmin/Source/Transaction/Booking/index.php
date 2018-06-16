@@ -744,11 +744,11 @@
 						var price1 = parseFloat($("#hdnPrice1").val());
 						var qty2 = parseFloat($("#hdnQty2").val());
 						var price2 = parseFloat($("#hdnPrice2").val());
-						if((Quantity * conversionQuantity) >= qty2 && qty2 > 1) {
+						if((parseFloat(Quantity) * conversionQuantity) >= qty2 && qty2 > 1) {
 							$("#txtBookingPrice").val(returnRupiah((price2 * conversionQuantity).toString()));
 							$("#hdnBookingPrice").val(price2);
 						}
-						else if((Quantity * conversionQuantity) >= qty1 && qty1 > 1) {
+						else if((parseFloat(Quantity) * conversionQuantity) >= qty1 && qty1 > 1) {
 							$("#txtBookingPrice").val(returnRupiah((price1 * conversionQuantity).toString()));
 							$("#hdnBookingPrice").val(price1);
 						}
@@ -2393,7 +2393,7 @@
 							}
 						}, 0);
 		            }, 500, "resizeWindow");
-				});
+				});				
 
 				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
 				    $(this).blur();
@@ -2402,9 +2402,10 @@
 				$("#txtQTY").spinner({
 					change: function() {
 						CalculateSubTotal();
+						Grosir($("#txtQTY").val());
 					}
 				});
-				
+
 				$('#toggle-retail').toggles({
 					drag: true, // allow dragging the toggle between positions
 					click: true, // allow clicking on the toggle

@@ -34,6 +34,7 @@
 				<input id='hdnItemDetailsID". $row['PickDetailsID'] ."' name='hdnItemDetailsID". $row['PickDetailsID'] ."' type='hidden' value='".$row['ItemDetailsID']."' />
 				<input id='hdnBuyPrice". $row['PickDetailsID'] ."' name='hdnBuyPrice". $row['PickDetailsID'] ."' type='hidden' value=".$row['BuyPrice']." />
 				<input id='hdnBookingPrice". $row['PickDetailsID'] ."' name='hdnBookingPrice". $row['PickDetailsID'] ."' type='hidden' value=".$row['SalePrice'] / $row['ConversionQuantity']." />
+				<input id='hdnDiscount". $row['PickDetailsID'] ."' name='hdnDiscount". $row['PickDetailsID'] ."' type='hidden' value=".$row['Discount']." />
 				<input id='hdnBookingDetailsID". $row['PickDetailsID'] ."' name='hdnBookingDetailsID". $row['PickDetailsID'] ."' type='hidden' value=".$row['BookingDetailsID']." />";
 			$row_array[] = $row['ItemCode'];
 			$row_array[] = $row['ItemName'];

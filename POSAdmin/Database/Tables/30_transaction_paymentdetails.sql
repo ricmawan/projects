@@ -4,7 +4,7 @@ CREATE TABLE transaction_paymentdetails
 (
 	PaymentDetailsID	BIGINT PRIMARY KEY AUTO_INCREMENT,
 	TransactionID		BIGINT,
-	TransactionType 	VARCHAR(1),
+	TransactionType 	VARCHAR(1), /* S=Sale B=Booking P=Purchase */
     PaymentDate			DATETIME,
 	Amount				DOUBLE,
     Remarks				TEXT,

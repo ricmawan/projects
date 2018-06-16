@@ -17,7 +17,7 @@
 			foreach($_POST['chkBookingDetails'] as $selected){
 				$ItemDetailsID = mysqli_real_escape_string($dbh, $_POST['hdnItemDetailsID'.$selected]);
 				if($ItemDetailsID == "") $ItemDetailsID = "NULL";
-				$PickUpData[] = "(".$PickUpID.", ".$_POST['hdnItemID'.$selected].", ".$ItemDetailsID.", ".$_POST['hdnBranchID'.$selected].", ".$_POST['txtQty'.$selected].", ".$_POST['hdnBuyPrice'.$selected].", ".$_POST['hdnBookingPrice'.$selected].", ".$_POST['hdnBookingDetailsID'.$selected].", NOW(), UserLogin)";
+				$PickUpData[] = "(".$PickUpID.", ".$_POST['hdnItemID'.$selected].", ".$ItemDetailsID.", ".$_POST['hdnBranchID'.$selected].", ".$_POST['txtQty'.$selected].", ".$_POST['hdnBuyPrice'.$selected].", ".$_POST['hdnBookingPrice'.$selected].", ".$_POST['hdnDiscount'.$selected].", ".$_POST['hdnBookingDetailsID'.$selected].", NOW(), UserLogin)";
 			}
 		}
 

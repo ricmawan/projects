@@ -176,11 +176,14 @@ SET @query = CONCAT("SELECT
 									SELECT
 										BD.ItemID,
 										BD.BranchID,
-										SUM(BD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+										SUM((BD.Quantity - IFNULL(PD.Quantity, 0)) * IFNULL(MID.ConversionQuantity, 1)) Quantity
 									FROM
 										transaction_bookingdetails BD
 										LEFT JOIN master_itemdetails MID
 											ON BD.ItemDetailsID = MID.ItemDetailsID
+										LEFT JOIN transaction_pickdetails PD
+											ON PD.BookingDetailsID = BD.BookingDetailsID
+											AND PD.BranchID <> BD.BranchID
 									GROUP BY
 										BD.ItemID,
 										BD.BranchID
@@ -203,8 +206,27 @@ SET @query = CONCAT("SELECT
 								)P
 									ON P.ItemID = MI.ItemID
 									AND P.BranchID = MB.BranchID
+								LEFT JOIN
+								(
+									SELECT
+										BD.ItemID,
+										PD.BranchID,
+										SUM(PD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+									FROM
+										transaction_bookingdetails BD
+										LEFT JOIN master_itemdetails MID
+											ON BD.ItemDetailsID = MID.ItemDetailsID
+										LEFT JOIN transaction_pickdetails PD
+											ON PD.BookingDetailsID = BD.BookingDetailsID
+											AND PD.BranchID <> BD.BranchID
+									GROUP BY
+										BD.ItemID,
+										PD.BranchID
+								)BN
+									ON BN.ItemID = MI.ItemID
+									AND BN.BranchID = MB.BranchID
 							WHERE
-								((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0)) <= MI.MinimumStock
+								((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0) - IFNULL(BN.Quantity, 0)) <= MI.MinimumStock
 								OR (IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(P.Quantity, 0)) <= MI.MinimumStock) AND ", pWhere, "
 							UNION ALL
                             SELECT
@@ -351,11 +373,14 @@ SET @query = CONCAT("SELECT
 									SELECT
 										BD.ItemID,
 										BD.BranchID,
-										SUM(BD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+										SUM((BD.Quantity - IFNULL(PD.Quantity, 0)) * IFNULL(MID.ConversionQuantity, 1)) Quantity
 									FROM
 										transaction_bookingdetails BD
 										LEFT JOIN master_itemdetails MID
 											ON BD.ItemDetailsID = MID.ItemDetailsID
+										LEFT JOIN transaction_pickdetails PD
+											ON PD.BookingDetailsID = BD.BookingDetailsID
+											AND PD.BranchID <> BD.BranchID
 									GROUP BY
 										BD.ItemID,
 										BD.BranchID
@@ -378,8 +403,27 @@ SET @query = CONCAT("SELECT
 								)P
 									ON P.ItemID = MI.ItemID
 									AND P.BranchID = MB.BranchID
+								LEFT JOIN
+								(
+									SELECT
+										BD.ItemID,
+										PD.BranchID,
+										SUM(PD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+									FROM
+										transaction_bookingdetails BD
+										LEFT JOIN master_itemdetails MID
+											ON BD.ItemDetailsID = MID.ItemDetailsID
+										LEFT JOIN transaction_pickdetails PD
+											ON PD.BookingDetailsID = BD.BookingDetailsID
+											AND PD.BranchID <> BD.BranchID
+									GROUP BY
+										BD.ItemID,
+										PD.BranchID
+								)BN
+									ON BN.ItemID = MI.ItemID
+									AND BN.BranchID = MB.BranchID
 							WHERE
-								(((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0)) / MID.ConversionQuantity) <= MI.MinimumStock
+								(((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0) - IFNULL(BN.Quantity, 0)) / MID.ConversionQuantity) <= MI.MinimumStock
 								OR ((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(P.Quantity, 0))  / MID.ConversionQuantity) <= MI.MinimumStock) AND ", pWhere, "
 						)ST" 
 				);
@@ -398,7 +442,7 @@ SET @query = CONCAT("SELECT
 						MC.CategoryName,
                         ROUND(MI.MinimumStock, 2) MinimumStock,
                         MU.UnitName,
-						ROUND(IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0), 2) Stock,
+						ROUND(IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0) - IFNULL(BN.Quantity, 0), 2) Stock,
                         ROUND(IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(P.Quantity, 0), 2) PhysicalStock                        
 					FROM
 						master_item MI
@@ -540,11 +584,14 @@ SET @query = CONCAT("SELECT
 							SELECT
 								BD.ItemID,
 								BD.BranchID,
-								SUM(BD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+								SUM((BD.Quantity - IFNULL(PD.Quantity, 0)) * IFNULL(MID.ConversionQuantity, 1)) Quantity
 							FROM
 								transaction_bookingdetails BD
 								LEFT JOIN master_itemdetails MID
 									ON BD.ItemDetailsID = MID.ItemDetailsID
+								LEFT JOIN transaction_pickdetails PD
+									ON PD.BookingDetailsID = BD.BookingDetailsID
+									AND PD.BranchID <> BD.BranchID
 							GROUP BY
 								BD.ItemID,
 								BD.BranchID
@@ -567,8 +614,27 @@ SET @query = CONCAT("SELECT
 						)P
 							ON P.ItemID = MI.ItemID
 							AND P.BranchID = MB.BranchID
+						LEFT JOIN
+						(
+							SELECT
+								BD.ItemID,
+								PD.BranchID,
+								SUM(PD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+							FROM
+								transaction_bookingdetails BD
+                                LEFT JOIN master_itemdetails MID
+									ON BD.ItemDetailsID = MID.ItemDetailsID
+								LEFT JOIN transaction_pickdetails PD
+									ON PD.BookingDetailsID = BD.BookingDetailsID
+									AND PD.BranchID <> BD.BranchID
+							GROUP BY
+								BD.ItemID,
+								PD.BranchID
+						)BN
+							ON BN.ItemID = MI.ItemID
+							AND BN.BranchID = MB.BranchID
 					WHERE
-						((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0)) <= MI.MinimumStock
+						((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0) - IFNULL(BN.Quantity, 0)) <= MI.MinimumStock
 						OR (IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(P.Quantity, 0)) <= MI.MinimumStock) AND ", pWhere,
 					"UNION ALL 
                     SELECT
@@ -579,7 +645,7 @@ SET @query = CONCAT("SELECT
 						MC.CategoryName,
                         ROUND(MID.MinimumStock, 2) MinimumStock,
                         MU.UnitName,
-						ROUND((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0)) / MID.ConversionQuantity, 2) Stock,
+						ROUND((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0) - IFNULL(BN.Quantity, 0)) / MID.ConversionQuantity, 2) Stock,
                         ROUND((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(P.Quantity, 0))  / MID.ConversionQuantity, 2) PhysicalStock                        
 					FROM
 						master_itemdetails MID
@@ -723,11 +789,14 @@ SET @query = CONCAT("SELECT
 							SELECT
 								BD.ItemID,
 								BD.BranchID,
-								SUM(BD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+								SUM((BD.Quantity - IFNULL(PD.Quantity, 0)) * IFNULL(MID.ConversionQuantity, 1)) Quantity
 							FROM
 								transaction_bookingdetails BD
 								LEFT JOIN master_itemdetails MID
 									ON BD.ItemDetailsID = MID.ItemDetailsID
+								LEFT JOIN transaction_pickdetails PD
+									ON PD.BookingDetailsID = BD.BookingDetailsID
+									AND PD.BranchID <> BD.BranchID
 							GROUP BY
 								BD.ItemID,
 								BD.BranchID
@@ -750,8 +819,27 @@ SET @query = CONCAT("SELECT
 						)P
 							ON P.ItemID = MI.ItemID
 							AND P.BranchID = MB.BranchID
+						LEFT JOIN
+						(
+							SELECT
+								BD.ItemID,
+								PD.BranchID,
+								SUM(PD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+							FROM
+								transaction_bookingdetails BD
+                                LEFT JOIN master_itemdetails MID
+									ON BD.ItemDetailsID = MID.ItemDetailsID
+								LEFT JOIN transaction_pickdetails PD
+									ON PD.BookingDetailsID = BD.BookingDetailsID
+									AND PD.BranchID <> BD.BranchID
+							GROUP BY
+								BD.ItemID,
+								PD.BranchID
+						)BN
+							ON BN.ItemID = MI.ItemID
+							AND BN.BranchID = MB.BranchID
 					WHERE
-						(((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0)) / MID.ConversionQuantity) <= MID.MinimumStock
+						(((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0) - IFNULL(BN.Quantity, 0)) / MID.ConversionQuantity) <= MID.MinimumStock
 						OR ((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(P.Quantity, 0)) / MID.ConversionQuantity) <= MID.MinimumStock) AND ", pWhere,
 					" ORDER BY ", pOrder,
 					" LIMIT ", pLimit_s, ", ", pLimit_l);

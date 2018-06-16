@@ -75,8 +75,8 @@ SET @query = CONCAT("SELECT
 						MI.Qty2,
 						MI.Weight,
 						MI.MinimumStock,
-						ROUND((IFNULL(FS.Toko, 0) + IFNULL(TP.Toko, 0) + IFNULL(SR.Toko, 0) - IFNULL(S.Toko, 0) - IFNULL(PR.Toko, 0) + IFNULL(SM.Toko, 0) - IFNULL(SMM.Toko, 0) + IFNULL(SA.Toko, 0) - IFNULL(B.Toko, 0)), 2) Toko,
-						ROUND((IFNULL(FS.Gudang, 0) + IFNULL(TP.Gudang, 0) + IFNULL(SR.Gudang, 0) - IFNULL(S.Gudang, 0) - IFNULL(PR.Gudang, 0) + IFNULL(SM.Gudang, 0) - IFNULL(SMM.Gudang, 0) + IFNULL(SA.Gudang, 0) - IFNULL(B.Gudang, 0)), 2) Gudang,
+						ROUND((IFNULL(FS.Toko, 0) + IFNULL(TP.Toko, 0) + IFNULL(SR.Toko, 0) - IFNULL(S.Toko, 0) - IFNULL(PR.Toko, 0) + IFNULL(SM.Toko, 0) - IFNULL(SMM.Toko, 0) + IFNULL(SA.Toko, 0) - IFNULL(B.Toko, 0) - IFNULL(BN.Toko, 0)), 2) Toko,
+						ROUND((IFNULL(FS.Gudang, 0) + IFNULL(TP.Gudang, 0) + IFNULL(SR.Gudang, 0) - IFNULL(S.Gudang, 0) - IFNULL(PR.Gudang, 0) + IFNULL(SM.Gudang, 0) - IFNULL(SMM.Gudang, 0) + IFNULL(SA.Gudang, 0) - IFNULL(B.Gudang, 0) - IFNULL(BN.Gudang, 0)), 2) Gudang,
 						MU.UnitName
 					FROM
 						master_item MI
@@ -277,7 +277,7 @@ SET @query = CONCAT("SELECT
 								SUM(
 										CASE
 											WHEN SAD.BranchID = 1
-											THEN(SAD.AdjustedQuantity - SAD.Quantity) * IFNULL(MID.ConversionQuantity, 1)
+											THEN (SAD.AdjustedQuantity - SAD.Quantity) * IFNULL(MID.ConversionQuantity, 1)
 											ELSE 0
 										END
 									) Toko,
@@ -303,14 +303,14 @@ SET @query = CONCAT("SELECT
 								SUM(
 										CASE
 											WHEN BD.BranchID = 1
-											THEN BD.Quantity * IFNULL(MID.ConversionQuantity, 1)
+											THEN (BD.Quantity - IFNULL(PD.Quantity, 0)) * IFNULL(MID.ConversionQuantity, 1)
 											ELSE 0
 										END
 									) Toko,
 								SUM(
 										CASE
 											WHEN BD.BranchID = 2
-											THEN BD.Quantity * IFNULL(MID.ConversionQuantity, 1)
+											THEN (BD.Quantity - IFNULL(PD.Quantity, 0)) * IFNULL(MID.ConversionQuantity, 1)
 											ELSE 0
 										END
 									) Gudang
@@ -320,6 +320,9 @@ SET @query = CONCAT("SELECT
 									ON TB.BookingID = BD.BookingID*/
 								LEFT JOIN master_itemdetails MID
 									ON BD.ItemDetailsID = MID.ItemDetailsID
+								LEFT JOIN transaction_pickdetails PD
+									ON PD.BookingDetailsID = BD.BookingDetailsID
+                                    AND PD.BranchID <> BD.BranchID
 							/*WHERE
 								TB.FinishFlag = 1*/
 							GROUP BY
@@ -352,6 +355,35 @@ SET @query = CONCAT("SELECT
 								PD.ItemID
 						)P
 							ON P.ItemID = MI.ItemID
+						LEFT JOIN
+						(
+							SELECT
+								BD.ItemID,
+								SUM(
+										CASE
+											WHEN PD.BranchID = 1
+                                            THEN PD.Quantity * IFNULL(MID.ConversionQuantity, 1)
+                                            ELSE 0
+										END
+									) Toko,
+								SUM(
+										CASE
+											WHEN PD.BranchID = 2
+                                            THEN PD.Quantity * IFNULL(MID.ConversionQuantity, 1)
+                                            ELSE 0
+										END
+									) Gudang
+							FROM
+								transaction_bookingdetails BD
+                                LEFT JOIN master_itemdetails MID
+									ON BD.ItemDetailsID = MID.ItemDetailsID
+								LEFT JOIN transaction_pickdetails PD
+									ON PD.BookingDetailsID = BD.BookingDetailsID
+									AND PD.BranchID <> BD.BranchID
+							GROUP BY
+								BD.ItemID
+						)BN
+							ON BN.ItemID = MI.ItemID
 					WHERE
 						", pWhere, "
 					
@@ -389,8 +421,8 @@ SET @query = CONCAT("SELECT
                         MI.Qty2,
                         MID.Weight,
                         MID.MinimumStock,
-                        ROUND((IFNULL(FS.Toko, 0) + IFNULL(TP.Toko, 0) + IFNULL(SR.Toko, 0) - IFNULL(S.Toko, 0) - IFNULL(PR.Toko, 0) + IFNULL(SM.Toko, 0) - IFNULL(SMM.Toko, 0) + IFNULL(SA.Toko, 0) - IFNULL(B.Toko, 0))  / MID.ConversionQuantity, 2) Toko,
-						ROUND((IFNULL(FS.Gudang, 0) + IFNULL(TP.Gudang, 0) + IFNULL(SR.Gudang, 0) - IFNULL(S.Gudang, 0) - IFNULL(PR.Gudang, 0) + IFNULL(SM.Gudang, 0) - IFNULL(SMM.Gudang, 0) + IFNULL(SA.Gudang, 0) - IFNULL(B.Gudang, 0))  / MID.ConversionQuantity, 2) Gudang,
+                        ROUND((IFNULL(FS.Toko, 0) + IFNULL(TP.Toko, 0) + IFNULL(SR.Toko, 0) - IFNULL(S.Toko, 0) - IFNULL(PR.Toko, 0) + IFNULL(SM.Toko, 0) - IFNULL(SMM.Toko, 0) + IFNULL(SA.Toko, 0) - IFNULL(B.Toko, 0) - IFNULL(BN.Toko, 0))  / MID.ConversionQuantity, 2) Toko,
+						ROUND((IFNULL(FS.Gudang, 0) + IFNULL(TP.Gudang, 0) + IFNULL(SR.Gudang, 0) - IFNULL(S.Gudang, 0) - IFNULL(PR.Gudang, 0) + IFNULL(SM.Gudang, 0) - IFNULL(SMM.Gudang, 0) + IFNULL(SA.Gudang, 0) - IFNULL(B.Gudang, 0) - IFNULL(BN.Gudang, 0))  / MID.ConversionQuantity, 2) Gudang,
 						MU.UnitName
 					FROM
 						master_itemdetails MID
@@ -619,14 +651,14 @@ SET @query = CONCAT("SELECT
 								SUM(
 										CASE
 											WHEN BD.BranchID = 1
-											THEN BD.Quantity * IFNULL(MID.ConversionQuantity, 1)
+											THEN (BD.Quantity - IFNULL(PD.Quantity, 0)) * IFNULL(MID.ConversionQuantity, 1)
 											ELSE 0
 										END
 									) Toko,
 								SUM(
 										CASE
 											WHEN BD.BranchID = 2
-											THEN BD.Quantity * IFNULL(MID.ConversionQuantity, 1)
+											THEN (BD.Quantity - IFNULL(PD.Quantity, 0)) * IFNULL(MID.ConversionQuantity, 1)
 											ELSE 0
 										END
 									) Gudang
@@ -636,6 +668,9 @@ SET @query = CONCAT("SELECT
 									ON TB.BookingID = BD.BookingID*/
                                 LEFT JOIN master_itemdetails MID
 									ON BD.ItemDetailsID = MID.ItemDetailsID
+								LEFT JOIN transaction_pickdetails PD
+									ON PD.BookingDetailsID = BD.BookingDetailsID
+                                    AND PD.BranchID <> BD.BranchID
 							/*WHERE
 								TB.FinishFlag = 1*/
 							GROUP BY
@@ -668,6 +703,35 @@ SET @query = CONCAT("SELECT
 								PD.ItemID
 						)P
 							ON P.ItemID = MI.ItemID
+						LEFT JOIN
+						(
+							SELECT
+								BD.ItemID,
+								SUM(
+										CASE
+											WHEN PD.BranchID = 1
+                                            THEN PD.Quantity * IFNULL(MID.ConversionQuantity, 1)
+                                            ELSE 0
+										END
+									) Toko,
+								SUM(
+										CASE
+											WHEN PD.BranchID = 2
+                                            THEN PD.Quantity * IFNULL(MID.ConversionQuantity, 1)
+                                            ELSE 0
+										END
+									) Gudang
+							FROM
+								transaction_bookingdetails BD
+                                LEFT JOIN master_itemdetails MID
+									ON BD.ItemDetailsID = MID.ItemDetailsID
+								LEFT JOIN transaction_pickdetails PD
+									ON PD.BookingDetailsID = BD.BookingDetailsID
+									AND PD.BranchID <> BD.BranchID
+							GROUP BY
+								BD.ItemID
+						)BN
+							ON BN.ItemID = MI.ItemID
 					WHERE
 					", pWhere, 
 					" ORDER BY ", pOrder,

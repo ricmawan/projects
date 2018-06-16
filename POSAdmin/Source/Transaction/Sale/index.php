@@ -744,11 +744,11 @@
 						var price1 = parseFloat($("#hdnPrice1").val());
 						var qty2 = parseFloat($("#hdnQty2").val());
 						var price2 = parseFloat($("#hdnPrice2").val());
-						if((Quantity * conversionQuantity) >= qty2 && qty2 > 1) {
+						if((parseFloat(Quantity) * conversionQuantity) >= qty2 && qty2 > 1) {
 							$("#txtSalePrice").val(returnRupiah((price2 * conversionQuantity).toString()));
 							$("#hdnSalePrice").val(price2);
 						}
-						else if((Quantity * conversionQuantity) >= qty1 && qty1 > 1) {
+						else if((parseFloat(Quantity) * conversionQuantity) >= qty1 && qty1 > 1) {
 							$("#txtSalePrice").val(returnRupiah((price1 * conversionQuantity).toString()));
 							$("#hdnSalePrice").val(price1);
 						}
@@ -2402,6 +2402,7 @@
 				$("#txtQTY").spinner({
 					change: function() {
 						CalculateSubTotal();
+						Grosir($("#txtQTY").val());
 					}
 				});
 				

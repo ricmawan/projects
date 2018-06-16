@@ -5,12 +5,12 @@ Created Date: 12 January 2018
 Modified Date: 
 ===============================================================*/
 
-DROP PROCEDURE IF EXISTS spSelSaleDetailsPrint;
+DROP PROCEDURE IF EXISTS spSelBookingDetailsPrint;
 
 DELIMITER $$
-CREATE PROCEDURE spSelSaleDetailsPrint (
-	pSaleDetailsID	TEXT,
-    pCurrentUser	VARCHAR(255)
+CREATE PROCEDURE spSelBookingDetailsPrint (
+	pBookingDetailsID	TEXT,
+    pCurrentUser		VARCHAR(255)
 )
 StoredProcedure:BEGIN
 
@@ -22,38 +22,38 @@ StoredProcedure:BEGIN
 		@MessageText = MESSAGE_TEXT, 
 		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
 		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelSaleDetailsPrint', pCurrentUser);
+		CALL spInsEventLog(@full_error, 'spSelBookingDetailsPrint', pCurrentUser);
 	END;
 	
 SET State = 1;
 
-	IF(pSaleDetailsID <> "" ) THEN
+	IF(pBookingDetailsID <> "" ) THEN
 		SET @query = CONCAT("SELECT
-								SD.Quantity,
+								BD.Quantity,
 								MI.ItemName,
                                 MU.UnitName
 							 FROM
-								transaction_saledetails SD
+								transaction_bookingdetails BD
 								JOIN master_item MI
-									ON MI.ItemID = SD.ItemID
+									ON MI.ItemID = BD.ItemID
 								LEFT JOIN master_itemdetails MID
-									ON MID.ItemDetailsID = SD.ItemDetailsID
+									ON MID.ItemDetailsID = BD.ItemDetailsID
 								JOIN master_unit MU
 									ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
 							WHERE
-								SD.SaleDetailsID IN ", pSaleDetailsID );
+								BD.BookingDetailsID IN ", pBookingDetailsID );
 							
 		PREPARE stmt FROM @query;
 		EXECUTE stmt;
 		DEALLOCATE PREPARE stmt;
 		
 SET State = 2;
-		SET @query = CONCAT("UPDATE transaction_saledetails
+		SET @query = CONCAT("UPDATE transaction_bookingdetails
 							SET
 								PrintCount = IFNULL(PrintCount, 0) + 1,
 								PrintedDate = NOW()
 							WHERE
-								SaleDetailsID IN ", pSaleDetailsID );
+								BookingDetailsID IN ", pBookingDetailsID );
 							
 		PREPARE stmt FROM @query;
 		EXECUTE stmt;

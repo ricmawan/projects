@@ -64,7 +64,7 @@ SET @query = CONCAT("SELECT
                         (
 							SELECT
 								TSR.PickID,
-                                SUM(TSRD.Quantity * (TSRD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - TSRD.Discount)) Total
+                                SUM(TSRD.Quantity * (TSRD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - IFNULL(TSRD.Discount, 0))) Total
 							FROM
 								transaction_booking TS
                                 JOIN master_customer MC
