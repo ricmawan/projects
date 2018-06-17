@@ -1,11 +1,19 @@
 <?php
+	require "../../assets/lib/escpos-php/autoload.php";
+    use Mike42\Escpos\Printer;
+    use Mike42\Escpos\EscposImage;
+    use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
+    use Mike42\Escpos\PrintConnectors\DummyPrintConnector;
 	//http://www.lprng.com/RESOURCES/PPD/epson.htm
 	if(isset($_POST['SaleDetailsID'])) {
 		$RequestedPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestedPath);
 		$RequestedPath = str_replace($file, "", $RequestedPath);
 		include "../../GetPermission.php";
-		$SaleDetailsID = $_POST['SaleDetailsID'];
+
+		$connector = new DummyPrintConnector();
+	    
+	    $SaleDetailsID = $_POST['SaleDetailsID'];
 		$SaleID = mysqli_real_escape_string($dbh, $_POST['SaleID']);		
 		$tanggal = date('d') . "-" . date('m') . "-" . date('Y');
 		/*$tmpdir = sys_get_temp_dir();   # ambil direktori temporary untuk simpan file.
@@ -17,7 +25,7 @@
 		$FailedFlag = 0;
 		$State = 1;
 		// 137 column 30 row
-		$bold1 = Chr(27) . Chr(69);
+		/*$bold1 = Chr(27) . Chr(69);
 		$bold0 = Chr(27) . Chr(70);
 		$double1 = Chr(27) . Chr(87) . Chr(49);
 		$double0 = Chr(27) . Chr(87) . Chr(48);
@@ -27,7 +35,7 @@
 		$underline1 = Chr(27) . Chr(45) . Chr(49);
 		$underline0 = Chr(27) . Chr(45) . Chr(48);
 		$italic1 = Chr(27) . Chr(52);
-		$italic0 = Chr(27) . Chr(53);
+		$italic0 = Chr(27) . Chr(53);*/
 		
 		$sql = "CALL spSelSaleHeader(".$SaleID.", '".$_SESSION['UserLogin']."')";
 
@@ -51,25 +59,23 @@
 		$Remarks = "";
 		mysqli_free_result($result);
 		mysqli_next_result($dbh);
-		
-		$Data  = $initialized ;
-		//$Data .= "\n"; //16 
-		$Data .= $bold1 . $double1 . $condensed1;
-		//68 col
-		$Data .= "SURAT JALAN" . fnSpace(40);
-		$Data .= "No : ". $SaleNumber . $double0 . $bold0 ."\n";
-		$Data .= "_________________________________________________________________________________________________________________________________________\n";
-		$Data .= $underline1 . "                                                                                                                                         \n" . $underline0;
-		
-		$Data .= fnSpace(73) ."Kepada Yth.  ".$condensed0; //13
-		$Data .= $CustomerName."\n" . $condensed1; //max 30
-		//$Data .= fnSpace(86) . $condensed0 . $Address1 . $condensed1;
-		if($Address != "") $Data .= fnSpace(86) . $condensed0 . $Address . $condensed1;
-		$Data .= "\n   Tanggal : " .$TransactionDate; //16
-		//$Data .= fnSpace(19) . $bold1 . $double1 ."SURAT JALAN". $double0 . $bold0;
-		$Data .= fnSpace(63) . $condensed0 . $City."\n".$condensed1;
-		$Data .= "   Kasir   : ".$CreatedBy;
-		$Data .= fnSpace(73 - strlen($CreatedBy)) . $condensed0 . "Ph " . $Telephone . "\n" . $condensed1;
+
+		$printer = new Printer($connector);
+		$printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
+		$printer -> setJustification(Printer::JUSTIFY_CENTER);
+		$printer -> text("SURAT JALAN");
+		$printer -> text(str_pad("", 40, " "));
+		$printer -> text("No : ". $SaleNumber ."\n");
+		$printer -> text(str_pad("", 137, "_") . "\n");
+		$printer -> text(str_pad("", 73, " ") . "Kepada Yth.  ");
+		$printer -> selectPrintMode(Printer::MODE_FONT_A);
+		$printer -> text($CustomerName ."\n");
+		$printer -> text(str_pad("", 86, " ") . $Address);
+		//if($Address != "") $printer -> text(str_pad("", 86, " ") . $Address);
+		$printer -> text("\n   Tanggal : " . $TransactionDate);
+		$printer -> text(str_pad("", 63, " ") . $City . "\n");
+		$printer -> text("   Kasir   : ");
+		$printer -> text(str_pad($CreatedBy, 73, " ") . "Ph " . $Telephone . "\n");
 		
 		$sql = "CALL spSelSaleDetailsPrint('(".implode(",", $SaleDetailsID).")', '".$_SESSION['UserLogin']."')";
 
@@ -82,47 +88,38 @@
 			return 0;
 		}
 
-		//$GrandTotal = 0;
-		$Data .= "|---------------------------------------------------------------------------------------------------------------------------------------|\n";
-		$Data .= "|      Qty      |                Nama Barang                              |                          Keterangan                         |\n";
-		$Data .= "|---------------|---------------------------------------------------------|-------------------------------------------------------------|\n";
+		$printer -> text("|" . str_pad("", 135, "-") . "|\n");
+		$printer -> text("|      Qty      |                Nama Barang                              |                          Keterangan                         |\n");
+		$printer -> text("|---------------|---------------------------------------------------------|-------------------------------------------------------------|\n");
 		
 		while($row = mysqli_fetch_array($result)) {
-			//Qty
-			$Data .= "| " . fnSpace(6 - strlen($row['Quantity'])) . $row['Quantity']  . " " . fnSpace(6) . " | ";//$row['UnitName'] . fnSpace(6 - strlen($row['UnitName'])) . " | ";
-			//ItemName
-			$Data .= $row['ItemName'] . fnSpace(55 - strlen($row['ItemName'])) . " | ";
-			//BatchNumber
-			//$Data .= fnSpace(10 - strlen($row['BatchNumber'])) . $row['BatchNumber'] . " | ";
-			//Remarks
-			//$Data .= $row['Remarks'] . fnSpace(59 - strlen($row['Remarks'])) . " |\n";
-			$Data .= $Remarks . fnSpace(59 - strlen($Remarks)) . " |\n";
-			//Harga Satuan
-			//$Data .= fnSpace(14 - strlen(number_format($row['SalePrice'],2,".",","))) . number_format($row['SalePrice'],2,".",",") . "  |  ";
-			//Diskon
-			//$Data .= fnSpace(9 - strlen(number_format($row['DiscountAmount'], 0, ".", ",")) - strlen($row['Discount'])) . number_format($row['DiscountAmount'], 0, ".", ",") . "(" . $row['Discount'] . "%)  |  ";
-			//Total
-			//$Data .= fnSpace(15 - strlen(number_format($row['Total'],2,".",","))) . number_format($row['Total'],2,".",",") . "  |\n";
-			//$GrandTotal += $row['Total'];
+			$printer -> text("| " . str_pad(number_format($row['Quantity'],0,".",","), 6, " ", STR_PAD_LEFT) . " ");
+			$printer -> text(str_pad($row['UnitName'], 6, " ") . " | ");
+			$printer -> text(str_pad($row['ItemName'], 55, " ") . " | ");
+			$printer -> text(str_pad($Remarks, 59, " ") . " |\n");
 		}
-		//$Data .= "|    2,00 m lari  |  MAESTRO 646 XTC                                  |    522  |      155,000.00  |   15.500(10%)  |   100,201,500.00  |\n";
-		$Data .= "|---------------------------------------------------------------------------------------------------------------------------------------|\n";
-		$Data .= "   Catatan   : " . $Remarks . "\n";
-		$Data .= fnSpace(15) . $bold1 . "Barang yang sudah dibeli tidak dapat ditukar/dikembalikan\n";
-		//$Data .= "   Kredit    : Rp. " . number_format($GrandTotal,2,".",",") . "\n";
-		//$Data .= "   Terbilang : " . strtoupper(Terbilang($GrandTotal)) . " RUPIAH\n";
-		$Data .= "_________________________________________________________________________________________________________________________________________\n";
-		$Data .= "   Penerima,". fnSpace(50) ."Checker,". fnSpace(50) ."Hormat Kami,\n\n\n";
-		//$Data .= fnSpace(115) . fnSpace(ceil((22 - strlen($_SESSION['UserLogin']))/2)). $_SESSION['UserLogin'] ."\n";
-		$Data .= "_______________                                            _______________                                             ". fnSpace(ceil((15 - strlen($CreatedBy))/2)). $CreatedBy . Chr(12);
-		//$Data .=  $bold1 . "Barang yang sudah dibeli tidak dapat ditukar/dikembalikan" . Chr(12);
-		fwrite($handle, $Data);
-		fclose($handle);
+		
+		$printer -> text("|" . str_pad("", 135, "-") . "|\n");
+		$printer -> text("   Catatan   : " . $Remarks . "\n");
+		$printer -> text(str_pad("", 15, " ") . "Barang yang sudah dibeli tidak dapat ditukar/dikembalikan\n");
+		$printer -> text(str_pad("", 137, "_") . "\n");
+		$printer -> text("   Penerima," . str_pad("", 50, " ") ."Checker,". str_pad("", 50, " ") ."Hormat Kami,\n\n\n");
+		$printer -> text("_______________" . str_pad("", 44, " "));
+		$printer -> text("_______________" . str_pad("", 46, " "));
+		$printer -> text(str_pad($CreatedBy, 12, " ", STR_PAD_BOTH));
+		
 		mysqli_free_result($result);
 		mysqli_next_result($dbh);
+		
 		//copy($file, $SHARED_PRINTER_ADDRESS); 
 		//exec("lp -d epson ".$file);  # Lakukan cetak
 		//unlink($file);
+
+		$data = $connector -> getData();
+	    fwrite($handle, $data);
+	    fclose($handle);
+	    $printer -> pulse();
+		$printer -> close();
 		echo returnstate($SaleID, $Message, $MessageDetail, $FailedFlag, $State);
 	}
 	
@@ -136,12 +133,5 @@
 		);
 		return json_encode($data);
 	
-	}
-	function fnSpace($loop) {
-		$space = "";
-		for($i = 0; $i< $loop; $i++) {
-			$space .= " ";
-		}
-		return $space;
 	}
 ?>

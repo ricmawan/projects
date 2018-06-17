@@ -75,6 +75,7 @@
 				$row_unit[] = $row['Price2'];
 				$row_unit[] = $row['Qty1'];
 				$row_unit[] = $row['Qty2'];
+				$row_unit[] = $row['ConversionQuantity'];
 				array_push($AvailableUnit, $row_unit);
 			}
 

@@ -24,7 +24,7 @@
 		while ($row = mysqli_fetch_array($result)) {
 			$row_array = array();
 			//data yang dikirim ke table
-			$row_array[] = "<input type='checkbox' style='margin:0;' name='select' value='".$row['BookingDetailsID']."' />";
+			$row_array[] = "<input type='checkbox' class='chkBookingDetails' style='margin:0;' name='select' value='".$row['BookingDetailsID']."' />";
 			$row_array[] = $row['BookingDetailsID'];
 			$row_array[] = $row['ItemID'];
 			$row_array[] = $row['BranchID'];
@@ -35,7 +35,7 @@
 			$row_array[] = $row['UnitName'];
 			$row_array[] = number_format($row['BookingPrice'],0,".",",");
 			$row_array[] = number_format($row['Discount'],0,".",",");
-			$row_array[] = number_format($row['BookingPrice'] * $row['Quantity'],0,".",",");
+			$row_array[] = number_format(($row['BookingPrice'] - $row['Discount']) * $row['Quantity'],0,".",",");
 			$row_array[] = $row['BuyPrice'];
 			$row_array[] = $row['Price1'];
 			$row_array[] = $row['Qty1'];

@@ -482,6 +482,11 @@
 											"last": "»",
 											"first": "«"
 										}
+									},
+									"initComplete": function(settings, json) {
+										setTimeout(function() {
+											$("#grid-transaction").find("input:checkbox").first().remove()
+										}, 0);
 									}
 								});
 						table2.columns.adjust();

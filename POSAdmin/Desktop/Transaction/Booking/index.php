@@ -6,50 +6,50 @@
 	<head>
 		<style>
 			#divTableContent {
-				min-height: 335px;
-				max-height: 335px;
+				min-height: 330px;
+				max-height: 330px;
 				overflow-y: auto;
 			}
 		</style>
 	</head>
 	<body>
 		<br />
-		<div class="row">			
-			<div id="FormData" class="col-md-12" >
-				<form class="col-md-12" id="PostForm" method="POST" action="" >
-					<div class="row">
-						<div class="col-md-1 labelColumn">
-							No. Invoice :
-							<input id="hdnBookingID" name="hdnBookingID" type="hidden" value=0 />
-							<input id="hdnBookingDetailsID" name="hdnBookingDetailsID" type="hidden" value=0 />
-							<input id="hdnItemID" name="hdnItemID" type="hidden" value=0 />
-							<input id="hdnItemDetailsID" name="hdnItemDetailsID" type="hidden" value=0 />
-							<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
-							<input id="hdnAvailableUnit" name="hdnAvailableUnit" type="hidden" />
-							<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
-							<input id="hdnPayment" name="hdnPayment" type="hidden" value=0 />
-							<input id="hdnDesktopPath" name="hdnDesktopPath" type="hidden" value='<?php echo $DESKTOP_PATH; ?>' />
-							<?php
-								echo '<input id="hdnEditFlag" name="hdnEditFlag" type="hidden" value="'.$EditFlag.'" />';
-								echo '<input id="hdnDeleteFlag" name="hdnDeleteFlag" type="hidden" value="'.$DeleteFlag.'" />';
-							?>
-						</div>
-						<div class="col-md-2">
-							<input id="txtBookingNumber" name="txtBookingNumber" type="text" tabindex=5 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="No. Invoice" readonly />
-						</div>
-						
-						<div class="col-md-1 labelColumn">
-							Tanggal :
-						</div>
-						<div class="col-md-2">
-							<input id="txtTransactionDate" name="txtTransactionDate" type="text" tabindex=6 class="form-control-custom" style="width: 80%; display: inline-block;margin-right: 5px;" onfocus="this.select();" autocomplete=off placeholder="Tanggal" required />
-						</div>
-						
-						<div class="col-md-1 labelColumn">
-							Pelanggan :
-						</div>
-						<div class="col-md-2">
-							<select id="ddlCustomer" name="ddlCustomer" tabindex=7 class="form-control-custom" style="width: 80%; display: inline-block;margin-right: 5px;" placeholder="Pilih Pelanggan" onchange="updateHeader();" >
+		<?php
+			echo '<input id="hdnEditFlag" name="hdnEditFlag" type="hidden" value="'.$EditFlag.'" />';
+			echo '<input id="hdnDeleteFlag" name="hdnDeleteFlag" type="hidden" value="'.$DeleteFlag.'" />';
+		?>
+		<div id="FormData" title="Tambah Kategori" class="col-md-12" >
+			<form class="col-md-12" id="PostForm" method="POST" action="" >
+				<div class="row">
+					<div class="col-md-1 labelColumn">
+						No. Invoice :
+						<input id="hdnBookingID" name="hdnBookingID" type="hidden" value=0 />
+						<input id="hdnBookingDetailsID" name="hdnBookingDetailsID" type="hidden" value=0 />
+						<input id="hdnItemID" name="hdnItemID" type="hidden" value=0 />
+						<input id="hdnItemDetailsID" name="hdnItemDetailsID" type="hidden" value=0 />
+						<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
+						<input id="hdnAvailableUnit" name="hdnAvailableUnit" type="hidden" />
+						<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
+						<input id="hdnPayment" name="hdnPayment" type="hidden" value=0 />
+						<input id="hdnPaymentType" name="hdnPaymentType" type="hidden" value=0 />
+						<input id="hdnDesktopPath" name="hdnDesktopPath" type="hidden" value='<?php echo $DESKTOP_PATH; ?>' />
+					</div>
+					<div class="col-md-2">
+						<input id="txtBookingNumber" name="txtBookingNumber" type="text" class="form-control-custom" placeholder="No. Invoice" readonly />
+					</div>
+					
+					<div class="col-md-1 labelColumn">
+						Tanggal :
+					</div>
+					<div class="col-md-2">
+						<input id="txtTransactionDate" name="txtTransactionDate" type="text" tabindex=6 class="form-control-custom mousetrap" style="width: 87%; display: inline-block;margin-right: 5px;" onfocus="this.select();" autocomplete=off placeholder="Tanggal" required />
+					</div>
+					
+					<div class="col-md-1 labelColumn">
+						Pelanggan :
+					</div>
+					<div class="col-md-2">
+						<select id="ddlCustomer" name="ddlCustomer" tabindex=7 class="form-control-custom mousetrap" style="width: 80%; display: inline-block;margin-right: 5px;" placeholder="Pilih Pelanggan" onchange="updateHeader();" >
 								<?php
 									$sql = "CALL spSelDDLCustomer('".$_SESSION['UserLogin']."')";
 									if (! $result = mysqli_query($dbh, $sql)) {
@@ -64,18 +64,18 @@
 								?>
 							</select>
 							<i class="fa fa-user-plus" style="font-size: 14px;cursor: pointer;" onclick="addNewCustomer();"></i>
-						</div>
-						<div class="col-md-1">
-							<div id="toggle-retail" class="toggle-modern" ></div>
-							<input type="hidden" id="hdnIsRetail" name="hdnIsRetail" value=1 />
-						</div>
 					</div>
-					<br />
-					<div class="row col-md-12">
-						<table class="table table-striped table-hover" style="margin-bottom: 5px;width:80%;" >
-							<tbody>
-								<tr>
-									<td style="width: 15%;" >
+					<div class="col-md-1">
+						<div id="toggle-retail" class="toggle-modern" ></div>
+						<input type="hidden" id="hdnIsRetail" name="hdnIsRetail" value=1 />
+					</div>
+				</div>
+				<br />
+				<div class="row">
+					<table class="table table-striped table-hover" style="margin-bottom: 5px;" >
+						<tbody>
+							<tr>
+								<td style="width: 15%;" >
 									<div class="has-float-label" >
 										<input id="txtItemCode" name="txtItemCode" type="text" tabindex=8 class="form-control-custom mousetrap" style="width: 100%;" onfocus="this.select();" onkeypress="isEnterKey(event, 'getItemDetails');" onchange="getItemDetails();" autocomplete=off />
 										<label for="txtItemCode" class="lblInput" >Kode Barang</label>
@@ -104,6 +104,7 @@
 								<td style="width: 15%;" >
 									<div class="has-float-label" >
 										<input id="hdnBuyPrice" name="hdnBuyPrice" type="hidden" value=0 />
+										<input id="hdnBookingPrice" name="hdnBookingPrice" type="hidden" value=0 />
 										<input id="hdnRetailPrice" name="hdnRetailPrice" type="hidden" value=0 />
 										<input id="hdnPrice1" name="hdnPrice1" type="hidden" value=0 />
 										<input id="hdnQty1" name="hdnQty1" type="hidden" value=0 />
@@ -113,13 +114,13 @@
 										<input id="hdnWeight" name="hdnWeight" type="hidden" value=0 />
 										<input id="hdnConversionQty" name="hdnConversionQty" type="hidden" value=0 />
 										<input id="hdnStock" name="hdnStock" type="hidden" value=0 />
-										<input id="txtBookingPrice" name="txtBookingPrice" type="text" tabindex=11 class="form-control-custom text-right mousetrap" value="0" autocomplete=off onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
+										<input id="txtBookingPrice" name="txtBookingPrice" type="text" class="form-control-custom text-right mousetrap" value="0" autocomplete=off onchange="CalculatePrice();" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" readonly />
 										<label for="txtBookingPrice" class="lblInput" >Harga Jual</label>
 									</div>
 								</td>
 								<td style="width: 15%;" >
 									<div class="has-float-label" >
-										<input id="txtDiscount" name="txtDiscount" type="text" tabindex=12 class="form-control-custom text-right mousetrap" value="0" autocomplete=off onkeypress="isEnterKey(event, 'addBookingDetails');return isNumberKey(event, this.id, this.value);" onchange="addBookingDetails();" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
+										<input id="txtDiscount" name="txtDiscount" type="text" tabindex=11 class="form-control-custom text-right mousetrap" value="0" autocomplete=off onkeypress="isEnterKey(event, 'addBookingDetails');return isNumberKey(event, this.id, this.value);" onchange="addBookingDetails();" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
 										<label for="txtDiscount" class="lblInput" >Diskon</label>
 									</div>
 								</td>
@@ -129,60 +130,53 @@
 										<label for="txtSubTotal" class="lblInput" >Sub Total</label>
 									</div>
 								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="row" >
+					<div id="divTableContent" class="table-responsive" style="overflow-x:hidden;">
+						<table id="grid-transaction" style="width: 100% !important;" class="table table-striped table-bordered table-hover" >
+							<thead>
+								<tr>
+									<th><input id="select_all_booking" name="select_all_booking" type="checkbox" onclick="chkAllBooking();" style="margin: 0;" /></th>
+									<th>BookingDetailsID</th>
+									<th>ItemID</th>
+									<th>BranchID</th>
+									<th>Cabang</th>
+									<th>Kode Barang</th>
+									<th>Nama Barang</th>
+									<th>Qty</th>
+									<th>Satuan</th>
+									<th>Harga Jual</th>
+									<th>Diskon</th>
+									<th>Sub Total</th>
+									<th>BuyPrice</th>
+									<th>Price1</th>
+									<th>Qty1</th>
+									<th>Price2</th>
+									<th>Qty2</th>
+									<th>Weight</th>
+									<th>RetailPrice</th>
+									<th>AvailableUnit</th>
+									<th>UnitID</th>
+									<th>ItemDetailsID</th>
+									<th>ConversionQty</th>
 								</tr>
-							</tbody>
+							</thead>
 						</table>
 					</div>
-					<div class="row col-md-12" >
-						<div id="divTableContent" class="table-responsive" style="overflow-x:hidden;">
-							<table id="grid-transaction" style="width: 100% !important;" class="table table-striped table-bordered table-hover" >
-								<thead>
-									<tr>
-										<th><input id="select_all" name="select_all" type="checkbox" onclick="chkAll();" style="margin: 0;" /></th>
-										<th>BookingDetailsID</th>
-										<th>ItemID</th>
-										<th>BranchID</th>
-										<th>Cabang</th>
-										<th>Kode Barang</th>
-										<th>Nama Barang</th>
-										<th>Qty</th>
-										<th>Satuan</th>
-										<th>Harga Jual</th>
-										<th>Diskon</th>
-										<th>Sub Total</th>
-										<th>BuyPrice</th>
-										<th>Price1</th>
-										<th>Qty1</th>
-										<th>Price2</th>
-										<th>Qty2</th>
-										<th>Weight</th>
-										<th>RetailPrice</th>
-										<th>AvailableUnit</th>
-										<th>UnitID</th>
-										<th>ItemDetailsID</th>
-										<th>ConversionQty</th>
-									</tr>
-								</thead>
-							</table>
-						</div>
-					</div>
-					<div class="row col-md-12" >
-						<h2 style="display: inline-block;float: left;" >TOTAL : &nbsp;</h2><span id="lblTotal" >0</span>
-						</h2><span id="lblWeight" >0</span><h2 style="display: inline-block;float: right;color: #0006ff;" >Berat(KG) : &nbsp;
-					</div>
-					<br />
-					<div class="row col-md-12" >
-						<h5 style="margin-top: 5px !important;margin-bottom: 5px !important;">F9 = Nota Baru; F10 = Transaksi Selesai; F12 = Daftar Barang; DELETE = Hapus; ENTER/DOUBLE KLIK = Edit;</h5>
-					</div>
-					<br />
-					<div class="row col-md-12" >
-						<!--<button type="button" class="btn btn-info" id="btnPrintInvoice" onclick="printInvoice();" style="padding-top: 1px;padding-bottom: 1px;" ><i class="fa fa-print"></i> Cetak Nota</button>&nbsp;&nbsp;
-						<button type="button" class="btn btn-success" id="btnPrintShipment" onclick="printShipment();" style="padding-top: 1px;padding-bottom: 1px;"" ><i class="fa fa-truck "></i> Cetak Surat Jalan</button>&nbsp;&nbsp;-->
-					</div>
-				</form>
-			</div>
+				</div>
+				<div class="row" >
+					<h2 style="display: inline-block;float: left;" >TOTAL : &nbsp;</h2><span id="lblTotal" >0</span>
+					</h2><span id="lblWeight" >0</span><h2 style="display: inline-block;float: right;color: #0006ff;" >Berat(KG) : &nbsp;
+				</div>
+				<br />
+				<div class="row" >
+					<h5 style="margin: 5px 0 0 0;">F10 = Transaksi Selesai; F12 = Daftar Barang; ESC = Tutup; DELETE = Hapus; ENTER/DOUBLE KLIK = Edit;</h5>
+				</div>
+			</form>
 		</div>
-		
 		<div id="add-confirm" title="Konfirmasi" style="display: none;">
 			<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Kode tidak valid, apakah ingin menambahkan barang?</p>
 		</div>
@@ -201,8 +195,8 @@
 								<th>QTY1</th>
 								<th>H Grosir 2</th>
 								<th>QTY2</th>
-								<th>Stok</th>
-								<th>Fisik</th>
+								<th>Toko</th>
+								<th>Gudang</th>
 							</tr>
 						</thead>
 					</table>
@@ -242,7 +236,7 @@
 			<br />
 			<div class="row col-md-12" >
 				<div class="col-md-4 labelColumn">
-					Kembali :
+					<label id="lblChange" style="font-weight: normal;" >Kembali :</label>
 				</div>
 				<div class="col-md-8">
 					<input id="txtChange" name="txtChange" type="text" class="form-control-custom text-right" value="0" readonly />
@@ -317,10 +311,17 @@
 			}
 
 			function CalculateSubTotal() {
-				var buyPrice = parseFloat($("#txtBookingPrice").val().replace(/\,/g, ""));
+				var bookingPrice = parseFloat($("#txtBookingPrice").val().replace(/\,/g, ""));
+				var discount = parseFloat($("#txtDiscount").val().replace(/\,/g, ""));
 				var QTY = parseFloat($("#txtQTY").val());
-				var SubTotal = buyPrice * QTY;
+				var SubTotal = (bookingPrice - discount) * QTY;
 				$("#txtSubTotal").val(returnRupiah(SubTotal.toString()));
+			}
+
+			function CalculatePrice() {
+				var conversionQuantity = parseFloat($("#ddlUnit option:selected").attr("conversionQuantity"));
+				var bookingPrice = parseFloat($("#txtBookingPrice").val().replace(/\,/g, ""));
+				$("#hdnBookingPrice").val(bookingPrice/conversionQuantity);
 			}
 			
 			function openDialogEdit(Data) {
@@ -331,6 +332,7 @@
 				$("#txtItemName").val(Data[6]);
 				$("#txtQTY").val(Data[7]);
 				$("#txtBookingPrice").val(Data[9]);
+				$("#hdnBookingPrice").val(parseFloat(Data[9].replace(/\,/g, "")) / parseFloat(Data[22]));
 				$("#txtDiscount").val(Data[10]);
 				$("#txtSubTotal").val(Data[11]);
 				$("#hdnBuyPrice").val(Data[12]);
@@ -349,7 +351,7 @@
 				if(availableUnit.length > 0) {
 					$("#ddlUnit").find('option').remove();
 					for(var i=0;i<availableUnit.length;i++) {
-						$("#ddlUnit").append("<option value=" + availableUnit[i][0] + " itemdetailsid='" + availableUnit[i][2] + "' itemcode='" + availableUnit[i][3] + "' buyprice='" + availableUnit[i][4] + "' retailprice='" + availableUnit[i][5] + "' price1='" + availableUnit[i][6] + "' price2='" + availableUnit[i][7] + "' qty1='" + availableUnit[i][8] + "'  qty2='" + availableUnit[i][9] + "' >" + availableUnit[i][1] + "</option>");
+						$("#ddlUnit").append("<option value=" + availableUnit[i][0] + " itemdetailsid='" + availableUnit[i][2] + "' itemcode='" + availableUnit[i][3] + "' buyprice='" + availableUnit[i][4] + "' retailprice='" + availableUnit[i][5] + "' price1='" + availableUnit[i][6] + "' price2='" + availableUnit[i][7] + "' qty1='" + availableUnit[i][8] + "'  qty2='" + availableUnit[i][9] + "' conversionQuantity='" + availableUnit[i][10] + "' >" + availableUnit[i][1] + "</option>");
 					}
 				}
 				$("#ddlUnit").val(Data[20]);
@@ -359,7 +361,7 @@
 			
 			function openDialog(Data, EditFlag) {
 				$("#hdnIsEdit").val(EditFlag);
-				//$("#txtTransactionDate").focus();
+				$("#txtTransactionDate").focus();
 				table2 = $("#grid-transaction").DataTable({
 							"keys": true,
 							"scrollY": "280px",
@@ -412,7 +414,7 @@
 							},
 							"initComplete": function(settings, json) {
 								setTimeout(function() {
-									$("#grid-transaction").find("input:checkbox").remove();
+									$("#grid-transaction").find("input:checkbox").first().remove()
 								}, 0);
 							}
 						});
@@ -420,18 +422,7 @@
 				var counterBookingDetails = 0;
 				table2.on( 'key', function (e, datatable, key, cell, originalEvent) {
 					var index = table2.cell({ focused: true }).index();
-					if(key == 32) { //space
-						var checkbox = $(".focus").find("input:checkbox");
-						if(checkbox.prop("checked") == true) {
-							checkbox.prop("checked", false);
-							checkbox.attr("checked", false);
-						}
-						else {
-							checkbox.prop("checked", true);
-							checkbox.attr("checked", true);
-						}
-					}
-					else if(counterBookingDetails == 0) {
+					if(counterBookingDetails == 0) {
 						counterBookingDetails = 1;
 						var data = datatable.row( cell.index().row ).data();
 						if(key == 13) {
@@ -470,10 +461,6 @@
 						setTimeout(function() { counterBookingDetails = 0; } , 1000);
 					}
 				});
-
-				table2.on('page', function() {
-					$("#select_all").prop("checked", false);
-				});
 				
 				$('#grid-transaction tbody').on('dblclick', 'tr', function () {
 					var data = table2.row(this).data();
@@ -485,13 +472,29 @@
 				
 				tableWidthAdjust();
 			}
-			
+
+			function chkAllBooking() {
+				if($("#select_all_booking").prop("checked") == true) {
+					$("input:checkbox[class=chkBookingDetails]").each(function() {
+						$(this).prop("checked", true);
+						$(this).attr("checked", true);
+					});
+				}
+				else {
+					$("input:checkbox[class=chkBookingDetails]").each(function() {
+						$(this).prop("checked", false);
+						$(this).attr("checked", false);
+					});
+				}
+				//Calculate();
+			}
+
 			var counterGetItem = 0;
 			function getItemDetails() {
 				if(counterGetItem == 0) {
 					counterGetItem = 1;
 					var itemCode = $("#txtItemCode").val();
-					if(itemCode == "") Finish();
+					if(itemCode == "") finish();
 					else {
 						$.ajax({
 							url: "./Transaction/Booking/CheckItem.php",
@@ -517,30 +520,31 @@
 										}
 										else {
 											$("#hdnStock").val(parseFloat(data.Stock));
-											$("#hdnItemID").val(data.ItemID);
-											$("#txtItemName").val(data.ItemName);
-											$("#txtBookingPrice").val(returnRupiah(data.RetailPrice));
-											$("#hdnBuyPrice").val(data.BuyPrice);
-											$("#hdnRetailPrice").val(data.RetailPrice);
-											$("#hdnPrice1").val(data.Price1);
-											$("#hdnQty1").val(data.Qty1);
-											$("#hdnPrice2").val(data.Price2);
-											$("#hdnQty2").val(data.Qty2);
-											$("#hdnWeight").val(data.Weight);
-											$("#txtSubTotal").val(returnRupiah(data.RetailPrice));
-											$("#hdnAvailableUnit").val(JSON.stringify(data.AvailableUnit));
-											$("#hdnItemDetailsID").val(data.ItemDetailsID);
-											if(data.AvailableUnit.length > 0) {
-												$("#ddlUnit").find('option').remove();
-												for(var i=0;i<data.AvailableUnit.length;i++) {
-													$("#ddlUnit").append("<option value=" + data.AvailableUnit[i][0] + " itemdetailsid='" + data.AvailableUnit[i][2] + "' itemcode='" + data.AvailableUnit[i][3] + "' buyprice='" + data.AvailableUnit[i][4] + "' retailprice='" + data.AvailableUnit[i][5] + "' price1='" + data.AvailableUnit[i][6] + "' price2='" + data.AvailableUnit[i][7] + "' qty1='" + data.AvailableUnit[i][8] + "' qty2='" + data.AvailableUnit[i][9] + "' >" + data.AvailableUnit[i][1] + "</option>");
-												}
-											}
-											$("#ddlUnit").val(data.UnitID);
-											Grosir($("#txtQTY").val());
-											CalculateSubTotal();
-											//console.log("mlebu 3");
 										}
+										$("#hdnItemID").val(data.ItemID);
+										$("#txtItemName").val(data.ItemName);
+										$("#txtBookingPrice").val(returnRupiah(data.RetailPrice));
+										$("#hdnBookingPrice").val(data.RetailPrice);
+										$("#hdnBuyPrice").val(data.BuyPrice);
+										$("#hdnRetailPrice").val(data.RetailPrice);
+										$("#hdnPrice1").val(data.Price1);
+										$("#hdnQty1").val(data.Qty1);
+										$("#hdnPrice2").val(data.Price2);
+										$("#hdnQty2").val(data.Qty2);
+										$("#hdnWeight").val(data.Weight);
+										$("#txtSubTotal").val(returnRupiah(data.RetailPrice));
+										$("#hdnAvailableUnit").val(JSON.stringify(data.AvailableUnit));
+										$("#hdnItemDetailsID").val(data.ItemDetailsID);
+										$("#hdnConversionQty").val(data.ConversionQty);
+										if(data.AvailableUnit.length > 0) {
+											$("#ddlUnit").find('option').remove();
+											for(var i=0;i<data.AvailableUnit.length;i++) {
+												$("#ddlUnit").append("<option value=" + data.AvailableUnit[i][0] + " itemdetailsid='" + data.AvailableUnit[i][2] + "' itemcode='" + data.AvailableUnit[i][3] + "' buyprice='" + data.AvailableUnit[i][4] + "' retailprice='" + data.AvailableUnit[i][5] + "' price1='" + data.AvailableUnit[i][6] + "' price2='" + data.AvailableUnit[i][7] + "' qty1='" + data.AvailableUnit[i][8] + "' qty2='" + data.AvailableUnit[i][9] + "' conversionQuantity='" + data.AvailableUnit[i][10] + "' >" + data.AvailableUnit[i][1] + "</option>");
+											}
+										}
+										$("#ddlUnit").val(data.UnitID);
+										Grosir($("#txtQTY").val());
+										CalculateSubTotal();
 										$("#txtQTY").focus();
 									//}
 									//else $("#txtQTY").focus();
@@ -632,25 +636,31 @@
 			
 			function Grosir(Quantity) {
 				if($("#hdnItemID").val() != 0) {
-					var retailPrice = $("#hdnRetailPrice").val();
+					var retailPrice = parseFloat($("#hdnRetailPrice").val());
+					var conversionQuantity = parseFloat($("#ddlUnit option:selected").attr("conversionQuantity"));
 					if($('#toggle-retail').data('toggles').active == false) {
-						var qty1 = $("#hdnQty1").val();
-						var price1 = $("#hdnPrice1").val();
-						var qty2 = $("#hdnQty2").val();
-						var price2 = $("#hdnPrice2").val();
-						if(parseFloat(Quantity) >= parseFloat(qty2) && parseFloat(qty2) > 1) {
-							$("#txtBookingPrice").val(returnRupiah(price2));
+						var qty1 = parseFloat($("#hdnQty1").val());
+						var price1 = parseFloat($("#hdnPrice1").val());
+						var qty2 = parseFloat($("#hdnQty2").val());
+						var price2 = parseFloat($("#hdnPrice2").val());
+						if((parseFloat(Quantity) * conversionQuantity) >= qty2 && qty2 > 1) {
+							$("#txtBookingPrice").val(returnRupiah((price2 * conversionQuantity).toString()));
+							$("#hdnBookingPrice").val(price2);
 						}
-						else if(parseFloat(Quantity) < parseFloat(qty2) && parseFloat(Quantity) >= parseFloat(qty1)  && parseFloat(qty2) > 1  && parseFloat(qty1) > 1) {
-							$("#txtBookingPrice").val(returnRupiah(price1));
+						else if((parseFloat(Quantity) * conversionQuantity) >= qty1 && qty1 > 1) {
+							$("#txtBookingPrice").val(returnRupiah((price1 * conversionQuantity).toString()));
+							$("#hdnBookingPrice").val(price1);
 						}
 						else {
-							$("#txtBookingPrice").val(returnRupiah(retailPrice));
+							$("#txtBookingPrice").val(returnRupiah((retailPrice * conversionQuantity).toString()));
+							$("#hdnBookingPrice").val(retailPrice);
 						}
 					}
 					else {
-						$("#txtBookingPrice").val(returnRupiah(retailPrice));
+						$("#txtBookingPrice").val(returnRupiah((retailPrice * conversionQuantity).toString()));
+						$("#hdnBookingPrice").val(retailPrice);
 					}
+					CalculateSubTotal();
 				}
 			}
 			
@@ -795,7 +805,7 @@
 												//$("#toggle-retail").toggleClass('disabled', true);
 												$("#txtBookingNumber").val(data.BookingNumber);
 												var toggleBranch = "<div id='toggle-branch-" + data.BookingDetailsID + "' onclick='updateBranch(this.id)' class='div-center toggle-modern' ></div>";
-												var checkboxData = "<input type='checkbox' name='select' value='" + data.BookingDetailsID + "' style='margin:0;' />"
+												var checkboxData = "<input type='checkbox' class='chkBookingDetails' name='select' value='" + data.BookingDetailsID + "' style='margin:0;' />"
 												table2.row.add([
 													checkboxData,
 													data.BookingDetailsID,
@@ -808,7 +818,7 @@
 													unitName,
 													bookingPrice,
 													returnRupiah(discount.toString()),
-													returnRupiah((parseFloat(bookingPrice.replace(/\,/g, "")) * parseFloat(Qty) - parseFloat(discount)).toString()),
+													returnRupiah(((parseFloat(bookingPrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, "")) ) * parseFloat(Qty)).toString()),
 													buyPrice,
 													price1,
 													qty1,
@@ -847,7 +857,7 @@
 											}
 											else {
 												var toggles = $('#toggle-branch-' + data.BookingDetailsID).data('toggles').active;
-												var checkboxData = "<input type='checkbox' name='select' value='" + data.BookingDetailsID + "' style='margin:0;' />"
+												var checkboxData = "<input type='checkbox' class='chkBookingDetails' name='select' value='" + data.BookingDetailsID + "' style='margin:0;' />"
 												table2.row(rowEdit).data([
 													checkboxData,
 													data.BookingDetailsID,
@@ -860,7 +870,7 @@
 													unitName,
 													bookingPrice,
 													returnRupiah(discount.toString()),
-													returnRupiah((parseFloat(bookingPrice.replace(/\,/g, "")) * parseFloat(Qty) - parseFloat(discount)).toString()),
+													returnRupiah(((parseFloat(bookingPrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, "")) ) * parseFloat(Qty)).toString()),
 													buyPrice,
 													price1,
 													qty1,
@@ -901,6 +911,7 @@
 											$("#txtBookingPrice").val(0);
 											$("#txtDiscount").val(0);
 											$("#hdnBuyPrice").val(0);
+											$("#hdnBookingPrice").val(0);
 											$("#hdnPrice1").val(0);
 											$("#hdnQty1").val(0);
 											$("#hdnPrice2").val(0);
@@ -977,6 +988,7 @@
 			function addBookingDetails() {
 				if(counterAddBooking == 0) {
 					counterAddBooking = 1;
+					CalculateSubTotal();
 					var itemID = $("#hdnItemID").val();
 					var itemCode = $("#txtItemCode").val();
 					var itemName = $("#txtItemName").val();
@@ -1041,7 +1053,7 @@
 											//$("#toggle-retail").toggleClass('disabled', true);
 											$("#txtBookingNumber").val(data.BookingNumber);
 											var toggleBranch = "<div id='toggle-branch-" + data.BookingDetailsID + "' onclick='updateBranch(this.id)' class='div-center toggle-modern' ></div>";
-											var checkboxData = "<input type='checkbox' name='select' value='" + data.BookingDetailsID + "' style='margin:0;' />"
+											var checkboxData = "<input type='checkbox' class='chkBookingDetails' name='select' value='" + data.BookingDetailsID + "' style='margin:0;' />"
 											table2.row.add([
 												checkboxData,
 												data.BookingDetailsID,
@@ -1054,7 +1066,7 @@
 												unitName,
 												bookingPrice,
 												returnRupiah(discount.toString()),
-												returnRupiah((parseFloat(bookingPrice.replace(/\,/g, "")) * parseFloat(Qty) - parseFloat(discount)).toString()),
+												returnRupiah(((parseFloat(bookingPrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, "")) ) * parseFloat(Qty)).toString()),
 												buyPrice,
 												price1,
 												qty1,
@@ -1084,10 +1096,17 @@
 												height: 18, // height if not set in css
 												type: 'compact' // if this is set to 'select' then the select style toggle will be used
 											});
+
+											if($("#hdnBranchID").val() == 1) {
+												$("#toggle-branch-" + data.BookingDetailsID).toggles(true);
+											}
+											else {
+												$("#toggle-branch-" + data.BookingDetailsID).toggles(false);
+											}
 										}
 										else {
 											var toggles = $('#toggle-branch-' + data.BookingDetailsID).data('toggles').active;
-											var checkboxData = "<input type='checkbox' name='select' value='" + data.BookingDetailsID + "' style='margin:0;' />"
+											var checkboxData = "<input type='checkbox' class='chkBookingDetails' name='select' value='" + data.BookingDetailsID + "' style='margin:0;' />"
 											table2.row(rowEdit).data([
 												checkboxData,
 												data.BookingDetailsID,
@@ -1100,7 +1119,7 @@
 												unitName,
 												bookingPrice,
 												returnRupiah(discount.toString()),
-												returnRupiah((parseFloat(bookingPrice.replace(/\,/g, "")) * parseFloat(Qty) - parseFloat(discount)).toString()),
+												returnRupiah(((parseFloat(bookingPrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, "")) ) * parseFloat(Qty)).toString()),
 												buyPrice,
 												price1,
 												qty1,
@@ -1141,6 +1160,7 @@
 										$("#txtBookingPrice").val(0);
 										$("#txtDiscount").val(0);
 										$("#hdnBuyPrice").val(0);
+										$("#hdnBookingPrice").val(0);
 										$("#hdnPrice1").val(0);
 										$("#hdnQty1").val(0);
 										$("#hdnPrice2").val(0);
@@ -1221,7 +1241,7 @@
 						error: function(jqXHR, textStatus, errorThrown) {
 							$("#loading").hide();
 							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-							LogEvent(errorMessage, "/Transaction/Booking/index.php");
+							LogEvent(errorMessage, "/Transaction/Purchase/index.php");
 							Lobibox.alert("error",
 							{
 								msg: errorMessage,
@@ -1705,11 +1725,11 @@
 				var weight = 0;
 				table2.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
 					var data = this.data();
-					grandTotal += parseFloat(data[9].replace(/\,/g, "")) * parseFloat(data[7]) - parseFloat(data[10].replace(/\,/g, ""));
-					weight += parseFloat(data[17]) * parseFloat(data[7]);
+					grandTotal += (parseFloat(data[9].replace(/\,/g, "")) - parseFloat(data[10].replace(/\,/g, ""))) * parseFloat(data[7]);
+					weight += (parseFloat(data[17]) * parseFloat(data[7]) * parseFloat(data[22]));
 				});
 				$("#lblTotal").html(returnRupiah(grandTotal.toString()));
-				$("#lblWeight").html(returnWeight(weight.toString()));
+				$("#lblWeight").html(returnWeight(weight.toFixed(2).toString()));
 			}
 			
 			function tableWidthAdjust() {
@@ -1732,6 +1752,8 @@
 				$("#txtQTY").val(1);
 				$("#txtBookingPrice").val(0);
 				$("#hdnBuyPrice").val(0);
+				$("#hdnBookingPrice").val(0);
+				$("#hdnWeight").val(0);
 				$("#hdnPrice1").val(0);
 				$("#hdnQty1").val(0);
 				$("#hdnQty2").val(0);
@@ -1752,7 +1774,7 @@
 				$("#hdnConversionQty").val(0);
 				table2.clear().draw();
 			}
-
+			
 			function branchChange(BranchID) {
 				$("#hdnBranchID").val(BranchID);
 				table3.ajax.reload();
@@ -1775,7 +1797,7 @@
 										{ "width": "15%", "orderable": false, className: "dt-head-center" },
 										{ "width": "20%", "orderable": false, className: "dt-head-center" },
 										{ "width": "5%", "orderable": false, className: "dt-head-center" },
-										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "visible": false, "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
@@ -1785,10 +1807,10 @@
 										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" }
 									],
 									"ajax": {
-										"url": "./Transaction/Booking/ItemList.php",
+										"url": "./Transaction/Booking/ItemList.php" /*,
 										"data": function ( d ) {
 											d.BranchID = $("#hdnBranchID").val()
-										}
+										}*/
 									},
 									"processing": true,
 									"serverSide": true,
@@ -1810,31 +1832,30 @@
 									"initComplete": function(settings, json) {
 										table3.columns.adjust();
 										$("#grid-item").DataTable().cell( ':eq(0)' ).focus();
-									},
-									"sDom": '<"toolbar">frtip'
+									} /*,
+									"sDom": '<"toolbar">frtip' */
 								});
 
-						$(".toolbar").css({
+						/*$(".toolbar").css({
 							"display" : "inline-block"
 						});
 
-						$("div.toolbar").html($("#divBranch").html());
+						$("div.toolbar").html($("#divBranch").html());*/
 
 						var counterPickItem = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
-							//var index = table3.cell({ focused: true }).index();
-							if(counterPickItem == 0) {
-								counterPickItem = 1;
-								var data = datatable.row( cell.index().row ).data();
-								if(key == 13 && $("#itemList-dialog").css("display") == "block") {
+							if(key == 13 && $("#itemList-dialog").css("display") == "block") {
+								if(counterPickItem == 0) {
+									counterPickItem = 1;
+									var data = datatable.row( table3.cell({ focused: true }).index().row ).data();
 									$("#txtItemCode").val(data[0]);
-									//$("#hdnStock").val(data[7]);
 									getItemDetails();
 									$("#itemList-dialog").dialog("destroy");
 									table3.destroy();
+									//table.keys.enable();
 									table2.keys.enable();
+									setTimeout(function() { counterPickItem = 0; } , 1000);
 								}
-								setTimeout(function() { counterPickItem = 0; } , 1000);
 							}
 						});
 						
@@ -1842,10 +1863,10 @@
 							if( $("#itemList-dialog").css("display") == "block") {
 								var data = table3.row(this).data();
 								$("#txtItemCode").val(data[0]);
-								//$("#hdnStock").val(data[7]);
 								getItemDetails();
 								$("#itemList-dialog").dialog("destroy");
 								table3.destroy();
+								//table.keys.enable();
 								table2.keys.enable();
 							}
 						});
@@ -1861,6 +1882,11 @@
 								if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0) {
 									$("#itemList-dialog").find("input[type='search']").focus();
 								}
+								else if(evt.keyCode == 27 && $("#itemList-dialog").css("display") == "block") {
+									$("#itemList-dialog").dialog("destroy");
+									table3.destroy();
+									table2.keys.enable();
+								}
 							}
 							setTimeout(function() { counterKeyItem = 0; } , 1000);
 						});
@@ -1869,12 +1895,14 @@
 					close: function() {
 						$(this).dialog("destroy");
 						table3.destroy();
+						//table.keys.enable();
 						table2.keys.enable();
+						$("#txtItemCode").focus();
 					},
 					resizable: false,
-					height: 500,
+					height: 420,
 					width: 1280,
-					modal: true,
+					modal: true /*,
 					buttons: [
 					{
 						text: "Tutup",
@@ -1883,10 +1911,11 @@
 						click: function() {
 							$(this).dialog("destroy");
 							table3.destroy();
+						//	table.keys.enable();
 							table2.keys.enable();
 							return false;
 						}
-					}]
+					}]*/
 				}).dialog("open");
 			}
 
@@ -1895,16 +1924,27 @@
 					$("#finish-dialog").dialog({
 						autoOpen: false,
 						open: function() {
-							$("#divModal").show();
+							//$("#divModal").show();
 							table2.keys.disable();
 							var Total = $("#lblTotal").html().replace(/\,/g, "");
 							var Payment = $("#hdnPayment").val();
+							var PaymentType = $("#hdnPaymentType").val();
+							var Change = 0;
 							if(parseFloat(Payment) != 0) {
-								var Change = parseFloat(Payment) - parseFloat(Total);
+								if(PaymentType == 1) {
+									Change = parseFloat(Payment) - parseFloat(Total);
+									$("#lblChange").html("Kembali :");
+								}
+								else {
+									Change = parseFloat(Total) - parseFloat(Payment);
+									$("#lblChange").html("Kekurangan :");
+								}
 								$("#txtChange").val(returnRupiah(Change.toString()));
 							}
+							if(parseFloat(PaymentType) == 0) PaymentType = 1;
 							$("#txtTotal").val($("#lblTotal").html());
 							$("#txtPayment").val(returnRupiah(Payment.toString()));
+							$("#ddlPayment").val(PaymentType);
 							$("#ddlPayment").focus();
 						},
 						show: {
@@ -1918,12 +1958,15 @@
 						close: function() {
 							$(this).dialog("destroy");
 							table2.keys.enable();
-							$("#divModal").hide();
+							//$("#divModal").hide();
+							$("#txtPayment").val(0);
+							$("#ddlPayment").val(1);
+							$("#txtChange").val(0);
 						},
 						resizable: false,
-						height: 380,
+						height: 340,
 						width: 420,
-						modal: false,
+						modal: true /*,
 						buttons: [
 						{
 							text: "Tutup",
@@ -1935,7 +1978,7 @@
 								$("#divModal").hide();
 								return false;
 							}
-						}]
+						}]*/
 					}).dialog("open");
 				}
 				else {
@@ -1956,11 +1999,46 @@
 				}
 			}
 
+			function PaymentTypeChange() {
+				var Total = $("#txtTotal").val().replace(/\,/g, "");
+				var Payment = $("#txtPayment").val().replace(/\,/g, "");
+				var PaymentType = $("#ddlPayment").val();
+				if(PaymentType == 1) {
+					$("#lblChange").html("Kembali :");
+					if(parseFloat(Payment) != 0) {
+						if(parseFloat(Total) > parseFloat(Payment)) {
+							$("#txtPayment").notify("Pembayaran Kurang!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+							setTimeout(function() {
+								$("#txtPayment").focus();
+							}, 0);
+						}
+						else {
+							var Change = parseFloat(Payment) - parseFloat(Total);
+							$("#txtChange").val(returnRupiah(Change.toString()));
+						}
+					}
+				}
+				else {
+					$("#lblChange").html("Kekurangan :");
+					if(parseFloat(Total) < parseFloat(Payment)) {
+						$("#txtPayment").notify("Pembayaran Lebih!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+						setTimeout(function() {
+							$("#txtPayment").focus();
+						}, 0);
+					}
+					else {
+						var Change = parseFloat(Total) - parseFloat(Payment);
+						$("#txtChange").val(returnRupiah(Change.toString()));
+					}
+				}
+			}
+			
 			function Change() {
 				var Total = $("#txtTotal").val().replace(/\,/g, "");
 				var Payment = $("#txtPayment").val().replace(/\,/g, "");
 				var PaymentType = $("#ddlPayment").val();
 				if(PaymentType == 1) {
+					$("#lblChange").html("Kembali :");
 					if(parseFloat(Payment) == 0) {
 						$("#txtPayment").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 						setTimeout(function() {
@@ -1981,76 +2059,136 @@
 					}
 				}
 				else {
+					$("#lblChange").html("Kekurangan :");
 					if(parseFloat(Total) < parseFloat(Payment)) {
 						$("#txtPayment").notify("Pembayaran Lebih!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 						setTimeout(function() {
 							$("#txtPayment").focus();
 						}, 0);
 					}
+					else {
+						var Change = parseFloat(Total) - parseFloat(Payment);
+						$("#txtChange").val(returnRupiah(Change.toString()));
+					}
 				}
 			}
 
 			function printInvoice() {
-				var bookingID = $("#hdnBookingID").val();
+				var Total = $("#txtTotal").val().replace(/\,/g, "");
 				var Payment = $("#txtPayment").val().replace(/\,/g, "");
 				var PaymentType = $("#ddlPayment").val();
-				var PrintInvoice = $("#chkPrint").prop("checked");
-				var PrintShipment = $("#chkPrintShipment").prop("checked");
-				$("#loading").show();
-				$.ajax({
-					url: "./Transaction/Booking/PrintInvoice.php",
-					type: "POST",
-					data: { BookingID : bookingID, Payment : Payment, PaymentType : PaymentType, PrintInvoice : PrintInvoice },
-					dataType: "json",
-					success: function(data) {
-						if(data.FailedFlag == '0') {
-							$("#loading").hide();
-							$("#divModal").hide();
-							if(PrintShipment == true) printShipment();
-							resetForm();
-							table2.destroy();
-							$("#finish-dialog").dialog("destroy");
-							openDialog(0, 0);
-							Lobibox.alert("success",
-							{
-								msg: data.Message,
-								width: 480,
-								delay: 2000
-							});
+				var PassValidate = 1;
+				if(PaymentType == 1) {
+					$("#lblChange").html("Kembali :");
+					if(parseFloat(Payment) == 0) {
+						$("#txtPayment").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+						setTimeout(function() {
+							$("#txtPayment").focus();
+						}, 0);
+						PassValidate = 0;
+					}
+					else {
+						$("#lblChange").html("Kekurangan :");
+						if(parseFloat(Total) > parseFloat(Payment)) {
+							$("#txtPayment").notify("Pembayaran Kurang!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+							setTimeout(function() {
+								$("#txtPayment").focus();
+							}, 0);
+							PassValidate = 0;
 						}
 						else {
+							var Change = parseFloat(Payment) - parseFloat(Total);
+							$("#txtChange").val(returnRupiah(Change.toString()));
+						}
+					}
+				}
+				else {
+					if(parseFloat(Total) < parseFloat(Payment)) {
+						$("#txtPayment").notify("Pembayaran Lebih!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+						setTimeout(function() {
+							$("#txtPayment").focus();
+						}, 0);
+						PassValidate = 0;
+					}
+					else {
+						var Change = parseFloat(Total) - parseFloat(Payment);
+						$("#txtChange").val(returnRupiah(Change.toString()));
+					}
+				}
+
+				if(PassValidate == 1) {
+					var bookingID = $("#hdnBookingID").val();
+					var BookingNumber = $("#txtBookingNumber").val();
+					var Payment = $("#txtPayment").val().replace(/\,/g, "");
+					var PaymentType = $("#ddlPayment").val();
+					var PrintInvoice = $("#chkPrint").prop("checked");
+					var PrintShipment = $("#chkPrintShipment").prop("checked");
+					var Change = $("#txtChange").val().replace(/\,/g, "");
+					var PaymentMethod = $("#ddlPayment option:selected").text();
+					var TransactionDate = $("#hdnTransactionDate").val();
+					$("#loading").show();
+					$.ajax({
+						url: "./Transaction/Booking/PrintInvoice.php",
+						type: "POST",
+						data: { BookingID : bookingID, Payment : Payment, PaymentType : PaymentType, PrintInvoice : PrintInvoice, Change: Change, BookingNumber : BookingNumber, PaymentMethod : PaymentMethod, TransactionDate : TransactionDate },
+						dataType: "json",
+						success: function(data) {
+							if(data.FailedFlag == '0') {
+								$("#loading").hide();
+								$("#divModal").hide();
+								if(PrintShipment == true) printShipment();
+								resetForm();
+								table2.destroy();
+								$("#finish-dialog").dialog("destroy");
+								var paymentInfo = "<table><tr><td align='right'>Pembayaran :&nbsp;</td><td>" + $("#ddlPayment option:selected").text() + "</td></tr>";
+								paymentInfo += "<tr><td align='right'>Total :&nbsp;</td><td align='right'>" + returnRupiah(Total) + "</td></tr>";
+								paymentInfo += "<tr><td align='right'>Bayar :&nbsp;</td><td align='right'>" + returnRupiah(Payment) + "</td></tr>";
+								if(PaymentType == 1) paymentInfo += "<tr><td align='right'>Kembali :&nbsp;</td><td align='right'>" + $("#txtChange").val() + "</td></tr></table>";
+								else paymentInfo += "<tr><td align='right'>Kekurangan :&nbsp;</td><td align='right'>" + $("#txtChange").val() + "</td></tr></table>";
+								var counter = 0;
+								$("#txtPayment").val(0);
+								$("#ddlPayment").val(1);
+								$("#txtChange").val(0);
+								Lobibox.alert("success",
+								{
+									msg: paymentInfo,
+									width: 480
+								});
+							}
+							else {
+								$("#loading").hide();
+								$("#divModal").hide();
+								var counter = 0;
+								Lobibox.alert("error",
+								{
+									msg: data.ErrorMessage,
+									width: 480,
+									beforeClose: function() {
+										if(counter == 0) {
+											setTimeout(function() {
+												$("#txtItemCode").focus();
+											}, 0);
+											counter = 1;
+										}
+									}
+								});
+								return 0;
+							}
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
 							$("#loading").hide();
 							$("#divModal").hide();
-							var counter = 0;
+							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+							LogEvent(errorMessage, "/Transaction/Booking/index.php");
 							Lobibox.alert("error",
 							{
-								msg: data.ErrorMessage,
-								width: 480,
-								beforeClose: function() {
-									if(counter == 0) {
-										setTimeout(function() {
-											$("#txtItemCode").focus();
-										}, 0);
-										counter = 1;
-									}
-								}
+								msg: errorMessage,
+								width: 480
 							});
 							return 0;
 						}
-					},
-					error: function(jqXHR, textStatus, errorThrown) {
-						$("#loading").hide();
-						$("#divModal").hide();
-						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-						LogEvent(errorMessage, "/Transaction/Booking/index.php");
-						Lobibox.alert("error",
-						{
-							msg: errorMessage,
-							width: 480
-						});
-						return 0;
-					}
-				});
+					});
+				}
 			}
 
 			function printShipment() {
@@ -2085,123 +2223,41 @@
 				}
 			}
 
-			function firstBalance() {
-				$("#first-balance").dialog({
-					autoOpen: false,
-					open: function() {
-						$("#divModal").show();
-						$(document).on('keydown', function(e) {
-							if (e.keyCode == 39 && $("input:focus").length == 0) { //right arrow
-								 $("#btnCancelFirstBalance").focus();
-							}
-							else if (e.keyCode == 37 && $("input:focus").length == 0) { //left arrow
-								 $("#btnSaveFirstBalance").focus();
-							}
-						});
-						$("#txtFirstBalance").focus();
-					},
-					
-					close: function() {
-						$(this).dialog("destroy");
-						$("#divModal").hide();
-					},
-					resizable: false,
-					height: 150,
-					width: 400,
-					modal: false,
-					buttons: [
-					{
-						text: "Simpan",
-						tabindex: 51,
-						id: "btnSaveFirstBalance",
-						click: function() {
-							$.ajax({
-								url: "./InsertFirstBalance.php",
-								type: "POST",
-								data: $("#FirstBalanceForm").serialize(),
-								dataType: "json",
-								success: function(data) {
-									$("#divModal").hide();
-									if(data.FailedFlag == '0') {
-										//$.notify(data.Message, "success");
-										$("#first-balance").dialog("destroy");
-										$("#txtFirstBalance").val("0.00");
-										$("#divModal").hide();
-										Lobibox.alert("success",
-										{
-											msg: data.Message,
-											width: 480,
-											delay: 2000
-										});
-									}
-									else {
-										$("#divModal").hide();
-										Lobibox.alert("warning",
-										{
-											msg: data.Message,
-											width: 480,
-											delay: false
-										});
-									}
-									
-								},
-								error: function(jqXHR, textStatus, errorThrown) {
-									$("#divModal").hide();
-									var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-									LogEvent(errorMessage, "Home.php (fnFirstBalance)");
-									Lobibox.alert("error",
-									{
-										msg: errorMessage,
-										width: 480
-									});
-									return 0;
-								}
-							});
-						}
-					},
-					{
-						text: "Tutup",
-						tabindex: 52,
-						id: "btnCancelFirstBalance",
-						click: function() {
-							$(this).dialog("destroy");
-							$("#divModal").hide();
-							return false;
-						}
-					}]
-				}).dialog("open");
-			}
-
-			var counterResize = 0;
+			var waitForFinalEvent = (function () {
+		        var timers = {};
+		        return function (callback, ms, uniqueId) {
+		            if (!uniqueId) {
+		                uniqueId = "Don't call this twice without a uniqueId";
+		            }
+		            if (timers[uniqueId]) {
+		                clearTimeout(timers[uniqueId]);
+		            }
+		            timers[uniqueId] = setTimeout(callback, ms);
+		        };
+		    })();
+			
 			$(document).ready(function() {
 				$( window ).resize(function() {
-					if(counterResize == 0) {
-						counterResize = 1;
-						if ( $.fn.DataTable.isDataTable( '#grid-transaction' ) ) {
-							setTimeout(function() {
+					waitForFinalEvent(function () {
+		               	setTimeout(function() {
+							if ( $.fn.DataTable.isDataTable( '#grid-transaction' ) ) {
 								tableWidthAdjust();
-							}, 500);
-						}
-						if ( $.fn.DataTable.isDataTable( '#grid-item' ) ) {
-							table3.columns.adjust().draw();
-						}
-						setTimeout(function() {
-							counterResize = 0;
-						}, 1000);
-					}
+							}
+							if ( $.fn.DataTable.isDataTable( '#grid-item' ) ) {
+								table3.columns.adjust().draw();
+							}
+						}, 0);
+		            }, 500, "resizeWindow");
 				});
-
-				$('#grid-transaction').on('click', 'input[type="checkbox"]', function() {
-					$(this).blur();
-				});
+				var path = $("#hdnDesktopPath").val();		
 
 				$("#txtQTY").spinner({
 					change: function() {
 						CalculateSubTotal();
+						Grosir($("#txtQTY").val());
 					}
 				});
 
-				openDialog(0, 0);
 				$('#toggle-retail').toggles({
 					drag: true, // allow dragging the toggle between positions
 					click: true, // allow clicking on the toggle
@@ -2222,11 +2278,9 @@
 				$('#toggle-retail').on('toggle', function(e, active) {
 					if (active) {
 						$("#hdnIsRetail").val(1);
-						//if($("#FormData").css("display") == "block") $('#FormData').dialog('option', 'title', 'Tambah Penjualan Eceran');
 						Grosir($("#txtQTY").val());
 					} else {
 						$("#hdnIsRetail").val(0);
-						//if($("#FormData").css("display") == "block") $('#FormData').dialog('option', 'title', 'Tambah Penjualan Grosir');
 						Grosir($("#txtQTY").val());
 					}
 				});
@@ -2263,7 +2317,6 @@
 					onSelect: function(dateText, obj) {
 						transactionDate = obj.selectedYear + "-" + ("0" + (obj.selectedMonth + 1)).slice(-2) + "-" + ("0" + obj.selectedDay).slice(-2);
 						$("#hdnTransactionDate").val(transactionDate);
-						updateHeader();
 					}
 				}).datepicker("setDate", new Date());
 				
@@ -2281,9 +2334,10 @@
 				keyFunction();
 				enterLikeTab();
 				var counterBooking = 0;
-				
+
 				var counterKey = 0;
 				$(document).on("keydown", function (evt) {
+					tableIndex = index;
 					if(evt.keyCode == 123 && $("#itemList-dialog").css("display") == "none" && $("#finish-dialog").css("display") == "none" && $(".lobibox").css("display") != "block") {
 						evt.preventDefault();
 						if(counterKey == 0) {
@@ -2294,10 +2348,6 @@
 					else if(evt.keyCode == 123) {
 						evt.preventDefault();
 					}
-					else if(evt.keyCode == 120) {
-						var path = $("#hdnDesktopPath").val();
-						window.open(path, "", "width=1000");
-					}
 					else if(evt.keyCode == 121 && $("#itemList-dialog").css("display") == "none"  && $("#finish-dialog").css("display") == "none" && $(".lobibox").css("display") != "block") {
 						evt.preventDefault();
 						if(counterKey == 0) {
@@ -2305,7 +2355,6 @@
 							counterKey = 1;
 						}
 					}
-
 					setTimeout(function() { counterKey = 0; } , 1000);
 				});
 
@@ -2326,47 +2375,8 @@
 					e.preventDefault();
 					window.open(path, "", "width=1000");
 				});
-
-				$.ajax({
-					url: "./FirstBalance.php",
-					type: "POST",
-					data: { },
-					dataType: "json",
-					success: function(Data) {
-						if(Data.FailedFlag == '0') {
-							if(Data.IsFilled == 0) firstBalance();
-							else $("#txtTransactionDate").focus();
-						}
-						else {
-							var counter = 0;
-							Lobibox.alert("error",
-							{
-								msg: "Gagal memuat data",
-								width: 480,
-								beforeClose: function() {
-									if(counter == 0) {
-										setTimeout(function() {
-											//$("#txtItemCode").focus();
-										}, 0);
-										counter = 1;
-									}
-								}
-							});
-							return 0;
-						}
-					},
-					error: function(jqXHR, textStatus, errorThrown) {
-						$("#loading").hide();
-						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-						LogEvent(errorMessage, "/Home.php");
-						Lobibox.alert("error",
-						{
-							msg: errorMessage,
-							width: 480
-						});
-						return 0;
-					}
-				});
+				
+				openDialog(0, 0);
 			});
 		</script>
 	</body>
