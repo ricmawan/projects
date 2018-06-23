@@ -92,7 +92,7 @@ SET @query = CONCAT("SELECT
 						MI.ItemName,
 						MC.CategoryName,
 						MB.BranchName,
-						ROUND((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0)), 2) Stock,
+						ROUND((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0) - IFNULL(BN.Quantity, 0)), 2) Stock,
                         ROUND((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(P.Quantity, 0)), 2) PhysicalStock,
 						MU.UnitName
 					FROM
@@ -342,7 +342,7 @@ SET @query = CONCAT("SELECT
 							SELECT
 								BD.ItemID,
 								BD.BranchID,
-								SUM(BD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+								SUM((BD.Quantity - IFNULL(PD.Quantity, 0)) * IFNULL(MID.ConversionQuantity, 1)) Quantity
 							FROM
 								transaction_bookingdetails BD
                                 JOIN transaction_booking TB
@@ -351,6 +351,9 @@ SET @query = CONCAT("SELECT
 									ON MI.ItemID = BD.ItemID
                                 LEFT JOIN master_itemdetails MID
 									ON BD.ItemDetailsID = MID.ItemDetailsID
+								LEFT JOIN transaction_pickdetails PD
+									ON PD.BookingDetailsID = BD.BookingDetailsID
+                                    AND PD.BranchID <> BD.BranchID
 							WHERE
 								CASE
 									WHEN ", pCategoryID," = 0
@@ -398,6 +401,25 @@ SET @query = CONCAT("SELECT
 						)P
 							ON P.ItemID = MI.ItemID
 							AND P.BranchID = MB.BranchID
+						LEFT JOIN
+						(
+							SELECT
+								BD.ItemID,
+                                PD.BranchID,
+								SUM(PD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+							FROM
+								transaction_bookingdetails BD
+                                LEFT JOIN master_itemdetails MID
+									ON BD.ItemDetailsID = MID.ItemDetailsID
+								LEFT JOIN transaction_pickdetails PD
+									ON PD.BookingDetailsID = BD.BookingDetailsID
+									AND PD.BranchID <> BD.BranchID
+							GROUP BY
+								BD.ItemID,
+                                PD.BranchID
+						)BN
+							ON BN.ItemID = MI.ItemID
+                            AND BN.BranchID = MB.BranchID
 					WHERE
 						CASE
 							WHEN ", pCategoryID," = 0
@@ -415,7 +437,7 @@ SET @query = CONCAT("SELECT
 						MI.ItemName,
 						MC.CategoryName,
 						MB.BranchName,
-						ROUND((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0)) / MID.ConversionQuantity, 2) Stock,
+						ROUND((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0) - IFNULL(BN.Quantity, 0)) / MID.ConversionQuantity, 2) Stock,
                         ROUND((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(P.Quantity, 0))  / MID.ConversionQuantity, 2) PhysicalStock,
                         MU.UnitName
 					FROM
@@ -667,7 +689,7 @@ SET @query = CONCAT("SELECT
 							SELECT
 								BD.ItemID,
 								BD.BranchID,
-								SUM(BD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+								SUM((BD.Quantity - IFNULL(PD.Quantity,0)) * IFNULL(MID.ConversionQuantity, 1)) Quantity
 							FROM
 								transaction_bookingdetails BD
                                 JOIN transaction_booking TB
@@ -676,6 +698,9 @@ SET @query = CONCAT("SELECT
 									ON MI.ItemID = BD.ItemID
                                 LEFT JOIN master_itemdetails MID
 									ON BD.ItemDetailsID = MID.ItemDetailsID
+								LEFT JOIN transaction_pickdetails PD
+									ON PD.BookingDetailsID = BD.BookingDetailsID
+                                    AND PD.BranchID <> BD.BranchID
 							WHERE
 								CASE
 									WHEN ", pCategoryID," = 0
@@ -723,6 +748,25 @@ SET @query = CONCAT("SELECT
 						)P
 							ON P.ItemID = MI.ItemID
 							AND P.BranchID = MB.BranchID
+						LEFT JOIN
+						(
+							SELECT
+								BD.ItemID,
+                                PD.BranchID,
+								SUM(PD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+							FROM
+								transaction_bookingdetails BD
+                                LEFT JOIN master_itemdetails MID
+									ON BD.ItemDetailsID = MID.ItemDetailsID
+								LEFT JOIN transaction_pickdetails PD
+									ON PD.BookingDetailsID = BD.BookingDetailsID
+									AND PD.BranchID <> BD.BranchID
+							GROUP BY
+								BD.ItemID,
+                                PD.BranchID
+						)BN
+							ON BN.ItemID = MI.ItemID
+                            AND BN.BranchID = MB.BranchID
 					WHERE
 						CASE
 							WHEN ", pCategoryID," = 0

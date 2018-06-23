@@ -27,6 +27,17 @@
 						<br />
 						<div class="row">
 							<div class="col-md-1 labelColumn">
+								Satuan:
+							</div>
+							<div class="col-md-3">
+								<select id="ddlUnit" name="ddlUnit" tabindex=13 class="form-control-custom" onchange="changeItemCode();" >
+									<option >--</option>
+								</select>
+							</div>
+						</div>
+						<br />
+						<div class="row">
+							<div class="col-md-1 labelColumn">
 								Cabang:
 							</div>
 							<div class="col-md-3">
@@ -99,16 +110,38 @@
 							<tr>
 								<th>Kode Barang</th>
 								<th>Nama Barang</th>
-								<th>Harga Ecer</th>
-								<th>Harga Grosir 1</th>
-								<th>QTY Grosir 1</th>
-								<th>Harga Grosir 2</th>
-								<th>QTY Grosir 2</th>
+								<th>Satuan</th>
+								<th>H Beli</th>
+								<th>H Ecer</th>
+								<th>H Grosir 1</th>
+								<th>QTY1</th>
+								<th>H Grosir 2</th>
+								<th>QTY2</th>
+								<th>Stok</th>
+								<th>Fisik</th>
 							</tr>
 						</thead>
 					</table>
 				</div>
 			</div>
+		</div>
+		<div id="divBranch" style="display:none;">
+			<select class="form-control-custom" placeholder="Pilih Cabang" onchange="branchChange(this.value);" >
+				<!--<option value=0 selected >-- Semua Cabang --</option>-->
+				<?php
+					$sql = "CALL spSelDDLBranch('".$_SESSION['UserLogin']."')";
+					if (! $result = mysqli_query($dbh, $sql)) {
+						logEvent(mysqli_error($dbh), '/Report/Sale/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+						return 0;
+					}
+					while($row = mysqli_fetch_array($result)) {
+						echo "<option value='".$row['BranchID']."' >".$row['BranchCode']." - ".$row['BranchName']."</option>";
+					}
+					mysqli_free_result($result);
+					mysqli_next_result($dbh);
+				?>
+			</select>
+			<input type="hidden" id="hdnBranchID" name="hdnBranchID" value=1 />
 		</div>
 		<script>		
 			var table;
@@ -132,6 +165,12 @@
 					}
 				}
 			};
+
+			function changeItemCode() {
+				var itemCode = $("#ddlUnit option:selected").attr("itemcode");
+				$("#txtItemCode").val(itemCode);
+			}
+
 			function Preview() {
 				var ItemName = $("#txtItemName").val();
 				var BranchID = $("#ddlBranch").val();
@@ -156,7 +195,7 @@
 				if(ItemName == "") {
 					$("#txtItemCode").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 					PassValidate = 0;
-					if(FirstFocus == 0) $("#txtItemCode").next().find("input").focus();
+					if(FirstFocus == 0) $("#txtItemCode").focus();
 					FirstFocus = 1;
 				}
 				
@@ -193,6 +232,13 @@
 								$("#loading").hide();
 								if(data.FailedFlag == '0') {
 									$("#txtItemName").val(data.ItemName);
+									if(data.AvailableUnit.length > 0) {
+										$("#ddlUnit").find('option').remove();
+										for(var i=0;i<data.AvailableUnit.length;i++) {
+											$("#ddlUnit").append("<option value=" + data.AvailableUnit[i][0] + " itemcode='" + data.AvailableUnit[i][2] + "' >" + data.AvailableUnit[i][1] + "</option>");
+										}
+									}
+									$("#ddlUnit").val(data.UnitID);
 								}
 								else {
 									//add new item
@@ -296,6 +342,7 @@
 				$("#itemList-dialog").dialog({
 					autoOpen: false,
 					open: function() {
+						table.keys.disable();
 						table3 = $("#grid-item").DataTable({
 									"keys": true,
 									"scrollY": "295px",
@@ -305,15 +352,24 @@
 									"searching": true,
 									"order": [],
 									"columns": [
+										{ "width": "15%", "orderable": false, className: "dt-head-center" },
 										{ "width": "20%", "orderable": false, className: "dt-head-center" },
-										{ "width": "25%", "orderable": false, className: "dt-head-center" },
-										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "11%", "orderable": false, className: "dt-head-center dt-body-right" }
+										{ "width": "5%", "orderable": false, className: "dt-head-center" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" }
 									],
-									"ajax": "./Report/StockDetails/ItemList.php",
+									"ajax": {
+										"url": "./Transaction/Purchase/ItemList.php",
+										"data": function ( d ) {
+											d.BranchID = $("#ddlBranch").val()
+										}
+									},
 									"processing": true,
 									"serverSide": true,
 									"language": {
@@ -334,8 +390,18 @@
 									"initComplete": function(settings, json) {
 										table3.columns.adjust();
 										$("#grid-item").DataTable().cell( ':eq(0)' ).focus();
-									}
+									},
+									"sDom": '<"toolbar">frtip'
 								});
+
+						$(".toolbar").css({
+							"display" : "inline-block"
+						});
+
+						$("div.toolbar").html($("#divBranch").html());
+
+						$("div.toolbar").find("select").val($("#ddlBranch").val());
+
 						var counterPickItem = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
 							//var index = table3.cell({ focused: true }).index();
@@ -346,6 +412,7 @@
 									$("#txtItemCode").val(data[0]);
 									getItemDetails();
 									$("#itemList-dialog").dialog("destroy");
+									table.keys.enable();
 									table3.destroy();
 								}
 								setTimeout(function() { counterPickItem = 0; } , 1000);
@@ -356,9 +423,10 @@
 							if( $("#itemList-dialog").css("display") == "block") {
 								var data = table3.row(this).data();
 								$("#txtItemCode").val(data[0]);
-								$("#txtItemName").val(data[1]);
-								//getItemDetails();
+								//$("#txtItemName").val(data[1]);
+								getItemDetails();
 								$("#itemList-dialog").dialog("destroy");
+								table.keys.enable();
 								table3.destroy();
 							}
 						});
@@ -383,12 +451,11 @@
 						$(this).dialog("destroy");
 						table3.destroy();
 						table.keys.enable();
-						table2.keys.enable();
 					},
 					resizable: false,
-					height: 500,
+					height: 420,
 					width: 1280,
-					modal: true,
+					modal: true /*,
 					buttons: [
 					{
 						text: "Tutup",
@@ -398,10 +465,9 @@
 							$(this).dialog("destroy");
 							table3.destroy();
 							table.keys.enable();
-							table2.keys.enable();
 							return false;
 						}
-					}]
+					}]*/
 				}).dialog("open");
 			}
 
@@ -472,6 +538,7 @@
 				else if(evt.keyCode == 123) {
 					evt.preventDefault();
 				}
+				setTimeout(function() { counterKey = 0; } , 1000);
 			});
 		</script>
 	</body>

@@ -10,6 +10,8 @@
 		$ItemCode = mysqli_real_escape_string($dbh, $_POST['itemCode']);
 		$FailedFlag = 0;
 		$ErrorMessage = "";
+		$AvailableUnit = "";
+		$UnitID = 0;
 		$State = 1;
 		
 		$sql = "CALL spSelItemDetails('".$ItemCode."', '".$_SESSION['UserLogin']."')";
@@ -18,7 +20,7 @@
 			$FailedFlag = 1;
 			$ErrorMessage = "Terjadi kesalahan sistem.";
 			logEvent(mysqli_error($dbh), '/Report/StockDetails/CheckItem.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-			echo returnstate($ItemID, $ItemName, $FailedFlag, $ErrorMessage);
+			echo returnstate($ItemID, $ItemName, $AvailableUnit, $UnitID, $FailedFlag, $ErrorMessage);
 			return 0;
 		}
 		
@@ -26,6 +28,7 @@
 			$row = mysqli_fetch_array($result);
 			$ItemID = $row['ItemID'];
 			$ItemName = $row['ItemName'];
+			$UnitID = $row['UnitID'];
 		}
 		else {
 			$FailedFlag = 1;
@@ -34,13 +37,30 @@
 		mysqli_free_result($result);
 		mysqli_next_result($dbh);
 		
-		echo returnstate($ItemID, $ItemName, $FailedFlag, $ErrorMessage);
+		if($FailedFlag == 0) {
+			$result2 = mysqli_use_result($dbh);
+			$AvailableUnit = array();
+			while ($row = mysqli_fetch_array($result2)) {
+				$row_unit = array();
+				$row_unit[] = $row['UnitID'];
+				$row_unit[] = $row['UnitName'];
+				$row_unit[] = $row['ItemCode'];
+				array_push($AvailableUnit, $row_unit);
+			}
+
+			mysqli_free_result($result2);
+			mysqli_next_result($dbh);
+		}
+
+		echo returnstate($ItemID, $ItemName, $AvailableUnit, $UnitID, $FailedFlag, $ErrorMessage);
 	}
 	
-	function returnstate($ItemID, $ItemName, $FailedFlag, $ErrorMessage) {
+	function returnstate($ItemID, $ItemName, $AvailableUnit, $UnitID, $FailedFlag, $ErrorMessage) {
 		$data = array(
 			"ItemID" => $ItemID, 
 			"ItemName" => $ItemName,
+			"AvailableUnit" => $AvailableUnit,
+			"UnitID" => $UnitID,
 			"FailedFlag" => $FailedFlag,
 			"ErrorMessage" => $ErrorMessage
 		);

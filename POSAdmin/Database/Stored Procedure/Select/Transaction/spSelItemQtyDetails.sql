@@ -53,9 +53,7 @@ SET State = 1;
 				SUM(FSD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_firststockdetails FSD
-                JOIN master_item MI
-					ON FSD.ItemID = MI.ItemID
-				LEFT JOIN master_itemdetails MID
+                LEFT JOIN master_itemdetails MID
 					ON FSD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = FSD.BranchID
@@ -70,9 +68,7 @@ SET State = 1;
 				SUM(TPD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_purchasedetails TPD
-                JOIN master_item MI
-					ON TPD.ItemID = MI.ItemID
-				LEFT JOIN master_itemdetails MID
+                LEFT JOIN master_itemdetails MID
 					ON TPD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = TPD.BranchID
@@ -87,8 +83,6 @@ SET State = 1;
 				SUM(SRD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_salereturndetails SRD
-                JOIN master_item MI
-					ON SRD.ItemID = MI.ItemID
 				LEFT JOIN master_itemdetails MID
 					ON SRD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
@@ -104,10 +98,6 @@ SET State = 1;
 				SUM(SD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_saledetails SD
-                /*JOIN transaction_sale TS
-					ON TS.SaleID = SD.SaleID*/
-                JOIN master_item MI
-					ON SD.ItemID = MI.ItemID
 				LEFT JOIN master_itemdetails MID
 					ON SD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
@@ -124,9 +114,7 @@ SET State = 1;
 				SUM(PRD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_purchasereturndetails PRD
-                JOIN master_item MI
-					ON PRD.ItemID = MI.ItemID
-				LEFT JOIN master_itemdetails MID
+                LEFT JOIN master_itemdetails MID
 					ON PRD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = PRD.BranchID
@@ -141,9 +129,7 @@ SET State = 1;
 				SUM(SMD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_stockmutationdetails SMD
-                JOIN master_item MI
-					ON SMD.ItemID = MI.ItemID
-				LEFT JOIN master_itemdetails MID
+                LEFT JOIN master_itemdetails MID
 					ON SMD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = SMD.DestinationID
@@ -159,8 +145,6 @@ SET State = 1;
 				SUM(SMD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_stockmutationdetails SMD
-                JOIN master_item MI
-					ON SMD.ItemID = MI.ItemID
 				LEFT JOIN master_itemdetails MID
 					ON SMD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
@@ -176,9 +160,7 @@ SET State = 1;
 				SUM((SAD.AdjustedQuantity - SAD.Quantity) * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_stockadjustdetails SAD
-                JOIN master_item MI
-					ON SAD.ItemID = MI.ItemID
-				LEFT JOIN master_itemdetails MID
+                LEFT JOIN master_itemdetails MID
 					ON SAD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = SAD.BranchID
@@ -193,21 +175,15 @@ SET State = 1;
 				SUM((BD.Quantity - IFNULL(PD.Quantity, 0)) * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_bookingdetails BD
-                /*JOIN transaction_booking TB
-					ON TB.BookingID = BD.BookingID*/
-                JOIN master_item MI
-					ON BD.ItemID = MI.ItemID
-				LEFT JOIN master_itemdetails MID
+               LEFT JOIN master_itemdetails MID
 					ON BD.ItemDetailsID = MID.ItemDetailsID
 				LEFT JOIN transaction_pickdetails PD
 					ON PD.BookingDetailsID = BD.BookingDetailsID
 					AND PD.BranchID <> BD.BranchID
 			WHERE
 				pBranchID = BD.BranchID
-                /*AND TB.FinishFlag = 1*/
 			GROUP BY
-				BD.ItemID,
-				BD.BranchID
+				BD.ItemID
 		)B
 			ON B.ItemID = MI.ItemID
 		LEFT JOIN
@@ -217,9 +193,7 @@ SET State = 1;
 				SUM(PD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_pickdetails PD
-                JOIN master_item MI
-					ON PD.ItemID = MI.ItemID
-				LEFT JOIN master_itemdetails MID
+                LEFT JOIN master_itemdetails MID
 					ON PD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = PD.BranchID
@@ -276,8 +250,6 @@ SET State = 1;
 				SUM(FSD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_firststockdetails FSD
-				JOIN master_item MI
-					ON MI.ItemID = FSD.ItemID
 				LEFT JOIN master_itemdetails MID
 					ON FSD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
@@ -293,9 +265,7 @@ SET State = 1;
 				SUM(TPD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_purchasedetails TPD
-                JOIN master_item MI
-					ON MI.ItemID = TPD.ItemID
-				LEFT JOIN master_itemdetails MID
+                LEFT JOIN master_itemdetails MID
 					ON TPD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = TPD.BranchID
@@ -310,9 +280,7 @@ SET State = 1;
 				SUM(SRD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_salereturndetails SRD
-                JOIN master_item MI
-					ON MI.ItemID = SRD.ItemID
-				LEFT JOIN master_itemdetails MID
+                LEFT JOIN master_itemdetails MID
 					ON SRD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = SRD.BranchID
@@ -327,10 +295,6 @@ SET State = 1;
 				SUM(SD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_saledetails SD
-				/*JOIN transaction_sale TS
-					ON TS.SaleID = SD.SaleID*/
-                JOIN master_item MI
-					ON MI.ItemID = SD.ItemID
 				LEFT JOIN master_itemdetails MID
 					ON SD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
@@ -347,8 +311,6 @@ SET State = 1;
 				SUM(PRD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_purchasereturndetails PRD
-                JOIN master_item MI
-					ON MI.ItemID = PRD.ItemID
 				LEFT JOIN master_itemdetails MID
 					ON PRD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
@@ -364,9 +326,7 @@ SET State = 1;
 				SUM(SMD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_stockmutationdetails SMD
-                JOIN master_item MI
-					ON MI.ItemID = SMD.ItemID
-				LEFT JOIN master_itemdetails MID
+                LEFT JOIN master_itemdetails MID
 					ON SMD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = SMD.DestinationID
@@ -382,8 +342,6 @@ SET State = 1;
 				SUM(SMD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_stockmutationdetails SMD
-                JOIN master_item MI
-					ON MI.ItemID = SMD.ItemID
 				LEFT JOIN master_itemdetails MID
 					ON SMD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
@@ -399,9 +357,7 @@ SET State = 1;
 				SUM((SAD.AdjustedQuantity - SAD.Quantity) * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_stockadjustdetails SAD
-                JOIN master_item MI
-					ON MI.ItemID = SAD.ItemID
-				LEFT JOIN master_itemdetails MID
+                LEFT JOIN master_itemdetails MID
 					ON SAD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = SAD.BranchID
@@ -416,18 +372,13 @@ SET State = 1;
 				SUM((BD.Quantity - IFNULL(PD.Quantity, 0)) * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_bookingdetails BD
-                /*JOIN transaction_booking TB
-					ON TB.BookingID = BD.BookingID*/
-                JOIN master_item MI
-					ON MI.ItemID = BD.ItemID
-				LEFT JOIN master_itemdetails MID
+                LEFT JOIN master_itemdetails MID
 					ON BD.ItemDetailsID = MID.ItemDetailsID
 				LEFT JOIN transaction_pickdetails PD
 					ON PD.BookingDetailsID = BD.BookingDetailsID
 					AND PD.BranchID <> BD.BranchID
 			WHERE
 				pBranchID = BD.BranchID
-                /*AND TB.FinishFlag = 1*/
 			GROUP BY
 				BD.ItemID,
 				BD.BranchID
@@ -440,9 +391,7 @@ SET State = 1;
 				SUM(PD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_pickdetails PD
-                JOIN master_item MI
-					ON MI.ItemID = PD.ItemID
-				LEFT JOIN master_itemdetails MID
+                LEFT JOIN master_itemdetails MID
 					ON PD.ItemDetailsID = MID.ItemDetailsID
 			WHERE
 				pBranchID = PD.BranchID
