@@ -63,6 +63,40 @@ SET State = 1;
 		AND CAST(TS.TransactionDate AS DATE) <= pToDate
 	UNION ALL
     SELECT
+		TB.BookingID,
+		TB.BookingNumber,
+        DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
+        MC.CustomerName,
+		MI.ItemID,
+        MI.ItemName,
+        MI.ItemCode,
+        BD.Quantity,
+        MU.UnitName,
+        BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
+        BD.Discount,
+        BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount) SubTotal
+    FROM
+		transaction_booking TB
+        JOIN transaction_bookingdetails BD
+			ON TB.BookingID = BD.BookingID
+		JOIN master_customer MC
+			ON MC.CustomerID = TB.CustomerID
+		JOIN master_item MI
+			ON MI.ItemID = BD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = BD.ItemDetailsID
+		LEFT JOIN master_unit MU
+			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
+	WHERE
+		CASE
+			WHEN pBranchID = 0
+			THEN BD.BranchID
+			ELSE pBranchID
+		END = BD.BranchID
+		AND CAST(TB.TransactionDate AS DATE) >= pFromDate
+		AND CAST(TB.TransactionDate AS DATE) <= pToDate
+	UNION ALL
+    SELECT
 		TSR.SaleReturnID,
 		CONCAT('R', TS.SaleNumber) SaleNumber,
         DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') TransactionDate,

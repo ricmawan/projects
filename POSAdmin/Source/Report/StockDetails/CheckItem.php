@@ -45,6 +45,7 @@
 				$row_unit[] = $row['UnitID'];
 				$row_unit[] = $row['UnitName'];
 				$row_unit[] = $row['ItemCode'];
+				$row_unit[] = $row['ConversionQuantity'];
 				array_push($AvailableUnit, $row_unit);
 			}
 

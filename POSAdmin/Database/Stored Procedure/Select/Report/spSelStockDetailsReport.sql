@@ -9,11 +9,12 @@ DROP PROCEDURE IF EXISTS spSelStockDetailsReport;
 
 DELIMITER $$
 CREATE PROCEDURE spSelStockDetailsReport (
-	pItemCode		VARCHAR(100),
-	pBranchID 		INT,
-	pFromDate		DATE,
-	pToDate			DATE,
-    pCurrentUser	VARCHAR(255)
+	pItemID					BIGINT,
+	pBranchID 				INT,
+	pFromDate				DATE,
+	pToDate					DATE,
+    pConversionQuantity		DOUBLE,
+    pCurrentUser			VARCHAR(255)
 )
 StoredProcedure:BEGIN
 
@@ -35,10 +36,12 @@ SET State = 1;
 		'-' TransactionDate,
 		pFromDate DateNoFormat,
 		'' CustomerName,
-		(IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0) - IFNULL(BN.Quantity, 0)) Quantity,
+		ROUND((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0) - IFNULL(BN.Quantity, 0)) / pConversionQuantity, 2) Quantity,
 		'0000-00-00' CreatedDate
 	FROM
 		master_item MI
+        JOIN master_itemdetails MID
+			ON MID.ItemID = MI.ItemID
         LEFT JOIN
 		(
 			SELECT
@@ -244,14 +247,35 @@ SET State = 1;
 		)BN
 			ON BN.ItemID = MI.ItemID
 	WHERE
-		TRIM(MI.ItemCode) = TRIM(pItemCode)
+		MI.ItemID = pItemID
+	UNION ALL
+    SELECT
+		'Stok Awal',
+		DATE_FORMAT(FS.TransactionDate, '%d-%m-%Y') TransactionDate,
+		FS.TransactionDate DateNoFormat,
+		'-',
+		ROUND((FSD.Quantity * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2),
+		FS.CreatedDate
+	FROM
+		transaction_firststock FS
+		JOIN transaction_firststockdetails FSD
+			ON FS.FirstStockID = FSD.FirstStockID
+		JOIN master_item MI
+			ON FSD.ItemID = MI.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = FSD.ItemDetailsID
+	WHERE
+		FSD.BranchID = pBranchID
+		AND MI.ItemID = pItemID
+		AND CAST(FS.TransactionDate AS DATE) >= pFromDate
+		AND CAST(FS.TransactionDate AS DATE) <= pToDate
 	UNION ALL
 	SELECT
 		'Pembelian',
 		DATE_FORMAT(TP.TransactionDate, '%d-%m-%Y') TransactionDate,
 		TP.TransactionDate DateNoFormat,
 		MS.SupplierName,
-		TPD.Quantity,
+		ROUND((TPD.Quantity * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2) ,
 		TP.CreatedDate
 	FROM
 		transaction_purchase TP
@@ -261,9 +285,11 @@ SET State = 1;
 			ON TPD.ItemID = MI.ItemID
 		JOIN master_supplier MS
 			ON MS.SupplierID = TP.SupplierID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = TPD.ItemDetailsID
 	WHERE
 		TPD.BranchID = pBranchID
-		AND TRIM(MI.ItemCode) = TRIM(pItemCode)
+		AND MI.ItemID = pItemID
 		AND CAST(TP.TransactionDate AS DATE) >= pFromDate
 		AND CAST(TP.TransactionDate AS DATE) <= pToDate
 	UNION ALL
@@ -272,7 +298,7 @@ SET State = 1;
 		DATE_FORMAT(SR.TransactionDate, '%d-%m-%Y') TransactionDate,
 		SR.TransactionDate DateNoFormat,
 		MC.CustomerName,
-		SRD.Quantity,
+		ROUND((SRD.Quantity * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2),
 		SR.CreatedDate
 	FROM
 		transaction_salereturn SR
@@ -284,9 +310,11 @@ SET State = 1;
 			ON SRD.ItemID = MI.ItemID
 		JOIN master_customer MC
 			ON MC.CustomerID = TS.CustomerID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SRD.ItemDetailsID
 	WHERE
 		SRD.BranchID = pBranchID
-		AND TRIM(MI.ItemCode) = TRIM(pItemCode)
+		AND MI.ItemID = pItemID
 		AND CAST(SR.TransactionDate AS DATE) >= pFromDate
 		AND CAST(SR.TransactionDate AS DATE) <= pToDate
 	UNION ALL
@@ -295,7 +323,7 @@ SET State = 1;
 		DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
 		TS.TransactionDate DateNoFormat,
 		MC.CustomerName,
-		-SD.Quantity,
+		ROUND((-SD.Quantity * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2),
 		TS.CreatedDate
 	FROM
 		transaction_sale TS
@@ -305,9 +333,11 @@ SET State = 1;
 			ON SD.ItemID = MI.ItemID
 		JOIN master_customer MC
 			ON MC.CustomerID = TS.CustomerID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SD.ItemDetailsID
 	WHERE
 		SD.BranchID = pBranchID
-		AND TRIM(MI.ItemCode) = TRIM(pItemCode)
+		AND MI.ItemID = pItemID
 		AND CAST(TS.TransactionDate AS DATE) >= pFromDate
 		AND CAST(TS.TransactionDate AS DATE) <= pToDate
 	UNION ALL
@@ -316,7 +346,7 @@ SET State = 1;
 		DATE_FORMAT(TPR.TransactionDate, '%d-%m-%Y') TransactionDate,
 		TPR.TransactionDate DateNoFormat,
 		MS.SupplierName,
-		-PRD.Quantity,
+		ROUND((-PRD.Quantity * IFNULL(MID.ConversionQuantity, 1)) /pConversionQuantity, 2),
 		TPR.CreatedDate
 	FROM
 		transaction_purchasereturn TPR
@@ -326,9 +356,11 @@ SET State = 1;
 			ON MI.ItemID = PRD.ItemID
 		JOIN master_supplier MS
 			ON MS.SupplierID = TPR.SupplierID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = PRD.ItemDetailsID
 	WHERE
 		PRD.BranchID = pBranchID
-		AND TRIM(MI.ItemCode) = TRIM(pItemCode)
+		AND MI.ItemID = pItemID
 		AND CAST(TPR.TransactionDate AS DATE) >= pFromDate
 		AND CAST(TPR.TransactionDate AS DATE) <= pToDate
 	UNION ALL
@@ -337,7 +369,7 @@ SET State = 1;
 		DATE_FORMAT(SM.TransactionDate, '%d-%m-%Y') TransactionDate,
 		SM.TransactionDate DateNoFormat,
 		'',
-		SMD.Quantity,
+		ROUND((SMD.Quantity * IFNULL(MID.ConversionQuantity, 1)) /pConversionQuantity, 2),
 		SM.CreatedDate
 	FROM
 		transaction_stockmutation SM
@@ -345,9 +377,32 @@ SET State = 1;
 			ON SM.StockMutationID = SMD.StockMutationID
 		JOIN master_item MI
 			ON MI.ItemID = SMD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SMD.ItemDetailsID
 	WHERE
 		SMD.DestinationID = pBranchID
-		AND TRIM(MI.ItemCode) = TRIM(pItemCode)
+		AND MI.ItemID = pItemID
+		AND CAST(SM.TransactionDate AS DATE) >= pFromDate
+		AND CAST(SM.TransactionDate AS DATE) <= pToDate
+	UNION ALL
+    SELECT
+		'Mutasi Stok',
+		DATE_FORMAT(SM.TransactionDate, '%d-%m-%Y') TransactionDate,
+		SM.TransactionDate DateNoFormat,
+		'',
+		ROUND((-SMD.Quantity * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2),
+		SM.CreatedDate
+	FROM
+		transaction_stockmutation SM
+		JOIN transaction_stockmutationdetails SMD
+			ON SM.StockMutationID = SMD.StockMutationID
+		JOIN master_item MI
+			ON MI.ItemID = SMD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SMD.ItemDetailsID
+	WHERE
+		SMD.SourceID = pBranchID
+		AND MI.ItemID = pItemID
 		AND CAST(SM.TransactionDate AS DATE) >= pFromDate
 		AND CAST(SM.TransactionDate AS DATE) <= pToDate
 	UNION ALL
@@ -356,7 +411,7 @@ SET State = 1;
 		DATE_FORMAT(SA.TransactionDate, '%d-%m-%Y') TransactionDate,
 		SA.TransactionDate DateNoFormat,
 		'',
-		(SAD.AdjustedQuantity - SAD.Quantity),
+		ROUND(((SAD.AdjustedQuantity - SAD.Quantity) * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2),
 		SA.CreatedDate
 	FROM
 		transaction_stockadjust SA
@@ -364,11 +419,65 @@ SET State = 1;
 			ON SA.StockAdjustID = SAD.StockAdjustID
 		JOIN master_item MI
 			ON MI.ItemID = SAD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SAD.ItemDetailsID
 	WHERE
 		SAD.BranchID = pBranchID
-		AND TRIM(MI.ItemCode) = TRIM(pItemCode)
+		AND MI.ItemID = pItemID
 		AND CAST(SA.TransactionDate AS DATE) >= pFromDate
 		AND CAST(SA.TransactionDate AS DATE) <= pToDate
+	UNION ALL
+    SELECT
+		'Pemesanan',
+		DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
+		TB.TransactionDate DateNoFormat,
+		MC.CustomerName,
+		ROUND((-(BD.Quantity  - IFNULL(PD.Quantity, 0)) * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2),
+		TB.CreatedDate
+	FROM
+		transaction_booking TB
+		JOIN transaction_bookingdetails BD
+			ON TB.BookingID = BD.BookingID
+		JOIN master_item MI
+			ON BD.ItemID = MI.ItemID
+		JOIN master_customer MC
+			ON MC.CustomerID = TB.CustomerID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = BD.ItemDetailsID
+		LEFT JOIN transaction_pickdetails PD
+			ON PD.BookingDetailsID = BD.BookingDetailsID
+			AND PD.BranchID <> BD.BranchID
+	WHERE
+		BD.BranchID = pBranchID
+		AND MI.ItemID = pItemID
+		AND CAST(TB.TransactionDate AS DATE) >= pFromDate
+		AND CAST(TB.TransactionDate AS DATE) <= pToDate
+	UNION ALL
+    SELECT
+		'Pengambilan',
+        DATE_FORMAT(TP.TransactionDate, '%d-%m-%Y') TransactionDate,
+		TP.TransactionDate DateNoFormat,
+		MC.CustomerName,
+		ROUND((-PD.Quantity * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2),
+		TP.CreatedDate
+	FROM
+		transaction_bookingdetails BD
+        JOIN transaction_pickdetails PD
+			ON PD.BookingDetailsID = BD.BookingDetailsID
+			AND PD.BranchID <> BD.BranchID
+		JOIN transaction_pick TP
+			ON TP.PickID = PD.PickID
+		JOIN transaction_booking TB
+			ON TB.BookingID = TP.BookingID
+		JOIN master_customer MC
+			ON MC.CustomerID = TB.CustomerID
+		LEFT JOIN master_itemdetails MID
+			ON BD.ItemDetailsID = MID.ItemDetailsID
+	WHERE
+		PD.BranchID = pBranchID
+		AND PD.ItemID = pItemID
+		AND CAST(TP.TransactionDate AS DATE) >= pFromDate
+		AND CAST(TP.TransactionDate AS DATE) <= pToDate
 	ORDER BY
 		DateNoFormat,
 		CreatedDate;

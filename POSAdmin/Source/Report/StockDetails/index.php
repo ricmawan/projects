@@ -19,6 +19,7 @@
 							</div>
 							<div class="col-md-3">
 								<input id="txtItemCode" name="txtItemCode" type="text" class="form-control-custom" style="width: 100%;" onfocus="this.select();" onkeypress="isEnterKey(event, 'validateItemCode');" onchange="validateItemCode();" autocomplete=off placeholder="Kode Barang" />
+								<input type="hidden" name="hdnItemID" id="hdnItemID" value=0 />
 							</div>
 							<div class="col-md-3">
 								<input id="txtItemName" name="txtItemName" type="text" class="form-control-custom" style="width: 100%;" placeholder="Nama Barang" readonly />
@@ -207,11 +208,66 @@
 				}
 				else {
 					FirstPass = 0;
-					$("#loading").show();
-					$("#dvTable").show();
-					table.ajax.reload();
-					table.columns.adjust();
-					$("#loading").hide();
+					$.ajax({
+						url: "./Report/StockDetails/CheckItem.php",
+						type: "POST",
+						data: { itemCode : $("#txtItemCode").val() },
+						dataType: "json",
+						success: function(data) {
+							$("#loading").hide();
+							if(data.FailedFlag == '0') {
+								$("#txtItemName").val(data.ItemName);
+								if(data.AvailableUnit.length > 0) {
+									$("#ddlUnit").find('option').remove();
+									for(var i=0;i<data.AvailableUnit.length;i++) {
+										$("#ddlUnit").append("<option value=" + data.AvailableUnit[i][0] + " itemcode='" + data.AvailableUnit[i][2] + "' conversionQuantity=" + data.AvailableUnit[i][3] + " >" + data.AvailableUnit[i][1] + "</option>");
+									}
+								}
+								$("#ddlUnit").val(data.UnitID);
+								$("#hdnItemID").val(data.ItemID);
+								$("#loading").show();
+								$("#dvTable").show();
+								table.ajax.reload();
+								table.columns.adjust();
+								$("#loading").hide();
+							}
+							else {
+								//add new item
+								if(data.ErrorMessage == "") {
+									$("#txtItemCode").notify("Kode tidak valid!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+									$("#txtItemName").val("");
+								}
+								else {
+									var counter = 0;
+									Lobibox.alert("error",
+									{
+										msg: data.ErrorMessage,
+										width: 480,
+										beforeClose: function() {
+											if(counter == 0) {
+												setTimeout(function() {
+													$("#txtItemCode").focus();
+												}, 0);
+												counter = 1;
+											}
+										}
+									});
+									return 0;
+								}
+							}
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+							$("#loading").hide();
+							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+							LogEvent(errorMessage, "/Report/StockDetails/index.php");
+							Lobibox.alert("error",
+							{
+								msg: errorMessage,
+								width: 480
+							});
+							return 0;
+						}
+					});
 				}
 			}
 
@@ -235,10 +291,11 @@
 									if(data.AvailableUnit.length > 0) {
 										$("#ddlUnit").find('option').remove();
 										for(var i=0;i<data.AvailableUnit.length;i++) {
-											$("#ddlUnit").append("<option value=" + data.AvailableUnit[i][0] + " itemcode='" + data.AvailableUnit[i][2] + "' >" + data.AvailableUnit[i][1] + "</option>");
+											$("#ddlUnit").append("<option value=" + data.AvailableUnit[i][0] + " itemcode='" + data.AvailableUnit[i][2] + "' conversionQuantity=" + data.AvailableUnit[i][3] + " >" + data.AvailableUnit[i][1] + "</option>");
 										}
 									}
 									$("#ddlUnit").val(data.UnitID);
+									$("#hdnItemID").val(data.ItemID);
 								}
 								else {
 									//add new item
@@ -319,11 +376,68 @@
 					return false;
 				}
 				else {
-					FirstPass = 0;
-					$("#loading").show();
-					setCookie('downloadStarted', 0, 100); //Expiration could be anything... As long as we reset the value
-					setTimeout(checkDownloadCookie, 1000); //Initiate the loop to check the cookie.
-					$("#excelDownload").attr("src", "Report/StockDetails/ExportExcel.php?BranchID=" + BranchID + "&ItemCode=" + ItemCode + "&ItemName=" + ItemName + "&BranchName=" + BranchName + "&FromDate=" + txtFromDate + "&ToDate=" + txtToDate);
+					$.ajax({
+						url: "./Report/StockDetails/CheckItem.php",
+						type: "POST",
+						data: { itemCode : $("#txtItemCode").val() },
+						dataType: "json",
+						success: function(data) {
+							$("#loading").hide();
+							if(data.FailedFlag == '0') {
+								$("#txtItemName").val(data.ItemName);
+								if(data.AvailableUnit.length > 0) {
+									$("#ddlUnit").find('option').remove();
+									for(var i=0;i<data.AvailableUnit.length;i++) {
+										$("#ddlUnit").append("<option value=" + data.AvailableUnit[i][0] + " itemcode='" + data.AvailableUnit[i][2] + "' conversionQuantity=" + data.AvailableUnit[i][3] + " >" + data.AvailableUnit[i][1] + "</option>");
+									}
+								}
+								$("#ddlUnit").val(data.UnitID);
+								$("#hdnItemID").val(data.ItemID);
+								var ItemID = data.ItemID;
+								var conversionQuantity = $("#ddlUnit option:selected").attr("conversionQuantity");
+								FirstPass = 0;
+								$("#loading").show();
+								setCookie('downloadStarted', 0, 100); //Expiration could be anything... As long as we reset the value
+								setTimeout(checkDownloadCookie, 1000); //Initiate the loop to check the cookie.
+								$("#excelDownload").attr("src", "Report/StockDetails/ExportExcel.php?BranchID=" + BranchID + "&ItemID=" + ItemID + "&ItemName=" + ItemName + "&BranchName=" + BranchName + "&FromDate=" + txtFromDate + "&ToDate=" + txtToDate + "&conversionQuantity=" + conversionQuantity);
+							}
+							else {
+								//add new item
+								if(data.ErrorMessage == "") {
+									$("#txtItemCode").notify("Kode tidak valid!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+									$("#txtItemName").val("");
+								}
+								else {
+									var counter = 0;
+									Lobibox.alert("error",
+									{
+										msg: data.ErrorMessage,
+										width: 480,
+										beforeClose: function() {
+											if(counter == 0) {
+												setTimeout(function() {
+													$("#txtItemCode").focus();
+												}, 0);
+												counter = 1;
+											}
+										}
+									});
+									return 0;
+								}
+							}
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+							$("#loading").hide();
+							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+							LogEvent(errorMessage, "/Report/StockDetails/index.php");
+							Lobibox.alert("error",
+							{
+								msg: errorMessage,
+								width: 480
+							});
+							return 0;
+						}
+					});
 				}
 			}
 
@@ -410,7 +524,7 @@
 								var data = datatable.row( cell.index().row ).data();
 								if(key == 13 && $("#itemList-dialog").css("display") == "block") {
 									$("#txtItemCode").val(data[0]);
-									getItemDetails();
+									validateItemCode();
 									$("#itemList-dialog").dialog("destroy");
 									table.keys.enable();
 									table3.destroy();
@@ -424,7 +538,7 @@
 								var data = table3.row(this).data();
 								$("#txtItemCode").val(data[0]);
 								//$("#txtItemName").val(data[1]);
-								getItemDetails();
+								validateItemCode();
 								$("#itemList-dialog").dialog("destroy");
 								table.keys.enable();
 								table3.destroy();
@@ -481,6 +595,25 @@
 					maxDate : "+0D"
 				});
 
+				$.fn.dataTable.ext.errMode = function(settings, techNote, message) { 
+					$("#loading").hide();
+					var errorMessage = "DataTables Error : " + techNote + " (" + message + ")";
+					var counterError = 0;
+					LogEvent(errorMessage, "/Transaction/Sale/index.php");
+					Lobibox.alert("error",
+					{
+						msg: "Terjadi kesalahan. Memuat ulang halaman.",
+						width: 480,
+						//delay: 2000,
+						beforeClose: function() {
+							if(counterError == 0) {
+								//location.reload();
+								counterError = 1;
+							}
+						}
+					});
+				};
+
 				table = $("#grid-data").DataTable({
 								"keys": true,
 								"scrollY": "280px",
@@ -502,10 +635,11 @@
 									"url": "./Report/StockDetails/DataSource.php",
 									"data": function ( d ) {
 										d.BranchID = $("#ddlBranch").val(),
-										d.ItemCode = $("#txtItemCode").val(),
+										d.ItemID = $("#hdnItemID").val(),
 										d.FirstPass = FirstPass,
 										d.FromDate = $("#txtFromDate").val(),
-										d.ToDate = $("#txtToDate").val()
+										d.ToDate = $("#txtToDate").val(),
+										d.conversionQuantity = $("#ddlUnit option:selected").attr("conversionQuantity")
 									}
 								},
 								"language": {

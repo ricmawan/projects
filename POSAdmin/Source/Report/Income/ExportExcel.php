@@ -117,7 +117,7 @@
 			return 0;
 		}
 		$RowNumber = 1;
-		$SaleNumber = 0;
+		$SaleNumber = "";
 		$MergeStart = 0;
 		$Total = 0;
 		$DetailsCounter = 0;
@@ -139,7 +139,6 @@
 
 					$objPHPExcel->getActiveSheet()->setCellValue("N".$rowExcel, $Total);
 					$objPHPExcel->getActiveSheet()->getStyle("E".$rowExcel.":N".$rowExcel)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('fffa00');
-
 					$rowExcel++;
 				}
 				$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $RowNumber);

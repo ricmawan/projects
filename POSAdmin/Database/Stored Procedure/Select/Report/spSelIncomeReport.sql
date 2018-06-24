@@ -61,6 +61,28 @@ SET @query = CONCAT("SELECT
 							GROUP BY
 								TS.SaleID
 							UNION ALL
+                            SELECT
+								SUM((BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (BD.Quantity * BD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) Total
+							FROM
+								transaction_booking TB
+								JOIN transaction_bookingdetails BD
+									ON TB.BookingID = BD.BookingID
+								JOIN master_customer MC
+									ON MC.CustomerID = TB.CustomerID
+								LEFT JOIN master_itemdetails MID
+									ON MID.ItemDetailsID = BD.ItemDetailsID
+							WHERE 
+								CASE
+									WHEN ",pBranchID," = 0
+									THEN BD.BranchID
+									ELSE ",pBranchID,"
+								END = BD.BranchID
+								AND CAST(TB.TransactionDate AS DATE) >= '",pFromDate,"'
+								AND CAST(TB.TransactionDate AS DATE) <= '",pToDate,"'
+								AND ", pWhere, "
+							GROUP BY
+								TB.BookingID
+							UNION ALL
 		                    SELECT
 								-SUM(((SRD.Quantity * SRD.SalePrice * IFNULL(MID.ConversionQuantity, 1)) - (SRD.Quantity * SRD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))))
 							FROM
@@ -121,6 +143,36 @@ SET @query = CONCAT("SELECT
 						TS.SaleID,
                         TS.SaleNumber,
                         TS.TransactionDate,
+                        MC.CustomerName
+                    UNION ALL
+                    SELECT
+						TB.BookingID,
+						'Pemesanan' TransactionType,
+                        TB.BookingNumber,
+                        DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
+                        MC.CustomerName,
+                        SUM((BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (BD.Quantity * BD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) Total
+					FROM
+						transaction_booking TB
+                        JOIN transaction_bookingdetails BD
+							ON TB.BookingID = BD.BookingID
+						JOIN master_customer MC
+							ON MC.CustomerID = TB.CustomerID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = BD.ItemDetailsID
+					WHERE 
+						CASE
+							WHEN ",pBranchID," = 0
+							THEN BD.BranchID
+							ELSE ",pBranchID,"
+						END = BD.BranchID
+						AND CAST(TB.TransactionDate AS DATE) >= '",pFromDate,"'
+						AND CAST(TB.TransactionDate AS DATE) <= '",pToDate,"'
+						AND ", pWhere, "
+                    GROUP BY
+						TB.BookingID,
+                        TB.BookingNumber,
+                        TB.TransactionDate,
                         MC.CustomerName
                     UNION ALL
                     SELECT

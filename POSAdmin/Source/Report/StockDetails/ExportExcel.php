@@ -1,14 +1,15 @@
 <?php
-	if(ISSET($_GET['BranchID']) && ISSET($_GET['ItemCode'])) {
+	if(ISSET($_GET['BranchID']) && ISSET($_GET['ItemID'])) {
 		$RequestedPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestedPath);
 		$RequestedPath = str_replace($file, "", $RequestedPath);	
 		include "../../GetPermission.php";
 		//echo $_SERVER['REQUEST_URI'];
-		$ItemCode = $_GET['ItemCode'];
+		$ItemID = $_GET['ItemID'];
 		$ItemName = $_GET['ItemName'];
 		$BranchID = $_GET['BranchID'];
 		$BranchName = $_GET['BranchName'];
+		$ConversionQuantity = $_GET['conversionQuantity'];
 		if($_GET['FromDate'] == "") {
 			$txtFromDate = "2000-01-01";
 		}
@@ -102,7 +103,7 @@
 		$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, "Stok");
 		$rowExcel++;
 		
-		$sql = "CALL spSelStockDetailsReport('".$ItemCode."', ".$BranchID.", '".$txtFromDate."', '".$txtToDate."', '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spSelStockDetailsReport(".$ItemID.", ".$BranchID.", '".$txtFromDate."', '".$txtToDate."', ".$ConversionQuantity.", '".$_SESSION['UserLogin']."')";
 
 		if (! $result = mysqli_query($dbh, $sql)) {
 			logEvent(mysqli_error($dbh), '/Report/Stock/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));

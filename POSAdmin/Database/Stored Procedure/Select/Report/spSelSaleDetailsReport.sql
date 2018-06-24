@@ -56,7 +56,34 @@ SET State = 1;
 				END = SD.BranchID
 		ORDER BY
 			SD.SaleDetailsID;
-	ELSE
+	ELSEIF(pTransactionType = 'Pemesanan')
+    THEN
+		SELECT
+			MI.ItemCode,
+	        MI.ItemName,
+	        BD.Quantity,
+            MU.UnitName,
+	        BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) SalePrice,
+			BD.Discount,
+			BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount) SubTotal
+		FROM
+			transaction_bookingdetails BD
+	        JOIN master_item MI
+				ON MI.ItemID = BD.ItemID
+			LEFT JOIN master_itemdetails MID
+				ON MID.ItemDetailsID = BD.ItemDetailsID
+			LEFT JOIN master_unit MU
+				ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
+		WHERE
+			BD.BookingID = pSaleID
+            AND CASE
+					WHEN pBranchID = 0
+					THEN BD.BranchID
+					ELSE pBranchID
+				END = BD.BranchID
+		ORDER BY
+			BD.BookingDetailsID;
+    ELSE
 		SELECT
 			MI.ItemCode,
 	        MI.ItemName,

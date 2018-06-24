@@ -48,6 +48,26 @@ SET State = 1;
 		TS.SaleNumber,
 		TS.TransactionDate
 	UNION ALL
+    SELECT
+		TB.BookingID,
+		TB.BookingNumber,
+		DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
+		SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) Total
+	FROM
+		transaction_booking TB
+		JOIN transaction_bookingdetails BD
+			ON TB.BookingID = BD.BookingID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = BD.ItemDetailsID
+	WHERE 
+		TB.CustomerID = pCustomerID
+		AND CAST(TB.TransactionDate AS DATE) >= pFromDate
+		AND CAST(TB.TransactionDate AS DATE) <= pToDate
+	GROUP BY
+		TB.BookingID,
+		TB.BookingNumber,
+		TB.TransactionDate
+	UNION ALL
 	SELECT
 		TSR.SaleReturnID,
 		CONCAT('R', TS.SaleNumber),
