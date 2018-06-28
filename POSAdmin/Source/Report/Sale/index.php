@@ -232,6 +232,25 @@
 					maxDate : "+0D"
 				});
 
+				$.fn.dataTable.ext.errMode = function(settings, techNote, message) { 
+					$("#loading").hide();
+					var errorMessage = "DataTables Error : " + techNote + " (" + message + ")";
+					var counterError = 0;
+					LogEvent(errorMessage, "/Transaction/Sale/index.php");
+					Lobibox.alert("error",
+					{
+						msg: "Terjadi kesalahan. Memuat ulang halaman.",
+						width: 480,
+						//delay: 2000,
+						beforeClose: function() {
+							if(counterError == 0) {
+								//location.reload();
+								counterError = 1;
+							}
+						}
+					});
+				};
+
 				var panelHeight = $(".panel-body").height();
 				//$("head").append("<style> .panel-body { overflow-y:auto;min-height : " + (panelHeight + 20) + "px; max-height : " + (panelHeight + 20) + "px } </style>");
 				$(".panel-body").css({

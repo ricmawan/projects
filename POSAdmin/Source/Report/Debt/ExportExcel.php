@@ -28,14 +28,14 @@
 		// Set document properties
 		$objPHPExcel->getProperties()->setCreator($_SESSION['UserLogin'])
 									 ->setLastModifiedBy($_SESSION['UserLogin'])
-									 ->setTitle("Laporan Piutang")
+									 ->setTitle("Laporan Hutang")
 									 ->setSubject("Laporan")
-									 ->setDescription("Laporan Piutang")
+									 ->setDescription("Laporan Hutang")
 									 ->setKeywords("Generate By PHPExcel")
 									 ->setCategory("Laporan");
 		//Header
 		$objPHPExcel->setActiveSheetIndex(0)
-					->setCellValue('A1', "LAPORAN PIUTANG");
+					->setCellValue('A1', "LAPORAN HUTANG");
 					
 		//set margin
 		$objPHPExcel->getActiveSheet()->getPageMargins()->setTop(0.787402);
@@ -80,31 +80,31 @@
 		$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "No");
 		$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, "No. Invoice");
 		$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, "Tanggal");
-		$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, "Nama Pelanggan");
+		$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, "Nama Supplier");
 		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Penjualan");
 		$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, "Pembayaran");
-		$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, "Piutang");
+		$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, "Hutang");
 		$rowExcel++;
 		
-		$sql = "CALL spSelExportCreditReport('".$txtFromDate."', '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spSelExportDebtReport('".$txtFromDate."', '".$_SESSION['UserLogin']."')";
 
 		if (! $result = mysqli_query($dbh, $sql)) {
-			logEvent(mysqli_error($dbh), '/Report/Credit/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Report/Debt/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 			return 0;
 		}
 		$RowNumber = 1;
 		$GrandTotal = 0;
 		while($row = mysqli_fetch_array($result)) {
 			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $RowNumber);
-			$objPHPExcel->getActiveSheet()->setCellValueExplicit("B".$rowExcel, $row['SaleNumber'], PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->getActiveSheet()->setCellValueExplicit("B".$rowExcel, $row['PurchaseNumber'], PHPExcel_Cell_DataType::TYPE_STRING);
 			$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['TransactionDate']);
-			$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row['CustomerName']);
-			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, $row['TotalSale']);
+			$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row['SupplierName']);
+			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, $row['TotalPurchase']);
 			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['TotalPayment']);
-			$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, $row['Credit']); 
+			$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, $row['Debt']); 
 			$RowNumber++;
 			$rowExcel++;
-			$GrandTotal += $row['Credit'];
+			$GrandTotal += $row['Debt'];
 		}
 
 		$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":F".$rowExcel);
@@ -145,7 +145,7 @@
 		);		
 		$objPHPExcel->getActiveSheet()->getStyle("A5:G".($rowExcel-1))->applyFromArray($styleArray);		
 
-		$title = "Laporan Piutang Per Tanggal " . $period;
+		$title = "Laporan Hutang Per Tanggal " . $period;
 		// Rename worksheet
 		//$objPHPExcel->getActiveSheet()->setTitle($title);
 		// Set active sheet index to the first sheet, so Excel opens this as the first sheet

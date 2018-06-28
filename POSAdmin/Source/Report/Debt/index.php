@@ -19,7 +19,7 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-heading" style="padding: 1px 15px;">
-						 <h5>Piutang</h5>
+						 <h5>Hutang</h5>
 					</div>
 					<div class="panel-body">
 						<div class="row">
@@ -44,11 +44,11 @@
 										<th></th>
 										<th>No. Invoice</th>
 										<th>Tanggal</th>
-										<th>Nama Pelanggan</th>
+										<th>Nama Supplier</th>
 										<th>Penjualan</th>
 										<th>Pembayaran</th>
 										<th>Piutang</th>
-										<th>SaleID</th>
+										<th>PurchaseID</th>
 										<th>TransactionType</th>
 									</tr>
 								</thead>
@@ -128,7 +128,7 @@
 					$("#loading").show();
 					setCookie('downloadStarted', 0, 100); //Expiration could be anything... As long as we reset the value
 					setTimeout(checkDownloadCookie, 1000); //Initiate the loop to check the cookie.
-					$("#excelDownload").attr("src", "Report/Credit/ExportExcel.php?FromDate=" + txtFromDate);
+					$("#excelDownload").attr("src", "Report/Debt/ExportExcel.php?FromDate=" + txtFromDate);
 				}
 			}
 
@@ -150,10 +150,10 @@
 			        .text( 'Loading...' );
 
 			    $.ajax( {
-			    	url: './Report/Credit/Details.php',
+			    	url: './Report/Debt/Details.php',
 			    	type: "POST",
 					data: {
-			            ID: rowData.SaleID,
+			            ID: rowData.PurchaseID,
 			            TransactionType: rowData.TransactionType,
 			            BranchID : 0,
 			            FromDate : $("#txtFromDate").val()
@@ -183,7 +183,7 @@
 					$("#loading").hide();
 					var errorMessage = "DataTables Error : " + techNote + " (" + message + ")";
 					var counterError = 0;
-					LogEvent(errorMessage, "/Transaction/Credit/index.php");
+					LogEvent(errorMessage, "/Transaction/Debt/index.php");
 					Lobibox.alert("error",
 					{
 						msg: "Terjadi kesalahan. Memuat ulang halaman.",
@@ -218,19 +218,19 @@
 						                "data": null,
 						                "defaultContent": ''
 						            },
-									{ "data": "SaleNumber", className: "dt-head-center" },
+									{ "data": "PurchaseNumber", className: "dt-head-center" },
 									{ "data": "TransactionDate", className: "dt-head-center" },
-									{ "data": "CustomerName", className: "dt-head-center" },
-									{ "data": "TotalSale", "orderable": false, className: "dt-head-center dt-body-right" },
+									{ "data": "SupplierName", className: "dt-head-center" },
+									{ "data": "TotalPurchase", "orderable": false, className: "dt-head-center dt-body-right" },
 									{ "data": "TotalPayment", "orderable": false, className: "dt-head-center dt-body-right" },
-									{ "data": "Credit", "orderable": false, className: "dt-head-center dt-body-right" },
-									{ "data": "SaleID", "visible": false },
+									{ "data": "Debt", "orderable": false, className: "dt-head-center dt-body-right" },
+									{ "data": "PurchaseID", "visible": false },
 									{ "data": "TransactionType", "visible": false }
 								],
 								"processing": true,
 								"serverSide": true,
 								"ajax": {
-									"url": "./Report/Credit/DataSource.php",
+									"url": "./Report/Debt/DataSource.php",
 									"data": function ( d ) {
 										d.FromDate = $("#txtFromDate").val(),
 										d.FirstPass = FirstPass

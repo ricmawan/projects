@@ -599,7 +599,7 @@
 					$("#loading").hide();
 					var errorMessage = "DataTables Error : " + techNote + " (" + message + ")";
 					var counterError = 0;
-					LogEvent(errorMessage, "/Transaction/Sale/index.php");
+					LogEvent(errorMessage, "/Transaction/StockDetails/index.php");
 					Lobibox.alert("error",
 					{
 						msg: "Terjadi kesalahan. Memuat ulang halaman.",

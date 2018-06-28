@@ -16,7 +16,7 @@
 		$sql = "CALL spSelPaymentDetailsReport(".$ID.", '".$txtFromDate."', '".$TransactionType."', '".$_SESSION['UserLogin']."')";
 
 		if (! $result = mysqli_query($dbh, $sql)) {
-			logEvent(mysqli_error($dbh), '/Report/Credit/Details.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Report/Debt/Details.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 			return 0;
 		}
 		$table = "<table class='table table-striped table-bordered table-hover'>";
