@@ -75,6 +75,12 @@
 					<div class="col-md-2">
 						<input id="txtCustomerName" name="txtCustomerName" type="text" class="form-control-custom mousetrap" onfocus="this.select();" autocomplete=off placeholder="Pelanggan" readonly />
 					</div>
+					<div class="col-md-1 labelColumn">
+						DP :
+					</div>
+					<div class="col-md-2">
+						<input id="txtPayment" name="txtPayment" type="text" class="form-control-custom mousetrap text-right" autocomplete=off onkeypress="isEnterKey(event, 'updatePayment');return isNumberKey(event, this.id, this.value);" onchange="updatePayment();" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" placeholder="DP" />
+					</div>
 				</div>
 				<br />
 				<div class="row">
@@ -119,8 +125,8 @@
 					</div>
 				</div>
 				<div class="row" >
-					<h2 style="display: inline-block;float: left;" >TOTAL : &nbsp;</h2><span id="lblTotal" >0</span>
-					</h2><span id="lblWeight" >0</span><h2 style="display: inline-block;float: right;color: #0006ff;" >Berat(KG) : &nbsp;
+					<h2 style="display: inline-block;float: left;" >TOTAL BAYAR: &nbsp;</h2><span id="lblTotal" >0</span>
+					<span id="lblWeight" >0</span><h2 style="display: inline-block;float: right;color: #0006ff;" >TOTAL BELANJA : &nbsp;</h2>
 				</div>
 				<br />
 				<div class="row" >
@@ -142,6 +148,56 @@
 				$("#txtRemarks").val(Data[4]);
 				setTimeout(function() { $("#txtAmount").focus(); }, 0);
 			}
+
+			var counterUpdatePayment = 0;
+			function updatePayment() {
+				if(counterUpdatePayment == 0) {
+					counterUpdatePayment = 1;
+					var TransactionID = $("#hdnTransactionID").val();
+					var TransactionType = $("#hdnTransactionType").val();
+					var Payment = $("#txtPayment").val().replace(/\,/g, "");
+					$.ajax({
+						url: "./Transaction/Payment/UpdatePayment.php",
+						type: "POST",
+						data: { TransactionID : TransactionID, TransactionType : TransactionType, Payment : Payment },
+						dataType: "json",
+						success: function(Data) {
+							if(Data.FailedFlag == '0') {
+								
+							}
+							else {
+								var counter = 0;
+								Lobibox.alert("error",
+								{
+									msg: "Gagal update pembayaran",
+									width: 480,
+									beforeClose: function() {
+										if(counter == 0) {
+											setTimeout(function() {
+												$("#txtPayment").focus();
+											}, 0);
+											counter = 1;
+										}
+									}
+								});
+								return 0;
+							}
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+							$("#loading").hide();
+							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+							LogEvent(errorMessage, "/Transaction/Payment/index.php");
+							Lobibox.alert("error",
+							{
+								msg: errorMessage,
+								width: 480
+							});
+							return 0;
+						}
+					});
+					setTimeout(function() { counterUpdatePayment = 0; } , 1000);
+				}
+			}
 			
 			function openDialog(Data, EditFlag) {
 				$("#hdnIsEdit").val(EditFlag);
@@ -152,6 +208,9 @@
 				$("#txtTransactionDate").datepicker("setDate", new Date(Data[8]));
 				$("#txtPaymentDate").datepicker("setDate", new Date());
 				$("#hdnTransactionType").val(Data[9]);
+				$("#txtPayment").val(returnRupiah(Data[10]));
+				$("#lblWeight").html(Data[4]);
+				$("#lblTotal").html(Data[5]);
 				getPaymentDetails(Data[7], Data[9]);
 				var index = table.cell({ focused: true }).index();
 				$("#FormData").dialog({

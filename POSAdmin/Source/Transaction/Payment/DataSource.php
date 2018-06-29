@@ -67,6 +67,7 @@
 		$row_array[] = $row['SaleID'];
 		$row_array[] = $row['PlainTransactionDate'];
 		$row_array[] = $row['TransactionType'];
+		$row_array[] = $row['Payment'];
 		array_push($return_arr, $row_array);
 	}
 	
