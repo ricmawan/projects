@@ -153,48 +153,67 @@
 			function updatePayment() {
 				if(counterUpdatePayment == 0) {
 					counterUpdatePayment = 1;
-					var TransactionID = $("#hdnTransactionID").val();
-					var TransactionType = $("#hdnTransactionType").val();
-					var Payment = $("#txtPayment").val().replace(/\,/g, "");
-					$.ajax({
-						url: "./Transaction/Payment/UpdatePayment.php",
-						type: "POST",
-						data: { TransactionID : TransactionID, TransactionType : TransactionType, Payment : Payment },
-						dataType: "json",
-						success: function(Data) {
-							if(Data.FailedFlag == '0') {
-								
-							}
-							else {
-								var counter = 0;
+					var PassValidate = 1;
+					var grandTotal = 0;
+					var FirstFocus = 0;
+					table2.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+						var data = this.data();
+						grandTotal += parseFloat(data[3].replace(/\,/g, ""));
+					});
+
+					var totalSale = parseFloat($("#lblWeight").html().replace(/\,/g, ""));
+					if((grandTotal + parseFloat($("#txtPayment").val().replace(/\,/g, ""))) > totalSale) {
+						PassValidate = 0;
+						$("#txtPayment").notify("Pembayaran melebihi pembelanjaan", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+						if(FirstFocus == 0) $("#txtAmount").focus();
+						FirstFocus = 1;
+					}
+
+					if(PassValidate == 1) {
+						var TransactionID = $("#hdnTransactionID").val();
+						var TransactionType = $("#hdnTransactionType").val();
+						var Payment = $("#txtPayment").val().replace(/\,/g, "");
+						$.ajax({
+							url: "./Transaction/Payment/UpdatePayment.php",
+							type: "POST",
+							data: { TransactionID : TransactionID, TransactionType : TransactionType, Payment : Payment },
+							dataType: "json",
+							success: function(Data) {
+								if(Data.FailedFlag == '0') {
+									Calculate();
+									printInvoice();
+								}
+								else {
+									var counter = 0;
+									Lobibox.alert("error",
+									{
+										msg: "Gagal update pembayaran",
+										width: 480,
+										beforeClose: function() {
+											if(counter == 0) {
+												setTimeout(function() {
+													$("#txtPayment").focus();
+												}, 0);
+												counter = 1;
+											}
+										}
+									});
+									return 0;
+								}
+							},
+							error: function(jqXHR, textStatus, errorThrown) {
+								$("#loading").hide();
+								var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+								LogEvent(errorMessage, "/Transaction/Payment/index.php");
 								Lobibox.alert("error",
 								{
-									msg: "Gagal update pembayaran",
-									width: 480,
-									beforeClose: function() {
-										if(counter == 0) {
-											setTimeout(function() {
-												$("#txtPayment").focus();
-											}, 0);
-											counter = 1;
-										}
-									}
+									msg: errorMessage,
+									width: 480
 								});
 								return 0;
 							}
-						},
-						error: function(jqXHR, textStatus, errorThrown) {
-							$("#loading").hide();
-							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-							LogEvent(errorMessage, "/Transaction/Payment/index.php");
-							Lobibox.alert("error",
-							{
-								msg: errorMessage,
-								width: 480
-							});
-							return 0;
-						}
-					});
+						});
+					}
 					setTimeout(function() { counterUpdatePayment = 0; } , 1000);
 				}
 			}
@@ -283,6 +302,7 @@
 												}
 											}
 											tableWidthAdjust();
+											Calculate();
 										}
 										else {
 											table2.keys.enable();
@@ -430,6 +450,15 @@
 						FirstFocus = 1;
 					}
 
+					var totalSale = parseFloat($("#lblWeight").html().replace(/\,/g, ""));
+					var totalPayment = parseFloat($("#lblTotal").html().replace(/\,/g, ""));
+					if((totalPayment + parseFloat($("#txtAmount").val().replace(/\,/g, ""))) > totalSale) {
+						PassValidate = 0;
+						$("#txtAmount").notify("Pembayaran melebihi pembelanjaan", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+						if(FirstFocus == 0) $("#txtAmount").focus();
+						FirstFocus = 1;
+					}
+
 					if(PassValidate == 1) {
 						
 						$.ajax({
@@ -471,6 +500,8 @@
 									$("#hdnPaymentDetailsID").val(0);
 									$("#txtPaymentDate").focus();
 									tableWidthAdjust();
+									Calculate();
+									printInvoice();
 								}
 								else {
 									var counter = 0;
@@ -528,6 +559,15 @@
 				$("#hdnTransactionDate").val(transactionDate);
 				$("#hdnPaymentDetailsID").val(0);
 				table2.clear().draw();
+			}
+
+			function Calculate() {
+				var grandTotal = parseFloat($("#txtPayment").val().replace(/\,/g, ""));
+				table2.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+					var data = this.data();
+					grandTotal += parseFloat(data[3].replace(/\,/g, ""));
+				});
+				$("#lblTotal").html(returnRupiah(grandTotal.toString()));
 			}
 			
 			function fnDeleteData() {
