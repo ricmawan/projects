@@ -181,7 +181,9 @@
 							success: function(Data) {
 								if(Data.FailedFlag == '0') {
 									Calculate();
-									printInvoice();
+									var transactionDate = new Date();
+									transactionDate = transactionDate.getFullYear() + "-" + ("0" + (transactionDate.getMonth() + 1)).slice(-2) + "-" + ("0" + transactionDate.getDate()).slice(-2);
+									printInvoice(1, parseFloat(Payment), transactionDate);
 								}
 								else {
 									var counter = 0;
@@ -501,7 +503,7 @@
 									$("#txtPaymentDate").focus();
 									tableWidthAdjust();
 									Calculate();
-									printInvoice();
+									printInvoice(0, parseFloat(amount.replace(/\,/g, "")), paymentDate);
 								}
 								else {
 									var counter = 0;
@@ -600,27 +602,26 @@
 				});
 			}
 
-			function printInvoice() {
-				var paymentID = $("#hdnTransactionID").val();
-				var Payment = $("#txtPayment").val().replace(/\,/g, "");
-				var PaymentType = $("#ddlPayment").val();
-				var PrintInvoice = $("#chkPrint").prop("checked");
-				var PrintShipment = $("#chkPrintShipment").prop("checked");
+			function printInvoice(DPFlag, Amount, TransactionDate) {
+				var TotalPayment = $("#lblTotal").html();
+				var TotalSale = $("#lblWeight").html();
+				var TransactionNumber = $("#txtPaymentNumber").val();
+				var CustomerName = $("#txtCustomerName").val();
+
 				$("#loading").show();
 				$.ajax({
 					url: "./Transaction/Payment/PrintInvoice.php",
 					type: "POST",
-					data: { TransactionID : paymentID, Payment : Payment, PaymentType : PaymentType, PrintInvoice : PrintInvoice },
+					data: { DPFlag : DPFlag, TransactionDate : TransactionDate, CustomerName : CustomerName, TransactionNumber : TransactionNumber, TotalPayment : TotalPayment, TotalSale : TotalSale, Amount : Amount },
 					dataType: "json",
 					success: function(data) {
 						if(data.FailedFlag == '0') {
 							$("#loading").hide();
 							$("#divModal").hide();
-							if(PrintShipment == true) printShipment();
-							resetForm();
-							table2.destroy();
-							$("#finish-dialog").dialog("destroy");
-							openDialog(0, 0);
+							//resetForm();
+							//table2.destroy();
+							//$("#FormData").dialog("destroy");
+							//openDialog(0, 0);
 							Lobibox.alert("success",
 							{
 								msg: data.Message,

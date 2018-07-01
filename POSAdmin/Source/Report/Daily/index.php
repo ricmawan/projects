@@ -12,6 +12,11 @@
 			tr.shown td.details-control {
 			    background: url('./assets/img/details_close.png') no-repeat center center;
 			}
+			.Cashier {
+				font-color: red;
+				font-size: 14px;
+				font-weight: bold;
+			}
 		</style>
 	</head>
 	<body>
@@ -28,15 +33,15 @@
 							</div>
 							<div class="col-md-2">
 								<select id="ddlUser" name="ddlUser" tabindex=8 class="form-control-custom" placeholder="Pilih Cabang" >
-									<!--<option value=0 selected >-- Semua Cabang --</option>-->
+									<option value=0 selected >-- Semua Kasir --</option>
 									<?php
-										$sql = "CALL spSelDDLBranch('".$_SESSION['UserLogin']."')";
+										$sql = "CALL spSelDDLCashier('".$_SESSION['UserLogin']."')";
 										if (! $result = mysqli_query($dbh, $sql)) {
-											logEvent(mysqli_error($dbh), '/Report/Sale/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+											logEvent(mysqli_error($dbh), '/Report/Daily/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 											return 0;
 										}
 										while($row = mysqli_fetch_array($result)) {
-											echo "<option value='".$row['BranchID']."' >".$row['BranchCode']." - ".$row['BranchName']."</option>";
+											echo "<option value='".$row['UserID']."' >".$row['UserName']."</option>";
 										}
 										mysqli_free_result($result);
 										mysqli_next_result($dbh);
@@ -48,7 +53,7 @@
 							</div>
 							<div class="col-md-2">
 								<div class="ui-widget" style="width: 100%;">
-									<input id="txtFromDate" name="txtFromDate" type="text" class="form-control-custom" style="background-color: #FFF;cursor: text;" placeholder="Dari Tanggal" readonly />
+									<input id="txtTransactionDate" name="txtTransactionDate" type="text" class="form-control-custom" style="background-color: #FFF;cursor: text;" placeholder="Tanggal" readonly />
 								</div>
 							</div>
 							<div class="col-md-3">
@@ -58,18 +63,8 @@
 						</div>
 						<hr style="margin: 10px 0;" />
 						<div class="table-responsive" id="dvTable" style="display: none;">
-							<table id="grid-data" class="table table-striped table-bordered table-hover" >
-								<thead>				
-									<tr>
-										<th></th>
-										<th>No. Invoice</th>
-										<th>Tanggal</th>
-										<th>Nama Pelanggan</th>
-										<th>Sub Total</th>
-									</tr>
-								</thead>
-								<tfoot id="tfootTable">
-								</tfoot>
+							<table id="grid-data" class="table table-hover" >
+								
 							</table>
 						</div>
 					</div>
@@ -98,85 +93,56 @@
 				}
 			};
 			function Preview() {
-				var BranchID = $("#ddlBranch").val();
-				var txtFromDate = $("#txtFromDate").val();
-				var txtToDate = $("#txtToDate").val();
-				var PassValidate = 1;
-				var FirstFocus = 0;
+				var UserID = $("#ddlUser").val();
+				var TransactionDate = $("#txtTransactionDate").val();
 			
-				if(txtFromDate != "" && txtToDate != "") {
-					var FromDate = txtFromDate.split("-");
-					FromDate = new Date(FromDate[1] + "-" + FromDate[0] + "-" + FromDate[2]);
-					var ToDate = txtToDate.split("-");
-					ToDate = new Date(ToDate[1] + "-" + ToDate[0] + "-" + ToDate[2]);
-					if(FromDate > ToDate) {
-						$("#txtToDate").notify("Tanggal Akhir harus lebih besar dari tanggal mulai!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						PassValidate = 0;
-						if(FirstFocus == 0) $("#txtToDate").focus();
-						FirstFocus = 1;
-					}
-				}
-				
-				if(PassValidate == 0) {
-					$("html, body").animate({
-						scrollTop: 0
-					}, "slow");
-					return false;
-				}
-				else {
-					FirstPass = 0;
-					$("#loading").show();
-					$("#dvTable").show();
-					table.ajax.reload(function(json) {
-						$("#tfootTable").html("<tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Sub Total:</td><td>" + json.SubTotal + "</td></tr><tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Grand Total:</td><td>" + json.GrandTotal + "</td></tr>");
-						$("#tfootTable").find("td").css({
-							"border" : "0",
-							"font-size" : "14px",
-							"font-weight" : "bold",
-							"padding-right" : "10px",
-							"padding-top" : "5px",
-							"padding-bottom" : "5px",
-							"text-align" : "right"
+				$("#loading").show();
+				$("#dvTable").show();
+				$.ajax({
+					url: "./Report/Daily/DataSource.php",
+					type: "POST",
+					data: { UserID : UserID, TransactionDate : TransactionDate },
+					dataType: "html",
+					success: function(data) {
+						if(data != "") {
+							$("#loading").hide();
+							$("#grid-data").html(data);
+						}
+						else {
+							$("#loading").hide();
+							var counter = 0;
+							Lobibox.alert("warning",
+							{
+								msg: "Gagal memuat data!",
+								width: 480,
+								delay: false
+							});
+							return 0;
+						}
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						$("#loading").hide();
+						var counter = 0;
+						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+						LogEvent(errorMessage, "/Report/Daily/index.php");
+						Lobibox.alert("error",
+						{
+							msg: errorMessage,
+							width: 480
 						});
-					});
-					table.columns.adjust();
-					$("#loading").hide();
-				}
+						return 0;
+					}
+				});
+				$("#loading").hide();
 			}
 			function ExportExcel() {
-				var BranchID = $("#ddlBranch").val();
-				var BranchName = $("#ddlBranch option:selected").text();
-				var txtFromDate = $("#txtFromDate").val();
-				var txtToDate = $("#txtToDate").val();
-				var PassValidate = 1;
-				var FirstFocus = 0;
-			
-				if(txtFromDate != "" && txtToDate != "") {
-					var FromDate = txtFromDate.split("-");
-					FromDate = new Date(FromDate[1] + "-" + FromDate[0] + "-" + FromDate[2]);
-					var ToDate = txtToDate.split("-");
-					ToDate = new Date(ToDate[1] + "-" + ToDate[0] + "-" + ToDate[2]);
-					if(FromDate > ToDate) {
-						$("#txtToDate").notify("Tanggal Akhir harus lebih besar dari tanggal mulai!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						PassValidate = 0;
-						if(FirstFocus == 0) $("#txtToDate").focus();
-						FirstFocus = 1;
-					}
-				}
+				var UserID = $("#ddlUser").val();
+				var TransactionDate = $("#txtTransactionDate").val();
 				
-				if(PassValidate == 0) {
-					$("html, body").animate({
-						scrollTop: 0
-					}, "slow");
-					return false;
-				}
-				else {
-					FirstPass = 0;
-					$("#loading").show();
-					setCookie('downloadStarted', 0, 100); //Expiration could be anything... As long as we reset the value
-					setTimeout(checkDownloadCookie, 1000); //Initiate the loop to check the cookie.
-					$("#excelDownload").attr("src", "Report/Sale/ExportExcel.php?BranchID=" + BranchID + "&BranchName=" + BranchName + "&FromDate=" + txtFromDate + "&ToDate=" + txtToDate);
-				}
+				$("#loading").show();
+				setCookie('downloadStarted', 0, 100); //Expiration could be anything... As long as we reset the value
+				setTimeout(checkDownloadCookie, 1000); //Initiate the loop to check the cookie.
+				$("#excelDownload").attr("src", "Report/Daily/ExportExcel.php?UserID=" + UserID + "&TransactionDate=" + TransactionDate);
 			}
 
 			var downloadTimeout;
@@ -190,36 +156,12 @@
 				}
 			};
 
-			function format(rowData) {
-				var div = $('<div/>')
-			        .addClass( 'loading' )
-			        .text( 'Loading...' );
-
-			    $.ajax( {
-			    	url: './Report/Sale/Details.php',
-			    	type: "POST",
-					data: {
-			            ID: rowData.SaleID,
-			            TransactionType: rowData.TransactionType,
-			            BranchID : $("#ddlBranch").val()
-			        },
-			        dataType: 'html',
-			        success: function (data) {
-			            div
-			                .html( data )
-			                .removeClass( 'loading' );
-			        }
-			    });
-			    
-			    return div;
-			}
-
 			$(document).ready(function () {
 				$( window ).resize(function() {
 					table.columns.adjust().draw();
 				});
 				
-				$("#txtToDate, #txtFromDate").datepicker({
+				$("#txtTransactionDate").datepicker({
 					dateFormat: 'dd-mm-yy',
 					maxDate : "+0D"
 				});
@@ -230,107 +172,6 @@
 					"min-height" : (panelHeight + 50),
 					"max-height" : (panelHeight + 50)
 				});
-
-				table = $("#grid-data").DataTable({
-								"keys": true,
-								"scrollY": "285px",
-								"rowId": "ItemID",
-								"scrollCollapse": true,
-								"order": [2, "asc"],
-								"columns": [
-									 {
-						                "className": 'details-control',
-						                "orderable": false,
-						                "data": null,
-						                "defaultContent": ''
-						            },
-									{ "data": "SaleNumber", className: "dt-head-center" },
-									{ "data": "TransactionDate", className: "dt-head-center" },
-									{ "data": "CustomerName", className: "dt-head-center" },
-									{ "data": "Total", "orderable": false, className: "dt-head-center dt-body-right" },
-									{ "data": "SaleID", "visible": false },
-									{ "data": "TransactionType", "visible": false }
-								],
-								"processing": true,
-								"serverSide": true,
-								"ajax": {
-									"url": "./Report/Sale/DataSource.php",
-									"data": function ( d ) {
-										d.FromDate = $("#txtFromDate").val(),
-										d.ToDate = $("#txtToDate").val(),
-										d.BranchID = $("#ddlBranch").val(),
-										d.FirstPass = FirstPass
-									}
-								},
-								"language": {
-									"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-									"infoFiltered": "",
-									"infoEmpty": "",
-									"zeroRecords": "Data tidak ditemukan",
-									"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
-									"search": "Cari",
-									"processing": "Memproses",
-									"paginate": {
-										"next": ">",
-										"previous": "<",
-										"last": "»",
-										"first": "«"
-									}
-								},
-								"drawCallback": function( settings ) {
-							        var json = table.ajax.json();
-							        $("#tfootTable").html("<tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Sub Total:</td><td>" + json.SubTotal + "</td></tr><tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Grand Total:</td><td>" + json.GrandTotal + "</td></tr>");
-									$("#tfootTable").find("td").css({
-										"border" : "0",
-										"font-size" : "14px",
-										"font-weight" : "bold",
-										"padding-right" : "10px",
-										"padding-top" : "5px",
-										"padding-bottom" : "5px",
-										"text-align" : "right"
-									});
-							    }
-							});
-			});
-
-			$('#grid-data tbody').on('click', 'td.details-control', function () {
-			    var tr = $(this).closest('tr');
-			    var row = table.row( tr );
-			 
-			    if ( row.child.isShown() ) {
-			        row.child.hide();
-			        tr.removeClass('shown');
-			    }
-			    else {
-			        row.child( format(row.data()) ).show();
-			        tr.addClass('shown');
-			    }
-			    
-			    var barWidth = table.settings()[0].oScroll.iBarWidth;
-			    var tableBodyWidth = parseFloat($("#grid-data").width()) + 2;
-			    var headerWidth = parseFloat($(".dataTables_scrollHeadInner").width());
-
-			   if(tableBodyWidth == headerWidth) {
-			    	$(".dataTables_scrollHeadInner").css({
-			    		"width" : headerWidth - barWidth,
-			    		"padding-right" : barWidth
-			    	});
-
-			    	$(".dataTables_scrollHeadInner table").css({
-			    		"width" : tableBodyWidth
-			    	});
-			    }
-			    else {
-			    	$(".dataTables_scrollHeadInner").css({
-			    		"width" : headerWidth + barWidth,
-			    		"padding-right" : 0
-			    	});
-
-			    	$(".dataTables_scrollHeadInner table").css({
-			    		"width" : tableBodyWidth
-			    	});
-			    }
-
 			});
 		</script>
 	</body>

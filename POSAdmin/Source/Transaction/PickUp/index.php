@@ -14,6 +14,9 @@
 			.chkBookingDetails {
 				margin-top : 0 !important;
 			}
+			.ui-spinner {
+				width: 100%;
+			}
 		</style>
 	</head>
 	<body>
@@ -400,7 +403,7 @@
 							$("#btnSavePickUp").attr("tabindex", Data.tabindex);
 							$("#btnCancelAddPickUp").attr("tabindex", (parseFloat(Data.tabindex) + 1));
 							setTimeout(function() {
-								//$("#grid-transaction").find("input:checkbox").first().remove()
+								$("#grid-transaction").find("#select_all_salereturn").first().remove()
 							}, 0);
 
 							$(".txtQTY").spinner();
@@ -463,7 +466,7 @@
 
 			var saleDetailsCounter = 0;
 			function getBookingDetails() {
-				if(saleDetailsCounter == 0) 
+				if(saleDetailsCounter == 0 && $("#txtBookingNumber").prop("readonly") == false)
 				{
 					saleDetailsCounter = 1;
 					var saleNumber = $("#txtBookingNumber").val();
@@ -488,11 +491,11 @@
 									$("#btnCancelAddPickUp").attr("tabindex", (parseFloat(Data.tabindex) + 1));
 									table2.draw();
 									tableWidthAdjust();
-									setTimeout(function() {
-										$("#grid-transaction").find("input:checkbox").first().remove()
-									}, 0);
 
 									$(".txtQTY").spinner();
+									setTimeout(function() {
+										$("#grid-transaction").find("#select_all_salereturn").first().remove()
+									}, 0);
 
 									$("#select_all_salereturn").prop("checked", false);								
 									
@@ -525,6 +528,7 @@
 									setTimeout(function() {
 										$("#grid-transaction").DataTable().cell( ':eq(3)' ).focus();
 									}, 0);
+									$("#txtTransactionDate").focus();
 								}
 								else {
 									var counter = 0;
@@ -575,6 +579,9 @@
 						}
 					});
 				}
+				else if($("#txtBookingNumber").prop("readonly") == true) {
+					$("#txtTransactionDate").focus();
+				}
 				setTimeout(function() {
 					saleDetailsCounter = 0;
 				}, 1000);
@@ -623,6 +630,8 @@
 				$("#txtBookingNumber").val("");
 				$("#lblTotal").html("0");
 				table2.clear().draw();
+				$("#select_all_salereturn").prop("checked", false);
+				$("#select_all_salereturn").attr("checked", false);	
 			}
 			
 			function fnDeleteData() {
@@ -703,7 +712,7 @@
 							//var index = table3.cell({ focused: true }).index();
 							if(counterPickTransaction == 0) {
 								counterPickTransaction = 1;
-								var data = datatable.row( cell.index().row ).data();
+								var data = datatable.row( table3.cell({ focused: true }).index().row ).data();
 								if(key == 13 && $("#transactionList-dialog").css("display") == "block") {
 									$("#txtBookingNumber").val(data[0]);
 									getBookingDetails();

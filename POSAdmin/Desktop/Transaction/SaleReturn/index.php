@@ -14,75 +14,77 @@
 			.chkSaleDetails {
 				margin-top : 0 !important;
 			}
+			.ui-spinner {
+				width: 100%;
+			}
 		</style>
 	</head>
 	<body>
 		<br />
-		<div class="row">
-			<div id="FormData" class="col-md-12" >
-				<form class="col-md-12" id="PostForm" method="POST" action="" >
-					<div class="row">
-						<div class="col-md-1 labelColumn">
-							No. Invoice :
-							<input id="hdnSaleReturnID" name="hdnSaleReturnID" type="hidden" value=0 />
-							<input id="hdnSaleID" name="hdnSaleID" type="hidden" value=0 />
-							<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
-							<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
-							<?php
-								echo '<input id="hdnEditFlag" name="hdnEditFlag" type="hidden" value="'.$EditFlag.'" />';
-								echo '<input id="hdnDeleteFlag" name="hdnDeleteFlag" type="hidden" value="'.$DeleteFlag.'" />';
-							?>
-						</div>
-						<div class="col-md-2">
-							<input id="txtSaleNumber" name="txtSaleNumber" type="text" tabindex=5 class="form-control-custom" onfocus="this.select();" onkeypress="isEnterKey(event, 'getSaleDetails');" onchange="getSaleDetails();" autocomplete=off placeholder="No. Invoice" />
-						</div>
-						
-						<div class="col-md-1 labelColumn">
-							Tanggal :
-						</div>
-						<div class="col-md-2">
-							<input id="txtTransactionDate" name="txtTransactionDate" type="text" tabindex=6 class="form-control-custom" style="width: 87%; display: inline-block;margin-right: 5px;" onfocus="this.select();" autocomplete=off placeholder="Tanggal" required />
-						</div>
-						
-						<div class="col-md-1 labelColumn">
-							Pelanggan :
-						</div>
-						<div class="col-md-2">
-							<input id="txtCustomerName" name="txtCustomerName" type="text" class="form-control-custom" readonly />
-						</div>
+		<?php
+			echo '<input id="hdnEditFlag" name="hdnEditFlag" type="hidden" value="'.$EditFlag.'" />';
+			echo '<input id="hdnDeleteFlag" name="hdnDeleteFlag" type="hidden" value="'.$DeleteFlag.'" />';
+		?>
+		<div id="FormData" title="Tambah Kategori" class="col-md-12" >
+			<form class="col-md-12" id="PostForm" method="POST" action="" >
+				<div class="row">
+					<div class="col-md-1 labelColumn">
+						No. Invoice :
+						<input id="hdnSaleReturnID" name="hdnSaleReturnID" type="hidden" value=0 />
+						<input id="hdnSaleID" name="hdnSaleID" type="hidden" value=0 />
+						<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
+						<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
+						<input id="hdnDesktopPath" name="hdnDesktopPath" type="hidden" value='<?php echo $DESKTOP_PATH; ?>' />
 					</div>
-					<hr style="margin: 5px 0 0 0;" />
-					<div class="row col-md-12" >
-						<div id="divTableContent" class="table-responsive" style="overflow-x:hidden;">
-							<table id="grid-transaction" style="width: 100% !important;" class="table table-striped table-bordered table-hover" >
-								<thead>
-									<tr>
-										<th>SaleReturnDetailsID</th>
-										<th>ItemID</th>
-										<th>BranchID</th>
-										<th><input id="select_all_salereturn" name="select_all_salereturn" type="checkbox" onclick="checkAllSaleReturn();" /></th>
-										<th>Cabang</th>
-										<th>Kode Barang</th>
-										<th>Nama Barang</th>
-										<th>Qty</th>
-										<th>Satuan</th>
-										<th>Harga Jual</th>
-										<th>Sub Total</th>
-										<th>BuyPrice</th>
-									</tr>
-								</thead>
-							</table>
-						</div>
+					<div class="col-md-2">
+						<input id="txtSaleNumber" name="txtSaleNumber" type="text" tabindex=5 class="form-control-custom" onfocus="this.select();" onkeypress="isEnterKey(event, 'getSaleDetails');" onchange="getSaleDetails();" autocomplete=off placeholder="No. Invoice" />
 					</div>
-					<div class="row" >
-						<h2 style="display: inline-block;float: left;" >TOTAL : &nbsp;</h2><span id="lblTotal" >0</span>
+					
+					<div class="col-md-1 labelColumn">
+						Tanggal :
 					</div>
-					<br />
-					<div class="row" >
-						<h5>F10 = Transaksi Selesai; F12 = Daftar Transaksi; ESC = Tutup;</h5>
+					<div class="col-md-2">
+						<input id="txtTransactionDate" name="txtTransactionDate" type="text" tabindex=6 class="form-control-custom" style="width: 87%; display: inline-block;margin-right: 5px;" onfocus="this.select();" autocomplete=off placeholder="Tanggal" required />
 					</div>
-				</form>
-			</div>
+					
+					<div class="col-md-1 labelColumn">
+						Pelanggan :
+					</div>
+					<div class="col-md-2">
+						<input id="txtCustomerName" name="txtCustomerName" type="text" class="form-control-custom" readonly />
+					</div>
+				</div>
+				<hr style="margin: 5px 0 0 0;" />
+				<div class="row" >
+					<div id="divTableContent" class="table-responsive" style="overflow-x:hidden;">
+						<table id="grid-transaction" style="width: 100% !important;" class="table table-striped table-bordered table-hover" >
+							<thead>
+								<tr>
+									<th>SaleReturnDetailsID</th>
+									<th>ItemID</th>
+									<th>BranchID</th>
+									<th><input id="select_all_salereturn" name="select_all_salereturn" type="checkbox" onclick="checkAllSaleReturn();" tabindex=7 /></th>
+									<th>Cabang</th>
+									<th>Kode Barang</th>
+									<th>Nama Barang</th>
+									<th>Qty</th>
+									<th>Satuan</th>
+									<th>Harga Jual</th>
+									<th>Sub Total</th>
+									<th>BuyPrice</th>
+								</tr>
+							</thead>
+						</table>
+					</div>
+				</div>
+				<div class="row" >
+					<h2 style="display: inline-block;float: left;" >TOTAL : &nbsp;</h2><span id="lblTotal" >0</span>
+				</div>
+				<br />
+				<div class="row" >
+					<h5>F10 = Transaksi Selesai; F12 = Daftar Transaksi; ESC = Tutup;</h5>
+				</div>
+			</form>
 		</div>
 		<div id="transactionList-dialog" title="Daftar Transaksi" style="display: none;">
 			<div class="row col-md-12" >
@@ -101,13 +103,17 @@
 			</div>
 		</div>
 		<script>
+			var table;
 			var table2;
 			var table3;
 			var today;
 			var rowEdit;
-
+			
 			function openDialog(Data, EditFlag) {
 				$("#hdnIsEdit").val(EditFlag);
+				$("#FormData").attr("title", "Tambah Retur Penjualan");
+				$("#txtSaleNumber").prop("readonly", false);
+				$("#txtSaleNumber").focus();
 				table2 = $("#grid-transaction").DataTable({
 							"keys": false,
 							"scrollY": "330px",
@@ -149,7 +155,7 @@
 							},
 							"initComplete": function(settings, json) {
 								setTimeout(function() {
-									$("#grid-transaction").find("input:checkbox").remove();
+									$("#grid-transaction").find("#select_all_salereturn").first().remove()
 								}, 0);
 							}
 						});
@@ -182,79 +188,9 @@
 				Calculate();
 			}
 			
-			function getSaleReturnDetails(SaleReturnID) {
-				$.ajax({
-					url: "./Transaction/SaleReturn/SaleReturnDetails.php",
-					type: "POST",
-					data: { SaleReturnID : SaleReturnID },
-					dataType: "json",
-					success: function(Data) {
-						if(Data.FailedFlag == '0') {
-							for(var i=0;i<Data.data.length;i++) {
-								table2.row.add(Data.data[i]);
-							}
-							table2.draw();
-							tableWidthAdjust();
-							
-							for(var i=0;i<Data.data.length;i++) {
-								$("#toggle-branch-" + Data.data[i][0]).toggles({
-									drag: true, // allow dragging the toggle between positions
-									click: true, // allow clicking on the toggle
-									text: {
-										on: 'Toko', // text for the ON position
-										off: 'Gudang' // and off
-									},
-									on: true, // is the toggle ON on init
-									animate: 250, // animation time (ms)
-									easing: 'swing', // animation transition easing function
-									checkbox: null, // the checkbox to toggle (for use in forms)
-									clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
-									width: 80, // width used if not set in css
-									height: 18, // height if not set in css
-									type: 'compact' // if this is set to 'select' then the select style toggle will be used
-								});
-								
-								if(Data.data[i][2] == 1) $("#toggle-branch-" + Data.data[i][0]).toggles(true);
-								else $("#toggle-branch-" + Data.data[i][0]).toggles(false);
-							}
-
-							$("#select_all_salereturn").click();
-						}
-						else {
-							var counter = 0;
-							Lobibox.alert("error",
-							{
-								msg: "Gagal memuat data",
-								width: 480,
-								beforeClose: function() {
-									if(counter == 0) {
-										setTimeout(function() {
-											//$("#txtItemCode").focus();
-										}, 0);
-										counter = 1;
-									}
-								}
-							});
-							return 0;
-						}
-					},
-					error: function(jqXHR, textStatus, errorThrown) {
-						$("#loading").hide();
-						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-						LogEvent(errorMessage, "/Transaction/SaleReturn/index.php");
-						Lobibox.alert("error",
-						{
-							msg: errorMessage,
-							width: 480
-						});
-						return 0;
-					}
-				});
-			}
-
 			var saleDetailsCounter = 0;
 			function getSaleDetails() {
-				if(saleDetailsCounter == 0) 
+				if(saleDetailsCounter == 0 && $("#txtSaleNumber").prop("readonly") == false) 
 				{
 					saleDetailsCounter = 1;
 					var saleNumber = $("#txtSaleNumber").val();
@@ -266,60 +202,81 @@
 						success: function(Data) {
 							if(Data.FailedFlag == '0') {
 								table2.clear().draw();
-								for(var i=0;i<Data.data.length;i++) {
-									if(i == 0) {
-										$("#hdnSaleID").val(Data.data[i][13]);
-										$("#txtCustomerName").val(Data.data[i][12]);
+
+								if(Data.data.length > 0) {
+									for(var i=0;i<Data.data.length;i++) {
+										if(i == 0) {
+											$("#hdnSaleID").val(Data.data[i][13]);
+											$("#txtCustomerName").val(Data.data[i][12]);
+										}
+										table2.row.add(Data.data[i]);
 									}
-									table2.row.add(Data.data[i]);
+									$("#btnSaveSaleReturn").attr("tabindex", Data.tabindex);
+									$("#btnCancelAddSaleReturn").attr("tabindex", (parseFloat(Data.tabindex) + 1));
+									table2.draw();
+									tableWidthAdjust();
+									setTimeout(function() {
+										$("#grid-transaction").find("#select_all_salereturn").first().remove()
+									}, 0);
+
+									$(".txtQTY").spinner();
+
+									$("#select_all_salereturn").prop("checked", false);								
+									for(var i=0;i<Data.data.length;i++) {
+										$("#toggle-branch-" + Data.data[i][0]).toggles({
+											drag: true, // allow dragging the toggle between positions
+											click: true, // allow clicking on the toggle
+											text: {
+												on: 'Toko', // text for the ON position
+												off: 'Gudang' // and off
+											},
+											on: true, // is the toggle ON on init
+											animate: 250, // animation time (ms)
+											easing: 'swing', // animation transition easing function
+											checkbox: null, // the checkbox to toggle (for use in forms)
+											clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
+											width: 80, // width used if not set in css
+											height: 18, // height if not set in css
+											type: 'compact' // if this is set to 'select' then the select style toggle will be used
+										});
+										
+										if(Data.data[i][2] == 1) $("#toggle-branch-" + Data.data[i][0]).toggles(true);
+										else $("#toggle-branch-" + Data.data[i][0]).toggles(false);
+												
+										if(Data.data[i][13] == 0) {
+											$("#toggle-branch-" + Data.data[i][0]).toggles().toggleClass('disabled', true);;
+										}
+									}
+									//Calculate();
+									setTimeout(function() {
+										$("#grid-transaction").DataTable().cell( ':eq(3)' ).focus();
+									}, 0);
+									$("#txtTransactionDate").focus();
 								}
-								table2.draw();
-								tableWidthAdjust();
-								
-								for(var i=0;i<Data.data.length;i++) {
-									$("#toggle-branch-" + Data.data[i][0]).toggles({
-										drag: true, // allow dragging the toggle between positions
-										click: true, // allow clicking on the toggle
-										text: {
-											on: 'Toko', // text for the ON position
-											off: 'Gudang' // and off
-										},
-										on: true, // is the toggle ON on init
-										animate: 250, // animation time (ms)
-										easing: 'swing', // animation transition easing function
-										checkbox: null, // the checkbox to toggle (for use in forms)
-										clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
-										width: 80, // width used if not set in css
-										height: 18, // height if not set in css
-										type: 'compact' // if this is set to 'select' then the select style toggle will be used
+								else {
+									var counter = 0;
+									Lobibox.alert("error",
+									{
+										msg: "No. Invoice tidak valid!",
+										width: 480,
+										beforeClose: function() {
+											if(counter == 0) {
+												setTimeout(function() {
+													$("#txtSaleNumber").focus();
+												}, 0);
+												counter = 1;
+											}
+										}
 									});
-									
-									if(Data.data[i][2] == 1) $("#toggle-branch-" + Data.data[i][0]).toggles(true);
-									else $("#toggle-branch-" + Data.data[i][0]).toggles(false);
-											
-									if(Data.data[i][13] == 0) {
-										$("#toggle-branch-" + Data.data[i][0]).toggles().toggleClass('disabled', true);;
-									}
+									return 0;
 								}
-								//Calculate();
-								setTimeout(function() {
-									$("#grid-transaction").DataTable().cell( ':eq(3)' ).focus();
-								}, 0);
 							}
 							else {
 								var counter = 0;
 								Lobibox.alert("error",
 								{
 									msg: "Gagal memuat data",
-									width: 480,
-									beforeClose: function() {
-										if(counter == 0) {
-											setTimeout(function() {
-												//$("#txtItemCode").focus();
-											}, 0);
-											counter = 1;
-										}
-									}
+									width: 480
 								});
 								return 0;
 							}
@@ -336,6 +293,9 @@
 							return 0;
 						}
 					});
+				}
+				else if($("#txtSaleNumber").prop("readonly") == true) {
+					$("#txtTransactionDate").focus();
 				}
 				setTimeout(function() {
 					saleDetailsCounter = 0;
@@ -385,8 +345,10 @@
 				$("#txtSaleNumber").val("");
 				$("#lblTotal").html("0");
 				table2.clear().draw();
+				$("#select_all_salereturn").prop("checked", false);
+				$("#select_all_salereturn").attr("checked", false);
 			}
-			
+
 			function transactionList() {
 				$("#transactionList-dialog").dialog({
 					autoOpen: false,
@@ -431,10 +393,9 @@
 								});
 						var counterPickTransaction = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
-							//var index = table3.cell({ focused: true }).index();
 							if(counterPickTransaction == 0) {
 								counterPickTransaction = 1;
-								var data = datatable.row( cell.index().row ).data();
+								var data = datatable.row( table3.cell({ focused: true }).index().row ).data();
 								if(key == 13 && $("#transactionList-dialog").css("display") == "block") {
 									$("#txtSaleNumber").val(data[0]);
 									getSaleDetails();
@@ -468,6 +429,11 @@
 								if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0) {
 									$("#transactionList-dialog").find("input[type='search']").focus();
 								}
+								else if(evt.keyCode == 27 && $("#transactionList-dialog").css("display") == "block") {
+									$("#transactionList-dialog").dialog("destroy");
+									table3.destroy();
+									table2.keys.enable();
+								}
 							}
 							setTimeout(function() { counterKeyTransaction = 0; } , 1000);
 						});
@@ -477,11 +443,12 @@
 						$(this).dialog("destroy");
 						table3.destroy();
 						table2.keys.enable();
+						$("#txtSaleNumber").focus();
 					},
 					resizable: false,
-					height: 500,
+					height: 420,
 					width: 1280,
-					modal: true,
+					modal: true /*,
 					buttons: [
 					{
 						text: "Tutup",
@@ -490,16 +457,16 @@
 						click: function() {
 							$(this).dialog("destroy");
 							table3.destroy();
+							table.keys.enable();
 							table2.keys.enable();
 							return false;
 						}
-					}]
+					}]*/
 				}).dialog("open");
 			}
 
-			
 			function finish() {
-				if($("#hdnSaleID").val() != "0") {
+				if($("#hdnSaleID").val() != 0) {
 					if($("input:checkbox[class=chkSaleDetails]:checked").length > 0)
 					{
 						saveConfirm(function(action) {
@@ -513,9 +480,10 @@
 									success: function(data) {
 										if(data.FailedFlag == '0') {
 											$("#loading").hide();
+											//$("#FormData").dialog("destroy");
+											$("#divModal").hide();
 											resetForm();
-											table2.destroy();
-											openDialog(0, 0);
+											//table2.destroy();
 											var counter = 0;
 											Lobibox.alert("success",
 											{
@@ -540,7 +508,7 @@
 										$("#loading").hide();
 										var counter = 0;
 										var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-										LogEvent(errorMessage, "/Transaction/SaleReturn/index.php");
+										LogEvent(errorMessage, "/Master/Item/index.php");
 										Lobibox.alert("error",
 										{
 											msg: errorMessage,
@@ -556,11 +524,19 @@
 						});
 					}
 					else {
-						Lobibox.alert("warning",
+						var counter = 0;
+						Lobibox.alert("error",
 						{
-							msg: "Mohon pilih minimal 1 data",
+							msg: "Minimal pilih 1 data!",
 							width: 480,
-							delay: false
+							beforeClose: function() {
+								if(counter == 0) {
+									setTimeout(function() {
+										$("#select_all_salereturn").focus();
+									}, 0);
+									counter = 1;
+								}
+							}
 						});
 					}
 				}
@@ -568,13 +544,34 @@
 					var counter = 0;
 					Lobibox.alert("error",
 					{
-						msg: "Silahkan pilih nota terlebih dahulu!",
-						width: 480
+						msg: "Silahkan input No. Invoice!",
+						width: 480,
+						beforeClose: function() {
+							if(counter == 0) {
+								setTimeout(function() {
+									$("#txtSaleNumber").focus();
+								}, 0);
+								counter = 1;
+							}
+						}
 					});
 				}
 			}
+			
+			var waitForFinalEvent = (function () {
+		        var timers = {};
+		        return function (callback, ms, uniqueId) {
+		            if (!uniqueId) {
+		                uniqueId = "Don't call this twice without a uniqueId";
+		            }
+		            if (timers[uniqueId]) {
+		                clearTimeout(timers[uniqueId]);
+		            }
+		            timers[uniqueId] = setTimeout(callback, ms);
+		        };
+		    })();
 
-			function firstBalance() {
+		    function firstBalance() {
 				$("#first-balance").dialog({
 					autoOpen: false,
 					open: function() {
@@ -662,11 +659,22 @@
 			}
 			
 			$(document).ready(function() {
-				$('#grid-transaction').on('click', 'input[type="checkbox"]', function() {
+				$( window ).resize(function() {
+					waitForFinalEvent(function () {
+		               	setTimeout(function() {
+							if ( $.fn.DataTable.isDataTable( '#grid-transaction' ) ) {
+								tableWidthAdjust();
+							}
+							if ( $.fn.DataTable.isDataTable( '#grid-item' ) ) {
+								table3.columns.adjust().draw();
+							}
+						}, 0);
+		            }, 500, "resizeWindow");
+				});
+				
+				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
 				    $(this).blur();
 				});
-
-				openDialog(0, 0);
 				
 				$.fn.dataTable.ext.errMode = function(settings, techNote, message) { 
 					$("#loading").hide();
@@ -716,45 +724,10 @@
 				
 				keyFunction();
 				enterLikeTab();
-				var counterSaleReturn = 0;
-				table = $("#grid-data").DataTable({
-								"keys": true,
-								"scrollY": "330px",
-								"rowId": "SaleReturnID",
-								"scrollCollapse": true,
-								"order": [],
-								"columns": [
-									{ "width": "20px", "orderable": false, className: "dt-head-center dt-body-center" },
-									{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ "orderable": false, className: "dt-head-center dt-body-right" }
-								],
-								"processing": true,
-								"serverSide": true,
-								"ajax": "./Transaction/SaleReturn/DataSource.php",
-								"language": {
-									"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-									"infoFiltered": "",
-									"infoEmpty": "",
-									"zeroRecords": "Data tidak ditemukan",
-									"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
-									"search": "Cari",
-									"processing": "Memproses",
-									"paginate": {
-										"next": ">",
-										"previous": "<",
-										"last": "»",
-										"first": "«"
-									}
-								}
-							});
-				
 				
 				var counterKey = 0;
 				$(document).on("keydown", function (evt) {
-					if(evt.keyCode == 123 && $("#transactionList-dialog").css("display") == "none" && $("#save-confirm").css("display") == "none" && $(".lobibox").css("display") != "block") {
+					if(evt.keyCode == 123 && $("#transactionList-dialog").css("display") == "none" && $("#FormData").css("display") == "block") {
 						evt.preventDefault();
 						if(counterKey == 0) {
 							transactionList();
@@ -764,7 +737,7 @@
 					else if(evt.keyCode == 123) {
 						evt.preventDefault();
 					}
-					else if(evt.keyCode == 121 && $("#transactionList-dialog").css("display") == "none"  && $("#save-confirm").css("display") == "none" && $(".lobibox").css("display") != "block") {
+					else if(evt.keyCode == 121 && $("#transactionList-dialog").css("display") == "none" && $("#FormData").css("display") == "block"  && $(".lobibox").css("display") != "block") {
 						evt.preventDefault();
 						if(counterKey == 0) {
 							finish();
@@ -774,6 +747,15 @@
 					setTimeout(function() { counterKey = 0; } , 1000);
 				});
 
+				var path = $("#hdnDesktopPath").val();	
+				Mousetrap.bind('ctrl+n', function(e) {
+					// your function here...
+					e.preventDefault();
+					window.open(path, "", "width=1000");
+				});
+				
+				openDialog(0, 0);
+
 				$.ajax({
 					url: "./FirstBalance.php",
 					type: "POST",
@@ -782,7 +764,7 @@
 					success: function(Data) {
 						if(Data.FailedFlag == '0') {
 							if(Data.IsFilled == 0) firstBalance();
-							else $("#txtTransactionDate").focus();
+							else $("#txtBookingNumber").focus();
 						}
 						else {
 							var counter = 0;

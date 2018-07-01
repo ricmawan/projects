@@ -8,23 +8,24 @@
 	$requestData= $_REQUEST;
 	//kolom di table
 	$columns = array(
-					0 => "SaleID", //unorderable
-					1 => "RowNumber", //unorderable
-					2 => "SaleNumber",
-					3 => "TransactionDate",
-					4 => "CustomerName",
-					5 => "Total"
+					0 => "RowNumber", //unorderable
+					1 => "SaleNumber", //unorderable
+					2 => "TransactionDate",
+					3 => "CustomerName",
+					4 => "Total"
 				);
 
 	$where = " 1=1 ";
 	$where2 = " 1=1 ";
-	$order_by = "SaleID";
+	$order_by = "Credit DESC";
 	$limit_s = $requestData['start'];
 	$limit_l = $requestData['length'];
 	
 	//Handles Sort querystring sent from Bootgrid
-	$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
-	$order_by .= ", SaleID ASC";
+	if(ISSET($requestData['order'])) {
+		$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
+		$order_by .= ", SaleID ASC";
+	}
 	//Handles search querystring sent from Bootgrid
 	if (!empty($requestData['search']['value']))
 	{
@@ -33,7 +34,7 @@
 		$where .= " OR DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
 		$where .= " OR MC.CustomerName LIKE '%".$search."%' )";
 
-		$where2 .= " AND ( TB.BookingNumber) LIKE '%".$search."%'";
+		$where2 .= " AND ( TB.BookingNumber LIKE '%".$search."%'";
 		$where2 .= " OR DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
 		$where2 .= " OR MC.CustomerName LIKE '%".$search."%' )";
 	}
@@ -61,13 +62,12 @@
 		$row_array[] = $row['TransactionDate'];
 		$row_array[] = $row['CustomerName'];
 		$row_array[] = number_format($row['Total'],0,".",",");
+		$row_array[] = number_format($row['TotalPayment'],0,".",",");
+		$row_array[] = number_format($row['Credit'],0,".",",");
 		$row_array[] = $row['SaleID'];
-		$row_array[] = $row['CustomerID'];
 		$row_array[] = $row['PlainTransactionDate'];
-		$row_array[] = 1;
-		$row_array[] = number_format($row['Total'],2,".",",");
+		$row_array[] = $row['TransactionType'];
 		$row_array[] = $row['Payment'];
-		$row_array[] = "<a href='#' onclick='printInvoice(".$row['SaleID'].");' ><i class='fa fa-print fa-2' acronym title='Cetak Nota' alt='Cetak Nota'></i></a>&nbsp;&nbsp;&nbsp;<a href='#' ><i class='fa fa-truck fa-2' acronym title='Cetak Surat Jalan'  alt='Cetak Surat Jalan'></i></a>";
 		array_push($return_arr, $row_array);
 	}
 	

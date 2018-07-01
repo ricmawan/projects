@@ -214,7 +214,7 @@
 									},
 									"initComplete": function(settings, json) {
 										setTimeout(function() {
-											$("#grid-transaction").find("input:checkbox").first().remove()
+											$("#grid-transaction").find("#select_all_salereturn").first().remove()
 										}, 0);
 									}
 								});
@@ -405,11 +405,11 @@
 							}
 							table2.draw();
 							tableWidthAdjust();
+							setTimeout(function() {
+								$("#grid-transaction").find("#select_all_salereturn").first().remove()
+							}, 0);
 							$("#btnSaveSaleReturn").attr("tabindex", Data.tabindex);
 							$("#btnCancelAddSaleReturn").attr("tabindex", (parseFloat(Data.tabindex) + 1));
-							setTimeout(function() {
-								$("#grid-transaction").find("input:checkbox").first().remove()
-							}, 0);
 
 							$(".txtQTY").spinner();
 							
@@ -463,7 +463,7 @@
 
 			var saleDetailsCounter = 0;
 			function getSaleDetails() {
-				if(saleDetailsCounter == 0) 
+				if(saleDetailsCounter == 0 && $("#txtSaleNumber").prop("readonly") == false) 
 				{
 					saleDetailsCounter = 1;
 					var saleNumber = $("#txtSaleNumber").val();
@@ -489,7 +489,7 @@
 									table2.draw();
 									tableWidthAdjust();
 									setTimeout(function() {
-										$("#grid-transaction").find("input:checkbox").first().remove()
+										$("#grid-transaction").find("#select_all_salereturn").first().remove()
 									}, 0);
 
 									$(".txtQTY").spinner();
@@ -567,6 +567,9 @@
 						}
 					});
 				}
+				else if($("#txtSaleNumber").prop("readonly") == true) {
+					$("#txtTransactionDate").focus();
+				}
 				setTimeout(function() {
 					saleDetailsCounter = 0;
 				}, 1000);
@@ -615,6 +618,8 @@
 				$("#txtSaleNumber").val("");
 				$("#lblTotal").html("0");
 				table2.clear().draw();
+				$("#select_all_salereturn").prop("checked", false);
+				$("#select_all_salereturn").attr("checked", false);
 			}
 			
 			function fnDeleteData() {
@@ -692,10 +697,9 @@
 								});
 						var counterPickTransaction = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
-							//var index = table3.cell({ focused: true }).index();
 							if(counterPickTransaction == 0) {
 								counterPickTransaction = 1;
-								var data = datatable.row( cell.index().row ).data();
+								var data = datatable.row( table3.cell({ focused: true }).index().row ).data();
 								if(key == 13 && $("#transactionList-dialog").css("display") == "block") {
 									$("#txtSaleNumber").val(data[0]);
 									getSaleDetails();

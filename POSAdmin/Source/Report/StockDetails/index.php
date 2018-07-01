@@ -521,7 +521,7 @@
 							//var index = table3.cell({ focused: true }).index();
 							if(counterPickItem == 0) {
 								counterPickItem = 1;
-								var data = datatable.row( cell.index().row ).data();
+								var data = datatable.row( table3.cell({ focused: true }).index().row ).data();
 								if(key == 13 && $("#itemList-dialog").css("display") == "block") {
 									$("#txtItemCode").val(data[0]);
 									validateItemCode();

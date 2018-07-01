@@ -119,8 +119,8 @@
 					</div>
 				</div>
 				<div class="row" >
-					<h2 style="display: inline-block;float: left;" >TOTAL : &nbsp;</h2><span id="lblTotal" >0</span>
-					</h2><span id="lblWeight" >0</span><h2 style="display: inline-block;float: right;color: #0006ff;" >Berat(KG) : &nbsp;
+					<h2 style="display: inline-block;float: left;" >TOTAL BAYAR: &nbsp;</h2><span id="lblTotal" >0</span>
+					<span id="lblWeight" >0</span><h2 style="display: inline-block;float: right;color: #0006ff;" >TOTAL BELANJA : &nbsp;</h2>
 				</div>
 				<br />
 				<div class="row" >
@@ -151,6 +151,8 @@
 				$("#txtPaymentNumber").val(Data[1]);
 				$("#txtTransactionDate").datepicker("setDate", new Date(Data[8]));
 				$("#txtPaymentDate").datepicker("setDate", new Date());
+				$("#lblWeight").html(Data[4]);
+				$("#lblTotal").html(Data[5]);
 				$("#hdnTransactionType").val(Data[9]);
 				getPaymentDetails(Data[7], Data[9]);
 				var index = table.cell({ focused: true }).index();
@@ -224,6 +226,7 @@
 												}
 											}
 											tableWidthAdjust();
+											Calculate();
 										}
 										else {
 											table2.keys.enable();
@@ -371,6 +374,15 @@
 						FirstFocus = 1;
 					}
 
+					var totalSale = parseFloat($("#lblWeight").html().replace(/\,/g, ""));
+					var totalPayment = parseFloat($("#lblTotal").html().replace(/\,/g, ""));
+					if((totalPayment + parseFloat($("#txtAmount").val().replace(/\,/g, ""))) > totalSale) {
+						PassValidate = 0;
+						$("#txtAmount").notify("Pembayaran melebihi pembelanjaan", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+						if(FirstFocus == 0) $("#txtAmount").focus();
+						FirstFocus = 1;
+					}
+					
 					if(PassValidate == 1) {
 						
 						$.ajax({
@@ -412,6 +424,7 @@
 									$("#hdnPaymentDetailsID").val(0);
 									$("#txtPaymentDate").focus();
 									tableWidthAdjust();
+									Calculate();
 								}
 								else {
 									var counter = 0;
@@ -471,6 +484,15 @@
 				table2.clear().draw();
 			}
 			
+			function Calculate() {
+				var grandTotal = 0;
+				table2.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+					var data = this.data();
+					grandTotal += parseFloat(data[3].replace(/\,/g, ""));
+				});
+				$("#lblTotal").html(returnRupiah(grandTotal.toString()));
+			}
+
 			function fnDeleteData() {
 				var index = table.cell({ focused: true }).index();
 				table.keys.disable();

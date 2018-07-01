@@ -1,111 +1,170 @@
 <?php
-	header('Content-Type: application/json');
 	$RequestedPath = "$_SERVER[REQUEST_URI]";
 	$file = basename($RequestedPath);
 	$RequestedPath = str_replace($file, "", $RequestedPath);
 	include "../../GetPermission.php";
-	$requestData= $_REQUEST;
-	if(ISSET($requestData['BranchID']) && ISSET($requestData['FirstPass']) && $requestData['FirstPass'] == "0")
+	
+	if(ISSET($_POST['UserID']))
 	{
-		$BranchID = $requestData['BranchID'];
-		if($requestData['FromDate'] == "") {
-			$txtFromDate = "2000-01-01";
+		$UserID = $_POST['UserID'];
+		if($_POST['TransactionDate'] == "") {
+			$TransactionDate = date("Y-m-d");
 		}
 		else {
-			$txtFromDate = explode('-', mysql_real_escape_string($requestData['FromDate']));
-			$requestData['FromDate'] = "$txtFromDate[2]-$txtFromDate[1]-$txtFromDate[0]"; 
-			$txtFromDate = $requestData['FromDate'];
+			$TransactionDate = explode('-', mysql_real_escape_string($_POST['TransactionDate']));
+			$_POST['TransactionDate'] = "$TransactionDate[2]-$TransactionDate[1]-$TransactionDate[0]"; 
+			$TransactionDate = $_POST['TransactionDate'];
 		}
-		if($requestData['ToDate'] == "") {
-			$txtToDate = date("Y-m-d");
-		}
-		else {
-			$txtToDate = explode('-', mysql_real_escape_string($requestData['ToDate']));
-			$requestData['ToDate'] = "$txtToDate[2]-$txtToDate[1]-$txtToDate[0]"; 
-			$txtToDate = $requestData['ToDate'];
-		}
-		//kolom di table
-		$columns = array(
-						0 => "Plus",
-						1 => "SaleNumber", //unorderable
-						2 => "TransactionDate", //unorderable
-						3 => "CustomerName"
-					);
-
-		$where = " 1=1 ";
-		$where2 = " 1=1 ";
-		$order_by = "SaleNumber";
-		$limit_s = $requestData['start'];
-		$limit_l = $requestData['length'];
 		
-		//Handles Sort querystring sent from Bootgrid
-		$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
-		//Handles search querystring sent from Bootgrid
-		$order_by .= ", SaleNumber ASC";
-		if (!empty($requestData['search']['value']))
-		{
-			$search = mysqli_escape_string($dbh, trim($requestData['search']['value']));
-			$where .= " AND ( TS.SaleNumber LIKE '%".$search."%'";
-			$where .= " OR DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
-			$where .= " OR MC.CustomerName LIKE '%".$search."%' )";
-
-			$where2 .= " AND ( CONCAT('R', TS.SaleNumber) LIKE '%".$search."%'";
-			$where2 .= " OR DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
-			$where2 .= " OR MC.CustomerName LIKE '%".$search."%' )";
-		}
-		$sql = "CALL spSelSaleReport(".$BranchID.", '".$txtFromDate."', '".$txtToDate."', \"$where\", \"$where2\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spSelDailyReport(".$UserID.", '".$TransactionDate."', '".$_SESSION['UserLogin']."')";
 
 		if (! $result = mysqli_query($dbh, $sql)) {
-			logEvent(mysqli_error($dbh), '/Report/Sale/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Report/Daily/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 			return 0;
 		}
-		$row = mysqli_fetch_array($result);
-		$totalData = $row['nRows'];
-		$GrandTotal = $row['GrandTotal'];
-		$totalFiltered = $totalData;
+		$GrandTotal = 0;
+		$Data = "";
+		$Kasir = "";
+		$UnionLevel = 0;
+		$TransactionNumber = "";
+		$TransactionName = "";
+		$UnionTotal = 0;
+		$SubTotal = 0;
+		$GrandTotal = 0;
+		$TotalKasir = 0;
+		$Payment = 0;
+		while ($row = mysqli_fetch_array($result)) {
+			if($Kasir != $row['UserName']) {
+				if($Kasir != "") {
+					if($SubTotal > 0) {
+						$Data .= "<tr><td colspan=4></td><td>Sub Total</td><td class='text-right'>". number_format($SubTotal,0,".",",") ."</td></tr>";
+						$SubTotal = 0;
+					} 
+					if($UnionTotal > 0) {
+						$Data .= "<tr><td>Total ". $TransactionName ."</td><td colspan=4></td><td class='text-right'>". number_format($UnionTotal,0,".",",") ."</td></tr>";
+						$UnionTotal = 0;
+						$Data .= "<tr><td colspan=6>&nbsp;</td></tr>";
+					}
+					$Data .= "<tr><td>Total ". $Kasir ."</td><td colspan=4></td><td class='text-right'>". number_format($TotalKasir,0,".",",") ."</td></tr>";
+					$TotalKasir = 0;
+					$Data .= "<tr><td colspan=6>&nbsp;</td></tr>";
+				}
+				$Data .= "<tr><td colspan=6 class='Cashier'>".$row['UserName']."</td></tr>";
+			}
+			if($row['UnionLevel'] == '0') {
+				$Data .= "<tr><td>". $row['TransactionName'] ."</td><td colspan=4></td><td class='text-right'>". number_format($row['SubTotal'],0,".",",") ."</td></tr>";
+				$TotalKasir += $row['SubTotal'];
+				$GrandTotal += $row['SubTotal'];
+			}
+			else if($row['UnionLevel'] > 0 && $row['UnionLevel'] < 4) {
+				if($UnionLevel != $row['UnionLevel']) {
+					if($row['UnionLevel'] > 1) {
+						if($SubTotal > 0) {
+							$Data .= "<tr><td colspan=4></td><td>Sub Total</td><td class='text-right'>". number_format($SubTotal,0,".",",") ."</td></tr>";
+							$SubTotal = 0;
+						}
+						if($UnionTotal > 0) {
+							$Data .= "<tr><td>Total ". $TransactionName ."</td><td colspan=4></td><td class='text-right'>". number_format($UnionTotal,0,".",",") ."</td></tr>";
+							$UnionTotal = 0;
+							$Data .= "<tr><td colspan=6>&nbsp;</td></tr>";
+						}
+					}
+					$Data .= "<tr><td colspan=6>". $row['TransactionName'] ."</td></tr>";
+				}
+				if($TransactionNumber != $row['TransactionNumber']) {
+					if($UnionLevel == $row['UnionLevel']) {
+						if($SubTotal > 0) { 
+							$Data .= "<tr><td colspan=4></td><td>Sub Total</td><td class='text-right'>". number_format($SubTotal,0,".",",") ."</td></tr>";
+							$SubTotal = 0;
+						}
+					}
+					$Data .= "<tr><td></td><td>". $row['CustomerName'] . " (". $row['TransactionNumber'] .")</td><td colspan=4></td></tr>";					
+				}
+				$Data .= "<tr><td></td><td>". $row['ItemName'] ."</td><td class='text-right'>". number_format($row['SalePrice'],0,".",",") ."</td>";
+				$Data .= "<td class='text-right'>". number_format($row['Quantity'],0,".",",") . " ". $row['UnitName'] ."</td>";
+				$Data .= "<td class='text-right'>(". number_format($row['Discount'],0,".",",") . ")</td><td class='text-right'>". number_format($row['SubTotal'],0,".",",") ."</td></tr>";
+				$UnionTotal += $row['SubTotal'];
+				$SubTotal += $row['SubTotal'];
+				$TotalKasir += $row['SubTotal'];
+				$GrandTotal += $row['SubTotal'];
+			}
+			else if($row['UnionLevel'] > 3 && $row['UnionLevel'] < 6) {
+				if($UnionLevel != $row['UnionLevel']) {
+					if($row['UnionLevel'] > 1) {
+						if($SubTotal > 0 || ($UnionLevel == 3 && $SubTotal < 0)) { 
+							$Data .= "<tr><td colspan=4></td><td>Sub Total</td><td class='text-right'>". number_format($SubTotal,0,".",",") ."</td></tr>";
+							if($UnionLevel > 3) {
+								$Data .= "<tr><td colspan=4></td><td>DP</td><td class='text-right'>". number_format($Payment,0,".",",") ."</td></tr>";
+								$UnionTotal += $Payment;
+								$TotalKasir += $Payment;
+								$GrandTotal += $Payment;
+							}
+							$SubTotal = 0;
+						}
+						if($UnionTotal > 0 || ($UnionLevel == 3 && $UnionTotal < 0)) {
+							$Data .= "<tr><td>Total ". $TransactionName ."</td><td colspan=4></td><td class='text-right'>". number_format($UnionTotal,0,".",",") ."</td></tr>";
+							$UnionTotal = 0;
+							$Data .= "<tr><td colspan=6>&nbsp;</td></tr>";
+						}
+					}
+					$Data .= "<tr><td colspan=6>". $row['TransactionName'] ."</td></tr>";
+				}
+				if($TransactionNumber != $row['TransactionNumber']) {
+					if($UnionLevel == $row['UnionLevel'] && $SubTotal > 0) {
+						$Data .= "<tr><td colspan=4></td><td>Sub Total</td><td class='text-right'>". number_format($SubTotal,0,".",",") ."</td></tr>";
+						$UnionTotal += $Payment;
+						$TotalKasir += $Payment;
+						$GrandTotal += $Payment;
+						$Data .= "<tr><td colspan=4></td><td>DP</td><td class='text-right'>". number_format($Payment,0,".",",") ."</td></tr>";
+						$SubTotal = 0;
+					}
+					$Data .= "<tr><td></td><td>". $row['CustomerName'] . " (". $row['TransactionNumber'] .")</td><td colspan=4></td></tr>";
+				}
+				$Data .= "<tr><td></td><td>". $row['ItemName'] ."</td><td class='text-right'>". number_format($row['SalePrice'],0,".",",") ."</td>";
+				$Data .= "<td class='text-right'>". number_format($row['Quantity'],0,".",",") . " ". $row['UnitName'] ."</td>";
+				$Data .= "<td class='text-right'>(". number_format($row['Discount'],0,".",",") . ")</td><td class='text-right'>". number_format($row['SubTotal'],0,".",",") ."</td></tr>";
+				$SubTotal += $row['SubTotal'];
+			}
+			else {
+				if($UnionLevel != $row['UnionLevel']) {
+					if($row['UnionLevel'] > 1) {
+						if($SubTotal > 0) { 
+							$Data .= "<tr><td colspan=4></td><td>Sub Total</td><td class='text-right'>". number_format($SubTotal,0,".",",") ."</td></tr>";
+							$UnionTotal += $Payment;
+							$TotalKasir += $Payment;
+							$GrandTotal += $Payment;
+							$Data .= "<tr><td colspan=4></td><td>DP</td><td class='text-right'>". number_format($Payment,0,".",",") ."</td></tr>";
+							$SubTotal = 0;
+						}
+						if($UnionTotal > 0) {
+							$Data .= "<tr><td>Total ". $TransactionName ."</td><td colspan=4></td><td class='text-right'>". number_format($UnionTotal,0,".",",") ."</td></tr>";
+							$UnionTotal = 0;
+							$Data .= "<tr><td colspan=6>&nbsp;</td></tr>";
+						}
+					}
+					$Data .= "<tr><td colspan=6>". $row['TransactionName'] ."</td></tr>";
+				}
+				$Data .= "<tr><td></td><td>". $row['CustomerName'] . " (". $row['TransactionNumber'] .")</td><td colspan=3></td><td class='text-right'>". number_format($row['SubTotal'],0,".",",") ."</td></tr>";
+				$UnionTotal += $row['SubTotal'];
+				$TotalKasir += $row['SubTotal'];
+				$GrandTotal += $row['SubTotal'];
+			}
+			$Payment = $row['Payment'];
+			$UnionLevel = $row['UnionLevel'];
+			$Kasir = $row['UserName'];
+			$TransactionNumber = $row['TransactionNumber'];
+			$TransactionName = $row['TransactionName'];
+		}
+		if($SubTotal > 0) $Data .= "<tr><td colspan=4></td><td>Sub Total</td><td class='text-right'>". number_format($SubTotal,0,".",",") ."</td></tr>";
+		if($UnionTotal > 0) $Data .= "<tr><td>Total ". $TransactionName ."</td><td colspan=4></td><td class='text-right'>". number_format($UnionTotal,0,".",",") ."</td></tr>";
+		if($TotalKasir > 0) $Data .= "<tr><td>Total ". $Kasir ."</td><td colspan=4></td><td class='text-right'>". number_format($TotalKasir,0,".",",") ."</td></tr>";
+		if($GrandTotal > 0) $Data .= "<tr><td>Grand Total</td><td colspan=4></td><td class='text-right'>". number_format($GrandTotal,0,".",",") ."</td></tr>";
+		if($Data == "") echo $Data = "<tr><td colspan=6>Data tidak ditemukan</td></tr>";
+		else echo $Data;
+		
 		mysqli_free_result($result);
 		mysqli_next_result($dbh);
-		
-		$result2 = mysqli_use_result($dbh);
-		$return_arr = array();
-		$RowNumber = $requestData['start'];
-		$SubTotal = 0;
-		while ($row = mysqli_fetch_array($result2)) {
-			$row_array = array();
-			//data yang dikirim ke table
-			$row_array["SaleNumber"] = $row['SaleNumber'];
-			$row_array["TransactionDate"] = $row['TransactionDate'];
-			$row_array["CustomerName"] = $row['CustomerName'];
-			$row_array["Total"] = number_format($row['Total'],0,".",",");
-			$row_array["SaleID"] = $row['SaleID'];
-			$row_array["TransactionType"] = $row['TransactionType'];
-			$SubTotal += $row['Total'];
-			array_push($return_arr, $row_array);
-		}
-		
-		mysqli_free_result($result2);
-		mysqli_next_result($dbh);
 
-		$json_data = array(
-						"draw"				=> intval( $requestData['draw'] ),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw. 
-						"recordsTotal"		=> intval( $totalData ),  // total number of records
-						"recordsFiltered"	=> intval( $totalFiltered ), // total number of records after searching, if there is no searching then totalFiltered = totalData
-						"data"				=> $return_arr,
-						"SubTotal" => number_format($SubTotal,0,".",","),
-						"GrandTotal" => number_format($GrandTotal,0,".",",")
-					);
+		
 	}
-	
-	else {
-		$json_data = array(
-						"draw"				=> intval( $requestData['draw'] ),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw. 
-						"recordsTotal"		=> 0,  // total number of records
-						"recordsFiltered"	=> 0, // total number of records after searching, if there is no searching then totalFiltered = totalData
-						"data"				=> "",
-						"SubTotal" => 0,
-						"GrandTotal" => 0
-					);
-	}
-	
-	echo json_encode($json_data);
 ?>

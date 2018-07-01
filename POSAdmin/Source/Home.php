@@ -59,8 +59,7 @@
 				</div>
 				<span id="Clock" style="color: white; padding: 5px 20px 0px 20px; float: left; font-size: 16px;"></span>
 				<div style="color: white; padding: 5px 20px 0px 50px; float: right; font-size: 16px;"> 
-					 Selamat Datang, <a href="#" style="color: white;font-size: 16px;" onclick="UpdatePassword();"><?php echo $_SESSION['Nama']; ?>!</a> &nbsp;&nbsp;&nbsp;<a href="#" onclick="printDailyReport();"><img src="./assets/img/logout.png" width="20px" border="0" acronym title="Logout" /></a>
-					 <input type="hidden" id="hdnLogout" class="menu" link="./Logout.php" />
+					 Selamat Datang, <a href="#" style="color: white;font-size: 16px;" onclick="UpdatePassword();"><?php echo $_SESSION['Nama']; ?>!</a> &nbsp;&nbsp;&nbsp;<a href="#" class="menu" link="./Logout.php" ><img src="./assets/img/logout.png" width="20px" border="0" acronym title="Logout" /></a>
 				</div>
 			</nav>   
 			<!-- /. NAV TOP  -->

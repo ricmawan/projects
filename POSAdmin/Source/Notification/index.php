@@ -14,7 +14,7 @@
 						<h5>Notifikasi</h5>
 					</div>
 					<div class="panel-body">
-						<div class="table-responsive" style="overflow-x:hidden;">
+						<div class="table-responsive" style="overflow-x:hidden;" id="divStock" >
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
@@ -30,12 +30,49 @@
 								</thead>
 							</table>
 						</div>
+						<div class="table-responsive" style="overflow-x:hidden;" id="divDebt" >
+							<table id="grid-debt" class="table table-striped table-bordered table-hover" >
+								<thead>				
+									<tr>
+										<th>No</th>
+										<th>No. Invoice</th>
+										<th>Tanggal</th>
+										<th>Jatuh Tempo</th>
+										<th>Supplier</th>
+										<th>Total</th>
+										<th>Pembayaran</th>
+										<th>Kekurangan</th>
+									</tr>
+								</thead>
+							</table>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
+		<div id="divNotification" style="display:none;">
+			<select id="ddlNotification" name="ddlNotification" class="form-control-custom" onchange="notificationChange(this.value);">
+				<option value=1>Stok Minimal</option>
+				<option value=2>Hutang Jatuh Tempo</option>
+			</select>
+		</div>
 		<script>
+			function notificationChange(notificationID) {
+				$("div.toolbar").find("select").val(notificationID);
+				if(notificationID == 1) {
+					$("#divDebt").hide();
+					$("#divStock").show();
+					table.columns.adjust().draw();
+				}
+				else {
+					$("#divDebt").show();
+					$("#divStock").hide();
+					table2.columns.adjust().draw();
+				}
+			}
+
 			var table;
+			var table2;
 			var waitForFinalEvent = (function () {
 		        var timers = {};
 		        return function (callback, ms, uniqueId) {
@@ -70,7 +107,7 @@
 						delay: 2000,
 						beforeClose: function() {
 							if(counterError == 0) {
-								location.reload();
+								//location.reload();
 								counterError = 1;
 							}
 						}
@@ -112,8 +149,56 @@
 										"last": "»",
 										"first": "«"
 									}
-								}
-							});
+								},
+								"sDom": '<"toolbar">frtip'
+						});
+
+				table2 = $("#grid-debt").DataTable({
+								"keys": true,
+								"scrollX":  false,
+								"scrollY": "330px",
+								"rowId": "ItemID",
+								"scrollCollapse": true,
+								"order": [],
+								"columns": [
+									{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
+									{ className: "dt-head-center" },
+									{ className: "dt-head-center" },
+									{ className: "dt-head-center" },
+									{ className: "dt-head-center" },
+									{ className: "dt-head-center dt-body-right" },
+									{ className: "dt-head-center dt-body-right", "orderable": false },
+									{ className: "dt-head-center dt-body-right", "orderable": false }	
+								],
+								"processing": true,
+								"serverSide": true,
+								"ajax": "./Notification/DebtDataSource.php",
+								"language": {
+									"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+									"infoFiltered": "",
+									"infoEmpty": "",
+									"zeroRecords": "Data tidak ditemukan",
+									"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
+									"search": "Cari",
+									"processing": "Memproses",
+									"paginate": {
+										"next": ">",
+										"previous": "<",
+										"last": "»",
+										"first": "«"
+									}
+								},
+								"sDom": '<"toolbar">frtip'
+						});
+
+				$(".toolbar").css({
+					"display" : "inline-block"
+				});
+
+				$("div.toolbar").html($("#divNotification").html());
+				$("#divDebt").hide();
+
+				//$("div.toolbar").find("select").val($("#ddlBranch").val());
 				
 				var counterKeyItem = 0;
 				$(document).on("keydown", function (evt) {

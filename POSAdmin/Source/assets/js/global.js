@@ -744,7 +744,7 @@ function saveConfirm(callback) {
 					}
 				});
 				setTimeout(function() {
-					$("#btnYesDel").focus();
+					$("#btnYes").focus();
 				}, 0);
 			},
 			close: function() {
