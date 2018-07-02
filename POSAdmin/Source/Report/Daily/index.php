@@ -13,9 +13,36 @@
 			    background: url('./assets/img/details_close.png') no-repeat center center;
 			}
 			.Cashier {
-				font-color: red;
+				color: red;
 				font-size: 14px;
 				font-weight: bold;
+			}
+			.TransactionName {
+				font-size: 14px;
+				font-weight: bold;
+				text-decoration: underline;
+			}
+			.GrandTotal {
+				color: #00ff50;
+				font-size: 24px;
+				font-weight: bold;
+				text-decoration: underline;
+				background-color: black;
+			}
+			.UnionTotal {
+				background-color: yellow;
+			}
+			.TotalKasir {
+				background-color: red;
+				color: black;
+			}
+			.table > thead > tr > th,
+			.table > tbody > tr > th,
+			.table > tfoot > tr > th,
+			.table > thead > tr > td,
+			.table > tbody > tr > td,
+			.table > tfoot > tr > td {
+				border-top: none;
 			}
 		</style>
 	</head>
@@ -63,7 +90,7 @@
 						</div>
 						<hr style="margin: 10px 0;" />
 						<div class="table-responsive" id="dvTable" style="display: none;">
-							<table id="grid-data" class="table table-hover" >
+							<table id="grid-data" class="table table-hover" style="border: none !important;" >
 								
 							</table>
 						</div>

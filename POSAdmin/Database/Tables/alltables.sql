@@ -343,7 +343,7 @@ VALUES
 	'Transaction/DebtPayment/',
 	NULL,
 	0,
-	10
+	12
 ),
 (
 	31,
@@ -622,6 +622,20 @@ VALUES
 	0,
 	1,
 	29,
+	1,
+	1
+),
+(
+	0,
+	1,
+	30,
+	1,
+	1
+),
+(
+	0,
+	1,
+	31,
 	1,
 	1
 );
@@ -1162,7 +1176,7 @@ CREATE TABLE transaction_paymentdetails
 (
 	PaymentDetailsID	BIGINT PRIMARY KEY AUTO_INCREMENT,
 	TransactionID		BIGINT,
-	TransactionType 	VARCHAR(1),
+	TransactionType 	VARCHAR(1), /* S=Sale B=Booking P=Purchase */
     PaymentDate			DATETIME,
 	Amount				DOUBLE,
     Remarks				TEXT,

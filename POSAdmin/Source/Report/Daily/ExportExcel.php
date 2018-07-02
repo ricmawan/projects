@@ -1,27 +1,18 @@
 <?php
-	if(ISSET($_GET['BranchID']) ) {
+	if(ISSET($_GET['UserID']) ) {
 		$RequestedPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestedPath);
 		$RequestedPath = str_replace($file, "", $RequestedPath);	
 		include "../../GetPermission.php";
 		//echo $_SERVER['REQUEST_URI'];
-		$BranchID = $_GET['BranchID'];
-		$BranchName = $_GET['BranchName'];
-		if($_GET['FromDate'] == "") {
-			$txtFromDate = "2000-01-01";
+		$UserID = $_GET['UserID'];
+		if($_GET['TransactionDate'] == "") {
+			$TransactionDate = date("Y-m-d");
 		}
 		else {
-			$txtFromDate = explode('-', mysql_real_escape_string($_GET['FromDate']));
-			$_GET['FromDate'] = "$txtFromDate[2]-$txtFromDate[1]-$txtFromDate[0]"; 
-			$txtFromDate = $_GET['FromDate'];
-		}
-		if($_GET['ToDate'] == "") {
-			$txtToDate = date("Y-m-d");
-		}
-		else {
-			$txtToDate = explode('-', mysql_real_escape_string($_GET['ToDate']));
-			$_GET['ToDate'] = "$txtToDate[2]-$txtToDate[1]-$txtToDate[0]"; 
-			$txtToDate = $_GET['ToDate'];
+			$TransactionDate = explode('-', mysql_real_escape_string($_GET['TransactionDate']));
+			$_GET['TransactionDate'] = "$TransactionDate[2]-$TransactionDate[1]-$TransactionDate[0]"; 
+			$TransactionDate = $_GET['TransactionDate'];
 		}
 				
 		error_reporting(E_ALL);
@@ -43,14 +34,14 @@
 		// Set document properties
 		$objPHPExcel->getProperties()->setCreator($_SESSION['UserLogin'])
 									 ->setLastModifiedBy($_SESSION['UserLogin'])
-									 ->setTitle("Laporan Penjualan")
+									 ->setTitle("Laporan Harian")
 									 ->setSubject("Laporan")
-									 ->setDescription("Laporan Penjualan")
+									 ->setDescription("Laporan Harian")
 									 ->setKeywords("Generate By PHPExcel")
 									 ->setCategory("Laporan");
 		//Header
 		$objPHPExcel->setActiveSheetIndex(0)
-					->setCellValue('A1', "LAPORAN PENJUALAN");
+					->setCellValue('A1', "LAPORAN HARIAN");
 					
 		//set margin
 		$objPHPExcel->getActiveSheet()->getPageMargins()->setTop(0.787402);
@@ -66,7 +57,7 @@
 		$objPHPExcel->getActiveSheet()->getStyle('A1')->getAlignment()->setWrapText(true);
 		$monthName = array("Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des");
 
-		$period = date("d", strtotime($txtFromDate)) . " " . $monthName[date("m", strtotime($txtFromDate)) - 1] . " " .  date("Y", strtotime($txtFromDate)) . " - " . date("d", strtotime($txtToDate)) . " " . $monthName[date("m", strtotime($txtToDate)) - 1] . " " .  date("Y", strtotime($txtToDate));
+		$period = date("d", strtotime($TransactionDate)) . " " . $monthName[date("m", strtotime($TransactionDate)) - 1] . " " .  date("Y", strtotime($TransactionDate));
 		
 		//bold title
 		$objPHPExcel->getActiveSheet()->getStyle("A1:A2")->getFont()->setBold(true);
@@ -77,24 +68,20 @@
 		$objPHPExcel->getActiveSheet()->getStyle("A1:K2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		
 		$objPHPExcel->setActiveSheetIndex(0)
-					->setCellValue('B3', "Cabang:");
+					->setCellValue('A3', "Tanggal:");
 		$objPHPExcel->setActiveSheetIndex(0)
-					->setCellValue('C3', $BranchName);
-		$objPHPExcel->setActiveSheetIndex(0)
-					->setCellValue('B4', "Tanggal:");
-		$objPHPExcel->setActiveSheetIndex(0)
-					->setCellValue('C4', $period );
-		$objPHPExcel->getActiveSheet()->getStyle("B3:C4")->getFont()->setBold(true);
+					->setCellValue('B3', $period );
+		$objPHPExcel->getActiveSheet()->getStyle("B3:C3")->getFont()->setBold(true);
 
 		//bold title
-		$objPHPExcel->getActiveSheet()->getStyle("A6:K6")->getFont()->setBold(true);
-		$objPHPExcel->getActiveSheet()->getStyle("A6:K6")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');
+		/*$objPHPExcel->getActiveSheet()->getStyle("A6:K6")->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle("A6:K6")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');*/
 
-		$rowExcel = 6;
+		$rowExcel = 4;
 		$col = 0;
 		//set color
 		//$objPHPExcel->getFont()->setColor( new PHPExcel_Style_Color( PHPExcel_Style_Color::COLOR_DARKGREEN ) );
-		$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "No");
+		/*$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "No");
 		$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, "No. Invoice");
 		$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, "Tanggal");
 		$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, "Nama Pelanggan");
@@ -105,88 +92,224 @@
 		$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, "Harga Jual");
 		$objPHPExcel->getActiveSheet()->setCellValue("J".$rowExcel, "Diskon");
 		$objPHPExcel->getActiveSheet()->setCellValue("K".$rowExcel, "Sub Total");
-		$rowExcel++;
+		$rowExcel++;*/
 		
-		$sql = "CALL spSelExportSaleReport(".$BranchID.", '".$txtFromDate."', '".$txtToDate."', '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spSelDailyReport(".$UserID.", '".$TransactionDate."', '".$_SESSION['UserLogin']."')";
 
 		if (! $result = mysqli_query($dbh, $sql)) {
-			logEvent(mysqli_error($dbh), '/Report/Sale/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Report/Daily/ExportExcel.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 			return 0;
 		}
-		$RowNumber = 1;
-		$SaleNumber = "";
-		$MergeStart = 0;
-		$Total = 0;
-		$DetailsCounter = 0;
 		$GrandTotal = 0;
-		while($row = mysqli_fetch_array($result)) {
-			if($SaleNumber != $row['SaleNumber']) {
-				$DetailsCounter = 0;
-				if ($MergeStart != $rowExcel && $RowNumber != 1) {
-					//merge header
-					$objPHPExcel->getActiveSheet()->mergeCells("A".($MergeStart - 1).":A".$rowExcel);
-					$objPHPExcel->getActiveSheet()->mergeCells("B".($MergeStart - 1).":B".$rowExcel);
-					$objPHPExcel->getActiveSheet()->mergeCells("C".($MergeStart - 1).":C".$rowExcel);
-					$objPHPExcel->getActiveSheet()->mergeCells("D".($MergeStart - 1).":D".$rowExcel);
-					$objPHPExcel->getActiveSheet()->getStyle("A".($MergeStart - 1).":D".$rowExcel)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
-
-					$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Total");
-					$objPHPExcel->getActiveSheet()->getStyle("E".$rowExcel.":K".$rowExcel)->getFont()->setBold(true);
-					$objPHPExcel->getActiveSheet()->mergeCells(	"E".$rowExcel.":J".$rowExcel);
-					$objPHPExcel->getActiveSheet()->getStyle("E".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-
-					$objPHPExcel->getActiveSheet()->setCellValue("K".$rowExcel, $Total);
-					$objPHPExcel->getActiveSheet()->getStyle("E".$rowExcel.":K".$rowExcel)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('fffa00');
+		$Data = "";
+		$Kasir = "";
+		$UnionLevel = 0;
+		$TransactionNumber = "";
+		$TransactionName = "";
+		$UnionTotal = 0;
+		$SubTotal = 0;
+		$GrandTotal = 0;
+		$TotalKasir = 0;
+		$Payment = 0;
+		while ($row = mysqli_fetch_array($result)) {
+			if($Kasir != $row['UserName']) {
+				if($Kasir != "") {
+					if($SubTotal > 0) {
+						$rowExcel++;
+						$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+						$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+						$SubTotal = 0;
+					} 
+					if($UnionTotal > 0) {
+						$rowExcel++;
+						//TransactionName
+						$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $TransactionName);
+						$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $UnionTotal);
+						
+						$UnionTotal = 0;
+						$rowExcel++;
+					}
+					$rowExcel++;
+					//TransactionName
+					$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $Kasir);
+					$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $TotalKasir);
+					$TotalKasir = 0;
 					$rowExcel++;
 				}
-				$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $RowNumber);
-				$objPHPExcel->getActiveSheet()->setCellValueExplicit("B".$rowExcel, $row['SaleNumber'], PHPExcel_Cell_DataType::TYPE_STRING);
-				$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['TransactionDate']);
-				$objPHPExcel->getActiveSheet()->setCellValueExplicit("D".$rowExcel, $row['CustomerName'], PHPExcel_Cell_DataType::TYPE_STRING);
-				$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":D".$rowExcel)->getFont()->setBold(true);
-				$RowNumber++;
-				$Total = 0;
-				$MergeStart = $rowExcel + 1;
+				//cashier
+				$rowExcel++;
+				$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $row['UserName']);
 			}
-			$DetailsCounter++;
-			$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, $row['ItemCode'], PHPExcel_Cell_DataType::TYPE_STRING);
-			$objPHPExcel->getActiveSheet()->setCellValueExplicit("F".$rowExcel, $row['ItemName'], PHPExcel_Cell_DataType::TYPE_STRING);
-			$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, $row['Quantity']);
-			$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, $row['UnitName']);
-			$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, $row['SalePrice']);
-			$objPHPExcel->getActiveSheet()->setCellValue("J".$rowExcel, $row['Discount']);
-			$objPHPExcel->getActiveSheet()->setCellValue("K".$rowExcel, $row['SubTotal']);
-			$Total += $row['SubTotal'];
-			$GrandTotal += $row['SubTotal'];
-			$rowExcel++;
-			$SaleNumber = $row['SaleNumber'];
+			if($row['UnionLevel'] == '0') {
+				//TransactionName
+				$rowExcel++;
+				$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $row['TransactionName']);
+				$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['SubTotal']);
+				$TotalKasir += $row['SubTotal'];
+				$GrandTotal += $row['SubTotal'];
+			}
+			else if($row['UnionLevel'] > 0 && $row['UnionLevel'] < 4) {
+				if($UnionLevel != $row['UnionLevel']) {
+					if($row['UnionLevel'] > 1) {
+						if($SubTotal > 0) {
+							$rowExcel++;
+							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+							$SubTotal = 0;
+						}
+						if($UnionTotal > 0) {
+							//TransactionName
+							$rowExcel++;
+							$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $TransactionName);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $UnionTotal);
+							$UnionTotal = 0;
+							$rowExcel++;
+						}
+					}
+					//TransactionName
+					$rowExcel++;
+					$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $row['TransactionName']);
+				}
+				if($TransactionNumber != $row['TransactionNumber']) {
+					if($UnionLevel == $row['UnionLevel']) {
+						if($SubTotal > 0) { 
+							$rowExcel++;
+							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+							$SubTotal = 0;
+						}
+					}
+					$rowExcel++;
+					$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['CustomerName'] . " (". $row['TransactionNumber']);
+				}
+				$rowExcel++;
+				$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['ItemName']);
+				$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['SalePrice']);
+				$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, number_format($row['Quantity'],0,".",",") . " ". $row['UnitName']);
+				$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, number_format($row['Discount'],0,".",","));
+				$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['SubTotal']);
+				$UnionTotal += $row['SubTotal'];
+				$SubTotal += $row['SubTotal'];
+				$TotalKasir += $row['SubTotal'];
+				$GrandTotal += $row['SubTotal'];
+			}
+			else if($row['UnionLevel'] > 3 && $row['UnionLevel'] < 6) {
+				if($UnionLevel != $row['UnionLevel']) {
+					if($row['UnionLevel'] > 1) {
+						if($SubTotal > 0 || ($UnionLevel == 3 && $SubTotal < 0)) { 
+							$rowExcel++;
+							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+							if($UnionLevel > 3) {
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "DP", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $Payment);
+								$UnionTotal += $Payment;
+								$TotalKasir += $Payment;
+								$GrandTotal += $Payment;
+							}
+							$SubTotal = 0;
+						}
+						if($UnionTotal > 0 || ($UnionLevel == 3 && $UnionTotal < 0)) {
+							//TransactionName
+							$rowExcel++;
+							$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $TransactionName);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $UnionTotal);
+							$UnionTotal = 0;
+							$rowExcel++;
+						}
+					}
+					//TransactionName
+					$rowExcel++;
+					$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $row['TransactionName']);
+				}
+				if($TransactionNumber != $row['TransactionNumber']) {
+					if($UnionLevel == $row['UnionLevel'] && $SubTotal > 0) {
+						$rowExcel++;
+						$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+						$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+						$UnionTotal += $Payment;
+						$TotalKasir += $Payment;
+						$GrandTotal += $Payment;
+						$rowExcel++;
+						$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "DP", PHPExcel_Cell_DataType::TYPE_STRING);
+						$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $Payment);
+						$SubTotal = 0;
+					}
+					$rowExcel++;
+					$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['CustomerName'] . " (". $row['TransactionNumber']);
+				}
+				$rowExcel++;
+				$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['ItemName']);
+				$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['SalePrice']);
+				$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, number_format($row['Quantity'],0,".",",") . " ". $row['UnitName']);
+				$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, number_format($row['Discount'],0,".",","));
+				$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['SubTotal']);
+				$SubTotal += $row['SubTotal'];
+			}
+			else {
+				if($UnionLevel != $row['UnionLevel']) {
+					if($row['UnionLevel'] > 1) {
+						if($SubTotal > 0) { 
+							$rowExcel++;
+							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+							$UnionTotal += $Payment;
+							$TotalKasir += $Payment;
+							$GrandTotal += $Payment;
+							$rowExcel++;
+							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "DP", PHPExcel_Cell_DataType::TYPE_STRING);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $Payment);
+							$SubTotal = 0;
+						}
+						if($UnionTotal > 0) {
+							//TransactionName
+							$rowExcel++;
+							$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $TransactionName);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $UnionTotal);
+							$UnionTotal = 0;
+							$rowExcel++;
+						}
+					}
+					//TransactionName
+					$rowExcel++;
+					$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $row['TransactionName']);
+				}
+				$rowExcel++;
+				$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['CustomerName'] . " (". $row['TransactionNumber']);
+				$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['SubTotal']);
+				$UnionTotal += $row['SubTotal'];
+				$TotalKasir += $row['SubTotal'];
+				$GrandTotal += $row['SubTotal'];
+			}
+			$Payment = $row['Payment'];
+			$UnionLevel = $row['UnionLevel'];
+			$Kasir = $row['UserName'];
+			$TransactionNumber = $row['TransactionNumber'];
+			$TransactionName = $row['TransactionName'];
 		}
-		if($DetailsCounter > 1) {
-			//merge the header
-			$objPHPExcel->getActiveSheet()->mergeCells("A".($MergeStart - 1).":A".$rowExcel);
-			$objPHPExcel->getActiveSheet()->mergeCells("B".($MergeStart - 1).":B".$rowExcel);
-			$objPHPExcel->getActiveSheet()->mergeCells("C".($MergeStart - 1).":C".$rowExcel);
-			$objPHPExcel->getActiveSheet()->mergeCells("D".($MergeStart - 1).":D".$rowExcel);
-			$objPHPExcel->getActiveSheet()->getStyle("A".($MergeStart - 1).":D".$rowExcel)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
-					
-			//merge sub total
-			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Total");
-			$objPHPExcel->getActiveSheet()->getStyle("E".$rowExcel.":J".$rowExcel)->getFont()->setBold(true);
-			$objPHPExcel->getActiveSheet()->mergeCells(	"E".$rowExcel.":J".$rowExcel);
-			$objPHPExcel->getActiveSheet()->getStyle("E".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-
-			$objPHPExcel->getActiveSheet()->setCellValue("K".$rowExcel, $Total);
-			$objPHPExcel->getActiveSheet()->getStyle("E".$rowExcel.":K".$rowExcel)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('fffa00');
+		if($SubTotal > 0) {
 			$rowExcel++;
+			$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
 		}
-
-		//merge grand total
-		$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":J".$rowExcel);
-		$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Grand Total");
-		$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":K".$rowExcel)->getFont()->setBold(true);
-		$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-		$objPHPExcel->getActiveSheet()->setCellValue("K".$rowExcel, $GrandTotal);
-		$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":K".$rowExcel)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('ff0000');
+		if($UnionTotal > 0) {
+			$rowExcel++;
+			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $TransactionName);
+			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $UnionTotal);
+		}
+		if($TotalKasir > 0) {
+			//TransactionName
+			$rowExcel++;
+			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $Kasir);
+			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $TotalKasir);
+		}
+		if($GrandTotal > 0) {
+			$rowExcel++;
+			$rowExcel++;
+			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Grand Total");
+			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $GrandTotal);
+		}
 
 		$styleArray = array(
 	    'font'  => array(
@@ -194,7 +317,7 @@
 	        'size'  => 14,
 	    ));
 
-	    $objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":K".$rowExcel)->applyFromArray($styleArray);
+	    $objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":F".$rowExcel)->applyFromArray($styleArray);
 
 		$rowExcel++;
 
@@ -202,10 +325,11 @@
 		mysqli_next_result($dbh);
 
 		//$objPHPExcel->getActiveSheet()->getStyle("B6:F".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
-		$objPHPExcel->getActiveSheet()->getStyle("G6:K".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+		$objPHPExcel->getActiveSheet()->getStyle("F5:F".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+		$objPHPExcel->getActiveSheet()->getStyle("C5:C".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 		//set all width 
 		$fromCol='A';
-		$toCol= 'L';
+		$toCol= 'G';
 		for($j = $fromCol; $j !== $toCol; $j++) {
 			//$calculatedWidth = $objPHPExcel->getActiveSheet()->getColumnDimension($i)->getWidth();
 			$objPHPExcel->getActiveSheet()->getColumnDimension($j)->setAutoSize(true);
@@ -217,9 +341,9 @@
 			  )
 			)
 		);		
-		$objPHPExcel->getActiveSheet()->getStyle("A6:K".($rowExcel-1))->applyFromArray($styleArray);		
+		//$objPHPExcel->getActiveSheet()->getStyle("A5:F".($rowExcel-1))->applyFromArray($styleArray);		
 
-		$title = "Laporan Penjualan " . $BranchName . " " . $period;
+		$title = "Laporan Harian " . $period;
 		// Rename worksheet
 		//$objPHPExcel->getActiveSheet()->setTitle($title);
 		// Set active sheet index to the first sheet, so Excel opens this as the first sheet

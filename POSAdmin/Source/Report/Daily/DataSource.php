@@ -41,18 +41,18 @@
 						$SubTotal = 0;
 					} 
 					if($UnionTotal > 0) {
-						$Data .= "<tr><td>Total ". $TransactionName ."</td><td colspan=4></td><td class='text-right'>". number_format($UnionTotal,0,".",",") ."</td></tr>";
+						$Data .= "<tr class='UnionTotal' ><td class='TransactionName'>Total ". $TransactionName ."</td><td colspan=4></td><td class='text-right TransactionName'>". number_format($UnionTotal,0,".",",") ."</td></tr>";
 						$UnionTotal = 0;
 						$Data .= "<tr><td colspan=6>&nbsp;</td></tr>";
 					}
-					$Data .= "<tr><td>Total ". $Kasir ."</td><td colspan=4></td><td class='text-right'>". number_format($TotalKasir,0,".",",") ."</td></tr>";
+					$Data .= "<tr class='TotalKasir'><td class='TransactionName'>Total ". $Kasir ."</td><td colspan=4></td><td class='text-right TransactionName'>". number_format($TotalKasir,0,".",",") ."</td></tr>";
 					$TotalKasir = 0;
 					$Data .= "<tr><td colspan=6>&nbsp;</td></tr>";
 				}
 				$Data .= "<tr><td colspan=6 class='Cashier'>".$row['UserName']."</td></tr>";
 			}
 			if($row['UnionLevel'] == '0') {
-				$Data .= "<tr><td>". $row['TransactionName'] ."</td><td colspan=4></td><td class='text-right'>". number_format($row['SubTotal'],0,".",",") ."</td></tr>";
+				$Data .= "<tr class='UnionTotal'><td class='TransactionName'>". $row['TransactionName'] ."</td><td colspan=4></td><td class='text-right'>". number_format($row['SubTotal'],0,".",",") ."</td></tr>";
 				$TotalKasir += $row['SubTotal'];
 				$GrandTotal += $row['SubTotal'];
 			}
@@ -64,12 +64,12 @@
 							$SubTotal = 0;
 						}
 						if($UnionTotal > 0) {
-							$Data .= "<tr><td>Total ". $TransactionName ."</td><td colspan=4></td><td class='text-right'>". number_format($UnionTotal,0,".",",") ."</td></tr>";
+							$Data .= "<tr class='UnionTotal'><td class='TransactionName'>Total ". $TransactionName ."</td><td colspan=4></td><td class='text-right TransactionName'>". number_format($UnionTotal,0,".",",") ."</td></tr>";
 							$UnionTotal = 0;
 							$Data .= "<tr><td colspan=6>&nbsp;</td></tr>";
 						}
 					}
-					$Data .= "<tr><td colspan=6>". $row['TransactionName'] ."</td></tr>";
+					$Data .= "<tr><td colspan=6 class='TransactionName'>". $row['TransactionName'] ."</td></tr>";
 				}
 				if($TransactionNumber != $row['TransactionNumber']) {
 					if($UnionLevel == $row['UnionLevel']) {
@@ -102,12 +102,12 @@
 							$SubTotal = 0;
 						}
 						if($UnionTotal > 0 || ($UnionLevel == 3 && $UnionTotal < 0)) {
-							$Data .= "<tr><td>Total ". $TransactionName ."</td><td colspan=4></td><td class='text-right'>". number_format($UnionTotal,0,".",",") ."</td></tr>";
+							$Data .= "<tr class='UnionTotal'><td class='TransactionName'>Total ". $TransactionName ."</td><td colspan=4></td><td class='text-right TransactionName'>". number_format($UnionTotal,0,".",",") ."</td></tr>";
 							$UnionTotal = 0;
 							$Data .= "<tr><td colspan=6>&nbsp;</td></tr>";
 						}
 					}
-					$Data .= "<tr><td colspan=6>". $row['TransactionName'] ."</td></tr>";
+					$Data .= "<tr><td colspan=6 class='TransactionName'>". $row['TransactionName'] ."</td></tr>";
 				}
 				if($TransactionNumber != $row['TransactionNumber']) {
 					if($UnionLevel == $row['UnionLevel'] && $SubTotal > 0) {
@@ -137,12 +137,12 @@
 							$SubTotal = 0;
 						}
 						if($UnionTotal > 0) {
-							$Data .= "<tr><td>Total ". $TransactionName ."</td><td colspan=4></td><td class='text-right'>". number_format($UnionTotal,0,".",",") ."</td></tr>";
+							$Data .= "<tr class='UnionTotal'><td class='TransactionName'>Total ". $TransactionName ."</td><td colspan=4></td><td class='text-right TransactionName'>". number_format($UnionTotal,0,".",",") ."</td></tr>";
 							$UnionTotal = 0;
 							$Data .= "<tr><td colspan=6>&nbsp;</td></tr>";
 						}
 					}
-					$Data .= "<tr><td colspan=6>". $row['TransactionName'] ."</td></tr>";
+					$Data .= "<tr><td colspan=6 class='TransactionName'>". $row['TransactionName'] ."</td></tr>";
 				}
 				$Data .= "<tr><td></td><td>". $row['CustomerName'] . " (". $row['TransactionNumber'] .")</td><td colspan=3></td><td class='text-right'>". number_format($row['SubTotal'],0,".",",") ."</td></tr>";
 				$UnionTotal += $row['SubTotal'];
@@ -156,9 +156,9 @@
 			$TransactionName = $row['TransactionName'];
 		}
 		if($SubTotal > 0) $Data .= "<tr><td colspan=4></td><td>Sub Total</td><td class='text-right'>". number_format($SubTotal,0,".",",") ."</td></tr>";
-		if($UnionTotal > 0) $Data .= "<tr><td>Total ". $TransactionName ."</td><td colspan=4></td><td class='text-right'>". number_format($UnionTotal,0,".",",") ."</td></tr>";
-		if($TotalKasir > 0) $Data .= "<tr><td>Total ". $Kasir ."</td><td colspan=4></td><td class='text-right'>". number_format($TotalKasir,0,".",",") ."</td></tr>";
-		if($GrandTotal > 0) $Data .= "<tr><td>Grand Total</td><td colspan=4></td><td class='text-right'>". number_format($GrandTotal,0,".",",") ."</td></tr>";
+		if($UnionTotal > 0) $Data .= "<tr class='UnionTotal'><td class='TransactionName'>Total ". $TransactionName ."</td><td colspan=4></td><td class='text-right TransactionName'>". number_format($UnionTotal,0,".",",") ."</td></tr>";
+		if($TotalKasir > 0) $Data .= "<tr class='TotalKasir'><td class='TransactionName'>Total ". $Kasir ."</td><td colspan=4></td><td class='text-right TransactionName'>". number_format($TotalKasir,0,".",",") ."</td></tr>";
+		if($GrandTotal > 0) $Data .= "<tr><td colspan=6>&nbsp;</td></tr><tr class='GrandTotal'><td>Grand Total</td><td colspan=4></td><td class='text-right'>". number_format($GrandTotal,0,".",",") ."</td></tr>";
 		if($Data == "") echo $Data = "<tr><td colspan=6>Data tidak ditemukan</td></tr>";
 		else echo $Data;
 		
