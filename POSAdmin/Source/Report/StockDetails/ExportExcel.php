@@ -140,7 +140,8 @@
 			  )
 			)
 		);		
-		$objPHPExcel->getActiveSheet()->getStyle("A7:F".($rowExcel-1))->applyFromArray($styleArray);		
+		$objPHPExcel->getActiveSheet()->getStyle("A7:F".($rowExcel-1))->applyFromArray($styleArray);
+		$objPHPExcel->getActiveSheet()->setSelectedCells('A1');
 
 		$title = "Laporan Detail Stok " . $ItemName . " " . $period;
 		// Rename worksheet

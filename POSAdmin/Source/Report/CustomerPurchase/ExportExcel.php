@@ -156,7 +156,8 @@
 			  )
 			)
 		);		
-		$objPHPExcel->getActiveSheet()->getStyle("A6:D".($rowExcel-1))->applyFromArray($styleArray);		
+		$objPHPExcel->getActiveSheet()->getStyle("A6:D".($rowExcel-1))->applyFromArray($styleArray);
+		$objPHPExcel->getActiveSheet()->setSelectedCells('A1');	
 
 		$title = "Laporan Omset Pelanggan " . $CustomerName . " " . $period;
 		// Rename worksheet

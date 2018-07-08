@@ -143,7 +143,8 @@
 			  )
 			)
 		);		
-		$objPHPExcel->getActiveSheet()->getStyle("A5:G".($rowExcel-1))->applyFromArray($styleArray);		
+		$objPHPExcel->getActiveSheet()->getStyle("A5:G".($rowExcel-1))->applyFromArray($styleArray);
+		$objPHPExcel->getActiveSheet()->setSelectedCells('A1');
 
 		$title = "Laporan Hutang Per Tanggal " . $period;
 		// Rename worksheet

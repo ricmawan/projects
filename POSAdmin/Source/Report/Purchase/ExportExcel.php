@@ -213,7 +213,8 @@
 			  )
 			)
 		);		
-		$objPHPExcel->getActiveSheet()->getStyle("A6:J".($rowExcel-1))->applyFromArray($styleArray);		
+		$objPHPExcel->getActiveSheet()->getStyle("A6:J".($rowExcel-1))->applyFromArray($styleArray);
+		$objPHPExcel->getActiveSheet()->setSelectedCells('A1');
 
 		$title = "Laporan Pembelian " . $BranchName . " " . $period;
 		// Rename worksheet

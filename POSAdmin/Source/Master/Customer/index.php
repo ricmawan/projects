@@ -62,7 +62,7 @@
 				<br />
 				<div class="row">
 					<div class="col-md-3 labelColumn">
-						Nama Pelanggan :
+						Nama Pelanggan:
 					</div>
 					<div class="col-md-7">
 						<input id="txtCustomerName" name="txtCustomerName" type="text" tabindex=6 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Nama Pelanggan" maxlength="30" required />

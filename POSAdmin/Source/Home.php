@@ -195,6 +195,7 @@
 		<script src="assets/js/toggles.js"></script>
 		<script src="assets/js/mousetrap.min.js"></script>
 		<script src="assets/js/jquery.simulate.js"></script>
+		<script src="assets/js/Chart.js"></script>
 		<div id="loading"></div>
 		<iframe id='excelDownload' src='' style='display:none'></iframe>
 		<script type="text/javascript">

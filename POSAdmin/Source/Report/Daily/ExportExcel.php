@@ -58,14 +58,61 @@
 		$monthName = array("Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des");
 
 		$period = date("d", strtotime($TransactionDate)) . " " . $monthName[date("m", strtotime($TransactionDate)) - 1] . " " .  date("Y", strtotime($TransactionDate));
+
+		$cashierStyle = array(
+			'font'  => array(
+	        	'color' => array('rgb' => 'FF0000'),
+	        	'size'  => 14,
+	        	'bold'  => true
+	    	)
+		);
+
+		$transactionNameStyle = array(
+			'font'  => array(
+	        	'color'  => array('rgb' => '000000'),
+	        	'size'   => 14,
+	        	'bold'   => true,
+	        	'underline' => true
+	    	)
+		);
+
+		$grandTotalStyle = array(
+			'font'  => array(
+	        	'color'  => array('rgb' => '00ff50'),
+	        	'size'   => 24,
+	        	'bold'   => true,
+	        	'underline' => true
+	    	),
+	    	'fill' => array(
+	    		'type' => 'solid',
+	    		'startcolor' => array('rgb' => '000000')
+	    	)
+		);
+
+		$unionTotalStyle = array(
+	    	'fill' => array(
+	    		'type' => 'solid',
+	    		'startcolor' => array('rgb' => 'fff600')
+	    	)
+		);
+
+		$totalKasirStyle = array(
+			'font'  => array(
+	        	'color'  => array('rgb' => '000000')
+	    	),
+	    	'fill' => array(
+	    		'type' => 'solid',
+	    		'startcolor' => array('rgb' => 'ff0000')
+	    	)
+		);
 		
 		//bold title
 		$objPHPExcel->getActiveSheet()->getStyle("A1:A2")->getFont()->setBold(true);
 		$objPHPExcel->getActiveSheet()->getStyle("A1")->getFont()->setSize(16);
 		//merge title
-		$objPHPExcel->getActiveSheet()->mergeCells("A1:K2");
+		$objPHPExcel->getActiveSheet()->mergeCells("A1:F2");
 		//center title
-		$objPHPExcel->getActiveSheet()->getStyle("A1:K2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$objPHPExcel->getActiveSheet()->getStyle("A1:F2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		
 		$objPHPExcel->setActiveSheetIndex(0)
 					->setCellValue('A3', "Tanggal:");
@@ -125,26 +172,32 @@
 						//TransactionName
 						$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $TransactionName);
 						$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $UnionTotal);
-						
+						$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->applyFromArray($transactionNameStyle);
+						$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":F".$rowExcel)->applyFromArray($unionTotalStyle);
 						$UnionTotal = 0;
 						$rowExcel++;
 					}
 					$rowExcel++;
 					//TransactionName
 					$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $Kasir);
-					$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $TotalKasir);
+					$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $TotalKasir);			
+					$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->applyFromArray($transactionNameStyle);
+					$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel."F".$rowExcel)->applyFromArray($totalKasirStyle);
 					$TotalKasir = 0;
 					$rowExcel++;
 				}
 				//cashier
 				$rowExcel++;
 				$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $row['UserName']);
+				$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->applyFromArray($cashierStyle);
 			}
 			if($row['UnionLevel'] == '0') {
 				//TransactionName
 				$rowExcel++;
 				$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $row['TransactionName']);
 				$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['SubTotal']);
+				$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->applyFromArray($transactionNameStyle);
+				$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":F".$rowExcel)->applyFromArray($unionTotalStyle);
 				$TotalKasir += $row['SubTotal'];
 				$GrandTotal += $row['SubTotal'];
 			}
@@ -162,6 +215,8 @@
 							$rowExcel++;
 							$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $TransactionName);
 							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $UnionTotal);
+							$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->applyFromArray($transactionNameStyle);
+							$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":F".$rowExcel)->applyFromArray($unionTotalStyle);
 							$UnionTotal = 0;
 							$rowExcel++;
 						}
@@ -169,6 +224,7 @@
 					//TransactionName
 					$rowExcel++;
 					$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $row['TransactionName']);
+					$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->applyFromArray($transactionNameStyle);
 				}
 				if($TransactionNumber != $row['TransactionNumber']) {
 					if($UnionLevel == $row['UnionLevel']) {
@@ -215,6 +271,8 @@
 							$rowExcel++;
 							$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $TransactionName);
 							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $UnionTotal);
+							$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->applyFromArray($transactionNameStyle);
+							$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":F".$rowExcel)->applyFromArray($unionTotalStyle);
 							$UnionTotal = 0;
 							$rowExcel++;
 						}
@@ -222,6 +280,7 @@
 					//TransactionName
 					$rowExcel++;
 					$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $row['TransactionName']);
+					$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->applyFromArray($transactionNameStyle);
 				}
 				if($TransactionNumber != $row['TransactionNumber']) {
 					if($UnionLevel == $row['UnionLevel'] && $SubTotal > 0) {
@@ -267,6 +326,8 @@
 							$rowExcel++;
 							$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $TransactionName);
 							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $UnionTotal);
+							$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->applyFromArray($transactionNameStyle);
+							$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":F".$rowExcel)->applyFromArray($unionTotalStyle);
 							$UnionTotal = 0;
 							$rowExcel++;
 						}
@@ -274,6 +335,7 @@
 					//TransactionName
 					$rowExcel++;
 					$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $row['TransactionName']);
+					$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->applyFromArray($transactionNameStyle);
 				}
 				$rowExcel++;
 				$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['CustomerName'] . " (". $row['TransactionNumber']);
@@ -297,27 +359,25 @@
 			$rowExcel++;
 			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $TransactionName);
 			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $UnionTotal);
+			$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->applyFromArray($transactionNameStyle);
+			$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":F".$rowExcel)->applyFromArray($unionTotalStyle);
 		}
 		if($TotalKasir > 0) {
 			//TransactionName
 			$rowExcel++;
 			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $Kasir);
 			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $TotalKasir);
+			$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->applyFromArray($transactionNameStyle);
+			$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":F".$rowExcel)->applyFromArray($totalKasirStyle);
 		}
 		if($GrandTotal > 0) {
 			$rowExcel++;
 			$rowExcel++;
 			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Grand Total");
 			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $GrandTotal);
+			$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":F".$rowExcel)->applyFromArray($grandTotalStyle);
 		}
-
-		$styleArray = array(
-	    'font'  => array(
-	        'color' => array('rgb' => 'FFFFFF'),
-	        'size'  => 14,
-	    ));
-
-	    $objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":F".$rowExcel)->applyFromArray($styleArray);
+		$objPHPExcel->getActiveSheet()->getStyle('A2:F'.$rowExcel)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
 
 		$rowExcel++;
 
@@ -334,14 +394,7 @@
 			//$calculatedWidth = $objPHPExcel->getActiveSheet()->getColumnDimension($i)->getWidth();
 			$objPHPExcel->getActiveSheet()->getColumnDimension($j)->setAutoSize(true);
 		}
-		$styleArray = array(
-			'borders' => array(
-			  'allborders' => array(
-				  'style' => PHPExcel_Style_Border::BORDER_THIN
-			  )
-			)
-		);		
-		//$objPHPExcel->getActiveSheet()->getStyle("A5:F".($rowExcel-1))->applyFromArray($styleArray);		
+		$objPHPExcel->getActiveSheet()->setSelectedCells('A1');
 
 		$title = "Laporan Harian " . $period;
 		// Rename worksheet

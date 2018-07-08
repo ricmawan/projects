@@ -302,6 +302,15 @@ VALUES
 	NULL,
 	1,
 	9
+),
+(
+	32,
+	4,
+	'Barang Terlaris',
+	'Report/TopSelling/',
+	NULL,
+	1,
+	10
 );
 
 CREATE UNIQUE INDEX MENU_INDEX
