@@ -36,11 +36,11 @@
 		while ($row = mysqli_fetch_array($result)) {
 			if($Kasir != $row['UserName']) {
 				if($Kasir != "") {
-					if($SubTotal > 0) {
+					if($SubTotal > 0 || ($UnionLevel == 3 && $SubTotal < 0)) {
 						$Data .= "<tr><td colspan=4></td><td>Sub Total</td><td class='text-right'>". number_format($SubTotal,0,".",",") ."</td></tr>";
 						$SubTotal = 0;
 					} 
-					if($UnionTotal > 0) {
+					if($UnionTotal > 0 || ($UnionLevel == 3 && $UnionTotal < 0)) {
 						$Data .= "<tr class='UnionTotal' ><td class='TransactionName'>Total ". $TransactionName ."</td><td colspan=4></td><td class='text-right TransactionName'>". number_format($UnionTotal,0,".",",") ."</td></tr>";
 						$UnionTotal = 0;
 						$Data .= "<tr><td colspan=6>&nbsp;</td></tr>";
@@ -130,11 +130,13 @@
 					if($row['UnionLevel'] > 1) {
 						if($SubTotal > 0) { 
 							$Data .= "<tr><td colspan=4></td><td>Sub Total</td><td class='text-right'>". number_format($SubTotal,0,".",",") ."</td></tr>";
-							$UnionTotal += $Payment;
-							$TotalKasir += $Payment;
-							$GrandTotal += $Payment;
-							$Data .= "<tr><td colspan=4></td><td>DP</td><td class='text-right'>". number_format($Payment,0,".",",") ."</td></tr>";
 							$SubTotal = 0;
+							if($UnionLevel > 3 && $UnionLevel < 6) {
+								$UnionTotal += $Payment;
+								$TotalKasir += $Payment;
+								$GrandTotal += $Payment;
+								$Data .= "<tr><td colspan=4></td><td>DP</td><td class='text-right'>". number_format($Payment,0,".",",") ."</td></tr>";
+							}
 						}
 						if($UnionTotal > 0) {
 							$Data .= "<tr class='UnionTotal'><td class='TransactionName'>Total ". $TransactionName ."</td><td colspan=4></td><td class='text-right TransactionName'>". number_format($UnionTotal,0,".",",") ."</td></tr>";
@@ -155,10 +157,21 @@
 			$TransactionNumber = $row['TransactionNumber'];
 			$TransactionName = $row['TransactionName'];
 		}
-		if($SubTotal > 0) $Data .= "<tr><td colspan=4></td><td>Sub Total</td><td class='text-right'>". number_format($SubTotal,0,".",",") ."</td></tr>";
-		if($UnionTotal > 0) $Data .= "<tr class='UnionTotal'><td class='TransactionName'>Total ". $TransactionName ."</td><td colspan=4></td><td class='text-right TransactionName'>". number_format($UnionTotal,0,".",",") ."</td></tr>";
+		if($SubTotal > 0 || ($UnionLevel == 3 && $SubTotal < 0)) $Data .= "<tr><td colspan=4></td><td>Sub Total</td><td class='text-right'>". number_format($SubTotal,0,".",",") ."</td></tr>";
+
+		if($Payment > 0) {
+			$Data .= "<tr><td colspan=4></td><td>DP</td><td class='text-right'>". number_format($Payment,0,".",",") ."</td></tr>";
+			$UnionTotal += $Payment;
+			$TotalKasir += $Payment;
+			$GrandTotal += $Payment;
+		}
+
+		if($UnionTotal > 0 || ($UnionLevel == 3 && $UnionTotal < 0)) $Data .= "<tr class='UnionTotal'><td class='TransactionName'>Total ". $TransactionName ."</td><td colspan=4></td><td class='text-right TransactionName'>". number_format($UnionTotal,0,".",",") ."</td></tr>";
+
 		if($TotalKasir > 0) $Data .= "<tr class='TotalKasir'><td class='TransactionName'>Total ". $Kasir ."</td><td colspan=4></td><td class='text-right TransactionName'>". number_format($TotalKasir,0,".",",") ."</td></tr>";
+
 		if($GrandTotal > 0) $Data .= "<tr><td colspan=6>&nbsp;</td></tr><tr class='GrandTotal'><td>Grand Total</td><td colspan=4></td><td class='text-right'>". number_format($GrandTotal,0,".",",") ."</td></tr>";
+
 		if($Data == "") echo $Data = "<tr><td colspan=6>Data tidak ditemukan</td></tr>";
 		else echo $Data;
 		

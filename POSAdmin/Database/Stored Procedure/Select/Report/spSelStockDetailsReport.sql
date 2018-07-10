@@ -40,8 +40,6 @@ SET State = 1;
 		'0000-00-00' CreatedDate
 	FROM
 		master_item MI
-        JOIN master_itemdetails MID
-			ON MID.ItemID = MI.ItemID
         LEFT JOIN
 		(
 			SELECT

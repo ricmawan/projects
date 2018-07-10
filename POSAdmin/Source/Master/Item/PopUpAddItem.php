@@ -77,7 +77,7 @@
 					<div id="item-data">
 						<br />
 						<div class="row">
-							<div class="col-md-2 labelColumn">
+							<div class="col-md-3 labelColumn">
 								Kode Barang :
 							</div>
 							<div class="col-md-4">
@@ -87,7 +87,7 @@
 						</div>
 						<br />
 						<div class="row">
-							<div class="col-md-2 labelColumn">
+							<div class="col-md-3 labelColumn">
 								Nama Barang :
 							</div>
 							<div class="col-md-4">
@@ -96,7 +96,7 @@
 						</div>
 						<br />
 						<div class="row">
-							<div class="col-md-2 labelColumn">
+							<div class="col-md-3 labelColumn">
 								Satuan Dasar :
 							</div>
 							<div class="col-md-4">
@@ -118,7 +118,7 @@
 						</div>
 						<br />
 						<div class="row">
-							<div class="col-md-2 labelColumn">
+							<div class="col-md-3 labelColumn">
 								Kategori :
 							</div>
 							<div class="col-md-4">
@@ -143,7 +143,7 @@
 						</div>
 						<br />
 						<div class="row">
-							<div class="col-md-2 labelColumn">
+							<div class="col-md-3 labelColumn">
 								Harga Beli :
 							</div>
 							<div class="col-md-4">
@@ -152,7 +152,7 @@
 						</div>
 						<br />
 						<div class="row">
-							<div class="col-md-2 labelColumn">
+							<div class="col-md-3 labelColumn">
 								Harga Ecer :
 							</div>
 							<div class="col-md-4">
@@ -161,7 +161,7 @@
 						</div>
 						<br />
 						<div class="row">
-							<div class="col-md-2 labelColumn">
+							<div class="col-md-3 labelColumn">
 								Harga Grosir 1 :
 							</div>
 							<div class="col-md-4">
@@ -176,7 +176,7 @@
 						</div>
 						<br />
 						<div class="row">
-							<div class="col-md-2 labelColumn">
+							<div class="col-md-3 labelColumn">
 								Harga Grosir 2 :
 							</div>
 							<div class="col-md-4">
@@ -191,7 +191,7 @@
 						</div>
 						<br />
 						<div class="row">
-							<div class="col-md-2 labelColumn">
+							<div class="col-md-3 labelColumn">
 								Berat (KG) :
 							</div>
 							<div class="col-md-4">
@@ -373,6 +373,44 @@
 				});
 
 				tabs.tabs( "option", "active", 0 );
+
+				$("#txtItemCode").focus();
+				var counterClose = 0;
+				// Close icon: removing the tab on click
+				tabs.on( "click", "span.ui-icon-close", function() {
+			    	if(counterClose == 0) {
+			    		counterClose = 1;
+				    	var panelId = $( this ).closest( "li" ).remove().attr( "aria-controls" );
+						$( "#" + panelId ).remove();
+						var tabsBefore = tabsCounter;
+						tabsCounter = tabsCounter - 1;
+						$("#hdnTabsCounter").val(tabsCounter);
+						//tabs.tabs( "refresh" );
+						if(tabsCounter > 0) refreshTabNumber();
+						if(tabsBefore == 3) {
+							var label = "Tambah Satuan",
+					        id = "add-unit",
+					        li = '<li><a href="#add-unit" onclick="addTab();" >Tambah Satuan</a></li>';
+					        tabContentHtml = "";
+					 
+							tabs.find( ".ui-tabs-nav" ).append( li );
+							tabs.append( "<div id='" + id + "'><p>" + tabContentHtml + "</p></div>" );
+						}
+						tabs.tabs("refresh");
+						var active = $("#tabs" ).tabs( "option", "active" );
+						if(active > 0) {
+							setTimeout(function() {
+								$("#txtItemCode_" + active).focus();
+							}, 0);
+						}
+						else {
+							$("#txtItemCode").focus();
+						}
+			    	}
+			    	setTimeout(function() {
+			    		counterClose = 0;
+			    	}, 1000)
+			    });
 			});
 		</script>
 	</body>

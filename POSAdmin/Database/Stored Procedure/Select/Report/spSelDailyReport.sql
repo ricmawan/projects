@@ -103,7 +103,7 @@ SET State = 1;
         BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
         BD.Discount,
         BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount) SubTotal,
-        0
+        0 Payment
     FROM
 		transaction_booking TB
 		JOIN master_user MUS
@@ -140,7 +140,7 @@ SET State = 1;
         SRD.SalePrice,
         0 Discount,
         -(SRD.Quantity * SRD.SalePrice) SubTotal,
-        0
+        0 Payment
     FROM
 		transaction_salereturn TSR
         JOIN master_user MUS
@@ -178,7 +178,7 @@ SET State = 1;
         SD.SalePrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
         SD.Discount,
         SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount) SubTotal,
-        IFNULL(TS.Payment, 0)
+        IFNULL(TS.Payment, 0) Payment
     FROM
 		transaction_sale TS
         JOIN master_user MUS
@@ -216,7 +216,7 @@ SET State = 1;
         BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
         BD.Discount,
         BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount) SubTotal,
-        IFNULL(TB.Payment, 0)
+        IFNULL(TB.Payment, 0) Payment
     FROM
 		transaction_booking TB
 		JOIN master_user MUS
@@ -255,7 +255,7 @@ SET State = 1;
         
         0,
         PD.Amount,
-        0
+        0 Payment
 	FROM
 		transaction_paymentdetails PD
         JOIN master_user MUS
@@ -266,7 +266,7 @@ SET State = 1;
 		LEFT JOIN transaction_booking TB
 			ON TB.BookingID = PD.TransactionID
             AND PD.TransactionType = 'B'
-		LEFT JOIN master_customer MC
+		JOIN master_customer MC
 			ON MC.CustomerID = IFNULL(TS.CustomerID, TB.CustomerID)
 	WHERE
 		CASE

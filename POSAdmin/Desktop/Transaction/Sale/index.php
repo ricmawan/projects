@@ -1302,9 +1302,9 @@
 				var itemCode = $("#txtItemCode").val();
 				Lobibox.window({
 					title: 'Tambah Barang',
-					url: 'Master/Item/PopUpAddItem.php',
+					url: 'Transaction/Sale/PopUpAddItem.php',
 					width: 780,
-					height: 540,
+					height: 560,
 					buttons: {
 						Simpan: {
 							'class': 'ui-button ui-corner-all ui-widget',
@@ -1448,7 +1448,7 @@
 											$(this).dialog("destroy");
 											//callback("Ya");
 											$.ajax({
-												url: "./Master/Item/InsertNewItem.php",
+												url: "./Transaction/Sale/InsertNewItem.php",
 												type: "POST",
 												data: $("#PostFormItem").serialize(),
 												dataType: "json",
@@ -1465,14 +1465,14 @@
 															delay: 2000,
 															beforeClose: function() {
 																setTimeout(function() {
-																	$("#txtQTY").focus();
+																	getItemDetails();
 																}, 0);
 															},
 															shown: function() {
 																setTimeout(function() {
-																	getItemDetails();
 																	var lobibox = $('.lobibox-window').data('lobibox');
 																	lobibox.destroy();
+																	$("#btnOK").focus();
 																}, 0);
 															}
 														});

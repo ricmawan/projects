@@ -1168,6 +1168,9 @@ $.extend($.ui.autocomplete.prototype.options, {
 		if(typeof windowIndex != 'undefined' && parseInt(windowIndex) > parseInt(dialogIndex)) {
 			dialogIndex = windowIndex;
 		}
+		else if(typeof dialogIndex == 'undefined') {
+			dialogIndex = windowIndex;
+		}
 		var newIndex = parseInt(dialogIndex) + 1;
 		$(this).autocomplete("widget").css({
             "width": ($(this).width() + "px !important"),

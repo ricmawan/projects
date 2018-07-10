@@ -161,13 +161,13 @@
 		while ($row = mysqli_fetch_array($result)) {
 			if($Kasir != $row['UserName']) {
 				if($Kasir != "") {
-					if($SubTotal > 0) {
+					if($SubTotal > 0 || ($UnionLevel == 3 && $SubTotal < 0)) {
 						$rowExcel++;
 						$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
 						$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
 						$SubTotal = 0;
 					} 
-					if($UnionTotal > 0) {
+					if($UnionTotal > 0 || ($UnionLevel == 3 && $UnionTotal < 0)) {
 						$rowExcel++;
 						//TransactionName
 						$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $TransactionName);
@@ -236,7 +236,7 @@
 						}
 					}
 					$rowExcel++;
-					$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['CustomerName'] . " (". $row['TransactionNumber']);
+					$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['CustomerName'] . " (". $row['TransactionNumber'] .")");
 				}
 				$rowExcel++;
 				$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['ItemName']);
@@ -296,7 +296,7 @@
 						$SubTotal = 0;
 					}
 					$rowExcel++;
-					$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['CustomerName'] . " (". $row['TransactionNumber']);
+					$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['CustomerName'] . " (". $row['TransactionNumber'] .")");
 				}
 				$rowExcel++;
 				$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['ItemName']);
@@ -313,13 +313,15 @@
 							$rowExcel++;
 							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
 							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
-							$UnionTotal += $Payment;
-							$TotalKasir += $Payment;
-							$GrandTotal += $Payment;
-							$rowExcel++;
-							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "DP", PHPExcel_Cell_DataType::TYPE_STRING);
-							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $Payment);
 							$SubTotal = 0;
+							if($UnionLevel > 3 && $UnionLevel < 6) {
+								$UnionTotal += $Payment;
+								$TotalKasir += $Payment;
+								$GrandTotal += $Payment;
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "DP", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $Payment);
+							}
 						}
 						if($UnionTotal > 0) {
 							//TransactionName
@@ -338,7 +340,7 @@
 					$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->applyFromArray($transactionNameStyle);
 				}
 				$rowExcel++;
-				$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['CustomerName'] . " (". $row['TransactionNumber']);
+				$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['CustomerName'] . " (". $row['TransactionNumber'] .")");
 				$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['SubTotal']);
 				$UnionTotal += $row['SubTotal'];
 				$TotalKasir += $row['SubTotal'];
@@ -350,12 +352,22 @@
 			$TransactionNumber = $row['TransactionNumber'];
 			$TransactionName = $row['TransactionName'];
 		}
-		if($SubTotal > 0) {
+		if($SubTotal > 0 || ($UnionLevel == 3 && $SubTotal < 0)) {
 			$rowExcel++;
 			$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
 			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
 		}
-		if($UnionTotal > 0) {
+
+		if($Payment > 0) {
+			$rowExcel++;
+			$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "DP", PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $Payment);
+			$UnionTotal += $Payment;
+			$TotalKasir += $Payment;
+			$GrandTotal += $Payment;
+		}
+
+		if($UnionTotal > 0 || ($UnionLevel == 3 && $UnionTotal < 0)) {
 			$rowExcel++;
 			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $TransactionName);
 			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $UnionTotal);

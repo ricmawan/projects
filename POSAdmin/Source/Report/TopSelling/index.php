@@ -67,6 +67,7 @@
 		<script>
 			var myChart;
 			var ctx = document.getElementById("myChart").getContext('2d');
+			var chartFlag = 0;
 			function Preview() {
 				var CategoryID = $("#ddlCategory").val();
 				var txtFromDate = $("#txtFromDate").val();
@@ -111,7 +112,7 @@
 						dataType: "json",
 						success: function(Data) {
 							if(Data.FailedFlag == '0') {
-								myChart.destroy();
+								if(chartFlag == 1) myChart.destroy();
 								myChart = new Chart(ctx, {
 									type: 'bar',
 									data: {
@@ -171,6 +172,7 @@
 										maintainAspectRatio: false
 									}
 								});
+								chartFlag = 1;
 								$("#loading").hide();
 							}
 							else {

@@ -77,7 +77,7 @@
 								<br />
 								<div class="form-group input-group">
 									<span class="input-group-addon"><i class="fa fa-user"></i></span>
-									<input id="txtUserLogin" name="txtUserLogin" type="text" tabindex=1 class="form-control" autocomplete=off onfocus="this.select();" placeholder="Username" required />
+									<input id="txtUserLogin" name="txtUserLogin" type="text" tabindex=1 class="form-control" autocomplete=off onkeypress="isEnterKey(event, 'focusPass');" onfocus="this.select();" placeholder="Username" required />
 								</div>
 
 								<div class="form-group input-group">
@@ -85,7 +85,7 @@
 									<input id="txtPassword" name="txtPassword" type="password" tabindex=2 class="form-control" autocomplete=off onfocus="this.select();" onkeypress="isEnterKey(event, 'SubmitForm');" placeholder="Password" required />
 								</div>
 								<div style="text-align:right;">
-									<input id="btnLogin" name="btnLogin" type="button" tabindex=3 value="Login" class="btn btn-primary" onclick="SubmitForm();" >
+									<input id="btnLogin" name="btnLogin" type="button" value="Login" class="btn btn-primary" onclick="SubmitForm();" >
 								</div>
 							</form>
 						</div>
@@ -103,28 +103,16 @@
 
 			$(document).ready(function() {
 				$("#txtUserLogin").focus();
-				
-				$("input").not($(":submit, :button")).keypress(function (evt) {
-					if (evt.keyCode == 13) {
-						evt.preventDefault();
-						var next = $('[tabindex="'+(this.tabIndex+1)+'"]');
-						if(next.length) next.focus();
-						else $('[tabindex="1"]').focus();  
-					}
-				});
-				
-				$(document).keypress(function (evt) {
-					//evt.preventDefault();
-					if (evt.keyCode == 13) {
-						if($(":focus").length == 0) $('[tabindex="1"]').focus();
-					}
-				});
 			});
 			
 			function isEnterKey(evt, fn) {
 				var e = evt || window.event;
 				var charCode = e.which || e.keyCode;
 				if (charCode == 13) window[fn]();
+			}
+
+			function focusPass() {
+				$("#txtPassword").focus();
 			}
 
 			function SubmitForm() {

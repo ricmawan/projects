@@ -186,7 +186,7 @@
 						Saldo Awal :
 					</div>
 					<div class="col-md-6">
-						<input id="txtFirstBalance" tabindex=50; name="txtFirstBalance" type="text" class="form-control-custom text-right mousetrap" placeholder="Salwo Awal" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" value="0.00" />
+						<input id="txtFirstBalance" tabindex=50; name="txtFirstBalance" type="text" class="form-control-custom text-right mousetrap" placeholder="Salwo Awal" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" autocomplete="off" onpaste="return false;" value="0.00" />
 					</div>
 				</div>
 				<br />

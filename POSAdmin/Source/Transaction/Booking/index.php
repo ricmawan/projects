@@ -1409,7 +1409,7 @@
 					title: 'Tambah Barang',
 					url: 'Master/Item/PopUpAddItem.php',
 					width: 780,
-					height: 540,
+					height: 560,
 					buttons: {
 						Simpan: {
 							'class': 'ui-button ui-corner-all ui-widget',
