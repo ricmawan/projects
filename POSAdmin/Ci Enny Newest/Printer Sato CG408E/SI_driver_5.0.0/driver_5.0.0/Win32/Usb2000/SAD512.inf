@@ -1,0 +1,58 @@
+[Version]
+Signature="$WINDOWS NT$"
+Class=USB
+ClassGUID={36FC9E60-C465-11CF-8056-444553540000}
+provider=%STO%
+LayoutFile=layout.inf
+DriverVer=11/16/2012,1.01
+
+[DestinationDirs]
+SAD512.Files.Ext = 4,
+SAD512.Files.Inf = 20,
+
+[Manufacturer]
+%MfgName%=SATO
+
+[SATO]
+%VID_0828&PID_00D8%=SAD512.dev,USB\VID_0828&PID_00D8
+
+[SAD512.Dev]
+CopyFiles=SAD512.Files.Ext, SAD512.Files.Inf
+AddReg=SAD512.AddReg
+
+[SAD512.Dev.NT]
+CopyFiles=SAD512.Files.Ext, SAD512.Files.Inf
+AddReg=SAD512.AddReg
+
+[SAD512.Dev.NT.Services]
+Addservice = SAD512, 0x00000002, SAD512.AddService
+
+[SAD512.AddService]
+DisplayName    = %SAD512.SvcDesc%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 2                  ; SERVICE_AUTO_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\CTWDMUSB.sys
+LoadOrderGroup = Base
+
+[SAD512.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,CTWDMUSB.sys
+HKR,,Icon,,-20
+HKR,,PortName,,%MfgName%
+
+[SAD512.Files.Ext]
+CTWDMUSB.sys
+
+[SAD512.Files.Inf]
+SAD512.Inf
+
+
+;---------------------------------------------------------------;
+
+[Strings]
+STO="Sato Corporation"
+MfgName="SATO"
+VID_0828&PID_00D8="USB Device Driver(D512)"
+SAD512.SvcDesc="USB Device Driver(D512)"
+

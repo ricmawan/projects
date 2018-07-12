@@ -1,0 +1,47 @@
+*DoubleStatus;17:2;
+-10 0 Printer does not support bidirectional communication through the current port
+-9 0 Checking printer status...
+-8 0 Viewing printer report, status unavailable
+-7 0 Configuring printer settings, status unavailable
+-6 0 Initial check of printer status...
+-5 0 Printer busy
+-4 3 Printer in unknown mode, Errcode :
+-3 0 Printing...
+-2 0 Printing & buffering data...
+-1 5 Not accessible
+48 0 Offline
+49 0 Wait to receive
+50 0 Printing
+51 0 Standby (Wait to dispense or cut)
+52 0 Analyzing or Editing
+53 1 Error
+54 0 Pause
+48 0 No error
+49 3 Ribbon near end
+50 3 Buffer near full
+51 3 Ribbon near end and Buffer near full
+52 3 Paper near end
+53 3 Paper near end and Ribbon near end
+54 3 Paper near end and Buffer near full
+55 3 Paper near end and Ribbon near end and Buffer near full
+65 0 Machine error
+66 0 Flash ROM error
+67 0 Print head open
+68 0 Out of paper
+69 0 Out of ribbon
+70 0 Sensor error
+71 0 Print head error
+72 0 Cartridge read/write error
+73 0 Cartridge full
+74 0 Cutter error
+75 0 Calendar error
+76 0 Kanji ROM error
+77 0 Rewind full
+78 0 Cutter open
+79 0 RFID tag error
+80 0 RFID protect error
+81 0 BCC error
+82 0 Item No. error
+83 0 Media error
+84 0 Nonlock error
+85 0 Other errors

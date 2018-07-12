@@ -1,0 +1,58 @@
+[Version]
+Signature="$WINDOWS NT$"
+Class=USB
+ClassGUID={36FC9E60-C465-11CF-8056-444553540000}
+provider=%STO%
+LayoutFile=layout.inf
+DriverVer=11/16/2012,1.01
+
+[DestinationDirs]
+SALT408.Files.Ext = 4,
+SALT408.Files.Inf = 20,
+
+[Manufacturer]
+%MfgName%=SATO
+
+[SATO]
+%VID_0828&PID_0075%=SALT408.dev,USB\VID_0828&PID_0075
+
+[SALT408.Dev]
+CopyFiles=SALT408.Files.Ext, SALT408.Files.Inf
+AddReg=SALT408.AddReg
+
+[SALT408.Dev.NT]
+CopyFiles=SALT408.Files.Ext, SALT408.Files.Inf
+AddReg=SALT408.AddReg
+
+[SALT408.Dev.NT.Services]
+Addservice = SALT408, 0x00000002, SALT408.AddService
+
+[SALT408.AddService]
+DisplayName    = %SALT408.SvcDesc%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 2                  ; SERVICE_AUTO_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\CTWDMUSB.sys
+LoadOrderGroup = Base
+
+[SALT408.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,CTWDMUSB.sys
+HKR,,Icon,,-20
+HKR,,PortName,,%MfgName%
+
+[SALT408.Files.Ext]
+CTWDMUSB.sys
+
+[SALT408.Files.Inf]
+SALT408.Inf
+
+
+;---------------------------------------------------------------;
+
+[Strings]
+STO="Sato Corporation"
+MfgName="SATO"
+VID_0828&PID_0075="USB Device Driver(Lt408)"
+SALT408.SvcDesc="USB Device Driver(Lt408)"
+

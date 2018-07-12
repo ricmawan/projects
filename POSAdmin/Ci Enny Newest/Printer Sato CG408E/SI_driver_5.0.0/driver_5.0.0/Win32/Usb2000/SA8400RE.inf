@@ -1,0 +1,58 @@
+[Version]
+Signature="$WINDOWS NT$"
+Class=USB
+ClassGUID={36FC9E60-C465-11CF-8056-444553540000}
+provider=%STO%
+LayoutFile=layout.inf
+DriverVer=11/16/2012,1.01
+
+[DestinationDirs]
+SA8400RE.Files.Ext = 4,
+SA8400RE.Files.Inf = 20,
+
+[Manufacturer]
+%MfgName%=SATO
+
+[SATO]
+%VID_0828&PID_0055%=SA8400RE.dev,USB\VID_0828&PID_0055
+
+[SA8400RE.Dev]
+CopyFiles=SA8400RE.Files.Ext, SA8400RE.Files.Inf
+AddReg=SA8400RE.AddReg
+
+[SA8400RE.Dev.NT]
+CopyFiles=SA8400RE.Files.Ext, SA8400RE.Files.Inf
+AddReg=SA8400RE.AddReg
+
+[SA8400RE.Dev.NT.Services]
+Addservice = SA8400RE, 0x00000002, SA8400RE.AddService
+
+[SA8400RE.AddService]
+DisplayName    = %SA8400RE.SvcDesc%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 2                  ; SERVICE_AUTO_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\CTWDMUSB.sys
+LoadOrderGroup = Base
+
+[SA8400RE.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,CTWDMUSB.sys
+HKR,,Icon,,-20
+HKR,,PortName,,%MfgName%
+
+[SA8400RE.Files.Ext]
+CTWDMUSB.sys
+
+[SA8400RE.Files.Inf]
+SA8400RE.Inf
+
+
+;---------------------------------------------------------------;
+
+[Strings]
+STO="Sato Corporation"
+MfgName="SATO"
+VID_0828&PID_0055="USB Device Driver(M-8400RVe)"
+SA8400RE.SvcDesc="USB Device Driver(M-8400RVe)"
+

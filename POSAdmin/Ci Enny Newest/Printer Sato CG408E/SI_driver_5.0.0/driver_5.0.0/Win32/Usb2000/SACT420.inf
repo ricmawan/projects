@@ -1,0 +1,58 @@
+[Version]
+Signature="$WINDOWS NT$"
+Class=USB
+ClassGUID={36FC9E60-C465-11CF-8056-444553540000}
+provider=%STO%
+LayoutFile=layout.inf
+DriverVer=11/16/2012,1.01
+
+[DestinationDirs]
+SACT420.Files.Ext = 4,
+SACT420.Files.Inf = 20,
+
+[Manufacturer]
+%MfgName%=SATO
+
+[SATO]
+%VID_0828&PID_0074%=SACT420.dev,USB\VID_0828&PID_0074
+
+[SACT420.Dev]
+CopyFiles=SACT420.Files.Ext, SACT420.Files.Inf
+AddReg=SACT420.AddReg
+
+[SACT420.Dev.NT]
+CopyFiles=SACT420.Files.Ext, SACT420.Files.Inf
+AddReg=SACT420.AddReg
+
+[SACT420.Dev.NT.Services]
+Addservice = SACT420, 0x00000002, SACT420.AddService
+
+[SACT420.AddService]
+DisplayName    = %SACT420.SvcDesc%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 2                  ; SERVICE_AUTO_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\CTWDMUSB.sys
+LoadOrderGroup = Base
+
+[SACT420.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,CTWDMUSB.sys
+HKR,,Icon,,-20
+HKR,,PortName,,%MfgName%
+
+[SACT420.Files.Ext]
+CTWDMUSB.sys
+
+[SACT420.Files.Inf]
+SACT420.Inf
+
+
+;---------------------------------------------------------------;
+
+[Strings]
+STO="Sato Corporation"
+MfgName="SATO"
+VID_0828&PID_0074="USB Device Driver(CT420)"
+SACT420.SvcDesc="USB Device Driver(CT420)"
+

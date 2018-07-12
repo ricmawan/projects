@@ -1,0 +1,173 @@
+
+;
+; Version section
+;
+[Version]
+Signature="$WINDOWS NT$"
+;
+; We'll install our device into the "USB" class of
+;  devices
+;
+Class=USB
+ClassGUID={36FC9E60-C465-11CF-8056-444553540000}
+provider=%STO%
+DriverVer=11/16/2012,1.01
+
+;
+; Manufacturer section
+;
+[Manufacturer]
+;
+; Indicate that whatever string %ManufacturerName%
+;  is defined to be in the [Strings] section is the
+;  manufacturer of our device.
+;
+; We need to specify separate models sections
+;  for each architecture that we support, so
+;  we will define an x86 models section and also
+;  and AMD64 models section
+;
+%ManufacturerName%=SATO,NTx86,NTamd64
+
+;
+; Models section for installation on pre XP, x86 based
+;  machines. We support one device type and the
+;  device is on the USB bus, has a vendor identifier
+;  of 0547 and a product identifier of 1002.
+;
+; This section instructs the installation to move
+;  on to the [USBFX2LKInst] section
+;
+[SATO]
+%VID_0828&PID_0062%=USBFX2LKInst, USB\VID_0828&PID_0062
+
+;
+; Models section for installation on XP and later x86
+;  based machines. Syntax and effect is identical to the
+;  previous installation section
+;
+[SATO.NTx86]
+%VID_0828&PID_0062%=USBFX2LKInst, USB\VID_0828&PID_0062
+
+;
+; Models section for installation on amd64 based
+;  machines. Syntax and effect is identical to the
+;  previous installation sections
+;
+[SATO.NTamd64]
+%VID_0828&PID_0062%=USBFX2LKInst, USB\VID_0828&PID_0062
+
+;
+; Installation section that is processed whenever
+;  a device that matches the device IDs defined
+;  in our models sections is discovered
+;
+[USBFX2LKInst]
+;
+; Indicate the location of our CopyFiles section,
+;  which we have named [USBFX2CopyFiles]
+;
+CopyFiles=USBFX2CopyFiles
+
+;
+; DestinationDirs section. Indicates
+;  where the files in the CopyFiles section
+;  should be copied to on the target system.
+;
+; "12" is expanded by the installer to be
+;  %SystemRoot%\System32\Drivers
+;
+[DestinationDirs]
+DefaultDestDir=12
+
+;
+; CopyFiles section, which lists all of the files that
+;  need to be copied from the installation disk to
+;  the target system
+;
+[USBFX2CopyFiles]
+CTWDMUSB.sys
+
+;
+; SourceDisksFiles section. Indicates
+;  the location of the files outlined in the
+;  CopyFiles section relative to the installation
+;  disk set.
+;
+[SourceDisksFiles]
+;
+; Indicate that the one file that we are copying
+;  as part of this installation is on Disk 1
+;
+CTWDMUSB.sys=1
+
+
+;
+; SourceDisksNames section. We chose to indicate that the
+;  files to install on x86 based systems are located in a
+;  separate directory on the installation disk than the
+;  files for an AMD64 based install. To do this,
+;  we decorate the required SourceDisksNames sections
+;  with the target platforma and in the description
+;  of the disk layout we add an appropriate subdirectory
+;
+[SourceDisksNames.x86]
+1=%DiskDesc%,,,
+
+[SourceDisksNames.amd64]
+1=%DiskDesc%,,,
+
+;
+; Services section. The name of the section
+;  is created by decorating the installation section
+;  name (defined in the Models section) with .Services.
+;
+[USBFX2LKInst.Services]
+;
+; We are creating one service named USBFX2LK (to match
+;  our binary image name) and directing the installation
+;  procedure to the USBFX2AddService for details on how
+;  to create the service
+;
+Addservice = SAXL400E, 0x00000002, SAXL400E.AddService
+
+;
+; AddService section. This section is used to create
+;  all of the values that will appear beneath the
+;  HKLM\System\CCS\Services\{ServiceName} key
+;
+[SAXL400E.AddService]
+DisplayName    = %ServiceDesc%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 3                  ; SERVICE_DEMAND_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\CTWDMUSB.sys
+;
+; We want to create a subkey of our services key in order
+;  to save some driver specific registry data. In order to
+;  create a subkey, we will need to use the AddReg directive.
+;
+AddReg         = USBFX2AddReg
+
+;
+; AddReg section. Indicate to the installation process that
+;  we would like to create an DebugLevel value in the
+;  Parameters subkey of our Service key
+;
+[USBFX2AddReg]
+HKR,%ParametersSubkey%,%DebugLevel%,0x10001,0
+
+
+;
+; Strings section. Any values in the INF that have %'s
+;  on either end are references to values within this
+;  section.
+;
+[Strings]
+STO="Sato Corporation"
+ManufacturerName="SATO"
+DiskDesc="USB Device Driver(XL 400e)"
+VID_0828&PID_0062="USB Device Driver(XL 400e)"
+ServiceDesc="USB Device Driver(XL 400e)"
+ParametersSubkey="Parameters"
+DebugLevel="DebugLevel"

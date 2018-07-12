@@ -1,0 +1,58 @@
+[Version]
+Signature="$WINDOWS NT$"
+Class=USB
+ClassGUID={36FC9E60-C465-11CF-8056-444553540000}
+provider=%STO%
+LayoutFile=layout.inf
+DriverVer=11/16/2012,1.01
+
+[DestinationDirs]
+SACT400.Files.Ext = 4,
+SACT400.Files.Inf = 20,
+
+[Manufacturer]
+%MfgName%=SATO
+
+[SATO]
+%VID_0828&PID_0001%=SACT400.dev,USB\VID_0828&PID_0001
+
+[SACT400.Dev]
+CopyFiles=SACT400.Files.Ext, SACT400.Files.Inf
+AddReg=SACT400.AddReg
+
+[SACT400.Dev.NT]
+CopyFiles=SACT400.Files.Ext, SACT400.Files.Inf
+AddReg=SACT400.AddReg
+
+[SACT400.Dev.NT.Services]
+Addservice = SACT400, 0x00000002, SACT400.AddService
+
+[SACT400.AddService]
+DisplayName    = %SACT400.SvcDesc%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 2                  ; SERVICE_AUTO_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\CTWDMUSB.sys
+LoadOrderGroup = Base
+
+[SACT400.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,CTWDMUSB.sys
+HKR,,Icon,,-20
+HKR,,PortName,,%MfgName%
+
+[SACT400.Files.Ext]
+CTWDMUSB.sys
+
+[SACT400.Files.Inf]
+SACT400.Inf
+
+
+;---------------------------------------------------------------;
+
+[Strings]
+STO="Sato Corporation"
+MfgName="SATO"
+VID_0828&PID_0001="USB Device Driver(CT400)"
+SACT400.SvcDesc="USB Device Driver(CT400)"
+

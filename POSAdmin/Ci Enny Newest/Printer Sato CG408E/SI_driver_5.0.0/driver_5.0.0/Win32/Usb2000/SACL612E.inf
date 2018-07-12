@@ -1,0 +1,58 @@
+[Version]
+Signature="$WINDOWS NT$"
+Class=USB
+ClassGUID={36FC9E60-C465-11CF-8056-444553540000}
+provider=%STO%
+LayoutFile=layout.inf
+DriverVer=11/16/2012,1.01
+
+[DestinationDirs]
+SACL612E.Files.Ext = 4,
+SACL612E.Files.Inf = 20,
+
+[Manufacturer]
+%MfgName%=SATO
+
+[SATO]
+%VID_0828&PID_0057%=SACL612E.dev,USB\VID_0828&PID_0057
+
+[SACL612E.Dev]
+CopyFiles=SACL612E.Files.Ext, SACL612E.Files.Inf
+AddReg=SACL612E.AddReg
+
+[SACL612E.Dev.NT]
+CopyFiles=SACL612E.Files.Ext, SACL612E.Files.Inf
+AddReg=SACL612E.AddReg
+
+[SACL612E.Dev.NT.Services]
+Addservice = SACL612E, 0x00000002, SACL612E.AddService
+
+[SACL612E.AddService]
+DisplayName    = %SACL612E.SvcDesc%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 2                  ; SERVICE_AUTO_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\CTWDMUSB.sys
+LoadOrderGroup = Base
+
+[SACL612E.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,CTWDMUSB.sys
+HKR,,Icon,,-20
+HKR,,PortName,,%MfgName%
+
+[SACL612E.Files.Ext]
+CTWDMUSB.sys
+
+[SACL612E.Files.Inf]
+SACL612E.Inf
+
+
+;---------------------------------------------------------------;
+
+[Strings]
+STO="Sato Corporation"
+MfgName="SATO"
+VID_0828&PID_0057="USB Device Driver(CL612e)"
+SACL612E.SvcDesc="USB Device Driver(CL612e)"
+

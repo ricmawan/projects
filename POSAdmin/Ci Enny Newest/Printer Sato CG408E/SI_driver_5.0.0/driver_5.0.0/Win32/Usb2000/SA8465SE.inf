@@ -1,0 +1,58 @@
+[Version]
+Signature="$WINDOWS NT$"
+Class=USB
+ClassGUID={36FC9E60-C465-11CF-8056-444553540000}
+provider=%STO%
+LayoutFile=layout.inf
+DriverVer=11/16/2012,1.01
+
+[DestinationDirs]
+SA8465SE.Files.Ext = 4,
+SA8465SE.Files.Inf = 20,
+
+[Manufacturer]
+%MfgName%=SATO
+
+[SATO]
+%VID_0828H&PID_0090H%=SA8465SE.dev,USB\VID_0828H&PID_0090H
+
+[SA8465SE.Dev]
+CopyFiles=SA8465SE.Files.Ext, SA8465SE.Files.Inf
+AddReg=SA8465SE.AddReg
+
+[SA8465SE.Dev.NT]
+CopyFiles=SA8465SE.Files.Ext, SA8465SE.Files.Inf
+AddReg=SA8465SE.AddReg
+
+[SA8465SE.Dev.NT.Services]
+Addservice = SA8465SE, 0x00000002, SA8465SE.AddService
+
+[SA8465SE.AddService]
+DisplayName    = %SA8465SE.SvcDesc%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 2                  ; SERVICE_AUTO_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\CTWDMUSB.sys
+LoadOrderGroup = Base
+
+[SA8465SE.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,CTWDMUSB.sys
+HKR,,Icon,,-20
+HKR,,PortName,,%MfgName%
+
+[SA8465SE.Files.Ext]
+CTWDMUSB.sys
+
+[SA8465SE.Files.Inf]
+SA8465SE.Inf
+
+
+;---------------------------------------------------------------;
+
+[Strings]
+STO="Sato Corporation"
+MfgName="SATO"
+VID_0828H&PID_0090H="USB Device Driver(M-8465Se)"
+SA8465SE.SvcDesc="USB Device Driver(M-8465Se)"
+

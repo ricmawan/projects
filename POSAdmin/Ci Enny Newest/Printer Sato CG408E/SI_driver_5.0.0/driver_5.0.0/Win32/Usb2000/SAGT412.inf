@@ -1,0 +1,58 @@
+[Version]
+Signature="$WINDOWS NT$"
+Class=USB
+ClassGUID={36FC9E60-C465-11CF-8056-444553540000}
+provider=%STO%
+LayoutFile=layout.inf
+DriverVer=11/16/2012,1.01
+
+[DestinationDirs]
+SAGT412.Files.Ext = 4,
+SAGT412.Files.Inf = 20,
+
+[Manufacturer]
+%MfgName%=SATO
+
+[SATO]
+%VID_0828&PID_0072%=SAGT412.dev,USB\VID_0828&PID_0072
+
+[SAGT412.Dev]
+CopyFiles=SAGT412.Files.Ext, SAGT412.Files.Inf
+AddReg=SAGT412.AddReg
+
+[SAGT412.Dev.NT]
+CopyFiles=SAGT412.Files.Ext, SAGT412.Files.Inf
+AddReg=SAGT412.AddReg
+
+[SAGT412.Dev.NT.Services]
+Addservice = SAGT412, 0x00000002, SAGT412.AddService
+
+[SAGT412.AddService]
+DisplayName    = %SAGT412.SvcDesc%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 2                  ; SERVICE_AUTO_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\CTWDMUSB.sys
+LoadOrderGroup = Base
+
+[SAGT412.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,CTWDMUSB.sys
+HKR,,Icon,,-20
+HKR,,PortName,,%MfgName%
+
+[SAGT412.Files.Ext]
+CTWDMUSB.sys
+
+[SAGT412.Files.Inf]
+SAGT412.Inf
+
+
+;---------------------------------------------------------------;
+
+[Strings]
+STO="Sato Corporation"
+MfgName="SATO"
+VID_0828&PID_0072="USB Device Driver(GT412e)"
+SAGT412.SvcDesc="USB Device Driver(GT412e)"
+

@@ -1,0 +1,58 @@
+[Version]
+Signature="$WINDOWS NT$"
+Class=USB
+ClassGUID={36FC9E60-C465-11CF-8056-444553540000}
+provider=%STO%
+LayoutFile=layout.inf
+DriverVer=11/16/2012,1.01
+
+[DestinationDirs]
+SA8459SE.Files.Ext = 4,
+SA8459SE.Files.Inf = 20,
+
+[Manufacturer]
+%MfgName%=SATO
+
+[SATO]
+%VID_0828&PID_0058%=SA8459SE.dev,USB\VID_0828&PID_0058
+
+[SA8459SE.Dev]
+CopyFiles=SA8459SE.Files.Ext, SA8459SE.Files.Inf
+AddReg=SA8459SE.AddReg
+
+[SA8459SE.Dev.NT]
+CopyFiles=SA8459SE.Files.Ext, SA8459SE.Files.Inf
+AddReg=SA8459SE.AddReg
+
+[SA8459SE.Dev.NT.Services]
+Addservice = SA8459SE, 0x00000002, SA8459SE.AddService
+
+[SA8459SE.AddService]
+DisplayName    = %SA8459SE.SvcDesc%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 2                  ; SERVICE_AUTO_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\CTWDMUSB.sys
+LoadOrderGroup = Base
+
+[SA8459SE.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,CTWDMUSB.sys
+HKR,,Icon,,-20
+HKR,,PortName,,%MfgName%
+
+[SA8459SE.Files.Ext]
+CTWDMUSB.sys
+
+[SA8459SE.Files.Inf]
+SA8459SE.Inf
+
+
+;---------------------------------------------------------------;
+
+[Strings]
+STO="Sato Corporation"
+MfgName="SATO"
+VID_0828&PID_0058="USB Device Driver(M-8459Se)"
+SA8459SE.SvcDesc="USB Device Driver(M-8459Se)"
+

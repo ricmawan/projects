@@ -1,0 +1,58 @@
+[Version]
+Signature="$WINDOWS NT$"
+Class=USB
+ClassGUID={36FC9E60-C465-11CF-8056-444553540000}
+provider=%STO%
+LayoutFile=layout.inf
+DriverVer=11/16/2012,1.01
+
+[DestinationDirs]
+SAM10E.Files.Ext = 4,
+SAM10E.Files.Inf = 20,
+
+[Manufacturer]
+%MfgName%=SATO
+
+[SATO]
+%VID_0828&PID_0068%=SAM10E.dev,USB\VID_0828&PID_0068
+
+[SAM10E.Dev]
+CopyFiles=SAM10E.Files.Ext, SAM10E.Files.Inf
+AddReg=SAM10E.AddReg
+
+[SAM10E.Dev.NT]
+CopyFiles=SAM10E.Files.Ext, SAM10E.Files.Inf
+AddReg=SAM10E.AddReg
+
+[SAM10E.Dev.NT.Services]
+Addservice = SAM10E, 0x00000002, SAM10E.AddService
+
+[SAM10E.AddService]
+DisplayName    = %SAM10E.SvcDesc%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 2                  ; SERVICE_AUTO_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\CTWDMUSB.sys
+LoadOrderGroup = Base
+
+[SAM10E.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,CTWDMUSB.sys
+HKR,,Icon,,-20
+HKR,,PortName,,%MfgName%
+
+[SAM10E.Files.Ext]
+CTWDMUSB.sys
+
+[SAM10E.Files.Inf]
+SAM10E.Inf
+
+
+;---------------------------------------------------------------;
+
+[Strings]
+STO="Sato Corporation"
+MfgName="SATO"
+VID_0828&PID_0068="USB Device Driver(M-10e)"
+SAM10E.SvcDesc="USB Device Driver(M-10e)"
+

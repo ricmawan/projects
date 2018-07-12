@@ -1,0 +1,46 @@
+-10 0 Printer does not support bidirectional communication through the current port
+-9 0 Checking printer status...
+-8 0 Viewing printer report, status unavailable
+-7 0 Configuring printer settings, status unavailable
+-6 0 Initial check of printer status...
+-5 0 Printer busy
+-4 3 Printer in unknown mode, Errcode :
+-3 0 Printing...
+-2 0 Printing & buffering data...
+-1 5 Not accessible
+48 0 Offline - No error
+49 3 Offline - Ribbon or paper near end
+50 3 Offline - Buffer near full
+51 3 Offline - Ribbon or paper near end and Buffer near full
+52 0 Offline - Pause
+65 0 Wait to receive - No error
+66 3 Wait to receive - Ribbon or paper near end
+67 3 Wait to receive - Buffer near full
+68 3 Wait to receive - Ribbon or paper near end and Buffer near full
+69 0 Wait to receive - Pause
+71 0 Printing - No error
+72 3 Printing - Ribbon or paper near end
+73 3 Printing - Buffer near full
+74 3 Printing - Ribbon or paper near end and Buffer near full
+75 0 Printing - Pause
+77 0 Standby - No error
+78 3 Standby - Ribbon or paper near end
+79 3 Standby - Buffer near full
+80 3 Standby - Ribbon or paper near end and Buffer near full
+81 0 Standby - Pause
+83 0 Analyzing or Editing - No error
+84 3 Analyzing or Editing - Ribbon or paper near end
+85 3 Analyzing or Editing - Buffer near full
+86 3 Analyzing or Editing - Ribbon or paper near end and Buffer near full
+87 0 Analyzing or Editing - Pause
+97 1 Buffer over
+98 1 Print head open
+99 1 Out of paper
+100 1 Out of ribbon
+101 1 Media error
+102 1 Sensor error
+103 1 Head error
+104 1 Cutter open error
+105 1 Card error
+106 1 Cutter error
+107 1 Other errors

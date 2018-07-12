@@ -1,0 +1,58 @@
+[Version]
+Signature="$WINDOWS NT$"
+Class=USB
+ClassGUID={36FC9E60-C465-11CF-8056-444553540000}
+provider=%STO%
+LayoutFile=layout.inf
+DriverVer=11/16/2012,1.01
+
+[DestinationDirs]
+SA84PRO2.Files.Ext = 4,
+SA84PRO2.Files.Inf = 20,
+
+[Manufacturer]
+%MfgName%=SATO
+
+[SATO]
+%VID_0828&PID_0069%=SA84PRO2.dev,USB\VID_0828&PID_0069
+
+[SA84PRO2.Dev]
+CopyFiles=SA84PRO2.Files.Ext, SA84PRO2.Files.Inf
+AddReg=SA84PRO2.AddReg
+
+[SA84PRO2.Dev.NT]
+CopyFiles=SA84PRO2.Files.Ext, SA84PRO2.Files.Inf
+AddReg=SA84PRO2.AddReg
+
+[SA84PRO2.Dev.NT.Services]
+Addservice = SA84PRO2, 0x00000002, SA84PRO2.AddService
+
+[SA84PRO2.AddService]
+DisplayName    = %SA84PRO2.SvcDesc%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 2                  ; SERVICE_AUTO_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\CTWDMUSB.sys
+LoadOrderGroup = Base
+
+[SA84PRO2.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,CTWDMUSB.sys
+HKR,,Icon,,-20
+HKR,,PortName,,%MfgName%
+
+[SA84PRO2.Files.Ext]
+CTWDMUSB.sys
+
+[SA84PRO2.Files.Inf]
+SA84PRO2.Inf
+
+
+;---------------------------------------------------------------;
+
+[Strings]
+STO="Sato Corporation"
+MfgName="SATO"
+VID_0828&PID_0069="USB Device Driver(M84 Pro 200DPI)"
+SA84PRO2.SvcDesc="USB Device Driver(M84 Pro 200DPI)"
+

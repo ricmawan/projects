@@ -1,0 +1,58 @@
+[Version]
+Signature="$WINDOWS NT$"
+Class=USB
+ClassGUID={36FC9E60-C465-11CF-8056-444553540000}
+provider=%STO%
+LayoutFile=layout.inf
+DriverVer=11/16/2012,1.01
+
+[DestinationDirs]
+SA8490SE.Files.Ext = 4,
+SA8490SE.Files.Inf = 20,
+
+[Manufacturer]
+%MfgName%=SATO
+
+[SATO]
+%VID_0828&PID_0059%=SA8490SE.dev,USB\VID_0828&PID_0059
+
+[SA8490SE.Dev]
+CopyFiles=SA8490SE.Files.Ext, SA8490SE.Files.Inf
+AddReg=SA8490SE.AddReg
+
+[SA8490SE.Dev.NT]
+CopyFiles=SA8490SE.Files.Ext, SA8490SE.Files.Inf
+AddReg=SA8490SE.AddReg
+
+[SA8490SE.Dev.NT.Services]
+Addservice = SA8490SE, 0x00000002, SA8490SE.AddService
+
+[SA8490SE.AddService]
+DisplayName    = %SA8490SE.SvcDesc%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 2                  ; SERVICE_AUTO_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\CTWDMUSB.sys
+LoadOrderGroup = Base
+
+[SA8490SE.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,CTWDMUSB.sys
+HKR,,Icon,,-20
+HKR,,PortName,,%MfgName%
+
+[SA8490SE.Files.Ext]
+CTWDMUSB.sys
+
+[SA8490SE.Files.Inf]
+SA8490SE.Inf
+
+
+;---------------------------------------------------------------;
+
+[Strings]
+STO="Sato Corporation"
+MfgName="SATO"
+VID_0828&PID_0059="USB Device Driver(M-8490Se)"
+SA8490SE.SvcDesc="USB Device Driver(M-8490Se)"
+

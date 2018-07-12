@@ -1,0 +1,56 @@
+Windows Drivers for SATO(Windows XP, Server 2003, Vista, Server 2008, Windows 7, Windows 8, XP 64-bit, Server 2003 64-bit, Vista 64-bit, Server 2008 64-bit, Server 2008 R2, Windows 7 64-bit, Windows 8 64-bit, Server 2012)
+
+Version: 5.0.00 (Build 4003)
+Date: 11/16/2012
+
+Supported printers:
+ CG208
+ CG212
+ CG408
+ CG412
+ CL408e
+ CL412e
+ CL608e
+ CL612e
+ CT400
+ CT408i
+ CT410
+ CT412i
+ CT420
+ CT424i
+ CZ408
+ CZ412
+ D508
+ D512
+ DR308e
+ GL408e
+ GL412e
+ GT408e
+ GT412e
+ GT424e
+ GY412T
+ GZ408e
+ GZ412e
+ HR212
+ HR224
+ LM408e
+ LM412e
+ Lt408
+ M-10e
+ M-5900RVe
+ M-8400RVe
+ M-8459Se
+ M-8460Se
+ M-8465Se
+ M-8485Se
+ M-8490Se
+ M84 Pro 200DPI
+ M84 Pro 300DPI
+ M84 Pro 600DPI
+ S-8408
+ S-8412
+ S-8424
+ TG 308
+ TG 312
+ XL 400e
+ XL 410e
