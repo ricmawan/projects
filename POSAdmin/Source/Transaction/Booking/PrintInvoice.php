@@ -86,7 +86,7 @@
 		    $rowPrice = "";
 		    while ($row = mysqli_fetch_array($result)) {
 		        $rowPrice .= number_format($row['Quantity'],0,".",",") . " " . $row['UnitName'] . " @ " . number_format($row['BookingPrice'],0,".",",");
-		        if($row['Discount'] != 0) $rowPrice += " - " . number_format($row['Discount'],0,".",",");
+		        if($row['Discount'] != 0) $rowPrice .= " - " . number_format($row['Discount'],0,".",",");
 		        $printer -> text(" " . $row['ItemName'] . "\n");
 		        $printer -> text(" " . str_pad($rowPrice , 26, " ") . " ");
 		        $printer -> text(str_pad(number_format(($row['BookingPrice'] - $row['Discount']) * $row['Quantity'],0,".",","), 11, " ", STR_PAD_LEFT) . "\n");
