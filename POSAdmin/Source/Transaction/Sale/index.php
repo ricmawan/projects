@@ -1140,7 +1140,19 @@
 					if($("#hdnItemID").val() == 0) {
 						PassValidate = 0;
 						$("#txtItemCode").notify("Kode barang tidak valid!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						$("#txtItemCode").focus();
+						if(FirstFocus == 0) $("#txtItemCode").focus();
+						FirstFocus = 1;
+					}
+
+					if( (parseFloat(buyPrice) * parseFloat(ConversionQty)) > (parseFloat(salePrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, ""))) ) {
+						PassValidate = 0;
+						$("#txtDiscount").notify("Harga sesudah diskon lebih kecil dari harga beli!", { position:"bottom right", className:"warn", autoHideDelay: 2000 });
+						if(FirstFocus == 0) {
+							setTimeout(function() {
+								$("#txtDiscount").focus();
+							}, 0);
+						}
+						FirstFocus = 1;
 					}
 					
 					if(PassValidate == 1) {
