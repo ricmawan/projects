@@ -741,6 +741,7 @@
 			function addPurchaseDetails() {
 				if(counterAddPurchase == 0) {
 					counterAddPurchase = 1;
+					var FirstFocus = 0;
 					var branchID = $("#ddlBranch").val();
 					var branchName = $("#ddlBranch option:selected").text();
 					var unitID = $("#ddlUnit").val();
@@ -780,7 +781,29 @@
 					if($("#hdnItemID").val() == 0) {
 						PassValidate = 0;
 						$("#txtItemCode").notify("Kode barang tidak valid!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						$("#txtItemCode").focus();
+						if(FirstFocus == 0) $("#txtItemCode").focus();
+						FirstFocus = 1;
+					}
+
+					if( parseFloat($("#txtBuyPrice").val().replace(/\,/g, "")) > parseFloat($("#txtRetailPrice").val().replace(/\,/g, "")) ) {
+						PassValidate = 0;
+						$("#txtRetailPrice").notify("Harga ecer lebih kecil dari harga beli!", { position:"bottom right", className:"warn", autoHideDelay: 2000 });
+						if(FirstFocus == 0) $("#txtRetailPrice").focus();
+						FirstFocus = 1;
+					}
+
+					if( parseFloat($("#txtBuyPrice").val().replace(/\,/g, "")) > parseFloat($("#txtPrice1").val().replace(/\,/g, "")) ) {
+						PassValidate = 0;
+						$("#txtPrice1").notify("Harga grosir 1 lebih kecil dari harga beli!", { position:"bottom right", className:"warn", autoHideDelay: 2000 });
+						if(FirstFocus == 0) $("#txtPrice1").focus();
+						FirstFocus = 1;
+					}
+
+					if( parseFloat($("#txtBuyPrice").val().replace(/\,/g, "")) > parseFloat($("#txtPrice2").val().replace(/\,/g, "")) ) {
+						PassValidate = 0;
+						$("#txtPrice2").notify("Harga grosir 2 lebih kecil dari harga beli!", { position:"bottom right", className:"warn", autoHideDelay: 2000 });
+						if(FirstFocus == 0) $("#txtPrice2").focus();
+						FirstFocus = 1;
 					}
 					
 					if(PassValidate == 1) {

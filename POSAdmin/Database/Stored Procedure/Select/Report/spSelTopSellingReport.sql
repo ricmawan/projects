@@ -109,6 +109,12 @@ SET State = 1;
 				MI.ItemID
         )SR
 			ON SR.ItemID = MI.ItemID
+	WHERE
+		CASE
+			WHEN pCategoryID = 0
+			THEN MI.CategoryID
+			ELSE pCategoryID
+		END = MI.CategoryID
 	ORDER BY
 		SellingCount DESC
 	LIMIT

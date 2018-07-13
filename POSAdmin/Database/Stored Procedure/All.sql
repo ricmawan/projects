@@ -1,3 +1,2548 @@
+DROP PROCEDURE IF EXISTS spInsSale;
+
+DELIMITER $$
+CREATE PROCEDURE spInsSale (
+	pID 				BIGINT,
+	pSaleNumber			VARCHAR(100),
+	pRetailFlag			BIT,
+    pFinishFlag			BIT,
+    pCustomerID			BIGINT,
+	pTransactionDate 	DATETIME,
+	pSaleDetailsID		BIGINT,
+    pBranchID			INT,
+    pItemID				BIGINT,
+	pItemDetailsID		BIGINT,
+	pQuantity			DOUBLE,
+    pBuyPrice			DOUBLE,
+    pSalePrice			DOUBLE,
+	pDiscount			DOUBLE,
+	pUserID				BIGINT,
+    pCurrentUser		VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE RowCount INT;
+
+	DECLARE PassValidate INT;
+	
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spInsSale', pCurrentUser);
+		SELECT
+			pID AS 'ID',
+            pSaleDetailsID AS 'SaleDetailsID',
+			pSaleNumber AS 'SaleNumber',
+			'Terjadi kesalahan sistem!' AS 'Message',
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag',
+			State AS 'State' ;
+	END;
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+
+		IF(pID = 0)	THEN /*Tambah baru*/
+			SELECT
+				CONCAT(RIGHT(CONCAT('00', pUserID), 2), DATE_FORMAT(NOW(), '%Y%m'), RIGHT(CONCAT('00000', (IFNULL(MAX(CAST(RIGHT(SaleNumber, 5) AS UNSIGNED)), 0) + 1)), 5))
+			FROM
+				transaction_sale TS
+			WHERE
+				MONTH(TS.TransactionDate) = MONTH(NOW())
+				AND YEAR(TS.TransactionDate) = YEAR(NOW())
+			INTO 
+				pSaleNumber;
+				
+SET State = 2;
+			INSERT INTO transaction_sale
+			(
+				SaleNumber,
+				RetailFlag,
+                FinishFlag,
+				CustomerID,
+				TransactionDate,
+				CreatedDate,
+				CreatedBy
+			)
+			VALUES 
+			(
+				pSaleNumber,
+				pRetailFlag,
+                pFinishFlag,
+				pCustomerID,
+				pTransactionDate,
+				NOW(),
+				pCurrentUser
+			);
+		
+SET State = 3;	               
+			SELECT
+				LAST_INSERT_ID()
+			INTO 
+				pID;
+				
+		ELSE
+		
+SET State = 4;
+			UPDATE
+				transaction_sale
+			SET
+				customerID = pCustomerID,
+				TransactionDate = pTransactionDate,
+				ModifiedBy = pCurrentUser
+			WHERE
+				SaleID = pID;
+				
+		END IF;
+		
+SET State = 5;
+		
+		IF(pSaleDetailsID = 0) THEN
+			INSERT INTO transaction_saledetails
+			(
+				SaleID,
+				ItemID,
+                ItemDetailsID,
+				BranchID,
+				Quantity,
+				BuyPrice,
+				SalePrice,
+				Discount,
+				CreatedDate,
+				CreatedBy
+			)
+			VALUES
+			(
+				pID,
+				pItemID,
+				pItemDetailsID,
+				pBranchID,
+				pQuantity,
+				pBuyPrice,
+				pSalePrice,
+				pDiscount,
+				NOW(),
+				pCurrentUser
+			);
+			
+SET State = 6;
+			
+			SELECT
+				LAST_INSERT_ID()
+			INTO 
+				pSaleDetailsID;
+		
+		ELSE
+				
+SET State = 7;
+			
+			UPDATE 
+				transaction_saledetails
+			SET
+				ItemID = pItemID,
+                ItemDetailsID = pItemDetailsID,
+				BranchID = pBranchID,
+				Quantity = pQuantity,
+				BuyPrice = pBuyPrice,
+				SalePrice = pSalePrice,
+				Discount = pDiscount,
+				ModifiedBy = pCurrentUser
+			WHERE
+				SaleDetailsID = pSaleDetailsID;
+			
+		END IF;
+		
+SET State = 8;
+
+		SELECT
+			pID AS 'ID',
+			pSaleDetailsID AS 'SaleDetailsID',
+			pSaleNumber AS 'SaleNumber',
+			'Transaksi Berhasil Disimpan' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State';
+                
+	COMMIT;
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for insert sale return
+Created Date: 23 February 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spInsSaleReturn;
+
+DELIMITER $$
+CREATE PROCEDURE spInsSaleReturn (
+	pID 				BIGINT, 
+	pSaleID 			BIGINT,
+	pTransactionDate 	DATETIME,
+	pSaleReturnData 	TEXT,
+	pIsEdit				INT,
+    pCurrentUser		VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE PassValidate INT;
+	
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spInsSaleReturn', pCurrentUser);
+		SELECT
+			pID AS 'ID',
+			'Terjadi kesalahan sistem!' AS 'Message',
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag',
+			State AS 'State' ;
+	END;
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+		IF(pIsEdit = 0)	THEN /*Tambah baru*/
+			INSERT INTO transaction_salereturn
+			(
+				SaleID,
+				TransactionDate,
+				CreatedDate,
+				CreatedBy
+			)
+			VALUES (
+				pSaleID,
+				pTransactionDate,
+				NOW(),
+				pCurrentUser
+			);
+			
+SET State = 2;			               
+			SELECT
+				LAST_INSERT_ID()
+			INTO 
+				pID;
+			
+		ELSE
+			
+SET State = 3;
+			UPDATE
+				transaction_salereturn
+			SET
+				TransactionDate = pTransactionDate,
+				ModifiedBy = pCurrentUser
+			WHERE
+				SaleReturnID = pID;
+	
+		END IF;
+	
+SET State = 4;
+
+		DELETE 
+		FROM 
+			transaction_salereturndetails
+		WHERE
+			SaleReturnID = pID;
+					
+SET State = 5;
+		IF(pSaleReturnData <> "" ) THEN
+			SET @query = CONCAT("INSERT INTO transaction_salereturndetails
+								(
+									SaleReturnID,
+									ItemID,
+									BranchID,
+									Quantity,
+									BuyPrice,
+									SalePrice,
+									SaleDetailsID,
+									CreatedDate,
+									CreatedBy
+								)
+								VALUES", REPLACE(REPLACE(pSaleReturnData, ', UserLogin)', CONCAT(', "', pCurrentUser, '")')), '(0,', CONCAT('(', pID, ','))
+								);
+								
+			PREPARE stmt FROM @query;
+			EXECUTE stmt;
+			DEALLOCATE PREPARE stmt;
+			
+		END IF;
+
+SET State = 6;
+
+		IF(pIsEdit = 0) THEN
+			SELECT
+				pID AS 'ID',
+				'Retur Berhasil Ditambahkan' AS 'Message',
+				'' AS 'MessageDetail',
+				0 AS 'FailedFlag',
+				State AS 'State';
+		ELSE
+	
+SET State = 7;
+
+			SELECT
+				pID AS 'ID',
+				'Retur Berhasil Diubah' AS 'Message',
+				'' AS 'MessageDetail',
+				0 AS 'FailedFlag',
+				State AS 'State';
+		END IF;
+    COMMIT;
+END;
+$$
+DELIMITER ;
+DROP PROCEDURE IF EXISTS spInsStockAdjust;
+
+DELIMITER $$
+CREATE PROCEDURE spInsStockAdjust (
+	pID 						BIGINT,
+	pBranchID					INT,
+	pTransactionDate 			DATETIME,
+	pStockAdjustDetailsID		BIGINT,
+    pItemID						BIGINT,
+    pItemDetailsID				BIGINT,
+	pQuantity					DOUBLE,
+	pAdjustedQuantity			DOUBLE,
+    pUserID						BIGINT,
+    pCurrentUser				VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE RowCount INT;
+
+	DECLARE PassValidate INT;
+	
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spInsStockAdjust', pCurrentUser);
+		SELECT
+			pID AS 'ID',
+            pStockAdjustDetailsID AS 'StockAdjustDetailsID',
+			'Terjadi kesalahan sistem!' AS 'Message',
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag',
+			State AS 'State' ;
+	END;
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+
+		IF(pID = 0)	THEN /*Tambah baru*/
+			INSERT INTO transaction_stockadjust
+			(
+				TransactionDate,
+				CreatedDate,
+				CreatedBy
+			)
+			VALUES 
+			(
+				pTransactionDate,
+				NOW(),
+				pCurrentUser
+			);
+		
+SET State = 3;	               
+			SELECT
+				LAST_INSERT_ID()
+			INTO 
+				pID;
+				
+		ELSE
+		
+SET State = 4;
+			UPDATE
+				transaction_stockadjust
+			SET
+				TransactionDate = pTransactionDate,
+				ModifiedBy = pCurrentUser
+			WHERE
+				StockAdjustID = pID;
+				
+		END IF;
+		
+SET State = 5;
+		
+		IF(pStockAdjustDetailsID = 0) THEN
+			INSERT INTO transaction_stockadjustdetails
+			(
+				StockAdjustID,
+				BranchID,
+				ItemID,
+                ItemDetailsID,
+				Quantity,
+				AdjustedQuantity,
+				CreatedDate,
+				CreatedBy
+			)
+			VALUES
+			(
+				pID,
+				pBranchID,
+				pItemID,
+                pItemDetailsID,
+				pQuantity,
+				pAdjustedQuantity,
+				NOW(),
+				pCurrentUser
+			);
+			
+SET State = 6;
+			
+			SELECT
+				LAST_INSERT_ID()
+			INTO 
+				pStockAdjustDetailsID;
+		
+		ELSE
+				
+SET State = 7;
+			
+			UPDATE 
+				transaction_stockadjustdetails
+			SET
+				ItemID = pItemID,
+				ItemDetailsID = pItemDetailsID,
+				BranchID = pBranchID,
+				Quantity = pQuantity,
+				AdjustedQuantity = pAdjustedQuantity,
+				ModifiedBy = pCurrentUser
+			WHERE
+				StockAdjustDetailsID = pStockAdjustDetailsID;
+			
+		END IF;
+		
+SET State = 8;
+
+		SELECT
+			pID AS 'ID',
+			pStockAdjustDetailsID AS 'StockAdjustDetailsID',
+			'Transaksi Berhasil Disimpan' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State';
+                
+	COMMIT;
+END;
+$$
+DELIMITER ;
+DROP PROCEDURE IF EXISTS spInsStockMutation;
+
+DELIMITER $$
+CREATE PROCEDURE spInsStockMutation (
+	pID 						BIGINT,
+	pSourceID					INT,
+	pDestinationID				INT,
+	pTransactionDate 			DATETIME,
+	pStockMutationDetailsID		BIGINT,
+    pItemID						BIGINT,
+    pItemDetailsID				BIGINT,
+	pQuantity					DOUBLE,
+    pUserID						BIGINT,
+    pCurrentUser				VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE RowCount INT;
+
+	DECLARE PassValidate INT;
+	
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spInsStockMutation', pCurrentUser);
+		SELECT
+			pID AS 'ID',
+            pStockMutationDetailsID AS 'StockMutationDetailsID',
+			'Terjadi kesalahan sistem!' AS 'Message',
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag',
+			State AS 'State' ;
+	END;
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+
+		IF(pID = 0)	THEN /*Tambah baru*/
+			INSERT INTO transaction_stockmutation
+			(
+				TransactionDate,
+				CreatedDate,
+				CreatedBy
+			)
+			VALUES 
+			(
+				pTransactionDate,
+				NOW(),
+				pCurrentUser
+			);
+		
+SET State = 3;	               
+			SELECT
+				LAST_INSERT_ID()
+			INTO 
+				pID;
+				
+		ELSE
+		
+SET State = 4;
+			UPDATE
+				transaction_stockmutation
+			SET
+				TransactionDate = pTransactionDate,
+				ModifiedBy = pCurrentUser
+			WHERE
+				StockMutationID = pID;
+				
+		END IF;
+		
+SET State = 5;
+		
+		IF(pStockMutationDetailsID = 0) THEN
+			INSERT INTO transaction_stockmutationdetails
+			(
+				StockMutationID,
+				SourceID,
+				DestinationID,
+				ItemID,
+                ItemDetailsID,
+				Quantity,
+				CreatedDate,
+				CreatedBy
+			)
+			VALUES
+			(
+				pID,
+				pSourceID,
+				pDestinationID,
+				pItemID,
+                pItemDetailsID,
+				pQuantity,
+				NOW(),
+				pCurrentUser
+			);
+			
+SET State = 6;
+			
+			SELECT
+				LAST_INSERT_ID()
+			INTO 
+				pStockMutationDetailsID;
+		
+		ELSE
+				
+SET State = 7;
+			
+			UPDATE 
+				transaction_stockmutationdetails
+			SET
+				ItemID = pItemID,
+                ItemDetailsID = pItemDetailsID,
+				SourceID = pSourceID,
+				DestinationID = pDestinationID,
+				Quantity = pQuantity,
+				ModifiedBy = pCurrentUser
+			WHERE
+				StockMutationDetailsID = pStockMutationDetailsID;
+			
+		END IF;
+		
+SET State = 8;
+
+		SELECT
+			pID AS 'ID',
+			pStockMutationDetailsID AS 'StockMutationDetailsID',
+			'Transaksi Berhasil Disimpan' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State';
+                
+	COMMIT;
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for insert the supplier
+Created Date: 12 November 2017
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spInsSupplier;
+
+DELIMITER $$
+CREATE PROCEDURE spInsSupplier (
+	pID 				BIGINT, 
+    pSupplierCode		VARCHAR(100),
+	pSupplierName 		VARCHAR(255),
+    pTelephone			VARCHAR(100),
+	pAddress			TEXT,
+    pCity				VARCHAR(100),
+	pRemarks			TEXT,
+    pIsEdit				INT,
+    pCurrentUser		VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE RowCount INT;
+
+	DECLARE PassValidate INT;
+	
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spInsSupplier', pCurrentUser);
+		SELECT
+			pID AS 'ID',
+			'Terjadi kesalahan sistem!' AS 'Message',
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag',
+			State AS 'State' ;
+	END;
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+
+		SELECT 
+			0
+		INTO
+			PassValidate
+		FROM 
+			master_supplier
+		WHERE
+			TRIM(SupplierCode) = TRIM(pSupplierCode)
+			AND SupplierID <> pID
+		LIMIT 1;
+			
+		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
+SET State = 2;
+
+			SELECT
+				pID AS 'ID',
+				CONCAT('Kode Supplier ', pSupplierCode, ' sudah ada') AS 'Message',
+				'' AS 'MessageDetail',
+				1 AS 'FailedFlag',
+				State AS 'State' ;
+		
+			LEAVE StoredProcedure;
+			
+		END IF;
+        
+SET State = 1;
+
+		SELECT 
+			0
+		INTO
+			PassValidate
+		FROM 
+			master_supplier
+		WHERE
+			(TRIM(SupplierName) = TRIM(pSupplierName)
+            AND TRIM(Address) = TRIM(pAddress))
+			AND SupplierID <> pID
+		LIMIT 1;
+			
+		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
+SET State = 3;
+
+			SELECT
+				pID AS 'ID',
+				CONCAT('Nama Supplier ', pSupplierName, ' dengan alamat ', pAddress, ' sudah ada') AS 'Message',
+				'' AS 'MessageDetail',
+				1 AS 'FailedFlag',
+				State AS 'State' ;
+		
+			LEAVE StoredProcedure;
+			
+		ELSE /*Data yang diinput valid*/
+SET State = 4;
+
+			IF(pIsEdit = 0)	THEN /*Tambah baru*/
+				INSERT INTO master_supplier
+				(
+                    SupplierCode,
+                    SupplierName,
+					Telephone,
+					Address,
+					City,
+					Remarks,
+					CreatedDate,
+					CreatedBy
+				)
+				VALUES (
+					pSupplierCode,
+					pSupplierName,
+					pTelephone,
+					pAddress,
+					pCity,
+					pRemarks,
+					NOW(),
+					pCurrentUser
+				);
+			
+SET State = 5;			               
+
+				SELECT
+					LAST_INSERT_ID()
+				INTO 
+					pID;
+
+SET State = 6;
+
+				SELECT
+					pID AS 'ID',
+					'Supplier Berhasil Ditambahkan' AS 'Message',
+					'' AS 'MessageDetail',
+					0 AS 'FailedFlag',
+					State AS 'State';
+			ELSE
+SET State = 7;
+
+				UPDATE
+					master_supplier
+				SET
+					SupplierCode = pSupplierCode,
+                    SupplierName = pSupplierName,
+					Telephone = pTelephone,
+					Address = pAddress,
+					City = pCity,
+					Remarks = pRemarks,
+					ModifiedBy = pCurrentUser
+				WHERE
+					SupplierID = pID;
+
+SET State = 8;
+
+				SELECT
+					pID AS 'ID',
+					'Supplier Berhasil Diubah' AS 'Message',
+					'' AS 'MessageDetail',
+					0 AS 'FailedFlag',
+					State AS 'State';
+			END IF;
+		END IF;
+	COMMIT;
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for insert the supplier
+Created Date: 12 November 2017
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spInsUnit;
+
+DELIMITER $$
+CREATE PROCEDURE spInsUnit (
+	pID 			INT, 
+	pUnitName 		VARCHAR(255),
+	pIsEdit			INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE RowCount INT;
+
+	DECLARE PassValidate INT;
+	
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spInsUnit', pCurrentUser);
+        SELECT
+			pID AS 'ID',
+			'Terjadi kesalahan sistem!' AS 'Message',
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag',
+			State AS 'State' ;
+	END;
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+
+		SELECT 
+			0
+		INTO
+			PassValidate
+		FROM 
+			master_unit
+		WHERE
+			TRIM(UnitName) = TRIM(pUnitName)
+			AND UnitID <> pID
+		LIMIT 1;
+        
+			
+		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
+SET State = 2;
+			SELECT
+				pID AS 'ID',
+				CONCAT('Nama satuan ', pUnitName, ' sudah ada') AS 'Message',
+				'' AS 'MessageDetail',
+				1 AS 'FailedFlag',
+				State AS 'State' ;
+		
+			LEAVE StoredProcedure;
+			
+		ELSE /*Data yang diinput valid*/
+SET State = 3;
+			IF(pIsEdit = 0)	THEN /*Tambah baru*/
+				INSERT INTO master_unit
+				(
+					UnitName,
+					CreatedDate,
+					CreatedBy
+				)
+				VALUES (
+					pUnitName,
+					NOW(),
+					pCurrentUser
+				);
+			
+SET State = 4;			               
+				SELECT
+					pID AS 'ID',
+					'Satuan Berhasil Ditambahkan' AS 'Message',
+					'' AS 'MessageDetail',
+					0 AS 'FailedFlag',
+					State AS 'State';
+			ELSE
+SET State = 5;
+				UPDATE
+					master_unit
+				SET
+					UnitName= pUnitName,
+					ModifiedBy = pCurrentUser
+				WHERE
+					UnitID = pID;
+
+SET State = 6;
+				SELECT
+					pID AS 'ID',
+					'Satuan Berhasil Diubah' AS 'Message',
+					'' AS 'MessageDetail',
+					0 AS 'FailedFlag',
+					State AS 'State';
+			END IF;
+		END IF;
+	COMMIT;
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for insert the user
+Created Date: 12 November 2017
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spInsUser;
+
+DELIMITER $$
+CREATE PROCEDURE spInsUser (
+	pID 			BIGINT, 
+	pUserName 		VARCHAR(255),
+	pUserTypeID		SMALLINT,
+	pUserLogin 		VARCHAR(100),
+	pPassword 		VARCHAR(255),
+	pIsActive		BIT,
+	pRoleValues		TEXT,
+	pIsEdit			INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE PassValidate INT;
+	
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spInsUser', pCurrentUser);
+		SELECT
+			pID AS 'ID',
+			'Terjadi kesalahan sistem!' AS 'Message',
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag',
+			State AS 'State' ;
+	END;
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+
+		SELECT 
+			0
+		INTO
+			PassValidate
+		FROM 
+			master_user 
+		WHERE
+			UserLogin = pUserLogin
+			AND UserID <> pID
+		LIMIT 1;
+			
+SET State = 2;
+
+		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
+			SELECT
+				pID AS 'ID',
+				CONCAT('Username ', pUserLogin, ' sudah dipakai') AS 'Message',
+				'' AS 'MessageDetail',
+				1 AS 'FailedFlag',
+				State AS 'State' ;
+		
+			LEAVE StoredProcedure;
+			
+		ELSE /*Data yang diinput valid*/
+		
+SET State = 3;
+
+			IF(pIsEdit = 0)	THEN /*Tambah baru*/
+				INSERT INTO master_user
+				(
+					UserName,
+					UserLogin,
+					UserTypeID,
+					UserPassword,
+					IsActive,
+					CreatedDate,
+					CreatedBy
+				)
+				VALUES (
+					pUserName,
+					pUserLogin,
+					pUserTypeID,
+					pPassword,
+					pIsActive,
+					NOW(),
+					pCurrentUser
+				);
+			
+SET State = 4;			               
+				SELECT
+					LAST_INSERT_ID()
+				INTO 
+					pID;
+					
+			ELSE
+			
+SET State = 5;
+				UPDATE
+					master_user
+				SET
+					UserName = pUserName,
+					UserLogin = pUserLogin,
+					UserTypeID = pUserTypeID,
+					UserPassword = pPassword,
+					IsActive = pIsActive,
+					ModifiedBy = pCurrentUser
+				WHERE
+					UserID = pID;
+		
+			END IF;
+	
+SET State = 6;
+
+				DELETE 
+				FROM 
+					master_role
+				WHERE
+					UserID = pID;
+					
+SET State = 7;
+			IF(pRoleValues <> "" ) THEN
+				SET @query = CONCAT("INSERT INTO master_role
+									(
+										UserID,
+										MenuID,
+										EditFlag,
+										DeleteFlag
+									)
+									VALUES", REPLACE(pRoleValues, '(0,', CONCAT('(', pID, ',')));
+									
+				PREPARE stmt FROM @query;
+				EXECUTE stmt;
+				DEALLOCATE PREPARE stmt;
+				
+			END IF;
+
+		END IF;
+
+SET State = 8;
+
+	IF(pIsEdit = 0) THEN
+		SELECT
+			pID AS 'ID',
+			'User Berhasil Ditambahkan' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State';
+	ELSE
+	
+SET State = 9;
+
+		SELECT
+			pID AS 'ID',
+			'User Berhasil Diubah' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State';
+	END IF;
+	
+    COMMIT;
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select category
+Created Date: 30 Desember 2017
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelCategory;
+
+DELIMITER $$
+CREATE PROCEDURE spSelCategory (
+	pWhere 			TEXT,
+	pOrder			TEXT,
+	pLimit_s		BIGINT,
+    pLimit_l		INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelUser', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+SET @query = CONCAT("SELECT
+						COUNT(1) AS nRows
+					FROM
+						master_category MC
+					WHERE ", pWhere);
+						
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+SET State = 2;
+
+SET @query = CONCAT("SELECT
+						MC.CategoryID,
+						MC.CategoryCode,
+						MC.CategoryName
+					FROM
+						master_category MC
+					WHERE ", pWhere, 
+					" ORDER BY ", pOrder,
+					" LIMIT ", pLimit_s, ", ", pLimit_l);
+					
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select item details by itemCode
+Created Date: 9 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelCategoryByName;
+
+DELIMITER $$
+CREATE PROCEDURE spSelCategoryByName (
+	pCategoryName	VARCHAR(100),
+	pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelCategoryByName', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+	SELECT
+		MC.CategoryID,
+		MC.CategoryName
+	FROM
+		master_category MC
+	WHERE
+		TRIM(MC.CategoryName) = TRIM(pCategoryName);
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select Customer
+Created Date: 3 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelCustomer;
+
+DELIMITER $$
+CREATE PROCEDURE spSelCustomer (
+	pWhere 			TEXT,
+	pOrder			TEXT,
+	pLimit_s		BIGINT,
+    pLimit_l		INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelCustomer', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+SET @query = CONCAT("SELECT
+						COUNT(1) AS nRows
+					FROM
+						master_customer MC
+					WHERE ", pWhere);
+						
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+SET State = 2;
+
+SET @query = CONCAT("SELECT
+						MC.CustomerID,
+                        MC.CustomerCode,
+                        MC.CustomerName,
+                        MC.Telephone,
+                        MC.Address,
+                        MC.City,
+                        MC.Remarks
+					FROM
+						master_customer MC
+					WHERE ", pWhere, 
+					" ORDER BY ", pOrder,
+					" LIMIT ", pLimit_s, ", ", pLimit_l);
+					
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select branch from dropdown list
+Created Date: 11 january 2018
+Modified Date: 
+===============================================================*/
+
+
+DROP PROCEDURE IF EXISTS spSelDDLBranch;
+DELIMITER $$
+CREATE PROCEDURE spSelDDLBranch (
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelDDLBranch', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+	SELECT 
+		MB.BranchID,
+		MB.BranchCode,
+		MB.BranchName
+	FROM 
+		master_branch MB
+	ORDER BY 
+		MB.BranchID;
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select category from dropdown list
+Created Date: 3 january 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelDDLCategory;
+
+DELIMITER $$
+CREATE PROCEDURE spSelDDLCategory (
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelDDLCategory', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+	SELECT 
+		MC.CategoryID,
+		MC.CategoryCode,
+		MC.CategoryName
+	FROM 
+		master_category MC
+	ORDER BY 
+		MC.CategoryCode;
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select customer from dropdown list
+Created Date: 9 january 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelDDLCustomer;
+
+DELIMITER $$
+CREATE PROCEDURE spSelDDLCustomer (
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelDDLCustomer', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+	SELECT 
+		MC.CustomerID,
+		MC.CustomerCode,
+		MC.CustomerName
+	FROM 
+		master_customer MC
+	ORDER BY 
+		MC.CustomerCode;
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select supplier from dropdown list
+Created Date: 9 january 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelDDLSupplier;
+
+DELIMITER $$
+CREATE PROCEDURE spSelDDLSupplier (
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelDDLSupplier', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+	SELECT 
+		MS.SupplierID,
+		MS.SupplierCode,
+		MS.SupplierName
+	FROM 
+		master_supplier MS
+	ORDER BY 
+		MS.SupplierCode;
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select category from dropdown list
+Created Date: 3 january 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelDDLUnit;
+
+DELIMITER $$
+CREATE PROCEDURE spSelDDLUnit (
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelDDLUnit', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+	SELECT 
+		MU.UnitID,
+		MU.UnitName
+	FROM 
+		master_unit MU
+	ORDER BY 
+		MU.UnitName;
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select user type from dropdown list
+Created Date: 7 january 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelDDLUserType;
+
+DELIMITER $$
+CREATE PROCEDURE spSelDDLUserType (
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelDDLUserType', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+	SELECT 
+		UT.UserTypeID,
+        UT.UserTypeName
+	FROM 
+		master_usertype UT
+	ORDER BY 
+		UT.UserTypeID;
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select item
+Created Date: 2 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelExportItem;
+
+DELIMITER $$
+CREATE PROCEDURE spSelExportItem (
+	pCategoryID		BIGINT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelExportItem', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+	SELECT
+		MI.ItemID,
+		MI.ItemCode,
+		MI.ItemName,
+		MC.CategoryID,
+		MC.CategoryName,
+		MI.BuyPrice,
+		MI.RetailPrice,
+		MI.Price1,
+		MI.Qty1,
+		MI.Price2,
+		MI.Qty2,
+		MI.Weight,
+		MI.MinimumStock,
+        MU.UnitName
+	FROM
+		master_item MI
+		JOIN master_category MC
+			ON MC.CategoryID = MI.CategoryID
+		JOIN master_unit MU
+			ON MU.UnitID = MI.UnitID
+	WHERE 
+		MC.CategoryID = pCategoryID;
+		
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select item
+Created Date: 2 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelItem;
+
+DELIMITER $$
+CREATE PROCEDURE spSelItem (
+	pWhere 			TEXT,
+	pOrder			TEXT,
+	pLimit_s		BIGINT,
+    pLimit_l		INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelItem', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+SET @query = CONCAT("SELECT
+						COUNT(1) AS nRows
+					FROM
+						master_item MI
+                        JOIN master_category MC
+							ON MC.CategoryID = MI.CategoryID
+						JOIN master_unit MU
+							ON MU.UnitID = MI.UnitID
+					WHERE ", pWhere);
+						
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+SET State = 2;
+
+SET @query = CONCAT("SELECT
+						MI.ItemID,
+                        MI.ItemCode,
+						MI.ItemName,
+                        MC.CategoryID,
+						MC.CategoryName,
+                        MI.BuyPrice,
+						MI.RetailPrice,
+                        MI.Price1,
+                        MI.Qty1,
+                        MI.Price2,
+                        MI.Qty2,
+                        MI.Weight,
+                        MI.MinimumStock,
+                        MU.UnitID,
+                        MU.UnitName
+					FROM
+						master_item MI
+                        JOIN master_category MC
+							ON MC.CategoryID = MI.CategoryID
+						JOIN master_unit MU
+							ON MU.UnitID = MI.UnitID
+					WHERE ", pWhere, 
+					" ORDER BY ", pOrder,
+					" LIMIT ", pLimit_s, ", ", pLimit_l);
+					
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select sale details by SaleID
+Created Date: 12 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelItemUnitDetails;
+
+DELIMITER $$
+CREATE PROCEDURE spSelItemUnitDetails (
+	pItemID			BIGINT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelItemUnitDetails', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+	SELECT
+		ItemDetailsID,
+		ItemID,
+		ItemDetailsCode,
+		UnitID,
+		ConversionQuantity
+		/*BuyPrice,
+		RetailPrice,
+		Price1,
+		Qty1,
+		Price2,
+		Qty2,
+		Weight,
+		MinimumStock*/
+	FROM
+		master_itemdetails MID
+	WHERE
+		MID.ItemID = pItemID
+	ORDER BY
+		MID.ItemDetailsID;
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Get all menu
+Created Date: 24 November 2017
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelMenu;
+
+DELIMITER $$
+CREATE PROCEDURE spSelMenu (
+	 pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+	
+    DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelMenu', pCurrentUser);
+	END;
+
+SET State = 1;
+
+	SELECT 
+		MG.GroupMenuID,
+		MG.GroupMenuName,
+		MM.MenuID,
+		MM.MenuName
+	FROM
+		master_groupmenu MG
+		JOIN master_menu MM 
+			ON MG.GroupMenuID = MM.GroupMenuID
+	GROUP BY
+		MM.MenuID
+	ORDER BY 
+		MG.OrderNo ASC , 
+		MM.OrderNo ASC;
+		
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for return all parameter
+Created Date: 16 November 2017
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelParameter;
+
+DELIMITER $$
+CREATE PROCEDURE spSelParameter (
+	pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+	
+    DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelParameter', pCurrentUser);
+	END;
+
+SET State = 1;
+
+	SELECT
+		ParameterName,
+		ParameterValue
+	FROM
+		master_parameter;
+		
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select supplier
+Created Date: 3 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelSupplier;
+
+DELIMITER $$
+CREATE PROCEDURE spSelSupplier (
+	pWhere 			TEXT,
+	pOrder			TEXT,
+	pLimit_s		BIGINT,
+    pLimit_l		INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelSupplier', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+SET @query = CONCAT("SELECT
+						COUNT(1) AS nRows
+					FROM
+						master_supplier MS
+					WHERE ", pWhere);
+						
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+SET State = 2;
+
+SET @query = CONCAT("SELECT
+						MS.SupplierID,
+                        MS.SupplierCode,
+                        MS.SupplierName,
+                        MS.Telephone,
+                        MS.Address,
+                        MS.City,
+                        MS.Remarks
+					FROM
+						master_supplier MS
+					WHERE ", pWhere, 
+					" ORDER BY ", pOrder,
+					" LIMIT ", pLimit_s, ", ", pLimit_l);
+					
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select category
+Created Date: 30 Desember 2017
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelUnit;
+
+DELIMITER $$
+CREATE PROCEDURE spSelUnit (
+	pWhere 			TEXT,
+	pOrder			TEXT,
+	pLimit_s		BIGINT,
+    pLimit_l		INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelUnit', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+SET @query = CONCAT("SELECT
+						COUNT(1) AS nRows
+					FROM
+						master_unit MU
+					WHERE ", pWhere);
+						
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+SET State = 2;
+
+SET @query = CONCAT("SELECT
+						MU.UnitID,
+						MU.UnitName
+					FROM
+						master_unit MU
+					WHERE ", pWhere, 
+					" ORDER BY ", pOrder,
+					" LIMIT ", pLimit_s, ", ", pLimit_l);
+					
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select item details by itemCode
+Created Date: 9 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelUnitByName;
+
+DELIMITER $$
+CREATE PROCEDURE spSelUnitByName (
+	pUnitName		VARCHAR(100),
+	pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelUnitByName', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+	SELECT
+		MU.UnitID,
+        MU.UnitName
+	FROM
+		master_unit MU
+	WHERE
+		TRIM(MU.UnitName) = TRIM(pUnitName);
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select user login
+Created Date: 12 November 2017
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelUser;
+
+DELIMITER $$
+CREATE PROCEDURE spSelUser (
+	pWhere 			TEXT,
+	pOrder			TEXT,
+	pLimit_s		BIGINT,
+    pLimit_l		INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelUser', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+SET @query = CONCAT("SELECT
+						COUNT(1) AS nRows
+					FROM
+						master_user MU
+						JOIN master_usertype MUT
+							ON MU.UserTypeID = MUT.UserTypeID
+					WHERE ", pWhere);
+						
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+SET State = 2;
+
+SET @query = CONCAT("SELECT
+						MU.UserID,
+						MU.UserName,
+						MU.UserLogin,
+						CASE
+							WHEN MU.IsActive = 0
+							THEN 'Tidak Aktif'
+							ELSE 'Aktif'
+						END AS Status,
+						MU.IsActive,
+                        MUT.UserTypeID,
+						MUT.UserTypeName,
+                        IFNULL(GC.MenuID, '') MenuID,
+                        IFNULL(GC.EditFlag, '') EditFlag,
+                        IFNULL(GC.DeleteFlag, '') DeleteFlag
+					FROM
+						master_user MU
+						JOIN master_usertype MUT
+							ON MU.UserTypeID = MUT.UserTypeID
+						LEFT JOIN 
+                        (
+							SELECT
+								GC.UserID,
+                                GROUP_CONCAT(MenuID SEPARATOR ', ') MenuID,
+                                GROUP_CONCAT(EditFlag SEPARATOR ', ') EditFlag,
+                                GROUP_CONCAT(DeleteFlag SEPARATOR ', ') DeleteFlag
+							FROM
+								master_role GC
+							GROUP BY
+								GC.UserID
+                        )GC
+							ON MU.UserID = GC.UserID
+					WHERE ", pWhere, 
+					" ORDER BY ", pOrder,
+					" LIMIT ", pLimit_s, ", ", pLimit_l);
+					
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select user login
+Created Date: 1 Desember 2017to show user details
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelUserDetails;
+
+DELIMITER $$
+CREATE PROCEDURE spSelUserDetails (
+	pUserID 		BIGINT,
+	pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelUserDetails', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+	SELECT
+		MR.RoleID,
+		MR.UserID,
+		MR.MenuID,
+		MR.EditFlag,
+		MR.DeleteFlag,
+		MU.UserName,
+		MU.UserLogin,
+		MU.IsActive
+	FROM
+		master_user MU
+		LEFT JOIN master_role MR
+			ON MU.UserID = MR.UserID
+	WHERE
+		MU.UserID = pUserID;
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select user login
+Created Date: 12 November 2017
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelUserLogin;
+
+DELIMITER $$
+CREATE PROCEDURE spSelUserLogin (
+	pUserLogin 		VARCHAR(100),
+	pPassword 		VARCHAR(255),
+	pIsActive		BIT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelUserLogin', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+	SELECT 
+		UserID,
+		UserName,
+		UserLogin,
+		UserPassword,
+		UserTypeID
+	FROM
+		master_user 
+	WHERE 
+		UserLogin = pUserLogin
+		AND IsActive = pIsActive
+		AND UserPassword = pPassword
+	LIMIT 1;
+		
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Get user menu permission
+Created Date: 24 November 2017
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelUserMenuNavigation;
+
+DELIMITER $$
+CREATE PROCEDURE spSelUserMenuNavigation (
+	pUserID			BIGINT,
+	pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+	
+    DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelUserMenuNavigation', pCurrentUser);
+	END;
+
+SET State = 1;
+
+	SELECT 
+		MG.GroupMenuID,
+		MG.GroupMenuName,
+		MM.MenuID,
+		MM.MenuName,
+		MM.Url,
+		MG.Icon
+	FROM
+		master_groupmenu MG
+		JOIN master_menu MM 
+			ON MG.GroupMenuID = MM.GroupMenuID
+		JOIN master_role MR 
+			ON MR.MenuID = MM.MenuID
+	WHERE
+		MR.UserID = pUserID
+	GROUP BY
+		MM.MenuID
+	ORDER BY 
+		MG.OrderNo ASC , 
+		MM.OrderNo ASC;
+		
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Get user menu permission
+Created Date: 16 November 2017
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelUserMenuPermission;
+
+DELIMITER $$
+CREATE PROCEDURE spSelUserMenuPermission (
+	pApplicationPath	VARCHAR(255),
+    pRequestedPath		VARCHAR(255),
+	pCurrentUser		VARCHAR(255)
+)
+StoredProcedure:BEGIN
+	
+    DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelUserMenuPermission', pCurrentUser);
+	END;
+
+SET State = 1;
+
+	SELECT
+		MR.EditFlag,
+		MR.DeleteFlag
+	FROM
+		master_role MR
+		JOIN master_menu MM
+			ON MM.MenuID = MR.MenuID
+	WHERE
+		CONCAT(pApplicationPath, MM.Url) = pRequestedPath
+		AND MR.UserID = pCurrentUser;
+		
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for delete category
+Created Date: 1 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spDelCategory;
+
+DELIMITER $$
+CREATE PROCEDURE spDelCategory (
+	pCategoryID		INT,
+	pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+	
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT,
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spDelCategory', pCurrentUser);
+        SELECT
+			pCategoryID AS 'ID',
+			'Terjadi kesalahan sistem!' AS 'Message',
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag',
+			State AS 'State' ;
+	END;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+
+		DELETE FROM
+			master_category
+		WHERE
+			CategoryID = pCategoryID;
+
+    COMMIT;
+    
+SET State = 2;
+
+		 SELECT
+			pCategoryID AS 'ID',
+			'Kategori berhasil dihapus!' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State' ;
+            
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for delete Customer
+Created Date: 3 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spDelCustomer;
+
+DELIMITER $$
+CREATE PROCEDURE spDelCustomer (
+	pCustomerID		BIGINT,
+	pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+	
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT,
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spDelCustomer', pCurrentUser);
+        SELECT
+			pCustomerID AS 'ID',
+			'Terjadi kesalahan sistem!' AS 'Message',
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag',
+			State AS 'State' ;
+	END;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+
+		DELETE FROM
+			master_customer
+		WHERE
+			CustomerID = pCustomerID;
+
+    COMMIT;
+    
+SET State = 2;
+
+		SELECT
+			pCustomerID AS 'ID',
+			'Pelanggan berhasil dihapus!' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State' ;
+            
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for delete item
+Created Date: 2 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spDelItem;
+
+DELIMITER $$
+CREATE PROCEDURE spDelItem (
+	pItemID		BIGINT,
+	pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+	
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT,
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spDelItem', pCurrentUser);
+        SELECT
+			pItemID AS 'ID',
+			'Terjadi kesalahan sistem!' AS 'Message',
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag',
+			State AS 'State' ;
+	END;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+
+		DELETE FROM
+			master_item
+		WHERE
+			ItemID = pItemID;
+
+    COMMIT;
+    
+SET State = 2;
+
+		SELECT
+			pItemID AS 'ID',
+			'Barang berhasil dihapus!' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State' ;
+            
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for delete supplier
+Created Date: 3 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spDelSupplier;
+
+DELIMITER $$
+CREATE PROCEDURE spDelSupplier (
+	pSupplierID		BIGINT,
+	pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+	
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT,
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spDelSupplier', pCurrentUser);
+        SELECT
+			pSupplierID AS 'ID',
+			'Terjadi kesalahan sistem!' AS 'Message',
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag',
+			State AS 'State' ;
+	END;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+
+		DELETE FROM
+			master_supplier
+		WHERE
+			SupplierID = pSupplierID;
+
+    COMMIT;
+    
+SET State = 2;
+
+		SELECT
+			pSupplierID AS 'ID',
+			'Supplier berhasil dihapus!' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State' ;
+            
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for delete category
+Created Date: 1 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spDelUnit;
+
+DELIMITER $$
+CREATE PROCEDURE spDelUnit (
+	pUnitID			INT,
+	pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+	
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT,
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spDelUnit', pCurrentUser);
+        SELECT
+			pUnitID AS 'ID',
+			'Terjadi kesalahan sistem!' AS 'Message',
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag',
+			State AS 'State' ;
+	END;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+
+		DELETE FROM
+			master_unit
+		WHERE
+			UnitID = pUnitID;
+
+    COMMIT;
+    
+SET State = 2;
+
+		 SELECT
+			pUnitID AS 'ID',
+			'Satuan berhasil dihapus!' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State' ;
+            
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for delete user
+Created Date: 27 November 2017
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spDelUser;
+
+DELIMITER $$
+CREATE PROCEDURE spDelUser (
+	pUserID			BIGINT,
+	pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+	
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT,
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spDelUser', pCurrentUser);
+        SELECT
+			pUserID AS 'ID',
+			'Terjadi kesalahan sistem!' AS 'Message',
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag',
+			State AS 'State' ;
+	END;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+
+		DELETE FROM
+			master_role
+		WHERE
+			UserID = pUserID;
+			
+SET State = 2;
+
+		DELETE FROM
+			master_user
+		WHERE
+			UserID = pUserID;
+
+    COMMIT;
+    
+SET State = 3;
+
+		SELECT
+			pUserID AS 'ID',
+			'User berhasil dihapus!' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State' ;
+END;
+$$
+DELIMITER ;
 /*=============================================================
 Author: Ricmawan Adi Wijaya
 Description: Stored Procedure for select sale transaction
@@ -109,12 +2654,504 @@ SET State = 1;
 				MI.ItemID
         )SR
 			ON SR.ItemID = MI.ItemID
+	WHERE
+		CASE
+			WHEN pCategoryID = 0
+			THEN MI.CategoryID
+			ELSE pCategoryID
+		END = MI.CategoryID
 	ORDER BY
 		SellingCount DESC
 	LIMIT
 		0, 10;
     
     
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select sale transaction
+Created Date: 3 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelStockDetailsReport;
+
+DELIMITER $$
+CREATE PROCEDURE spSelStockDetailsReport (
+	pItemID					BIGINT,
+	pBranchID 				INT,
+	pFromDate				DATE,
+	pToDate					DATE,
+    pConversionQuantity		DOUBLE,
+    pCurrentUser			VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelStockDetailsReport', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+	SELECT
+		'Mutasi Sebelumnya' TransactionType,
+		'-' TransactionDate,
+		pFromDate DateNoFormat,
+		'' CustomerName,
+		ROUND((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0) - IFNULL(BN.Quantity, 0)) / pConversionQuantity, 2) Quantity,
+		'0000-00-00' CreatedDate
+	FROM
+		master_item MI
+        LEFT JOIN
+		(
+			SELECT
+				FSD.ItemID,
+				SUM(FSD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+			FROM
+				transaction_firststock FS
+				JOIN transaction_firststockdetails FSD
+					ON FS.FirstStockID = FSD.FirstStockID
+				LEFT JOIN master_itemdetails MID
+					ON FSD.ItemDetailsID = MID.ItemDetailsID
+			WHERE
+				FSD.BranchID = pBranchID
+				AND CAST(FS.TransactionDate AS DATE) < pFromDate
+			GROUP BY
+				FSD.ItemID
+		)FS
+			ON FS.ItemID = MI.ItemID
+		LEFT JOIN
+		(
+			SELECT
+				TPD.ItemID,
+				SUM(TPD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+			FROM
+				transaction_purchase TP
+				JOIN transaction_purchasedetails TPD
+					ON TP.PurchaseID = TPD.PurchaseID
+				LEFT JOIN master_itemdetails MID
+					ON TPD.ItemDetailsID = MID.ItemDetailsID
+			WHERE
+				TPD.BranchID = pBranchID
+				AND CAST(TP.TransactionDate AS DATE) < pFromDate
+			GROUP BY
+				TPD.ItemID
+		)TP
+			ON TP.ItemID = MI.ItemID
+		LEFT JOIN
+		(
+			SELECT
+				SRD.ItemID,
+				SUM(SRD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+			FROM
+				transaction_salereturn SR
+				JOIN transaction_salereturndetails SRD
+					ON SRD.SaleReturnID = SR.SaleReturnID
+				LEFT JOIN master_itemdetails MID
+					ON SRD.ItemDetailsID = MID.ItemDetailsID
+			WHERE
+				SRD.BranchID = pBranchID
+				AND CAST(SR.TransactionDate AS DATE) < pFromDate
+			GROUP BY
+				SRD.ItemID
+		)SR
+			ON SR.ItemID = MI.ItemID
+		LEFT JOIN
+		(
+			SELECT
+				SD.ItemID,
+				SUM(SD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+			FROM
+				transaction_sale TS
+				JOIN transaction_saledetails SD
+					ON TS.SaleID = SD.SaleID
+				LEFT JOIN master_itemdetails MID
+					ON SD.ItemDetailsID = MID.ItemDetailsID
+			WHERE
+				SD.BranchID = pBranchID
+				AND CAST(TS.TransactionDate AS DATE) < pFromDate
+			GROUP BY
+				SD.ItemID
+		)S
+			ON S.ItemID = MI.ItemID
+		LEFT JOIN
+		(
+			SELECT
+				PRD.ItemID,
+				SUM(PRD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+			FROM
+				transaction_purchasereturn TPR
+				JOIN transaction_purchasereturndetails PRD
+					ON TPR.PurchaseReturnID = PRD.PurchaseReturnID
+				LEFT JOIN master_itemdetails MID
+					ON PRD.ItemDetailsID = MID.ItemDetailsID
+			WHERE
+				PRD.BranchID = pBranchID
+				AND CAST(TPR.TransactionDate AS DATE) < pFromDate
+			GROUP BY
+				PRD.ItemID
+		)PR
+			ON MI.ItemID = PR.ItemID
+		LEFT JOIN
+		(
+			SELECT
+				SMD.ItemID,
+				SUM(SMD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+			FROM
+				transaction_stockmutation SM
+				JOIN transaction_stockmutationdetails SMD
+					ON SM.StockMutationID = SMD.StockMutationID
+				LEFT JOIN master_itemdetails MID
+					ON SMD.ItemDetailsID = MID.ItemDetailsID
+			WHERE
+				SMD.DestinationID = pBranchID
+				AND CAST(SM.TransactionDate AS DATE) < pFromDate
+			GROUP BY
+				SMD.ItemID
+		)SM
+			ON MI.ItemID = SM.ItemID
+		LEFT JOIN
+        (
+			SELECT
+				SMD.ItemID,
+				SUM(SMD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+			FROM
+				transaction_stockmutation SM
+				JOIN transaction_stockmutationdetails SMD
+					ON SM.StockMutationID = SMD.StockMutationID
+				LEFT JOIN master_itemdetails MID
+					ON SMD.ItemDetailsID = MID.ItemDetailsID
+			WHERE
+				SMD.SourceID = pBranchID
+				AND CAST(SM.TransactionDate AS DATE) < pFromDate
+			GROUP BY
+				SMD.ItemID
+		)SMM
+			ON MI.ItemID = SMM.ItemID
+		LEFT JOIN
+		(
+			SELECT
+				SAD.ItemID,
+				SUM((SAD.AdjustedQuantity - SAD.Quantity)  * IFNULL(MID.ConversionQuantity, 1)) Quantity
+			FROM
+				transaction_stockadjust SA
+				JOIN transaction_stockadjustdetails SAD
+					ON SA.StockAdjustID = SAD.StockAdjustID
+				LEFT JOIN master_itemdetails MID
+					ON SAD.ItemDetailsID = MID.ItemDetailsID
+			WHERE
+				SAD.BranchID = pBranchID
+				AND CAST(SA.TransactionDate AS DATE) < pFromDate
+			GROUP BY
+				SAD.ItemID
+		)SA
+			ON MI.ItemID = SA.ItemID
+		LEFT JOIN
+		(
+			SELECT
+				BD.ItemID,
+				SUM((BD.Quantity - IFNULL(PD.Quantity, 0)) * IFNULL(MID.ConversionQuantity, 1)) Quantity
+			FROM
+				transaction_bookingdetails BD
+                JOIN transaction_booking TB
+					ON TB.BookingID = BD.BookingID
+                LEFT JOIN master_itemdetails MID
+					ON BD.ItemDetailsID = MID.ItemDetailsID
+				LEFT JOIN transaction_pickdetails PD
+					ON PD.BookingDetailsID = BD.BookingDetailsID
+					AND PD.BranchID <> BD.BranchID
+			WHERE
+				BD.BranchID = pBranchID
+				AND CAST(TB.TransactionDate AS DATE) < pFromDate
+			GROUP BY
+				BD.ItemID
+		)B
+			ON B.ItemID = MI.ItemID
+		LEFT JOIN
+		(
+			SELECT
+				PD.ItemID,
+				SUM(PD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+			FROM
+				transaction_pick TP
+				JOIN transaction_pickdetails PD
+					ON TP.PickID = PD.PickID
+				LEFT JOIN master_itemdetails MID
+					ON PD.ItemDetailsID = MID.ItemDetailsID
+			WHERE
+				pBranchID = PD.BranchID
+				AND CAST(TP.TransactionDate AS DATE) < pFromDate
+			GROUP BY
+				PD.ItemID
+		)P
+			ON P.ItemID = MI.ItemID
+		LEFT JOIN
+		(
+			SELECT
+				BD.ItemID,
+				SUM(PD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
+			FROM
+				transaction_booking B
+				JOIN transaction_bookingdetails BD
+					ON B.BookingID = BD.BookingID
+				LEFT JOIN master_itemdetails MID
+					ON BD.ItemDetailsID = MID.ItemDetailsID
+				LEFT JOIN transaction_pickdetails PD
+					ON PD.BookingDetailsID = BD.BookingDetailsID
+					AND PD.BranchID <> BD.BranchID
+			WHERE
+				pBranchID = PD.BranchID
+				AND CAST(B.TransactionDate AS DATE) < pFromDate
+			GROUP BY
+				BD.ItemID
+		)BN
+			ON BN.ItemID = MI.ItemID
+	WHERE
+		MI.ItemID = pItemID
+	UNION ALL
+    SELECT
+		'Stok Awal',
+		DATE_FORMAT(FS.TransactionDate, '%d-%m-%Y') TransactionDate,
+		FS.TransactionDate DateNoFormat,
+		'-',
+		ROUND((FSD.Quantity * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2),
+		FS.CreatedDate
+	FROM
+		transaction_firststock FS
+		JOIN transaction_firststockdetails FSD
+			ON FS.FirstStockID = FSD.FirstStockID
+		JOIN master_item MI
+			ON FSD.ItemID = MI.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = FSD.ItemDetailsID
+	WHERE
+		FSD.BranchID = pBranchID
+		AND MI.ItemID = pItemID
+		AND CAST(FS.TransactionDate AS DATE) >= pFromDate
+		AND CAST(FS.TransactionDate AS DATE) <= pToDate
+	UNION ALL
+	SELECT
+		'Pembelian',
+		DATE_FORMAT(TP.TransactionDate, '%d-%m-%Y') TransactionDate,
+		TP.TransactionDate DateNoFormat,
+		MS.SupplierName,
+		ROUND((TPD.Quantity * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2) ,
+		TP.CreatedDate
+	FROM
+		transaction_purchase TP
+		JOIN transaction_purchasedetails TPD
+			ON TP.PurchaseID = TPD.PurchaseID
+		JOIN master_item MI
+			ON TPD.ItemID = MI.ItemID
+		JOIN master_supplier MS
+			ON MS.SupplierID = TP.SupplierID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = TPD.ItemDetailsID
+	WHERE
+		TPD.BranchID = pBranchID
+		AND MI.ItemID = pItemID
+		AND CAST(TP.TransactionDate AS DATE) >= pFromDate
+		AND CAST(TP.TransactionDate AS DATE) <= pToDate
+	UNION ALL
+	SELECT
+		'Retur Penjualan',
+		DATE_FORMAT(SR.TransactionDate, '%d-%m-%Y') TransactionDate,
+		SR.TransactionDate DateNoFormat,
+		MC.CustomerName,
+		ROUND((SRD.Quantity * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2),
+		SR.CreatedDate
+	FROM
+		transaction_salereturn SR
+		JOIN transaction_sale TS
+			ON TS.SaleID = SR.SaleID
+		JOIN transaction_salereturndetails SRD
+			ON SRD.SaleReturnID = SR.SaleReturnID
+		JOIN master_item MI
+			ON SRD.ItemID = MI.ItemID
+		JOIN master_customer MC
+			ON MC.CustomerID = TS.CustomerID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SRD.ItemDetailsID
+	WHERE
+		SRD.BranchID = pBranchID
+		AND MI.ItemID = pItemID
+		AND CAST(SR.TransactionDate AS DATE) >= pFromDate
+		AND CAST(SR.TransactionDate AS DATE) <= pToDate
+	UNION ALL
+	SELECT
+		'Penjualan',
+		DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
+		TS.TransactionDate DateNoFormat,
+		MC.CustomerName,
+		ROUND((-SD.Quantity * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2),
+		TS.CreatedDate
+	FROM
+		transaction_sale TS
+		JOIN transaction_saledetails SD
+			ON TS.SaleID = SD.SaleID
+		JOIN master_item MI
+			ON SD.ItemID = MI.ItemID
+		JOIN master_customer MC
+			ON MC.CustomerID = TS.CustomerID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SD.ItemDetailsID
+	WHERE
+		SD.BranchID = pBranchID
+		AND MI.ItemID = pItemID
+		AND CAST(TS.TransactionDate AS DATE) >= pFromDate
+		AND CAST(TS.TransactionDate AS DATE) <= pToDate
+	UNION ALL
+	SELECT
+		'Retur Pembelian',
+		DATE_FORMAT(TPR.TransactionDate, '%d-%m-%Y') TransactionDate,
+		TPR.TransactionDate DateNoFormat,
+		MS.SupplierName,
+		ROUND((-PRD.Quantity * IFNULL(MID.ConversionQuantity, 1)) /pConversionQuantity, 2),
+		TPR.CreatedDate
+	FROM
+		transaction_purchasereturn TPR
+		JOIN transaction_purchasereturndetails PRD
+			ON TPR.PurchaseReturnID = PRD.PurchaseReturnID
+		JOIN master_item MI
+			ON MI.ItemID = PRD.ItemID
+		JOIN master_supplier MS
+			ON MS.SupplierID = TPR.SupplierID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = PRD.ItemDetailsID
+	WHERE
+		PRD.BranchID = pBranchID
+		AND MI.ItemID = pItemID
+		AND CAST(TPR.TransactionDate AS DATE) >= pFromDate
+		AND CAST(TPR.TransactionDate AS DATE) <= pToDate
+	UNION ALL
+	SELECT
+		'Mutasi Stok',
+		DATE_FORMAT(SM.TransactionDate, '%d-%m-%Y') TransactionDate,
+		SM.TransactionDate DateNoFormat,
+		'',
+		ROUND((SMD.Quantity * IFNULL(MID.ConversionQuantity, 1)) /pConversionQuantity, 2),
+		SM.CreatedDate
+	FROM
+		transaction_stockmutation SM
+		JOIN transaction_stockmutationdetails SMD
+			ON SM.StockMutationID = SMD.StockMutationID
+		JOIN master_item MI
+			ON MI.ItemID = SMD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SMD.ItemDetailsID
+	WHERE
+		SMD.DestinationID = pBranchID
+		AND MI.ItemID = pItemID
+		AND CAST(SM.TransactionDate AS DATE) >= pFromDate
+		AND CAST(SM.TransactionDate AS DATE) <= pToDate
+	UNION ALL
+    SELECT
+		'Mutasi Stok',
+		DATE_FORMAT(SM.TransactionDate, '%d-%m-%Y') TransactionDate,
+		SM.TransactionDate DateNoFormat,
+		'',
+		ROUND((-SMD.Quantity * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2),
+		SM.CreatedDate
+	FROM
+		transaction_stockmutation SM
+		JOIN transaction_stockmutationdetails SMD
+			ON SM.StockMutationID = SMD.StockMutationID
+		JOIN master_item MI
+			ON MI.ItemID = SMD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SMD.ItemDetailsID
+	WHERE
+		SMD.SourceID = pBranchID
+		AND MI.ItemID = pItemID
+		AND CAST(SM.TransactionDate AS DATE) >= pFromDate
+		AND CAST(SM.TransactionDate AS DATE) <= pToDate
+	UNION ALL
+	SELECT
+		'Adjust Stok',
+		DATE_FORMAT(SA.TransactionDate, '%d-%m-%Y') TransactionDate,
+		SA.TransactionDate DateNoFormat,
+		'',
+		ROUND(((SAD.AdjustedQuantity - SAD.Quantity) * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2),
+		SA.CreatedDate
+	FROM
+		transaction_stockadjust SA
+		JOIN transaction_stockadjustdetails SAD
+			ON SA.StockAdjustID = SAD.StockAdjustID
+		JOIN master_item MI
+			ON MI.ItemID = SAD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SAD.ItemDetailsID
+	WHERE
+		SAD.BranchID = pBranchID
+		AND MI.ItemID = pItemID
+		AND CAST(SA.TransactionDate AS DATE) >= pFromDate
+		AND CAST(SA.TransactionDate AS DATE) <= pToDate
+	UNION ALL
+    SELECT
+		'Pemesanan',
+		DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
+		TB.TransactionDate DateNoFormat,
+		MC.CustomerName,
+		ROUND((-(BD.Quantity  - IFNULL(PD.Quantity, 0)) * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2),
+		TB.CreatedDate
+	FROM
+		transaction_booking TB
+		JOIN transaction_bookingdetails BD
+			ON TB.BookingID = BD.BookingID
+		JOIN master_item MI
+			ON BD.ItemID = MI.ItemID
+		JOIN master_customer MC
+			ON MC.CustomerID = TB.CustomerID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = BD.ItemDetailsID
+		LEFT JOIN transaction_pickdetails PD
+			ON PD.BookingDetailsID = BD.BookingDetailsID
+			AND PD.BranchID <> BD.BranchID
+	WHERE
+		BD.BranchID = pBranchID
+		AND MI.ItemID = pItemID
+		AND CAST(TB.TransactionDate AS DATE) >= pFromDate
+		AND CAST(TB.TransactionDate AS DATE) <= pToDate
+	UNION ALL
+    SELECT
+		'Pengambilan',
+        DATE_FORMAT(TP.TransactionDate, '%d-%m-%Y') TransactionDate,
+		TP.TransactionDate DateNoFormat,
+		MC.CustomerName,
+		ROUND((-PD.Quantity * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2),
+		TP.CreatedDate
+	FROM
+		transaction_bookingdetails BD
+        JOIN transaction_pickdetails PD
+			ON PD.BookingDetailsID = BD.BookingDetailsID
+			AND PD.BranchID <> BD.BranchID
+		JOIN transaction_pick TP
+			ON TP.PickID = PD.PickID
+		JOIN transaction_booking TB
+			ON TB.BookingID = TP.BookingID
+		JOIN master_customer MC
+			ON MC.CustomerID = TB.CustomerID
+		LEFT JOIN master_itemdetails MID
+			ON BD.ItemDetailsID = MID.ItemDetailsID
+	WHERE
+		PD.BranchID = pBranchID
+		AND PD.ItemID = pItemID
+		AND CAST(TP.TransactionDate AS DATE) >= pFromDate
+		AND CAST(TP.TransactionDate AS DATE) <= pToDate
+	ORDER BY
+		DateNoFormat,
+		CreatedDate;
+
+        
 END;
 $$
 DELIMITER ;
@@ -223,7 +3260,7 @@ SET State = 1;
         BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
         BD.Discount,
         BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount) SubTotal,
-        0
+        0 Payment
     FROM
 		transaction_booking TB
 		JOIN master_user MUS
@@ -260,7 +3297,7 @@ SET State = 1;
         SRD.SalePrice,
         0 Discount,
         -(SRD.Quantity * SRD.SalePrice) SubTotal,
-        0
+        0 Payment
     FROM
 		transaction_salereturn TSR
         JOIN master_user MUS
@@ -298,7 +3335,7 @@ SET State = 1;
         SD.SalePrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
         SD.Discount,
         SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount) SubTotal,
-        IFNULL(TS.Payment, 0)
+        IFNULL(TS.Payment, 0) Payment
     FROM
 		transaction_sale TS
         JOIN master_user MUS
@@ -336,7 +3373,7 @@ SET State = 1;
         BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
         BD.Discount,
         BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount) SubTotal,
-        IFNULL(TB.Payment, 0)
+        IFNULL(TB.Payment, 0) Payment
     FROM
 		transaction_booking TB
 		JOIN master_user MUS
@@ -375,7 +3412,7 @@ SET State = 1;
         
         0,
         PD.Amount,
-        0
+        0 Payment
 	FROM
 		transaction_paymentdetails PD
         JOIN master_user MUS
@@ -386,7 +3423,7 @@ SET State = 1;
 		LEFT JOIN transaction_booking TB
 			ON TB.BookingID = PD.TransactionID
             AND PD.TransactionType = 'B'
-		LEFT JOIN master_customer MC
+		JOIN master_customer MC
 			ON MC.CustomerID = IFNULL(TS.CustomerID, TB.CustomerID)
 	WHERE
 		CASE
@@ -2827,494 +5864,6 @@ SET @query = CONCAT("SELECT
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
 	DEALLOCATE PREPARE stmt;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select sale transaction
-Created Date: 3 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelStockDetailsReport;
-
-DELIMITER $$
-CREATE PROCEDURE spSelStockDetailsReport (
-	pItemID					BIGINT,
-	pBranchID 				INT,
-	pFromDate				DATE,
-	pToDate					DATE,
-    pConversionQuantity		DOUBLE,
-    pCurrentUser			VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelStockDetailsReport', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-	SELECT
-		'Mutasi Sebelumnya' TransactionType,
-		'-' TransactionDate,
-		pFromDate DateNoFormat,
-		'' CustomerName,
-		ROUND((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0) - IFNULL(BN.Quantity, 0)) / pConversionQuantity, 2) Quantity,
-		'0000-00-00' CreatedDate
-	FROM
-		master_item MI
-        JOIN master_itemdetails MID
-			ON MID.ItemID = MI.ItemID
-        LEFT JOIN
-		(
-			SELECT
-				FSD.ItemID,
-				SUM(FSD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
-			FROM
-				transaction_firststock FS
-				JOIN transaction_firststockdetails FSD
-					ON FS.FirstStockID = FSD.FirstStockID
-				LEFT JOIN master_itemdetails MID
-					ON FSD.ItemDetailsID = MID.ItemDetailsID
-			WHERE
-				FSD.BranchID = pBranchID
-				AND CAST(FS.TransactionDate AS DATE) < pFromDate
-			GROUP BY
-				FSD.ItemID
-		)FS
-			ON FS.ItemID = MI.ItemID
-		LEFT JOIN
-		(
-			SELECT
-				TPD.ItemID,
-				SUM(TPD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
-			FROM
-				transaction_purchase TP
-				JOIN transaction_purchasedetails TPD
-					ON TP.PurchaseID = TPD.PurchaseID
-				LEFT JOIN master_itemdetails MID
-					ON TPD.ItemDetailsID = MID.ItemDetailsID
-			WHERE
-				TPD.BranchID = pBranchID
-				AND CAST(TP.TransactionDate AS DATE) < pFromDate
-			GROUP BY
-				TPD.ItemID
-		)TP
-			ON TP.ItemID = MI.ItemID
-		LEFT JOIN
-		(
-			SELECT
-				SRD.ItemID,
-				SUM(SRD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
-			FROM
-				transaction_salereturn SR
-				JOIN transaction_salereturndetails SRD
-					ON SRD.SaleReturnID = SR.SaleReturnID
-				LEFT JOIN master_itemdetails MID
-					ON SRD.ItemDetailsID = MID.ItemDetailsID
-			WHERE
-				SRD.BranchID = pBranchID
-				AND CAST(SR.TransactionDate AS DATE) < pFromDate
-			GROUP BY
-				SRD.ItemID
-		)SR
-			ON SR.ItemID = MI.ItemID
-		LEFT JOIN
-		(
-			SELECT
-				SD.ItemID,
-				SUM(SD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
-			FROM
-				transaction_sale TS
-				JOIN transaction_saledetails SD
-					ON TS.SaleID = SD.SaleID
-				LEFT JOIN master_itemdetails MID
-					ON SD.ItemDetailsID = MID.ItemDetailsID
-			WHERE
-				SD.BranchID = pBranchID
-				AND CAST(TS.TransactionDate AS DATE) < pFromDate
-			GROUP BY
-				SD.ItemID
-		)S
-			ON S.ItemID = MI.ItemID
-		LEFT JOIN
-		(
-			SELECT
-				PRD.ItemID,
-				SUM(PRD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
-			FROM
-				transaction_purchasereturn TPR
-				JOIN transaction_purchasereturndetails PRD
-					ON TPR.PurchaseReturnID = PRD.PurchaseReturnID
-				LEFT JOIN master_itemdetails MID
-					ON PRD.ItemDetailsID = MID.ItemDetailsID
-			WHERE
-				PRD.BranchID = pBranchID
-				AND CAST(TPR.TransactionDate AS DATE) < pFromDate
-			GROUP BY
-				PRD.ItemID
-		)PR
-			ON MI.ItemID = PR.ItemID
-		LEFT JOIN
-		(
-			SELECT
-				SMD.ItemID,
-				SUM(SMD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
-			FROM
-				transaction_stockmutation SM
-				JOIN transaction_stockmutationdetails SMD
-					ON SM.StockMutationID = SMD.StockMutationID
-				LEFT JOIN master_itemdetails MID
-					ON SMD.ItemDetailsID = MID.ItemDetailsID
-			WHERE
-				SMD.DestinationID = pBranchID
-				AND CAST(SM.TransactionDate AS DATE) < pFromDate
-			GROUP BY
-				SMD.ItemID
-		)SM
-			ON MI.ItemID = SM.ItemID
-		LEFT JOIN
-        (
-			SELECT
-				SMD.ItemID,
-				SUM(SMD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
-			FROM
-				transaction_stockmutation SM
-				JOIN transaction_stockmutationdetails SMD
-					ON SM.StockMutationID = SMD.StockMutationID
-				LEFT JOIN master_itemdetails MID
-					ON SMD.ItemDetailsID = MID.ItemDetailsID
-			WHERE
-				SMD.SourceID = pBranchID
-				AND CAST(SM.TransactionDate AS DATE) < pFromDate
-			GROUP BY
-				SMD.ItemID
-		)SMM
-			ON MI.ItemID = SMM.ItemID
-		LEFT JOIN
-		(
-			SELECT
-				SAD.ItemID,
-				SUM((SAD.AdjustedQuantity - SAD.Quantity)  * IFNULL(MID.ConversionQuantity, 1)) Quantity
-			FROM
-				transaction_stockadjust SA
-				JOIN transaction_stockadjustdetails SAD
-					ON SA.StockAdjustID = SAD.StockAdjustID
-				LEFT JOIN master_itemdetails MID
-					ON SAD.ItemDetailsID = MID.ItemDetailsID
-			WHERE
-				SAD.BranchID = pBranchID
-				AND CAST(SA.TransactionDate AS DATE) < pFromDate
-			GROUP BY
-				SAD.ItemID
-		)SA
-			ON MI.ItemID = SA.ItemID
-		LEFT JOIN
-		(
-			SELECT
-				BD.ItemID,
-				SUM((BD.Quantity - IFNULL(PD.Quantity, 0)) * IFNULL(MID.ConversionQuantity, 1)) Quantity
-			FROM
-				transaction_bookingdetails BD
-                JOIN transaction_booking TB
-					ON TB.BookingID = BD.BookingID
-                LEFT JOIN master_itemdetails MID
-					ON BD.ItemDetailsID = MID.ItemDetailsID
-				LEFT JOIN transaction_pickdetails PD
-					ON PD.BookingDetailsID = BD.BookingDetailsID
-					AND PD.BranchID <> BD.BranchID
-			WHERE
-				BD.BranchID = pBranchID
-				AND CAST(TB.TransactionDate AS DATE) < pFromDate
-			GROUP BY
-				BD.ItemID
-		)B
-			ON B.ItemID = MI.ItemID
-		LEFT JOIN
-		(
-			SELECT
-				PD.ItemID,
-				SUM(PD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
-			FROM
-				transaction_pick TP
-				JOIN transaction_pickdetails PD
-					ON TP.PickID = PD.PickID
-				LEFT JOIN master_itemdetails MID
-					ON PD.ItemDetailsID = MID.ItemDetailsID
-			WHERE
-				pBranchID = PD.BranchID
-				AND CAST(TP.TransactionDate AS DATE) < pFromDate
-			GROUP BY
-				PD.ItemID
-		)P
-			ON P.ItemID = MI.ItemID
-		LEFT JOIN
-		(
-			SELECT
-				BD.ItemID,
-				SUM(PD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
-			FROM
-				transaction_booking B
-				JOIN transaction_bookingdetails BD
-					ON B.BookingID = BD.BookingID
-				LEFT JOIN master_itemdetails MID
-					ON BD.ItemDetailsID = MID.ItemDetailsID
-				LEFT JOIN transaction_pickdetails PD
-					ON PD.BookingDetailsID = BD.BookingDetailsID
-					AND PD.BranchID <> BD.BranchID
-			WHERE
-				pBranchID = PD.BranchID
-				AND CAST(B.TransactionDate AS DATE) < pFromDate
-			GROUP BY
-				BD.ItemID
-		)BN
-			ON BN.ItemID = MI.ItemID
-	WHERE
-		MI.ItemID = pItemID
-	UNION ALL
-    SELECT
-		'Stok Awal',
-		DATE_FORMAT(FS.TransactionDate, '%d-%m-%Y') TransactionDate,
-		FS.TransactionDate DateNoFormat,
-		'-',
-		ROUND((FSD.Quantity * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2),
-		FS.CreatedDate
-	FROM
-		transaction_firststock FS
-		JOIN transaction_firststockdetails FSD
-			ON FS.FirstStockID = FSD.FirstStockID
-		JOIN master_item MI
-			ON FSD.ItemID = MI.ItemID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = FSD.ItemDetailsID
-	WHERE
-		FSD.BranchID = pBranchID
-		AND MI.ItemID = pItemID
-		AND CAST(FS.TransactionDate AS DATE) >= pFromDate
-		AND CAST(FS.TransactionDate AS DATE) <= pToDate
-	UNION ALL
-	SELECT
-		'Pembelian',
-		DATE_FORMAT(TP.TransactionDate, '%d-%m-%Y') TransactionDate,
-		TP.TransactionDate DateNoFormat,
-		MS.SupplierName,
-		ROUND((TPD.Quantity * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2) ,
-		TP.CreatedDate
-	FROM
-		transaction_purchase TP
-		JOIN transaction_purchasedetails TPD
-			ON TP.PurchaseID = TPD.PurchaseID
-		JOIN master_item MI
-			ON TPD.ItemID = MI.ItemID
-		JOIN master_supplier MS
-			ON MS.SupplierID = TP.SupplierID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = TPD.ItemDetailsID
-	WHERE
-		TPD.BranchID = pBranchID
-		AND MI.ItemID = pItemID
-		AND CAST(TP.TransactionDate AS DATE) >= pFromDate
-		AND CAST(TP.TransactionDate AS DATE) <= pToDate
-	UNION ALL
-	SELECT
-		'Retur Penjualan',
-		DATE_FORMAT(SR.TransactionDate, '%d-%m-%Y') TransactionDate,
-		SR.TransactionDate DateNoFormat,
-		MC.CustomerName,
-		ROUND((SRD.Quantity * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2),
-		SR.CreatedDate
-	FROM
-		transaction_salereturn SR
-		JOIN transaction_sale TS
-			ON TS.SaleID = SR.SaleID
-		JOIN transaction_salereturndetails SRD
-			ON SRD.SaleReturnID = SR.SaleReturnID
-		JOIN master_item MI
-			ON SRD.ItemID = MI.ItemID
-		JOIN master_customer MC
-			ON MC.CustomerID = TS.CustomerID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = SRD.ItemDetailsID
-	WHERE
-		SRD.BranchID = pBranchID
-		AND MI.ItemID = pItemID
-		AND CAST(SR.TransactionDate AS DATE) >= pFromDate
-		AND CAST(SR.TransactionDate AS DATE) <= pToDate
-	UNION ALL
-	SELECT
-		'Penjualan',
-		DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
-		TS.TransactionDate DateNoFormat,
-		MC.CustomerName,
-		ROUND((-SD.Quantity * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2),
-		TS.CreatedDate
-	FROM
-		transaction_sale TS
-		JOIN transaction_saledetails SD
-			ON TS.SaleID = SD.SaleID
-		JOIN master_item MI
-			ON SD.ItemID = MI.ItemID
-		JOIN master_customer MC
-			ON MC.CustomerID = TS.CustomerID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = SD.ItemDetailsID
-	WHERE
-		SD.BranchID = pBranchID
-		AND MI.ItemID = pItemID
-		AND CAST(TS.TransactionDate AS DATE) >= pFromDate
-		AND CAST(TS.TransactionDate AS DATE) <= pToDate
-	UNION ALL
-	SELECT
-		'Retur Pembelian',
-		DATE_FORMAT(TPR.TransactionDate, '%d-%m-%Y') TransactionDate,
-		TPR.TransactionDate DateNoFormat,
-		MS.SupplierName,
-		ROUND((-PRD.Quantity * IFNULL(MID.ConversionQuantity, 1)) /pConversionQuantity, 2),
-		TPR.CreatedDate
-	FROM
-		transaction_purchasereturn TPR
-		JOIN transaction_purchasereturndetails PRD
-			ON TPR.PurchaseReturnID = PRD.PurchaseReturnID
-		JOIN master_item MI
-			ON MI.ItemID = PRD.ItemID
-		JOIN master_supplier MS
-			ON MS.SupplierID = TPR.SupplierID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = PRD.ItemDetailsID
-	WHERE
-		PRD.BranchID = pBranchID
-		AND MI.ItemID = pItemID
-		AND CAST(TPR.TransactionDate AS DATE) >= pFromDate
-		AND CAST(TPR.TransactionDate AS DATE) <= pToDate
-	UNION ALL
-	SELECT
-		'Mutasi Stok',
-		DATE_FORMAT(SM.TransactionDate, '%d-%m-%Y') TransactionDate,
-		SM.TransactionDate DateNoFormat,
-		'',
-		ROUND((SMD.Quantity * IFNULL(MID.ConversionQuantity, 1)) /pConversionQuantity, 2),
-		SM.CreatedDate
-	FROM
-		transaction_stockmutation SM
-		JOIN transaction_stockmutationdetails SMD
-			ON SM.StockMutationID = SMD.StockMutationID
-		JOIN master_item MI
-			ON MI.ItemID = SMD.ItemID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = SMD.ItemDetailsID
-	WHERE
-		SMD.DestinationID = pBranchID
-		AND MI.ItemID = pItemID
-		AND CAST(SM.TransactionDate AS DATE) >= pFromDate
-		AND CAST(SM.TransactionDate AS DATE) <= pToDate
-	UNION ALL
-    SELECT
-		'Mutasi Stok',
-		DATE_FORMAT(SM.TransactionDate, '%d-%m-%Y') TransactionDate,
-		SM.TransactionDate DateNoFormat,
-		'',
-		ROUND((-SMD.Quantity * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2),
-		SM.CreatedDate
-	FROM
-		transaction_stockmutation SM
-		JOIN transaction_stockmutationdetails SMD
-			ON SM.StockMutationID = SMD.StockMutationID
-		JOIN master_item MI
-			ON MI.ItemID = SMD.ItemID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = SMD.ItemDetailsID
-	WHERE
-		SMD.SourceID = pBranchID
-		AND MI.ItemID = pItemID
-		AND CAST(SM.TransactionDate AS DATE) >= pFromDate
-		AND CAST(SM.TransactionDate AS DATE) <= pToDate
-	UNION ALL
-	SELECT
-		'Adjust Stok',
-		DATE_FORMAT(SA.TransactionDate, '%d-%m-%Y') TransactionDate,
-		SA.TransactionDate DateNoFormat,
-		'',
-		ROUND(((SAD.AdjustedQuantity - SAD.Quantity) * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2),
-		SA.CreatedDate
-	FROM
-		transaction_stockadjust SA
-		JOIN transaction_stockadjustdetails SAD
-			ON SA.StockAdjustID = SAD.StockAdjustID
-		JOIN master_item MI
-			ON MI.ItemID = SAD.ItemID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = SAD.ItemDetailsID
-	WHERE
-		SAD.BranchID = pBranchID
-		AND MI.ItemID = pItemID
-		AND CAST(SA.TransactionDate AS DATE) >= pFromDate
-		AND CAST(SA.TransactionDate AS DATE) <= pToDate
-	UNION ALL
-    SELECT
-		'Pemesanan',
-		DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
-		TB.TransactionDate DateNoFormat,
-		MC.CustomerName,
-		ROUND((-(BD.Quantity  - IFNULL(PD.Quantity, 0)) * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2),
-		TB.CreatedDate
-	FROM
-		transaction_booking TB
-		JOIN transaction_bookingdetails BD
-			ON TB.BookingID = BD.BookingID
-		JOIN master_item MI
-			ON BD.ItemID = MI.ItemID
-		JOIN master_customer MC
-			ON MC.CustomerID = TB.CustomerID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = BD.ItemDetailsID
-		LEFT JOIN transaction_pickdetails PD
-			ON PD.BookingDetailsID = BD.BookingDetailsID
-			AND PD.BranchID <> BD.BranchID
-	WHERE
-		BD.BranchID = pBranchID
-		AND MI.ItemID = pItemID
-		AND CAST(TB.TransactionDate AS DATE) >= pFromDate
-		AND CAST(TB.TransactionDate AS DATE) <= pToDate
-	UNION ALL
-    SELECT
-		'Pengambilan',
-        DATE_FORMAT(TP.TransactionDate, '%d-%m-%Y') TransactionDate,
-		TP.TransactionDate DateNoFormat,
-		MC.CustomerName,
-		ROUND((-PD.Quantity * IFNULL(MID.ConversionQuantity, 1)) / pConversionQuantity, 2),
-		TP.CreatedDate
-	FROM
-		transaction_bookingdetails BD
-        JOIN transaction_pickdetails PD
-			ON PD.BookingDetailsID = BD.BookingDetailsID
-			AND PD.BranchID <> BD.BranchID
-		JOIN transaction_pick TP
-			ON TP.PickID = PD.PickID
-		JOIN transaction_booking TB
-			ON TB.BookingID = TP.BookingID
-		JOIN master_customer MC
-			ON MC.CustomerID = TB.CustomerID
-		LEFT JOIN master_itemdetails MID
-			ON BD.ItemDetailsID = MID.ItemDetailsID
-	WHERE
-		PD.BranchID = pBranchID
-		AND PD.ItemID = pItemID
-		AND CAST(TP.TransactionDate AS DATE) >= pFromDate
-		AND CAST(TP.TransactionDate AS DATE) <= pToDate
-	ORDER BY
-		DateNoFormat,
-		CreatedDate;
-
         
 END;
 $$
@@ -14725,2551 +17274,6 @@ SET State = 7;
 			State AS 'State';
 
 	COMMIT;
-END;
-$$
-DELIMITER ;
-DROP PROCEDURE IF EXISTS spInsSale;
-
-DELIMITER $$
-CREATE PROCEDURE spInsSale (
-	pID 				BIGINT,
-	pSaleNumber			VARCHAR(100),
-	pRetailFlag			BIT,
-    pFinishFlag			BIT,
-    pCustomerID			BIGINT,
-	pTransactionDate 	DATETIME,
-	pSaleDetailsID		BIGINT,
-    pBranchID			INT,
-    pItemID				BIGINT,
-	pItemDetailsID		BIGINT,
-	pQuantity			DOUBLE,
-    pBuyPrice			DOUBLE,
-    pSalePrice			DOUBLE,
-	pDiscount			DOUBLE,
-	pUserID				BIGINT,
-    pCurrentUser		VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE Message VARCHAR(255);
-	DECLARE MessageDetail VARCHAR(255);
-	DECLARE FailedFlag INT;
-	DECLARE State INT;
-	DECLARE RowCount INT;
-
-	DECLARE PassValidate INT;
-	
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		ROLLBACK;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spInsSale', pCurrentUser);
-		SELECT
-			pID AS 'ID',
-            pSaleDetailsID AS 'SaleDetailsID',
-			pSaleNumber AS 'SaleNumber',
-			'Terjadi kesalahan sistem!' AS 'Message',
-			@full_error AS 'MessageDetail',
-			1 AS 'FailedFlag',
-			State AS 'State' ;
-	END;
-	
-	SET PassValidate = 1;
-	
-	START TRANSACTION;
-	
-SET State = 1;
-
-		IF(pID = 0)	THEN /*Tambah baru*/
-			SELECT
-				CONCAT(RIGHT(CONCAT('00', pUserID), 2), DATE_FORMAT(NOW(), '%Y%m'), RIGHT(CONCAT('00000', (IFNULL(MAX(CAST(RIGHT(SaleNumber, 5) AS UNSIGNED)), 0) + 1)), 5))
-			FROM
-				transaction_sale TS
-			WHERE
-				MONTH(TS.TransactionDate) = MONTH(NOW())
-				AND YEAR(TS.TransactionDate) = YEAR(NOW())
-			INTO 
-				pSaleNumber;
-				
-SET State = 2;
-			INSERT INTO transaction_sale
-			(
-				SaleNumber,
-				RetailFlag,
-                FinishFlag,
-				CustomerID,
-				TransactionDate,
-				CreatedDate,
-				CreatedBy
-			)
-			VALUES 
-			(
-				pSaleNumber,
-				pRetailFlag,
-                pFinishFlag,
-				pCustomerID,
-				pTransactionDate,
-				NOW(),
-				pCurrentUser
-			);
-		
-SET State = 3;	               
-			SELECT
-				LAST_INSERT_ID()
-			INTO 
-				pID;
-				
-		ELSE
-		
-SET State = 4;
-			UPDATE
-				transaction_sale
-			SET
-				customerID = pCustomerID,
-				TransactionDate = pTransactionDate,
-				ModifiedBy = pCurrentUser
-			WHERE
-				SaleID = pID;
-				
-		END IF;
-		
-SET State = 5;
-		
-		IF(pSaleDetailsID = 0) THEN
-			INSERT INTO transaction_saledetails
-			(
-				SaleID,
-				ItemID,
-                ItemDetailsID,
-				BranchID,
-				Quantity,
-				BuyPrice,
-				SalePrice,
-				Discount,
-				CreatedDate,
-				CreatedBy
-			)
-			VALUES
-			(
-				pID,
-				pItemID,
-				pItemDetailsID,
-				pBranchID,
-				pQuantity,
-				pBuyPrice,
-				pSalePrice,
-				pDiscount,
-				NOW(),
-				pCurrentUser
-			);
-			
-SET State = 6;
-			
-			SELECT
-				LAST_INSERT_ID()
-			INTO 
-				pSaleDetailsID;
-		
-		ELSE
-				
-SET State = 7;
-			
-			UPDATE 
-				transaction_saledetails
-			SET
-				ItemID = pItemID,
-                ItemDetailsID = pItemDetailsID,
-				BranchID = pBranchID,
-				Quantity = pQuantity,
-				BuyPrice = pBuyPrice,
-				SalePrice = pSalePrice,
-				Discount = pDiscount,
-				ModifiedBy = pCurrentUser
-			WHERE
-				SaleDetailsID = pSaleDetailsID;
-			
-		END IF;
-		
-SET State = 8;
-
-		SELECT
-			pID AS 'ID',
-			pSaleDetailsID AS 'SaleDetailsID',
-			pSaleNumber AS 'SaleNumber',
-			'Transaksi Berhasil Disimpan' AS 'Message',
-			'' AS 'MessageDetail',
-			0 AS 'FailedFlag',
-			State AS 'State';
-                
-	COMMIT;
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for insert sale return
-Created Date: 23 February 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spInsSaleReturn;
-
-DELIMITER $$
-CREATE PROCEDURE spInsSaleReturn (
-	pID 				BIGINT, 
-	pSaleID 			BIGINT,
-	pTransactionDate 	DATETIME,
-	pSaleReturnData 	TEXT,
-	pIsEdit				INT,
-    pCurrentUser		VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE Message VARCHAR(255);
-	DECLARE MessageDetail VARCHAR(255);
-	DECLARE FailedFlag INT;
-	DECLARE State INT;
-	DECLARE PassValidate INT;
-	
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		ROLLBACK;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spInsSaleReturn', pCurrentUser);
-		SELECT
-			pID AS 'ID',
-			'Terjadi kesalahan sistem!' AS 'Message',
-			@full_error AS 'MessageDetail',
-			1 AS 'FailedFlag',
-			State AS 'State' ;
-	END;
-	
-	SET PassValidate = 1;
-	
-	START TRANSACTION;
-	
-SET State = 1;
-		IF(pIsEdit = 0)	THEN /*Tambah baru*/
-			INSERT INTO transaction_salereturn
-			(
-				SaleID,
-				TransactionDate,
-				CreatedDate,
-				CreatedBy
-			)
-			VALUES (
-				pSaleID,
-				pTransactionDate,
-				NOW(),
-				pCurrentUser
-			);
-			
-SET State = 2;			               
-			SELECT
-				LAST_INSERT_ID()
-			INTO 
-				pID;
-			
-		ELSE
-			
-SET State = 3;
-			UPDATE
-				transaction_salereturn
-			SET
-				TransactionDate = pTransactionDate,
-				ModifiedBy = pCurrentUser
-			WHERE
-				SaleReturnID = pID;
-	
-		END IF;
-	
-SET State = 4;
-
-		DELETE 
-		FROM 
-			transaction_salereturndetails
-		WHERE
-			SaleReturnID = pID;
-					
-SET State = 5;
-		IF(pSaleReturnData <> "" ) THEN
-			SET @query = CONCAT("INSERT INTO transaction_salereturndetails
-								(
-									SaleReturnID,
-									ItemID,
-									BranchID,
-									Quantity,
-									BuyPrice,
-									SalePrice,
-									SaleDetailsID,
-									CreatedDate,
-									CreatedBy
-								)
-								VALUES", REPLACE(REPLACE(pSaleReturnData, ', UserLogin)', CONCAT(', "', pCurrentUser, '")')), '(0,', CONCAT('(', pID, ','))
-								);
-								
-			PREPARE stmt FROM @query;
-			EXECUTE stmt;
-			DEALLOCATE PREPARE stmt;
-			
-		END IF;
-
-SET State = 6;
-
-		IF(pIsEdit = 0) THEN
-			SELECT
-				pID AS 'ID',
-				'Retur Berhasil Ditambahkan' AS 'Message',
-				'' AS 'MessageDetail',
-				0 AS 'FailedFlag',
-				State AS 'State';
-		ELSE
-	
-SET State = 7;
-
-			SELECT
-				pID AS 'ID',
-				'Retur Berhasil Diubah' AS 'Message',
-				'' AS 'MessageDetail',
-				0 AS 'FailedFlag',
-				State AS 'State';
-		END IF;
-    COMMIT;
-END;
-$$
-DELIMITER ;
-DROP PROCEDURE IF EXISTS spInsStockAdjust;
-
-DELIMITER $$
-CREATE PROCEDURE spInsStockAdjust (
-	pID 						BIGINT,
-	pBranchID					INT,
-	pTransactionDate 			DATETIME,
-	pStockAdjustDetailsID		BIGINT,
-    pItemID						BIGINT,
-    pItemDetailsID				BIGINT,
-	pQuantity					DOUBLE,
-	pAdjustedQuantity			DOUBLE,
-    pUserID						BIGINT,
-    pCurrentUser				VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE Message VARCHAR(255);
-	DECLARE MessageDetail VARCHAR(255);
-	DECLARE FailedFlag INT;
-	DECLARE State INT;
-	DECLARE RowCount INT;
-
-	DECLARE PassValidate INT;
-	
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		ROLLBACK;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spInsStockAdjust', pCurrentUser);
-		SELECT
-			pID AS 'ID',
-            pStockAdjustDetailsID AS 'StockAdjustDetailsID',
-			'Terjadi kesalahan sistem!' AS 'Message',
-			@full_error AS 'MessageDetail',
-			1 AS 'FailedFlag',
-			State AS 'State' ;
-	END;
-	
-	SET PassValidate = 1;
-	
-	START TRANSACTION;
-	
-SET State = 1;
-
-		IF(pID = 0)	THEN /*Tambah baru*/
-			INSERT INTO transaction_stockadjust
-			(
-				TransactionDate,
-				CreatedDate,
-				CreatedBy
-			)
-			VALUES 
-			(
-				pTransactionDate,
-				NOW(),
-				pCurrentUser
-			);
-		
-SET State = 3;	               
-			SELECT
-				LAST_INSERT_ID()
-			INTO 
-				pID;
-				
-		ELSE
-		
-SET State = 4;
-			UPDATE
-				transaction_stockadjust
-			SET
-				TransactionDate = pTransactionDate,
-				ModifiedBy = pCurrentUser
-			WHERE
-				StockAdjustID = pID;
-				
-		END IF;
-		
-SET State = 5;
-		
-		IF(pStockAdjustDetailsID = 0) THEN
-			INSERT INTO transaction_stockadjustdetails
-			(
-				StockAdjustID,
-				BranchID,
-				ItemID,
-                ItemDetailsID,
-				Quantity,
-				AdjustedQuantity,
-				CreatedDate,
-				CreatedBy
-			)
-			VALUES
-			(
-				pID,
-				pBranchID,
-				pItemID,
-                pItemDetailsID,
-				pQuantity,
-				pAdjustedQuantity,
-				NOW(),
-				pCurrentUser
-			);
-			
-SET State = 6;
-			
-			SELECT
-				LAST_INSERT_ID()
-			INTO 
-				pStockAdjustDetailsID;
-		
-		ELSE
-				
-SET State = 7;
-			
-			UPDATE 
-				transaction_stockadjustdetails
-			SET
-				ItemID = pItemID,
-				ItemDetailsID = pItemDetailsID,
-				BranchID = pBranchID,
-				Quantity = pQuantity,
-				AdjustedQuantity = pAdjustedQuantity,
-				ModifiedBy = pCurrentUser
-			WHERE
-				StockAdjustDetailsID = pStockAdjustDetailsID;
-			
-		END IF;
-		
-SET State = 8;
-
-		SELECT
-			pID AS 'ID',
-			pStockAdjustDetailsID AS 'StockAdjustDetailsID',
-			'Transaksi Berhasil Disimpan' AS 'Message',
-			'' AS 'MessageDetail',
-			0 AS 'FailedFlag',
-			State AS 'State';
-                
-	COMMIT;
-END;
-$$
-DELIMITER ;
-DROP PROCEDURE IF EXISTS spInsStockMutation;
-
-DELIMITER $$
-CREATE PROCEDURE spInsStockMutation (
-	pID 						BIGINT,
-	pSourceID					INT,
-	pDestinationID				INT,
-	pTransactionDate 			DATETIME,
-	pStockMutationDetailsID		BIGINT,
-    pItemID						BIGINT,
-    pItemDetailsID				BIGINT,
-	pQuantity					DOUBLE,
-    pUserID						BIGINT,
-    pCurrentUser				VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE Message VARCHAR(255);
-	DECLARE MessageDetail VARCHAR(255);
-	DECLARE FailedFlag INT;
-	DECLARE State INT;
-	DECLARE RowCount INT;
-
-	DECLARE PassValidate INT;
-	
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		ROLLBACK;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spInsStockMutation', pCurrentUser);
-		SELECT
-			pID AS 'ID',
-            pStockMutationDetailsID AS 'StockMutationDetailsID',
-			'Terjadi kesalahan sistem!' AS 'Message',
-			@full_error AS 'MessageDetail',
-			1 AS 'FailedFlag',
-			State AS 'State' ;
-	END;
-	
-	SET PassValidate = 1;
-	
-	START TRANSACTION;
-	
-SET State = 1;
-
-		IF(pID = 0)	THEN /*Tambah baru*/
-			INSERT INTO transaction_stockmutation
-			(
-				TransactionDate,
-				CreatedDate,
-				CreatedBy
-			)
-			VALUES 
-			(
-				pTransactionDate,
-				NOW(),
-				pCurrentUser
-			);
-		
-SET State = 3;	               
-			SELECT
-				LAST_INSERT_ID()
-			INTO 
-				pID;
-				
-		ELSE
-		
-SET State = 4;
-			UPDATE
-				transaction_stockmutation
-			SET
-				TransactionDate = pTransactionDate,
-				ModifiedBy = pCurrentUser
-			WHERE
-				StockMutationID = pID;
-				
-		END IF;
-		
-SET State = 5;
-		
-		IF(pStockMutationDetailsID = 0) THEN
-			INSERT INTO transaction_stockmutationdetails
-			(
-				StockMutationID,
-				SourceID,
-				DestinationID,
-				ItemID,
-                ItemDetailsID,
-				Quantity,
-				CreatedDate,
-				CreatedBy
-			)
-			VALUES
-			(
-				pID,
-				pSourceID,
-				pDestinationID,
-				pItemID,
-                pItemDetailsID,
-				pQuantity,
-				NOW(),
-				pCurrentUser
-			);
-			
-SET State = 6;
-			
-			SELECT
-				LAST_INSERT_ID()
-			INTO 
-				pStockMutationDetailsID;
-		
-		ELSE
-				
-SET State = 7;
-			
-			UPDATE 
-				transaction_stockmutationdetails
-			SET
-				ItemID = pItemID,
-                ItemDetailsID = pItemDetailsID,
-				SourceID = pSourceID,
-				DestinationID = pDestinationID,
-				Quantity = pQuantity,
-				ModifiedBy = pCurrentUser
-			WHERE
-				StockMutationDetailsID = pStockMutationDetailsID;
-			
-		END IF;
-		
-SET State = 8;
-
-		SELECT
-			pID AS 'ID',
-			pStockMutationDetailsID AS 'StockMutationDetailsID',
-			'Transaksi Berhasil Disimpan' AS 'Message',
-			'' AS 'MessageDetail',
-			0 AS 'FailedFlag',
-			State AS 'State';
-                
-	COMMIT;
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for insert the supplier
-Created Date: 12 November 2017
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spInsSupplier;
-
-DELIMITER $$
-CREATE PROCEDURE spInsSupplier (
-	pID 				BIGINT, 
-    pSupplierCode		VARCHAR(100),
-	pSupplierName 		VARCHAR(255),
-    pTelephone			VARCHAR(100),
-	pAddress			TEXT,
-    pCity				VARCHAR(100),
-	pRemarks			TEXT,
-    pIsEdit				INT,
-    pCurrentUser		VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE Message VARCHAR(255);
-	DECLARE MessageDetail VARCHAR(255);
-	DECLARE FailedFlag INT;
-	DECLARE State INT;
-	DECLARE RowCount INT;
-
-	DECLARE PassValidate INT;
-	
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		ROLLBACK;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spInsSupplier', pCurrentUser);
-		SELECT
-			pID AS 'ID',
-			'Terjadi kesalahan sistem!' AS 'Message',
-			@full_error AS 'MessageDetail',
-			1 AS 'FailedFlag',
-			State AS 'State' ;
-	END;
-	
-	SET PassValidate = 1;
-	
-	START TRANSACTION;
-	
-SET State = 1;
-
-		SELECT 
-			0
-		INTO
-			PassValidate
-		FROM 
-			master_supplier
-		WHERE
-			TRIM(SupplierCode) = TRIM(pSupplierCode)
-			AND SupplierID <> pID
-		LIMIT 1;
-			
-		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
-SET State = 2;
-
-			SELECT
-				pID AS 'ID',
-				CONCAT('Kode Supplier ', pSupplierCode, ' sudah ada') AS 'Message',
-				'' AS 'MessageDetail',
-				1 AS 'FailedFlag',
-				State AS 'State' ;
-		
-			LEAVE StoredProcedure;
-			
-		END IF;
-        
-SET State = 1;
-
-		SELECT 
-			0
-		INTO
-			PassValidate
-		FROM 
-			master_supplier
-		WHERE
-			(TRIM(SupplierName) = TRIM(pSupplierName)
-            AND TRIM(Address) = TRIM(pAddress))
-			AND SupplierID <> pID
-		LIMIT 1;
-			
-		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
-SET State = 3;
-
-			SELECT
-				pID AS 'ID',
-				CONCAT('Nama Supplier ', pSupplierName, ' dengan alamat ', pAddress, ' sudah ada') AS 'Message',
-				'' AS 'MessageDetail',
-				1 AS 'FailedFlag',
-				State AS 'State' ;
-		
-			LEAVE StoredProcedure;
-			
-		ELSE /*Data yang diinput valid*/
-SET State = 4;
-
-			IF(pIsEdit = 0)	THEN /*Tambah baru*/
-				INSERT INTO master_supplier
-				(
-                    SupplierCode,
-                    SupplierName,
-					Telephone,
-					Address,
-					City,
-					Remarks,
-					CreatedDate,
-					CreatedBy
-				)
-				VALUES (
-					pSupplierCode,
-					pSupplierName,
-					pTelephone,
-					pAddress,
-					pCity,
-					pRemarks,
-					NOW(),
-					pCurrentUser
-				);
-			
-SET State = 5;			               
-
-				SELECT
-					LAST_INSERT_ID()
-				INTO 
-					pID;
-
-SET State = 6;
-
-				SELECT
-					pID AS 'ID',
-					'Supplier Berhasil Ditambahkan' AS 'Message',
-					'' AS 'MessageDetail',
-					0 AS 'FailedFlag',
-					State AS 'State';
-			ELSE
-SET State = 7;
-
-				UPDATE
-					master_supplier
-				SET
-					SupplierCode = pSupplierCode,
-                    SupplierName = pSupplierName,
-					Telephone = pTelephone,
-					Address = pAddress,
-					City = pCity,
-					Remarks = pRemarks,
-					ModifiedBy = pCurrentUser
-				WHERE
-					SupplierID = pID;
-
-SET State = 8;
-
-				SELECT
-					pID AS 'ID',
-					'Supplier Berhasil Diubah' AS 'Message',
-					'' AS 'MessageDetail',
-					0 AS 'FailedFlag',
-					State AS 'State';
-			END IF;
-		END IF;
-	COMMIT;
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for insert the supplier
-Created Date: 12 November 2017
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spInsUnit;
-
-DELIMITER $$
-CREATE PROCEDURE spInsUnit (
-	pID 			INT, 
-	pUnitName 		VARCHAR(255),
-	pIsEdit			INT,
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE Message VARCHAR(255);
-	DECLARE MessageDetail VARCHAR(255);
-	DECLARE FailedFlag INT;
-	DECLARE State INT;
-	DECLARE RowCount INT;
-
-	DECLARE PassValidate INT;
-	
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		ROLLBACK;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spInsUnit', pCurrentUser);
-        SELECT
-			pID AS 'ID',
-			'Terjadi kesalahan sistem!' AS 'Message',
-			@full_error AS 'MessageDetail',
-			1 AS 'FailedFlag',
-			State AS 'State' ;
-	END;
-	
-	SET PassValidate = 1;
-	
-	START TRANSACTION;
-	
-SET State = 1;
-
-		SELECT 
-			0
-		INTO
-			PassValidate
-		FROM 
-			master_unit
-		WHERE
-			TRIM(UnitName) = TRIM(pUnitName)
-			AND UnitID <> pID
-		LIMIT 1;
-        
-			
-		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
-SET State = 2;
-			SELECT
-				pID AS 'ID',
-				CONCAT('Nama satuan ', pUnitName, ' sudah ada') AS 'Message',
-				'' AS 'MessageDetail',
-				1 AS 'FailedFlag',
-				State AS 'State' ;
-		
-			LEAVE StoredProcedure;
-			
-		ELSE /*Data yang diinput valid*/
-SET State = 3;
-			IF(pIsEdit = 0)	THEN /*Tambah baru*/
-				INSERT INTO master_unit
-				(
-					UnitName,
-					CreatedDate,
-					CreatedBy
-				)
-				VALUES (
-					pUnitName,
-					NOW(),
-					pCurrentUser
-				);
-			
-SET State = 4;			               
-				SELECT
-					pID AS 'ID',
-					'Satuan Berhasil Ditambahkan' AS 'Message',
-					'' AS 'MessageDetail',
-					0 AS 'FailedFlag',
-					State AS 'State';
-			ELSE
-SET State = 5;
-				UPDATE
-					master_unit
-				SET
-					UnitName= pUnitName,
-					ModifiedBy = pCurrentUser
-				WHERE
-					UnitID = pID;
-
-SET State = 6;
-				SELECT
-					pID AS 'ID',
-					'Satuan Berhasil Diubah' AS 'Message',
-					'' AS 'MessageDetail',
-					0 AS 'FailedFlag',
-					State AS 'State';
-			END IF;
-		END IF;
-	COMMIT;
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for insert the user
-Created Date: 12 November 2017
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spInsUser;
-
-DELIMITER $$
-CREATE PROCEDURE spInsUser (
-	pID 			BIGINT, 
-	pUserName 		VARCHAR(255),
-	pUserTypeID		SMALLINT,
-	pUserLogin 		VARCHAR(100),
-	pPassword 		VARCHAR(255),
-	pIsActive		BIT,
-	pRoleValues		TEXT,
-	pIsEdit			INT,
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE Message VARCHAR(255);
-	DECLARE MessageDetail VARCHAR(255);
-	DECLARE FailedFlag INT;
-	DECLARE State INT;
-	DECLARE PassValidate INT;
-	
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		ROLLBACK;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spInsUser', pCurrentUser);
-		SELECT
-			pID AS 'ID',
-			'Terjadi kesalahan sistem!' AS 'Message',
-			@full_error AS 'MessageDetail',
-			1 AS 'FailedFlag',
-			State AS 'State' ;
-	END;
-	
-	SET PassValidate = 1;
-	
-	START TRANSACTION;
-	
-SET State = 1;
-
-		SELECT 
-			0
-		INTO
-			PassValidate
-		FROM 
-			master_user 
-		WHERE
-			UserLogin = pUserLogin
-			AND UserID <> pID
-		LIMIT 1;
-			
-SET State = 2;
-
-		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
-			SELECT
-				pID AS 'ID',
-				CONCAT('Username ', pUserLogin, ' sudah dipakai') AS 'Message',
-				'' AS 'MessageDetail',
-				1 AS 'FailedFlag',
-				State AS 'State' ;
-		
-			LEAVE StoredProcedure;
-			
-		ELSE /*Data yang diinput valid*/
-		
-SET State = 3;
-
-			IF(pIsEdit = 0)	THEN /*Tambah baru*/
-				INSERT INTO master_user
-				(
-					UserName,
-					UserLogin,
-					UserTypeID,
-					UserPassword,
-					IsActive,
-					CreatedDate,
-					CreatedBy
-				)
-				VALUES (
-					pUserName,
-					pUserLogin,
-					pUserTypeID,
-					pPassword,
-					pIsActive,
-					NOW(),
-					pCurrentUser
-				);
-			
-SET State = 4;			               
-				SELECT
-					LAST_INSERT_ID()
-				INTO 
-					pID;
-					
-			ELSE
-			
-SET State = 5;
-				UPDATE
-					master_user
-				SET
-					UserName = pUserName,
-					UserLogin = pUserLogin,
-					UserTypeID = pUserTypeID,
-					UserPassword = pPassword,
-					IsActive = pIsActive,
-					ModifiedBy = pCurrentUser
-				WHERE
-					UserID = pID;
-		
-			END IF;
-	
-SET State = 6;
-
-				DELETE 
-				FROM 
-					master_role
-				WHERE
-					UserID = pID;
-					
-SET State = 7;
-			IF(pRoleValues <> "" ) THEN
-				SET @query = CONCAT("INSERT INTO master_role
-									(
-										UserID,
-										MenuID,
-										EditFlag,
-										DeleteFlag
-									)
-									VALUES", REPLACE(pRoleValues, '(0,', CONCAT('(', pID, ',')));
-									
-				PREPARE stmt FROM @query;
-				EXECUTE stmt;
-				DEALLOCATE PREPARE stmt;
-				
-			END IF;
-
-		END IF;
-
-SET State = 8;
-
-	IF(pIsEdit = 0) THEN
-		SELECT
-			pID AS 'ID',
-			'User Berhasil Ditambahkan' AS 'Message',
-			'' AS 'MessageDetail',
-			0 AS 'FailedFlag',
-			State AS 'State';
-	ELSE
-	
-SET State = 9;
-
-		SELECT
-			pID AS 'ID',
-			'User Berhasil Diubah' AS 'Message',
-			'' AS 'MessageDetail',
-			0 AS 'FailedFlag',
-			State AS 'State';
-	END IF;
-	
-    COMMIT;
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select category
-Created Date: 30 Desember 2017
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelCategory;
-
-DELIMITER $$
-CREATE PROCEDURE spSelCategory (
-	pWhere 			TEXT,
-	pOrder			TEXT,
-	pLimit_s		BIGINT,
-    pLimit_l		INT,
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelUser', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-SET @query = CONCAT("SELECT
-						COUNT(1) AS nRows
-					FROM
-						master_category MC
-					WHERE ", pWhere);
-						
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-SET State = 2;
-
-SET @query = CONCAT("SELECT
-						MC.CategoryID,
-						MC.CategoryCode,
-						MC.CategoryName
-					FROM
-						master_category MC
-					WHERE ", pWhere, 
-					" ORDER BY ", pOrder,
-					" LIMIT ", pLimit_s, ", ", pLimit_l);
-					
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select item details by itemCode
-Created Date: 9 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelCategoryByName;
-
-DELIMITER $$
-CREATE PROCEDURE spSelCategoryByName (
-	pCategoryName	VARCHAR(100),
-	pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelCategoryByName', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-	SELECT
-		MC.CategoryID,
-		MC.CategoryName
-	FROM
-		master_category MC
-	WHERE
-		TRIM(MC.CategoryName) = TRIM(pCategoryName);
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select Customer
-Created Date: 3 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelCustomer;
-
-DELIMITER $$
-CREATE PROCEDURE spSelCustomer (
-	pWhere 			TEXT,
-	pOrder			TEXT,
-	pLimit_s		BIGINT,
-    pLimit_l		INT,
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelCustomer', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-SET @query = CONCAT("SELECT
-						COUNT(1) AS nRows
-					FROM
-						master_customer MC
-					WHERE ", pWhere);
-						
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-SET State = 2;
-
-SET @query = CONCAT("SELECT
-						MC.CustomerID,
-                        MC.CustomerCode,
-                        MC.CustomerName,
-                        MC.Telephone,
-                        MC.Address,
-                        MC.City,
-                        MC.Remarks
-					FROM
-						master_customer MC
-					WHERE ", pWhere, 
-					" ORDER BY ", pOrder,
-					" LIMIT ", pLimit_s, ", ", pLimit_l);
-					
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select branch from dropdown list
-Created Date: 11 january 2018
-Modified Date: 
-===============================================================*/
-
-
-DROP PROCEDURE IF EXISTS spSelDDLBranch;
-DELIMITER $$
-CREATE PROCEDURE spSelDDLBranch (
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelDDLBranch', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-	SELECT 
-		MB.BranchID,
-		MB.BranchCode,
-		MB.BranchName
-	FROM 
-		master_branch MB
-	ORDER BY 
-		MB.BranchID;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select category from dropdown list
-Created Date: 3 january 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelDDLCategory;
-
-DELIMITER $$
-CREATE PROCEDURE spSelDDLCategory (
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelDDLCategory', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-	SELECT 
-		MC.CategoryID,
-		MC.CategoryCode,
-		MC.CategoryName
-	FROM 
-		master_category MC
-	ORDER BY 
-		MC.CategoryCode;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select customer from dropdown list
-Created Date: 9 january 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelDDLCustomer;
-
-DELIMITER $$
-CREATE PROCEDURE spSelDDLCustomer (
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelDDLCustomer', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-	SELECT 
-		MC.CustomerID,
-		MC.CustomerCode,
-		MC.CustomerName
-	FROM 
-		master_customer MC
-	ORDER BY 
-		MC.CustomerCode;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select supplier from dropdown list
-Created Date: 9 january 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelDDLSupplier;
-
-DELIMITER $$
-CREATE PROCEDURE spSelDDLSupplier (
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelDDLSupplier', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-	SELECT 
-		MS.SupplierID,
-		MS.SupplierCode,
-		MS.SupplierName
-	FROM 
-		master_supplier MS
-	ORDER BY 
-		MS.SupplierCode;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select category from dropdown list
-Created Date: 3 january 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelDDLUnit;
-
-DELIMITER $$
-CREATE PROCEDURE spSelDDLUnit (
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelDDLUnit', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-	SELECT 
-		MU.UnitID,
-		MU.UnitName
-	FROM 
-		master_unit MU
-	ORDER BY 
-		MU.UnitName;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select user type from dropdown list
-Created Date: 7 january 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelDDLUserType;
-
-DELIMITER $$
-CREATE PROCEDURE spSelDDLUserType (
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelDDLUserType', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-	SELECT 
-		UT.UserTypeID,
-        UT.UserTypeName
-	FROM 
-		master_usertype UT
-	ORDER BY 
-		UT.UserTypeID;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select item
-Created Date: 2 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelExportItem;
-
-DELIMITER $$
-CREATE PROCEDURE spSelExportItem (
-	pCategoryID		BIGINT,
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelExportItem', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-	SELECT
-		MI.ItemID,
-		MI.ItemCode,
-		MI.ItemName,
-		MC.CategoryID,
-		MC.CategoryName,
-		MI.BuyPrice,
-		MI.RetailPrice,
-		MI.Price1,
-		MI.Qty1,
-		MI.Price2,
-		MI.Qty2,
-		MI.Weight,
-		MI.MinimumStock,
-        MU.UnitName
-	FROM
-		master_item MI
-		JOIN master_category MC
-			ON MC.CategoryID = MI.CategoryID
-		JOIN master_unit MU
-			ON MU.UnitID = MI.UnitID
-	WHERE 
-		MC.CategoryID = pCategoryID;
-		
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select item
-Created Date: 2 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelItem;
-
-DELIMITER $$
-CREATE PROCEDURE spSelItem (
-	pWhere 			TEXT,
-	pOrder			TEXT,
-	pLimit_s		BIGINT,
-    pLimit_l		INT,
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelItem', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-SET @query = CONCAT("SELECT
-						COUNT(1) AS nRows
-					FROM
-						master_item MI
-                        JOIN master_category MC
-							ON MC.CategoryID = MI.CategoryID
-						JOIN master_unit MU
-							ON MU.UnitID = MI.UnitID
-					WHERE ", pWhere);
-						
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-SET State = 2;
-
-SET @query = CONCAT("SELECT
-						MI.ItemID,
-                        MI.ItemCode,
-						MI.ItemName,
-                        MC.CategoryID,
-						MC.CategoryName,
-                        MI.BuyPrice,
-						MI.RetailPrice,
-                        MI.Price1,
-                        MI.Qty1,
-                        MI.Price2,
-                        MI.Qty2,
-                        MI.Weight,
-                        MI.MinimumStock,
-                        MU.UnitID,
-                        MU.UnitName
-					FROM
-						master_item MI
-                        JOIN master_category MC
-							ON MC.CategoryID = MI.CategoryID
-						JOIN master_unit MU
-							ON MU.UnitID = MI.UnitID
-					WHERE ", pWhere, 
-					" ORDER BY ", pOrder,
-					" LIMIT ", pLimit_s, ", ", pLimit_l);
-					
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select sale details by SaleID
-Created Date: 12 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelItemUnitDetails;
-
-DELIMITER $$
-CREATE PROCEDURE spSelItemUnitDetails (
-	pItemID			BIGINT,
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelItemUnitDetails', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-	SELECT
-		ItemDetailsID,
-		ItemID,
-		ItemDetailsCode,
-		UnitID,
-		ConversionQuantity
-		/*BuyPrice,
-		RetailPrice,
-		Price1,
-		Qty1,
-		Price2,
-		Qty2,
-		Weight,
-		MinimumStock*/
-	FROM
-		master_itemdetails MID
-	WHERE
-		MID.ItemID = pItemID
-	ORDER BY
-		MID.ItemDetailsID;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Get all menu
-Created Date: 24 November 2017
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelMenu;
-
-DELIMITER $$
-CREATE PROCEDURE spSelMenu (
-	 pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-	
-    DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelMenu', pCurrentUser);
-	END;
-
-SET State = 1;
-
-	SELECT 
-		MG.GroupMenuID,
-		MG.GroupMenuName,
-		MM.MenuID,
-		MM.MenuName
-	FROM
-		master_groupmenu MG
-		JOIN master_menu MM 
-			ON MG.GroupMenuID = MM.GroupMenuID
-	GROUP BY
-		MM.MenuID
-	ORDER BY 
-		MG.OrderNo ASC , 
-		MM.OrderNo ASC;
-		
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for return all parameter
-Created Date: 16 November 2017
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelParameter;
-
-DELIMITER $$
-CREATE PROCEDURE spSelParameter (
-	pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-	
-    DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelParameter', pCurrentUser);
-	END;
-
-SET State = 1;
-
-	SELECT
-		ParameterName,
-		ParameterValue
-	FROM
-		master_parameter;
-		
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select supplier
-Created Date: 3 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelSupplier;
-
-DELIMITER $$
-CREATE PROCEDURE spSelSupplier (
-	pWhere 			TEXT,
-	pOrder			TEXT,
-	pLimit_s		BIGINT,
-    pLimit_l		INT,
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelSupplier', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-SET @query = CONCAT("SELECT
-						COUNT(1) AS nRows
-					FROM
-						master_supplier MS
-					WHERE ", pWhere);
-						
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-SET State = 2;
-
-SET @query = CONCAT("SELECT
-						MS.SupplierID,
-                        MS.SupplierCode,
-                        MS.SupplierName,
-                        MS.Telephone,
-                        MS.Address,
-                        MS.City,
-                        MS.Remarks
-					FROM
-						master_supplier MS
-					WHERE ", pWhere, 
-					" ORDER BY ", pOrder,
-					" LIMIT ", pLimit_s, ", ", pLimit_l);
-					
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select category
-Created Date: 30 Desember 2017
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelUnit;
-
-DELIMITER $$
-CREATE PROCEDURE spSelUnit (
-	pWhere 			TEXT,
-	pOrder			TEXT,
-	pLimit_s		BIGINT,
-    pLimit_l		INT,
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelUnit', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-SET @query = CONCAT("SELECT
-						COUNT(1) AS nRows
-					FROM
-						master_unit MU
-					WHERE ", pWhere);
-						
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-SET State = 2;
-
-SET @query = CONCAT("SELECT
-						MU.UnitID,
-						MU.UnitName
-					FROM
-						master_unit MU
-					WHERE ", pWhere, 
-					" ORDER BY ", pOrder,
-					" LIMIT ", pLimit_s, ", ", pLimit_l);
-					
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select item details by itemCode
-Created Date: 9 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelUnitByName;
-
-DELIMITER $$
-CREATE PROCEDURE spSelUnitByName (
-	pUnitName		VARCHAR(100),
-	pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelUnitByName', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-	SELECT
-		MU.UnitID,
-        MU.UnitName
-	FROM
-		master_unit MU
-	WHERE
-		TRIM(MU.UnitName) = TRIM(pUnitName);
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select user login
-Created Date: 12 November 2017
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelUser;
-
-DELIMITER $$
-CREATE PROCEDURE spSelUser (
-	pWhere 			TEXT,
-	pOrder			TEXT,
-	pLimit_s		BIGINT,
-    pLimit_l		INT,
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelUser', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-SET @query = CONCAT("SELECT
-						COUNT(1) AS nRows
-					FROM
-						master_user MU
-						JOIN master_usertype MUT
-							ON MU.UserTypeID = MUT.UserTypeID
-					WHERE ", pWhere);
-						
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-SET State = 2;
-
-SET @query = CONCAT("SELECT
-						MU.UserID,
-						MU.UserName,
-						MU.UserLogin,
-						CASE
-							WHEN MU.IsActive = 0
-							THEN 'Tidak Aktif'
-							ELSE 'Aktif'
-						END AS Status,
-						MU.IsActive,
-                        MUT.UserTypeID,
-						MUT.UserTypeName,
-                        IFNULL(GC.MenuID, '') MenuID,
-                        IFNULL(GC.EditFlag, '') EditFlag,
-                        IFNULL(GC.DeleteFlag, '') DeleteFlag
-					FROM
-						master_user MU
-						JOIN master_usertype MUT
-							ON MU.UserTypeID = MUT.UserTypeID
-						LEFT JOIN 
-                        (
-							SELECT
-								GC.UserID,
-                                GROUP_CONCAT(MenuID SEPARATOR ', ') MenuID,
-                                GROUP_CONCAT(EditFlag SEPARATOR ', ') EditFlag,
-                                GROUP_CONCAT(DeleteFlag SEPARATOR ', ') DeleteFlag
-							FROM
-								master_role GC
-							GROUP BY
-								GC.UserID
-                        )GC
-							ON MU.UserID = GC.UserID
-					WHERE ", pWhere, 
-					" ORDER BY ", pOrder,
-					" LIMIT ", pLimit_s, ", ", pLimit_l);
-					
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select user login
-Created Date: 1 Desember 2017to show user details
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelUserDetails;
-
-DELIMITER $$
-CREATE PROCEDURE spSelUserDetails (
-	pUserID 		BIGINT,
-	pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelUserDetails', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-	SELECT
-		MR.RoleID,
-		MR.UserID,
-		MR.MenuID,
-		MR.EditFlag,
-		MR.DeleteFlag,
-		MU.UserName,
-		MU.UserLogin,
-		MU.IsActive
-	FROM
-		master_user MU
-		LEFT JOIN master_role MR
-			ON MU.UserID = MR.UserID
-	WHERE
-		MU.UserID = pUserID;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select user login
-Created Date: 12 November 2017
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelUserLogin;
-
-DELIMITER $$
-CREATE PROCEDURE spSelUserLogin (
-	pUserLogin 		VARCHAR(100),
-	pPassword 		VARCHAR(255),
-	pIsActive		BIT,
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelUserLogin', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-	SELECT 
-		UserID,
-		UserName,
-		UserLogin,
-		UserPassword,
-		UserTypeID
-	FROM
-		master_user 
-	WHERE 
-		UserLogin = pUserLogin
-		AND IsActive = pIsActive
-		AND UserPassword = pPassword
-	LIMIT 1;
-		
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Get user menu permission
-Created Date: 24 November 2017
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelUserMenuNavigation;
-
-DELIMITER $$
-CREATE PROCEDURE spSelUserMenuNavigation (
-	pUserID			BIGINT,
-	pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-	
-    DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelUserMenuNavigation', pCurrentUser);
-	END;
-
-SET State = 1;
-
-	SELECT 
-		MG.GroupMenuID,
-		MG.GroupMenuName,
-		MM.MenuID,
-		MM.MenuName,
-		MM.Url,
-		MG.Icon
-	FROM
-		master_groupmenu MG
-		JOIN master_menu MM 
-			ON MG.GroupMenuID = MM.GroupMenuID
-		JOIN master_role MR 
-			ON MR.MenuID = MM.MenuID
-	WHERE
-		MR.UserID = pUserID
-	GROUP BY
-		MM.MenuID
-	ORDER BY 
-		MG.OrderNo ASC , 
-		MM.OrderNo ASC;
-		
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Get user menu permission
-Created Date: 16 November 2017
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelUserMenuPermission;
-
-DELIMITER $$
-CREATE PROCEDURE spSelUserMenuPermission (
-	pApplicationPath	VARCHAR(255),
-    pRequestedPath		VARCHAR(255),
-	pCurrentUser		VARCHAR(255)
-)
-StoredProcedure:BEGIN
-	
-    DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelUserMenuPermission', pCurrentUser);
-	END;
-
-SET State = 1;
-
-	SELECT
-		MR.EditFlag,
-		MR.DeleteFlag
-	FROM
-		master_role MR
-		JOIN master_menu MM
-			ON MM.MenuID = MR.MenuID
-	WHERE
-		CONCAT(pApplicationPath, MM.Url) = pRequestedPath
-		AND MR.UserID = pCurrentUser;
-		
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for delete category
-Created Date: 1 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spDelCategory;
-
-DELIMITER $$
-CREATE PROCEDURE spDelCategory (
-	pCategoryID		INT,
-	pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-	
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT,
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		ROLLBACK;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spDelCategory', pCurrentUser);
-        SELECT
-			pCategoryID AS 'ID',
-			'Terjadi kesalahan sistem!' AS 'Message',
-			@full_error AS 'MessageDetail',
-			1 AS 'FailedFlag',
-			State AS 'State' ;
-	END;
-	
-	START TRANSACTION;
-	
-SET State = 1;
-
-		DELETE FROM
-			master_category
-		WHERE
-			CategoryID = pCategoryID;
-
-    COMMIT;
-    
-SET State = 2;
-
-		 SELECT
-			pCategoryID AS 'ID',
-			'Kategori berhasil dihapus!' AS 'Message',
-			'' AS 'MessageDetail',
-			0 AS 'FailedFlag',
-			State AS 'State' ;
-            
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for delete Customer
-Created Date: 3 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spDelCustomer;
-
-DELIMITER $$
-CREATE PROCEDURE spDelCustomer (
-	pCustomerID		BIGINT,
-	pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-	
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT,
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		ROLLBACK;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spDelCustomer', pCurrentUser);
-        SELECT
-			pCustomerID AS 'ID',
-			'Terjadi kesalahan sistem!' AS 'Message',
-			@full_error AS 'MessageDetail',
-			1 AS 'FailedFlag',
-			State AS 'State' ;
-	END;
-	
-	START TRANSACTION;
-	
-SET State = 1;
-
-		DELETE FROM
-			master_customer
-		WHERE
-			CustomerID = pCustomerID;
-
-    COMMIT;
-    
-SET State = 2;
-
-		SELECT
-			pCustomerID AS 'ID',
-			'Pelanggan berhasil dihapus!' AS 'Message',
-			'' AS 'MessageDetail',
-			0 AS 'FailedFlag',
-			State AS 'State' ;
-            
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for delete item
-Created Date: 2 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spDelItem;
-
-DELIMITER $$
-CREATE PROCEDURE spDelItem (
-	pItemID		BIGINT,
-	pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-	
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT,
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		ROLLBACK;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spDelItem', pCurrentUser);
-        SELECT
-			pItemID AS 'ID',
-			'Terjadi kesalahan sistem!' AS 'Message',
-			@full_error AS 'MessageDetail',
-			1 AS 'FailedFlag',
-			State AS 'State' ;
-	END;
-	
-	START TRANSACTION;
-	
-SET State = 1;
-
-		DELETE FROM
-			master_item
-		WHERE
-			ItemID = pItemID;
-
-    COMMIT;
-    
-SET State = 2;
-
-		SELECT
-			pItemID AS 'ID',
-			'Barang berhasil dihapus!' AS 'Message',
-			'' AS 'MessageDetail',
-			0 AS 'FailedFlag',
-			State AS 'State' ;
-            
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for delete supplier
-Created Date: 3 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spDelSupplier;
-
-DELIMITER $$
-CREATE PROCEDURE spDelSupplier (
-	pSupplierID		BIGINT,
-	pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-	
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT,
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		ROLLBACK;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spDelSupplier', pCurrentUser);
-        SELECT
-			pSupplierID AS 'ID',
-			'Terjadi kesalahan sistem!' AS 'Message',
-			@full_error AS 'MessageDetail',
-			1 AS 'FailedFlag',
-			State AS 'State' ;
-	END;
-	
-	START TRANSACTION;
-	
-SET State = 1;
-
-		DELETE FROM
-			master_supplier
-		WHERE
-			SupplierID = pSupplierID;
-
-    COMMIT;
-    
-SET State = 2;
-
-		SELECT
-			pSupplierID AS 'ID',
-			'Supplier berhasil dihapus!' AS 'Message',
-			'' AS 'MessageDetail',
-			0 AS 'FailedFlag',
-			State AS 'State' ;
-            
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for delete category
-Created Date: 1 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spDelUnit;
-
-DELIMITER $$
-CREATE PROCEDURE spDelUnit (
-	pUnitID			INT,
-	pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-	
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT,
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		ROLLBACK;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spDelUnit', pCurrentUser);
-        SELECT
-			pUnitID AS 'ID',
-			'Terjadi kesalahan sistem!' AS 'Message',
-			@full_error AS 'MessageDetail',
-			1 AS 'FailedFlag',
-			State AS 'State' ;
-	END;
-	
-	START TRANSACTION;
-	
-SET State = 1;
-
-		DELETE FROM
-			master_unit
-		WHERE
-			UnitID = pUnitID;
-
-    COMMIT;
-    
-SET State = 2;
-
-		 SELECT
-			pUnitID AS 'ID',
-			'Satuan berhasil dihapus!' AS 'Message',
-			'' AS 'MessageDetail',
-			0 AS 'FailedFlag',
-			State AS 'State' ;
-            
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for delete user
-Created Date: 27 November 2017
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spDelUser;
-
-DELIMITER $$
-CREATE PROCEDURE spDelUser (
-	pUserID			BIGINT,
-	pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-	
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT,
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		ROLLBACK;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spDelUser', pCurrentUser);
-        SELECT
-			pUserID AS 'ID',
-			'Terjadi kesalahan sistem!' AS 'Message',
-			@full_error AS 'MessageDetail',
-			1 AS 'FailedFlag',
-			State AS 'State' ;
-	END;
-	
-	START TRANSACTION;
-	
-SET State = 1;
-
-		DELETE FROM
-			master_role
-		WHERE
-			UserID = pUserID;
-			
-SET State = 2;
-
-		DELETE FROM
-			master_user
-		WHERE
-			UserID = pUserID;
-
-    COMMIT;
-    
-SET State = 3;
-
-		SELECT
-			pUserID AS 'ID',
-			'User berhasil dihapus!' AS 'Message',
-			'' AS 'MessageDetail',
-			0 AS 'FailedFlag',
-			State AS 'State' ;
 END;
 $$
 DELIMITER ;
