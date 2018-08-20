@@ -60,8 +60,7 @@
 			<div class="row text-center ">
 				<div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-10 col-xs-offset-1">
 					<br />
-					<br />
-					<img src="assets/img/logo.png" width=125>
+					<!--<img src="assets/img/logo.png" width=125>-->
 					<br />
 					<br />
 				</div>
