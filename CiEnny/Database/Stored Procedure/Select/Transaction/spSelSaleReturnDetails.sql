@@ -39,39 +39,42 @@ SET State = 1;
         TSRD.Quantity,
         TSRD.BuyPrice,
         TSRD.SalePrice,
-        (IFNULL(TS.Quantity, 0) - IFNULL(SR.Quantity, 0) + IFNULL(TSRD.Quantity, 0)) Maksimum
+        (IFNULL(TS.Quantity, 0) - IFNULL(SR.Quantity, 0) + IFNULL(TSRD.Quantity, 0)) Maksimum,
+        MU.UnitName
 	FROM
 		transaction_salereturn TSR
 		JOIN transaction_salereturndetails TSRD
 			ON TSRD.SaleReturnID = TSR.SaleReturnID
 		JOIN master_item MI
 			ON MI.ItemID = TSRD.ItemID
+		JOIN master_unit MU
+			ON MU.UnitID = MI.UnitID
         LEFT JOIN
 		(
 			SELECT
 				TS.SaleID,
 				SD.ItemID,
-				SD.BranchID,
-				SUM(SD.Quantity) Quantity
+				SD.SaleDetailsID,
+				SUM(SD.Quantity * IFNULL(MID.ConversionQuantity, 1)) Quantity
 			FROM
 				transaction_sale TS
 				JOIN transaction_saledetails SD
 					ON TS.SaleID = SD.SaleID
+				LEFT JOIN master_itemdetails MID
+					ON MID.ItemDetailsID = SD.ItemDetailsID
 			GROUP BY
 				TS.SaleID,
 				SD.ItemID,
-				SD.BranchID
+				SD.SaleDetailsID
 		)TS
 			ON TSR.SaleID = TS.SaleID
 			AND MI.ItemID = TS.ItemID
-			AND TS.BranchID = TSRD.BranchID
-
+			AND TSRD.SaleDetailsID = TS.SaleDetailsID
 		LEFT JOIN
 		(
 			SELECT
 				SR.SaleID,
 				SRD.ItemID,
-				SRD.BranchID,
 				SRD.SaleDetailsID,
 				SUM(SRD.Quantity) Quantity
 			FROM
@@ -81,12 +84,10 @@ SET State = 1;
 			GROUP BY
 				SR.SaleID,
 				SRD.ItemID,
-				SRD.BranchID,
 				SRD.SaleDetailsID
 		)SR
 			ON TSR.SaleID = SR.SaleID
 			AND MI.ItemID = SR.ItemID
-			AND SR.BranchID = TSRD.BranchID
 			AND TSRD.SaleDetailsID = SR.SaleDetailsID
 
 	WHERE

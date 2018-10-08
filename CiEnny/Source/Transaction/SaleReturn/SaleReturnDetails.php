@@ -21,26 +21,29 @@
 		}
 		
 		$return_arr = array();
+		$tabindex = 8;
 		while ($row = mysqli_fetch_array($result)) {
 			$row_array = array();
 			//data yang dikirim ke table
 			$row_array[] = $row['SaleReturnDetailsID'];
 			$row_array[] = $row['ItemID'];
 			$row_array[] = $row['BranchID'];
-			$row_array[] = "<input type='checkbox' name='chkSaleDetails[]' class='chkSaleDetails' value=" . $row['SaleReturnDetailsID'] . " onclick='Calculate();' />";
+			$row_array[] = "<input type='checkbox' name='chkSaleDetails[]' class='chkSaleDetails' value=" . $row['SaleReturnDetailsID'] . " onclick='Calculate();' tabindex=".$tabindex." />";
 			$row_array[] = "<div id='toggle-branch-" . $row['SaleReturnDetailsID'] . "' class='div-center toggle-modern' onclick='updateBranch(this.id)' ></div>
 				<input id='hdnBranchID". $row['SaleReturnDetailsID'] ."' name='hdnBranchID". $row['SaleReturnDetailsID'] ."' type='hidden' value=".$row['BranchID']." />
 				<input id='hdnItemID". $row['SaleReturnDetailsID'] ."' name='hdnItemID". $row['SaleReturnDetailsID'] ."' type='hidden' value=".$row['ItemID']." />
 				<input id='hdnBuyPrice". $row['SaleReturnDetailsID'] ."' name='hdnBuyPrice". $row['SaleReturnDetailsID'] ."' type='hidden' value=".$row['BuyPrice']." />
 				<input id='hdnSalePrice". $row['SaleReturnDetailsID'] ."' name='hdnSalePrice". $row['SaleReturnDetailsID'] ."' type='hidden' value=".$row['SalePrice']." />
-				<input id='hdnSaleDetailsID". $row['SaleDetailsID'] ."' name='hdnSaleDetailsID". $row['SaleDetailsID'] ."' type='hidden' value=".$row['SaleDetailsID']." />";
+				<input id='hdnSaleDetailsID". $row['SaleReturnDetailsID'] ."' name='hdnSaleDetailsID". $row['SaleReturnDetailsID'] ."' type='hidden' value=".$row['SaleDetailsID']." />";
 			$row_array[] = $row['ItemCode'];
 			$row_array[] = $row['ItemName'];
-			$row_array[] = '<input id="txtQty'. $row['SaleReturnDetailsID'] .'" name="txtQty'. $row['SaleReturnDetailsID'] .'" type="number" class="form-control-custom" value='.$row['Quantity'].' max='.$row['Maksimum'].' min=1 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 1" onpaste="return false;" onchange="validateQTY2(this)" required />';
+			$row_array[] = '<input id="txtQty'. $row['SaleReturnDetailsID'] .'" name="txtQty'. $row['SaleReturnDetailsID'] .'" type="number" class="form-control-custom text-right txtQTY" style="width: 100%;margin: 0;border: 0;padding-right: 22px;" value='.$row['Quantity'].' max='.$row['Maksimum'].' min=1 onfocus="this.select();" onchange="validateQTY2(this)" required tabindex='.($tabindex+1).' />';
+			$row_array[] = $row['UnitName'];
 			$row_array[] = "<label style='font-weight:normal !important;'>".number_format($row['SalePrice'],0,".",",")."</label>";
 			$row_array[] = 0;
 			$row_array[] = $row['BuyPrice'];
 			$row_array[] = $row['SaleID'];
+			$tabindex = $tabindex + 2;
 			array_push($return_arr, $row_array);
 		}
 
@@ -49,7 +52,8 @@
 
 		$json_data = array(
 						"FailedFlag" => $FailedFlag,
-						"data"		=> $return_arr
+						"data"		=> $return_arr,
+						"tabindex" => $tabindex
 					);
 		
 		echo json_encode($json_data);

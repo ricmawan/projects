@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-		<title>Main App</title>
+		<title>POS Admin</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		
@@ -18,6 +18,7 @@
 		<link href="assets/css/jquery-ui.theme.css" rel="stylesheet" />
 		<link href="assets/js/morris/morris-0.4.3.min.css" rel="stylesheet" />
 		<link href="assets/css/custom.css" rel="stylesheet" />
+		<link href="assets/css/bootstrap-float-label.min.css" rel="stylesheet" />
 		<link href="assets/css/dataTables.bootstrap.css" rel="stylesheet" />
 		<link href="assets/css/jquery.dataTables.css" rel="stylesheet" />
 		<link href="assets/css/keyTable.bootstrap.css" rel="stylesheet" />
@@ -58,7 +59,7 @@
 				</div>
 				<span id="Clock" style="color: white; padding: 5px 20px 0px 20px; float: left; font-size: 16px;"></span>
 				<div style="color: white; padding: 5px 20px 0px 50px; float: right; font-size: 16px;"> 
-					 Selamat Datang, <a href="#" style="color: white;font-size: 16px;" onclick="UpdatePassword();"><?php echo $_SESSION['Nama']; ?>!</a> &nbsp;&nbsp;&nbsp;<a href="#" class="menu" link="./Logout.php"><img src="./assets/img/logout.png" width="20px" border="0" acronym title="Logout" /></a>
+					 Selamat Datang, <a href="#" style="color: white;font-size: 16px;" onclick="UpdatePassword();"><?php echo $_SESSION['Nama']; ?>!</a> &nbsp;&nbsp;&nbsp;<a href="#" class="menu" link="./Logout.php" ><img src="./assets/img/logout.png" width="20px" border="0" acronym title="Logout" /></a>
 				</div>
 			</nav>   
 			<!-- /. NAV TOP  -->
@@ -69,10 +70,10 @@
 							<!--<img src="assets/img/find_user.png" class="user-image img-responsive"/>-->&nbsp;
 						</li>
 						<li>
-							<a href="#" onclick="Reload();"><i class="fa fa-refresh fa-3x"></i> Reload</a>
+							<a href="#" onclick="Reload();"><i class="fa fa-refresh fa-2x"></i> Reload</a>
 						</li>
 						<li>
-							<a class='menu active-menu' href='#' id='Menu1' link='./Home.php'><i class='fa fa-home fa-3x'></i> Home</a>
+							<a class='menu active-menu' href='#' id='Menu1' link='./Home.php'><i class='fa fa-home fa-2x'></i> Home</a>
 						</li>
 						<?php
 							$sql = "CALL spSelUserMenuNavigation(".$_SESSION['UserID'].", '".$_SESSION['UserLogin']."')";
@@ -122,7 +123,7 @@
 			
 			<div id="page-wrapper">
 				<div id="page-inner" style="overflow-x:hidden;overflow-y:hidden;">
-					<img src="./assets/img/logo.png" style="width:100%;"/>
+					<!--<img src="./assets/img/logo.png" style="width:40%;margin: 40px auto;display:block;"/>-->
 				</div>
 			</div>
 		</div>
@@ -132,8 +133,8 @@
 		<div id="save-confirm" title="Konfirmasi" style="display: none;">
 			<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Apakah anda yakin data yang diinput sudah benar?</p>
 		</div>
-		<div id="finish-confirm" title="Konfirmasi" style="display: none;">
-			<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Apakah anda yakin transaksi sudah selesai?</p>
+		<div id="print-confirm" title="Konfirmasi" style="display: none;">
+			<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Apakah anda ingin mencetak laporan harian?</p>
 		</div>
 		<div id="update-password" title="Ganti Password" style="display: none;">
 			<form class="col-md-12" id="UpdatePasswordForm" method="POST" action="" >
@@ -192,6 +193,9 @@
 		<script src="assets/js/dataTables.bootstrap.js"></script>
 		<script src="assets/js/dataTables.keyTable.js"></script>
 		<script src="assets/js/toggles.js"></script>
+		<script src="assets/js/mousetrap.min.js"></script>
+		<script src="assets/js/jquery.simulate.js"></script>
+		<script src="assets/js/Chart.js"></script>
 		<div id="loading"></div>
 		<iframe id='excelDownload' src='' style='display:none'></iframe>
 		<script type="text/javascript">
@@ -221,6 +225,28 @@
 					$("#wrapper").css ({
 						"width" : "calc(100% - 5px)"
 					});
+				});
+
+				$("#loading").show();
+				$.ajax({
+					url: "./Notification/",
+					type: "POST",
+					data: { },
+					dataType: "html",
+					success: function(data) {
+						$("#loading").hide();
+						$("#page-inner").html(data);
+					},
+					error: function(data) {
+						$("#loading").hide();
+						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+						LogEvent(errorMessage, "/Home.php");
+						Lobibox.alert("error",
+						{
+							msg: errorMessage,
+							width: 480
+						});
+					}
 				});
 			});
 		</script>

@@ -16,16 +16,19 @@
 					5 => "MI.ItemCode",
 					6 => "MI.ItemName",
 					7 => "SMD.Quantity",
+					8 => "MU.Unitname"
 				);
 
 	$where = " 1=1 ";
-	$order_by = "SM.StockMutationID";
+	$order_by = "SM.StockMutationID DESC";
 	$limit_s = $requestData['start'];
 	$limit_l = $requestData['length'];
 	
 	//Handles Sort querystring sent from Bootgrid
-	$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
-	$order_by .= ", SM.StockMutationID ASC";
+	if(ISSET($requestData['order'])) {
+		$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
+		$order_by .= ", SM.StockMutationID ASC";
+	}
 	//Handles search querystring sent from Bootgrid
 	if (!empty($requestData['search']['value']))
 	{
@@ -34,6 +37,8 @@
 		$where .= " OR DB.BranchName LIKE '%".$search."%'";
 		$where .= " OR MI.ItemName LIKE '%".$search."%'";
 		$where .= " OR MI.ItemCode LIKE '%".$search."%'";
+		$where .= " OR MID.ItemDetailsCode LIKE '%".$search."%'";
+		$where .= " OR MU.UnitName LIKE '%".$search."%'";
 		$where .= " OR DATE_FORMAT(SM.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
 		$where .= " OR SMD.Quantity LIKE '%".$search."%' )";
 	}
@@ -64,12 +69,14 @@
 		$row_array[] = $row['ItemCode'];
 		$row_array[] = $row['ItemName'];
 		$row_array[] = $row['Quantity'];
+		$row_array[] = $row['UnitName'];
 		$row_array[] = $row['StockMutationID'];
 		$row_array[] = $row['StockMutationDetailsID'];
 		$row_array[] = $row['PlainTransactionDate'];
 		$row_array[] = $row['ItemID'];
 		$row_array[] = $row['SourceID'];
 		$row_array[] = $row['DestinationID'];
+		$row_array[] = $row['UnitID'];
 		array_push($return_arr, $row_array);
 	}
 	

@@ -136,15 +136,11 @@
 								$("#btnSaveSupplier").focus();
 							}
 						});
+						setTimeout(function() {
+							$("#txtSupplierCode").focus();
+						}, 0);
 					},
-					show: {
-						effect: "fade",
-						duration: 500
-					},
-					hide: {
-						effect: "fade",
-						duration: 500
-					},
+					
 					close: function() {
 						$(this).dialog("destroy");
 						$("#divModal").hide();
@@ -250,6 +246,7 @@
 					{
 						text: "Batal",
 						id: "btnCancelAddSupplier",
+						tabindex: 12,
 						click: function() {
 							$(this).dialog("destroy");
 							$("#divModal").hide();
@@ -302,7 +299,28 @@
 				});
 			}
 
+			var waitForFinalEvent = (function () {
+		        var timers = {};
+		        return function (callback, ms, uniqueId) {
+		            if (!uniqueId) {
+		                uniqueId = "Don't call this twice without a uniqueId";
+		            }
+		            if (timers[uniqueId]) {
+		                clearTimeout(timers[uniqueId]);
+		            }
+		            timers[uniqueId] = setTimeout(callback, ms);
+		        };
+		    })();
+			
 			$(document).ready(function() {
+				$( window ).resize(function() {
+					waitForFinalEvent(function () {
+		               setTimeout(function() {
+							table.columns.adjust().draw();
+						}, 0);
+		            }, 500, "resizeWindow");
+				});
+				
 				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
 				    $(this).blur();
 				});
@@ -334,7 +352,7 @@
 							"scrollY": "330px",
 							"rowId": "SupplierID",
 							"scrollCollapse": true,
-							"order": [2, "asc"],
+							"order": [],
 							"columns": [
 								{ "width": "20px", "orderable": false, className: "dt-head-center dt-body-center" },
 								{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },

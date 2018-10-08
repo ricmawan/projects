@@ -1,3 +1,10 @@
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for insert the customer
+Created Date: 12 November 2017
+Modified Date: 
+===============================================================*/
+
 DROP PROCEDURE IF EXISTS spInsCustomer;
 
 DELIMITER $$
@@ -51,16 +58,44 @@ SET State = 1;
 		FROM 
 			master_customer
 		WHERE
-			(TRIM(CustomerName) = TRIM(pCustomerName)
-            OR TRIM(CustomerCode) = TRIM(pCustomerCode))
+			TRIM(CustomerCode) = TRIM(pCustomerCode)
 			AND CustomerID <> pID
 		LIMIT 1;
 			
 		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
 SET State = 2;
+
 			SELECT
 				pID AS 'ID',
-				'Pelanggan sudah ada' AS 'Message',
+				CONCAT('Kode Pelanggan ', pCustomerCode, ' sudah ada') AS 'Message',
+				'' AS 'MessageDetail',
+				1 AS 'FailedFlag',
+				State AS 'State' ;
+		
+			LEAVE StoredProcedure;
+			
+		END IF;
+        
+SET State = 1;
+
+		SELECT 
+			0
+		INTO
+			PassValidate
+		FROM 
+			master_customer
+		WHERE
+			(TRIM(CustomerName) = TRIM(pCustomerName)
+            AND TRIM(Address) = TRIM(pAddress))
+			AND CustomerID <> pID
+		LIMIT 1;
+			
+		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
+SET State = 3;
+
+			SELECT
+				pID AS 'ID',
+				CONCAT('Nama Pelanggan ', pCustomerName, ' dengan alamat ', pAddress, ' sudah ada') AS 'Message',
 				'' AS 'MessageDetail',
 				1 AS 'FailedFlag',
 				State AS 'State' ;
@@ -68,7 +103,8 @@ SET State = 2;
 			LEAVE StoredProcedure;
 			
 		ELSE /*Data yang diinput valid*/
-SET State = 3;
+SET State = 4;
+
 			IF(pIsEdit = 0)	THEN /*Tambah baru*/
 				INSERT INTO master_customer
 				(
@@ -92,7 +128,15 @@ SET State = 3;
 					pCurrentUser
 				);
 			
-SET State = 4;			               
+SET State = 5;			               
+
+				SELECT
+					LAST_INSERT_ID()
+				INTO 
+					pID;
+
+SET State = 6;
+
 				SELECT
 					pID AS 'ID',
 					'Pelanggan Berhasil Ditambahkan' AS 'Message',
@@ -100,7 +144,8 @@ SET State = 4;
 					0 AS 'FailedFlag',
 					State AS 'State';
 			ELSE
-SET State = 5;
+SET State = 7;
+
 				UPDATE
 					master_customer
 				SET
@@ -114,7 +159,8 @@ SET State = 5;
 				WHERE
 					CustomerID = pID;
 
-SET State = 6;
+SET State = 8;
+
 				SELECT
 					pID AS 'ID',
 					'Pelanggan Berhasil Diubah' AS 'Message',

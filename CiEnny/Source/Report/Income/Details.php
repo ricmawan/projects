@@ -21,6 +21,7 @@
 		$table .= "<td>Kode Barang</td>";
 		$table .= "<td>Nama Barang</td>";
 		$table .= "<td>Quantity</td>";
+		$table .= "<td>Satuan</td>";
 		$table .= "<td>Harga Beli</td>";
 		$table .= "<td>Total Beli</td>";
 		$table .= "<td>Harga Jual</td>";
@@ -32,7 +33,8 @@
 			$table .= "<tr><td>";
 			$table .= $row['ItemCode'] ."</td><td>";
 			$table .= $row['ItemName'] ."</td><td align='right'>";
-			$table .= $row['Quantity'] ."</td><td align='right'>";
+			$table .= $row['Quantity'] ."</td><td>";
+			$table .= $row['UnitName'] ."</td><td align='right'>";
 			$table .= number_format($row['BuyPrice'],0,".",",") ."</td><td align='right'>";
 			$table .= number_format($row['TotalBuy'],0,".",",") ."</td><td align='right'>";
 			$table .= number_format($row['SalePrice'],0,".",",") ."</td><td align='right'>";

@@ -56,8 +56,7 @@ SET State = 1;
 		FROM 
 			master_user 
 		WHERE
-			(UserName = pUserName
-			OR UserLogin = pUserLogin)
+			UserLogin = pUserLogin
 			AND UserID <> pID
 		LIMIT 1;
 			
@@ -66,7 +65,7 @@ SET State = 2;
 		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
 			SELECT
 				pID AS 'ID',
-				'Username sudah dipakai' AS 'Message',
+				CONCAT('Username ', pUserLogin, ' sudah dipakai') AS 'Message',
 				'' AS 'MessageDetail',
 				1 AS 'FailedFlag',
 				State AS 'State' ;

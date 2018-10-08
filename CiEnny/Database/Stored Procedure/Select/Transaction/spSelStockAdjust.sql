@@ -40,6 +40,10 @@ SET @query = CONCAT("SELECT
 							ON MB.BranchID = SAD.BranchID
 						JOIN master_item MI
 							ON MI.ItemID = SAD.ItemID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = SAD.ItemDetailsID
+						LEFT JOIN master_unit MU
+							ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
 					WHERE ", pWhere);
 						
 	PREPARE stmt FROM @query;
@@ -56,10 +60,12 @@ SET @query = CONCAT("SELECT
                         MB.BranchID,
                         CONCAT(MB.BranchCode, ' - ', MB.BranchName) BranchName,
                        	MI.ItemID,
-                        MI.ItemCode,
+                        IFNULL(MID.ItemDetailsCode, MI.ItemCode) ItemCode,
                         MI.ItemName,
-                        SAD.Quantity,
-                        SAD.AdjustedQuantity
+                        MU.UnitID,
+                        MU.UnitName,
+                        ROUND(SAD.Quantity, 2) Quantity,
+                        ROUND(SAD.AdjustedQuantity, 2) AdjustedQuantity
 					FROM
 						transaction_stockadjust SA
 						JOIN transaction_stockadjustdetails SAD
@@ -68,6 +74,10 @@ SET @query = CONCAT("SELECT
 							ON MB.BranchID = SAD.BranchID
 						JOIN master_item MI
 							ON MI.ItemID = SAD.ItemID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = SAD.ItemDetailsID
+						LEFT JOIN master_unit MU
+							ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
 					WHERE ", pWhere, 
 					" ORDER BY ", pOrder,
 					" LIMIT ", pLimit_s, ", ", pLimit_l);

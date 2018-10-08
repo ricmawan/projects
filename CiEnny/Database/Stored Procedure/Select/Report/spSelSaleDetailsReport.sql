@@ -35,33 +35,78 @@ SET State = 1;
 			MI.ItemCode,
 	        MI.ItemName,
 	        SD.Quantity,
-	        SD.SalePrice,
+            MU.UnitName,
+	        SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) SalePrice,
 			SD.Discount,
-			((SD.Quantity * SD.SalePrice) - SD.Discount) SubTotal
+			SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount) SubTotal
 		FROM
 			transaction_saledetails SD
 	        JOIN master_item MI
 				ON MI.ItemID = SD.ItemID
+			LEFT JOIN master_itemdetails MID
+				ON MID.ItemDetailsID = SD.ItemDetailsID
+			LEFT JOIN master_unit MU
+				ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
 		WHERE
 			SD.SaleID = pSaleID
-            AND SD.BranchID = pBranchID
+            AND CASE
+					WHEN pBranchID = 0
+					THEN SD.BranchID
+					ELSE pBranchID
+				END = SD.BranchID
 		ORDER BY
 			SD.SaleDetailsID;
-	ELSE
+	ELSEIF(pTransactionType = 'Pemesanan')
+    THEN
+		SELECT
+			MI.ItemCode,
+	        MI.ItemName,
+	        BD.Quantity,
+            MU.UnitName,
+	        BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) SalePrice,
+			BD.Discount,
+			BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount) SubTotal
+		FROM
+			transaction_bookingdetails BD
+	        JOIN master_item MI
+				ON MI.ItemID = BD.ItemID
+			LEFT JOIN master_itemdetails MID
+				ON MID.ItemDetailsID = BD.ItemDetailsID
+			LEFT JOIN master_unit MU
+				ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
+		WHERE
+			BD.BookingID = pSaleID
+            AND CASE
+					WHEN pBranchID = 0
+					THEN BD.BranchID
+					ELSE pBranchID
+				END = BD.BranchID
+		ORDER BY
+			BD.BookingDetailsID;
+    ELSE
 		SELECT
 			MI.ItemCode,
 	        MI.ItemName,
 	        SRD.Quantity,
+            MU.UnitName,
 	        SRD.SalePrice,
             0 Discount,
-			(SRD.Quantity * SRD.SalePrice) SubTotal
+			-(SRD.Quantity * SRD.SalePrice) SubTotal
 		FROM
 			transaction_salereturndetails SRD
 	        JOIN master_item MI
 				ON MI.ItemID = SRD.ItemID
+			LEFT JOIN master_itemdetails MID
+				ON MID.ItemDetailsID = SRD.ItemDetailsID
+			LEFT JOIN master_unit MU
+				ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
 		WHERE
 			SRD.SaleReturnID = pSaleID
-            AND SRD.BranchID = pBranchID
+            AND CASE
+					WHEN pBranchID = 0
+					THEN SRD.BranchID
+					ELSE pBranchID
+				END = SRD.BranchID
 		ORDER BY
 			SRD.SaleReturnDetailsID;
             

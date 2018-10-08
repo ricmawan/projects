@@ -17,7 +17,7 @@
 							<div class="col-md-1 labelColumn">
 								Pelanggan:
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-2">
 								<div class="ui-widget" style="width: 100%;">
 									<select id="ddlCustomer" name="ddlCustomer" tabindex=7 class="form-control-custom" placeholder="Pilih Pelanggan" >
 										<?php
@@ -38,7 +38,7 @@
 							<div class="col-md-1 labelColumn">
 								Tanggal :
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-2">
 								<div class="ui-widget" style="width: 100%;">
 									<input id="txtFromDate" name="txtFromDate" type="text" class="form-control-custom" style="background-color: #FFF;cursor: text;" placeholder="Dari Tanggal" readonly />
 								</div>
@@ -46,22 +46,17 @@
 							<div style="float:left;" class="labelColumn">
 								-
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-2">
 								<div class="ui-widget" style="width: 100%;">
 									<input id="txtToDate" name="txtToDate" type="text" class="form-control-custom" style="background-color: #FFF;cursor: text;" placeholder="Sampai Tanggal" readonly />
 								</div>
 							</div>
-						</div>
-						<br />
-						<div class="row">
-							<div class="col-md-12">
-								<button class="btn btn-info" id="btnView" onclick="Preview();" ><i class="fa fa-list"></i> Lihat</button>&nbsp;&nbsp;
-								<button class="btn btn-success" id="btnExcel" onclick="ExportExcel();" ><i class="fa fa-file-excel-o "></i> Eksport Excel</button>&nbsp;&nbsp;
+							<div class="col-md-3">
+								<button class="btn btn-info" id="btnView" onclick="Preview();" style="padding-top: 1px;padding-bottom: 1px;" ><i class="fa fa-list"></i> Lihat</button>&nbsp;&nbsp;
+								<button class="btn btn-success" id="btnExcel" onclick="ExportExcel();" style="padding-top: 1px;padding-bottom: 1px;"" ><i class="fa fa-file-excel-o "></i> Eksport Excel</button>&nbsp;&nbsp;
 							</div>
 						</div>
-						<br />
-						<!--Grand Total: <span class="grandtotal"></span>
-						<br />-->
+						<hr style="margin: 10px 0;" />
 						<div class="table-responsive" id="dvTable" style="display: none;">
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
@@ -71,10 +66,10 @@
 										<th>Total</th>
 									</tr>
 								</thead>
+								<tfoot id="tfootTable">
+								</tfoot>
 							</table>
 						</div>
-						<!--<br />
-						Grand Total: <span class="grandtotal"></span>-->
 					</div>
 				</div>
 			</div>
@@ -137,7 +132,18 @@
 					FirstPass = 0;
 					$("#loading").show();
 					$("#dvTable").show();
-					table.ajax.reload();
+					table.ajax.reload(function(json) {
+						$("#tfootTable").html("<tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Sub Total:</td><td>" + json.SubTotal + "</td></tr><tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Grand Total:</td><td>" + json.GrandTotal + "</td></tr>");
+						$("#tfootTable").find("td").css({
+							"border" : "0",
+							"font-size" : "14px",
+							"font-weight" : "bold",
+							"padding-right" : "10px",
+							"padding-top" : "5px",
+							"padding-bottom" : "5px",
+							"text-align" : "right"
+						});
+					});
 					table.columns.adjust();
 					$("#loading").hide();
 				}
@@ -197,6 +203,10 @@
 			};
 
 			$(document).ready(function () {
+				$( window ).resize(function() {
+					table.columns.adjust().draw();
+				});
+				
 				$("#ddlCustomer").combobox();
 				$("#ddlCustomer").next().find("input").click(function() {
 					$(this).val("");
@@ -206,6 +216,25 @@
 					dateFormat: 'dd-mm-yy',
 					maxDate : "+0D"
 				});
+
+				$.fn.dataTable.ext.errMode = function(settings, techNote, message) { 
+					$("#loading").hide();
+					var errorMessage = "DataTables Error : " + techNote + " (" + message + ")";
+					var counterError = 0;
+					LogEvent(errorMessage, "/Transaction/CustomerPurchase/index.php");
+					Lobibox.alert("error",
+					{
+						msg: "Terjadi kesalahan. Memuat ulang halaman.",
+						width: 480,
+						//delay: 2000,
+						beforeClose: function() {
+							if(counterError == 0) {
+								//location.reload();
+								counterError = 1;
+							}
+						}
+					});
+				};
 
 				table = $("#grid-data").DataTable({
 							"keys": true,
@@ -243,7 +272,20 @@
 									"last": "»",
 									"first": "«"
 								}
-							}
+							},
+							"drawCallback": function( settings ) {
+						        var json = table.ajax.json();
+						        $("#tfootTable").html("<tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Sub Total:</td><td>" + json.SubTotal + "</td></tr><tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Grand Total:</td><td>" + json.GrandTotal + "</td></tr>");
+								$("#tfootTable").find("td").css({
+									"border" : "0",
+									"font-size" : "14px",
+									"font-weight" : "bold",
+									"padding-right" : "10px",
+									"padding-top" : "5px",
+									"padding-bottom" : "5px",
+									"text-align" : "right"
+								});
+						    }
 						});
 			});
 

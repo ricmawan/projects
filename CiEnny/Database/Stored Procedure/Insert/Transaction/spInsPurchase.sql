@@ -9,11 +9,14 @@ CREATE PROCEDURE spInsPurchase (
 	pPurchaseDetailsID	BIGINT,
     pBranchID			INT,
     pItemID				BIGINT,
+    pItemDetailsID		BIGINT,
 	pQuantity			DOUBLE,
     pBuyPrice			DOUBLE,
     pRetailPrice		DOUBLE,
     pPrice1				DOUBLE,
     pPrice2				DOUBLE,
+    pDeadline			DATETIME,
+    pPaymentTypeID		SMALLINT,
     pCurrentUser		VARCHAR(255)
 )
 StoredProcedure:BEGIN
@@ -65,7 +68,7 @@ SET State = 2;
 			SELECT
 				pID AS 'ID',
                 pPurchaseDetailsID AS 'PurchaseDetailsID',
-				'No. Invoice sudah ada' AS 'Message',
+				CONCAT('No. Invoice ', pPurchaseNumber, ' sudah ada') AS 'Message',
 				'' AS 'MessageDetail',
 				1 AS 'FailedFlag',
 				State AS 'State' ;
@@ -80,6 +83,8 @@ SET State = 3;
                     PurchaseNumber,
                     SupplierID,
 					TransactionDate,
+                    Deadline,
+                    PaymentTypeID,
 					CreatedDate,
 					CreatedBy
 				)
@@ -88,6 +93,8 @@ SET State = 3;
 					pPurchaseNumber,
 					pSupplierID,
 					pTransactionDate,
+                    pDeadline,
+                    pPaymentTypeID,
 					NOW(),
 					pCurrentUser
 				);
@@ -106,6 +113,8 @@ SET State = 5;
 					PurchaseNumber = pPurchaseNumber,
                     SupplierID = pSupplierID,
 					TransactionDate = pTransactionDate,
+                    PaymentTypeID = pPaymentTypeID,
+                    Deadline = pDeadline,
 					ModifiedBy = pCurrentUser
 				WHERE
 					PurchaseID = pID;
@@ -119,6 +128,7 @@ SET State = 6;
                 (
 					PurchaseID,
                     ItemID,
+                    ItemDetailsID,
                     BranchID,
                     Quantity,
                     BuyPrice,
@@ -132,6 +142,7 @@ SET State = 6;
                 (
 					pID,
                     pItemID,
+                    pItemDetailsID,
                     pBranchID,
                     pQuantity,
                     pBuyPrice,
@@ -157,6 +168,7 @@ SET State = 8;
 					transaction_purchasedetails
 				SET
 					ItemID = pItemID,
+                    ItemDetailsID = pItemDetailsID,
                     BranchID = pBranchID,
                     Quantity = pQuantity,
                     BuyPrice = pBuyPrice,
@@ -177,11 +189,26 @@ SET State = 9;
 					BuyPrice = pBuyPrice,
 					RetailPrice = pRetailPrice,
 					Price1 = pPrice1,
-					Price2 = pPrice2
+					Price2 = pPrice2,
+					ModifiedBy = pCurrentUser
 				WHERE
-					ItemID = pItemID;
+					ItemID = pItemID
+                    AND pItemDetailsID IS NULL;
+                    
+SET State = 10;
 
-SET State = 9;
+				UPDATE 
+					master_itemdetails
+				SET
+					BuyPrice = pBuyPrice,
+					RetailPrice = pRetailPrice,
+					Price1 = pPrice1,
+					Price2 = pPrice2,
+					ModifiedBy = pCurrentUser
+				WHERE
+					ItemDetailsID = pItemDetailsID
+                    AND pItemDetailsID IS NOT NULL;
+SET State = 11;
 				
 				SELECT
 					pID AS 'ID',

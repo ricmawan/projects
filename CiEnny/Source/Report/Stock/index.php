@@ -41,7 +41,6 @@
 							</div>
 							<div class="col-md-3">
 								<select id="ddlBranch" name="ddlBranch" tabindex=8 class="form-control-custom" placeholder="Pilih Cabang" >
-									<!--<option value=0 selected >-- Semua Cabang --</option>-->
 									<?php
 										$sql = "CALL spSelDDLBranch('".$_SESSION['UserLogin']."')";
 										if (! $result = mysqli_query($dbh, $sql)) {
@@ -56,32 +55,27 @@
 									?>
 								</select>
 							</div>
-						</div>
-						<br />
-						<div class="row">
-							<div class="col-md-12">
-								<button class="btn btn-info" id="btnView" onclick="Preview();" ><i class="fa fa-list"></i> Lihat</button>&nbsp;&nbsp;
-								<button class="btn btn-success" id="btnExcel" onclick="ExportExcel();" ><i class="fa fa-file-excel-o "></i> Eksport Excel</button>&nbsp;&nbsp;
+							<div class="col-md-3">
+								<button class="btn btn-info" id="btnView" onclick="Preview();" style="padding-top: 1px;padding-bottom: 1px;" ><i class="fa fa-list"></i> Lihat</button>&nbsp;&nbsp;
+								<button class="btn btn-success" id="btnExcel" onclick="ExportExcel();" style="padding-top: 1px;padding-bottom: 1px;"" ><i class="fa fa-file-excel-o "></i> Eksport Excel</button>&nbsp;&nbsp;
 							</div>
 						</div>
-						<br />
-						<!--Grand Total: <span class="grandtotal"></span>
-						<br />-->
+						<hr style="margin: 10px 0;" />
 						<div class="table-responsive" id="dvTable" style="display: none;">
-							<table id="grid-data" class="table table-striped table-bordered table-hover" >
+							<table id="grid-data" class="table table-striped table-bordered table-hover" style="width: 100%;" >
 								<thead>				
 									<tr>
+										<th>Cabang</th>
 										<th>Kode</th>
 										<th>Nama</th>
+										<th>Satuan</th>
 										<th>Kategori</th>
-										<th>Cabang</th>
 										<th>Stok</th>
+										<th>Fisik</th>
 									</tr>
 								</thead>
 							</table>
 						</div>
-						<!--<br />
-						Grand Total: <span class="grandtotal"></span>-->
 					</div>
 				</div>
 			</div>
@@ -174,22 +168,46 @@
 				}
 			};
 			$(document).ready(function () {
+				$( window ).resize(function() {
+					table.columns.adjust().draw();
+				});
 				$("#ddlCategory").combobox();
 				$("#ddlCategory").next().find("input").click(function() {
 					$(this).val("");
 				});
 
+				$.fn.dataTable.ext.errMode = function(settings, techNote, message) { 
+					$("#loading").hide();
+					var errorMessage = "DataTables Error : " + techNote + " (" + message + ")";
+					var counterError = 0;
+					LogEvent(errorMessage, "/Transaction/Stock/index.php");
+					Lobibox.alert("error",
+					{
+						msg: "Terjadi kesalahan. Memuat ulang halaman.",
+						width: 480,
+						//delay: 2000,
+						beforeClose: function() {
+							if(counterError == 0) {
+								//location.reload();
+								counterError = 1;
+							}
+						}
+					});
+				};
+
 				table = $("#grid-data").DataTable({
 								"keys": true,
 								"scrollY": "330px",
 								"scrollCollapse": true,
-								"order": [2, "asc"],
+								"order": [],
 								"columns": [
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ "orderable": false, className: "dt-head-center dt-body-right" }						
+									{ "width": "10%", className: "dt-head-center" },
+									{ "width": "25%", className: "dt-head-center" },
+									{ "width": "30%", className: "dt-head-center" },
+									{ "width": "10%", className: "dt-head-center" },
+									{ "width": "10%", className: "dt-head-center" },
+									{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+									{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" }
 								],
 								"processing": true,
 								"serverSide": true,

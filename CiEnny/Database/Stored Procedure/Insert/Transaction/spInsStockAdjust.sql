@@ -7,6 +7,7 @@ CREATE PROCEDURE spInsStockAdjust (
 	pTransactionDate 			DATETIME,
 	pStockAdjustDetailsID		BIGINT,
     pItemID						BIGINT,
+    pItemDetailsID				BIGINT,
 	pQuantity					DOUBLE,
 	pAdjustedQuantity			DOUBLE,
     pUserID						BIGINT,
@@ -86,6 +87,7 @@ SET State = 5;
 				StockAdjustID,
 				BranchID,
 				ItemID,
+                ItemDetailsID,
 				Quantity,
 				AdjustedQuantity,
 				CreatedDate,
@@ -96,6 +98,7 @@ SET State = 5;
 				pID,
 				pBranchID,
 				pItemID,
+                pItemDetailsID,
 				pQuantity,
 				pAdjustedQuantity,
 				NOW(),
@@ -117,6 +120,7 @@ SET State = 7;
 				transaction_stockadjustdetails
 			SET
 				ItemID = pItemID,
+				ItemDetailsID = pItemDetailsID,
 				BranchID = pBranchID,
 				Quantity = pQuantity,
 				AdjustedQuantity = pAdjustedQuantity,

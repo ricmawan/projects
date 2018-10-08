@@ -9,7 +9,7 @@ DROP PROCEDURE IF EXISTS spDelCategory;
 
 DELIMITER $$
 CREATE PROCEDURE spDelCategory (
-	pCategoryID		BIGINT,
+	pCategoryID		INT,
 	pCurrentUser	VARCHAR(255)
 )
 StoredProcedure:BEGIN

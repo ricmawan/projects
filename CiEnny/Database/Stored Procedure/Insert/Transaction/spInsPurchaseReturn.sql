@@ -4,11 +4,12 @@ DELIMITER $$
 CREATE PROCEDURE spInsPurchaseReturn (
 	pID 						BIGINT,
 	pPurchaseReturnNumber		VARCHAR(100),
-	pPurchaseReturnDetailsID	BIGINT,
-    pSupplierID					BIGINT,
+	pSupplierID					BIGINT,
 	pTransactionDate 			DATETIME,
+    pPurchaseReturnDetailsID	BIGINT,
     pBranchID					INT,
     pItemID						BIGINT,
+    pItemDetailsID				BIGINT,
 	pQuantity					DOUBLE,
     pBuyPrice					DOUBLE,
 	pUserID						BIGINT,
@@ -102,6 +103,7 @@ SET State = 4;
 			(
 				PurchaseReturnID,
 				ItemID,
+                ItemDetailsID,
 				BranchID,
 				Quantity,
 				BuyPrice,
@@ -112,6 +114,7 @@ SET State = 4;
 			(
 				pID,
 				pItemID,
+                pItemDetailsID,
 				pBranchID,
 				pQuantity,
 				pBuyPrice,
@@ -134,6 +137,7 @@ SET State = 6;
 				transaction_purchasereturndetails
 			SET
 				ItemID = pItemID,
+                ItemDetailsID = pItemDetailsID,
 				BranchID = pBranchID,
 				Quantity = pQuantity,
 				BuyPrice = pBuyPrice,

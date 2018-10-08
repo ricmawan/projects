@@ -8,6 +8,7 @@ CREATE PROCEDURE spInsStockMutation (
 	pTransactionDate 			DATETIME,
 	pStockMutationDetailsID		BIGINT,
     pItemID						BIGINT,
+    pItemDetailsID				BIGINT,
 	pQuantity					DOUBLE,
     pUserID						BIGINT,
     pCurrentUser				VARCHAR(255)
@@ -87,6 +88,7 @@ SET State = 5;
 				SourceID,
 				DestinationID,
 				ItemID,
+                ItemDetailsID,
 				Quantity,
 				CreatedDate,
 				CreatedBy
@@ -97,6 +99,7 @@ SET State = 5;
 				pSourceID,
 				pDestinationID,
 				pItemID,
+                pItemDetailsID,
 				pQuantity,
 				NOW(),
 				pCurrentUser
@@ -117,6 +120,7 @@ SET State = 7;
 				transaction_stockmutationdetails
 			SET
 				ItemID = pItemID,
+                ItemDetailsID = pItemDetailsID,
 				SourceID = pSourceID,
 				DestinationID = pDestinationID,
 				Quantity = pQuantity,

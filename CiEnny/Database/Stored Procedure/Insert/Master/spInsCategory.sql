@@ -1,8 +1,15 @@
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for insert the category
+Created Date: 12 November 2017
+Modified Date: 
+===============================================================*/
+
 DROP PROCEDURE IF EXISTS spInsCategory;
 
 DELIMITER $$
 CREATE PROCEDURE spInsCategory (
-	pID 				BIGINT, 
+	pID 				INT, 
     pCategoryCode		VARCHAR(100),
 	pCategoryName 		VARCHAR(255),
 	pIsEdit				INT,
@@ -47,8 +54,7 @@ SET State = 1;
 		FROM 
 			master_category
 		WHERE
-			(TRIM(CategoryName) = TRIM(pCategoryName)
-            OR TRIM(CategoryCode) = TRIM(pCategoryCode))
+			TRIM(CategoryCode) = TRIM(pCategoryCode)
 			AND CategoryID <> pID
 		LIMIT 1;
         
@@ -57,7 +63,34 @@ SET State = 1;
 SET State = 2;
 			SELECT
 				pID AS 'ID',
-				'Kategori sudah ada' AS 'Message',
+				CONCAT('Kode Kategori ', pCategoryCode, ' sudah ada') AS 'Message',
+				'' AS 'MessageDetail',
+				1 AS 'FailedFlag',
+				State AS 'State' ;
+		
+			LEAVE StoredProcedure;
+            
+		END IF;
+        
+SET State = 2;
+
+		SELECT 
+			0
+		INTO
+			PassValidate
+		FROM 
+			master_category
+		WHERE
+			TRIM(CategoryName) = TRIM(pCategoryName)
+            AND CategoryID <> pID
+		LIMIT 1;
+        
+			
+		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
+SET State = 2;
+			SELECT
+				pID AS 'ID',
+				CONCAT('Nama Kategori ', pCategoryName, ' sudah ada') AS 'Message',
 				'' AS 'MessageDetail',
 				1 AS 'FailedFlag',
 				State AS 'State' ;

@@ -34,10 +34,11 @@ SET State = 1;
         SD.BranchID,
         MI.ItemCode,
         MI.ItemName,
-        (SD.Quantity - IFNULL(TSR.Quantity, 0)) Quantity,
+        (SD.Quantity * IFNULL(MID.ConversionQuantity, 1) - IFNULL(TSR.Quantity, 0)) Quantity,
         SD.BuyPrice,
-        SD.SalePrice,
-        MC.CustomerName
+        SD.SalePrice - (SD.Discount / IFNULL(MID.ConversionQuantity, 1)) SalePrice,
+        MC.CustomerName,
+        MU.UnitName
 	FROM
 		transaction_sale TS
 		JOIN master_customer MC
@@ -48,12 +49,15 @@ SET State = 1;
 			ON MB.BranchID = SD.BranchID
 		JOIN master_item MI
 			ON MI.ItemID = SD.ItemID
+		JOIN master_unit MU
+			ON MI.UnitID = MU.UnitID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SD.ItemDetailsID
 		LEFT JOIN
 		(
 			SELECT
 				SR.SaleID,
 				SRD.ItemID,
-				SRD.BranchID,
 				SRD.SaleDetailsID,
 				SUM(SRD.Quantity) Quantity
 			FROM
@@ -63,12 +67,10 @@ SET State = 1;
 			GROUP BY
 				SR.SaleID,
 				SRD.ItemID,
-				SRD.BranchID,
 				SRD.SaleDetailsID
 		)TSR
 			ON TSR.SaleID = TS.SaleID
 			AND MI.ItemID = TSR.ItemID
-			AND TSR.BranchID = SD.BranchID
 			AND TSR.SaleDetailsID = SD.SaleDetailsID
 	WHERE
 		TRIM(TS.SaleNumber) = TRIM(pSaleNumber)

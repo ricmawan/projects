@@ -114,7 +114,7 @@
 				<br />
 				<div class="row">
 					<div class="col-md-12">
-						<div class="panel panel-default" style="max-height: 340px;min-height: 340px;" >
+						<div class="panel panel-user" style="max-height: 340px !important;min-height: 340px !important;" >
 							<div class="panel-heading" style="padding: 5px 15px;" >
 								<h5>Pilih Hak Akses Menu</h5>
 							</div>
@@ -265,15 +265,11 @@
 								$("#btnSaveUser").focus();
 							}
 						});
+						setTimeout(function() {
+							$("#txtUserName").focus();
+						}, 0);
 					},
-					show: {
-						effect: "fade",
-						duration: 500
-					},
-					hide: {
-						effect: "fade",
-						duration: 500
-					},
+					
 					close: function() {
 						$(this).dialog("destroy");
 						$("#divModal").hide();
@@ -384,6 +380,7 @@
 					{
 						text: "Batal",
 						id: "btnCancelAddUser",
+						tabindex: (parseInt(btnIndex) + 1),
 						click: function() {
 							$(this).dialog("destroy");
 							$("#divModal").hide();
@@ -503,7 +500,7 @@
 						FirstFocus = 1;
 					}
 					if($("#txtConfirmPassword").val() != $("#txtPassword").val()) {
-						$("#txtConfirmPassword").notify("Konfirmasi Password tidak cocok!", { position:"right", className:"warn", autoHideDelay: 2000 });
+						$("#txtConfirmPassword").notify("Konfirmasi Password tidak cocok!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 						if(FirstFocus == 0) $("#txtConfirmPassword").focus();
 						PassValidate = 0;
 						FirstFocus = 1;
@@ -518,7 +515,7 @@
 							FirstFocus = 1;
 						}
 						if($("#txtConfirmPassword").val() != $("#txtPassword").val()) {
-							$("#txtConfirmPassword").notify("Konfirmasi Password tidak cocok!", { position:"right", className:"warn", autoHideDelay: 2000 });
+							$("#txtConfirmPassword").notify("Konfirmasi Password tidak cocok!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 							if(FirstFocus == 0) $("#txtConfirmPassword").focus();
 							PassValidate = 0;
 							FirstFocus = 1;
@@ -552,8 +549,34 @@
 				}
 				return PassValidate;
 			}
+			var waitForFinalEvent = (function () {
+		        var timers = {};
+		        return function (callback, ms, uniqueId) {
+		            if (!uniqueId) {
+		                uniqueId = "Don't call this twice without a uniqueId";
+		            }
+		            if (timers[uniqueId]) {
+		                clearTimeout(timers[uniqueId]);
+		            }
+		            timers[uniqueId] = setTimeout(callback, ms);
+		        };
+		    })();
 			
 			$(document).ready(function() {
+				$( window ).resize(function() {
+					waitForFinalEvent(function () {
+		               setTimeout(function() {
+							table.columns.adjust().draw();
+						}, 0);
+		            }, 500, "resizeWindow");
+				});
+
+				$("#txtUserLogin").on("keydown", function(evt) {
+					if(evt.keyCode == 32) {
+						evt.preventDefault();
+						return false;
+					}
+				});
 				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
 				    $(this).blur();
 				});
@@ -585,7 +608,7 @@
 							"scrollY": "330px",
 							"rowId": "UserID",
 							"scrollCollapse": true,
-							"order": [2, "asc"],
+							"order": [],
 							"columns": [
 								{ "width": "20px", "orderable": false, className: "dt-head-center dt-body-center" },
 								{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },

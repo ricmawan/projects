@@ -42,25 +42,26 @@ $(document).ready(function () {
 		}
 		else {
 			$("#loading").show();
-			/*$.ajax({
-				url: "./Master/Notification/",
+			$.ajax({
+				url: "./Notification/",
 				type: "POST",
 				data: { },
 				dataType: "html",
 				success: function(data) {
-					$("#page-inner").html(data);
-					$("html, body").animate({
-						scrollTop: 0
-					}, "slow");
 					$("#loading").hide();
+					$("#page-inner").html(data);
 				},
 				error: function(data) {
 					$("#loading").hide();
-					$.notify("Koneksi gagal", "error");
+					var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+					LogEvent(errorMessage, "/Home.php");
+					Lobibox.alert("error",
+					{
+						msg: errorMessage,
+						width: 480
+					});
 				}
-			});*/
-			$("#page-inner").html('<img src="./assets/img/logo.png" style="width:100%;"/>');
-			$("#loading").hide();
+			});
 		}
 		$(this).addClass("active-menu");
 	});
@@ -101,25 +102,26 @@ function Redirect(link) {
 	}
 	else {
 		$("#loading").show();
-		/*$.ajax({
-			url: "./Master/Notification/",
+		$.ajax({
+			url: "./Notification/",
 			type: "POST",
 			data: { },
 			dataType: "html",
 			success: function(data) {
-				$("#page-inner").html(data);
-				$("html, body").animate({
-					scrollTop: 0
-				}, "slow");
 				$("#loading").hide();
+				$("#page-inner").html(data);
 			},
 			error: function(data) {
 				$("#loading").hide();
-				$.notify("Koneksi gagal", "error");
+				var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+				LogEvent(errorMessage, "/Home.php");
+				Lobibox.alert("error",
+				{
+					msg: errorMessage,
+					width: 480
+				});
 			}
-		});*/
-		$("#page-inner").html('<img src="./assets/img/logo.png" style="width:100%;"/>');
-		$("#loading").hide();
+		});
 	}
 }
 
@@ -154,25 +156,26 @@ function Reload() {
 	}
 	else {
 		$("#loading").show();
-		/*$.ajax({
-			url: "./Master/Notification/",
+		$.ajax({
+			url: "./Notification/",
 			type: "POST",
 			data: { },
 			dataType: "html",
 			success: function(data) {
-				$("#page-inner").html(data);
-				$("html, body").animate({
-					scrollTop: 0
-				}, "slow");
 				$("#loading").hide();
+				$("#page-inner").html(data);
 			},
 			error: function(data) {
 				$("#loading").hide();
-				$.notify("Koneksi gagal", "error");
+				var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+				LogEvent(errorMessage, "/Home.php");
+				Lobibox.alert("error",
+				{
+					msg: errorMessage,
+					width: 480
+				});
 			}
-		});*/
-		$("#page-inner").html('<img src="./assets/img/logo.png" style="width:100%;"/>');
-		$("#loading").hide();
+		});
 	}
 }
 
@@ -373,6 +376,29 @@ function Back() {
 			}
 		});
 	}
+	else {
+		$("#loading").show();
+		$.ajax({
+			url: "./Notification/",
+			type: "POST",
+			data: { },
+			dataType: "html",
+			success: function(data) {
+				$("#loading").hide();
+				$("#page-inner").html(data);
+			},
+			error: function(data) {
+				$("#loading").hide();
+				var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+				LogEvent(errorMessage, "/Home.php");
+				Lobibox.alert("error",
+				{
+					msg: errorMessage,
+					width: 480
+				});
+			}
+		});
+	}
 }
 
 function UpdatePassword() {
@@ -389,14 +415,6 @@ function UpdatePassword() {
 					 $("#btnSavePassword").focus();
 				}
 			});
-		},
-		show: {
-			effect: "fade",
-			duration: 500
-		},
-		hide: {
-			effect: "fade",
-			duration: 500
 		},
 		close: function() {
 			$(this).dialog("destroy");
@@ -512,19 +530,15 @@ function SingleDelete(url, DeleteID, callback) {
 					 $("#btnYesDelete").focus();
 				}
 			});
+			setTimeout(function() {
+				$("#btnYesDelete").focus();
+			}, 0);
 		},
 		close: function() {
 			$(this).dialog("destroy");
 			callback("Tidak");
 		},
-		show: {
-			effect: "fade",
-			duration: 500
-		},
-		hide: {
-			effect: "fade",
-			duration: 500
-		},
+		
 		resizable: false,
 		height: "auto",
 		width: 400,
@@ -613,6 +627,9 @@ function DeleteData(url, callback) {
 						 $("#btnYesDel").focus();
 					}
 				});
+				setTimeout(function() {
+					$("#btnYesDel").focus();
+				}, 0);
 			},
 			close: function() {
 				$(this).dialog("destroy");
@@ -620,11 +637,11 @@ function DeleteData(url, callback) {
 			},
 			show: {
 				effect: "fade",
-				duration: 500
+				duration: 0
 			},
 			hide: {
 				effect: "fade",
-				duration: 500
+				duration: 0
 			},
 			resizable: false,
 			height: "auto",
@@ -696,6 +713,9 @@ function DeleteData(url, callback) {
 			}]
 		}).dialog("open");
 	}
+	else {
+		callback("No Data");
+	}
 }
 
 function saveConfirm(callback) {
@@ -723,14 +743,9 @@ function saveConfirm(callback) {
 						 $("#btnYes").focus();
 					}
 				});
-			},
-			show: {
-				effect: "fade",
-				duration: 500
-			},
-			hide: {
-				effect: "fade",
-				duration: 500
+				setTimeout(function() {
+					$("#btnYes").focus();
+				}, 0);
 			},
 			close: function() {
 				$(this).dialog("destroy");
@@ -813,7 +828,7 @@ function chkAll() {
 
 var enterCounter = 0;
 function enterLikeTab() {
-	$("input").not($(":submit, :button")).keypress(function (evt) {
+	$(document).not($(":submit, :button")).on("keypress", "input", function (evt) {	
 		if (evt.keyCode == 13) {
 			evt.preventDefault();
 			var next = $('[tabindex="'+(this.tabIndex+1)+'"]');
@@ -821,21 +836,22 @@ function enterLikeTab() {
 			if(next.length) {
 				if(next.attr("disabled") == "disabled") {
 					$(document).find(":focusable").each(function() {
-						console.log("element: " + parseInt($(this)[0].tabIndex));
-						console.log("element: " + nextTabIndex);
 						if(parseInt($(this)[0].tabIndex) > nextTabIndex) {
 							$(this).focus();
 							return false;
 						}
 					});
 				}
-				else next.focus();
+				else {
+					if(next.prop("type") == "select-one") next.simulate('mousedown');
+					next.focus();
+				}
 			}
 			else $('[tabindex="1"]').focus();
 		}
 	});
 	
-	$("select").keypress(function (evt) {
+	$(document).on("keypress", "select", function (evt) {
 		if (evt.keyCode == 13) {
 			evt.preventDefault();
 			var next = $('[tabindex="'+(this.tabIndex+1)+'"]');
@@ -844,7 +860,7 @@ function enterLikeTab() {
 		}
 	});
 	
-	$("textarea").keypress(function (evt) {
+	$(document).on("keypress", "textarea", function (evt) {
 		if (evt.keyCode == 13) {
 			if(enterCounter == 0) {
 				enterCounter = 1;
@@ -935,6 +951,7 @@ function validateQTY(QTY) {
 });*/
 
 //combobox autocomplete
+var idBeforeEsc = "";
 (function( $ ) {
 	$.widget( "custom.combobox", {
 		_create: function() {
@@ -946,6 +963,38 @@ function validateQTY(QTY) {
 			this._createAutocomplete();
 			//this._createShowAllButton();
 		},
+		_createShowAllButton: function() {
+			var input = this.input,
+			wasOpen = false;
+
+			$( "<a>" )
+			.attr( "tabIndex", -1 )
+			.attr( "title", "Show All Items" )
+			.tooltip()
+			.appendTo( this.wrapper )
+			.button({
+				icons: {
+					primary: "ui-icon-triangle-1-s"
+				},
+				text: false
+			})
+			.removeClass( "ui-corner-all" )
+			.addClass( "custom-combobox-toggle ui-corner-right" )
+			.on( "mousedown", function() {
+				wasOpen = input.autocomplete( "widget" ).is( ":visible" );
+			})
+			.on( "click", function() {
+				input.trigger( "focus" );
+
+				// Close if already visible
+				if ( wasOpen ) {
+				return;
+				}
+
+				// Pass empty string as value to search for, displaying all results
+				input.autocomplete( "search", "" );
+			});
+		},
 
 		_createAutocomplete: function() {
 			var selected = this.element.children( ":selected" ),
@@ -954,6 +1003,7 @@ function validateQTY(QTY) {
 			tabindex = this.element.attr("tabindex");
 			var dialogIndex = $(".ui-dialog").css("z-index");
 			var newIndex = parseInt(dialogIndex) + 1;
+			var id = this.element.attr("id");
 			wasOpen = false;
 			this.input = $( "<input style='font-family: Open Sans, sans-serif; font-size: 12px;'>" )
 			.appendTo( this.wrapper )
@@ -985,6 +1035,29 @@ function validateQTY(QTY) {
 				input.select();
 				// Pass empty string as value to search for, displaying all results
 				input.autocomplete( "search", "" );
+			})
+			.keydown(function(evt) {
+				if(evt.keyCode == 38 || evt.keyCode == 40) {
+					// Pass empty string as value to search for, displaying all results
+					//input.autocomplete( "search", "" );
+					if($("#" + id).val() != "") {
+						//input.val("");
+						input.trigger( "focus" );
+
+						// Close if already visible
+						if ( wasOpen ) {
+						return;
+						}
+
+						// Pass empty string as value to search for, displaying all results
+						input.autocomplete( "search", "" );
+						idBeforeEsc = $("#" + id).val();
+						$("#" + id).val("");
+					}
+				}
+				else if(evt.keyCode == 27) {
+					$("#" + id).val(idBeforeEsc);
+				}
 			})
 			.tooltip({
 				tooltipClass: "ui-state-highlight"
@@ -1150,4 +1223,68 @@ function slideIn() {
 		slidingDiv.style.right = parseInt(slidingDiv.style.right) - 2 + "px";
 		setTimeout(slideIn, 1);
 	}
+}
+
+function printDailyReport() {
+	$("#print-confirm").dialog({
+		autoOpen: false,
+		open: function() {
+			$(document).on('keydown', function(e) {
+				if (e.keyCode == 39) { //right arrow
+					$("#btnNoPrint").focus();
+				}
+				else if (e.keyCode == 37) { //left arrow
+					 $("#btnYesPrint").focus();
+				}
+			});
+			setTimeout(function() {
+				$("#btnYesPrint").focus();
+			}, 0);
+		},
+		close: function() {
+			$(this).dialog("destroy");
+		},
+		
+		resizable: false,
+		height: "auto",
+		width: 400,
+		modal: true,
+		buttons: [
+		{
+			text: "Ya",
+			id: "btnYesPrint",
+			click: function() {
+				$(this).dialog("destroy");
+				$("#loading").show();
+				$.ajax({
+					url: "./PrintDailyReport.php",
+					type: "POST",
+					data: { },
+					dataType: "json",
+					success: function(data) {
+						$("#loading").hide();
+						$("#hdnLogout").click();
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						$("#loading").hide();
+						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+						LogEvent(errorMessage, "global.js (fnSingleDelete)");
+						Lobibox.alert("error",
+						{
+							msg: errorMessage,
+							width: 480
+						});
+					}
+				});
+			}
+		},
+		{
+			text: "Tidak",
+			id: "btnNoPrint",
+			click: function() {
+				$(this).dialog("destroy");
+				$("#hdnLogout").click();
+			}
+		}]
+	}).dialog("open");
 }

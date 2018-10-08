@@ -1,3 +1,10 @@
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for insert the supplier
+Created Date: 12 November 2017
+Modified Date: 
+===============================================================*/
+
 DROP PROCEDURE IF EXISTS spInsSupplier;
 
 DELIMITER $$
@@ -51,16 +58,44 @@ SET State = 1;
 		FROM 
 			master_supplier
 		WHERE
-			(TRIM(SupplierName) = TRIM(pSupplierName)
-            OR TRIM(SupplierCode) = TRIM(pSupplierCode))
+			TRIM(SupplierCode) = TRIM(pSupplierCode)
 			AND SupplierID <> pID
 		LIMIT 1;
 			
 		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
 SET State = 2;
+
 			SELECT
 				pID AS 'ID',
-				'Supplier sudah ada' AS 'Message',
+				CONCAT('Kode Supplier ', pSupplierCode, ' sudah ada') AS 'Message',
+				'' AS 'MessageDetail',
+				1 AS 'FailedFlag',
+				State AS 'State' ;
+		
+			LEAVE StoredProcedure;
+			
+		END IF;
+        
+SET State = 1;
+
+		SELECT 
+			0
+		INTO
+			PassValidate
+		FROM 
+			master_supplier
+		WHERE
+			(TRIM(SupplierName) = TRIM(pSupplierName)
+            AND TRIM(Address) = TRIM(pAddress))
+			AND SupplierID <> pID
+		LIMIT 1;
+			
+		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
+SET State = 3;
+
+			SELECT
+				pID AS 'ID',
+				CONCAT('Nama Supplier ', pSupplierName, ' dengan alamat ', pAddress, ' sudah ada') AS 'Message',
 				'' AS 'MessageDetail',
 				1 AS 'FailedFlag',
 				State AS 'State' ;
@@ -68,7 +103,8 @@ SET State = 2;
 			LEAVE StoredProcedure;
 			
 		ELSE /*Data yang diinput valid*/
-SET State = 3;
+SET State = 4;
+
 			IF(pIsEdit = 0)	THEN /*Tambah baru*/
 				INSERT INTO master_supplier
 				(
@@ -92,7 +128,15 @@ SET State = 3;
 					pCurrentUser
 				);
 			
-SET State = 4;			               
+SET State = 5;			               
+
+				SELECT
+					LAST_INSERT_ID()
+				INTO 
+					pID;
+
+SET State = 6;
+
 				SELECT
 					pID AS 'ID',
 					'Supplier Berhasil Ditambahkan' AS 'Message',
@@ -100,9 +144,10 @@ SET State = 4;
 					0 AS 'FailedFlag',
 					State AS 'State';
 			ELSE
-SET State = 5;
+SET State = 7;
+
 				UPDATE
-					master_Supplier
+					master_supplier
 				SET
 					SupplierCode = pSupplierCode,
                     SupplierName = pSupplierName,
@@ -114,7 +159,8 @@ SET State = 5;
 				WHERE
 					SupplierID = pID;
 
-SET State = 6;
+SET State = 8;
+
 				SELECT
 					pID AS 'ID',
 					'Supplier Berhasil Diubah' AS 'Message',

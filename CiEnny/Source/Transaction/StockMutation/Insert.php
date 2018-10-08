@@ -10,12 +10,14 @@
 		$SourceID = mysqli_real_escape_string($dbh, $_POST['ddlSourceBranch']);
 		$DestinationID = mysqli_real_escape_string($dbh, $_POST['ddlDestinationBranch']);
 		$ItemID = mysqli_real_escape_string($dbh, $_POST['hdnItemID']);
+		$ItemDetailsID = mysqli_real_escape_string($dbh, $_POST['hdnItemDetailsID']);
+		if($ItemDetailsID == "") $ItemDetailsID = "NULL";
 		$Qty = mysqli_real_escape_string($dbh, $_POST['txtQTY']);
 		$Message = "Terjadi Kesalahan Sistem!";
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
-		$sql = "CALL spInsStockMutation(".$StockMutationID.", ".$SourceID.", ".$DestinationID.", '".$TransactionDate."', ".$StockMutationDetailsID.", ".$ItemID.", ".$Qty.", ".$_SESSION['UserID'].", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsStockMutation(".$StockMutationID.", ".$SourceID.", ".$DestinationID.", '".$TransactionDate."', ".$StockMutationDetailsID.", ".$ItemID.", ".$ItemDetailsID.", ".$Qty.", ".$_SESSION['UserID'].", '".$_SESSION['UserLogin']."')";
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;

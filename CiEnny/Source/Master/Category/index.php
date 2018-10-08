@@ -91,15 +91,11 @@
 								$("#btnSaveCategory").focus();
 							}
 						});
+						setTimeout(function() {
+							$("#txtCategoryCode").focus();
+						}, 0);
 					},
-					show: {
-						effect: "fade",
-						duration: 500
-					},
-					hide: {
-						effect: "fade",
-						duration: 500
-					},
+					
 					close: function() {
 						$(this).dialog("destroy");
 						$("#divModal").hide();
@@ -205,6 +201,7 @@
 					{
 						text: "Batal",
 						id: "btnCancelAddCategory",
+						tabindex: 8,
 						click: function() {
 							$(this).dialog("destroy");
 							$("#divModal").hide();
@@ -224,7 +221,6 @@
 			}
 			
 			function fnDeleteData() {
-				console.log("kepanggil");
 				var index = table.cell({ focused: true }).index();
 				table.keys.disable();
 				DeleteData("./Master/Category/Delete.php", function(action) {
@@ -254,7 +250,27 @@
 				});
 			}
 
+			var waitForFinalEvent = (function () {
+		        var timers = {};
+		        return function (callback, ms, uniqueId) {
+		            if (!uniqueId) {
+		                uniqueId = "Don't call this twice without a uniqueId";
+		            }
+		            if (timers[uniqueId]) {
+		                clearTimeout(timers[uniqueId]);
+		            }
+		            timers[uniqueId] = setTimeout(callback, ms);
+		        };
+		    })();
+			
 			$(document).ready(function() {
+				$( window ).resize(function() {
+					waitForFinalEvent(function () {
+		               setTimeout(function() {
+							table.columns.adjust().draw();
+						}, 0);
+		            }, 500, "resizeWindow");
+				});
 				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
 					$(this).blur();
 				});
@@ -286,7 +302,7 @@
 								"scrollY": "330px",
 								"rowId": "CategoryID",
 								"scrollCollapse": true,
-								"order": [2, "asc"],
+								"order": [],
 								"columns": [
 									{ "width": "20px", "orderable": false, className: "dt-head-center dt-body-center" },
 									{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },

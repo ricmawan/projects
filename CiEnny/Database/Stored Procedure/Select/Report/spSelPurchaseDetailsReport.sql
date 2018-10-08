@@ -35,15 +35,24 @@ SET State = 1;
 			MI.ItemCode,
 	        MI.ItemName,
 	        PD.Quantity,
-	        PD.BuyPrice,
-			(PD.Quantity * PD.BuyPrice) SubTotal
+            MU.UnitName,
+	        PD.BuyPrice * IFNULL(MID.ConversionQuantity, 1) BuyPrice,
+			(PD.Quantity * PD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) SubTotal
 		FROM
 			transaction_purchasedetails PD
 	        JOIN master_item MI
 				ON MI.ItemID = PD.ItemID
+			LEFT JOIN master_itemdetails MID
+				ON MID.ItemDetailsID = PD.ItemDetailsID
+			LEFT JOIN master_unit MU
+				ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
 		WHERE
 			PD.PurchaseID = pPurchaseID
-            AND PD.BranchID = pBranchID
+            AND CASE
+					WHEN pBranchID = 0
+					THEN PD.BranchID
+					ELSE pBranchID
+				END = PD.BranchID
 		ORDER BY
 			PD.PurchaseDetailsID;
 	ELSE
@@ -51,15 +60,24 @@ SET State = 1;
 			MI.ItemCode,
 	        MI.ItemName,
 	        PRD.Quantity,
-	        PRD.BuyPrice,
-            (PRD.Quantity * PRD.BuyPrice) SubTotal
+            MU.UnitName,
+	        PRD.BuyPrice * IFNULL(MID.ConversionQuantity, 1) BuyPrice,
+            -(PRD.Quantity * PRD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) SubTotal
 		FROM
 			transaction_purchasereturndetails PRD
 	        JOIN master_item MI
 				ON MI.ItemID = PRD.ItemID
+			LEFT JOIN master_itemdetails MID
+				ON MID.ItemDetailsID = PRD.ItemDetailsID
+			LEFT JOIN master_unit MU
+				ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
 		WHERE
 			PRD.PurchaseReturnID = pPurchaseID
-            AND PRD.BranchID = pBranchID
+            AND CASE
+					WHEN pBranchID = 0
+					THEN PRD.BranchID
+					ELSE pBranchID
+				END = PRD.BranchID
 		ORDER BY
 			PRD.PurchaseReturnDetailsID;
             

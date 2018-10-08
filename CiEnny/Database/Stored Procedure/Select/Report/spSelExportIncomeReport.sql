@@ -37,12 +37,13 @@ SET State = 1;
         MI.ItemName,
         MI.ItemCode,
         SD.Quantity,
-        SD.BuyPrice,
-        (SD.Quantity * SD.BuyPrice) TotalBuy,
-        SD.SalePrice,
+        MU.UnitName,
+        SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1) BuyPrice,
+        (SD.Quantity * SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) TotalBuy,
+        SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) SalePrice,
         SD.Discount,
-        ((SD.Quantity * SD.SalePrice) - SD.Discount) TotalSale,
-		(SD.Quantity * SD.SalePrice) - (SD.Quantity * SD.BuyPrice) Income
+        (SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) TotalSale,
+		(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (SD.Quantity * SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) Income
     FROM
 		transaction_sale TS
         JOIN transaction_saledetails SD
@@ -51,10 +52,55 @@ SET State = 1;
 			ON MC.CustomerID = TS.CustomerID
 		JOIN master_item MI
 			ON MI.ItemID = SD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SD.ItemDetailsID
+		LEFT JOIN master_unit MU
+			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
 	WHERE
-		SD.BranchID = pBranchID
+		CASE
+			WHEN pBranchID = 0
+			THEN SD.BranchID
+			ELSE pBranchID
+		END = SD.BranchID
 		AND CAST(TS.TransactionDate AS DATE) >= pFromDate
 		AND CAST(TS.TransactionDate AS DATE) <= pToDate
+	UNION ALL
+    SELECT
+		TB.BookingID SaleID,
+		TB.BookingNumber SaleNumber,
+        DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
+        MC.CustomerName,
+		MI.ItemID,
+        MI.ItemName,
+        MI.ItemCode,
+        BD.Quantity,
+        MU.UnitName,
+        BD.BuyPrice * IFNULL(MID.ConversionQuantity, 1) BuyPrice,
+        (BD.Quantity * BD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) TotalBuy,
+        BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) SalePrice,
+        BD.Discount,
+        (BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) TotalSale,
+		(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (BD.Quantity * BD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) Income
+    FROM
+		transaction_booking TB
+        JOIN transaction_bookingdetails BD
+			ON TB.BookingID = BD.BookingID
+		JOIN master_customer MC
+			ON MC.CustomerID = TB.CustomerID
+		JOIN master_item MI
+			ON MI.ItemID = BD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = BD.ItemDetailsID
+		LEFT JOIN master_unit MU
+			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
+	WHERE
+		CASE
+			WHEN pBranchID = 0
+			THEN BD.BranchID
+			ELSE pBranchID
+		END = BD.BranchID
+		AND CAST(TB.TransactionDate AS DATE) >= pFromDate
+		AND CAST(TB.TransactionDate AS DATE) <= pToDate
 	UNION ALL
     SELECT
 		TSR.SaleReturnID,
@@ -65,6 +111,7 @@ SET State = 1;
         MI.ItemName,
         MI.ItemCode,
         SRD.Quantity,
+        MU.UnitName,
         SRD.BuyPrice,
 		(SRD.Quantity * SRD.BuyPrice) TotalBuy,
         SRD.SalePrice,
@@ -81,8 +128,16 @@ SET State = 1;
 			ON MC.CustomerID = TS.CustomerID
 		JOIN master_item MI
 			ON MI.ItemID = SRD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SRD.ItemDetailsID
+		LEFT JOIN master_unit MU
+			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
 	WHERE
-		SRD.BranchID = pBranchID
+		CASE
+			WHEN pBranchID = 0
+			THEN SRD.BranchID
+			ELSE pBranchID
+		END = SRD.BranchID
 		AND CAST(TSR.TransactionDate AS DATE) >= pFromDate
 		AND CAST(TSR.TransactionDate AS DATE) <= pToDate
 	ORDER BY

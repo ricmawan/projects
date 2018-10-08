@@ -14,25 +14,30 @@
 					3 => "MB.BranchName",
 					4 => "MI.ItemCode",
 					5 => "MI.ItemName",
-					6 => "SAD.Quantity",
-					6 => "SAD.AdjustedQuantity"
+					6 => "MU.UnitName",
+					7 => "SAD.Quantity",
+					8 => "SAD.AdjustedQuantity"
 				);
 
 	$where = " 1=1 ";
-	$order_by = "SA.StockAdjustID";
+	$order_by = "SA.StockAdjustID DESC";
 	$limit_s = $requestData['start'];
 	$limit_l = $requestData['length'];
 	
 	//Handles Sort querystring sent from Bootgrid
-	$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
-	$order_by .= ", SA.StockAdjustID ASC";
+	if(ISSET($requestData['order'])) {
+		$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
+		$order_by .= ", SA.StockAdjustID ASC";
+	}
 	//Handles search querystring sent from Bootgrid
 	if (!empty($requestData['search']['value']))
 	{
 		$search = mysqli_escape_string($dbh, trim($requestData['search']['value']));
 		$where .= " AND ( MB.BranchName LIKE '%".$search."%'";
 		$where .= " OR MI.ItemCode LIKE '%".$search."%'";
+		$where .= " OR MID.ItemDetailsCode LIKE '%".$search."%'";
 		$where .= " OR MI.ItemName LIKE '%".$search."%'";
+		$where .= " OR MU.UnitName LIKE '%".$search."%'";
 		$where .= " OR DATE_FORMAT(SA.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
 		$where .= " OR SAD.AdjustedQuantity LIKE '%".$search."%'";
 		$where .= " OR SAD.Quantity LIKE '%".$search."%' )";
@@ -62,6 +67,7 @@
 		$row_array[] = $row['BranchName'];
 		$row_array[] = $row['ItemCode'];
 		$row_array[] = $row['ItemName'];
+		$row_array[] = $row['UnitName'];
 		$row_array[] = $row['Quantity'];
 		$row_array[] = $row['AdjustedQuantity'];
 		$row_array[] = $row['StockAdjustID'];
@@ -69,6 +75,7 @@
 		$row_array[] = $row['PlainTransactionDate'];
 		$row_array[] = $row['ItemID'];
 		$row_array[] = $row['BranchID'];
+		$row_array[] = $row['UnitID'];
 		array_push($return_arr, $row_array);
 	}
 	

@@ -7,13 +7,19 @@
 		include "../../GetPermission.php";
 		$ItemCode = mysqli_real_escape_string($dbh, $_POST['itemCode']);
 		$ItemID = 0;
+		$ItemDetailsID = 0;
 		$ItemName = "";
 		$BuyPrice = 0;
 		$RetailPrice = 0;
 		$Price1 = 0;
 		$Price2 = 0;
+		$UnitID = 0;
+		$AvailableUnit = "";
 		$FailedFlag = 0;
 		$ErrorMessage = "";
+		$ConversionQuantity = 1;
+		$Qty1 = 1;
+		$Qty2 = 1;
 		$State = 1;
 		
 		$sql = "CALL spSelItemDetails('".$ItemCode."', '".$_SESSION['UserLogin']."')";
@@ -22,18 +28,23 @@
 			$FailedFlag = 1;
 			$ErrorMessage = "Terjadi kesalahan sistem.";
 			logEvent(mysqli_error($dbh), '/Transaction/Purchase/CheckItem.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-			echo returnstate($ItemID, $ItemName, $BuyPrice, $RetailPrice, $Price1, $Price2, $FailedFlag, $ErrorMessage);
+			echo returnstate($ItemID, $ItemDetailsID, $ItemName, $BuyPrice, $RetailPrice, $Price1, $Price2, $UnitID, $AvailableUnit, $ConversionQuantity, $Qty1, $Qty2, $FailedFlag, $ErrorMessage);
 			return 0;
 		}
 		
 		if(mysqli_num_rows($result) > 0) {
 			$row = mysqli_fetch_array($result);
 			$ItemID = $row['ItemID'];
+			$ItemDetailsID = $row['ItemDetailsID'];
 			$ItemName = $row['ItemName'];
 			$BuyPrice = $row['BuyPrice'];
 			$RetailPrice = $row['RetailPrice'];
 			$Price1 = $row['Price1'];
 			$Price2 = $row['Price2'];
+			$UnitID = $row['UnitID'];
+			$ConversionQuantity = $row['ConversionQuantity'];
+			$Qty1 = $row['Qty1'];
+			$Qty2 = $row['Qty2'];
 		}
 		else {
 			$FailedFlag = 1;
@@ -41,18 +52,47 @@
 		
 		mysqli_free_result($result);
 		mysqli_next_result($dbh);
+
+		if($FailedFlag == 0) {
+			$result2 = mysqli_use_result($dbh);
+			$AvailableUnit = array();
+			while ($row = mysqli_fetch_array($result2)) {
+				$row_unit = array();
+				$row_unit[] = $row['UnitID'];
+				$row_unit[] = $row['UnitName'];
+				$row_unit[] = $row['ItemDetailsID'];
+				$row_unit[] = $row['ItemCode'];
+				$row_unit[] = $row['BuyPrice'];
+				$row_unit[] = $row['RetailPrice'];
+				$row_unit[] = $row['Price1'];
+				$row_unit[] = $row['Price2'];
+				$row_unit[] = $row['Qty1'];
+				$row_unit[] = $row['Qty2'];
+				$row_unit[] = $row['ConversionQuantity'];
+				array_push($AvailableUnit, $row_unit);
+			}
+
+			mysqli_free_result($result2);
+			mysqli_next_result($dbh);
+		}
 		
-		echo returnstate($ItemID, $ItemName, $BuyPrice, $RetailPrice, $Price1, $Price2, $FailedFlag, $ErrorMessage);
+		echo returnstate($ItemID, $ItemDetailsID, $ItemName, $BuyPrice, $RetailPrice, $Price1, $Price2, $UnitID, $AvailableUnit, $ConversionQuantity, $Qty1, $Qty2, $FailedFlag, $ErrorMessage);
 	}
 	
-	function returnstate($ItemID, $ItemName, $BuyPrice, $RetailPrice, $Price1, $Price2, $FailedFlag, $ErrorMessage) {
+	function returnstate($ItemID, $ItemDetailsID, $ItemName, $BuyPrice, $RetailPrice, $Price1, $Price2, $UnitID, $AvailableUnit, $ConversionQuantity, $Qty1, $Qty2, $FailedFlag, $ErrorMessage) {
 		$data = array(
 			"ItemID" => $ItemID, 
 			"ItemName" => $ItemName, 
+			"ItemDetailsID" => $ItemDetailsID,
 			"BuyPrice" => $BuyPrice,
 			"RetailPrice" => $RetailPrice,
 			"Price1" => $Price1,
 			"Price2" => $Price2,
+			"AvailableUnit" => $AvailableUnit,
+			"UnitID" => $UnitID,
+			"ConversionQuantity" => $ConversionQuantity,
+			"Qty1" => $Qty1,
+			"Qty2" => $Qty2,
 			"FailedFlag" => $FailedFlag,
 			"ErrorMessage" => $ErrorMessage
 		);

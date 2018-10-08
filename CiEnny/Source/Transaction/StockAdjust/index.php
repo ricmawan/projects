@@ -18,7 +18,7 @@
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						 <span style="width:50%;display:inline-block;">
-							 <h5>Adjust Stok</h5>
+							 <h5>Penyesuaian Stok</h5>
 						</span>
 						<span style="width:49%;display:inline-block;text-align:right;">
 							<button id="btnAdd" class="btn btn-primary" onclick="openDialog(0, 0);"><i class="fa fa-plus "></i> Tambah</button>&nbsp;
@@ -37,10 +37,18 @@
 										<th><input id="select_all" name="select_all" type="checkbox" onclick="chkAll();" /></th>
 										<th>No</th>
 										<th>Tanggal</th>
+										<th>Cabang</th>
 										<th>Kode Barang</th>
 										<th>Nama Barang</th>
+										<th>Satuan</th>
 										<th>QTY</th>
-										<th>Adjust</th>
+										<th>Penyesuaian</th>
+										<th>StockAdjustID</th>
+										<th>StockAdjustDetailsID</th>
+										<th>PlainTransactionDate</th>
+										<th>ItemID</th>
+										<th>BranchID</th>
+										<th>UnitID</th>
 									</tr>
 								</thead>
 							</table>
@@ -65,48 +73,71 @@
 						<input id="hdnStockAdjustDetailsID" name="hdnStockAdjustDetailsID" type="hidden" value=0 />
 						<input id="hdnItemID" name="hdnItemID" type="hidden" value=0 />
 						<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
+						<input id="hdnAvailableUnit" name="hdnAvailableUnit" type="hidden" />
+						<input id="hdnItemDetailsID" name="hdnItemDetailsID" type="hidden" value=0 />
 						<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
 					</div>
 				</div>
-				<hr style="margin: 10px 0;" />
+				<br />
 				<div class="row">
 					<table class="table table-striped table-hover" style="margin-bottom: 5px;width:100%;" >
-						<thead>
-							<tr>
-								<th style="width: 15%;text-align: center;" >Cabang</th>
-								<th style="width: 25%;text-align: center;" >Kode Barang</th>
-								<th style="width: 30%;text-align: center;" >Nama Barang</th>
-								<th style="width: 15%;text-align: center;" >Qty</th>
-								<th style="width: 15%;text-align: center;" >Adjusted Qty</th>
-							</tr>
-						</thead>
 						<tbody>
 							<tr>
-								<td style="width: 15%;" >
-									<select id="ddlBranch" name="ddlBranch" tabindex=7 class="form-control-custom" placeholder="Pilih Cabang" >
-										<?php
-											$sql = "CALL spSelDDLBranch('".$_SESSION['UserLogin']."')";
-											if (! $result = mysqli_query($dbh, $sql)) {
-												logEvent(mysqli_error($dbh), '/Transaction/StockAdjust/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-												return 0;
-											}
-											while($row = mysqli_fetch_array($result)) {
-												echo "<option value='".$row['BranchID']."' >".$row['BranchCode']." - ".$row['BranchName']."</option>";
-											}
-											mysqli_free_result($result);
-											mysqli_next_result($dbh);
-										?>
-									</select>
+								<td style="width: 10%;" >
+									<div class="has-float-label" >
+										<select id="ddlBranch" name="ddlBranch" tabindex=7 class="form-control-custom" placeholder="Pilih Cabang" >
+											<?php
+												$sql = "CALL spSelDDLBranch('".$_SESSION['UserLogin']."')";
+												if (! $result = mysqli_query($dbh, $sql)) {
+													logEvent(mysqli_error($dbh), '/Transaction/StockAdjust/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+													return 0;
+												}
+												while($row = mysqli_fetch_array($result)) {
+													echo "<option value='".$row['BranchID']."' >".$row['BranchCode']." - ".$row['BranchName']."</option>";
+												}
+												mysqli_free_result($result);
+												mysqli_next_result($dbh);
+											?>
+										</select>
+										<label for="ddlBranch" class="lblInput" >Cabang</label>
+									</div>
 								</td>
-								<td style="width: 25%;" ><input id="txtItemCode" name="txtItemCode" type="text" tabindex=8 class="form-control-custom" style="width: 100%;" onfocus="this.select();" onkeypress="isEnterKey(event, 'getItemDetails');" onchange="getItemDetails();" autocomplete=off placeholder="Kode Barang" /></td>
-								<td style="width: 30%;" ><input id="txtItemName" name="txtItemName" type="text" class="form-control-custom" style="width: 100%;" disabled /></td>
-								<td style="width: 15%;" ><input id="txtQTY" name="txtQTY" type="number" class="form-control-custom" style="width: 100%;" value=1 min=1 readonly="readonly" /></td>
-								<td style="width: 15%;" ><input id="txtAdjustedQTY" name="txtAdjustedQTY" type="number" tabindex=9 class="form-control-custom" style="width: 100%;" value=1 min=1 onchange="this.value = validateQTY(this.value);" onkeypress="isEnterKey(event, 'addStockAdjustDetails');" onpaste="return false;" onfocus="this.select();" /></td>
+								<td style="width: 20%;" >
+									<div class="has-float-label" >
+										<input id="txtItemCode" name="txtItemCode" type="text" tabindex=8 class="form-control-custom" style="width: 100%;" onfocus="this.select();" onkeypress="isEnterKey(event, 'getItemDetails');" onchange="getItemDetails();" autocomplete=off />
+										<label for="txtItemCode" class="lblInput" >Kode Barang</label>
+									</div>
+								</td>
+								<td style="width: 25%;" >
+									<div class="has-float-label" >
+										<input id="txtItemName" name="txtItemName" type="text" class="form-control-custom" style="width: 100%;" disabled />
+										<label for="txtItemName" class="lblInput" >Nama Barang</label>
+									</div>
+								</td>
+								<td style="width: 15%;" >
+									<div class="has-float-label" >
+										<select id="ddlUnit" name="ddlUnit" tabindex=9 class="form-control-custom" onchange="changeItemCode();" >
+											<option >--</option>
+										</select>
+										<label for="ddlUnit" class="lblInput" >Satuan</label>
+									</div>
+								</td>
+								<td style="width: 15%;" >
+									<div class="has-float-label" >
+										<input id="txtQTY" name="txtQTY" type="number" class="form-control-custom" style="width: 100%;" value=1 min=1 readonly="readonly" />
+										<label for="txtQTY" class="lblInput" >Qty</label>
+									</div>
+								</td>
+								<td style="width: 15%;" >
+									<div class="has-float-label" >
+										<input id="txtAdjustedQTY" name="txtAdjustedQTY" type="number" tabindex=10 class="form-control-custom" style="width: 100%;margin: 0;border: 0;" value=1 min=1 onchange="this.value = validateQTY(this.value);" onkeypress="isEnterKey(event, 'addStockAdjustDetails');" onpaste="return false;" onfocus="this.select();" />
+										<label for="txtAdjustedQTY" class="lblInput" >Penyesuaian</label>
+									</div>
+								</td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
-				<hr style="margin: 10px 0;" />
 				<div class="row" >
 					<div id="divTableContent" class="table-responsive" style="overflow-x:hidden;">
 						<table id="grid-transaction" style="width: 100% !important;" class="table table-striped table-bordered table-hover" >
@@ -119,8 +150,12 @@
 									<th>Cabang</th>
 									<th>Kode Barang</th>
 									<th>Nama Barang</th>
+									<th>Satuan</th>
 									<th>QTY</th>
-									<th>Adjusted QTY</th>
+									<th>Penyesuaian QTY</th>
+									<th>UnitID</th>
+									<th>AvailableUnit</th>
+									<th>ItemDetailsID</th>
 								</tr>
 							</thead>
 						</table>
@@ -139,12 +174,38 @@
 							<tr>
 								<th>Kode Barang</th>
 								<th>Nama Barang</th>
-								<th>Harga Jual</th>
+								<th>Satuan</th>
+								<th>H Beli</th>
+								<th>H Ecer</th>
+								<th>H Grosir 1</th>
+								<th>QTY1</th>
+								<th>H Grosir 2</th>
+								<th>QTY2</th>
+								<th>Stok</th>
+								<th>Fisik</th>
 							</tr>
 						</thead>
 					</table>
 				</div>
 			</div>
+		</div>
+		<div id="divBranch" style="display:none;">
+			<select class="form-control-custom" placeholder="Pilih Cabang" onchange="branchChange(this.value);" >
+				<!--<option value=0 selected >-- Semua Cabang --</option>-->
+				<?php
+					$sql = "CALL spSelDDLBranch('".$_SESSION['UserLogin']."')";
+					if (! $result = mysqli_query($dbh, $sql)) {
+						logEvent(mysqli_error($dbh), '/Report/Sale/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+						return 0;
+					}
+					while($row = mysqli_fetch_array($result)) {
+						echo "<option value='".$row['BranchID']."' >".$row['BranchCode']." - ".$row['BranchName']."</option>";
+					}
+					mysqli_free_result($result);
+					mysqli_next_result($dbh);
+				?>
+			</select>
+			<input type="hidden" id="hdnBranchID" name="hdnBranchID" value=1 />
 		</div>
 		<script>
 			var table;
@@ -152,6 +213,12 @@
 			var table3;
 			var today;
 			var rowEdit;
+
+			function changeItemCode() {
+				var itemCode = $("#ddlUnit option:selected").attr("itemcode");
+				$("#txtItemCode").val(itemCode);
+				getItemDetails();
+			}
 			
 			function openDialogEdit(Data) {
 				$("#hdnStockAdjustDetailsID").val(Data[1]);
@@ -159,8 +226,21 @@
 				$("#ddlBranch").val(Data[3]);
 				$("#txtItemCode").val(Data[5]);
 				$("#txtItemName").val(Data[6]);
-				$("#txtQTY").val(Data[7]);
-				$("#txtAdjustedQTY").val(Data[7]);
+				$("#txtQTY").val(Data[8]);
+				$("#txtAdjustedQTY").val(Data[9]);
+
+				$("#hdnAvailableUnit").val(Data[11]);
+				$("#hdnItemDetailsID").val(Data[12]);
+				var availableUnit = JSON.parse(Data[11]);
+				if(availableUnit.length > 0) {
+					$("#ddlUnit").find('option').remove();
+					for(var i=0;i<availableUnit.length;i++) {
+						$("#ddlUnit").append("<option value=" + availableUnit[i][0] + " itemdetailsid='" + availableUnit[i][2] + "' >" + availableUnit[i][1] + "</option>");
+					}
+				}
+
+
+				$("#ddlUnit").val(Data[10]);
 
 				setTimeout(function() { $("#txtItemCode").focus(); }, 0);
 			}
@@ -169,18 +249,79 @@
 				$("#hdnIsEdit").val(EditFlag);
 				if(EditFlag == 1) {
 					$("#FormData").attr("title", "Edit Adjust Stok");
-					$("#hdnStockAdjustID").val(Data[8]);
-					//$("#lblTotal").html(Data[5]);
-					$("#txtTransactionDate").datepicker("setDate", new Date(Data[10]));
-					getStockAdjustDetails(Data[8], Data[9]);
-					
-					$("#hdnStockAdjustDetailsID").val(Data[9]);
-					$("#hdnItemID").val(Data[11]);
+					$("#hdnStockAdjustID").val(Data[9]);
 					$("#txtItemCode").val(Data[4]);
 					$("#txtItemName").val(Data[5]);
-					$("#txtQTY").val(Data[6]);
-					$("#txtAdjustedQTY").val(Data[7]);
-					$("#ddlBranch").val(Data[12]);
+					$("#ddlBranch").val(Data[13]);
+					//$("#lblTotal").html(Data[5]);
+					$("#txtTransactionDate").datepicker("setDate", new Date(Data[10]));
+					$("#hdnTransactionDate").val(Data[10]);
+					getStockAdjustDetails(Data[9], Data[10]);
+					var itemCode = $("#txtItemCode").val();
+					var branchID = $("#ddlBranch").val();
+					$.ajax({
+						url: "./Transaction/StockAdjust/CheckItem.php",
+						type: "POST",
+						data: { itemCode : itemCode, branchID : branchID },
+						dataType: "json",
+						success: function(data) {
+							if(data.FailedFlag == '0') {
+								//if($("#hdnItemID").val() != data.ItemID) {
+									$("#hdnAvailableUnit").val(JSON.stringify(data.AvailableUnit));
+									$("#hdnItemDetailsID").val(data.ItemDetailsID);
+									if(data.AvailableUnit.length > 0) {
+										$("#ddlUnit").find('option').remove();
+										for(var i=0;i<data.AvailableUnit.length;i++) {
+											$("#ddlUnit").append("<option value=" + data.AvailableUnit[i][0] + " itemdetailsid='" + data.AvailableUnit[i][2] + "' itemcode='" + data.AvailableUnit[i][3] + "' >" + data.AvailableUnit[i][1] + "</option>");
+										}
+									}
+
+									$("#hdnStockAdjustDetailsID").val(Data[10]);
+									$("#hdnItemID").val(Data[12]);
+									$("#txtQTY").val(Data[7]);
+									$("#txtAdjustedQTY").val(Data[8]);
+									$("#ddlBranch").val(Data[13]);
+									$("#ddlUnit").val(Data[14]);
+									$("#txtAdjustedQTY").focus();
+								//}
+								//else $("#txtAdjustedQTY").focus();
+							}
+							else {
+								//add new item
+								if(data.ErrorMessage == "") {
+									 $("#txtItemCode").notify("Kode tidak valid!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+								}
+								else {
+									var counter = 0;
+									Lobibox.alert("error",
+									{
+										msg: data.ErrorMessage,
+										width: 480,
+										beforeClose: function() {
+											if(counter == 0) {
+												setTimeout(function() {
+													$("#txtItemCode").focus();
+												}, 0);
+												counter = 1;
+											}
+										}
+									});
+									return 0;
+								}
+							}
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+							$("#loading").hide();
+							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+							LogEvent(errorMessage, "/Transaction/StockAdjust/index.php");
+							Lobibox.alert("error",
+							{
+								msg: errorMessage,
+								width: 480
+							});
+							return 0;
+						}
+					});
 					setTimeout(function() { $("#txtItemCode").focus(); }, 0);
 				}
 				else {
@@ -205,11 +346,15 @@
 										{ "visible": false },
 										{ "visible": false },
 										{ "visible": false },
-										{ "width": "15%", "orderable": false, className: "dt-head-center" },
+										{ "width": "10%", "orderable": false, className: "dt-head-center" },
+										{ "width": "20%", "orderable": false, className: "dt-head-center" },
 										{ "width": "25%", "orderable": false, className: "dt-head-center" },
-										{ "width": "30%", "orderable": false, className: "dt-head-center" },
+										{ "width": "15%", "orderable": false, className: "dt-head-center" },
 										{ "width": "15%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "15%", "orderable": false, className: "dt-head-center dt-body-right" }
+										{ "width": "15%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "visible": false },
+										{ "visible": false },
+										{ "visible": false }
 									],
 									"processing": false,
 									"serverSide": false,
@@ -284,14 +429,7 @@
 						tableWidthAdjust();
 						$("#divModal").show();
 					},
-					show: {
-						effect: "fade",
-						duration: 500
-					},
-					hide: {
-						effect: "fade",
-						duration: 500
-					},
+					
 					close: function() {
 						$(this).dialog("destroy");
 						$("#divModal").hide();
@@ -303,13 +441,13 @@
 						table2.destroy();
 					},
 					resizable: false,
-					height: 620,
-					width: 1180,
-					modal: false,
+					height: 500,
+					width: 1280,
+					modal: false /*,
 					buttons: [
 					{
 						text: "Tutup",
-						tabindex: 10,
+						tabindex: 11,
 						id: "btnCancelAddStockAdjust",
 						click: function() {
 							$(this).dialog("destroy");
@@ -322,7 +460,7 @@
 							table2.destroy();
 							return false;
 						}
-					}]
+					}]*/
 				}).dialog("open");
 			}
 			
@@ -341,15 +479,33 @@
 							dataType: "json",
 							success: function(data) {
 								if(data.FailedFlag == '0') {
-									if($("#hdnItemID").val() != data.ItemID) {
+									//if($("#hdnItemID").val() != data.ItemID) {
+										if($("#hdnStockAdjustDetailsID").val() != 0) {
+											$("#txtQTY").val(table2.row( rowEdit ).data()[8]);
+											$("#txtAdjustedQTY").val(table2.row( rowEdit ).data()[8]);
+										}
+										else {
+											$("#txtQTY").val(data.Quantity);
+											$("#txtAdjustedQTY").val(data.Quantity);
+											//console.log("mlebu 3");
+										}
+
 										$("#hdnItemID").val(data.ItemID);
 										$("#txtItemName").val(data.ItemName);
-										$("#txtQTY").val(data.Quantity);
-										$("#txtAdjustedQTY").val(data.Quantity);
 										//$("#txtSalePrice").val(returnRupiah(data.RetailPrice));
-										$("#txtAdjustedQTY").focus();
-									}
-									else $("#txtAdjustedQTY").focus();
+										$("#ddlUnit").focus();
+
+										$("#hdnAvailableUnit").val(JSON.stringify(data.AvailableUnit));
+										$("#hdnItemDetailsID").val(data.ItemDetailsID);
+										if(data.AvailableUnit.length > 0) {
+											$("#ddlUnit").find('option').remove();
+											for(var i=0;i<data.AvailableUnit.length;i++) {
+												$("#ddlUnit").append("<option value=" + data.AvailableUnit[i][0] + " itemdetailsid='" + data.AvailableUnit[i][2] + "' itemcode='" + data.AvailableUnit[i][3] + "' >" + data.AvailableUnit[i][1] + "</option>");
+											}
+										}
+										$("#ddlUnit").val(data.UnitID);
+									//}
+									//else $("#txtAdjustedQTY").focus();
 								}
 								else {
 									//add new item
@@ -449,14 +605,18 @@
 					var itemID = $("#hdnItemID").val();
 					var itemCode = $("#txtItemCode").val();
 					var itemName = $("#txtItemName").val();
+					var unitID = $("#ddlUnit").val();
+					var unitName = $("#ddlUnit option:selected").text();
 					var branchID = $("#ddlBranch").val();
 					var branchName = $("#ddlBranch option:selected").text();
-					var Qty = $("#txtQTY").val();
+					var Qty = parseFloat($("#txtQTY").val()).toFixed(2);
 					var adjustedQty = $("#txtAdjustedQTY").val();
 					var salePrice = $("#txtSalePrice").val();
 					$("#txtDiscount").blur();
 					var PassValidate = 1;
 					var FirstFocus = 0;
+					var availableUnit = $("#hdnAvailableUnit").val();
+					var itemDetailsID = $("#hdnItemDetailsID").val();
 					$("#FormData .form-control-custom").each(function() {
 						if($(this).hasAttr('required')) {
 							if($(this).val() == "") {
@@ -491,8 +651,12 @@
 											branchName,
 											itemCode,
 											itemName,
+											unitName,
 											Qty,
-											adjustedQty
+											adjustedQty,
+											unitID,
+											availableUnit,
+											itemDetailsID
 										]).draw();
 									}
 									else {
@@ -504,8 +668,12 @@
 											branchName,
 											itemCode,
 											itemName,
+											unitName,
 											Qty,
-											adjustedQty
+											adjustedQty,
+											unitID,
+											availableUnit,
+											itemDetailsID
 										]).draw();
 										table2.keys.enable();
 									}
@@ -518,6 +686,10 @@
 									$("#hdnStockAdjustID").val(data.ID);
 									$("#hdnStockAdjustDetailsID").val(0);
 									$("#hdnItemID").val(0);
+									$("#ddlUnit").find('option').remove();
+									$("#ddlUnit").append("<option>--</option>");
+									$("#hdnAvailableUnit").val("");
+									$("#hdnItemDetailsID").val(0);
 									tableWidthAdjust();
 									//Calculate();
 								}
@@ -579,12 +751,17 @@
 			
 			function resetForm() {
 				$("#hdnStockAdjustID").val(0);
+				$("#hdnStockAdjustDetailsID").val(0);
 				$("#hdnItemID").val(0);
 				$("#txtTransactionDate").datepicker("setDate", new Date());
 				$("#txtItemCode").val("");
 				$("#txtItemName").val("");
 				$("#txtQTY").val(1);
 				$("#txtAdjustedQTY").val(1);
+				$("#ddlUnit").find('option').remove();
+				$("#ddlUnit").append("<option>--</option>");
+				$("#hdnAvailableUnit").val("");
+				$("#hdnItemDetailsID").val(0);
 				//$("#txtSalePrice").val(0);
 				//$("#lblTotal").html("0");
 				table2.clear().draw();
@@ -620,6 +797,11 @@
 				});
 			}
 			
+			function branchChange(BranchID) {
+				$("#ddlBranch").val(BranchID);
+				table3.ajax.reload();
+			}
+
 			function itemList() {
 				$("#itemList-dialog").dialog({
 					autoOpen: false,
@@ -628,18 +810,31 @@
 						table2.keys.disable();
 						table3 = $("#grid-item").DataTable({
 									"keys": true,
-									"scrollY": "295px",
+									"scrollY": "280px",
 									"scrollX": false,
 									"scrollCollapse": false,
 									"paging": false,
 									"searching": true,
 									"order": [],
 									"columns": [
-										{ "width": "45%", "orderable": false, className: "dt-head-center" },
-										{ "width": "45%", "orderable": false, className: "dt-head-center" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" }
+										{ "width": "15%", "orderable": false, className: "dt-head-center" },
+										{ "width": "20%", "orderable": false, className: "dt-head-center" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" }
 									],
-									"ajax": "./Transaction/StockAdjust/ItemList.php",
+									"ajax": {
+										"url": "./Transaction/StockAdjust/ItemList.php",
+										"data": function ( d ) {
+											d.BranchID = $("#ddlBranch").val()
+										}
+									},
 									"processing": true,
 									"serverSide": true,
 									"language": {
@@ -660,20 +855,29 @@
 									"initComplete": function(settings, json) {
 										table3.columns.adjust();
 										$("#grid-item").DataTable().cell( ':eq(0)' ).focus();
-									}
+									},
+									"sDom": '<"toolbar">frtip'
 								});
+
+						$(".toolbar").css({
+							"display" : "inline-block"
+						});
+
+						$("div.toolbar").html($("#divBranch").html());
+						$("div.toolbar").find("select").val($("#ddlBranch").val());
+
 						var counterPickItem = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
 							//var index = table3.cell({ focused: true }).index();
 							if(counterPickItem == 0) {
 								counterPickItem = 1;
-								var data = datatable.row( cell.index().row ).data();
+								var data = datatable.row( table3.cell({ focused: true }).index().row ).data();
 								if(key == 13 && $("#itemList-dialog").css("display") == "block") {
 									$("#txtItemCode").val(data[0]);
 									getItemDetails();
 									$("#itemList-dialog").dialog("destroy");
 									table3.destroy();
-									table.keys.enable();
+									//table.keys.enable();
 									table2.keys.enable();
 								}
 								setTimeout(function() { counterPickItem = 0; } , 1000);
@@ -687,7 +891,7 @@
 								getItemDetails();
 								$("#itemList-dialog").dialog("destroy");
 								table3.destroy();
-								table.keys.enable();
+								///table.keys.enable();
 								table2.keys.enable();
 							}
 						});
@@ -703,28 +907,27 @@
 								if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0) {
 									$("#itemList-dialog").find("input[type='search']").focus();
 								}
+								else if(evt.keyCode == 27 && $("#itemList-dialog").css("display") == "block") {
+									$("#itemList-dialog").dialog("destroy");
+									table3.destroy();
+									table2.keys.enable();
+								}
 							}
 							setTimeout(function() { counterKeyItem = 0; } , 1000);
 						});
 					},
-					show: {
-						effect: "fade",
-						duration: 500
-					},
-					hide: {
-						effect: "fade",
-						duration: 500
-					},
+					
 					close: function() {
 						$(this).dialog("destroy");
 						table3.destroy();
-						table.keys.enable();
+						//table.keys.enable();
 						table2.keys.enable();
+						$("#txtItemCode").focus();
 					},
 					resizable: false,
-					height: 500,
+					height: 420,
 					width: 1280,
-					modal: true,
+					modal: true /*,
 					buttons: [
 					{
 						text: "Tutup",
@@ -733,17 +936,17 @@
 						click: function() {
 							$(this).dialog("destroy");
 							table3.destroy();
-							table.keys.enable();
+							//table.keys.enable();
 							table2.keys.enable();
 							return false;
 						}
-					}]
+					}]*/
 				}).dialog("open");
 			}
 
 			function finish() {
-				if($("#hdnSaleID").val() != 0) {
-					$("#finish-confirm").dialog({
+				if($("#hdnStockAdjustID").val() != 0) {
+					$("#save-confirm").dialog({
 						autoOpen: false,
 						open: function() {
 							$(document).on('keydown', function(e) {
@@ -757,11 +960,11 @@
 						},
 						show: {
 							effect: "fade",
-							duration: 500
+							duration: 0
 						},
 						hide: {
 							effect: "fade",
-							duration: 500
+							duration: 0
 						},
 						close: function() {
 							$(this).dialog("destroy");
@@ -817,10 +1020,39 @@
 				}
 			}
 
+			var waitForFinalEvent = (function () {
+		        var timers = {};
+		        return function (callback, ms, uniqueId) {
+		            if (!uniqueId) {
+		                uniqueId = "Don't call this twice without a uniqueId";
+		            }
+		            if (timers[uniqueId]) {
+		                clearTimeout(timers[uniqueId]);
+		            }
+		            timers[uniqueId] = setTimeout(callback, ms);
+		        };
+		    })();
+			
 			$(document).ready(function() {
+				$( window ).resize(function() {
+					waitForFinalEvent(function () {
+		               	setTimeout(function() {
+							table.columns.adjust().draw();
+							if ( $.fn.DataTable.isDataTable( '#grid-transaction' ) ) {
+								tableWidthAdjust();
+							}
+							if ( $.fn.DataTable.isDataTable( '#grid-item' ) ) {
+								table3.columns.adjust().draw();
+							}
+						}, 0);
+		            }, 500, "resizeWindow");
+				});
+				
 				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
 				   $(this).blur();
 				});
+
+				$("#txtAdjustedQTY").spinner();
 				
 				$.fn.dataTable.ext.errMode = function(settings, techNote, message) { 
 					$("#loading").hide();
@@ -844,7 +1076,8 @@
 				$("#txtTransactionDate").datepicker({
 					dateFormat: 'DD, dd M yy',
 					dayNames: [ "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu" ],
-					monthNames: [ "Jan", "Feb", "Mar", "Apr", "Mey", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Des" ],
+					monthNames: [ "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember" ],
+					monthNamesShort: [ "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Des" ],
 					maxDate : "+0D",
 					showOn: "button",
 					buttonImage: "./assets/img/calendar.gif",
@@ -875,15 +1108,23 @@
 								"scrollY": "330px",
 								"rowId": "StockAdjustID",
 								"scrollCollapse": true,
-								"order": [2, "asc"],
+								"order": [],
 								"columns": [
 									{ "width": "20px", "orderable": false, className: "dt-head-center dt-body-center" },
 									{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
 									{ className: "dt-head-center" },
 									{ className: "dt-head-center" },
 									{ className: "dt-head-center" },
+									{ className: "dt-head-center" },
+									{ className: "dt-head-center" },
 									{ className: "dt-head-cente dt-body-right" },
-									{ className: "dt-head-center dt-body-right" }
+									{ className: "dt-head-center dt-body-right" },
+									{ "visible" : false },
+									{ "visible" : false },
+									{ "visible" : false },
+									{ "visible" : false },
+									{ "visible" : false },
+									{ "visible" : false }
 								],
 								"processing": true,
 								"serverSide": true,
@@ -934,7 +1175,7 @@
 							if(DeleteID.length == 0) {
 								table.keys.disable();
 								var deletedData = new Array();
-								deletedData.push(data[9]);
+								deletedData.push(data[10]);
 								SingleDelete("./Transaction/StockAdjust/Delete.php", deletedData, function(action) {
 									if(action == "success") {
 										table.ajax.reload(function() {
@@ -992,7 +1233,7 @@
 					else if(evt.keyCode == 123) {
 						evt.preventDefault();
 					}
-					else if(evt.keyCode == 121 && $("#itemList-dialog").css("display") == "none"  && $("#finish-dialog").css("display") == "none" && $("#FormData").css("display") == "block"  && $(".lobibox").css("display") != "block") {
+					else if(evt.keyCode == 121 && $("#itemList-dialog").css("display") == "none"  && $("#save-confirm").css("display") == "none" && $("#FormData").css("display") == "block"  && $(".lobibox").css("display") != "block") {
 						evt.preventDefault();
 						if(counterKey == 0) {
 							finish();

@@ -12,15 +12,18 @@
 		$RetailFlag = mysqli_real_escape_string($dbh, $_POST['hdnIsRetail']);
 		$CustomerID = mysqli_real_escape_string($dbh, $_POST['ddlCustomer']);
 		$ItemID = mysqli_real_escape_string($dbh, $_POST['hdnItemID']);
+		$ItemDetailsID = mysqli_real_escape_string($dbh, $_POST['hdnItemDetailsID']);
+		if($ItemDetailsID == "") $ItemDetailsID = "NULL";
 		$Qty = mysqli_real_escape_string($dbh, $_POST['txtQTY']);
 		$BuyPrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['hdnBuyPrice']));
-		$SalePrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtSalePrice']));
+		$SalePrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['hdnSalePrice']));
 		$Discount = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtDiscount']));
+		$FinishFlag = $FINSH_DEFAULT;
 		$Message = "Terjadi Kesalahan Sistem!";
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
-		$sql = "CALL spInsSale(".$SaleID.", '".$SaleNumber."', ".$RetailFlag.", ".$CustomerID.", '".$TransactionDate."', ".$SaleDetailsID.", ".$BranchID.", ".$ItemID.", ".$Qty.", ".$BuyPrice.", ".$SalePrice.", ".$Discount.", ".$_SESSION['UserID'].", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsSale(".$SaleID.", '".$SaleNumber."', ".$RetailFlag.", ".$FinishFlag.", ".$CustomerID.", '".$TransactionDate."', ".$SaleDetailsID.", ".$BranchID.", ".$ItemID.", ".$ItemDetailsID.", ".$Qty.", ".$BuyPrice.", ".$SalePrice.", ".$Discount.", ".$_SESSION['UserID'].", '".$_SESSION['UserLogin']."')";
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;

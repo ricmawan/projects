@@ -62,10 +62,10 @@
 				<br />
 				<div class="row">
 					<div class="col-md-3 labelColumn">
-						Nama Pelanggan :
+						Nama Pelanggan:
 					</div>
 					<div class="col-md-7">
-						<input id="txtCustomerName" name="txtCustomerName" type="text" tabindex=6 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Nama Pelanggan" required />
+						<input id="txtCustomerName" name="txtCustomerName" type="text" tabindex=6 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Nama Pelanggan" maxlength="30" required />
 					</div>
 				</div>				
 				<br />
@@ -83,7 +83,7 @@
 						Alamat :
 					</div>
 					<div class="col-md-7">
-						<input id="txtAddress" name="txtAddress" type="text" tabindex=8 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Alamat" />
+						<input id="txtAddress" maxlength="30" name="txtAddress" type="text" tabindex=8 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Alamat" />
 					</div>
 				</div>
 				<br />
@@ -136,15 +136,11 @@
 								$("#btnSaveCustomer").focus();
 							}
 						});
+						setTimeout(function() {
+							$("#txtCustomerCode").focus();
+						}, 0);
 					},
-					show: {
-						effect: "fade",
-						duration: 500
-					},
-					hide: {
-						effect: "fade",
-						duration: 500
-					},
+					
 					close: function() {
 						$(this).dialog("destroy");
 						$("#divModal").hide();
@@ -250,6 +246,7 @@
 					{
 						text: "Batal",
 						id: "btnCancelAddCustomer",
+						tabindex: 12,
 						click: function() {
 							$(this).dialog("destroy");
 							$("#divModal").hide();
@@ -302,7 +299,28 @@
 				});
 			}
 
+			var waitForFinalEvent = (function () {
+		        var timers = {};
+		        return function (callback, ms, uniqueId) {
+		            if (!uniqueId) {
+		                uniqueId = "Don't call this twice without a uniqueId";
+		            }
+		            if (timers[uniqueId]) {
+		                clearTimeout(timers[uniqueId]);
+		            }
+		            timers[uniqueId] = setTimeout(callback, ms);
+		        };
+		    })();
+			
 			$(document).ready(function() {
+				$( window ).resize(function() {
+					waitForFinalEvent(function () {
+		               setTimeout(function() {
+							table.columns.adjust().draw();
+						}, 0);
+		            }, 500, "resizeWindow");
+				});
+				
 				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
 					$(this).blur();
 				});
@@ -334,7 +352,7 @@
 								"scrollY": "330px",
 								"rowId": "CustomerID",
 								"scrollCollapse": true,
-								"order": [2, "asc"],
+								"order": [],
 								"columns": [
 									{ "width": "20px", "orderable": false, className: "dt-head-center dt-body-center" },
 									{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },

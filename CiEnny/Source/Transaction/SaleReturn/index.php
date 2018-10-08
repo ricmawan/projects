@@ -14,6 +14,9 @@
 			.chkSaleDetails {
 				margin-top : 0 !important;
 			}
+			.ui-spinner {
+				width: 100%;
+			}
 		</style>
 	</head>
 	<body>
@@ -84,7 +87,7 @@
 						<input id="txtCustomerName" name="txtCustomerName" type="text" class="form-control-custom" readonly />
 					</div>
 				</div>
-				<hr style="margin: 10px 0;" />
+				<hr style="margin: 5px 0 0 0;" />
 				<div class="row" >
 					<div id="divTableContent" class="table-responsive" style="overflow-x:hidden;">
 						<table id="grid-transaction" style="width: 100% !important;" class="table table-striped table-bordered table-hover" >
@@ -93,11 +96,12 @@
 									<th>SaleReturnDetailsID</th>
 									<th>ItemID</th>
 									<th>BranchID</th>
-									<th><input id="select_all_salereturn" name="select_all_salereturn" type="checkbox" onclick="checkAllSaleReturn();" /></th>
+									<th><input id="select_all_salereturn" name="select_all_salereturn" type="checkbox" onclick="checkAllSaleReturn();" tabindex=7 /></th>
 									<th>Cabang</th>
 									<th>Kode Barang</th>
 									<th>Nama Barang</th>
 									<th>Qty</th>
+									<th>Satuan</th>
 									<th>Harga Jual</th>
 									<th>Sub Total</th>
 									<th>BuyPrice</th>
@@ -147,6 +151,7 @@
 					$("#txtSaleNumber").val(Data[2]);
 					$("#lblTotal").html(Data[5]);
 					$("#txtTransactionDate").datepicker("setDate", new Date(Data[7]));
+					$("#hdnTransactionDate").val(Data[7]);
 					$("#txtSaleNumber").prop("readonly", true);
 					getSaleReturnDetails(Data[6]);
 				}
@@ -158,6 +163,14 @@
 				$("#FormData").dialog({
 					autoOpen: false,
 					open: function() {
+						$(document).on('keydown', function(e) {
+							if (e.keyCode == 39 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0 && $("select:focus").length == 0) { //right arrow
+								$("#btnCancelAddSaleReturn").focus();
+							}
+							else if(e.keyCode == 37 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0 && $("select:focus").length == 0) { //left arrow
+								$("#btnSaveSaleReturn").focus();
+							}
+						});
 						$("#txtSaleNumber").focus();
 						table.keys.disable();
 						table2 = $("#grid-transaction").DataTable({
@@ -173,10 +186,11 @@
 										{ "visible": false },
 										{ "visible": false },
 										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-center" },
-										{ "width": "15%", "orderable": false, className: "dt-head-center dt-body-center" },
-										{ "width": "20%", "orderable": false, className: "dt-head-center" },
+										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-center" },
+										{ "width": "15%", "orderable": false, className: "dt-head-center" },
 										{ "width": "20%", "orderable": false, className: "dt-head-center" },
 										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "10%", "orderable": false, className: "dt-head-center" },
 										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "visible": false }
@@ -197,20 +211,18 @@
 											"last": "»",
 											"first": "«"
 										}
+									},
+									"initComplete": function(settings, json) {
+										setTimeout(function() {
+											$("#grid-transaction").find("#select_all_salereturn").first().remove()
+										}, 0);
 									}
 								});
 						table2.columns.adjust();
 						tableWidthAdjust();
 						$("#divModal").show();
 					},
-					show: {
-						effect: "fade",
-						duration: 500
-					},
-					hide: {
-						effect: "fade",
-						duration: 500
-					},
+					
 					close: function() {
 						$(this).dialog("destroy");
 						$("#divModal").hide();
@@ -222,99 +234,116 @@
 						table2.destroy();
 					},
 					resizable: false,
-					height: 640,
+					height: 620,
 					width: 1280,
 					modal: false,
 					buttons: [
 					{
 						text: "Simpan",
-						tabindex: 12,
 						id: "btnSaveSaleReturn",
 						click: function() {
-							if($("input:checkbox[class=chkSaleDetails]:checked").length > 0)
-							{
-								saveConfirm(function(action) {
-									if(action == "Ya") {
-										$("#loading").show();
-										$.ajax({
-											url: "./Transaction/SaleReturn/Insert.php",
-											type: "POST",
-											data: $("#PostForm").serialize(),
-											dataType: "json",
-											success: function(data) {
-												if(data.FailedFlag == '0') {
-													$("#loading").hide();
-													$("#FormData").dialog("destroy");
-													$("#divModal").hide();
-													resetForm();
-													table2.destroy();
-													var counter = 0;
-													Lobibox.alert("success",
-													{
-														msg: data.Message,
-														width: 480,
-														delay: 2000,
-														beforeClose: function() {
-															if(counter == 0) {
-																table.keys.enable();
-																counter = 1;
-															}
-														},
-														shown: function() {
-															setTimeout(function() {
-																table.ajax.reload(function() {
+							if($("#hdnSaleID").val() != 0) {
+								if($("input:checkbox[class=chkSaleDetails]:checked").length > 0)
+								{
+									saveConfirm(function(action) {
+										if(action == "Ya") {
+											$("#loading").show();
+											$.ajax({
+												url: "./Transaction/SaleReturn/Insert.php",
+												type: "POST",
+												data: $("#PostForm").serialize(),
+												dataType: "json",
+												success: function(data) {
+													if(data.FailedFlag == '0') {
+														$("#loading").hide();
+														$("#FormData").dialog("destroy");
+														$("#divModal").hide();
+														resetForm();
+														table2.destroy();
+														var counter = 0;
+														Lobibox.alert("success",
+														{
+															msg: data.Message,
+															width: 480,
+															delay: 2000,
+															beforeClose: function() {
+																if(counter == 0) {
 																	table.keys.enable();
-																	if(typeof index !== 'undefined') table.cell(index).focus();
-																	table.keys.disable();
-																}, false);
-															}, 0);
-														}
-													});
-												}
-												else {
+																	counter = 1;
+																}
+															},
+															shown: function() {
+																setTimeout(function() {
+																	table.ajax.reload(function() {
+																		table.keys.enable();
+																		if(typeof index !== 'undefined') table.cell(index).focus();
+																		table.keys.disable();
+																	}, false);
+																}, 0);
+															}
+														});
+													}
+													else {
+														$("#loading").hide();
+														var counter = 0;
+														Lobibox.alert("warning",
+														{
+															msg: data.Message,
+															width: 480,
+															delay: false
+														});
+														return 0;
+													}
+												},
+												error: function(jqXHR, textStatus, errorThrown) {
 													$("#loading").hide();
 													var counter = 0;
-													Lobibox.alert("warning",
+													var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+													LogEvent(errorMessage, "/Master/Item/index.php");
+													Lobibox.alert("error",
 													{
-														msg: data.Message,
-														width: 480,
-														delay: false,
-														beforeClose: function() {
-															if(counter == 0) {
-																setTimeout(function() {
-																	$("#txtItemCode").focus();
-																}, 0);
-																counter = 1;
-															}
-														}
+														msg: errorMessage,
+														width: 480
 													});
 													return 0;
 												}
-											},
-											error: function(jqXHR, textStatus, errorThrown) {
-												$("#loading").hide();
-												var counter = 0;
-												var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-												LogEvent(errorMessage, "/Master/Item/index.php");
-												Lobibox.alert("error",
-												{
-													msg: errorMessage,
-													width: 480,
-													beforeClose: function() {
-														if(counter == 0) {
-															setTimeout(function() {
-																$("#txtItemCode").focus();
-															}, 0);
-															counter = 1;
-														}
-													}
-												});
-												return 0;
+											});
+										}
+										else {
+											return false;
+										}
+									});
+								}
+								else {
+									var counter = 0;
+									Lobibox.alert("error",
+									{
+										msg: "Minimal pilih 1 data!",
+										width: 480,
+										beforeClose: function() {
+											if(counter == 0) {
+												setTimeout(function() {
+													$("#select_all_salereturn").focus();
+												}, 0);
+												counter = 1;
 											}
-										});
-									}
-									else {
-										return false;
+										}
+									});
+								}
+							}
+							else {
+								var counter = 0;
+								Lobibox.alert("error",
+								{
+									msg: "Silahkan input No. Invoice!",
+									width: 480,
+									beforeClose: function() {
+										if(counter == 0) {
+											setTimeout(function() {
+												$("#txtSaleNumber").focus();
+											}, 0);
+											counter = 1;
+										}
 									}
 								});
 							}
@@ -322,7 +351,6 @@
 					},
 					{
 						text: "Tutup",
-						tabindex: 13,
 						id: "btnCancelAddSaleReturn",
 						click: function() {
 							$(this).dialog("destroy");
@@ -377,6 +405,13 @@
 							}
 							table2.draw();
 							tableWidthAdjust();
+							setTimeout(function() {
+								$("#grid-transaction").find("#select_all_salereturn").first().remove()
+							}, 0);
+							$("#btnSaveSaleReturn").attr("tabindex", Data.tabindex);
+							$("#btnCancelAddSaleReturn").attr("tabindex", (parseFloat(Data.tabindex) + 1));
+
+							$(".txtQTY").spinner();
 							
 							for(var i=0;i<Data.data.length;i++) {
 								$("#toggle-branch-" + Data.data[i][0]).toggles({
@@ -407,15 +442,7 @@
 							Lobibox.alert("error",
 							{
 								msg: "Gagal memuat data",
-								width: 480,
-								beforeClose: function() {
-									if(counter == 0) {
-										setTimeout(function() {
-											//$("#txtItemCode").focus();
-										}, 0);
-										counter = 1;
-									}
-								}
+								width: 480
 							});
 							return 0;
 						}
@@ -436,7 +463,7 @@
 
 			var saleDetailsCounter = 0;
 			function getSaleDetails() {
-				if(saleDetailsCounter == 0) 
+				if(saleDetailsCounter == 0 && $("#txtSaleNumber").prop("readonly") == false) 
 				{
 					saleDetailsCounter = 1;
 					var saleNumber = $("#txtSaleNumber").val();
@@ -448,60 +475,81 @@
 						success: function(Data) {
 							if(Data.FailedFlag == '0') {
 								table2.clear().draw();
-								for(var i=0;i<Data.data.length;i++) {
-									if(i == 0) {
-										$("#hdnSaleID").val(Data.data[i][12]);
-										$("#txtCustomerName").val(Data.data[i][11]);
+
+								if(Data.data.length > 0) {
+									for(var i=0;i<Data.data.length;i++) {
+										if(i == 0) {
+											$("#hdnSaleID").val(Data.data[i][13]);
+											$("#txtCustomerName").val(Data.data[i][12]);
+										}
+										table2.row.add(Data.data[i]);
 									}
-									table2.row.add(Data.data[i]);
+									$("#btnSaveSaleReturn").attr("tabindex", Data.tabindex);
+									$("#btnCancelAddSaleReturn").attr("tabindex", (parseFloat(Data.tabindex) + 1));
+									table2.draw();
+									tableWidthAdjust();
+									setTimeout(function() {
+										$("#grid-transaction").find("#select_all_salereturn").first().remove()
+									}, 0);
+
+									$(".txtQTY").spinner();
+
+									$("#select_all_salereturn").prop("checked", false);								
+									for(var i=0;i<Data.data.length;i++) {
+										$("#toggle-branch-" + Data.data[i][0]).toggles({
+											drag: true, // allow dragging the toggle between positions
+											click: true, // allow clicking on the toggle
+											text: {
+												on: 'Toko', // text for the ON position
+												off: 'Gudang' // and off
+											},
+											on: true, // is the toggle ON on init
+											animate: 250, // animation time (ms)
+											easing: 'swing', // animation transition easing function
+											checkbox: null, // the checkbox to toggle (for use in forms)
+											clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
+											width: 80, // width used if not set in css
+											height: 18, // height if not set in css
+											type: 'compact' // if this is set to 'select' then the select style toggle will be used
+										});
+										
+										if(Data.data[i][2] == 1) $("#toggle-branch-" + Data.data[i][0]).toggles(true);
+										else $("#toggle-branch-" + Data.data[i][0]).toggles(false);
+												
+										if(Data.data[i][13] == 0) {
+											$("#toggle-branch-" + Data.data[i][0]).toggles().toggleClass('disabled', true);;
+										}
+									}
+									//Calculate();
+									setTimeout(function() {
+										$("#grid-transaction").DataTable().cell( ':eq(3)' ).focus();
+									}, 0);
+									$("#txtTransactionDate").focus();
 								}
-								table2.draw();
-								tableWidthAdjust();
-								
-								for(var i=0;i<Data.data.length;i++) {
-									$("#toggle-branch-" + Data.data[i][0]).toggles({
-										drag: true, // allow dragging the toggle between positions
-										click: true, // allow clicking on the toggle
-										text: {
-											on: 'Toko', // text for the ON position
-											off: 'Gudang' // and off
-										},
-										on: true, // is the toggle ON on init
-										animate: 250, // animation time (ms)
-										easing: 'swing', // animation transition easing function
-										checkbox: null, // the checkbox to toggle (for use in forms)
-										clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
-										width: 80, // width used if not set in css
-										height: 18, // height if not set in css
-										type: 'compact' // if this is set to 'select' then the select style toggle will be used
+								else {
+									var counter = 0;
+									Lobibox.alert("error",
+									{
+										msg: "No. Invoice tidak valid!",
+										width: 480,
+										beforeClose: function() {
+											if(counter == 0) {
+												setTimeout(function() {
+													$("#txtSaleNumber").focus();
+												}, 0);
+												counter = 1;
+											}
+										}
 									});
-									
-									if(Data.data[i][2] == 1) $("#toggle-branch-" + Data.data[i][0]).toggles(true);
-									else $("#toggle-branch-" + Data.data[i][0]).toggles(false);
-											
-									if(Data.data[i][13] == 0) {
-										$("#toggle-branch-" + Data.data[i][0]).toggles().toggleClass('disabled', true);;
-									}
+									return 0;
 								}
-								//Calculate();
-								setTimeout(function() {
-									$("#grid-transaction").DataTable().cell( ':eq(3)' ).focus();
-								}, 0);
 							}
 							else {
 								var counter = 0;
 								Lobibox.alert("error",
 								{
 									msg: "Gagal memuat data",
-									width: 480,
-									beforeClose: function() {
-										if(counter == 0) {
-											setTimeout(function() {
-												//$("#txtItemCode").focus();
-											}, 0);
-											counter = 1;
-										}
-									}
+									width: 480
 								});
 								return 0;
 							}
@@ -518,6 +566,9 @@
 							return 0;
 						}
 					});
+				}
+				else if($("#txtSaleNumber").prop("readonly") == true) {
+					$("#txtTransactionDate").focus();
 				}
 				setTimeout(function() {
 					saleDetailsCounter = 0;
@@ -567,6 +618,8 @@
 				$("#txtSaleNumber").val("");
 				$("#lblTotal").html("0");
 				table2.clear().draw();
+				$("#select_all_salereturn").prop("checked", false);
+				$("#select_all_salereturn").attr("checked", false);
 			}
 			
 			function fnDeleteData() {
@@ -644,10 +697,9 @@
 								});
 						var counterPickTransaction = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
-							//var index = table3.cell({ focused: true }).index();
 							if(counterPickTransaction == 0) {
 								counterPickTransaction = 1;
-								var data = datatable.row( cell.index().row ).data();
+								var data = datatable.row( table3.cell({ focused: true }).index().row ).data();
 								if(key == 13 && $("#transactionList-dialog").css("display") == "block") {
 									$("#txtSaleNumber").val(data[0]);
 									getSaleDetails();
@@ -683,28 +735,27 @@
 								if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0) {
 									$("#transactionList-dialog").find("input[type='search']").focus();
 								}
+								else if(evt.keyCode == 27 && $("#transactionList-dialog").css("display") == "block") {
+									$("#transactionList-dialog").dialog("destroy");
+									table3.destroy();
+									table2.keys.enable();
+								}
 							}
 							setTimeout(function() { counterKeyTransaction = 0; } , 1000);
 						});
 					},
-					show: {
-						effect: "fade",
-						duration: 500
-					},
-					hide: {
-						effect: "fade",
-						duration: 500
-					},
+					
 					close: function() {
 						$(this).dialog("destroy");
 						table3.destroy();
-						table.keys.enable();
+						//table.keys.enable();
 						table2.keys.enable();
+						$("#txtSaleNumber").focus();
 					},
 					resizable: false,
-					height: 500,
+					height: 420,
 					width: 1280,
-					modal: true,
+					modal: true /*,
 					buttons: [
 					{
 						text: "Tutup",
@@ -717,78 +768,110 @@
 							table2.keys.enable();
 							return false;
 						}
-					}]
+					}]*/
 				}).dialog("open");
 			}
 
 			function finish() {
 				if($("#hdnSaleID").val() != 0) {
-					$("#finish-confirm").dialog({
-						autoOpen: false,
-						open: function() {
-							$(document).on('keydown', function(e) {
-								if (e.keyCode == 39) { //right arrow
-									 $("#btnNo").focus();
-								}
-								else if (e.keyCode == 37) { //left arrow
-									 $("#btnYes").focus();
-								}
-							});
-						},
-						show: {
-							effect: "fade",
-							duration: 500
-						},
-						hide: {
-							effect: "fade",
-							duration: 500
-						},
-						close: function() {
-							$(this).dialog("destroy");
-							//callback("Tidak");
-						},
-						resizable: false,
-						height: "auto",
-						width: 400,
-						modal: true,
-						buttons: [
-						{
-							text: "Ya",
-							id: "btnYes",
-							click: function() {
-								$(this).dialog("destroy");
-								$("#FormData").dialog("destroy");
-								$("#divModal").hide();
-								table.ajax.reload(function() {
-									table.keys.enable();
-									if(typeof index !== 'undefined') table.cell(index).focus();
-								}, false);
-								resetForm();
-								table2.destroy();
-								//$(this).dialog("destroy");
-								//callback("Ya");
+					if($("input:checkbox[class=chkSaleDetails]:checked").length > 0)
+					{
+						saveConfirm(function(action) {
+							if(action == "Ya") {
+								$("#loading").show();
+								$.ajax({
+									url: "./Transaction/SaleReturn/Insert.php",
+									type: "POST",
+									data: $("#PostForm").serialize(),
+									dataType: "json",
+									success: function(data) {
+										if(data.FailedFlag == '0') {
+											$("#loading").hide();
+											$("#FormData").dialog("destroy");
+											$("#divModal").hide();
+											resetForm();
+											table2.destroy();
+											var counter = 0;
+											Lobibox.alert("success",
+											{
+												msg: data.Message,
+												width: 480,
+												delay: 2000,
+												beforeClose: function() {
+													if(counter == 0) {
+														table.keys.enable();
+														counter = 1;
+													}
+												},
+												shown: function() {
+													setTimeout(function() {
+														table.ajax.reload(function() {
+															table.keys.enable();
+															if(typeof index !== 'undefined') table.cell(index).focus();
+															table.keys.disable();
+														}, false);
+													}, 0);
+												}
+											});
+										}
+										else {
+											$("#loading").hide();
+											var counter = 0;
+											Lobibox.alert("warning",
+											{
+												msg: data.Message,
+												width: 480,
+												delay: false
+											});
+											return 0;
+										}
+									},
+									error: function(jqXHR, textStatus, errorThrown) {
+										$("#loading").hide();
+										var counter = 0;
+										var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+										LogEvent(errorMessage, "/Master/Item/index.php");
+										Lobibox.alert("error",
+										{
+											msg: errorMessage,
+											width: 480
+										});
+										return 0;
+									}
+								});
 							}
-						},
-						{
-							text: "Tidak",
-							id: "btnNo",
-							click: function() {
-								$(this).dialog("destroy");
-								//callback("Tidak");
+							else {
+								return false;
 							}
-						}]
-					}).dialog("open");
+						});
+					}
+					else {
+						var counter = 0;
+						Lobibox.alert("error",
+						{
+							msg: "Minimal pilih 1 data!",
+							width: 480,
+							beforeClose: function() {
+								if(counter == 0) {
+									setTimeout(function() {
+										$("#select_all_salereturn").focus();
+									}, 0);
+									counter = 1;
+								}
+							}
+						});
+					}
 				}
 				else {
 					var counter = 0;
 					Lobibox.alert("error",
 					{
-						msg: "Silahkan tambahkan barang terlebih dahulu!",
+						msg: "Silahkan input No. Invoice!",
 						width: 480,
 						beforeClose: function() {
 							if(counter == 0) {
 								setTimeout(function() {
-									$("#txtItemCode").focus();
+									$("#txtSaleNumber").focus();
 								}, 0);
 								counter = 1;
 							}
@@ -797,7 +880,34 @@
 				}
 			}
 			
+			var waitForFinalEvent = (function () {
+		        var timers = {};
+		        return function (callback, ms, uniqueId) {
+		            if (!uniqueId) {
+		                uniqueId = "Don't call this twice without a uniqueId";
+		            }
+		            if (timers[uniqueId]) {
+		                clearTimeout(timers[uniqueId]);
+		            }
+		            timers[uniqueId] = setTimeout(callback, ms);
+		        };
+		    })();
+			
 			$(document).ready(function() {
+				$( window ).resize(function() {
+					waitForFinalEvent(function () {
+		               	setTimeout(function() {
+							table.columns.adjust().draw();
+							if ( $.fn.DataTable.isDataTable( '#grid-transaction' ) ) {
+								tableWidthAdjust();
+							}
+							if ( $.fn.DataTable.isDataTable( '#grid-item' ) ) {
+								table3.columns.adjust().draw();
+							}
+						}, 0);
+		            }, 500, "resizeWindow");
+				});
+				
 				$('#grid-data').on('click', 'input[type="checkbox"]', function() {
 				    $(this).blur();
 				});
@@ -824,7 +934,8 @@
 				$("#txtTransactionDate").datepicker({
 					dateFormat: 'DD, dd M yy',
 					dayNames: [ "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu" ],
-					monthNames: [ "Jan", "Feb", "Mar", "Apr", "Mey", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Des" ],
+					monthNames: [ "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember" ],
+					monthNamesShort: [ "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Des" ],
 					maxDate : "+0D",
 					showOn: "button",
 					buttonImage: "./assets/img/calendar.gif",
@@ -855,7 +966,7 @@
 								"scrollY": "330px",
 								"rowId": "SaleReturnID",
 								"scrollCollapse": true,
-								"order": [2, "asc"],
+								"order": [],
 								"columns": [
 									{ "width": "20px", "orderable": false, className: "dt-head-center dt-body-center" },
 									{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
@@ -971,7 +1082,7 @@
 					else if(evt.keyCode == 123) {
 						evt.preventDefault();
 					}
-					else if(evt.keyCode == 121 && $("#itemList-dialog").css("display") == "none"  && $("#finish-dialog").css("display") == "none" && $("#FormData").css("display") == "block"  && $(".lobibox").css("display") != "block") {
+					else if(evt.keyCode == 121 && $("#transactionList-dialog").css("display") == "none" && $("#FormData").css("display") == "block"  && $(".lobibox").css("display") != "block") {
 						evt.preventDefault();
 						if(counterKey == 0) {
 							finish();

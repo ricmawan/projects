@@ -13,17 +13,27 @@
 					2 => "TB.BookingNumber",
 					3 => "TB.TransactionDate",
 					4 => "MC.CustomerName",
-					5 => "TSD.Total"
+					5 => "TBD.Total",
+					6 => "BookingID",
+					7 => "CustomerID",
+					8 => "PlainTransactionDate",
+					9 => "RetailFlag",
+					10 => "Weight",
+					11 => "Payment",
+					12 => "Status",
+					13 => "PaymentTypeName"
 				);
 
 	$where = " 1=1 ";
-	$order_by = "TB.BookingID";
+	$order_by = "TB.BookingID DESC";
 	$limit_s = $requestData['start'];
 	$limit_l = $requestData['length'];
 	
 	//Handles Sort querystring sent from Bootgrid
-	$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
-	$order_by .= ", TB.BookingID ASC";
+	if(ISSET($requestData['order'])) {
+		$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
+		$order_by .= ", TB.BookingID ASC";
+	}
 	//Handles search querystring sent from Bootgrid
 	if (!empty($requestData['search']['value']))
 	{
@@ -62,6 +72,10 @@
 		$row_array[] = $row['PlainTransactionDate'];
 		$row_array[] = $row['RetailFlag'];
 		$row_array[] = number_format($row['Weight'],2,".",",");
+		$row_array[] = $row['Payment'];
+		$row_array[] = $row['Status'];
+		$row_array[] = $row['PaymentTypeName'];
+		$row_array[] = $row['PaymentTypeID'];
 		array_push($return_arr, $row_array);
 	}
 	

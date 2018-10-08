@@ -35,27 +35,56 @@ StoredProcedure:BEGIN
 SET State = 1;
 
 SET @query = CONCAT("SELECT
-						COUNT(1) AS nRows
+						COUNT(1) AS nRows,
+						SUM(Total) GrandTotal
 					FROM
 						(
 							SELECT
-								1
+								SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) Total
 							FROM
 								transaction_sale TS
 								JOIN transaction_saledetails SD
 									ON SD.SaleID = TS.SaleID
 								JOIN master_customer MC
 									ON MC.CustomerID = TS.CustomerID
-							WHERE 
-								SD.BranchID = ", pBranchID ,"
+								LEFT JOIN master_itemdetails MID
+									ON MID.ItemDetailsID = SD.ItemDetailsID
+							WHERE
+								CASE
+									WHEN ",pBranchID," = 0
+									THEN SD.BranchID
+									ELSE ",pBranchID,"
+								END = SD.BranchID
 								AND CAST(TS.TransactionDate AS DATE) >= '",pFromDate,"'
 								AND CAST(TS.TransactionDate AS DATE) <= '",pToDate,"'
 								AND ", pWhere, "
 							GROUP BY
 								TS.SaleID
 							UNION ALL
+							SELECT
+								SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) Total
+							FROM
+								transaction_booking TB
+								JOIN transaction_bookingdetails BD
+									ON TB.BookingID = BD.BookingID
+								JOIN master_customer MC
+									ON MC.CustomerID = TB.CustomerID
+								LEFT JOIN master_itemdetails MID
+									ON MID.ItemDetailsID = BD.ItemDetailsID
+							WHERE 
+								CASE
+									WHEN ",pBranchID," = 0
+									THEN BD.BranchID
+									ELSE ",pBranchID,"
+								END = BD.BranchID
+								AND CAST(TB.TransactionDate AS DATE) >= '",pFromDate,"'
+								AND CAST(TB.TransactionDate AS DATE) <= '",pToDate,"'
+								AND ", pWhere, "
+							GROUP BY
+								TB.BookingID
+							UNION ALL
 		                    SELECT
-								1
+								-SUM(SRD.Quantity * SRD.SalePrice) Total
 							FROM
 								transaction_salereturn TSR
 								JOIN transaction_sale TS
@@ -65,7 +94,11 @@ SET @query = CONCAT("SELECT
 								JOIN master_customer MC
 									ON MC.CustomerID = TS.CustomerID
 							WHERE 
-								SRD.BranchID = ", pBranchID ,"
+								CASE
+									WHEN ",pBranchID," = 0
+									THEN SRD.BranchID
+									ELSE ",pBranchID,"
+								END = SRD.BranchID
 								AND CAST(TSR.TransactionDate AS DATE) >= '",pFromDate,"'
 								AND CAST(TSR.TransactionDate AS DATE) <= '",pToDate,"'
 								AND ", pWhere2, "
@@ -86,15 +119,21 @@ SET @query = CONCAT("SELECT
                         TS.SaleNumber,
                         DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
                         MC.CustomerName,
-                        SUM(SD.Quantity * SD.SalePrice) - SD.Discount Total
+                        SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) Total
 					FROM
 						transaction_sale TS
                         JOIN transaction_saledetails SD
 							ON SD.SaleID = TS.SaleID
 						JOIN master_customer MC
 							ON MC.CustomerID = TS.CustomerID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = SD.ItemDetailsID
 					WHERE 
-						SD.BranchID = ", pBranchID ,"
+						CASE
+							WHEN ",pBranchID," = 0
+							THEN SD.BranchID
+							ELSE ",pBranchID,"
+						END = SD.BranchID
 						AND CAST(TS.TransactionDate AS DATE) >= '",pFromDate,"'
 						AND CAST(TS.TransactionDate AS DATE) <= '",pToDate,"'
 						AND ", pWhere, "
@@ -105,12 +144,42 @@ SET @query = CONCAT("SELECT
                         MC.CustomerName
                     UNION ALL
                     SELECT
+						TB.BookingID,
+						'Pemesanan' TransactionType,
+                        TB.BookingNumber,
+                        DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
+                        MC.CustomerName,
+                        SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) Total
+					FROM
+						transaction_booking TB
+                        JOIN transaction_bookingdetails BD
+							ON TB.BookingID = BD.BookingID
+						JOIN master_customer MC
+							ON MC.CustomerID = TB.CustomerID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = BD.ItemDetailsID
+					WHERE 
+						CASE
+							WHEN ",pBranchID," = 0
+							THEN BD.BranchID
+							ELSE ",pBranchID,"
+						END = BD.BranchID
+						AND CAST(TB.TransactionDate AS DATE) >= '",pFromDate,"'
+						AND CAST(TB.TransactionDate AS DATE) <= '",pToDate,"'
+						AND ", pWhere, "
+                    GROUP BY
+						TB.BookingID,
+                        TB.BookingNumber,
+                        TB.TransactionDate,
+                        MC.CustomerName
+                    UNION ALL
+                    SELECT
 						TSR.SaleReturnID,
 						'Retur' TransactionType,
                         CONCAT('R', TS.SaleNumber),
                         DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') TransactionDate,
                         MC.CustomerName,
-                        SUM(SRD.Quantity * SRD.SalePrice) Total
+                        -SUM(SRD.Quantity * SRD.SalePrice) Total
 					FROM
 						transaction_salereturn TSR
 						JOIN transaction_sale TS
@@ -120,7 +189,11 @@ SET @query = CONCAT("SELECT
 						JOIN master_customer MC
 							ON MC.CustomerID = TS.CustomerID
 					WHERE 
-						SRD.BranchID = ", pBranchID ,"
+						CASE
+							WHEN ",pBranchID," = 0
+							THEN SRD.BranchID
+							ELSE ",pBranchID,"
+						END = SRD.BranchID
 						AND CAST(TSR.TransactionDate AS DATE) >= '",pFromDate,"'
 						AND CAST(TSR.TransactionDate AS DATE) <= '",pToDate,"'
 						AND ", pWhere2, "

@@ -5,10 +5,11 @@
 	$RequestedPath = str_replace($file, "", $RequestedPath);
 	include "../../GetPermission.php";
 	$requestData= $_REQUEST;
-	if(ISSET($requestData['BranchID']) && ISSET($requestData['ItemCode']) && ISSET($requestData['FirstPass']) && $requestData['FirstPass'] == "0")
+	if(ISSET($requestData['BranchID']) && ISSET($requestData['ItemID']) && ISSET($requestData['FirstPass']) && $requestData['FirstPass'] == "0")
 	{
-		$ItemCode = $requestData['ItemCode'];
+		$ItemID = $requestData['ItemID'];
 		$BranchID = $requestData['BranchID'];
+		$ConversionQuantity = $requestData['conversionQuantity'];
 		if($requestData['FromDate'] == "") {
 			$txtFromDate = "2000-01-01";
 		}
@@ -27,7 +28,7 @@
 		}
 		//kolom di table
 		
-		$sql = "CALL spSelStockDetailsReport('".$ItemCode."', ".$BranchID.", '".$txtFromDate."', '".$txtToDate."', '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spSelStockDetailsReport(".$ItemID.", ".$BranchID.", '".$txtFromDate."', '".$txtToDate."', ".$ConversionQuantity.", '".$_SESSION['UserLogin']."')";
 
 		if (! $result = mysqli_query($dbh, $sql)) {
 			logEvent(mysqli_error($dbh), '/Report/StockDetails/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));

@@ -37,8 +37,9 @@ SET State = 1;
         MI.ItemName,
         MI.ItemCode,
         PD.Quantity,
-        PD.BuyPrice,
-		(PD.Quantity * PD.BuyPrice) SubTotal
+        MU.UnitName,
+        PD.BuyPrice * IFNULL(MID.ConversionQuantity, 1) BuyPrice,
+		(PD.Quantity * PD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) SubTotal
 	FROM
 		transaction_purchase TP
 		JOIN transaction_purchasedetails PD
@@ -47,8 +48,16 @@ SET State = 1;
 			ON MS.SupplierID = TP.SupplierID
 		JOIN master_item MI
 			ON MI.ItemID = PD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = PD.ItemDetailsID
+		LEFT JOIN master_unit MU
+			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
 	WHERE
-		PD.BranchID = pBranchID
+		CASE
+			WHEN pBranchID = 0
+			THEN PD.BranchID
+			ELSE pBranchID
+		END = PD.BranchID
 		AND CAST(TP.TransactionDate AS DATE) >= pFromDate
 		AND CAST(TP.TransactionDate AS DATE) <= pToDate
 	UNION ALL
@@ -61,8 +70,9 @@ SET State = 1;
         MI.ItemName,
         MI.ItemCode,
         PRD.Quantity,
-        PRD.BuyPrice,
-		-(PRD.Quantity * PRD.BuyPrice) SubTotal
+        MU.UnitName,
+        PRD.BuyPrice * IFNULL(MID.ConversionQuantity, 1) BuyPrice,
+		-(PRD.Quantity * PRD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) SubTotal
 	FROM
 		transaction_purchasereturn TPR
 		JOIN transaction_purchasereturndetails PRD
@@ -71,8 +81,16 @@ SET State = 1;
 			ON MS.SupplierID = TPR.SupplierID
 		JOIN master_item MI
 			ON MI.ItemID = PRD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = PRD.ItemDetailsID
+		LEFT JOIN master_unit MU
+			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
 	WHERE
-		PRD.BranchID = pBranchID
+		CASE
+			WHEN pBranchID = 0
+			THEN PRD.BranchID
+			ELSE pBranchID
+		END = PRD.BranchID
 		AND CAST(TPR.TransactionDate AS DATE) >= pFromDate
 		AND CAST(TPR.TransactionDate AS DATE) <= pToDate
 	ORDER BY
