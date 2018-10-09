@@ -53,7 +53,7 @@
 								<?php
 									$sql = "CALL spSelDDLCustomer('".$_SESSION['UserLogin']."')";
 									if (! $result = mysqli_query($dbh, $sql)) {
-										logEvent(mysqli_error($dbh), '/Master/Sale/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+										logEvent(mysqli_error($dbh), '/Transaction/Sale/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 										return 0;
 									}
 									while($row = mysqli_fetch_array($result)) {

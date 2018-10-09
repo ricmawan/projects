@@ -39,6 +39,7 @@ SET State = 1;
         PD.Quantity,
         MU.UnitName,
         PD.BuyPrice * IFNULL(MID.ConversionQuantity, 1) BuyPrice,
+        PD.RetailPrice * IFNULL(MID.ConversionQuantity, 1) RetailPrice,
 		(PD.Quantity * PD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) SubTotal
 	FROM
 		transaction_purchase TP
@@ -72,6 +73,7 @@ SET State = 1;
         PRD.Quantity,
         MU.UnitName,
         PRD.BuyPrice * IFNULL(MID.ConversionQuantity, 1) BuyPrice,
+        0 RetailPrice,
 		-(PRD.Quantity * PRD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) SubTotal
 	FROM
 		transaction_purchasereturn TPR

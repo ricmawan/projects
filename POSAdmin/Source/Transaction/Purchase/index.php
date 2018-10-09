@@ -41,6 +41,7 @@
 										<th>Jatuh Tempo</th>
 										<th>Supplier</th>
 										<th>Total</th>
+										<th>PurchaseID</th>
 									</tr>
 								</thead>
 							</table>
@@ -1814,7 +1815,8 @@
 									{ className: "dt-head-center" },
 									{ className: "dt-head-center" },
 									{ className: "dt-head-center" },
-									{ "orderable": false, className: "dt-head-center dt-body-right" }
+									{ "orderable": false, className: "dt-head-center dt-body-right" },
+									{ "visible": false }
 								],
 								"processing": true,
 								"serverSide": true,
@@ -1865,7 +1867,7 @@
 							if(DeleteID.length == 0) {
 								table.keys.disable();
 								var deletedData = new Array();
-								deletedData.push(data[6] + "^" + data[2]);
+								deletedData.push(data[7] + "^" + data[2]);
 								SingleDelete("./Transaction/Purchase/Delete.php", deletedData, function(action) {
 									if(action == "success") {
 										table.ajax.reload(function() {

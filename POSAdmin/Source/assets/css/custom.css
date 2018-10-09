@@ -786,101 +786,6 @@ input::-webkit-inner-spin-button {
     display: block;
     position: relative;
     padding-left: 35px;
-    margin-bottom: 12px;
-    cursor: pointer;
-    font-size: 22px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
-/* Hide the browser's default checkbox */
-.checkboxContainer input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-}
-
-/* Create a custom checkbox */
-.checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 25px;
-    width: 25px;
-    background-color: #eee;
-}
-
-/* On mouse-over, add a grey background color */
-.checkboxContainer:hover input ~ .checkmark {
-    background-color: #ccc;
-}
-
-/* When the checkbox is checked, add a blue background */
-.checkboxContainer input:checked ~ .checkmark {
-    background-color: #2196F3;
-}
-
-/* Create the checkmark/indicator (hidden when not checked) */
-.checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-}
-
-/* Show the checkmark when checked */
-.checkboxContainer input:checked ~ .checkmark:after {
-    display: block;
-}
-
-/* Style the checkmark/indicator */
-.checkboxContainer .checkmark:after {
-    left: 9px;
-    top: 5px;
-    width: 5px;
-    height: 10px;
-    border: solid white;
-    border-width: 0 3px 3px 0;
-    -webkit-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    transform: rotate(45deg);
-}
-
-.ui-tabs {
-    border: 0 !important;
-}
-
-.ui-tabs-nav {
-	border: 0 !important;
-    background: none !important;
-}
-
-.ui-tabs .ui-tabs-nav li.ui-tabs-active {
-	background: #cc0000 url("images/ui-bg_highlight-soft_15_cc0000_1x100.png") 50% 50% repeat-x !important;
-}
-
-.ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited {
-	color: white !important;
-}
-
-
-.lblInput {
-	font-family:'Open Sans', sans-serif !important;
-	font-size: 11px !important;
-	font-weight:400 !important;
-	font-stretch:100% !important;
-}
-
-.has-float-label input, .has-float-label select {
-	padding-top: 5px !important;
-}
-
-/* The container */
-.checkboxContainer {
-    display: block;
-    position: relative;
-    padding-left: 35px;
     margin-bottom: 0px;
     cursor: pointer;
     font-size: 12px;
@@ -944,6 +849,35 @@ input::-webkit-inner-spin-button {
     -webkit-transform: rotate(45deg);
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
+}
+
+.ui-tabs {
+    border: 0 !important;
+}
+
+.ui-tabs-nav {
+	border: 0 !important;
+    background: none !important;
+}
+
+.ui-tabs .ui-tabs-nav li.ui-tabs-active {
+	background: #cc0000 url("images/ui-bg_highlight-soft_15_cc0000_1x100.png") 50% 50% repeat-x !important;
+}
+
+.ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited {
+	color: white !important;
+}
+
+
+.lblInput {
+	font-family:'Open Sans', sans-serif !important;
+	font-size: 11px !important;
+	font-weight:400 !important;
+	font-stretch:100% !important;
+}
+
+.has-float-label input, .has-float-label select {
+	padding-top: 5px !important;
 }
 
 .panel-user {

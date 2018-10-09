@@ -13,7 +13,7 @@
 		}
 		else {
 			$txtFromDate = explode('-', mysql_real_escape_string($requestData['FromDate']));
-			$requestData['txtFromDate'] = "$txtFromDate[2]-$txtFromDate[1]-$txtFromDate[0]"; 
+			$requestData['FromDate'] = "$txtFromDate[2]-$txtFromDate[1]-$txtFromDate[0]"; 
 			$txtFromDate = $requestData['FromDate'];
 		}
 		if($requestData['ToDate'] == "") {
