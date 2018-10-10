@@ -143,27 +143,30 @@
 				$("#ddlSales").combobox();
 			});
 			
+			var counterInsert = 0;
 			function SubmitValidate() {
-				var PassValidate = 1;
-				var FirstFocus = 0;
-				$(".form-control-custom").each(function() {
-					if($(this).hasAttr('required')) {
-						if($(this).val() == "") {
-							PassValidate = 0;
-							$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-							if(FirstFocus == 0) $(this).focus();
-							FirstFocus = 1;
+				if(counterInsert == 0) {
+					counterInsert = 1;
+					var PassValidate = 1;
+					var FirstFocus = 0;
+					$(".form-control-custom").each(function() {
+						if($(this).hasAttr('required')) {
+							if($(this).val() == "") {
+								PassValidate = 0;
+								$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+								if(FirstFocus == 0) $(this).focus();
+								FirstFocus = 1;
+							}
 						}
+					});
+					
+					if($("#ddlSales").val() == "") {
+						PassValidate = 0;
+						$("#ddlSales").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+						if(FirstFocus == 0) $("#ddlSales").next().find("input").focus();
+						FirstFocus = 1;
 					}
-				});
-				
-				if($("#ddlSales").val() == "") {
-					PassValidate = 0;
-					$("#ddlSales").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-					if(FirstFocus == 0) $("#ddlSales").next().find("input").focus();
-					FirstFocus = 1;
-				}
-				if(PassValidate == 0) {
+					if(PassValidate == 0) {
 						$("html, body").animate({
 							scrollTop: 0
 						}, "slow");
@@ -172,6 +175,10 @@
 					else {
 						SubmitForm('./Master/Customer/Insert.php')
 					}
+				}
+				setTimeout(function() {
+					counterInsert = 0;
+				}, 1000);
 			}
 		</script>
 	</body>

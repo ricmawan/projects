@@ -780,84 +780,93 @@
 				}
 			});
 			
+			var counterInsert = 0;
 			function SubmitValidate() {
-				if($("#recordnew").val() > 0) {
-					var PassValidate = 1;
-					var FirstFocus = 0;
-					$(".form-control-custom").each(function() {
-						if($(this).hasAttr('required')) {
-							if($(this).val() == "") {
-								PassValidate = 0;
-								$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-								if(FirstFocus == 0) $(this).focus();
-								FirstFocus = 1;
-							}
-						}
-					});
-					
-					if($("#ddlSales").val() == "") {
-						PassValidate = 0;
-						$("#ddlSales").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						if(FirstFocus == 0) $("#ddlSales").next().find("input").focus();
-						FirstFocus = 1;
-					}
-					if($("#ddlCustomer").val() == "") {
-						PassValidate = 0;
-						$("#ddlCustomer").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						if(FirstFocus == 0) $("#ddlCustomer").next().find("input").focus();
-						FirstFocus = 1;
-					}
-					if($("#txtDueDate").val() != "") {
-						if($("#txtTransactionDate").val() == "") {
-							PassValidate = 0;
-							$("#txtTransactionDate").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-							if(FirstFocus == 0) $("#txtTransactionDate").next().find("input").focus();
-							FirstFocus = 1;
-						}
-						var FromDate = $("#txtTransactionDate").val().split("-");
-						FromDate = new Date(FromDate[1] + "-" + FromDate[0] + "-" + FromDate[2]);
-						var ToDate = $("#txtDueDate").val().split("-");
-						ToDate = new Date(ToDate[1] + "-" + ToDate[0] + "-" + ToDate[2]);
-						if(FromDate > ToDate) {
-							$("#txtDueDate").notify("Tanggal jatuh tempo harus lebih besar dari tanggal transaksi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-							PassValidate = 0;
-							if(FirstFocus == 0) $("#txtDueDate").focus();
-							FirstFocus = 1;
-						}
-						
-					}
-					if(PassValidate == 0) {
-						$("html, body").animate({
-							scrollTop: 0
-						}, "slow");
-						return false;
-					}
-					else {
-						$.ajax({
-							url: "./Transaction/Booking/Insert.php",
-							type: "POST",
-							data: $("#PostForm").serialize(),
-							dataType: "json",
-							success: function(data) {
-								if(data.FailedFlag == '0') {
-									$.notify(data.Message, "success");
-									$("#hdnBookingID").val(data.ID);
-									$("#hdnIsEdit").val(1);
-									$("#txtBookingNumber").val(data.InvoiceNumber);
-									$("#txtTransactionDate").attr("readonly", "readonly");
+				if(counterInsert == 0) {
+					counterInsert = 1;
+					if($("#recordnew").val() > 0) {
+						var PassValidate = 1;
+						var FirstFocus = 0;
+						$(".form-control-custom").each(function() {
+							if($(this).hasAttr('required')) {
+								if($(this).val() == "") {
+									PassValidate = 0;
+									$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+									if(FirstFocus == 0) $(this).focus();
+									FirstFocus = 1;
 								}
-								else {
-									$("#loading").hide();
-									$.notify(data.Message, "error");					
-								}
-							},
-							error: function(data) {
-								$("#loading").hide();
-								$.notify("Terjadi kesalahan sistem!", "error");
 							}
 						});
+						
+						if($("#ddlSales").val() == "") {
+							PassValidate = 0;
+							$("#ddlSales").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+							if(FirstFocus == 0) $("#ddlSales").next().find("input").focus();
+							FirstFocus = 1;
+						}
+						if($("#ddlCustomer").val() == "") {
+							PassValidate = 0;
+							$("#ddlCustomer").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+							if(FirstFocus == 0) $("#ddlCustomer").next().find("input").focus();
+							FirstFocus = 1;
+						}
+						if($("#txtDueDate").val() != "") {
+							if($("#txtTransactionDate").val() == "") {
+								PassValidate = 0;
+								$("#txtTransactionDate").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+								if(FirstFocus == 0) $("#txtTransactionDate").next().find("input").focus();
+								FirstFocus = 1;
+							}
+							var FromDate = $("#txtTransactionDate").val().split("-");
+							FromDate = new Date(FromDate[1] + "-" + FromDate[0] + "-" + FromDate[2]);
+							var ToDate = $("#txtDueDate").val().split("-");
+							ToDate = new Date(ToDate[1] + "-" + ToDate[0] + "-" + ToDate[2]);
+							if(FromDate > ToDate) {
+								$("#txtDueDate").notify("Tanggal jatuh tempo harus lebih besar dari tanggal transaksi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+								PassValidate = 0;
+								if(FirstFocus == 0) $("#txtDueDate").focus();
+								FirstFocus = 1;
+							}
+							
+						}
+						if(PassValidate == 0) {
+							$("html, body").animate({
+								scrollTop: 0
+							}, "slow");
+							return false;
+						}
+						else {
+							$("#loading").show();
+							$.ajax({
+								url: "./Transaction/Booking/Insert.php",
+								type: "POST",
+								data: $("#PostForm").serialize(),
+								dataType: "json",
+								success: function(data) {
+									if(data.FailedFlag == '0') {
+										$("#loading").hide();
+										$.notify(data.Message, "success");
+										$("#hdnBookingID").val(data.ID);
+										$("#hdnIsEdit").val(1);
+										$("#txtBookingNumber").val(data.InvoiceNumber);
+										$("#txtTransactionDate").attr("readonly", "readonly");
+									}
+									else {
+										$("#loading").hide();
+										$.notify(data.Message, "error");					
+									}
+								},
+								error: function(data) {
+									$("#loading").hide();
+									$.notify("Terjadi kesalahan sistem!", "error");
+								}
+							});
+						}
 					}
 				}
+				setTimeout(function() {
+					counterInsert = 0;
+				}, 1000);
 			}
 			
 			function ValidateQty(row) {

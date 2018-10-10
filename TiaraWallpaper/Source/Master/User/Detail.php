@@ -254,39 +254,30 @@
 					}
 				});
 			});
+			
+			var counterInsert = 0;
 			function SubmitValidate(form) {
-				var isedit = $("#hdnIsEdit").val();
-				var PassValidate = 1;
-				var FirstFocus = 0;
-				$(".form-control-custom").each(function() {
-					if($(this).hasAttr('required')) {
-						if($(this).val() == "") {
-							PassValidate = 0;
-							$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-							if(FirstFocus == 0) $(this).focus();
-							FirstFocus = 1;
+				if(counterInsert == 0) {
+					counterInsert = 1;
+					var isedit = $("#hdnIsEdit").val();
+					var PassValidate = 1;
+					var FirstFocus = 0;
+					$(".form-control-custom").each(function() {
+						if($(this).hasAttr('required')) {
+							if($(this).val() == "") {
+								PassValidate = 0;
+								$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+								if(FirstFocus == 0) $(this).focus();
+								FirstFocus = 1;
+							}
 						}
-					}
-				});
-				if(isedit == 0) {
-					if($("#txtPassword").val() == '') {
-						$("#txtPassword").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						if(FirstFocus == 0) $("#txtPassword").focus();
-						PassValidate = 0;
-					}
-					if($("#txtConfirmPassword").val() == '') {
-						$("#txtConfirmPassword").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						if(FirstFocus == 0) $("#txtConfirmPassword").focus();
-						PassValidate = 0;
-					}
-					if($("#txtConfirmPassword").val() != $("#txtPassword").val()) {
-						$("#txtConfirmPassword").notify("Konfirmasi Password tidak cocok!", { position:"right", className:"warn", autoHideDelay: 2000 });
-						if(FirstFocus == 0) $("#txtConfirmPassword").focus();
-						PassValidate = 0;
-					}
-				}
-				else {
-					if($("#txtPassword").val() != '') {
+					});
+					if(isedit == 0) {
+						if($("#txtPassword").val() == '') {
+							$("#txtPassword").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+							if(FirstFocus == 0) $("#txtPassword").focus();
+							PassValidate = 0;
+						}
 						if($("#txtConfirmPassword").val() == '') {
 							$("#txtConfirmPassword").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 							if(FirstFocus == 0) $("#txtConfirmPassword").focus();
@@ -298,33 +289,50 @@
 							PassValidate = 0;
 						}
 					}
+					else {
+						if($("#txtPassword").val() != '') {
+							if($("#txtConfirmPassword").val() == '') {
+								$("#txtConfirmPassword").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+								if(FirstFocus == 0) $("#txtConfirmPassword").focus();
+								PassValidate = 0;
+							}
+							if($("#txtConfirmPassword").val() != $("#txtPassword").val()) {
+								$("#txtConfirmPassword").notify("Konfirmasi Password tidak cocok!", { position:"right", className:"warn", autoHideDelay: 2000 });
+								if(FirstFocus == 0) $("#txtConfirmPassword").focus();
+								PassValidate = 0;
+							}
+						}
+					}
+					
+					if(PassValidate == 0) return false;
+					var MenuID = new Array();
+					var EditMenuID = new Array();
+					var DeleteMenuID = new Array();
+					$("input:checkbox[name=permission]:checked").each(function() {
+						var getID = $(this).attr('id');
+						if($("#e" + getID).prop('checked')) {
+							EditMenuID.push(1);
+						}
+						else {
+							EditMenuID.push(0);
+						}
+						if($("#d" + getID).prop('checked')) {
+							DeleteMenuID.push(1);
+						}
+						else {
+							DeleteMenuID.push(0);
+						}
+						MenuID.push($(this).attr('id'));
+					});
+					//console.log(MenuID);
+					$("#hdnDeleteMenuID").val(DeleteMenuID);
+					$("#hdnEditMenuID").val(EditMenuID);
+					$("#hdnMenuID").val(MenuID);
+					SubmitForm("./Master/User/Insert.php");
 				}
-				
-				if(PassValidate == 0) return false;
-				var MenuID = new Array();
-				var EditMenuID = new Array();
-				var DeleteMenuID = new Array();
-				$("input:checkbox[name=permission]:checked").each(function() {
-					var getID = $(this).attr('id');
-					if($("#e" + getID).prop('checked')) {
-						EditMenuID.push(1);
-					}
-					else {
-						EditMenuID.push(0);
-					}
-					if($("#d" + getID).prop('checked')) {
-						DeleteMenuID.push(1);
-					}
-					else {
-						DeleteMenuID.push(0);
-					}
-					MenuID.push($(this).attr('id'));
-				});
-				//console.log(MenuID);
-				$("#hdnDeleteMenuID").val(DeleteMenuID);
-				$("#hdnEditMenuID").val(EditMenuID);
-				$("#hdnMenuID").val(MenuID);
-				SubmitForm("./Master/User/Insert.php");
+				setTimeout(function() {
+					counterInsert = 0;
+				}, 1000);
 			}
 		</script>
 	</body>
