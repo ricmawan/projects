@@ -150,33 +150,41 @@
 					$("#ddlBrand").combobox();
 				}
 			});
+			
+			var counterInsert = 0;
 			function SubmitValidate(form) {
-				var PassValidate = 1;
-				var FirstFocus = 0;
-				$(".form-control-custom").each(function() {
-					if($(this).hasAttr('required')) {
-						if($(this).val() == "") {
-							PassValidate = 0;
-							$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-							if(FirstFocus == 0) $(this).focus();
-							FirstFocus = 1;
+				if(counterInsert == 0) {
+					counterInsert = 1;
+					var PassValidate = 1;
+					var FirstFocus = 0;
+					$(".form-control-custom").each(function() {
+						if($(this).hasAttr('required')) {
+							if($(this).val() == "") {
+								PassValidate = 0;
+								$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+								if(FirstFocus == 0) $(this).focus();
+								FirstFocus = 1;
+							}
 						}
+					});
+					
+					if($("#ddlBrand").val() == "") {
+						PassValidate = 0;
+						$(".custom-combobox-input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+						if(FirstFocus == 0) $(".custom-combobox-input").focus();
+						FirstFocus = 1;
 					}
-				});
-				
-				if($("#ddlBrand").val() == "") {
-					PassValidate = 0;
-					$(".custom-combobox-input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-					if(FirstFocus == 0) $(".custom-combobox-input").focus();
-					FirstFocus = 1;
+					if(PassValidate == 0) {
+						$("html, body").animate({
+							scrollTop: 0
+						}, "slow");
+						return false;
+					}
+					else SubmitForm("./Master/Type/Insert.php");
 				}
-				if(PassValidate == 0) {
-					$("html, body").animate({
-						scrollTop: 0
-					}, "slow");
-					return false;
-				}
-				else SubmitForm("./Master/Type/Insert.php");
+				setTimeout(function() {
+					counterInsert = 0;
+				}, 1000);
 			}
 		</script>
 	</body>

@@ -600,35 +600,42 @@
 				}
 			});
 			
+			var counterInsert = 0;
 			function SubmitValidate() {
-				if($("#recordnew").val() > 0) {
-					var PassValidate = 1;
-					var FirstFocus = 0;
-					$(".form-control-custom").each(function() {
-						if($(this).hasAttr('required')) {
-							if($(this).val() == "") {
-								PassValidate = 0;
-								$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-								if(FirstFocus == 0) $(this).focus();
-								FirstFocus = 1;
+				if(counterInsert == 0) {
+					counterInsert = 1;
+					if($("#recordnew").val() > 0) {
+						var PassValidate = 1;
+						var FirstFocus = 0;
+						$(".form-control-custom").each(function() {
+							if($(this).hasAttr('required')) {
+								if($(this).val() == "") {
+									PassValidate = 0;
+									$(this).notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+									if(FirstFocus == 0) $(this).focus();
+									FirstFocus = 1;
+								}
 							}
+						});
+						
+						if($("#ddlSupplier").val() == "") {
+							PassValidate = 0;
+							$("#ddlSupplier").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+							if(FirstFocus == 0) $("#ddlSupplier").next().find("input").focus();
+							FirstFocus = 1;
 						}
-					});
-					
-					if($("#ddlSupplier").val() == "") {
-						PassValidate = 0;
-						$("#ddlSupplier").next().find("input").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						if(FirstFocus == 0) $("#ddlSupplier").next().find("input").focus();
-						FirstFocus = 1;
+						if(PassValidate == 0) {
+							$("html, body").animate({
+								scrollTop: 0
+							}, "slow");
+							return false;
+						}
+						else SubmitForm("./Transaction/Incoming/Insert.php");
 					}
-					if(PassValidate == 0) {
-						$("html, body").animate({
-							scrollTop: 0
-						}, "slow");
-						return false;
-					}
-					else SubmitForm("./Transaction/Incoming/Insert.php");
 				}
+				setTimeout(function() {
+					counterInsert = 0;
+				}, 1000);
 			}
 		</script>
 	</body>
