@@ -5,9 +5,8 @@
 	$RequestedPath = str_replace($file, "", $RequestedPath);
 	include "../../GetPermission.php";
 	$requestData= $_REQUEST;
-	if(ISSET($requestData['BranchID']) && ISSET($requestData['FirstPass']) && $requestData['FirstPass'] == "0")
+	if(ISSET($requestData['FirstPass']) && $requestData['FirstPass'] == "0")
 	{
-		$BranchID = $requestData['BranchID'];
 		if($requestData['FromDate'] == "") {
 			$txtFromDate = "2000-01-01";
 		}
@@ -15,14 +14,6 @@
 			$txtFromDate = explode('-', mysql_real_escape_string($requestData['FromDate']));
 			$requestData['FromDate'] = "$txtFromDate[2]-$txtFromDate[1]-$txtFromDate[0]"; 
 			$txtFromDate = $requestData['FromDate'];
-		}
-		if($requestData['ToDate'] == "") {
-			$txtToDate = date("Y-m-d");
-		}
-		else {
-			$txtToDate = explode('-', mysql_real_escape_string($requestData['ToDate']));
-			$requestData['ToDate'] = "$txtToDate[2]-$txtToDate[1]-$txtToDate[0]"; 
-			$txtToDate = $requestData['ToDate'];
 		}
 		//kolom di table
 		$columns = array(
@@ -33,7 +24,6 @@
 					);
 
 		$where = " 1=1 ";
-		$where2 = " 1=1 ";
 		$order_by = "PurchaseNumber";
 		$limit_s = $requestData['start'];
 		$limit_l = $requestData['length'];
@@ -45,18 +35,14 @@
 		if (!empty($requestData['search']['value']))
 		{
 			$search = mysqli_escape_string($dbh, trim($requestData['search']['value']));
-			$where .= " AND ( TP.PurchaseNumber LIKE '%".$search."%'";
-			$where .= " OR DATE_FORMAT(TP.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
+			$where .= " AND ( TS.PurchaseNumber LIKE '%".$search."%'";
+			$where .= " OR DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
 			$where .= " OR MS.SupplierName LIKE '%".$search."%' )";
-
-			$where2 .= " AND ( TPR.PurchaseReturnNumber LIKE '%".$search."%'";
-			$where2 .= " OR DATE_FORMAT(TPR.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
-			$where2 .= " OR MS.SupplierName LIKE '%".$search."%' )";
 		}
-		$sql = "CALL spSelPurchaseReport(".$BranchID.", '".$txtFromDate."', '".$txtToDate."', \"$where\", \"$where2\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spSelDebtReport('".$txtFromDate."', \"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
 
 		if (! $result = mysqli_query($dbh, $sql)) {
-			logEvent(mysqli_error($dbh), '/Report/Purchase/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Report/Debt/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 			return 0;
 		}
 		$row = mysqli_fetch_array($result);
@@ -76,10 +62,12 @@
 			$row_array["PurchaseNumber"] = $row['PurchaseNumber'];
 			$row_array["TransactionDate"] = $row['TransactionDate'];
 			$row_array["SupplierName"] = $row['SupplierName'];
-			$row_array["Total"] = number_format($row['Total'],0,".",",");
+			$row_array["TotalPurchase"] = number_format($row['TotalPurchase'],0,".",",");
+			$row_array["TotalPayment"] = number_format($row['TotalPayment'],0,".",",");
+			$row_array["Debt"] = number_format($row['Debt'],0,".",",");
 			$row_array["PurchaseID"] = $row['PurchaseID'];
 			$row_array["TransactionType"] = $row['TransactionType'];
-			$SubTotal += $row['Total'];
+			$SubTotal += $row['Debt'];
 			array_push($return_arr, $row_array);
 		}
 		

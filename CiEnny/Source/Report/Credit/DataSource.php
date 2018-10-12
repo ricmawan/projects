@@ -5,9 +5,8 @@
 	$RequestedPath = str_replace($file, "", $RequestedPath);
 	include "../../GetPermission.php";
 	$requestData= $_REQUEST;
-	if(ISSET($requestData['BranchID']) && ISSET($requestData['FirstPass']) && $requestData['FirstPass'] == "0")
+	if(ISSET($requestData['FirstPass']) && $requestData['FirstPass'] == "0")
 	{
-		$BranchID = $requestData['BranchID'];
 		if($requestData['FromDate'] == "") {
 			$txtFromDate = "2000-01-01";
 		}
@@ -16,47 +15,39 @@
 			$requestData['FromDate'] = "$txtFromDate[2]-$txtFromDate[1]-$txtFromDate[0]"; 
 			$txtFromDate = $requestData['FromDate'];
 		}
-		if($requestData['ToDate'] == "") {
-			$txtToDate = date("Y-m-d");
-		}
-		else {
-			$txtToDate = explode('-', mysql_real_escape_string($requestData['ToDate']));
-			$requestData['ToDate'] = "$txtToDate[2]-$txtToDate[1]-$txtToDate[0]"; 
-			$txtToDate = $requestData['ToDate'];
-		}
 		//kolom di table
 		$columns = array(
 						0 => "Plus",
-						1 => "PurchaseNumber", //unorderable
+						1 => "SaleNumber", //unorderable
 						2 => "TransactionDate", //unorderable
-						3 => "SupplierName"
+						3 => "CustomerName"
 					);
 
 		$where = " 1=1 ";
 		$where2 = " 1=1 ";
-		$order_by = "PurchaseNumber";
+		$order_by = "SaleNumber";
 		$limit_s = $requestData['start'];
 		$limit_l = $requestData['length'];
 		
 		//Handles Sort querystring sent from Bootgrid
 		$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
 		//Handles search querystring sent from Bootgrid
-		$order_by .= ", PurchaseNumber ASC";
+		$order_by .= ", SaleNumber ASC";
 		if (!empty($requestData['search']['value']))
 		{
 			$search = mysqli_escape_string($dbh, trim($requestData['search']['value']));
-			$where .= " AND ( TP.PurchaseNumber LIKE '%".$search."%'";
-			$where .= " OR DATE_FORMAT(TP.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
-			$where .= " OR MS.SupplierName LIKE '%".$search."%' )";
+			$where .= " AND ( TS.SaleNumber LIKE '%".$search."%'";
+			$where .= " OR DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
+			$where .= " OR MC.CustomerName LIKE '%".$search."%' )";
 
-			$where2 .= " AND ( TPR.PurchaseReturnNumber LIKE '%".$search."%'";
-			$where2 .= " OR DATE_FORMAT(TPR.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
-			$where2 .= " OR MS.SupplierName LIKE '%".$search."%' )";
+			$where2 .= " AND ( CONCAT('R', TS.SaleNumber) LIKE '%".$search."%'";
+			$where2 .= " OR DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
+			$where2 .= " OR MC.CustomerName LIKE '%".$search."%' )";
 		}
-		$sql = "CALL spSelPurchaseReport(".$BranchID.", '".$txtFromDate."', '".$txtToDate."', \"$where\", \"$where2\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spSelCreditReport('".$txtFromDate."', \"$where\", \"$where2\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
 
 		if (! $result = mysqli_query($dbh, $sql)) {
-			logEvent(mysqli_error($dbh), '/Report/Purchase/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Report/Credit/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 			return 0;
 		}
 		$row = mysqli_fetch_array($result);
@@ -73,13 +64,15 @@
 		while ($row = mysqli_fetch_array($result2)) {
 			$row_array = array();
 			//data yang dikirim ke table
-			$row_array["PurchaseNumber"] = $row['PurchaseNumber'];
+			$row_array["SaleNumber"] = $row['SaleNumber'];
 			$row_array["TransactionDate"] = $row['TransactionDate'];
-			$row_array["SupplierName"] = $row['SupplierName'];
-			$row_array["Total"] = number_format($row['Total'],0,".",",");
-			$row_array["PurchaseID"] = $row['PurchaseID'];
+			$row_array["CustomerName"] = $row['CustomerName'];
+			$row_array["TotalSale"] = number_format($row['TotalSale'],0,".",",");
+			$row_array["TotalPayment"] = number_format($row['TotalPayment'],0,".",",");
+			$row_array["Credit"] = number_format($row['Credit'],0,".",",");
+			$row_array["SaleID"] = $row['SaleID'];
 			$row_array["TransactionType"] = $row['TransactionType'];
-			$SubTotal += $row['Total'];
+			$SubTotal += $row['Credit'];
 			array_push($return_arr, $row_array);
 		}
 		
