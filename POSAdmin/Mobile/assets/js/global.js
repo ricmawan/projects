@@ -199,6 +199,20 @@ function isNumberKey(evt, id, value) {
 	return true;
 }
 
+function isNumberKeyMobile(e, id, value) {
+	$("#" + id).removeAttr("onpaste");
+	$("#" + id).attr("onpaste", "return false;");
+	var key = e.charCode || e.keyCode || 0;
+	if (key >= 48 && key <= 57) {
+		return true;
+	}
+	else {
+		evt.preventDefault();
+		return  false;
+	}
+	if (key == 13) $("#" + id).blur();
+}
+
 function isEnterKey(evt, fn) {
 	var e = evt || window.event;
 	e.stopImmediatePropagation();
@@ -1077,6 +1091,9 @@ $.extend($.ui.autocomplete.prototype.options, {
 		var dialogIndex = $(".ui-dialog").css("z-index");
 		var windowIndex = $(".lobibox-backdrop").css("z-index");
 		if(typeof windowIndex != 'undefined' && parseInt(windowIndex) > parseInt(dialogIndex)) {
+			dialogIndex = windowIndex;
+		}
+		else if(typeof dialogIndex == 'undefined') {
 			dialogIndex = windowIndex;
 		}
 		var newIndex = parseInt(dialogIndex) + 1;

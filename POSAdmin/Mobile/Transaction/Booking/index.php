@@ -124,7 +124,7 @@
 								
 								<div class="row" >
 									<div class="col-md-12 has-float-label" >
-										<input id="txtDiscount" name="txtDiscount" type="number" lang="en-150" tabindex=11 class="form-control-custom text-right" value="0" autocomplete=off onkeypress="isEnterKey(event, 'addSaleDetails');return isNumberKey(event, this.id, this.value);" onchange="addSaleDetails();" onfocus="this.select();" onpaste="return false;" />
+										<input id="txtDiscount" name="txtDiscount" type="tel" lang="en-150" tabindex=11 class="form-control-custom text-right" value="0" autocomplete=off onkeypress="isEnterKey(event, 'addSaleDetails');return isNumberKey(event, this.id, this.value);" onchange="addSaleDetails();" onfocus="this.select();" onpaste="return false;" />
 										<label for="txtDiscount" class="lblInput" >Diskon</label>
 									</div>
 								</div>
@@ -1933,6 +1933,10 @@
 				if($("#hdnSaleID").val() != 0) {
 					$("#finish-dialog").dialog({
 						autoOpen: false,
+						position: {
+							my : 'top+10%',
+							at : 'top'
+						},
 						open: function() {
 							//$("#divModal").show();
 							table2.keys.disable();
@@ -2258,6 +2262,10 @@
 		    function firstBalance() {
 				$("#first-balance").dialog({
 					autoOpen: false,
+					position: {
+						my : 'top+10%',
+						at : 'top'
+					},
 					open: function() {
 						$("#divModal").show();
 						$(document).on('keydown', function(e) {

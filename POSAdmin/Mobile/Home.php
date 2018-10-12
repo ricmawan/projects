@@ -85,6 +85,7 @@
 	</head>
 	<body> 
 		<div id="wrapper">
+			<div style="height: 25px;"></div>
 			<header style="height:30px;">
 				<div class="container" style="display:inline-block; width: 70%;padding-right: 0;float:left;" >
 					<div class="navbar navbar-static-top">
@@ -176,7 +177,7 @@
 						Saldo Awal :
 					</div>
 					<div class="col-md-6">
-						<input id="txtFirstBalance" tabindex=50; name="txtFirstBalance" type="text" class="form-control-custom text-right" placeholder="Salwo Awal" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" value="0.00" />
+						<input id="txtFirstBalance" tabindex=50; name="txtFirstBalance" type="tel" class="form-control-custom text-right" placeholder="Salwo Awal" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" value="0.00" />
 					</div>
 				</div>
 				<br />
@@ -208,7 +209,7 @@
 			});
 
 			$(document).ready(function() {
-				var windowHeight = $( window ).height() - 33;				
+				var windowHeight = $( window ).height() - 58;				
 				if(windowHeight < 540) {
 					//windowHeight = 540;
 				}
@@ -249,6 +250,14 @@
 				});
 
 				$("#menuSale").click();
+
+				$("#txtFirstBalance").on("input change paste",
+				    function filterNumericAndDecimal(event) {
+						var formControl;
+						formControl = $(event.target);
+						formControl.val(formControl.val().replace(/[^0-9]+/g, ""));
+					}
+				);
 			});
 		</script>
 	</body>

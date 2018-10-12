@@ -20,11 +20,31 @@
 				height:45px;
 				width:49%;
 			}
+
+			.lobibox {
+				top: 55px !important;
+			}
+
+			.lobibox.lobibox-window .lobibox-header {
+				font-size: 14px !important;
+			}
+
+			.lobibox .lobibox-header {
+			    padding: 2px 10px !important;
+			}
+
+			.lobibox.lobibox-window .lobibox-body {
+				padding: 10px 15px !important;
+			}
+
+			.lobibox .lobibox-footer {
+				padding: 3px !important;
+			}
 		</style>
 	</head>
 	<body>
 		<div class="row">			
-			<div id="FormData" class="col-md-12" >
+			<div id="FormData" class="col-md-12 col-sm-12" >
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<span style="width:50%;display:inline-block;">
@@ -51,7 +71,7 @@
 							<input type="hidden" id="hdnIsRetail" name="hdnIsRetail" value=1 />
 							<div id="leftSide" class="col-md-12" style="display:inline-block;width:20%;border-right:3px double black;float:left;font-size: 10px !important;" >
 								<div class="row" >
-									<div class="col-md-12 has-float-label" >
+									<div class="col-md-12 col-sm-12 has-float-label" >
 										<select id="ddlCustomer" name="ddlCustomer" tabindex=7 class="form-control-custom" placeholder="Pilih Pelanggan" style="width: 80%; display: inline-block;margin-right: 5px;" onchange="updateHeader();" >
 											<?php
 												$sql = "CALL spSelDDLCustomer('".$_SESSION['UserLogin']."')";
@@ -73,7 +93,7 @@
 								<br />
 								
 								<div class="row" >
-									<div class="col-md-12 has-float-label" >
+									<div class="col-md-12 col-sm-12 has-float-label" >
 										<input tabindex=8 id="txtItemCode" name="txtItemCode" type="text" class="form-control-custom" onfocus="this.select();" onkeypress="isEnterKey(event, 'getItemDetails');" onchange="getItemDetails();" autocomplete=off />
 										<label for="txtItemCode" class="lblInput" >Kode Barang</label>
 									</div>
@@ -81,7 +101,7 @@
 								<br />
 								
 								<div class="row" >
-									<div class="col-md-12 has-float-label" >
+									<div class="col-md-12 col-sm-12 has-float-label" >
 										<input disabled id="txtItemName" name="txtItemName" type="text" class="form-control-custom" />
 										<label for="txtItemName" class="lblInput" >Nama Barang</label>
 									</div>
@@ -89,12 +109,12 @@
 								<br />
 								
 								<div class="row" >
-									<div class="col-md-6 has-float-label" >
+									<div class="col-md-6 col-sm-6 has-float-label" >
 										<input tabindex=9 id="txtQTY" onfocus="this.select();" name="txtQTY" type="number" class="form-control-custom" style="border: 1px solid #ccc !important;margin: 0;" value=1 min=1 onchange="this.value = validateQTY(this.value);Grosir(this.value);" onpaste="return false;" onfocus="this.select();" />
 										<label for="txtQTY" class="lblInput" >Qty</label>
 									</div>
 
-									<div class="col-md-6 has-float-label" >
+									<div class="col-md-6 col-sm-6 has-float-label" >
 										<select id="ddlUnit" name="ddlUnit" tabindex=10 class="form-control-custom mousetrap" onchange="changeItemCode();" >
 											<option >--</option>
 										</select>
@@ -104,7 +124,7 @@
 								<br />
 								
 								<div class="row" >
-									<div class="col-md-12 has-float-label" >
+									<div class="col-md-12 col-sm-12 has-float-label" >
 										<input id="hdnBuyPrice" name="hdnBuyPrice" type="hidden" value=0 />
 										<input id="hdnSalePrice" name="hdnSalePrice" type="hidden" value=0 />
 										<input id="hdnRetailPrice" name="hdnRetailPrice" type="hidden" value=0 />
@@ -123,8 +143,8 @@
 								<br />
 								
 								<div class="row" >
-									<div class="col-md-12 has-float-label" >
-										<input id="txtDiscount" name="txtDiscount" type="number" lang="en-150" tabindex=11 class="form-control-custom text-right" value="0" autocomplete=off onkeypress="isEnterKey(event, 'addSaleDetails');return isNumberKey(event, this.id, this.value);" onchange="addSaleDetails();" onfocus="this.select();" onpaste="return false;" />
+									<div class="col-md-12 col-sm-12 has-float-label" >
+										<input id="txtDiscount" name="txtDiscount" type="tel" tabindex=11 class="form-control-custom text-right" value="0" autocomplete=off onfocus="clearFormat(this.id, this.value);this.select();" onpaste="return false;" onblur="convertRupiah(this.id, this.value);" />
 										<label for="txtDiscount" class="lblInput" >Diskon</label>
 									</div>
 								</div>
@@ -140,9 +160,9 @@
 								<button id="btnGrosir" type="button" class="btn btn-default btn-mobile" value="Cetak" ><i class="fa fa-cart-arrow-down fa-2x"></i> Grosir</button>
 	</button>
 							</div>
-							<div class="col-md-12" style="display:inline-block;width:80%;float:left;" >
+							<div class="col-md-12 col-sm-12" style="display:inline-block;width:80%;float:left;" >
 								<div class="row" style="max-height: 400px;overflow-y:auto;" >
-									<div class="col-md-12" >
+									<div class="col-md-12 col-sm-12" >
 										<div id="divTableContent" class="table-responsive" style="overflow-x:hidden;">
 											<table id="grid-transaction" style="width: 100% !important;" class="table table-striped table-bordered table-hover" >
 												<thead>
@@ -178,7 +198,7 @@
 									</div>
 								</div>
 								<br />
-								<div class="row col-md-12" >
+								<div class="row col-md-12 col-sm-12" >
 									<h2 style="display: inline-block;float: left;" >TOTAL : &nbsp;</h2><span id="lblTotal" >0</span>
 									</h2><span id="lblWeight" >0</span><h2 style="display: inline-block;float: right;color: #0006ff;" >Berat(KG) : &nbsp;
 								</div>
@@ -193,7 +213,7 @@
 			<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Kode tidak valid, apakah ingin menambahkan barang?</p>
 		</div>
 		<div id="itemList-dialog" title="Daftar Barang" style="display: none;">
-			<div class="row col-md-12" >
+			<div class="row col-md-12 col-sm-12" >
 				<div id="divTableItem" class="table-responsive" style="overflow-x:hidden;">
 					<table id="grid-item" style="width: 100% !important;" class="table table-striped table-bordered table-hover" >
 						<thead>
@@ -216,11 +236,11 @@
 			</div>
 		</div>
 		<div id="finish-dialog" title="Transaksi Selesai" style="display: none;">
-			<div class="row col-md-12" >
-				<div class="col-md-4 labelColumn">
+			<div class="row col-md-12 col-sm-12" >
+				<div class="col-md-4 col-sm-4 labelColumn">
 					Pembayaran :
 				</div>
-				<div class="col-md-8">
+				<div class="col-md-8 col-sm-8">
 					<select id="ddlPayment" name="ddlPayment" class="form-control-custom" tabindex=14 onchange="PaymentTypeChange();" >
 						<option value=1 >Tunai</option>
 						<option value=2 >Tempo</option>
@@ -228,46 +248,52 @@
 				</div>
 			</div>
 			<br />
-			<div class="row col-md-12" >
-				<div class="col-md-4 labelColumn">
+			<br />
+			<div class="row col-md-12 col-sm-12" >
+				<div class="col-md-4 col-sm-4 labelColumn">
 					Total :
 				</div>
-				<div class="col-md-8">
+				<div class="col-md-8 col-sm-8">
 					<input id="txtTotal" name="txtTotal" type="text" class="form-control-custom text-right" value="0" autocomplete=off placeholder="Total" readonly />
 				</div>
 			</div>
 			<br />
-			<div class="row col-md-12" >
-				<div class="col-md-4 labelColumn">
+			<br />
+			<div class="row col-md-12 col-sm-12" >
+				<div class="col-md-4 col-sm-4 labelColumn">
 					Bayar :
 				</div>
-				<div class="col-md-8">
-					<input id="txtPayment" name="txtPayment" type="text" tabindex=15 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" onchange="Change();" />
+				<div class="col-md-8 col-sm-8">
+					<input id="txtPayment" name="txtPayment" type="tel" tabindex=15 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" onchange="Change();" />
 				</div>
 			</div>
 			<br />
-			<div class="row col-md-12" >
-				<div class="col-md-4 labelColumn">
+			<br />
+			<div class="row col-md-12 col-sm-12" >
+				<div class="col-md-4 col-sm-4 labelColumn">
 					<label id="lblChange" style="font-weight: normal;" >Kembali :</label>
 				</div>
-				<div class="col-md-8">
+				<div class="col-md-8 col-sm-8">
 					<input id="txtChange" name="txtChange" type="text" class="form-control-custom text-right" value="0" readonly />
 				</div>
 			</div>
 			<br />
-			<div class="row col-md-12" >
+			<br />
+			<div class="row col-md-12 col-sm-12" >
 				<label class="checkboxContainer" >Cetak Nota
 					<input type="checkbox" id="chkPrint" name="chkPrint" value=1 tabindex=16 checked />
 					<span class="checkmark"></span>
 				</label>
 			</div>
 			<br />
-			<div class="row col-md-12" >
+			<br />
+			<div class="row col-md-12 col-sm-12" >
 				<label class="checkboxContainer">Cetak Surat Pengambilan
 					<input type="checkbox" id="chkPrintShipment" name="chkPrintShipment" value=1 tabindex=17 checked />
 					<span class="checkmark"></span>
 				</label>
 			</div>
+			<br />
 			<br />
 			<button type="button" class="btn btn-primary btn-block" onclick="printInvoice();" style="padding: 6px 12px !important;" tabindex=18 >Selesai</button>
 			<!--<br />
@@ -292,20 +318,20 @@
 		</div>
 		<div id="code-dialog" title="Konfirmasi Kode" style="display: none;">
 			<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Stok barang tidak mencukupi, masukkan kode di bawah jika tetap ingin menambahkan!</p>
-			<div class="row col-md-12" >
-				<div class="col-md-4 labelColumn">
+			<div class="row col-md-12 col-sm-12" >
+				<div class="col-md-4 col-sm-4 labelColumn">
 					Kode :
 				</div>
-				<div class="col-md-8">
+				<div class="col-md-8 col-sm-8">
 					<label id="lblCode" name="lblCode" ></label>
 				</div>
 			</div>
 			<br />
-			<div class="row col-md-12" >
-				<div class="col-md-4 labelColumn">
+			<div class="row col-md-12 col-sm-12" >
+				<div class="col-md-4 col-sm-4 labelColumn">
 					Masukkan Kode :
 				</div>
-				<div class="col-md-6">
+				<div class="col-md-6 col-sm-6">
 					<input id="txtCode" name="txtCode" type="number" max="999999" tabindex=60 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Kode" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="this.select();" onpaste="return false;" />
 				</div>
 			</div>
@@ -510,7 +536,7 @@
 									//add new item
 									if(data.ErrorMessage == "") {
 										$("#add-confirm").dialog({
-											autoOpen: false,
+											autoOpen: false,											
 											open: function() {
 												$(document).on('keydown', function(e) {
 													if (e.keyCode == 39) { //right arrow
@@ -726,6 +752,10 @@
 				$("#lblCode").html(code);
 				$("#code-dialog").dialog({
 					autoOpen: false,
+					position: {
+						my : 'top+25%',
+						at : 'top'
+					},
 					open: function() {
 						$("#divModal").show();
 						$(document).on('keydown', function(e) {
@@ -1313,8 +1343,8 @@
 				Lobibox.window({
 					title: 'Tambah Barang',
 					url: 'Transaction/Sale/PopUpAddItem.php',
-					width: 780,
-					height: 560,
+					width: 760,
+					height: 235,
 					buttons: {
 						Simpan: {
 							'class': 'ui-button ui-corner-all ui-widget',
@@ -1550,8 +1580,8 @@
 				Lobibox.window({
 					title: 'Tambah Pelanggan',
 					url: 'Transaction/Sale/PopUpAddCustomer.php',
-					width: 680,
-					height: 400,
+					width: 480,
+					height: 235,
 					buttons: {
 						Simpan: {
 							'class': 'ui-button ui-corner-all ui-widget',
@@ -1795,6 +1825,10 @@
 			function itemList() {
 				$("#itemList-dialog").dialog({
 					autoOpen: false,
+					position: {
+						my : 'top+20%',
+						at : 'top'
+					},
 					open: function() {
 						table2.keys.disable();
 						table3 = $("#grid-item").DataTable({
@@ -1905,7 +1939,7 @@
 						table2.keys.enable();
 					},
 					resizable: false,
-					height: 500,
+					height: 420,
 					width: 960,
 					modal: true/*,
 					buttons: [
@@ -1933,6 +1967,10 @@
 				if($("#hdnSaleID").val() != 0) {
 					$("#finish-dialog").dialog({
 						autoOpen: false,
+						position: {
+							my : 'top+20%',
+							at : 'top'
+						},
 						open: function() {
 							//$("#divModal").show();
 							table2.keys.disable();
@@ -1974,7 +2012,7 @@
 							$("#txtChange").val(0);
 						},
 						resizable: false,
-						height: 340,
+						height: 300,
 						width: 420,
 						modal: true /*,
 						buttons: [
@@ -2258,6 +2296,10 @@
 		    function firstBalance() {
 				$("#first-balance").dialog({
 					autoOpen: false,
+					position: {
+						my : 'top+45%',
+						at : 'top'
+					},
 					open: function() {
 						$("#divModal").show();
 						$(document).on('keydown', function(e) {
@@ -2343,6 +2385,22 @@
 			}
 
 			$(document).ready(function() {
+				$("#txtDiscount").on("input change paste",
+				    function filterNumericAndDecimal(event) {
+						var formControl;
+						formControl = $(event.target);
+						formControl.val(formControl.val().replace(/[^0-9]+/g, ""));
+					}
+				);
+
+				$("#txtPayment").on("input change paste",
+				    function filterNumericAndDecimal(event) {
+						var formControl;
+						formControl = $(event.target);
+						formControl.val(formControl.val().replace(/[^0-9]+/g, ""));
+					}
+				);
+
 				$("#txtQTY").spinner();
 				$('#grid-transaction').on('click', 'input[type="checkbox"]', function() {
 					$(this).blur();

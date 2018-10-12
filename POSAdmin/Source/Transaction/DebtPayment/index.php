@@ -39,10 +39,6 @@
 								</thead>
 							</table>
 						</div>
-						<br />
-						<div class="row col-md-12" >
-							<h5 style="margin-top:5px !important;margin-bottom: 5px !important;">INSERT = Tambah Data; ENTER/DOUBLE KLIK = Edit; DELETE = Hapus; SPASI = Menandai Data;</h5>
-						</div>
 					</div>
 				</div>
 			</div>
@@ -493,36 +489,6 @@
 				$("#lblTotal").html(returnRupiah(grandTotal.toString()));
 			}
 
-			function fnDeleteData() {
-				var index = table.cell({ focused: true }).index();
-				table.keys.disable();
-				DeleteData("./Transaction/Payment/Delete.php", function(action) {
-					if(action == "success") {
-						$("#select_all").prop("checked", false);
-						table.ajax.reload(function() {
-							table.keys.enable();
-							if(typeof index !== 'undefined') {
-								try {
-									table.cell(index).focus();
-								}
-								catch (err) {
-									$("#grid-data").DataTable().cell( ':eq(0)' ).focus();
-								}
-							}
-							if(table.page.info().page == table.page.info().pages) {
-								setTimeout(function() {
-									table.page("previous").draw('page');
-								}, 0);
-							}
-						}, false);
-					}
-					else {
-						table.keys.enable();
-						return false;
-					}
-				});
-			}
-
 			function printInvoice() {
 				var paymentID = $("#hdnTransactionID").val();
 				var Payment = $("#txtPayment").val().replace(/\,/g, "");
@@ -735,44 +701,6 @@
 								openDialog(data, 1);
 							}
 						}
-						else if(key == 46 && $("#hdnDeleteFlag").val() == "1") {
-							var DeleteID = new Array();
-							$("input:checkbox[name=select]:checked").each(function() {
-								if($(this).val() != 'all') DeleteID.push($(this).val());
-							});
-							if(DeleteID.length == 0) {
-								table.keys.disable();
-								var deletedData = new Array();
-								deletedData.push(data[6] + "^" + data[2]);
-								SingleDelete("./Transaction/Payment/Delete.php", deletedData, function(action) {
-									if(action == "success") {
-										table.ajax.reload(function() {
-											table.keys.enable();
-											if(typeof index !== 'undefined') {
-												try {
-													table.cell(index).focus();
-												}
-												catch (err) {
-													$("#grid-data").DataTable().cell( ':eq(0)' ).focus();
-												}
-											}
-											if(table.page.info().page == table.page.info().pages) {
-												setTimeout(function() {
-													table.page("previous").draw('page');
-												}, 0);
-											}
-										}, false);
-									}
-									else {
-										table.keys.enable();
-										return false;
-									}
-								});
-							}
-							else {
-								fnDeleteData();
-							}
-						}
 						setTimeout(function() { counterPayment = 0; } , 1000);
 					}
 				});
@@ -784,14 +712,7 @@
 				var counterKey = 0;
 				$(document).on("keydown", function (evt) {
 					var index = table.cell({ focused: true }).index();
-					if (evt.keyCode == 46 && $("#hdnDeleteFlag").val() == "1" && typeof index == 'undefined' && $("#FormData").css("display") == "none" && $(".lobibox").css("display") != "block") { //delete button
-						evt.preventDefault();
-						if(counterKey == 0) {
-							fnDeleteData();
-							counterKey = 1;
-						}
-					}
-					else if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0 && $("#FormData").css("display") == "none" && $("#delete-confirm").css("display") == "none") {
+					if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0 && $("#FormData").css("display") == "none" && $("#delete-confirm").css("display") == "none") {
 						$("#grid-data_wrapper").find("input[type='search']").focus();
 					}
 					setTimeout(function() { counterKey = 0; } , 1000);
