@@ -14,11 +14,11 @@
     $file =  "PrintInvoice.txt";  # nama file temporary yang akan dicetak
     $handle = fopen($file, 'w');
 
-    $SaleID = $_GET['ID'];
+    $BookingID = $_GET['ID'];
     $TransactionDate = date($_GET['TransactionDate']);
     $Payment = mysqli_real_escape_string($dbh, $_GET['Payment']);
     $Change = mysqli_real_escape_string($dbh, $_GET['Change']);
-    $SaleNumber = mysqli_real_escape_string($dbh, $_GET['SaleNumber']);
+    $BookingNumber = mysqli_real_escape_string($dbh, $_GET['BookingNumber']);
     $PaymentMethod = mysqli_real_escape_string($dbh, $_GET['PaymentMethod']);
     $dayName = array("Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu");
     $monthName = array("Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des");
@@ -42,11 +42,11 @@
     $printer -> selectPrintMode(Printer::MODE_FONT_B);
     $printer -> text(str_pad("", 39, "-") . "\n");
     
-    $sql = "CALL spSelSaleDetails(".$SaleID.", '".$_SESSION['UserLogin']."')";
+    $sql = "CALL spSelBookingDetails(".$BookingID.", '".$_SESSION['UserLogin']."')";
     $FailedFlag = 0;
 
     if (! $result = mysqli_query($dbh, $sql)) {
-        logEvent(mysqli_error($dbh), '/Transaction/Sale/Print.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+        logEvent(mysqli_error($dbh), '/Transaction/Booking/Print.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
         $FailedFlag = 1;
         $json_data = array(
                         "FailedFlag" => $FailedFlag
@@ -59,14 +59,14 @@
     $GrandTotal = 0;
     $rowPrice = "";
     while ($row = mysqli_fetch_array($result)) {
-        $rowPrice .= number_format($row['Quantity'],0,".",",") . " " . $row['UnitName'] . " @ " . number_format($row['SalePrice'],0,".",",");
+        $rowPrice .= number_format($row['Quantity'],0,".",",") . " " . $row['UnitName'] . " @ " . number_format($row['BookingPrice'],0,".",",");
         if($row['Discount'] != 0) $rowPrice += " - " . number_format($row['Discount'],0,".",",");
         $printer -> text(" " . $row['ItemName'] . "\n");
         $printer -> text(" " . str_pad($rowPrice , 26, " ") . " ");
-        $printer -> text(str_pad(number_format(($row['SalePrice'] - $row['Discount']) * $row['Quantity'],0,".",","), 11, " ", STR_PAD_LEFT) . "\n");
-        //$printer -> text("  " . str_pad(number_format($row['Quantity'],0,".",","), 5, " ", STR_PAD_LEFT) . " " . str_pad($row['UnitName'], 6, " ") . " @ " . str_pad(number_format($row['SalePrice'],0,".",","), 10, " ") . " " . str_pad(number_format($row['SalePrice'] * $row['Quantity'],0,".",","), 11, " ", STR_PAD_LEFT) . "\n");
+        $printer -> text(str_pad(number_format(($row['BookingPrice'] - $row['Discount']) * $row['Quantity'],0,".",","), 11, " ", STR_PAD_LEFT) . "\n");
+        //$printer -> text("  " . str_pad(number_format($row['Quantity'],0,".",","), 5, " ", STR_PAD_LEFT) . " " . str_pad($row['UnitName'], 6, " ") . " @ " . str_pad(number_format($row['BookingPrice'],0,".",","), 10, " ") . " " . str_pad(number_format($row['BookingPrice'] * $row['Quantity'],0,".",","), 11, " ", STR_PAD_LEFT) . "\n");
         //$Discount += $row['Discount'] * $row['Quantity'];
-        $GrandTotal += ($row['SalePrice'] - $row['Discount']) * $row['Quantity'];
+        $GrandTotal += ($row['BookingPrice'] - $row['Discount']) * $row['Quantity'];
         $rowPrice = "";
     }
 
@@ -83,7 +83,7 @@
     else $printer -> text("KEKURANGAN     : " . str_pad(number_format($Change ,0,".",","), 16, " ", STR_PAD_LEFT) . "\n" );
     $printer -> setEmphasis(false);
 
-    $printer -> text("Kasir : " . str_pad($_SESSION['UserLogin'] . ", ", 10, " ") . " No : " . str_pad($SaleNumber, 14, " ") . "\n");
+    $printer -> text("Kasir : " . str_pad($_SESSION['UserLogin'] . ", ", 10, " ") . " No : " . str_pad($BookingNumber, 14, " ") . "\n");
     $printer -> text(str_pad("", 39, "-") . "\n");
     $printer -> setJustification(Printer::JUSTIFY_CENTER);
     $printer -> text("KAMI TIDAK MELAYANI PENUKARAN BARANG\n");

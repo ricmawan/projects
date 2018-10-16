@@ -77,7 +77,7 @@
 							<tr>
 								<td style="width: 15%;" >
 									<div class="has-float-label" >
-										<input id="txtItemCode" name="txtItemCode" type="text" tabindex=8 class="form-control-custom mousetrap" style="width: 100%;" onfocus="this.select();" onkeypress="isEnterKey(event, 'getItemDetails');" onchange="getItemDetails();" autocomplete=off />
+										<input id="txtItemCode" name="txtItemCode" type="text" tabindex=8 class="form-control-custom mousetrap" style="width: 100%;" onfocus="this.select();" onkeypress="isEnterKeySale(event);" onchange="getItemDetails(0);" autocomplete=off />
 										<label for="txtItemCode" class="lblInput" >Kode Barang</label>
 									</div>
 								</td>
@@ -303,11 +303,19 @@
 			var table3;
 			var today;
 			var rowEdit;
+			var itemCodeTemp = 0;
+
+			function isEnterKeySale(evt) {
+				var e = evt || window.event;
+				e.stopImmediatePropagation();
+				var charCode = e.which || e.keyCode;
+				if (charCode == 13) getItemDetails(0);
+			}
 
 			function changeItemCode() {
 				var itemCode = $("#ddlUnit option:selected").attr("itemcode");
 				$("#txtItemCode").val(itemCode);
-				getItemDetails();
+				getItemDetails(0);
 			}
 
 			function CalculateSubTotal() {
@@ -326,36 +334,13 @@
 			
 			function openDialogEdit(Data) {
 				$("#hdnSaleDetailsID").val(Data[1]);
-				$("#hdnItemID").val(Data[2]);
 				$("#hdnBranchID").val(Data[3]);
 				$("#txtItemCode").val(Data[5]);
-				$("#txtItemName").val(Data[6]);
 				$("#txtQTY").val(Data[7]);
-				$("#txtSalePrice").val(Data[9]);
-				$("#hdnSalePrice").val(parseFloat(Data[9].replace(/\,/g, "")) / parseFloat(Data[22]));
 				$("#txtDiscount").val(Data[10]);
-				$("#txtSubTotal").val(Data[11]);
-				$("#hdnBuyPrice").val(Data[12]);
-				$("#hdnPrice1").val(Data[13]);
-				$("#hdnQty1").val(Data[14]);
-				$("#hdnPrice2").val(Data[15]);
-				$("#hdnQty2").val(Data[16]);
-				$("#hdnWeight").val(Data[17]);
-				$("#hdnRetailPrice").val(Data[18]);
 
-				$("#hdnAvailableUnit").val(Data[19]);
-				$("#hdnItemDetailsID").val(Data[21]);
-				$("#hdnConversionQty").val(Data[22]);
-
-				var availableUnit = JSON.parse(Data[19]);
-				if(availableUnit.length > 0) {
-					$("#ddlUnit").find('option').remove();
-					for(var i=0;i<availableUnit.length;i++) {
-						$("#ddlUnit").append("<option value=" + availableUnit[i][0] + " itemdetailsid='" + availableUnit[i][2] + "' itemcode='" + availableUnit[i][3] + "' buyprice='" + availableUnit[i][4] + "' retailprice='" + availableUnit[i][5] + "' price1='" + availableUnit[i][6] + "' price2='" + availableUnit[i][7] + "' qty1='" + availableUnit[i][8] + "'  qty2='" + availableUnit[i][9] + "' conversionQuantity='" + availableUnit[i][10] + "' >" + availableUnit[i][1] + "</option>");
-					}
-				}
-				$("#ddlUnit").val(Data[20]);
-
+				itemCodeTemp = Data[5];
+				getItemDetails(1);
 				setTimeout(function() { $("#txtItemCode").focus(); }, 0);
 			}
 			
@@ -491,12 +476,14 @@
 			}
 
 			var counterGetItem = 0;
-			function getItemDetails() {
+			function getItemDetails(EditFlag) {
 				if(counterGetItem == 0) {
 					counterGetItem = 1;
 					var itemCode = $("#txtItemCode").val();
 					if(itemCode == "") finish();
-					else {
+					else if(EditFlag == 1 || (EditFlag == 0 && itemCode != itemCodeTemp)) {
+						itemCodeTemp = itemCode;
+						$("#loading").show();
 						$.ajax({
 							url: "./Transaction/Sale/CheckItem.php",
 							type: "POST",
@@ -505,6 +492,7 @@
 							success: function(data) {
 								if(data.FailedFlag == '0') {
 									//if($("#hdnItemID").val() != data.ItemID) {
+										$("#loading").hide();
 										if($("#hdnSaleDetailsID").val() != 0) {
 											var itemDetailsTemp = table2.row( rowEdit ).data()[21];
 											if(itemDetailsTemp == "") itemDetailsTemp = null;
@@ -546,12 +534,13 @@
 										$("#ddlUnit").val(data.UnitID);
 										Grosir($("#txtQTY").val());
 										CalculateSubTotal();
-										$("#txtQTY").focus();
+										if(EditFlag == 0) $("#txtQTY").focus();
 									//}
 									//else $("#txtQTY").focus();
 								}
 								else {
 									//add new item
+									$("#loading").hide();
 									if(data.ErrorMessage == "") {
 										$("#add-confirm").dialog({
 											autoOpen: false,
@@ -631,6 +620,7 @@
 							}
 						});
 					}
+					else $("#txtQTY").focus();
 				}
 				setTimeout(function() { counterGetItem = 0; }, 1000);
 			}
@@ -749,6 +739,7 @@
 								$("#btnPromptCode").focus();
 							}
 						});
+						$("#txtCode").focus();
 					},
 					
 					close: function() {
@@ -805,7 +796,7 @@
 											if($("#hdnSaleDetailsID").val() == 0) {
 												//$("#toggle-retail").toggleClass('disabled', true);
 												$("#txtSaleNumber").val(data.SaleNumber);
-												var toggleBranch = "<div id='toggle-branch-" + data.SaleDetailsID + "' onclick='updateBranch(this.id)' class='div-center toggle-modern' ></div>";
+												var toggleBranch = "<div id='toggle-branch-" + data.SaleDetailsID + "' onclick=\"updateBranch(this.id, " + Qty + ", '" + itemCode + "')\" class='div-center toggle-modern' ></div>";
 												var checkboxData = "<input type='checkbox' class='chkSaleDetails' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
 												table2.row.add([
 													checkboxData,
@@ -1064,7 +1055,7 @@
 										if($("#hdnSaleDetailsID").val() == 0) {
 											//$("#toggle-retail").toggleClass('disabled', true);
 											$("#txtSaleNumber").val(data.SaleNumber);
-											var toggleBranch = "<div id='toggle-branch-" + data.SaleDetailsID + "' onclick='updateBranch(this.id)' class='div-center toggle-modern' ></div>";
+											var toggleBranch = "<div id='toggle-branch-" + data.SaleDetailsID + "' onclick=\"updateBranch(this.id, " + Qty + ", '" + itemCode + "')\" class='div-center toggle-modern' ></div>";
 											var checkboxData = "<input type='checkbox' class='chkSaleDetails' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
 											table2.row.add([
 												checkboxData,
@@ -1265,43 +1256,191 @@
 				}
 			}
 			
-			function updateBranch(SaleDetailsID) {
+			function updateBranch(SaleDetailsID, Qty, itemCode) {
 				setTimeout(function() {
 					var BranchID = 1;
 					var str = SaleDetailsID.split("-");
+					var Stock = 0;
 					if($('#toggle-branch-' + str[2]).data('toggles').active == false) BranchID = 2;
 					$("#loading").show();
 					$.ajax({
-						url: "./Transaction/Sale/UpdateBranch.php",
+						url: "./Transaction/Sale/CheckItem.php",
 						type: "POST",
-						data: { SaleDetailsID : str[2], BranchID : BranchID },
+						data: { itemCode : itemCode, branchID : BranchID },
 						dataType: "json",
 						success: function(data) {
-							$("#loading").hide();
 							if(data.FailedFlag == '0') {
-								
+								Stock = parseFloat(data.Stock);
+								if((Stock - Qty) < 0) {
+									$("#loading").hide();
+									var code = Math.floor(100000 + Math.random() * 900000);
+									$("#lblCode").html(code);
+									$("#code-dialog").dialog({
+										autoOpen: false,
+										open: function() {
+											$("#divModal").show();
+											$(document).on('keydown', function(e) {
+												if (e.keyCode == 39 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //right arrow
+													$("#btnCancelPromptCode").focus();
+												}
+												else if(e.keyCode == 37 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //left arrow
+													$("#btnPromptCode").focus();
+												}
+											});
+											$("#txtCode").focus();
+										},
+										
+										close: function() {
+											$(this).dialog("destroy");
+											$("#divModal").hide();
+											if(BranchID == 1) {
+												$("#toggle-branch-" + str[2]).toggles(false);
+											}
+											else {
+												$("#toggle-branch-" + str[2]).toggles(true);
+											}
+											return false;
+										},
+										resizable: false,
+										height: 250,
+										width: 450,
+										modal: false,
+										buttons: [
+										{
+											text: "Konfirmasi Kode",
+											id: "btnPromptCode",
+											tabindex: 61,
+											click: function() {
+												var txtCode = $("#txtCode").val();
+												if(txtCode == code) {
+													$(this).dialog("destroy");
+													$("#divModal").hide();
+													$("#txtCode").val("");
+													$("#loading").show();
+													$.ajax({
+														url: "./Transaction/Sale/UpdateBranch.php",
+														type: "POST",
+														data: { SaleDetailsID : str[2], BranchID : BranchID },
+														dataType: "json",
+														success: function(data) {
+															$("#loading").hide();
+															if(data.FailedFlag == '0') {
+																
+															}
+															else {
+																
+															}
+														},
+														error: function(jqXHR, textStatus, errorThrown) {
+															$("#loading").hide();
+															var counter = 0;
+															var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+															LogEvent(errorMessage, "/Master/Item/index.php");
+															Lobibox.alert("error",
+															{
+																msg: errorMessage,
+																width: 480,
+																beforeClose: function() {
+																	if(counter == 0) {
+																		setTimeout(function() {
+																			$("#txtItemCode").focus();
+																		}, 0);
+																		counter = 1;
+																	}
+																}
+															});
+															return 0;
+														}
+													});
+												}
+												else {
+													$("#txtCode").notify("Kode salah!", { position:"right", className:"warn", autoHideDelay: 2000 });
+													$("#txtCode").focus();
+												}
+											}
+										},
+										{
+											text: "Batal",
+											id: "btnCancelPromptCode",
+											click: function() {
+												$(this).dialog("destroy");
+												$("#divModal").hide();
+												if(BranchID == 1) {
+													$("#toggle-branch-" + str[2]).toggles(false);
+												}
+												else {
+													$("#toggle-branch-" + str[2]).toggles(true);
+												}
+												return false;
+											}
+										}]
+									}).dialog("open");
+								}
+								else {
+									$.ajax({
+										url: "./Transaction/Sale/UpdateBranch.php",
+										type: "POST",
+										data: { SaleDetailsID : str[2], BranchID : BranchID },
+										dataType: "json",
+										success: function(data) {
+											$("#loading").hide();
+											if(data.FailedFlag == '0') {
+												
+											}
+											else {
+												
+											}
+										},
+										error: function(jqXHR, textStatus, errorThrown) {
+											$("#loading").hide();
+											var counter = 0;
+											var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+											LogEvent(errorMessage, "/Transaction/Sale/index.php");
+											Lobibox.alert("error",
+											{
+												msg: errorMessage,
+												width: 480,
+												beforeClose: function() {
+													if(counter == 0) {
+														setTimeout(function() {
+															$("#txtItemCode").focus();
+														}, 0);
+														counter = 1;
+													}
+												}
+											});
+											return 0;
+										}
+									});
+								}
 							}
 							else {
-								
+								$("#loading").hide();
+								var counter = 0;
+								Lobibox.alert("error",
+								{
+									msg: data.ErrorMessage,
+									width: 480,
+									beforeClose: function() {
+										if(counter == 0) {
+											setTimeout(function() {
+												$("#txtItemCode").focus();
+											}, 0);
+											counter = 1;
+										}
+									}
+								});
+								return 0;
 							}
 						},
 						error: function(jqXHR, textStatus, errorThrown) {
 							$("#loading").hide();
-							var counter = 0;
 							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-							LogEvent(errorMessage, "/Master/Item/index.php");
+							LogEvent(errorMessage, "/Transaction/Sale/index.php");
 							Lobibox.alert("error",
 							{
 								msg: errorMessage,
-								width: 480,
-								beforeClose: function() {
-									if(counter == 0) {
-										setTimeout(function() {
-											$("#txtItemCode").focus();
-										}, 0);
-										counter = 1;
-									}
-								}
+								width: 480
 							});
 							return 0;
 						}
@@ -1476,7 +1615,7 @@
 															delay: 2000,
 															beforeClose: function() {
 																setTimeout(function() {
-																	getItemDetails();
+																	getItemDetails(0);
 																}, 0);
 															},
 															shown: function() {
@@ -1861,7 +2000,7 @@
 									counterPickItem = 1;
 									var data = datatable.row( table3.cell({ focused: true }).index().row ).data();
 									$("#txtItemCode").val(data[0]);
-									getItemDetails();
+									getItemDetails(0);
 									$("#itemList-dialog").dialog("destroy");
 									table3.destroy();
 									//table.keys.enable();
@@ -1875,7 +2014,7 @@
 							if( $("#itemList-dialog").css("display") == "block") {
 								var data = table3.row(this).data();
 								$("#txtItemCode").val(data[0]);
-								getItemDetails();
+								getItemDetails(0);
 								$("#itemList-dialog").dialog("destroy");
 								table3.destroy();
 								//table.keys.enable();
@@ -2028,6 +2167,9 @@
 							var Change = parseFloat(Payment) - parseFloat(Total);
 							$("#txtChange").val(returnRupiah(Change.toString()));
 						}
+					}
+					else {
+						$("#txtChange").val(0);
 					}
 				}
 				else {

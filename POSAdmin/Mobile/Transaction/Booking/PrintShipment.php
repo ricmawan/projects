@@ -5,7 +5,7 @@
     use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
     use Mike42\Escpos\PrintConnectors\DummyPrintConnector;
 	//http://www.lprng.com/RESOURCES/PPD/epson.htm
-	if(isset($_POST['SaleDetailsID'])) {
+	if(isset($_POST['BookingDetailsID'])) {
 		$RequestedPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestedPath);
 		$RequestedPath = str_replace($file, "", $RequestedPath);
@@ -13,8 +13,8 @@
 
 		$connector = new DummyPrintConnector();
 	    
-	    $SaleDetailsID = $_POST['SaleDetailsID'];
-		$SaleID = mysqli_real_escape_string($dbh, $_POST['SaleID']);		
+	    $BookingDetailsID = $_POST['BookingDetailsID'];
+		$BookingID = mysqli_real_escape_string($dbh, $_POST['BookingID']);		
 		$tanggal = date('d') . "-" . date('m') . "-" . date('Y');
 		/*$tmpdir = sys_get_temp_dir();   # ambil direktori temporary untuk simpan file.
 		$file =  tempnam($tmpdir, 'ctk');  # nama file temporary yang akan dicetak*/
@@ -37,19 +37,19 @@
 		$italic1 = Chr(27) . Chr(52);
 		$italic0 = Chr(27) . Chr(53);*/
 		
-		$sql = "CALL spSelSaleHeader(".$SaleID.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spSelBookingHeader(".$BookingID.", '".$_SESSION['UserLogin']."')";
 
 		if (! $result = mysqli_query($dbh, $sql)) {
-			logEvent(mysqli_error($dbh), '/Transaction/Sale/PrintShipment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Transaction/Booking/PrintShipment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysql_error();
 			$FailedFlag = 1;
-			echo returnstate($SaleID, $Message, $MessageDetail, $FailedFlag, $State);
+			echo returnstate($BookingID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}
 
 		$row = mysqli_fetch_array($result);
-		$SaleNumber = $row['SaleNumber'];
+		$BookingNumber = $row['BookingNumber'];
 		$CustomerName = $row['CustomerName'];
 		$City = $row['City'];
 		$TransactionDate = $row['TransactionDate'];
@@ -65,7 +65,7 @@
 		$printer -> setJustification(Printer::JUSTIFY_CENTER);
 		$printer -> text("SURAT JALAN");
 		$printer -> text(str_pad("", 40, " "));
-		$printer -> text("No : ". $SaleNumber ."\n");
+		$printer -> text("No : ". $BookingNumber ."\n");
 		$printer -> text(str_pad("", 137, "_") . "\n");
 		$printer -> text(str_pad("", 73, " ") . "Kepada Yth.  ");
 		$printer -> selectPrintMode(Printer::MODE_FONT_A);
@@ -77,14 +77,14 @@
 		$printer -> text("   Kasir   : ");
 		$printer -> text(str_pad($CreatedBy, 73, " ") . "Ph " . $Telephone . "\n");
 		
-		$sql = "CALL spSelSaleDetailsPrint('(".implode(",", $SaleDetailsID).")', '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spSelBookingDetailsPrint('(".implode(",", $BookingDetailsID).")', '".$_SESSION['UserLogin']."')";
 
 		if (! $result = mysqli_query($dbh, $sql)) {
-			logEvent(mysqli_error($dbh), '/Transaction/Sale/PrintShipment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Transaction/Booking/PrintShipment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysql_error();
 			$FailedFlag = 1;
-			echo returnstate($SaleID, $Message, $MessageDetail, $FailedFlag, $State);
+			echo returnstate($BookingID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}
 
@@ -120,7 +120,7 @@
 	    fclose($handle);
 	    $printer -> pulse();
 		$printer -> close();
-		echo returnstate($SaleID, $Message, $MessageDetail, $FailedFlag, $State);
+		echo returnstate($BookingID, $Message, $MessageDetail, $FailedFlag, $State);
 	}
 	
 	function returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State) {

@@ -1,23 +1,23 @@
 <?php
-	if(ISSET($_POST['SaleDetailsID']) && ISSET($_POST['BranchID'])) {
+	if(ISSET($_POST['BookingDetailsID']) && ISSET($_POST['BranchID'])) {
 		$RequestedPath = "$_SERVER[REQUEST_URI]";
 		$file = basename($RequestedPath);
 		$RequestedPath = str_replace($file, "", $RequestedPath);
 		include "../../GetPermission.php";
-		$SaleDetailsID = mysqli_real_escape_string($dbh, $_POST['SaleDetailsID']);
+		$BookingDetailsID = mysqli_real_escape_string($dbh, $_POST['BookingDetailsID']);
 		$BranchID = mysqli_real_escape_string($dbh, $_POST['BranchID']);
 		$Message = "Cabang berhasil diubah";
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
 		
-		$sql = "CALL spUpdSaleDetailsBranch(".$SaleDetailsID.", ".$BranchID.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spUpdBookingDetailsBranch(".$BookingDetailsID.", ".$BranchID.", '".$_SESSION['UserLogin']."')";
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;
-			logEvent(mysqli_error($dbh), '/Transaction/Sale/UpdateBranch.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-			echo returnstate($SaleDetailsID, $Message, $MessageDetail, $FailedFlag, $State);
+			logEvent(mysqli_error($dbh), '/Transaction/Booking/UpdateBranch.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			echo returnstate($BookingDetailsID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}
 		

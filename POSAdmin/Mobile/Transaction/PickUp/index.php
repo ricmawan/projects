@@ -173,8 +173,10 @@
 			function checkAllPickUp() {
 				if($("#select_all_salereturn").prop("checked") == true) {
 					$("input:checkbox[class=chkBookingDetails]").each(function() {
-						$(this).prop("checked", true);
-						$(this).attr("checked", true);
+						if($(this).attr("disabled") == false) {
+							$(this).prop("checked", true);
+							$(this).attr("checked", true);
+						}
 					});
 				}
 				else {

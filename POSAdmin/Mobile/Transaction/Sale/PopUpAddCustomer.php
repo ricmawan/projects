@@ -76,6 +76,7 @@
 	<body>
 		<div id="FormCustomer" title="Tambah Item" >
 			<form class="col-md-12 col-sm-12" id="PostFormCustomer" method="POST" action="" >
+				<br />
 				<div class="row">
 					<div class="col-md-5 col-sm-5 has-float-label">
 						<input id="txtCustomerCodeAdd" name="txtCustomerCodeAdd" type="text" tabindex=70 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Kode Pelanggan" required />

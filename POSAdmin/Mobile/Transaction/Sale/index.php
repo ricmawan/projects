@@ -22,7 +22,7 @@
 			}
 
 			.lobibox {
-				top: 55px !important;
+				top: 25px !important;
 			}
 
 			.lobibox.lobibox-window .lobibox-header {
@@ -34,11 +34,16 @@
 			}
 
 			.lobibox.lobibox-window .lobibox-body {
-				padding: 10px 15px !important;
+				padding: 0 15px !important;
 			}
 
 			.lobibox .lobibox-footer {
 				padding: 3px !important;
+			}
+
+			.ui-tabs .ui-tabs-panel {
+				padding-bottom: 0;
+				padding-top: 0;
 			}
 		</style>
 	</head>
@@ -94,8 +99,9 @@
 								
 								<div class="row" >
 									<div class="col-md-12 col-sm-12 has-float-label" >
-										<input tabindex=8 id="txtItemCode" name="txtItemCode" type="text" class="form-control-custom" onfocus="this.select();" onkeypress="isEnterKey(event, 'getItemDetails');" onchange="getItemDetails();" autocomplete=off />
+										<input tabindex=8 id="txtItemCode" name="txtItemCode" type="text" class="form-control-custom" onfocus="this.select();" onchange="getItemDetails(0);" autocomplete=off />
 										<label for="txtItemCode" class="lblInput" >Kode Barang</label>
+										<input type="text" tabindex=9 onfocus="getItemDetails(0);" style="height:0; width: 0;opacity:0;" />
 									</div>
 								</div>
 								<br />
@@ -110,12 +116,12 @@
 								
 								<div class="row" >
 									<div class="col-md-6 col-sm-6 has-float-label" >
-										<input tabindex=9 id="txtQTY" onfocus="this.select();" name="txtQTY" type="number" class="form-control-custom" style="border: 1px solid #ccc !important;margin: 0;" value=1 min=1 onchange="this.value = validateQTY(this.value);Grosir(this.value);" onpaste="return false;" onfocus="this.select();" />
+										<input tabindex=10 id="txtQTY" onfocus="this.select();" name="txtQTY" type="number" class="form-control-custom" style="border: 1px solid #ccc !important;margin: 0;" value=1 min=1 onchange="this.value = validateQTY(this.value);Grosir(this.value);" onpaste="return false;" onfocus="this.select();" />
 										<label for="txtQTY" class="lblInput" >Qty</label>
 									</div>
 
 									<div class="col-md-6 col-sm-6 has-float-label" >
-										<select id="ddlUnit" name="ddlUnit" tabindex=10 class="form-control-custom mousetrap" onchange="changeItemCode();" >
+										<select id="ddlUnit" name="ddlUnit" tabindex=11 class="form-control-custom mousetrap" onchange="changeItemCode();" >
 											<option >--</option>
 										</select>
 										<label for="ddlUnit" class="lblInput" >Satuan</label>
@@ -144,11 +150,11 @@
 								
 								<div class="row" >
 									<div class="col-md-12 col-sm-12 has-float-label" >
-										<input id="txtDiscount" name="txtDiscount" type="tel" tabindex=11 class="form-control-custom text-right" value="0" autocomplete=off onfocus="clearFormat(this.id, this.value);this.select();" onpaste="return false;" onblur="convertRupiah(this.id, this.value);" />
+										<input id="txtDiscount" name="txtDiscount" type="tel" tabindex=12 class="form-control-custom text-right" value="0" autocomplete=off onfocus="clearFormat(this.id, this.value);this.select();" onpaste="return false;" onblur="convertRupiah(this.id, this.value);" />
 										<label for="txtDiscount" class="lblInput" >Diskon</label>
 									</div>
 								</div>
-								<input type="text" tabindex=12 onfocus="addSaleDetails();" style="height:0; width: 0;opacity:0;" />
+								<input type="text" tabindex=13 onfocus="addSaleDetails();" style="height:0; width: 0;opacity:0;" />
 								<br />
 								<button type="button" class="btn btn-default btn-mobile" value="Simpan" onclick="finish();" ><i class="fa fa-save fa-2x"></i><br /> Selesai</button>
 								<button type="button" class="btn btn-default btn-mobile" value="Cetak" onclick="itemList();" ><i class="fa fa-list fa-2x"></i><br /> List Barang</button>
@@ -158,7 +164,6 @@
 								<br />
 								<button type="button" class="btn btn-default btn-mobile" value="Cancel" onclick="newWindow();" ><i class="fa fa-window-restore fa-2x"></i> <br />Nota Baru</button>
 								<button id="btnGrosir" type="button" class="btn btn-default btn-mobile" value="Cetak" ><i class="fa fa-cart-arrow-down fa-2x"></i> Grosir</button>
-	</button>
 							</div>
 							<div class="col-md-12 col-sm-12" style="display:inline-block;width:80%;float:left;" >
 								<div class="row" style="max-height: 400px;overflow-y:auto;" >
@@ -241,7 +246,7 @@
 					Pembayaran :
 				</div>
 				<div class="col-md-8 col-sm-8">
-					<select id="ddlPayment" name="ddlPayment" class="form-control-custom" tabindex=14 onchange="PaymentTypeChange();" >
+					<select id="ddlPayment" name="ddlPayment" class="form-control-custom" tabindex=15 onchange="PaymentTypeChange();" >
 						<option value=1 >Tunai</option>
 						<option value=2 >Tempo</option>
 					</select>
@@ -264,7 +269,7 @@
 					Bayar :
 				</div>
 				<div class="col-md-8 col-sm-8">
-					<input id="txtPayment" name="txtPayment" type="tel" tabindex=15 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" onchange="Change();" />
+					<input id="txtPayment" name="txtPayment" type="tel" tabindex=16 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" onchange="Change();" />
 				</div>
 			</div>
 			<br />
@@ -281,7 +286,7 @@
 			<br />
 			<div class="row col-md-12 col-sm-12" >
 				<label class="checkboxContainer" >Cetak Nota
-					<input type="checkbox" id="chkPrint" name="chkPrint" value=1 tabindex=16 checked />
+					<input type="checkbox" id="chkPrint" name="chkPrint" value=1 tabindex=17 checked />
 					<span class="checkmark"></span>
 				</label>
 			</div>
@@ -289,13 +294,13 @@
 			<br />
 			<div class="row col-md-12 col-sm-12" >
 				<label class="checkboxContainer">Cetak Surat Pengambilan
-					<input type="checkbox" id="chkPrintShipment" name="chkPrintShipment" value=1 tabindex=17 checked />
+					<input type="checkbox" id="chkPrintShipment" name="chkPrintShipment" value=1 tabindex=18 checked />
 					<span class="checkmark"></span>
 				</label>
 			</div>
 			<br />
 			<br />
-			<button type="button" class="btn btn-primary btn-block" onclick="printInvoice();" style="padding: 6px 12px !important;" tabindex=18 >Selesai</button>
+			<button type="button" class="btn btn-primary btn-block" onclick="printInvoice();" style="padding: 6px 12px !important;" tabindex=19 >Selesai</button>
 			<!--<br />
 			<button class="btn btn-danger btn-block" tabindex=16 onclick="printShipment();" >Cetak Surat Jalan</button>-->
 		</div>
@@ -341,11 +346,12 @@
 			var table3;
 			var today;
 			var rowEdit;
+			var itemCodeTemp = 0;
 
 			function changeItemCode() {
 				var itemCode = $("#ddlUnit option:selected").attr("itemcode");
 				$("#txtItemCode").val(itemCode);
-				getItemDetails();
+				getItemDetails(0);
 			}
 
 			function CalculateSubTotal() {
@@ -364,36 +370,13 @@
 			
 			function openDialogEdit(Data) {
 				$("#hdnSaleDetailsID").val(Data[1]);
-				$("#hdnItemID").val(Data[2]);
 				$("#hdnBranchID").val(Data[3]);
 				$("#txtItemCode").val(Data[5]);
-				$("#txtItemName").val(Data[6]);
 				$("#txtQTY").val(Data[7]);
-				$("#txtSalePrice").val(Data[9]);
-				$("#hdnSalePrice").val(parseFloat(Data[9].replace(/\,/g, "")) / parseFloat(Data[22]));
 				$("#txtDiscount").val(Data[10]);
-				$("#txtSubTotal").val(Data[11]);
-				$("#hdnBuyPrice").val(Data[12]);
-				$("#hdnPrice1").val(Data[13]);
-				$("#hdnQty1").val(Data[14]);
-				$("#hdnPrice2").val(Data[15]);
-				$("#hdnQty2").val(Data[16]);
-				$("#hdnWeight").val(Data[17]);
-				$("#hdnRetailPrice").val(Data[18]);
 
-				$("#hdnAvailableUnit").val(Data[19]);
-				$("#hdnItemDetailsID").val(Data[21]);
-				$("#hdnConversionQty").val(Data[22]);
-
-				var availableUnit = JSON.parse(Data[19]);
-				if(availableUnit.length > 0) {
-					$("#ddlUnit").find('option').remove();
-					for(var i=0;i<availableUnit.length;i++) {
-						$("#ddlUnit").append("<option value=" + availableUnit[i][0] + " itemdetailsid='" + availableUnit[i][2] + "' itemcode='" + availableUnit[i][3] + "' buyprice='" + availableUnit[i][4] + "' retailprice='" + availableUnit[i][5] + "' price1='" + availableUnit[i][6] + "' price2='" + availableUnit[i][7] + "' qty1='" + availableUnit[i][8] + "'  qty2='" + availableUnit[i][9] + "' conversionQuantity='" + availableUnit[i][10] + "' >" + availableUnit[i][1] + "</option>");
-					}
-				}
-				$("#ddlUnit").val(Data[20]);
-
+				itemCodeTemp = Data[5];
+				getItemDetails(1);
 				setTimeout(function() { $("#txtItemCode").focus(); }, 0);
 			}
 			
@@ -478,7 +461,9 @@
 					counterGetItem = 1;
 					var itemCode = $("#txtItemCode").val();
 					if(itemCode == "") $("#txtItemCode").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-					else {
+					else if(EditFlag == 1 || (EditFlag == 0 && itemCode != itemCodeTemp)) {
+						itemCodeTemp = itemCode;
+						$("#loading").show();
 						$.ajax({
 							url: "./Transaction/Sale/CheckItem.php",
 							type: "POST",
@@ -487,6 +472,7 @@
 							success: function(data) {
 								if(data.FailedFlag == '0') {
 									//if($("#hdnItemID").val() != data.ItemID) {
+										$("#loading").hide();
 										if($("#hdnSaleDetailsID").val() != 0) {
 											var itemDetailsTemp = table2.row( rowEdit ).data()[21];
 											if(itemDetailsTemp == "") itemDetailsTemp = null;
@@ -534,6 +520,7 @@
 								}
 								else {
 									//add new item
+									$("#loading").hide();
 									if(data.ErrorMessage == "") {
 										$("#add-confirm").dialog({
 											autoOpen: false,											
@@ -613,6 +600,7 @@
 							}
 						});
 					}
+					else $("#txtQTY").focus();
 				}
 				setTimeout(function() { counterGetItem = 0; }, 1000);
 			}
@@ -766,6 +754,7 @@
 								$("#btnPromptCode").focus();
 							}
 						});
+						$("#txtCode").focus();
 					},
 					
 					close: function() {
@@ -823,7 +812,7 @@
 												//$("#toggle-retail").toggleClass('disabled', true);
 												$("#hdnSaleNumber").val(data.SaleNumber);
 												$("#lblSaleNumber").html(data.SaleNumber);
-												var toggleBranch = "<div id='toggle-branch-" + data.SaleDetailsID + "' onclick='updateBranch(this.id)' class='div-center toggle-modern' ></div>";
+												var toggleBranch = "<div id='toggle-branch-" + data.SaleDetailsID + "' onclick=\"updateBranch(this.id, " + Qty + ", '" + itemCode + "')\" class='div-center toggle-modern' ></div>";
 												var checkboxData = "<input type='checkbox' class='chkSaleDetails' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
 												var deleteData = '<span style="background-color:red;padding:3px 6px 1px 5px;border:1px solid black;color:white;"><i style="cursor:pointer;" class="fa fa-trash fa-2x" acronym title="Hapus Data" onclick="deleteItem(' + data.SaleDetailsID + ');"></i>';
 
@@ -1087,7 +1076,7 @@
 											//$("#toggle-retail").toggleClass('disabled', true);
 											$("#hdnSaleNumber").val(data.SaleNumber);
 											$("#lblSaleNumber").html(data.SaleNumber);
-											var toggleBranch = "<div id='toggle-branch-" + data.SaleDetailsID + "' onclick='updateBranch(this.id)' class='div-center toggle-modern' ></div>";
+											var toggleBranch = "<div id='toggle-branch-" + data.SaleDetailsID + "' onclick=\"updateBranch(this.id, " + Qty + ", '" + itemCode + "')\" class='div-center toggle-modern' ></div>";
 											var checkboxData = "<input type='checkbox' class='chkSaleDetails' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
 											var deleteData = '<span style="background-color:red;padding:3px 6px 1px 5px;border:1px solid black;color:white;"><i style="cursor:pointer;" class="fa fa-trash fa-2x" acronym title="Hapus Data" onclick="deleteItem(' + data.SaleDetailsID + ');"></i>';
 												
@@ -1294,43 +1283,195 @@
 				}
 			}
 			
-			function updateBranch(SaleDetailsID) {
+			function updateBranch(SaleDetailsID, Qty, itemCode) {
 				setTimeout(function() {
 					var BranchID = 1;
 					var str = SaleDetailsID.split("-");
+					var Stock = 0;
 					if($('#toggle-branch-' + str[2]).data('toggles').active == false) BranchID = 2;
 					$("#loading").show();
 					$.ajax({
-						url: "./Transaction/Sale/UpdateBranch.php",
+						url: "./Transaction/Sale/CheckItem.php",
 						type: "POST",
-						data: { SaleDetailsID : str[2], BranchID : BranchID },
+						data: { itemCode : itemCode, branchID : BranchID },
 						dataType: "json",
 						success: function(data) {
-							$("#loading").hide();
 							if(data.FailedFlag == '0') {
-								
+								Stock = parseFloat(data.Stock);
+								if((Stock - Qty) < 0) {
+									$("#loading").hide();
+									var code = Math.floor(100000 + Math.random() * 900000);
+									$("#lblCode").html(code);
+									$("#code-dialog").dialog({
+										autoOpen: false,
+										position: {
+											my : 'top+25%',
+											at : 'top'
+										},
+										open: function() {
+											$("#divModal").show();
+											$(document).on('keydown', function(e) {
+												if (e.keyCode == 39 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //right arrow
+													$("#btnCancelPromptCode").focus();
+												}
+												else if(e.keyCode == 37 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //left arrow
+													$("#btnPromptCode").focus();
+												}
+											});
+											$("#txtCode").focus();
+										},
+										
+										close: function() {
+											$(this).dialog("destroy");
+											$("#divModal").hide();
+											if(BranchID == 1) {
+												$("#toggle-branch-" + str[2]).toggles(false);
+											}
+											else {
+												$("#toggle-branch-" + str[2]).toggles(true);
+											}
+											return false;
+										},
+										resizable: false,
+										height: 250,
+										width: 450,
+										modal: false,
+										buttons: [
+										{
+											text: "Konfirmasi Kode",
+											id: "btnPromptCode",
+											tabindex: 61,
+											click: function() {
+												var txtCode = $("#txtCode").val();
+												if(txtCode == code) {
+													$(this).dialog("destroy");
+													$("#divModal").hide();
+													$("#txtCode").val("");
+													$("#loading").show();
+													$.ajax({
+														url: "./Transaction/Sale/UpdateBranch.php",
+														type: "POST",
+														data: { SaleDetailsID : str[2], BranchID : BranchID },
+														dataType: "json",
+														success: function(data) {
+															$("#loading").hide();
+															if(data.FailedFlag == '0') {
+																
+															}
+															else {
+																
+															}
+														},
+														error: function(jqXHR, textStatus, errorThrown) {
+															$("#loading").hide();
+															var counter = 0;
+															var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+															LogEvent(errorMessage, "/Master/Item/index.php");
+															Lobibox.alert("error",
+															{
+																msg: errorMessage,
+																width: 480,
+																beforeClose: function() {
+																	if(counter == 0) {
+																		setTimeout(function() {
+																			$("#txtItemCode").focus();
+																		}, 0);
+																		counter = 1;
+																	}
+																}
+															});
+															return 0;
+														}
+													});
+												}
+												else {
+													$("#txtCode").notify("Kode salah!", { position:"right", className:"warn", autoHideDelay: 2000 });
+													$("#txtCode").focus();
+												}
+											}
+										},
+										{
+											text: "Batal",
+											id: "btnCancelPromptCode",
+											click: function() {
+												$(this).dialog("destroy");
+												$("#divModal").hide();
+												if(BranchID == 1) {
+													$("#toggle-branch-" + str[2]).toggles(false);
+												}
+												else {
+													$("#toggle-branch-" + str[2]).toggles(true);
+												}
+												return false;
+											}
+										}]
+									}).dialog("open");
+								}
+								else {
+									$.ajax({
+										url: "./Transaction/Sale/UpdateBranch.php",
+										type: "POST",
+										data: { SaleDetailsID : str[2], BranchID : BranchID },
+										dataType: "json",
+										success: function(data) {
+											$("#loading").hide();
+											if(data.FailedFlag == '0') {
+												
+											}
+											else {
+												
+											}
+										},
+										error: function(jqXHR, textStatus, errorThrown) {
+											$("#loading").hide();
+											var counter = 0;
+											var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+											LogEvent(errorMessage, "/Transaction/Sale/index.php");
+											Lobibox.alert("error",
+											{
+												msg: errorMessage,
+												width: 480,
+												beforeClose: function() {
+													if(counter == 0) {
+														setTimeout(function() {
+															$("#txtItemCode").focus();
+														}, 0);
+														counter = 1;
+													}
+												}
+											});
+											return 0;
+										}
+									});
+								}
 							}
 							else {
-								
+								$("#loading").hide();
+								var counter = 0;
+								Lobibox.alert("error",
+								{
+									msg: data.ErrorMessage,
+									width: 480,
+									beforeClose: function() {
+										if(counter == 0) {
+											setTimeout(function() {
+												$("#txtItemCode").focus();
+											}, 0);
+											counter = 1;
+										}
+									}
+								});
+								return 0;
 							}
 						},
 						error: function(jqXHR, textStatus, errorThrown) {
 							$("#loading").hide();
-							var counter = 0;
 							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-							LogEvent(errorMessage, "/Master/Item/index.php");
+							LogEvent(errorMessage, "/Transaction/Sale/index.php");
 							Lobibox.alert("error",
 							{
 								msg: errorMessage,
-								width: 480,
-								beforeClose: function() {
-									if(counter == 0) {
-										setTimeout(function() {
-											$("#txtItemCode").focus();
-										}, 0);
-										counter = 1;
-									}
-								}
+								width: 480
 							});
 							return 0;
 						}
@@ -1505,7 +1646,7 @@
 															delay: 2000,
 															beforeClose: function() {
 																setTimeout(function() {
-																	getItemDetails();
+																	getItemDetails(0);
 																}, 0);
 															},
 															shown: function() {
@@ -1883,7 +2024,7 @@
 								var data = datatable.row( cell.index().row ).data();
 								if(key == 13 && $("#itemList-dialog").css("display") == "block") {
 									$("#txtItemCode").val(data[0]);
-									getItemDetails();
+									getItemDetails(0);
 									$("#itemList-dialog").dialog("destroy");
 									table3.destroy();
 									table2.keys.enable();
@@ -1910,7 +2051,7 @@
 							if( $("#itemList-dialog").css("display") == "block") {
 								var data = table3.row(this).data();
 								$("#txtItemCode").val(data[0]);
-								getItemDetails();
+								getItemDetails(0);
 								$("#itemList-dialog").dialog("destroy");
 								table3.destroy();
 								table2.keys.enable();
@@ -2064,6 +2205,9 @@
 							var Change = parseFloat(Payment) - parseFloat(Total);
 							$("#txtChange").val(returnRupiah(Change.toString()));
 						}
+					}
+					else {
+						$("#txtChange").val(0);
 					}
 				}
 				else {

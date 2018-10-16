@@ -20,26 +20,46 @@
 				height:45px;
 				width:49%;
 			}
+
+			.lobibox {
+				top: 55px !important;
+			}
+
+			.lobibox.lobibox-window .lobibox-header {
+				font-size: 14px !important;
+			}
+
+			.lobibox .lobibox-header {
+			    padding: 2px 10px !important;
+			}
+
+			.lobibox.lobibox-window .lobibox-body {
+				padding: 10px 15px !important;
+			}
+
+			.lobibox .lobibox-footer {
+				padding: 3px !important;
+			}
 		</style>
 	</head>
 	<body>
 		<div class="row">			
-			<div id="FormData" class="col-md-12" >
+			<div id="FormData" class="col-md-12 col-sm-12" >
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<span style="width:50%;display:inline-block;">
 							<h5 id="headTitle" style="margin-bottom: 5px;margin-top: 5px;">Transaksi Penjualan Eceran</h5>
 						</span>
 						<span style="width:49%;display:inline-block;text-align:right;">
-							<b>No Invoice: <span id="lblSaleNumber" ></span></b>
+							<b>No Invoice: <span id="lblBookingNumber" ></span></b>
 						</span>
 					</div>
 					<div class="panel-body" style="margin-top: 5px;">
 						
 						<form id="PostForm" method="POST" action="" >
-							<input id="hdnSaleID" name="hdnSaleID" type="hidden" value=0 />
-							<input id="hdnSaleDetailsID" name="hdnSaleDetailsID" type="hidden" value=0 />
-							<input id="hdnSaleNumber" name="hdnSaleNumber" type="hidden" value="" />
+							<input id="hdnBookingID" name="hdnBookingID" type="hidden" value=0 />
+							<input id="hdnBookingDetailsID" name="hdnBookingDetailsID" type="hidden" value=0 />
+							<input id="hdnBookingNumber" name="hdnBookingNumber" type="hidden" value="" />
 							<input id="hdnItemID" name="hdnItemID" type="hidden" value=0 />
 							<input id="hdnItemDetailsID" name="hdnItemDetailsID" type="hidden" value=0 />
 							<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
@@ -51,12 +71,12 @@
 							<input type="hidden" id="hdnIsRetail" name="hdnIsRetail" value=1 />
 							<div id="leftSide" class="col-md-12" style="display:inline-block;width:20%;border-right:3px double black;float:left;font-size: 10px !important;" >
 								<div class="row" >
-									<div class="col-md-12 has-float-label" >
+									<div class="col-md-12 col-sm-12 has-float-label" >
 										<select id="ddlCustomer" name="ddlCustomer" tabindex=7 class="form-control-custom" placeholder="Pilih Pelanggan" style="width: 80%; display: inline-block;margin-right: 5px;" onchange="updateHeader();" >
 											<?php
 												$sql = "CALL spSelDDLCustomer('".$_SESSION['UserLogin']."')";
 												if (! $result = mysqli_query($dbh, $sql)) {
-													logEvent(mysqli_error($dbh), '/Transaction/Sale/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+													logEvent(mysqli_error($dbh), '/Transaction/Booking/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 													return 0;
 												}
 												while($row = mysqli_fetch_array($result)) {
@@ -73,15 +93,16 @@
 								<br />
 								
 								<div class="row" >
-									<div class="col-md-12 has-float-label" >
-										<input tabindex=8 id="txtItemCode" name="txtItemCode" type="text" class="form-control-custom" onfocus="this.select();" onkeypress="isEnterKey(event, 'getItemDetails');" onchange="getItemDetails();" autocomplete=off />
+									<div class="col-md-12 col-sm-12 has-float-label" >
+										<input tabindex=8 id="txtItemCode" name="txtItemCode" type="text" class="form-control-custom" onfocus="this.select();" onchange="getItemDetails(0);" autocomplete=off />
 										<label for="txtItemCode" class="lblInput" >Kode Barang</label>
+										<input type="text" tabindex=9 onfocus="getItemDetails(0);" style="height:0; width: 0;opacity:0;" />
 									</div>
 								</div>
 								<br />
 								
 								<div class="row" >
-									<div class="col-md-12 has-float-label" >
+									<div class="col-md-12 col-sm-12 has-float-label" >
 										<input disabled id="txtItemName" name="txtItemName" type="text" class="form-control-custom" />
 										<label for="txtItemName" class="lblInput" >Nama Barang</label>
 									</div>
@@ -89,13 +110,13 @@
 								<br />
 								
 								<div class="row" >
-									<div class="col-md-6 has-float-label" >
-										<input tabindex=9 id="txtQTY" onfocus="this.select();" name="txtQTY" type="number" class="form-control-custom" style="border: 1px solid #ccc !important;margin: 0;" value=1 min=1 onchange="this.value = validateQTY(this.value);Grosir(this.value);" onpaste="return false;" onfocus="this.select();" />
+									<div class="col-md-6 col-sm-6 has-float-label" >
+										<input tabindex=10 id="txtQTY" onfocus="this.select();" name="txtQTY" type="number" class="form-control-custom" style="border: 1px solid #ccc !important;margin: 0;" value=1 min=1 onchange="this.value = validateQTY(this.value);Grosir(this.value);" onpaste="return false;" onfocus="this.select();" />
 										<label for="txtQTY" class="lblInput" >Qty</label>
 									</div>
 
-									<div class="col-md-6 has-float-label" >
-										<select id="ddlUnit" name="ddlUnit" tabindex=10 class="form-control-custom mousetrap" onchange="changeItemCode();" >
+									<div class="col-md-6 col-sm-6 has-float-label" >
+										<select id="ddlUnit" name="ddlUnit" tabindex=11 class="form-control-custom mousetrap" onchange="changeItemCode();" >
 											<option >--</option>
 										</select>
 										<label for="ddlUnit" class="lblInput" >Satuan</label>
@@ -104,9 +125,9 @@
 								<br />
 								
 								<div class="row" >
-									<div class="col-md-12 has-float-label" >
+									<div class="col-md-12 col-sm-12 has-float-label" >
 										<input id="hdnBuyPrice" name="hdnBuyPrice" type="hidden" value=0 />
-										<input id="hdnSalePrice" name="hdnSalePrice" type="hidden" value=0 />
+										<input id="hdnBookingPrice" name="hdnBookingPrice" type="hidden" value=0 />
 										<input id="hdnRetailPrice" name="hdnRetailPrice" type="hidden" value=0 />
 										<input id="hdnPrice1" name="hdnPrice1" type="hidden" value=0 />
 										<input id="hdnQty1" name="hdnQty1" type="hidden" value=0 />
@@ -116,19 +137,19 @@
 										<input id="hdnWeight" name="hdnWeight" type="hidden" value=0 />
 										<input id="hdnConversionQty" name="hdnConversionQty" type="hidden" value=0 />
 										<input id="hdnStock" name="hdnStock" type="hidden" value=0 />
-										<input id="txtSalePrice" name="txtSalePrice" class="form-control-custom text-right" value="0" autocomplete=off onfocus="this.select();" onpaste="return false;" readonly />
-										<label for="txtSalePrice" class="lblInput" >Harga</label>
+										<input id="txtBookingPrice" name="txtBookingPrice" class="form-control-custom text-right" value="0" autocomplete=off onfocus="this.select();" onpaste="return false;" readonly />
+										<label for="txtBookingPrice" class="lblInput" >Harga</label>
 									</div>
 								</div>
 								<br />
 								
 								<div class="row" >
-									<div class="col-md-12 has-float-label" >
-										<input id="txtDiscount" name="txtDiscount" type="tel" lang="en-150" tabindex=11 class="form-control-custom text-right" value="0" autocomplete=off onkeypress="isEnterKey(event, 'addSaleDetails');return isNumberKey(event, this.id, this.value);" onchange="addSaleDetails();" onfocus="this.select();" onpaste="return false;" />
+									<div class="col-md-12 col-sm-12 has-float-label" >
+										<input id="txtDiscount" name="txtDiscount" type="tel" tabindex=12 class="form-control-custom text-right" value="0" autocomplete=off onfocus="clearFormat(this.id, this.value);this.select();" onpaste="return false;" onblur="convertRupiah(this.id, this.value);" />
 										<label for="txtDiscount" class="lblInput" >Diskon</label>
 									</div>
 								</div>
-								<input type="text" tabindex=12 onfocus="addSaleDetails();" style="height:0; width: 0;opacity:0;" />
+								<input type="text" tabindex=13 onfocus="addBookingDetails();" style="height:0; width: 0;opacity:0;" />
 								<br />
 								<button type="button" class="btn btn-default btn-mobile" value="Simpan" onclick="finish();" ><i class="fa fa-save fa-2x"></i><br /> Selesai</button>
 								<button type="button" class="btn btn-default btn-mobile" value="Cetak" onclick="itemList();" ><i class="fa fa-list fa-2x"></i><br /> List Barang</button>
@@ -140,15 +161,15 @@
 								<button id="btnGrosir" type="button" class="btn btn-default btn-mobile" value="Cetak" ><i class="fa fa-cart-arrow-down fa-2x"></i> Grosir</button>
 	</button>
 							</div>
-							<div class="col-md-12" style="display:inline-block;width:80%;float:left;" >
+							<div class="col-md-12 col-sm-12" style="display:inline-block;width:80%;float:left;" >
 								<div class="row" style="max-height: 400px;overflow-y:auto;" >
-									<div class="col-md-12" >
+									<div class="col-md-12 col-sm-12" >
 										<div id="divTableContent" class="table-responsive" style="overflow-x:hidden;">
 											<table id="grid-transaction" style="width: 100% !important;" class="table table-striped table-bordered table-hover" >
 												<thead>
 													<tr>
 														<th><input id="select_all" name="select_all" type="checkbox" onclick="chkAll();" style="margin: 0;" /></th>
-														<th>SaleDetailsID</th>
+														<th>BookingDetailsID</th>
 														<th>ItemID</th>
 														<th>BranchID</th>
 														<th>Cabang</th>
@@ -178,7 +199,7 @@
 									</div>
 								</div>
 								<br />
-								<div class="row col-md-12" >
+								<div class="row col-md-12 col-sm-12" >
 									<h2 style="display: inline-block;float: left;" >TOTAL : &nbsp;</h2><span id="lblTotal" >0</span>
 									</h2><span id="lblWeight" >0</span><h2 style="display: inline-block;float: right;color: #0006ff;" >Berat(KG) : &nbsp;
 								</div>
@@ -193,7 +214,7 @@
 			<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Kode tidak valid, apakah ingin menambahkan barang?</p>
 		</div>
 		<div id="itemList-dialog" title="Daftar Barang" style="display: none;">
-			<div class="row col-md-12" >
+			<div class="row col-md-12 col-sm-12" >
 				<div id="divTableItem" class="table-responsive" style="overflow-x:hidden;">
 					<table id="grid-item" style="width: 100% !important;" class="table table-striped table-bordered table-hover" >
 						<thead>
@@ -216,60 +237,66 @@
 			</div>
 		</div>
 		<div id="finish-dialog" title="Transaksi Selesai" style="display: none;">
-			<div class="row col-md-12" >
-				<div class="col-md-4 labelColumn">
+			<div class="row col-md-12 col-sm-12" >
+				<div class="col-md-4 col-sm-4 labelColumn">
 					Pembayaran :
 				</div>
-				<div class="col-md-8">
-					<select id="ddlPayment" name="ddlPayment" class="form-control-custom" tabindex=14 onchange="PaymentTypeChange();" >
+				<div class="col-md-8 col-sm-8">
+					<select id="ddlPayment" name="ddlPayment" class="form-control-custom" tabindex=15 onchange="PaymentTypeChange();" >
 						<option value=1 >Tunai</option>
 						<option value=2 >Tempo</option>
 					</select>
 				</div>
 			</div>
 			<br />
-			<div class="row col-md-12" >
-				<div class="col-md-4 labelColumn">
+			<br />
+			<div class="row col-md-12 col-sm-12" >
+				<div class="col-md-4 col-sm-4 labelColumn">
 					Total :
 				</div>
-				<div class="col-md-8">
+				<div class="col-md-8 col-sm-8">
 					<input id="txtTotal" name="txtTotal" type="text" class="form-control-custom text-right" value="0" autocomplete=off placeholder="Total" readonly />
 				</div>
 			</div>
 			<br />
-			<div class="row col-md-12" >
-				<div class="col-md-4 labelColumn">
+			<br />
+			<div class="row col-md-12 col-sm-12" >
+				<div class="col-md-4 col-sm-4 labelColumn">
 					Bayar :
 				</div>
-				<div class="col-md-8">
-					<input id="txtPayment" name="txtPayment" type="text" tabindex=15 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" onchange="Change();" />
+				<div class="col-md-8 col-sm-8">
+					<input id="txtPayment" name="txtPayment" type="tel" tabindex=16 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" onchange="Change();" />
 				</div>
 			</div>
 			<br />
-			<div class="row col-md-12" >
-				<div class="col-md-4 labelColumn">
+			<br />
+			<div class="row col-md-12 col-sm-12" >
+				<div class="col-md-4 col-sm-4 labelColumn">
 					<label id="lblChange" style="font-weight: normal;" >Kembali :</label>
 				</div>
-				<div class="col-md-8">
+				<div class="col-md-8 col-sm-8">
 					<input id="txtChange" name="txtChange" type="text" class="form-control-custom text-right" value="0" readonly />
 				</div>
 			</div>
 			<br />
-			<div class="row col-md-12" >
+			<br />
+			<div class="row col-md-12 col-sm-12" >
 				<label class="checkboxContainer" >Cetak Nota
-					<input type="checkbox" id="chkPrint" name="chkPrint" value=1 tabindex=16 checked />
+					<input type="checkbox" id="chkPrint" name="chkPrint" value=1 tabindex=17 checked />
 					<span class="checkmark"></span>
 				</label>
 			</div>
 			<br />
-			<div class="row col-md-12" >
+			<br />
+			<div class="row col-md-12 col-sm-12" >
 				<label class="checkboxContainer">Cetak Surat Pengambilan
-					<input type="checkbox" id="chkPrintShipment" name="chkPrintShipment" value=1 tabindex=17 checked />
+					<input type="checkbox" id="chkPrintShipment" name="chkPrintShipment" value=1 tabindex=18 checked />
 					<span class="checkmark"></span>
 				</label>
 			</div>
 			<br />
-			<button type="button" class="btn btn-primary btn-block" onclick="printInvoice();" style="padding: 6px 12px !important;" tabindex=18 >Selesai</button>
+			<br />
+			<button type="button" class="btn btn-primary btn-block" onclick="printInvoice();" style="padding: 6px 12px !important;" tabindex=19 >Selesai</button>
 			<!--<br />
 			<button class="btn btn-danger btn-block" tabindex=16 onclick="printShipment();" >Cetak Surat Jalan</button>-->
 		</div>
@@ -279,7 +306,7 @@
 				<?php
 					$sql = "CALL spSelDDLBranch('".$_SESSION['UserLogin']."')";
 					if (! $result = mysqli_query($dbh, $sql)) {
-						logEvent(mysqli_error($dbh), '/Report/Sale/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+						logEvent(mysqli_error($dbh), '/Report/Booking/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 						return 0;
 					}
 					while($row = mysqli_fetch_array($result)) {
@@ -292,20 +319,20 @@
 		</div>
 		<div id="code-dialog" title="Konfirmasi Kode" style="display: none;">
 			<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Stok barang tidak mencukupi, masukkan kode di bawah jika tetap ingin menambahkan!</p>
-			<div class="row col-md-12" >
-				<div class="col-md-4 labelColumn">
+			<div class="row col-md-12 col-sm-12" >
+				<div class="col-md-4 col-sm-4 labelColumn">
 					Kode :
 				</div>
-				<div class="col-md-8">
+				<div class="col-md-8 col-sm-8">
 					<label id="lblCode" name="lblCode" ></label>
 				</div>
 			</div>
 			<br />
-			<div class="row col-md-12" >
-				<div class="col-md-4 labelColumn">
+			<div class="row col-md-12 col-sm-12" >
+				<div class="col-md-4 col-sm-4 labelColumn">
 					Masukkan Kode :
 				</div>
-				<div class="col-md-6">
+				<div class="col-md-6 col-sm-6">
 					<input id="txtCode" name="txtCode" type="number" max="999999" tabindex=60 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Kode" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="this.select();" onpaste="return false;" />
 				</div>
 			</div>
@@ -315,59 +342,37 @@
 			var table3;
 			var today;
 			var rowEdit;
+			var itemCodeTemp = 0;
 
 			function changeItemCode() {
 				var itemCode = $("#ddlUnit option:selected").attr("itemcode");
 				$("#txtItemCode").val(itemCode);
-				getItemDetails();
+				getItemDetails(0);
 			}
 
 			function CalculateSubTotal() {
-				var salePrice = parseFloat($("#txtSalePrice").val().replace(/\,/g, ""));
+				var BookingPrice = parseFloat($("#txtBookingPrice").val().replace(/\,/g, ""));
 				var discount = parseFloat($("#txtDiscount").val().replace(/\,/g, ""));
 				var QTY = parseFloat($("#txtQTY").val());
-				var SubTotal = (salePrice - discount) * QTY;
+				var SubTotal = (BookingPrice - discount) * QTY;
 				$("#txtSubTotal").val(returnRupiah(SubTotal.toString()));
 			}
 
 			function CalculatePrice() {
 				var conversionQuantity = parseFloat($("#ddlUnit option:selected").attr("conversionQuantity"));
-				var salePrice = parseFloat($("#txtSalePrice").val().replace(/\,/g, ""));
-				$("#hdnSalePrice").val(salePrice/conversionQuantity);
+				var BookingPrice = parseFloat($("#txtBookingPrice").val().replace(/\,/g, ""));
+				$("#hdnBookingPrice").val(BookingPrice/conversionQuantity);
 			}
 			
 			function openDialogEdit(Data) {
-				$("#hdnSaleDetailsID").val(Data[1]);
-				$("#hdnItemID").val(Data[2]);
+				$("#hdnBookingDetailsID").val(Data[1]);
 				$("#hdnBranchID").val(Data[3]);
 				$("#txtItemCode").val(Data[5]);
-				$("#txtItemName").val(Data[6]);
 				$("#txtQTY").val(Data[7]);
-				$("#txtSalePrice").val(Data[9]);
-				$("#hdnSalePrice").val(parseFloat(Data[9].replace(/\,/g, "")) / parseFloat(Data[22]));
 				$("#txtDiscount").val(Data[10]);
-				$("#txtSubTotal").val(Data[11]);
-				$("#hdnBuyPrice").val(Data[12]);
-				$("#hdnPrice1").val(Data[13]);
-				$("#hdnQty1").val(Data[14]);
-				$("#hdnPrice2").val(Data[15]);
-				$("#hdnQty2").val(Data[16]);
-				$("#hdnWeight").val(Data[17]);
-				$("#hdnRetailPrice").val(Data[18]);
 
-				$("#hdnAvailableUnit").val(Data[19]);
-				$("#hdnItemDetailsID").val(Data[21]);
-				$("#hdnConversionQty").val(Data[22]);
-
-				var availableUnit = JSON.parse(Data[19]);
-				if(availableUnit.length > 0) {
-					$("#ddlUnit").find('option').remove();
-					for(var i=0;i<availableUnit.length;i++) {
-						$("#ddlUnit").append("<option value=" + availableUnit[i][0] + " itemdetailsid='" + availableUnit[i][2] + "' itemcode='" + availableUnit[i][3] + "' buyprice='" + availableUnit[i][4] + "' retailprice='" + availableUnit[i][5] + "' price1='" + availableUnit[i][6] + "' price2='" + availableUnit[i][7] + "' qty1='" + availableUnit[i][8] + "'  qty2='" + availableUnit[i][9] + "' conversionQuantity='" + availableUnit[i][10] + "' >" + availableUnit[i][1] + "</option>");
-					}
-				}
-				$("#ddlUnit").val(Data[20]);
-
+				itemCodeTemp = Data[5];
+				getItemDetails(1);
 				setTimeout(function() { $("#txtItemCode").focus(); }, 0);
 			}
 			
@@ -433,7 +438,7 @@
 						});
 
 				table2.columns.adjust();
-				var counterSaleDetails = 0;
+				var counterBookingDetails = 0;
 				
 				$('#grid-transaction tbody').on('dblclick', 'tr', function () {
 					var data = table2.row(this).data();
@@ -447,30 +452,33 @@
 			}
 
 			var counterGetItem = 0;
-			function getItemDetails() {
+			function getItemDetails(EditFlag) {
 				if(counterGetItem == 0) {
 					counterGetItem = 1;
 					var itemCode = $("#txtItemCode").val();
 					if(itemCode == "") $("#txtItemCode").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-					else {
+					else if(EditFlag == 1 || (EditFlag == 0 && itemCode != itemCodeTemp)) {
+						itemCodeTemp = itemCode;
+						$("#loading").show();
 						$.ajax({
-							url: "./Transaction/Sale/CheckItem.php",
+							url: "./Transaction/Booking/CheckItem.php",
 							type: "POST",
 							data: { itemCode : itemCode, branchID : $("#hdnBranchID").val() },
 							dataType: "json",
 							success: function(data) {
 								if(data.FailedFlag == '0') {
 									//if($("#hdnItemID").val() != data.ItemID) {
-										if($("#hdnSaleDetailsID").val() != 0) {
+										$("#loading").hide();
+										if($("#hdnBookingDetailsID").val() != 0) {
 											var itemDetailsTemp = table2.row( rowEdit ).data()[21];
 											if(itemDetailsTemp == "") itemDetailsTemp = null;
 										}
 
-										if($("#hdnSaleDetailsID").val() != 0 && itemDetailsTemp === data.ItemDetailsID && table2.row( rowEdit ).data()[2] == data.ItemID) {
+										if($("#hdnBookingDetailsID").val() != 0 && itemDetailsTemp === data.ItemDetailsID && table2.row( rowEdit ).data()[2] == data.ItemID) {
 											$("#hdnStock").val((parseFloat(data.Stock) + parseFloat(table2.row( rowEdit ).data()[7])).toFixed(2));
 											//console.log("mlebu 1");
 										}
-										else if($("#hdnSaleDetailsID").val() != 0 && itemDetailsTemp !== data.ItemDetailsID && table2.row( rowEdit ).data()[2] == data.ItemID) {
+										else if($("#hdnBookingDetailsID").val() != 0 && itemDetailsTemp !== data.ItemDetailsID && table2.row( rowEdit ).data()[2] == data.ItemID) {
 											var baseQTY = parseFloat(table2.row( rowEdit ).data()[22]) * parseFloat(table2.row( rowEdit ).data()[7]);
 											$("#hdnStock").val((parseFloat(data.Stock) + (baseQTY / parseFloat(data.ConversionQty)) ).toFixed(2));
 											//console.log("mlebu 2");
@@ -480,8 +488,8 @@
 										}
 										$("#hdnItemID").val(data.ItemID);
 										$("#txtItemName").val(data.ItemName);
-										$("#txtSalePrice").val(returnRupiah(data.RetailPrice));
-										$("#hdnSalePrice").val(data.RetailPrice);
+										$("#txtBookingPrice").val(returnRupiah(data.RetailPrice));
+										$("#hdnBookingPrice").val(data.RetailPrice);
 										$("#hdnBuyPrice").val(data.BuyPrice);
 										$("#hdnRetailPrice").val(data.RetailPrice);
 										$("#hdnPrice1").val(data.Price1);
@@ -508,9 +516,10 @@
 								}
 								else {
 									//add new item
+									$("#loading").hide();
 									if(data.ErrorMessage == "") {
 										$("#add-confirm").dialog({
-											autoOpen: false,
+											autoOpen: false,											
 											open: function() {
 												$(document).on('keydown', function(e) {
 													if (e.keyCode == 39) { //right arrow
@@ -577,7 +586,7 @@
 							error: function(jqXHR, textStatus, errorThrown) {
 								$("#loading").hide();
 								var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-								LogEvent(errorMessage, "/Transaction/Sale/index.php");
+								LogEvent(errorMessage, "/Transaction/Booking/index.php");
 								Lobibox.alert("error",
 								{
 									msg: errorMessage,
@@ -587,6 +596,7 @@
 							}
 						});
 					}
+					else $("#txtQTY").focus();
 				}
 				setTimeout(function() { counterGetItem = 0; }, 1000);
 			}
@@ -601,31 +611,31 @@
 						var qty2 = parseFloat($("#hdnQty2").val());
 						var price2 = parseFloat($("#hdnPrice2").val());
 						if((parseFloat(Quantity) * conversionQuantity) >= qty2 && qty2 > 1) {
-							$("#txtSalePrice").val(returnRupiah((price2 * conversionQuantity).toString()));
-							$("#hdnSalePrice").val(price2);
+							$("#txtBookingPrice").val(returnRupiah((price2 * conversionQuantity).toString()));
+							$("#hdnBookingPrice").val(price2);
 						}
 						else if((parseFloat(Quantity) * conversionQuantity) >= qty1 && qty1 > 1) {
-							$("#txtSalePrice").val(returnRupiah((price1 * conversionQuantity).toString()));
-							$("#hdnSalePrice").val(price1);
+							$("#txtBookingPrice").val(returnRupiah((price1 * conversionQuantity).toString()));
+							$("#hdnBookingPrice").val(price1);
 						}
 						else {
-							$("#txtSalePrice").val(returnRupiah((retailPrice * conversionQuantity).toString()));
-							$("#hdnSalePrice").val(retailPrice);
+							$("#txtBookingPrice").val(returnRupiah((retailPrice * conversionQuantity).toString()));
+							$("#hdnBookingPrice").val(retailPrice);
 						}
 					}
 					else {
-						$("#txtSalePrice").val(returnRupiah((retailPrice * conversionQuantity).toString()));
-						$("#hdnSalePrice").val(retailPrice);
+						$("#txtBookingPrice").val(returnRupiah((retailPrice * conversionQuantity).toString()));
+						$("#hdnBookingPrice").val(retailPrice);
 					}
 					CalculateSubTotal();
 				}
 			}
 			
-			function getSaleDetails(SaleID) {
+			function getBookingDetails(BookingID) {
 				$.ajax({
-					url: "./Transaction/Sale/SaleDetails.php",
+					url: "./Transaction/Booking/BookingDetails.php",
 					type: "POST",
-					data: { SaleID : SaleID },
+					data: { BookingID : BookingID },
 					dataType: "json",
 					success: function(Data) {
 						if(Data.FailedFlag == '0') {
@@ -679,7 +689,7 @@
 					error: function(jqXHR, textStatus, errorThrown) {
 						$("#loading").hide();
 						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-						LogEvent(errorMessage, "/Transaction/Sale/index.php");
+						LogEvent(errorMessage, "/Transaction/Booking/index.php");
 						Lobibox.alert("error",
 						{
 							msg: errorMessage,
@@ -690,16 +700,16 @@
 				});
 			}
 
-			function deleteItem(SaleDetailsID) {
+			function deleteItem(BookingDetailsID) {
 				table2.keys.disable();
 				var deletedData = new Array();
-				deletedData.push(SaleDetailsID);
+				deletedData.push(BookingDetailsID);
 				var index = 0;
 				table2.rows().eq( 0 ).filter( function (rowIdx) {
-				    if(table2.cell( rowIdx, 1 ).data() == SaleDetailsID) index = rowIdx;
+				    if(table2.cell( rowIdx, 1 ).data() == BookingDetailsID) index = rowIdx;
 				});
 				//console.log(indexes);
-				SingleDelete("./Transaction/Sale/DeleteDetails.php", deletedData, function(action) {
+				SingleDelete("./Transaction/Booking/DeleteDetails.php", deletedData, function(action) {
 					if(action == "success") {
 						table2.row( index ).remove().draw();
 						table2.keys.enable();
@@ -726,6 +736,10 @@
 				$("#lblCode").html(code);
 				$("#code-dialog").dialog({
 					autoOpen: false,
+					position: {
+						my : 'top+25%',
+						at : 'top'
+					},
 					open: function() {
 						$("#divModal").show();
 						$(document).on('keydown', function(e) {
@@ -736,6 +750,7 @@
 								$("#btnPromptCode").focus();
 							}
 						});
+						$("#txtCode").focus();
 					},
 					
 					close: function() {
@@ -764,7 +779,7 @@
 								var unitID = $("#ddlUnit").val();
 								var unitName = $("#ddlUnit option:selected").text();
 								var Qty = $("#txtQTY").val();
-								var salePrice = $("#txtSalePrice").val();
+								var BookingPrice = $("#txtBookingPrice").val();
 								var buyPrice = $("#hdnBuyPrice").val();
 								var price1 = $("#hdnPrice1").val();
 								var qty1 = $("#hdnQty1").val();
@@ -783,23 +798,23 @@
 								var ConversionQty = $("#hdnConversionQty").val();
 								var Stock = $("#hdnStock").val();
 								$.ajax({
-									url: "./Transaction/Sale/Insert.php",
+									url: "./Transaction/Booking/Insert.php",
 									type: "POST",
 									data: $("#PostForm").serialize(),
 									dataType: "json",
 									success: function(data) {
 										if(data.FailedFlag == '0') {
-											if($("#hdnSaleDetailsID").val() == 0) {
+											if($("#hdnBookingDetailsID").val() == 0) {
 												//$("#toggle-retail").toggleClass('disabled', true);
-												$("#hdnSaleNumber").val(data.SaleNumber);
-												$("#lblSaleNumber").html(data.SaleNumber);
-												var toggleBranch = "<div id='toggle-branch-" + data.SaleDetailsID + "' onclick='updateBranch(this.id)' class='div-center toggle-modern' ></div>";
-												var checkboxData = "<input type='checkbox' class='chkSaleDetails' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
-												var deleteData = '<span style="background-color:red;padding:3px 6px 1px 5px;border:1px solid black;color:white;"><i style="cursor:pointer;" class="fa fa-trash fa-2x" acronym title="Hapus Data" onclick="deleteItem(' + data.SaleDetailsID + ');"></i>';
+												$("#hdnBookingNumber").val(data.BookingNumber);
+												$("#lblBookingNumber").html(data.BookingNumber);
+												var toggleBranch = "<div id='toggle-branch-" + data.BookingDetailsID + "' onclick=\"updateBranch(this.id, " + Qty + ", '" + itemCode + "')\" class='div-center toggle-modern' ></div>";
+												var checkboxData = "<input type='checkbox' class='chkBookingDetails' name='select' value='" + data.BookingDetailsID + "' style='margin:0;' />"
+												var deleteData = '<span style="background-color:red;padding:3px 6px 1px 5px;border:1px solid black;color:white;"><i style="cursor:pointer;" class="fa fa-trash fa-2x" acronym title="Hapus Data" onclick="deleteItem(' + data.BookingDetailsID + ');"></i>';
 
 												table2.row.add([
 													checkboxData,
-													data.SaleDetailsID,
+													data.BookingDetailsID,
 													itemID,
 													branchID,
 													toggleBranch,
@@ -807,9 +822,9 @@
 													itemName,
 													Qty,
 													Qty + " " + unitName,
-													salePrice,
+													BookingPrice,
 													returnRupiah(discount.toString()),
-													returnRupiah(((parseFloat(salePrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, "")) ) * parseFloat(Qty)).toString()),
+													returnRupiah(((parseFloat(BookingPrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, "")) ) * parseFloat(Qty)).toString()),
 													buyPrice,
 													price1,
 													qty1,
@@ -824,7 +839,7 @@
 													deleteData
 												]).draw();
 												
-												$("#toggle-branch-" + data.SaleDetailsID).toggles({
+												$("#toggle-branch-" + data.BookingDetailsID).toggles({
 													drag: true, // allow dragging the toggle between positions
 													click: true, // allow clicking on the toggle
 													text: {
@@ -841,19 +856,19 @@
 													type: 'compact' // if this is set to 'select' then the select style toggle will be used
 												});
 												if($("#hdnBranchID").val() == 1) {
-													$("#toggle-branch-" + data.SaleDetailsID).toggles(true);
+													$("#toggle-branch-" + data.BookingDetailsID).toggles(true);
 												}
 												else {
-													$("#toggle-branch-" + data.SaleDetailsID).toggles(false);
+													$("#toggle-branch-" + data.BookingDetailsID).toggles(false);
 												}
 											}
 											else {
-												var toggles = $('#toggle-branch-' + data.SaleDetailsID).data('toggles').active;
-												var checkboxData = "<input type='checkbox' class='chkSaleDetails' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
-												var deleteData = '<span style="background-color:red;padding:3px 6px 1px 5px;border:1px solid black;color:white;"><i style="cursor:pointer;" class="fa fa-trash fa-2x" acronym title="Hapus Data" onclick="deleteItem(' + data.SaleDetailsID + ');"></i>';
+												var toggles = $('#toggle-branch-' + data.BookingDetailsID).data('toggles').active;
+												var checkboxData = "<input type='checkbox' class='chkBookingDetails' name='select' value='" + data.BookingDetailsID + "' style='margin:0;' />"
+												var deleteData = '<span style="background-color:red;padding:3px 6px 1px 5px;border:1px solid black;color:white;"><i style="cursor:pointer;" class="fa fa-trash fa-2x" acronym title="Hapus Data" onclick="deleteItem(' + data.BookingDetailsID + ');"></i>';
 												table2.row(rowEdit).data([
 													checkboxData,
-													data.SaleDetailsID,
+													data.BookingDetailsID,
 													itemID,
 													branchID,
 													table2.row( rowEdit ).data()[4],
@@ -861,9 +876,9 @@
 													itemName,
 													Qty,
 													Qty + " " + unitName,
-													salePrice,
+													BookingPrice,
 													returnRupiah(discount.toString()),
-													returnRupiah(((parseFloat(salePrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, "")) ) * parseFloat(Qty)).toString()),
+													returnRupiah(((parseFloat(BookingPrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, "")) ) * parseFloat(Qty)).toString()),
 													buyPrice,
 													price1,
 													qty1,
@@ -878,7 +893,7 @@
 													deleteData
 												]).draw();
 												
-												$("#toggle-branch-" + data.SaleDetailsID).toggles({
+												$("#toggle-branch-" + data.BookingDetailsID).toggles({
 													drag: true, // allow dragging the toggle between positions
 													click: true, // allow clicking on the toggle
 													text: {
@@ -895,25 +910,25 @@
 													type: 'compact' // if this is set to 'select' then the select style toggle will be used
 												});
 												
-												$("#toggle-branch-" + data.SaleDetailsID).toggles(toggles);
+												$("#toggle-branch-" + data.BookingDetailsID).toggles(toggles);
 												
 												table2.keys.enable();
 											}
 											$("#txtItemCode").val("");
 											$("#txtItemName").val("");
 											$("#txtQTY").val(1);
-											$("#txtSalePrice").val(0);
+											$("#txtBookingPrice").val(0);
 											$("#txtDiscount").val(0);
 											$("#hdnBuyPrice").val(0);
-											$("#hdnSalePrice").val(0);
+											$("#hdnBookingPrice").val(0);
 											$("#hdnPrice1").val(0);
 											$("#hdnQty1").val(0);
 											$("#hdnPrice2").val(0);
 											$("#hdnQty2").val(0);
 											$("#hdnBranchID").val(1);
 											$("#txtItemCode").focus();
-											$("#hdnSaleID").val(data.ID);
-											$("#hdnSaleDetailsID").val(0);
+											$("#hdnBookingID").val(data.ID);
+											$("#hdnBookingDetailsID").val(0);
 											$("#hdnItemID").val(0);
 											$("#hdnWeight").val(0);
 											$("#hdnRetailPrice").val(0);
@@ -936,7 +951,7 @@
 												beforeClose: function() {
 													if(counter == 0) {
 														setTimeout(function() {
-															if(data.Message == "No. Invoice sudah ada") $("#txtSaleNumber").focus();
+															if(data.Message == "No. Invoice sudah ada") $("#txtBookingNumber").focus();
 															else $("#txtItemCode").focus();
 														}, 0);
 														counter = 1;
@@ -949,7 +964,7 @@
 									error: function(jqXHR, textStatus, errorThrown) {
 										$("#divModal").hide();
 										var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-										LogEvent(errorMessage, "/Transaction/Sale/index.php");
+										LogEvent(errorMessage, "/Transaction/Booking/index.php");
 										Lobibox.alert("error",
 										{
 											msg: errorMessage,
@@ -978,17 +993,17 @@
 				}).dialog("open");
 			}
 
-			var counterAddSale = 0;
-			function addSaleDetails() {
-				if(counterAddSale == 0) {
-					counterAddSale = 1;
+			var counterAddBooking = 0;
+			function addBookingDetails() {
+				if(counterAddBooking == 0) {
+					counterAddBooking = 1;
 					var itemID = $("#hdnItemID").val();
 					var itemCode = $("#txtItemCode").val();
 					var itemName = $("#txtItemName").val();
 					var unitID = $("#ddlUnit").val();
 					var unitName = $("#ddlUnit option:selected").text();
 					var Qty = parseFloat($("#txtQTY").val());
-					var salePrice = $("#txtSalePrice").val();
+					var BookingPrice = $("#txtBookingPrice").val();
 					var buyPrice = $("#hdnBuyPrice").val();
 					var price1 = $("#hdnPrice1").val();
 					var qty1 = $("#hdnQty1").val();
@@ -1030,7 +1045,7 @@
 						if(FirstFocus == 0) $("#txtItemCode").focus();
 					}
 
-					if( (parseFloat(buyPrice) * parseFloat(ConversionQty)) > (parseFloat(salePrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, ""))) ) {
+					if( (parseFloat(buyPrice) * parseFloat(ConversionQty)) > (parseFloat(BookingPrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, ""))) ) {
 						PassValidate = 0;
 						$("#txtDiscount").notify("Harga sesudah diskon lebih kecil dari harga beli!", { position:"bottom right", className:"warn", autoHideDelay: 2000 });
 						if(FirstFocus == 0) {
@@ -1047,23 +1062,23 @@
 						}
 						else {
 							$.ajax({
-								url: "./Transaction/Sale/Insert.php",
+								url: "./Transaction/Booking/Insert.php",
 								type: "POST",
 								data: $("#PostForm").serialize(),
 								dataType: "json",
 								success: function(data) {
 									if(data.FailedFlag == '0') {
-										if($("#hdnSaleDetailsID").val() == 0) {
+										if($("#hdnBookingDetailsID").val() == 0) {
 											//$("#toggle-retail").toggleClass('disabled', true);
-											$("#hdnSaleNumber").val(data.SaleNumber);
-											$("#lblSaleNumber").html(data.SaleNumber);
-											var toggleBranch = "<div id='toggle-branch-" + data.SaleDetailsID + "' onclick='updateBranch(this.id)' class='div-center toggle-modern' ></div>";
-											var checkboxData = "<input type='checkbox' class='chkSaleDetails' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
-											var deleteData = '<span style="background-color:red;padding:3px 6px 1px 5px;border:1px solid black;color:white;"><i style="cursor:pointer;" class="fa fa-trash fa-2x" acronym title="Hapus Data" onclick="deleteItem(' + data.SaleDetailsID + ');"></i>';
+											$("#hdnBookingNumber").val(data.BookingNumber);
+											$("#lblBookingNumber").html(data.BookingNumber);
+											var toggleBranch = "<div id='toggle-branch-" + data.BookingDetailsID + "' onclick=\"updateBranch(this.id, " + Qty + ", '" + itemCode + "')\" class='div-center toggle-modern' ></div>";
+											var checkboxData = "<input type='checkbox' class='chkBookingDetails' name='select' value='" + data.BookingDetailsID + "' style='margin:0;' />"
+											var deleteData = '<span style="background-color:red;padding:3px 6px 1px 5px;border:1px solid black;color:white;"><i style="cursor:pointer;" class="fa fa-trash fa-2x" acronym title="Hapus Data" onclick="deleteItem(' + data.BookingDetailsID + ');"></i>';
 												
 											table2.row.add([
 												checkboxData,
-												data.SaleDetailsID,
+												data.BookingDetailsID,
 												itemID,
 												branchID,
 												toggleBranch,
@@ -1071,9 +1086,9 @@
 												itemName,
 												Qty,
 												Qty + " " + unitName,
-												salePrice,
+												BookingPrice,
 												returnRupiah(discount.toString()),
-												returnRupiah(((parseFloat(salePrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, "")) ) * parseFloat(Qty)).toString()),
+												returnRupiah(((parseFloat(BookingPrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, "")) ) * parseFloat(Qty)).toString()),
 												buyPrice,
 												price1,
 												qty1,
@@ -1088,7 +1103,7 @@
 												deleteData
 											]).draw();
 											
-											$("#toggle-branch-" + data.SaleDetailsID).toggles({
+											$("#toggle-branch-" + data.BookingDetailsID).toggles({
 												drag: true, // allow dragging the toggle between positions
 												click: true, // allow clicking on the toggle
 												text: {
@@ -1106,20 +1121,20 @@
 											});
 
 											if($("#hdnBranchID").val() == 1) {
-												$("#toggle-branch-" + data.SaleDetailsID).toggles(true);
+												$("#toggle-branch-" + data.BookingDetailsID).toggles(true);
 											}
 											else {
-												$("#toggle-branch-" + data.SaleDetailsID).toggles(false);
+												$("#toggle-branch-" + data.BookingDetailsID).toggles(false);
 											}
 										}
 										else {
-											var toggles = $('#toggle-branch-' + data.SaleDetailsID).data('toggles').active;
-											var checkboxData = "<input type='checkbox' class='chkSaleDetails' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
-											var deleteData = '<span style="background-color:red;padding:3px 6px 1px 5px;border:1px solid black;color:white;"><i style="cursor:pointer;" class="fa fa-trash fa-2x" acronym title="Hapus Data" onclick="deleteItem(' + data.SaleDetailsID + ');"></i>';
+											var toggles = $('#toggle-branch-' + data.BookingDetailsID).data('toggles').active;
+											var checkboxData = "<input type='checkbox' class='chkBookingDetails' name='select' value='" + data.BookingDetailsID + "' style='margin:0;' />"
+											var deleteData = '<span style="background-color:red;padding:3px 6px 1px 5px;border:1px solid black;color:white;"><i style="cursor:pointer;" class="fa fa-trash fa-2x" acronym title="Hapus Data" onclick="deleteItem(' + data.BookingDetailsID + ');"></i>';
 												
 											table2.row(rowEdit).data([
 												checkboxData,
-												data.SaleDetailsID,
+												data.BookingDetailsID,
 												itemID,
 												branchID,
 												table2.row( rowEdit ).data()[4],
@@ -1127,9 +1142,9 @@
 												itemName,
 												Qty,
 												Qty + " " + unitName,
-												salePrice,
+												BookingPrice,
 												returnRupiah(discount.toString()),
-												returnRupiah(((parseFloat(salePrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, "")) ) * parseFloat(Qty)).toString()),
+												returnRupiah(((parseFloat(BookingPrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, "")) ) * parseFloat(Qty)).toString()),
 												buyPrice,
 												price1,
 												qty1,
@@ -1144,7 +1159,7 @@
 												deleteData
 											]).draw();
 											
-											$("#toggle-branch-" + data.SaleDetailsID).toggles({
+											$("#toggle-branch-" + data.BookingDetailsID).toggles({
 												drag: true, // allow dragging the toggle between positions
 												click: true, // allow clicking on the toggle
 												text: {
@@ -1161,25 +1176,25 @@
 												type: 'compact' // if this is set to 'select' then the select style toggle will be used
 											});
 											
-											$("#toggle-branch-" + data.SaleDetailsID).toggles(toggles);
+											$("#toggle-branch-" + data.BookingDetailsID).toggles(toggles);
 											
 											table2.keys.enable();
 										}
 										$("#txtItemCode").val("");
 										$("#txtItemName").val("");
 										$("#txtQTY").val(1);
-										$("#txtSalePrice").val(0);
+										$("#txtBookingPrice").val(0);
 										$("#txtDiscount").val(0);
 										$("#hdnBuyPrice").val(0);
-										$("#hdnSalePrice").val(0);
+										$("#hdnBookingPrice").val(0);
 										$("#hdnPrice1").val(0);
 										$("#hdnQty1").val(0);
 										$("#hdnPrice2").val(0);
 										$("#hdnQty2").val(0);
 										$("#hdnBranchID").val(1);
 										$("#txtItemCode").focus();
-										$("#hdnSaleID").val(data.ID);
-										$("#hdnSaleDetailsID").val(0);
+										$("#hdnBookingID").val(data.ID);
+										$("#hdnBookingDetailsID").val(0);
 										$("#hdnItemID").val(0);
 										$("#hdnWeight").val(0);
 										$("#hdnRetailPrice").val(0);
@@ -1202,7 +1217,7 @@
 											beforeClose: function() {
 												if(counter == 0) {
 													setTimeout(function() {
-														if(data.Message == "No. Invoice sudah ada") $("#txtSaleNumber").focus();
+														if(data.Message == "No. Invoice sudah ada") $("#txtBookingNumber").focus();
 														else $("#txtItemCode").focus();
 													}, 0);
 													counter = 1;
@@ -1215,7 +1230,7 @@
 								error: function(jqXHR, textStatus, errorThrown) {
 									$("#loading").hide();
 									var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-									LogEvent(errorMessage, "/Transaction/Sale/index.php");
+									LogEvent(errorMessage, "/Transaction/Booking/index.php");
 									Lobibox.alert("error",
 									{
 										msg: errorMessage,
@@ -1227,18 +1242,18 @@
 						}
 					}
 				}
-				setTimeout(function() { counterAddSale = 0; }, 1000);
+				setTimeout(function() { counterAddBooking = 0; }, 1000);
 			}
 
 			function updateHeader() {
-				if($("#hdnSaleID").val() != 0) {
-					var SaleID = $("#hdnSaleID").val();
+				if($("#hdnBookingID").val() != 0) {
+					var BookingID = $("#hdnBookingID").val();
 					var TransactionDate = $("#hdnTransactionDate").val();
 					var CustomerID = $("#ddlCustomer").val();
 					$.ajax({
-						url: "./Transaction/Sale/UpdateHeader.php",
+						url: "./Transaction/Booking/UpdateHeader.php",
 						type: "POST",
-						data: { SaleID : SaleID, TransactionDate : TransactionDate, CustomerID : CustomerID },
+						data: { BookingID : BookingID, TransactionDate : TransactionDate, CustomerID : CustomerID },
 						dataType: "json",
 						success: function(data) {
 							$("#loading").hide();
@@ -1264,43 +1279,191 @@
 				}
 			}
 			
-			function updateBranch(SaleDetailsID) {
+			function updateBranch(SaleDetailsID, Qty, itemCode) {
 				setTimeout(function() {
 					var BranchID = 1;
 					var str = SaleDetailsID.split("-");
+					var Stock = 0;
 					if($('#toggle-branch-' + str[2]).data('toggles').active == false) BranchID = 2;
 					$("#loading").show();
 					$.ajax({
-						url: "./Transaction/Sale/UpdateBranch.php",
+						url: "./Transaction/Booking/CheckItem.php",
 						type: "POST",
-						data: { SaleDetailsID : str[2], BranchID : BranchID },
+						data: { itemCode : itemCode, branchID : BranchID },
 						dataType: "json",
 						success: function(data) {
-							$("#loading").hide();
 							if(data.FailedFlag == '0') {
-								
+								Stock = parseFloat(data.Stock);
+								if((Stock - Qty) < 0) {
+									$("#loading").hide();
+									var code = Math.floor(100000 + Math.random() * 900000);
+									$("#lblCode").html(code);
+									$("#code-dialog").dialog({
+										autoOpen: false,
+										open: function() {
+											$("#divModal").show();
+											$(document).on('keydown', function(e) {
+												if (e.keyCode == 39 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //right arrow
+													$("#btnCancelPromptCode").focus();
+												}
+												else if(e.keyCode == 37 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //left arrow
+													$("#btnPromptCode").focus();
+												}
+											});
+											$("#txtCode").focus();
+										},
+										
+										close: function() {
+											$(this).dialog("destroy");
+											$("#divModal").hide();
+											if(BranchID == 1) {
+												$("#toggle-branch-" + str[2]).toggles(false);
+											}
+											else {
+												$("#toggle-branch-" + str[2]).toggles(true);
+											}
+											return false;
+										},
+										resizable: false,
+										height: 250,
+										width: 450,
+										modal: false,
+										buttons: [
+										{
+											text: "Konfirmasi Kode",
+											id: "btnPromptCode",
+											tabindex: 61,
+											click: function() {
+												var txtCode = $("#txtCode").val();
+												if(txtCode == code) {
+													$(this).dialog("destroy");
+													$("#divModal").hide();
+													$("#txtCode").val("");
+													$("#loading").show();
+													$.ajax({
+														url: "./Transaction/Booking/UpdateBranch.php",
+														type: "POST",
+														data: { SaleDetailsID : str[2], BranchID : BranchID },
+														dataType: "json",
+														success: function(data) {
+															$("#loading").hide();
+															if(data.FailedFlag == '0') {
+																
+															}
+															else {
+																
+															}
+														},
+														error: function(jqXHR, textStatus, errorThrown) {
+															$("#loading").hide();
+															var counter = 0;
+															var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+															LogEvent(errorMessage, "/Transaction/Booking/UpdateBranch.php");
+															Lobibox.alert("error",
+															{
+																msg: errorMessage,
+																width: 480,
+																beforeClose: function() {
+																	if(counter == 0) {
+																		setTimeout(function() {
+																			$("#txtItemCode").focus();
+																		}, 0);
+																		counter = 1;
+																	}
+																}
+															});
+															return 0;
+														}
+													});
+												}
+												else {
+													$("#txtCode").notify("Kode salah!", { position:"right", className:"warn", autoHideDelay: 2000 });
+													$("#txtCode").focus();
+												}
+											}
+										},
+										{
+											text: "Batal",
+											id: "btnCancelPromptCode",
+											click: function() {
+												$(this).dialog("destroy");
+												$("#divModal").hide();
+												if(BranchID == 1) {
+													$("#toggle-branch-" + str[2]).toggles(false);
+												}
+												else {
+													$("#toggle-branch-" + str[2]).toggles(true);
+												}
+												return false;
+											}
+										}]
+									}).dialog("open");
+								}
+								else {
+									$.ajax({
+										url: "./Transaction/Booking/UpdateBranch.php",
+										type: "POST",
+										data: { SaleDetailsID : str[2], BranchID : BranchID },
+										dataType: "json",
+										success: function(data) {
+											$("#loading").hide();
+											if(data.FailedFlag == '0') {
+												
+											}
+											else {
+												
+											}
+										},
+										error: function(jqXHR, textStatus, errorThrown) {
+											$("#loading").hide();
+											var counter = 0;
+											var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+											LogEvent(errorMessage, "/Transaction/Booking/UpdateBranch.php");
+											Lobibox.alert("error",
+											{
+												msg: errorMessage,
+												width: 480,
+												beforeClose: function() {
+													if(counter == 0) {
+														setTimeout(function() {
+															$("#txtItemCode").focus();
+														}, 0);
+														counter = 1;
+													}
+												}
+											});
+											return 0;
+										}
+									});
+								}
 							}
 							else {
-								
+								$("#loading").hide();
+								var counter = 0;
+								Lobibox.alert("error",
+								{
+									msg: data.ErrorMessage,
+									width: 480,
+									beforeClose: function() {
+										if(counter == 0) {
+											setTimeout(function() {
+												$("#txtItemCode").focus();
+											}, 0);
+											counter = 1;
+										}
+									}
+								});
+								return 0;
 							}
 						},
 						error: function(jqXHR, textStatus, errorThrown) {
 							$("#loading").hide();
-							var counter = 0;
 							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-							LogEvent(errorMessage, "/Master/Item/index.php");
+							LogEvent(errorMessage, "/Transaction/Booking/");
 							Lobibox.alert("error",
 							{
 								msg: errorMessage,
-								width: 480,
-								beforeClose: function() {
-									if(counter == 0) {
-										setTimeout(function() {
-											$("#txtItemCode").focus();
-										}, 0);
-										counter = 1;
-									}
-								}
+								width: 480
 							});
 							return 0;
 						}
@@ -1313,8 +1476,8 @@
 				Lobibox.window({
 					title: 'Tambah Barang',
 					url: 'Transaction/Booking/PopUpAddItem.php',
-					width: 780,
-					height: 560,
+					width: 760,
+					height: 235,
 					buttons: {
 						Simpan: {
 							'class': 'ui-button ui-corner-all ui-widget',
@@ -1475,7 +1638,7 @@
 															delay: 2000,
 															beforeClose: function() {
 																setTimeout(function() {
-																	getItemDetails();
+																	getItemDetails(0);
 																}, 0);
 															},
 															shown: function() {
@@ -1550,8 +1713,8 @@
 				Lobibox.window({
 					title: 'Tambah Pelanggan',
 					url: 'Transaction/Booking/PopUpAddCustomer.php',
-					width: 680,
-					height: 400,
+					width: 480,
+					height: 235,
 					buttons: {
 						Simpan: {
 							'class': 'ui-button ui-corner-all ui-widget',
@@ -1696,7 +1859,7 @@
 													$("#loading").hide();
 													var counter = 0;
 													var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-													LogEvent(errorMessage, "/Transaction/Sale/index.php");
+													LogEvent(errorMessage, "/Transaction/Booking/index.php");
 													Lobibox.alert("error",
 													{
 														msg: errorMessage,
@@ -1753,18 +1916,18 @@
 			}
 			
 			function resetForm() {
-				$("#hdnSaleID").val(0);
-				$("#hdnSaleDetailsID").val(0);
+				$("#hdnBookingID").val(0);
+				$("#hdnBookingDetailsID").val(0);
 				$("#hdnItemID").val(0);
 				$("#txtTransactionDate").datepicker("setDate", new Date());
-				$("#txtSaleNumber").val("");
-				$("#hdnSaleNumber").val("");
+				$("#txtBookingNumber").val("");
+				$("#hdnBookingNumber").val("");
 				$("#txtItemCode").val("");
 				$("#txtItemName").val("");
 				$("#txtQTY").val(1);
-				$("#txtSalePrice").val(0);
+				$("#txtBookingPrice").val(0);
 				$("#hdnBuyPrice").val(0);
-				$("#hdnSalePrice").val(0);
+				$("#hdnBookingPrice").val(0);
 				$("#hdnWeight").val(0);
 				$("#hdnPrice1").val(0);
 				$("#hdnQty1").val(0);
@@ -1795,6 +1958,10 @@
 			function itemList() {
 				$("#itemList-dialog").dialog({
 					autoOpen: false,
+					position: {
+						my : 'top+20%',
+						at : 'top'
+					},
 					open: function() {
 						table2.keys.disable();
 						table3 = $("#grid-item").DataTable({
@@ -1818,7 +1985,7 @@
 										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" }
 									],
-									"ajax": "./Transaction/Sale/ItemList.php",
+									"ajax": "./Transaction/Booking/ItemList.php",
 									"processing": true,
 									"serverSide": true,
 									"language": {
@@ -1849,7 +2016,7 @@
 								var data = datatable.row( cell.index().row ).data();
 								if(key == 13 && $("#itemList-dialog").css("display") == "block") {
 									$("#txtItemCode").val(data[0]);
-									getItemDetails();
+									getItemDetails(0);
 									$("#itemList-dialog").dialog("destroy");
 									table3.destroy();
 									table2.keys.enable();
@@ -1876,7 +2043,7 @@
 							if( $("#itemList-dialog").css("display") == "block") {
 								var data = table3.row(this).data();
 								$("#txtItemCode").val(data[0]);
-								getItemDetails();
+								getItemDetails(0);
 								$("#itemList-dialog").dialog("destroy");
 								table3.destroy();
 								table2.keys.enable();
@@ -1905,7 +2072,7 @@
 						table2.keys.enable();
 					},
 					resizable: false,
-					height: 500,
+					height: 420,
 					width: 960,
 					modal: true/*,
 					buttons: [
@@ -1930,11 +2097,11 @@
 			}
 
 			function finish() {
-				if($("#hdnSaleID").val() != 0) {
+				if($("#hdnBookingID").val() != 0) {
 					$("#finish-dialog").dialog({
 						autoOpen: false,
 						position: {
-							my : 'top+10%',
+							my : 'top+20%',
 							at : 'top'
 						},
 						open: function() {
@@ -1978,7 +2145,7 @@
 							$("#txtChange").val(0);
 						},
 						resizable: false,
-						height: 340,
+						height: 300,
 						width: 420,
 						modal: true /*,
 						buttons: [
@@ -2030,6 +2197,9 @@
 							var Change = parseFloat(Payment) - parseFloat(Total);
 							$("#txtChange").val(returnRupiah(Change.toString()));
 						}
+					}
+					else {
+						$("#txtChange").val(0);
 					}
 				}
 				else {
@@ -2131,8 +2301,8 @@
 				}
 
 				if(PassValidate == 1) {
-					var saleID = $("#hdnSaleID").val();
-					var SaleNumber = $("#hdnSaleNumber").val();
+					var BookingID = $("#hdnBookingID").val();
+					var BookingNumber = $("#hdnBookingNumber").val();
 					var Payment = $("#txtPayment").val().replace(/\,/g, "");
 					var PaymentType = $("#ddlPayment").val();
 					var PrintInvoice = $("#chkPrint").prop("checked");
@@ -2142,9 +2312,9 @@
 					var TransactionDate = $("#hdnTransactionDate").val();
 					$("#loading").show();
 					$.ajax({
-						url: "./Transaction/Sale/PrintInvoice.php",
+						url: "./Transaction/Booking/PrintInvoice.php",
 						type: "POST",
-						data: { SaleID : saleID, Payment : Payment, PaymentType : PaymentType, PrintInvoice : PrintInvoice, Change: Change, SaleNumber : SaleNumber, PaymentMethod : PaymentMethod, TransactionDate : TransactionDate },
+						data: { BookingID : BookingID, Payment : Payment, PaymentType : PaymentType, PrintInvoice : PrintInvoice, Change: Change, BookingNumber : BookingNumber, PaymentMethod : PaymentMethod, TransactionDate : TransactionDate },
 						dataType: "json",
 						success: function(data) {
 							if(data.FailedFlag == '0') {
@@ -2202,7 +2372,7 @@
 							$("#loading").hide();
 							$("#divModal").hide();
 							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-							LogEvent(errorMessage, "/Transaction/Sale/index.php");
+							LogEvent(errorMessage, "/Transaction/Booking/index.php");
 							Lobibox.alert("error",
 							{
 								msg: errorMessage,
@@ -2216,17 +2386,17 @@
 
 			function printShipment() {
 				//alert("print shipment");
-				var SaleDetailsID = new Array();
-				var SaleID = $("#hdnSaleID").val();
+				var BookingDetailsID = new Array();
+				var BookingID = $("#hdnBookingID").val();
 				$("input:checkbox[name=select]:checked").each(function() {
-					if($(this).val() != 'all') SaleDetailsID.push($(this).val());
+					if($(this).val() != 'all') BookingDetailsID.push($(this).val());
 				});
-				if(SaleDetailsID.length > 0) {
+				if(BookingDetailsID.length > 0) {
 					$("#loading").show();
 					$.ajax({
-						url: "./Transaction/Sale/PrintShipment.php",
+						url: "./Transaction/Booking/PrintShipment.php",
 						type: "POST",
-						data: { SaleDetailsID : SaleDetailsID, SaleID : SaleID },
+						data: { BookingDetailsID : BookingDetailsID, BookingID : BookingID },
 						dataType: "json",
 						success: function(data) {
 							$("#loading").hide();
@@ -2234,7 +2404,7 @@
 						error: function(data) {
 							$("#loading").hide();
 							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-							LogEvent(errorMessage, "/Transaction/Sale/index.php");
+							LogEvent(errorMessage, "/Transaction/Booking/index.php");
 							Lobibox.alert("error",
 							{
 								msg: errorMessage,
@@ -2263,7 +2433,7 @@
 				$("#first-balance").dialog({
 					autoOpen: false,
 					position: {
-						my : 'top+10%',
+						my : 'top+45%',
 						at : 'top'
 					},
 					open: function() {
@@ -2351,6 +2521,22 @@
 			}
 
 			$(document).ready(function() {
+				$("#txtDiscount").on("input change paste",
+				    function filterNumericAndDecimal(event) {
+						var formControl;
+						formControl = $(event.target);
+						formControl.val(formControl.val().replace(/[^0-9]+/g, ""));
+					}
+				);
+
+				$("#txtPayment").on("input change paste",
+				    function filterNumericAndDecimal(event) {
+						var formControl;
+						formControl = $(event.target);
+						formControl.val(formControl.val().replace(/[^0-9]+/g, ""));
+					}
+				);
+
 				$("#txtQTY").spinner();
 				$('#grid-transaction').on('click', 'input[type="checkbox"]', function() {
 					$(this).blur();
@@ -2410,7 +2596,7 @@
 					$("#loading").hide();
 					var errorMessage = "DataTables Error : " + techNote + " (" + message + ")";
 					var counterError = 0;
-					LogEvent(errorMessage, "/Transaction/Sale/index.php");
+					LogEvent(errorMessage, "/Transaction/Booking/index.php");
 					Lobibox.alert("error",
 					{
 						msg: "Terjadi kesalahan. Memuat ulang halaman.",
@@ -2453,7 +2639,7 @@
 				
 				keyFunction();
 				enterLikeTab();
-				var counterSale = 0;
+				var counterBooking = 0;
 
 				$.ajax({
 					url: "./FirstBalance.php",

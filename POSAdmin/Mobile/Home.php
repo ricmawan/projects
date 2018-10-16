@@ -110,6 +110,9 @@
 									<li class='dropdown'>
 										<a href='#' class='menu' link='Transaction/PickUp/'><i class='fa fa-download fa-2'></i> Pengambilan</a>
 									</li>
+									<li class='dropdown'>
+										<a href='#' class='menu' link='Transaction/StockOpname/'><i class='fa fa-download fa-2'></i> Stock Opname</a>
+									</li>
 								</ul>
 							</nav>
 						</div>
@@ -119,7 +122,8 @@
 					<div class="navbar navbar-static-top" style="float:right;">
 						<div class="navigation" style="margin-bottom: 7px;">
 							<nav>
-									Selamat Datang, <a href="#" style="color: white;font-size: 13px;" onclick="UpdatePassword();"><?php echo $_SESSION['Nama']; ?>!</a>&nbsp;&nbsp;&nbsp;<a href="#" class="menu" link="./Logout.php"><img src="./assets/img/logout.png" width="15px" border="0" acronym title="Logout" /></a>
+									Selamat Datang, <a href="#" style="color: white;font-size: 13px;" onclick="UpdatePassword();"><?php echo $_SESSION['Nama']; ?>!</a>&nbsp;&nbsp;&nbsp;<a href="#" onclick="printDailyReport();"><img src="./assets/img/logout.png" width="15px" border="0" acronym title="Logout" /></a>
+									<input type="hidden" id="hdnLogout" class="menu" link="./Logout.php" />
 							</nav>
 						</div>
 					</div>
@@ -138,6 +142,9 @@
 		</div>
 		<div id="save-confirm" title="Konfirmasi" style="display: none;">
 			<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Apakah anda yakin data yang diinput sudah benar?</p>
+		</div>
+		<div id="print-confirm" title="Konfirmasi" style="display: none;">
+			<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Apakah anda ingin mencetak laporan harian?</p>
 		</div>
 		<div id="update-password" title="Ganti Password" style="display: none;">
 			<form class="col-md-12" id="UpdatePasswordForm" method="POST" action="" >
@@ -177,7 +184,7 @@
 						Saldo Awal :
 					</div>
 					<div class="col-md-6">
-						<input id="txtFirstBalance" tabindex=50; name="txtFirstBalance" type="tel" class="form-control-custom text-right" placeholder="Salwo Awal" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" value="0.00" />
+						<input id="txtFirstBalance" tabindex=50; name="txtFirstBalance" type="tel" class="form-control-custom text-right" placeholder="Saldo Awal" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" value="0.00" />
 					</div>
 				</div>
 				<br />
