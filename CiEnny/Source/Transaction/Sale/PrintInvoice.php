@@ -13,13 +13,14 @@
 		$Payment = mysqli_real_escape_string($dbh, $_POST['Payment']);
 		$PaymentType = mysqli_real_escape_string($dbh, $_POST['PaymentType']);
 		$PrintInvoice = mysqli_real_escape_string($dbh, $_POST['PrintInvoice']);
+		$ServiceCost = mysqli_real_escape_string($dbh, $_POST['ServiceCost']);
 		$Message = "Pembayaran berhasil";
 		$FinishFlag = 1;
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
 		
-		$sql = "CALL spUpdSalePayment(".$SaleID.", ".$Payment.", ".$PaymentType.", ".$FinishFlag.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spUpdSalePayment(".$SaleID.", ".$Payment.", ".$PaymentType.", ".$ServiceCost.", ".$FinishFlag.", '".$_SESSION['UserLogin']."')";
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysqli_error($dbh);

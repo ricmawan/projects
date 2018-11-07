@@ -175,8 +175,10 @@
 			function checkAllPickUp() {
 				if($("#select_all_salereturn").prop("checked") == true) {
 					$("input:checkbox[class=chkBookingDetails]").each(function() {
-						$(this).prop("checked", true);
-						$(this).attr("checked", true);
+						if($(this).prop("disabled") == false) {
+							$(this).prop("checked", true);
+							$(this).attr("checked", true);
+						}
 					});
 				}
 				else {
@@ -219,7 +221,11 @@
 										$("#grid-transaction").find("#select_all_salereturn").first().remove()
 									}, 0);
 
-									$(".txtQTY").spinner();
+									$(".txtQTY").spinner({
+										stop: function() {
+											validateQTY2($(this));
+										}
+									});
 
 									$("#select_all_salereturn").prop("checked", false);								
 									

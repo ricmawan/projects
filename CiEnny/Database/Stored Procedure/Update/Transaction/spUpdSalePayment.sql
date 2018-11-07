@@ -5,6 +5,7 @@ CREATE PROCEDURE spUpdSalePayment (
 	pID 			BIGINT, 
 	pPayment 		DOUBLE,
 	pPaymentTypeID	SMALLINT,
+	pServiceCost	DOUBLE,
     pFinishFlag		BIT,
 	pCurrentUser	VARCHAR(255)
 )
@@ -44,7 +45,8 @@ SET State = 1;
 			Payment = pPayment,
             FinishFlag = pFinishFlag,
 			PaymentTypeID = pPaymentTypeID,
-			ModifiedBy = pCurrentUser
+			ModifiedBy = pCurrentUser,
+			ServiceCost = pServiceCost
 		WHERE
 			SaleID = pID;
 

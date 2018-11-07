@@ -587,7 +587,6 @@
 					var itemCode = $("#txtItemCode").val();
 					if(itemCode == "") finish();
 					else if(EditFlag == 1 || (EditFlag == 0 && itemCode != itemCodeTemp)) {
-						itemCodeTemp = itemCode;
 						$("#loading").show();
 						$.ajax({
 							url: "./Transaction/Booking/CheckItem.php",
@@ -639,7 +638,8 @@
 										$("#ddlUnit").val(data.UnitID);
 										Grosir($("#txtQTY").val());
 										CalculateSubTotal();
-										if(EditFlag == 0) $("#txtQTY").focus();$("#txtQTY").focus();
+										if(EditFlag == 0) $("#txtQTY").focus();
+										itemCodeTemp = itemCode;
 									//}
 									//else $("#txtQTY").focus();
 								}
@@ -951,6 +951,7 @@
 												else {
 													$("#toggle-branch-" + data.BookingDetailsID).toggles(false);
 												}
+												itemCodeTemp = "";
 											}
 											else {
 												var toggles = $('#toggle-branch-' + data.BookingDetailsID).data('toggles').active;
@@ -1001,6 +1002,7 @@
 												$("#toggle-branch-" + data.BookingDetailsID).toggles(toggles);
 												
 												table2.keys.enable();
+												itemCodeTemp = "";
 											}
 											$("#txtItemCode").val("");
 											$("#txtItemName").val("");
@@ -1211,6 +1213,7 @@
 											else {
 												$("#toggle-branch-" + data.BookingDetailsID).toggles(false);
 											}
+											itemCodeTemp = "";
 										}
 										else {
 											var toggles = $('#toggle-branch-' + data.BookingDetailsID).data('toggles').active;
@@ -1261,6 +1264,7 @@
 											$("#toggle-branch-" + data.BookingDetailsID).toggles(toggles);
 											
 											table2.keys.enable();
+											itemCodeTemp = "";
 										}
 										$("#txtItemCode").val("");
 										$("#txtItemName").val("");

@@ -111,8 +111,9 @@
 										<a href='#' class='menu' link='Transaction/PickUp/'><i class='fa fa-download fa-2'></i> Pengambilan</a>
 									</li>
 									<li class='dropdown'>
-										<a href='#' class='menu' link='Transaction/StockOpname/'><i class='fa fa-download fa-2'></i> Stock Opname</a>
+										<a href='#' class='menu' link='Transaction/StockAdjust/'><i class='fa fa-check fa-2'></i>Stock Opname</a>
 									</li>
+									
 								</ul>
 							</nav>
 						</div>
@@ -147,30 +148,30 @@
 			<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Apakah anda ingin mencetak laporan harian?</p>
 		</div>
 		<div id="update-password" title="Ganti Password" style="display: none;">
-			<form class="col-md-12" id="UpdatePasswordForm" method="POST" action="" >
+			<form class="col-md-12 col-sm-12" id="UpdatePasswordForm" method="POST" action="" >
 				<div class="row">
-					<div class="col-md-5 labelColumn">
+					<div class="col-md-5 col-sm-5 labelColumn">
 						Password Lama :
 					</div>
-					<div class="col-md-6">
+					<div class="col-md-6 col-sm-6">
 						<input id="txtCurrentPassword" name="txtCurrentPassword" type="password" class="form-control-custom" placeholder="Password Lama" />
 					</div>
 				</div>
 				<br />
 				<div class="row">
-					<div class="col-md-5 labelColumn">
+					<div class="col-md-5 col-sm-5 labelColumn">
 						Password Baru :
 					</div>
-					<div class="col-md-6">
+					<div class="col-md-6 col-sm-6">
 						<input id="txtNewPassword" name="txtNewPassword" type="password" class="form-control-custom" placeholder="Password Baru" />
 					</div>
 				</div>
 				<br />
 				<div class="row">
-					<div class="col-md-5 labelColumn">
+					<div class="col-md-5 col-sm-5 labelColumn">
 						Konfirmasi Password :
 					</div>
-					<div class="col-md-6">
+					<div class="col-md-6 col-sm-6">
 						<input id="txtConfirmNewPassword" name="txtConfirmNewPassword" type="password" class="form-control-custom" placeholder="Konfirmasi Password" />
 					</div>
 				</div>
@@ -178,12 +179,12 @@
 		</div>
 		<div id="divModal"></div>
 		<div id="first-balance" title="Saldo Awal" style="display: none;">
-			<form class="col-md-12" id="FirstBalanceForm" method="POST" action="" >
+			<form class="col-md-12 col-sm-12" id="FirstBalanceForm" method="POST" action="" >
 				<div class="row">
-					<div class="col-md-5 labelColumn">
+					<div class="col-md-5 col-sm-5 labelColumn">
 						Saldo Awal :
 					</div>
-					<div class="col-md-6">
+					<div class="col-md-6 col-sm-6">
 						<input id="txtFirstBalance" tabindex=50; name="txtFirstBalance" type="tel" class="form-control-custom text-right" placeholder="Saldo Awal" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" value="0.00" />
 					</div>
 				</div>

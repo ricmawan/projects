@@ -6,8 +6,8 @@
 	<head>
 		<style>
 			#divTableContent {
-				min-height: 330px;
-				max-height: 330px;
+				min-height: 235px;
+				max-height: 235px;
 				overflow-y: auto;
 			}
 		</style>
@@ -16,8 +16,8 @@
 		<div class="row">
 			<div class="col-md-12 col-sm-12">
 				<div class="panel panel-default">
-					<div class="panel-heading" style="padding: 1px 15px;">
-						<h5>Pembayaran Piutang</h5>
+					<div class="panel-heading">
+						<h5 style="margin-bottom: 5px;margin-top: 5px;">Pembayaran Piutang</h5>
 						<?php
 							echo '<input id="hdnEditFlag" name="hdnEditFlag" type="hidden" value="'.$EditFlag.'" />';
 							echo '<input id="hdnDeleteFlag" name="hdnDeleteFlag" type="hidden" value="'.$DeleteFlag.'" />';
@@ -210,7 +210,7 @@
 				$("#FormData").dialog({
 					autoOpen: false,
 					position: {
-						my : 'top+10%',
+						my : 'top+12.5%',
 						at : 'top'
 					},
 					open: function() {
@@ -218,7 +218,7 @@
 						table.keys.disable();
 						table2 = $("#grid-transaction").DataTable({
 									"keys": true,
-									"scrollY": "280px",
+									"scrollY": "168px",
 									"scrollX": false,
 									"scrollCollapse": false,
 									"paging": false,
@@ -283,7 +283,7 @@
 						table2.destroy();
 					},
 					resizable: false,
-					height: 520,
+					height: 420,
 					width: 840,
 					modal: false /*,
 					buttons: [
@@ -707,7 +707,7 @@
 				var counterPayment = 0;
 				table = $("#grid-data").DataTable({
 								"keys": true,
-								"scrollY": "330px",
+								"scrollY": "252px",
 								"rowId": "TransactionID",
 								"scrollCollapse": true,
 								"order": [],

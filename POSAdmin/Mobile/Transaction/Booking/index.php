@@ -6,8 +6,8 @@
 	<head>
 		<style>
 			#divTableContent {
-				min-height: 335px;
-				max-height: 335px;
+				min-height: 330px;
+				max-height: 330px;
 				overflow-y: auto;
 			}
 			
@@ -22,7 +22,7 @@
 			}
 
 			.lobibox {
-				top: 55px !important;
+				top: 25px !important;
 			}
 
 			.lobibox.lobibox-window .lobibox-header {
@@ -34,11 +34,16 @@
 			}
 
 			.lobibox.lobibox-window .lobibox-body {
-				padding: 10px 15px !important;
+				padding: 0 15px !important;
 			}
 
 			.lobibox .lobibox-footer {
 				padding: 3px !important;
+			}
+
+			.ui-tabs .ui-tabs-panel {
+				padding-bottom: 0;
+				padding-top: 0;
 			}
 		</style>
 	</head>
@@ -55,7 +60,6 @@
 						</span>
 					</div>
 					<div class="panel-body" style="margin-top: 5px;">
-						
 						<form id="PostForm" method="POST" action="" >
 							<input id="hdnBookingID" name="hdnBookingID" type="hidden" value=0 />
 							<input id="hdnBookingDetailsID" name="hdnBookingDetailsID" type="hidden" value=0 />
@@ -91,16 +95,13 @@
 									</div>
 								</div>
 								<br />
-								
 								<div class="row" >
 									<div class="col-md-12 col-sm-12 has-float-label" >
 										<input tabindex=8 id="txtItemCode" name="txtItemCode" type="text" class="form-control-custom" onfocus="this.select();" onchange="getItemDetails(0);" autocomplete=off />
 										<label for="txtItemCode" class="lblInput" >Kode Barang</label>
-										<input type="text" tabindex=9 onfocus="getItemDetails(0);" style="height:0; width: 0;opacity:0;" />
 									</div>
 								</div>
 								<br />
-								
 								<div class="row" >
 									<div class="col-md-12 col-sm-12 has-float-label" >
 										<input disabled id="txtItemName" name="txtItemName" type="text" class="form-control-custom" />
@@ -108,14 +109,13 @@
 									</div>
 								</div>
 								<br />
-								
 								<div class="row" >
-									<div class="col-md-6 col-sm-6 has-float-label" >
+									<div class="col-md-6 col-sm-6 has-float-label" style="padding-right: 5px;" >
 										<input tabindex=10 id="txtQTY" onfocus="this.select();" name="txtQTY" type="number" class="form-control-custom" style="border: 1px solid #ccc !important;margin: 0;" value=1 min=1 onchange="this.value = validateQTY(this.value);Grosir(this.value);" onpaste="return false;" onfocus="this.select();" />
 										<label for="txtQTY" class="lblInput" >Qty</label>
 									</div>
 
-									<div class="col-md-6 col-sm-6 has-float-label" >
+									<div class="col-md-6 col-sm-6 has-float-label" style="padding-left: 0;" >
 										<select id="ddlUnit" name="ddlUnit" tabindex=11 class="form-control-custom mousetrap" onchange="changeItemCode();" >
 											<option >--</option>
 										</select>
@@ -123,7 +123,6 @@
 									</div>
 								</div>
 								<br />
-								
 								<div class="row" >
 									<div class="col-md-12 col-sm-12 has-float-label" >
 										<input id="hdnBuyPrice" name="hdnBuyPrice" type="hidden" value=0 />
@@ -142,7 +141,6 @@
 									</div>
 								</div>
 								<br />
-								
 								<div class="row" >
 									<div class="col-md-12 col-sm-12 has-float-label" >
 										<input id="txtDiscount" name="txtDiscount" type="tel" tabindex=12 class="form-control-custom text-right" value="0" autocomplete=off onfocus="clearFormat(this.id, this.value);this.select();" onpaste="return false;" onblur="convertRupiah(this.id, this.value);" />
@@ -150,6 +148,7 @@
 									</div>
 								</div>
 								<input type="text" tabindex=13 onfocus="addBookingDetails();" style="height:0; width: 0;opacity:0;" />
+								<input type="text" tabindex=9 onfocus="getItemDetails(0);" style="height:0; width: 0;opacity:0;" />
 								<br />
 								<button type="button" class="btn btn-default btn-mobile" value="Simpan" onclick="finish();" ><i class="fa fa-save fa-2x"></i><br /> Selesai</button>
 								<button type="button" class="btn btn-default btn-mobile" value="Cetak" onclick="itemList();" ><i class="fa fa-list fa-2x"></i><br /> List Barang</button>
@@ -159,7 +158,6 @@
 								<br />
 								<button type="button" class="btn btn-default btn-mobile" value="Cancel" onclick="newWindow();" ><i class="fa fa-window-restore fa-2x"></i> <br />Nota Baru</button>
 								<button id="btnGrosir" type="button" class="btn btn-default btn-mobile" value="Cetak" ><i class="fa fa-cart-arrow-down fa-2x"></i> Grosir</button>
-	</button>
 							</div>
 							<div class="col-md-12 col-sm-12" style="display:inline-block;width:80%;float:left;" >
 								<div class="row" style="max-height: 400px;overflow-y:auto;" >
@@ -198,7 +196,6 @@
 										</div>
 									</div>
 								</div>
-								<br />
 								<div class="row col-md-12 col-sm-12" >
 									<h2 style="display: inline-block;float: left;" >TOTAL : &nbsp;</h2><span id="lblTotal" >0</span>
 									</h2><span id="lblWeight" >0</span><h2 style="display: inline-block;float: right;color: #0006ff;" >Berat(KG) : &nbsp;
@@ -381,7 +378,7 @@
 				//$("#txtTransactionDate").focus();
 				table2 = $("#grid-transaction").DataTable({
 							"keys": true,
-							"scrollY": "290px",
+							"scrollY": "280px",
 							"scrollX": false,
 							"scrollCollapse": false,
 							"paging": false,
@@ -458,7 +455,6 @@
 					var itemCode = $("#txtItemCode").val();
 					if(itemCode == "") $("#txtItemCode").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 					else if(EditFlag == 1 || (EditFlag == 0 && itemCode != itemCodeTemp)) {
-						itemCodeTemp = itemCode;
 						$("#loading").show();
 						$.ajax({
 							url: "./Transaction/Booking/CheckItem.php",
@@ -511,6 +507,7 @@
 										Grosir($("#txtQTY").val());
 										CalculateSubTotal();
 										$("#txtQTY").focus();
+										itemCodeTemp = itemCode;
 									//}
 									//else $("#txtQTY").focus();
 								}
@@ -596,7 +593,11 @@
 							}
 						});
 					}
-					else $("#txtQTY").focus();
+					else {
+						setTimeout(function() {
+							$("#txtQTY").focus();
+						}, 0);
+					}
 				}
 				setTimeout(function() { counterGetItem = 0; }, 1000);
 			}
@@ -861,6 +862,8 @@
 												else {
 													$("#toggle-branch-" + data.BookingDetailsID).toggles(false);
 												}
+
+												itemCodeTemp = "";
 											}
 											else {
 												var toggles = $('#toggle-branch-' + data.BookingDetailsID).data('toggles').active;
@@ -913,6 +916,7 @@
 												$("#toggle-branch-" + data.BookingDetailsID).toggles(toggles);
 												
 												table2.keys.enable();
+												itemCodeTemp = "";
 											}
 											$("#txtItemCode").val("");
 											$("#txtItemName").val("");
@@ -1126,6 +1130,7 @@
 											else {
 												$("#toggle-branch-" + data.BookingDetailsID).toggles(false);
 											}
+											itemCodeTemp = "";
 										}
 										else {
 											var toggles = $('#toggle-branch-' + data.BookingDetailsID).data('toggles').active;
@@ -1179,6 +1184,7 @@
 											$("#toggle-branch-" + data.BookingDetailsID).toggles(toggles);
 											
 											table2.keys.enable();
+											itemCodeTemp = "";
 										}
 										$("#txtItemCode").val("");
 										$("#txtItemName").val("");
@@ -1300,6 +1306,10 @@
 									$("#lblCode").html(code);
 									$("#code-dialog").dialog({
 										autoOpen: false,
+										position: {
+											my : 'top+25%',
+											at : 'top'
+										},
 										open: function() {
 											$("#divModal").show();
 											$(document).on('keydown', function(e) {
@@ -1959,55 +1969,60 @@
 				$("#itemList-dialog").dialog({
 					autoOpen: false,
 					position: {
-						my : 'top+20%',
+						my : 'top+12.5%',
 						at : 'top'
 					},
 					open: function() {
 						table2.keys.disable();
-						table3 = $("#grid-item").DataTable({
-									"keys": true,
-									"scrollY": "295px",
-									"scrollX": false,
-									"scrollCollapse": false,
-									"paging": false,
-									"searching": true,
-									"order": [],
-									"columns": [
-										{ "width": "15%", "orderable": false, className: "dt-head-center" },
-										{ "width": "20%", "orderable": false, className: "dt-head-center" },
-										{ "width": "5%", "orderable": false, className: "dt-head-center" },
-										{ "width": "7.5%", "visible": false, "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" }
-									],
-									"ajax": "./Transaction/Booking/ItemList.php",
-									"processing": true,
-									"serverSide": true,
-									"language": {
-										"info": "",
-										"infoFiltered": "",
-										"infoEmpty": "",
-										"zeroRecords": "Data tidak ditemukan",
-										"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
-										"search": "Cari",
-										"processing": "",
-										"paginate": {
-											"next": ">",
-											"previous": "<",
-											"last": "»",
-											"first": "«"
+						if ( $.fn.dataTable.isDataTable( '#grid-item' ) ) {
+							table3 = $('#grid-item').DataTable();
+						}
+						else {
+							table3 = $("#grid-item").DataTable({
+										"keys": true,
+										"scrollY": "280px",
+										"scrollX": false,
+										"scrollCollapse": false,
+										"paging": false,
+										"searching": true,
+										"order": [],
+										"columns": [
+											{ "width": "15%", "orderable": false, className: "dt-head-center" },
+											{ "width": "20%", "orderable": false, className: "dt-head-center" },
+											{ "width": "5%", "orderable": false, className: "dt-head-center" },
+											{ "width": "7.5%", "visible": false, "orderable": false, className: "dt-head-center dt-body-right" },
+											{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+											{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+											{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+											{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+											{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+											{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+											{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" }
+										],
+										"ajax": "./Transaction/Booking/ItemList.php",
+										"processing": true,
+										"serverSide": true,
+										"language": {
+											"info": "",
+											"infoFiltered": "",
+											"infoEmpty": "",
+											"zeroRecords": "Data tidak ditemukan",
+											"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
+											"search": "Cari",
+											"processing": "",
+											"paginate": {
+												"next": ">",
+												"previous": "<",
+												"last": "»",
+												"first": "«"
+											}
+										},
+										"initComplete": function(settings, json) {
+											table3.columns.adjust();
+											$("#grid-item").DataTable().cell( ':eq(0)' ).focus();
 										}
-									},
-									"initComplete": function(settings, json) {
-										table3.columns.adjust();
-										$("#grid-item").DataTable().cell( ':eq(0)' ).focus();
-									}
-								});
+									});
+						}
 						var counterPickItem = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
 							//var index = table3.cell({ focused: true }).index();
@@ -2070,10 +2085,11 @@
 						$(this).dialog("destroy");
 						table3.destroy();
 						table2.keys.enable();
+						$("#txtItemCode").focus();
 					},
 					resizable: false,
 					height: 420,
-					width: 960,
+					width: 840,
 					modal: true/*,
 					buttons: [
 					{

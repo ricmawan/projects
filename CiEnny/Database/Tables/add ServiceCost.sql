@@ -1,0 +1,1 @@
+ALTER TABLE `transaction_sale` ADD `ServiceCost` DOUBLE NOT NULL AFTER `Payment`;

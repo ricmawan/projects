@@ -393,6 +393,10 @@ function UpdatePassword() {
 	enterLikeTab();
 	$("#update-password").dialog({
 		autoOpen: false,
+		position: {
+			my : 'top+25%',
+			at : 'top'
+		},
 		open: function() {
 			$("#divModal").show();
 			$(document).on('keydown', function(e) {
@@ -410,7 +414,7 @@ function UpdatePassword() {
 			$("#divModal").hide();
 		},
 		resizable: false,
-		height: 250,
+		height: 220,
 		width: 450,
 		modal: false,
 		buttons: [

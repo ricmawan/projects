@@ -640,6 +640,7 @@
 										Grosir($("#txtQTY").val());
 										CalculateSubTotal();
 										if(EditFlag == 0) $("#txtQTY").focus();
+										itemCodeTemp = itemCode;
 									//}
 									//else $("#txtQTY").focus();
 								}
@@ -951,6 +952,8 @@
 												else {
 													$("#toggle-branch-" + data.SaleDetailsID).toggles(false);
 												}
+												
+												itemCodeTemp = "";
 											}
 											else {
 												var toggles = $('#toggle-branch-' + data.SaleDetailsID).data('toggles').active;
@@ -1001,6 +1004,7 @@
 												$("#toggle-branch-" + data.SaleDetailsID).toggles(toggles);
 												
 												table2.keys.enable();
+												itemCodeTemp = "";
 											}
 											$("#txtItemCode").val("");
 											$("#txtItemName").val("");
@@ -1212,6 +1216,8 @@
 											else {
 												$("#toggle-branch-" + data.SaleDetailsID).toggles(false);
 											}
+											
+											itemCodeTemp = "";
 										}
 										else {
 											var toggles = $('#toggle-branch-' + data.SaleDetailsID).data('toggles').active;
@@ -1262,6 +1268,7 @@
 											$("#toggle-branch-" + data.SaleDetailsID).toggles(toggles);
 											
 											table2.keys.enable();
+											itemCodeTemp = "";
 										}
 										$("#txtItemCode").val("");
 										$("#txtItemName").val("");

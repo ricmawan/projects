@@ -374,7 +374,7 @@
 			function checkAllPickUp() {
 				if($("#select_all_salereturn").prop("checked") == true) {
 					$("input:checkbox[class=chkBookingDetails]").each(function() {
-						if($(this).attr("disabled") == false) {
+						if($(this).prop("disabled") == false) {
 							$(this).prop("checked", true);
 							$(this).attr("checked", true);
 						}
@@ -408,7 +408,11 @@
 								$("#grid-transaction").find("#select_all_salereturn").first().remove()
 							}, 0);
 
-							$(".txtQTY").spinner();
+							$(".txtQTY").spinner({
+								stop: function() {
+									validateQTY2($(this));
+								}
+							});
 							
 							for(var i=0;i<Data.data.length;i++) {
 								$("#toggle-branch-" + Data.data[i][0]).toggles({
@@ -494,7 +498,11 @@
 									table2.draw();
 									tableWidthAdjust();
 
-									$(".txtQTY").spinner();
+									$(".txtQTY").spinner({
+										stop: function() {
+											validateQTY2($(this));
+										}
+									});
 									setTimeout(function() {
 										$("#grid-transaction").find("#select_all_salereturn").first().remove()
 									}, 0);

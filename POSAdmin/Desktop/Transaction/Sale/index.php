@@ -482,7 +482,6 @@
 					var itemCode = $("#txtItemCode").val();
 					if(itemCode == "") finish();
 					else if(EditFlag == 1 || (EditFlag == 0 && itemCode != itemCodeTemp)) {
-						itemCodeTemp = itemCode;
 						$("#loading").show();
 						$.ajax({
 							url: "./Transaction/Sale/CheckItem.php",
@@ -534,6 +533,7 @@
 										$("#ddlUnit").val(data.UnitID);
 										Grosir($("#txtQTY").val());
 										CalculateSubTotal();
+										itemCodeTemp = itemCode;
 										if(EditFlag == 0) $("#txtQTY").focus();
 									//}
 									//else $("#txtQTY").focus();
@@ -846,6 +846,8 @@
 												else {
 													$("#toggle-branch-" + data.SaleDetailsID).toggles(false);
 												}
+												
+												itemCodeTemp = "";
 											}
 											else {
 												var toggles = $('#toggle-branch-' + data.SaleDetailsID).data('toggles').active;
@@ -896,6 +898,7 @@
 												$("#toggle-branch-" + data.SaleDetailsID).toggles(toggles);
 												
 												table2.keys.enable();
+												itemCodeTemp = "";
 											}
 											$("#txtItemCode").val("");
 											$("#txtItemName").val("");
@@ -1106,6 +1109,8 @@
 											else {
 												$("#toggle-branch-" + data.SaleDetailsID).toggles(false);
 											}
+											
+											itemCodeTemp = "";
 										}
 										else {
 											var toggles = $('#toggle-branch-' + data.SaleDetailsID).data('toggles').active;
@@ -1156,6 +1161,7 @@
 											$("#toggle-branch-" + data.SaleDetailsID).toggles(toggles);
 											
 											table2.keys.enable();
+											itemCodeTemp = "";
 										}
 										$("#txtItemCode").val("");
 										$("#txtItemName").val("");

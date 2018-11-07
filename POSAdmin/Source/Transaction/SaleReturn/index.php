@@ -379,7 +379,7 @@
 			function checkAllSaleReturn() {
 				if($("#select_all_salereturn").prop("checked") == true) {
 					$("input:checkbox[class=chkSaleDetails]").each(function() {
-						if($(this).attr("disabled") == false) {
+						if($(this).prop("disabled") == false) {
 							$(this).prop("checked", true);
 							$(this).attr("checked", true);
 						}
@@ -413,7 +413,11 @@
 							$("#btnSaveSaleReturn").attr("tabindex", Data.tabindex);
 							$("#btnCancelAddSaleReturn").attr("tabindex", (parseFloat(Data.tabindex) + 1));
 
-							$(".txtQTY").spinner();
+							$(".txtQTY").spinner({
+								stop: function() {
+									validateQTY2($(this));
+								}
+							});
 							
 							for(var i=0;i<Data.data.length;i++) {
 								$("#toggle-branch-" + Data.data[i][0]).toggles({
@@ -494,7 +498,11 @@
 										$("#grid-transaction").find("#select_all_salereturn").first().remove()
 									}, 0);
 
-									$(".txtQTY").spinner();
+									$(".txtQTY").spinner({
+										stop: function() {
+											validateQTY2($(this));
+										}
+									});
 
 									$("#select_all_salereturn").prop("checked", false);								
 									for(var i=0;i<Data.data.length;i++) {

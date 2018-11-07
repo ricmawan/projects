@@ -865,7 +865,7 @@
 						delay: 2000,
 						beforeClose: function() {
 							if(counterError == 0) {
-								location.reload();
+								//location.reload();
 								counterError = 1;
 							}
 						}

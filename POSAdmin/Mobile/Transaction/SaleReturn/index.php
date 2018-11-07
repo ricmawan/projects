@@ -6,8 +6,8 @@
 	<head>
 		<style>
 			#divTableContent {
-				min-height: 380px;
-				max-height: 380px;
+				min-height: 310px;
+				max-height: 310px;
 				overflow-y: auto;
 			}
 
@@ -117,7 +117,7 @@
 				$("#txtSaleNumber").focus();
 				table2 = $("#grid-transaction").DataTable({
 							"keys": false,
-							"scrollY": "330px",
+							"scrollY": "252px",
 							"scrollX": false,
 							"scrollCollapse": false,
 							"paging": false,
@@ -175,7 +175,7 @@
 			function checkAllSaleReturn() {
 				if($("#select_all_salereturn").prop("checked") == true) {
 					$("input:checkbox[class=chkSaleDetails]").each(function() {
-						if($(this).attr("disabled") == false) {
+						if($(this).prop("disabled") == false) {
 							$(this).prop("checked", true);
 							$(this).attr("checked", true);
 						}
@@ -190,75 +190,6 @@
 				Calculate();
 			}
 			
-			function getSaleReturnDetails(SaleReturnID) {
-				$.ajax({
-					url: "./Transaction/SaleReturn/SaleReturnDetails.php",
-					type: "POST",
-					data: { SaleReturnID : SaleReturnID },
-					dataType: "json",
-					success: function(Data) {
-						if(Data.FailedFlag == '0') {
-							for(var i=0;i<Data.data.length;i++) {
-								table2.row.add(Data.data[i]);
-							}
-							table2.draw();
-							tableWidthAdjust();
-							setTimeout(function() {
-								$("#grid-transaction").find("#select_all_salereturn").first().remove()
-							}, 0);
-							$("#btnSaveSaleReturn").attr("tabindex", Data.tabindex);
-							$("#btnCancelAddSaleReturn").attr("tabindex", (parseFloat(Data.tabindex) + 1));
-
-							$(".txtQTY").spinner();
-							
-							for(var i=0;i<Data.data.length;i++) {
-								$("#toggle-branch-" + Data.data[i][0]).toggles({
-									drag: true, // allow dragging the toggle between positions
-									click: true, // allow clicking on the toggle
-									text: {
-										on: 'Toko', // text for the ON position
-										off: 'Gudang' // and off
-									},
-									on: true, // is the toggle ON on init
-									animate: 250, // animation time (ms)
-									easing: 'swing', // animation transition easing function
-									checkbox: null, // the checkbox to toggle (for use in forms)
-									clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
-									width: 80, // width used if not set in css
-									height: 18, // height if not set in css
-									type: 'compact' // if this is set to 'select' then the select style toggle will be used
-								});
-								
-								if(Data.data[i][2] == 1) $("#toggle-branch-" + Data.data[i][0]).toggles(true);
-								else $("#toggle-branch-" + Data.data[i][0]).toggles(false);
-							}
-
-							$("#select_all_salereturn").click();
-						}
-						else {
-							var counter = 0;
-							Lobibox.alert("error",
-							{
-								msg: "Gagal memuat data",
-								width: 480
-							});
-							return 0;
-						}
-					},
-					error: function(jqXHR, textStatus, errorThrown) {
-						$("#loading").hide();
-						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-						LogEvent(errorMessage, "/Transaction/SaleReturn/index.php");
-						Lobibox.alert("error",
-						{
-							msg: errorMessage,
-							width: 480
-						});
-						return 0;
-					}
-				});
-			}
-
 			var saleDetailsCounter = 0;
 			function getSaleDetails() {
 				if(saleDetailsCounter == 0 && $("#txtSaleNumber").prop("readonly") == false) 
@@ -290,7 +221,11 @@
 										$("#grid-transaction").find("#select_all_salereturn").first().remove()
 									}, 0);
 
-									$(".txtQTY").spinner();
+									$(".txtQTY").spinner({
+										stop: function() {
+											validateQTY2($(this));
+										}
+									});
 
 									$("#select_all_salereturn").prop("checked", false);								
 									for(var i=0;i<Data.data.length;i++) {
@@ -424,7 +359,7 @@
 				$("#transactionList-dialog").dialog({
 					autoOpen: false,
 					position: {
-						my : 'top+20%',
+						my : 'top+12.5%',
 						at : 'top'
 					},
 					open: function() {
@@ -523,7 +458,7 @@
 					},
 					resizable: false,
 					height: 420,
-					width: 960,
+					width: 840,
 					modal: true /*,
 					buttons: [
 					{

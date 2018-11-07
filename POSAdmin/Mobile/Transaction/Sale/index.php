@@ -6,8 +6,8 @@
 	<head>
 		<style>
 			#divTableContent {
-				min-height: 335px;
-				max-height: 335px;
+				min-height: 330px;
+				max-height: 330px;
 				overflow-y: auto;
 			}
 			
@@ -60,7 +60,6 @@
 						</span>
 					</div>
 					<div class="panel-body" style="margin-top: 5px;">
-						
 						<form id="PostForm" method="POST" action="" >
 							<input id="hdnSaleID" name="hdnSaleID" type="hidden" value=0 />
 							<input id="hdnSaleDetailsID" name="hdnSaleDetailsID" type="hidden" value=0 />
@@ -96,16 +95,13 @@
 									</div>
 								</div>
 								<br />
-								
 								<div class="row" >
 									<div class="col-md-12 col-sm-12 has-float-label" >
 										<input tabindex=8 id="txtItemCode" name="txtItemCode" type="text" class="form-control-custom" onfocus="this.select();" onchange="getItemDetails(0);" autocomplete=off />
 										<label for="txtItemCode" class="lblInput" >Kode Barang</label>
-										<input type="text" tabindex=9 onfocus="getItemDetails(0);" style="height:0; width: 0;opacity:0;" />
 									</div>
 								</div>
 								<br />
-								
 								<div class="row" >
 									<div class="col-md-12 col-sm-12 has-float-label" >
 										<input disabled id="txtItemName" name="txtItemName" type="text" class="form-control-custom" />
@@ -113,22 +109,20 @@
 									</div>
 								</div>
 								<br />
-								
 								<div class="row" >
-									<div class="col-md-6 col-sm-6 has-float-label" >
-										<input tabindex=10 id="txtQTY" onfocus="this.select();" name="txtQTY" type="number" class="form-control-custom" style="border: 1px solid #ccc !important;margin: 0;" value=1 min=1 onchange="this.value = validateQTY(this.value);Grosir(this.value);" onpaste="return false;" onfocus="this.select();" />
+									<div class="col-md-6 col-sm-6 has-float-label" style="padding-right: 5px;" >
+										<input tabindex=10 id="txtQTY" onfocus="this.select();" name="txtQTY" type="tel" class="form-control-custom" style="border: 1px solid #ccc !important;margin: 0;" value=1 min=1 onchange="this.value = validateQTY(this.value);Grosir(this.value);" onpaste="return false;" onfocus="this.select();" />
 										<label for="txtQTY" class="lblInput" >Qty</label>
 									</div>
 
-									<div class="col-md-6 col-sm-6 has-float-label" >
-										<select id="ddlUnit" name="ddlUnit" tabindex=11 class="form-control-custom mousetrap" onchange="changeItemCode();" >
+									<div class="col-md-6 col-sm-6 has-float-label" style="padding-left: 0;" >
+										<select id="ddlUnit" name="ddlUnit" tabindex=11 class="form-control-custom mousetrap" onchange="changeItemCode();" style="height:26px;" >
 											<option >--</option>
 										</select>
 										<label for="ddlUnit" class="lblInput" >Satuan</label>
 									</div>
 								</div>
 								<br />
-								
 								<div class="row" >
 									<div class="col-md-12 col-sm-12 has-float-label" >
 										<input id="hdnBuyPrice" name="hdnBuyPrice" type="hidden" value=0 />
@@ -147,13 +141,13 @@
 									</div>
 								</div>
 								<br />
-								
 								<div class="row" >
 									<div class="col-md-12 col-sm-12 has-float-label" >
 										<input id="txtDiscount" name="txtDiscount" type="tel" tabindex=12 class="form-control-custom text-right" value="0" autocomplete=off onfocus="clearFormat(this.id, this.value);this.select();" onpaste="return false;" onblur="convertRupiah(this.id, this.value);" />
 										<label for="txtDiscount" class="lblInput" >Diskon</label>
 									</div>
 								</div>
+								<input type="text" tabindex=9 onfocus="getItemDetails(0);" style="height:0; width: 0;opacity:0;" />
 								<input type="text" tabindex=13 onfocus="addSaleDetails();" style="height:0; width: 0;opacity:0;" />
 								<br />
 								<button type="button" class="btn btn-default btn-mobile" value="Simpan" onclick="finish();" ><i class="fa fa-save fa-2x"></i><br /> Selesai</button>
@@ -202,7 +196,6 @@
 										</div>
 									</div>
 								</div>
-								<br />
 								<div class="row col-md-12 col-sm-12" >
 									<h2 style="display: inline-block;float: left;" >TOTAL : &nbsp;</h2><span id="lblTotal" >0</span>
 									</h2><span id="lblWeight" >0</span><h2 style="display: inline-block;float: right;color: #0006ff;" >Berat(KG) : &nbsp;
@@ -304,23 +297,6 @@
 			<!--<br />
 			<button class="btn btn-danger btn-block" tabindex=16 onclick="printShipment();" >Cetak Surat Jalan</button>-->
 		</div>
-		<div id="divBranch" style="display:none;">
-			<select class="form-control-custom" placeholder="Pilih Cabang" onchange="branchChange(this.value);" >
-				<!--<option value=0 selected >-- Semua Cabang --</option>-->
-				<?php
-					$sql = "CALL spSelDDLBranch('".$_SESSION['UserLogin']."')";
-					if (! $result = mysqli_query($dbh, $sql)) {
-						logEvent(mysqli_error($dbh), '/Report/Sale/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-						return 0;
-					}
-					while($row = mysqli_fetch_array($result)) {
-						echo "<option value='".$row['BranchID']."' >".$row['BranchCode']." - ".$row['BranchName']."</option>";
-					}
-					mysqli_free_result($result);
-					mysqli_next_result($dbh);
-				?>
-			</select>
-		</div>
 		<div id="code-dialog" title="Konfirmasi Kode" style="display: none;">
 			<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Stok barang tidak mencukupi, masukkan kode di bawah jika tetap ingin menambahkan!</p>
 			<div class="row col-md-12 col-sm-12" >
@@ -385,7 +361,7 @@
 				//$("#txtTransactionDate").focus();
 				table2 = $("#grid-transaction").DataTable({
 							"keys": true,
-							"scrollY": "290px",
+							"scrollY": "280px",
 							"scrollX": false,
 							"scrollCollapse": false,
 							"paging": false,
@@ -456,13 +432,12 @@
 			}
 
 			var counterGetItem = 0;
-			function getItemDetails() {
+			function getItemDetails(EditFlag) {
 				if(counterGetItem == 0) {
 					counterGetItem = 1;
 					var itemCode = $("#txtItemCode").val();
 					if(itemCode == "") $("#txtItemCode").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 					else if(EditFlag == 1 || (EditFlag == 0 && itemCode != itemCodeTemp)) {
-						itemCodeTemp = itemCode;
 						$("#loading").show();
 						$.ajax({
 							url: "./Transaction/Sale/CheckItem.php",
@@ -515,6 +490,7 @@
 										Grosir($("#txtQTY").val());
 										CalculateSubTotal();
 										$("#txtQTY").focus();
+										itemCodeTemp = itemCode;
 									//}
 									//else $("#txtQTY").focus();
 								}
@@ -600,7 +576,11 @@
 							}
 						});
 					}
-					else $("#txtQTY").focus();
+					else {
+						setTimeout(function() {
+							$("#txtQTY").focus();
+						}, 0);
+					}
 				}
 				setTimeout(function() { counterGetItem = 0; }, 1000);
 			}
@@ -865,6 +845,8 @@
 												else {
 													$("#toggle-branch-" + data.SaleDetailsID).toggles(false);
 												}
+
+												itemCodeTemp = "";
 											}
 											else {
 												var toggles = $('#toggle-branch-' + data.SaleDetailsID).data('toggles').active;
@@ -917,6 +899,7 @@
 												$("#toggle-branch-" + data.SaleDetailsID).toggles(toggles);
 												
 												table2.keys.enable();
+												itemCodeTemp = "";
 											}
 											$("#txtItemCode").val("");
 											$("#txtItemName").val("");
@@ -1130,6 +1113,7 @@
 											else {
 												$("#toggle-branch-" + data.SaleDetailsID).toggles(false);
 											}
+											itemCodeTemp = "";
 										}
 										else {
 											var toggles = $('#toggle-branch-' + data.SaleDetailsID).data('toggles').active;
@@ -1183,6 +1167,7 @@
 											$("#toggle-branch-" + data.SaleDetailsID).toggles(toggles);
 											
 											table2.keys.enable();
+											itemCodeTemp = "";
 										}
 										$("#txtItemCode").val("");
 										$("#txtItemName").val("");
@@ -1967,55 +1952,60 @@
 				$("#itemList-dialog").dialog({
 					autoOpen: false,
 					position: {
-						my : 'top+20%',
+						my : 'top+12.5%',
 						at : 'top'
 					},
 					open: function() {
 						table2.keys.disable();
-						table3 = $("#grid-item").DataTable({
-									"keys": true,
-									"scrollY": "295px",
-									"scrollX": false,
-									"scrollCollapse": false,
-									"paging": false,
-									"searching": true,
-									"order": [],
-									"columns": [
-										{ "width": "15%", "orderable": false, className: "dt-head-center" },
-										{ "width": "20%", "orderable": false, className: "dt-head-center" },
-										{ "width": "5%", "orderable": false, className: "dt-head-center" },
-										{ "width": "7.5%", "visible": false, "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" }
-									],
-									"ajax": "./Transaction/Sale/ItemList.php",
-									"processing": true,
-									"serverSide": true,
-									"language": {
-										"info": "",
-										"infoFiltered": "",
-										"infoEmpty": "",
-										"zeroRecords": "Data tidak ditemukan",
-										"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
-										"search": "Cari",
-										"processing": "",
-										"paginate": {
-											"next": ">",
-											"previous": "<",
-											"last": "»",
-											"first": "«"
+						if ( $.fn.dataTable.isDataTable( '#grid-item' ) ) {
+							table3 = $('#grid-item').DataTable();
+						}
+						else {
+							table3 = $("#grid-item").DataTable({
+										"keys": true,
+										"scrollY": "280px",
+										"scrollX": false,
+										"scrollCollapse": false,
+										"paging": false,
+										"searching": true,
+										"order": [],
+										"columns": [
+											{ "width": "15%", "orderable": false, className: "dt-head-center" },
+											{ "width": "20%", "orderable": false, className: "dt-head-center" },
+											{ "width": "5%", "orderable": false, className: "dt-head-center" },
+											{ "width": "7.5%", "visible": false, "orderable": false, className: "dt-head-center dt-body-right" },
+											{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+											{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+											{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+											{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+											{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+											{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+											{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" }
+										],
+										"ajax": "./Transaction/Sale/ItemList.php",
+										"processing": true,
+										"serverSide": true,
+										"language": {
+											"info": "",
+											"infoFiltered": "",
+											"infoEmpty": "",
+											"zeroRecords": "Data tidak ditemukan",
+											"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
+											"search": "Cari",
+											"processing": "",
+											"paginate": {
+												"next": ">",
+												"previous": "<",
+												"last": "»",
+												"first": "«"
+											}
+										},
+										"initComplete": function(settings, json) {
+											table3.columns.adjust();
+											$("#grid-item").DataTable().cell( ':eq(0)' ).focus();
 										}
-									},
-									"initComplete": function(settings, json) {
-										table3.columns.adjust();
-										$("#grid-item").DataTable().cell( ':eq(0)' ).focus();
-									}
-								});
+									});
+						}
 						var counterPickItem = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
 							//var index = table3.cell({ focused: true }).index();
@@ -2078,10 +2068,11 @@
 						$(this).dialog("destroy");
 						table3.destroy();
 						table2.keys.enable();
+						$("#txtItemCode").focus();
 					},
 					resizable: false,
 					height: 420,
-					width: 960,
+					width: 840,
 					modal: true/*,
 					buttons: [
 					{

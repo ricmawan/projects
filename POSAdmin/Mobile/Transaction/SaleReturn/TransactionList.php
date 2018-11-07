@@ -9,7 +9,7 @@
 	//kolom di table
 
 	$where = " 1=1 ";
-	$order_by = "TS.SaleID";
+	$order_by = "TS.SaleID DESC";
 	$limit_s = 0;
 	$limit_l = 20;
 	

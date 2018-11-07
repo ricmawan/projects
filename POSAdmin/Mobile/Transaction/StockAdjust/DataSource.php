@@ -8,44 +8,44 @@
 	$requestData= $_REQUEST;
 	//kolom di table
 	$columns = array(
-					0 => "SaleID", //unorderable
+					0 => "SA.StockAdjustID", //unorderable
 					1 => "RowNumber", //unorderable
-					2 => "TS.SaleNumber",
-					3 => "TS.TransactionDate",
-					4 => "MC.CustomerName",
-					5 => "TSD.Total",
-					6 => "SaleID",
-					7 => "CustomerID",
-					8 => "PlainTransactionDate",
-					9 => "RetailFlag",
-					10 => "Weight",
-					11 => "Payment",
-					12 => "Status",
-					13 => "PaymentTypeName"
+					2 => "SA.TransactionDate",
+					3 => "MB.BranchName",
+					4 => "MI.ItemCode",
+					5 => "MI.ItemName",
+					6 => "MU.UnitName",
+					7 => "SAD.Quantity",
+					8 => "SAD.AdjustedQuantity"
 				);
 
 	$where = " 1=1 ";
-	$order_by = "TS.SaleID DESC";
+	$order_by = "SA.StockAdjustID DESC";
 	$limit_s = $requestData['start'];
 	$limit_l = $requestData['length'];
 	
 	//Handles Sort querystring sent from Bootgrid
 	if(ISSET($requestData['order'])) {
 		$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
-		$order_by .= ", TS.SaleID ASC";
+		$order_by .= ", SA.StockAdjustID ASC";
 	}
 	//Handles search querystring sent from Bootgrid
 	if (!empty($requestData['search']['value']))
 	{
-		$search = mysqli_real_escape_string($dbh, trim($requestData['search']['value']));
-		$where .= " AND ( TS.SaleNumber LIKE '%".$search."%'";
-		$where .= " OR DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
-		$where .= " OR MC.CustomerName LIKE '%".$search."%' )";
+		$search = mysqli_escape_string($dbh, trim($requestData['search']['value']));
+		$where .= " AND ( MB.BranchName LIKE '%".$search."%'";
+		$where .= " OR MI.ItemCode LIKE '%".$search."%'";
+		$where .= " OR MID.ItemDetailsCode LIKE '%".$search."%'";
+		$where .= " OR MI.ItemName LIKE '%".$search."%'";
+		$where .= " OR MU.UnitName LIKE '%".$search."%'";
+		$where .= " OR DATE_FORMAT(SA.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
+		$where .= " OR SAD.AdjustedQuantity LIKE '%".$search."%'";
+		$where .= " OR SAD.Quantity LIKE '%".$search."%' )";
 	}
-	$sql = "CALL spSelSale(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
+	$sql = "CALL spSelStockAdjust(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
 
 	if (! $result = mysqli_query($dbh, $sql)) {
-		logEvent(mysqli_error($dbh), '/Transaction/Sale/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+		logEvent(mysqli_error($dbh), '/Transaction/StockAdjust/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 		return 0;
 	}
 	$row = mysqli_fetch_array($result);
@@ -61,22 +61,21 @@
 		$row_array = array();
 		$RowNumber++;
 		//data yang dikirim ke table
-		$row_array[] = "<input name='select' type='checkbox' value='".$row['SaleID']."^".$row['SaleNumber']."' />";
+		$row_array[] = "<input name='select' type='checkbox' value='".$row['StockAdjustDetailsID']."' />";
 		$row_array[] = $RowNumber;
-		$row_array[] = $row['SaleNumber'];
 		$row_array[] = $row['TransactionDate'];
-		$row_array[] = $row['CustomerName'];
-		$row_array[] = number_format($row['Total'] + $row['ServiceCost'],0,".",",");
-		$row_array[] = $row['SaleID'];
-		$row_array[] = $row['CustomerID'];
+		$row_array[] = $row['BranchName'];
+		$row_array[] = $row['ItemCode'];
+		$row_array[] = $row['ItemName'];
+		$row_array[] = $row['UnitName'];
+		$row_array[] = $row['Quantity'];
+		$row_array[] = $row['AdjustedQuantity'];
+		$row_array[] = $row['StockAdjustID'];
+		$row_array[] = $row['StockAdjustDetailsID'];
 		$row_array[] = $row['PlainTransactionDate'];
-		$row_array[] = $row['RetailFlag'];
-		$row_array[] = number_format($row['Weight'],2,".",",");
-		$row_array[] = $row['Payment'];
-		$row_array[] = $row['Status'];
-		$row_array[] = $row['PaymentTypeName'];
-		$row_array[] = $row['PaymentTypeID'];
-		$row_array[] = $row['ServiceCost'];
+		$row_array[] = $row['ItemID'];
+		$row_array[] = $row['BranchID'];
+		$row_array[] = $row['UnitID'];
 		array_push($return_arr, $row_array);
 	}
 	

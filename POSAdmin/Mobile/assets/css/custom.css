@@ -633,12 +633,12 @@ input::-webkit-inner-spin-button {
 	display:inline-block;
 	float:left;
 	height:5%;
-	min-height:45px;
+	min-height:40px;
 	margin:0 0 0 auto;
 	text-align:right;
 	background-color:black;
 	color:#00ff50;
-	font-size:32px;
+	font-size:28px;
 	font-weight:bold;
 }
 
@@ -647,12 +647,12 @@ input::-webkit-inner-spin-button {
 	display:inline-block;
 	float:right;
 	height:5%;
-	min-height:45px;
+	min-height:40px;
 	margin:0 0 0 auto;
 	text-align:right;
 	background-color:black;
 	color:#ffffff;
-	font-size:32px;
+	font-size:28px;
 	font-weight:bold;
 }
 

@@ -28,7 +28,7 @@
 			$row_array[] = $row['BookingDetailsID'];
 			$row_array[] = $row['ItemID'];
 			$row_array[] = $row['BranchID'];
-			$row_array[] = "<div id='toggle-branch-" . $row['BookingDetailsID'] . "' onclick='updateBranch(this.id)' class='div-center toggle-modern' ></div>";
+			$row_array[] = "<div id='toggle-branch-" . $row['BookingDetailsID'] . "' onclick=\"updateBranch(this.id, " . $row['Quantity'] . ", '". $row['ItemCode'] ."')\" class='div-center toggle-modern' ></div>";
 			$row_array[] = $row['ItemCode'];
 			$row_array[] = $row['ItemName'];
 			$row_array[] = $row['Quantity'];
