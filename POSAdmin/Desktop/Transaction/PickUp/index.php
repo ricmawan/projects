@@ -358,6 +358,7 @@
 				$("#hdnBookingID").val(0);
 				$("#txtTransactionDate").datepicker("setDate", new Date());
 				$("#txtBookingNumber").val("");
+				$("#txtCustomerName").val("");
 				$("#lblTotal").html("0");
 				table2.clear().draw();
 				$("#select_all_salereturn").prop("checked", false);

@@ -13,6 +13,7 @@ CREATE TABLE transaction_booking
 	PrintedDate			DATETIME,
     FinishFlag 			BIT,
 	Remarks				TEXT,
+	Discount			DOUBLE,
 	CreatedDate 		DATETIME NOT NULL,
 	CreatedBy 			VARCHAR(255) NOT NULL,
 	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,

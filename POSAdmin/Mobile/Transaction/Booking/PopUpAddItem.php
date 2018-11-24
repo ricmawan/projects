@@ -158,7 +158,7 @@
 								<label for="txtPrice2Add" class="lblInput" >Harga Grosir 2</label>
 							</div>
 							<div class="col-md-2 col-sm-2 has-float-label">
-								<input id="txtQty2Add" name="txtQty2Add" type="number" tabindex=27 class="form-control-custom text-right" value=1 min=1 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 2" required />
+								<input id="txtQty2Add" name="txtQty2Add" type="tel" tabindex=27 class="form-control-custom text-right" value=1 min=1 onfocus="this.select();" autocomplete=off placeholder="Qty Grosir 2" required />
 								<label for="txtQty2Add" class="lblInput" >Qty Grosir 2</label>
 							</div>
 						</div>

@@ -6,6 +6,7 @@ CREATE PROCEDURE spUpdSalePayment (
 	pPayment 		DOUBLE,
 	pPaymentTypeID	SMALLINT,
     pFinishFlag		BIT,
+	pDiscountTotal	DOUBLE,
 	pCurrentUser	VARCHAR(255)
 )
 StoredProcedure:BEGIN
@@ -44,7 +45,8 @@ SET State = 1;
 			Payment = pPayment,
             FinishFlag = pFinishFlag,
 			PaymentTypeID = pPaymentTypeID,
-			ModifiedBy = pCurrentUser
+			ModifiedBy = pCurrentUser,
+			Discount = pDiscountTotal
 		WHERE
 			SaleID = pID;
 

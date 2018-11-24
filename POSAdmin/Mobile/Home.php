@@ -111,7 +111,7 @@
 										<a href='#' class='menu' link='Transaction/PickUp/'><i class='fa fa-download fa-2'></i> Pengambilan</a>
 									</li>
 									<li class='dropdown'>
-										<a href='#' class='menu' link='Transaction/StockAdjust/'><i class='fa fa-check fa-2'></i>Stock Opname</a>
+										<a href='#' class='menu' link='Transaction/StockAdjust'><i class='fa fa-check fa-2'></i>Stock Opname</a>
 									</li>
 									
 								</ul>

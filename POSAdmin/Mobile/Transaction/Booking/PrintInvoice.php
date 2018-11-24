@@ -13,13 +13,14 @@
 		$Payment = mysqli_real_escape_string($dbh, $_POST['Payment']);
 		$PaymentType = mysqli_real_escape_string($dbh, $_POST['PaymentType']);
 		$PrintInvoice = mysqli_real_escape_string($dbh, $_POST['PrintInvoice']);
+		$DiscountTotal = mysqli_real_escape_string($dbh, $_POST['DiscountTotal']);
 		$Message = "Pembayaran berhasil";
 		$FinishFlag = 1;
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
 		
-		$sql = "CALL spUpdBookingPayment(".$BookingID.", ".$Payment.", ".$PaymentType.", ".$FinishFlag.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spUpdBookingPayment(".$BookingID.", ".$Payment.", ".$PaymentType.", ".$FinishFlag.", ".$DiscountTotal.", '".$_SESSION['UserLogin']."')";
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysqli_error($dbh);
@@ -87,7 +88,7 @@
 		    while ($row = mysqli_fetch_array($result)) {
 		        $rowPrice .= number_format($row['Quantity'],0,".",",") . " " . $row['UnitName'] . " @ " . number_format($row['BookingPrice'],0,".",",");
 		        if($row['Discount'] != 0) $rowPrice .= " - " . number_format($row['Discount'],0,".",",");
-		        $printer -> text(" " . $row['ItemName'] . "\n");
+		        $printer -> text("*" . $row['ItemName'] . "\n");
 		        $printer -> text(" " . str_pad($rowPrice , 26, " ") . " ");
 		        $printer -> text(str_pad(number_format(($row['BookingPrice'] - $row['Discount']) * $row['Quantity'],0,".",","), 11, " ", STR_PAD_LEFT) . "\n");
 		        //$printer -> text("  " . str_pad(number_format($row['Quantity'],0,".",","), 5, " ", STR_PAD_LEFT) . " " . str_pad($row['UnitName'], 6, " ") . " @ " . str_pad(number_format($row['BookingPrice'],0,".",","), 10, " ") . " " . str_pad(number_format($row['BookingPrice'] * $row['Quantity'],0,".",","), 11, " ", STR_PAD_LEFT) . "\n");
@@ -104,7 +105,8 @@
 		    $printer -> setEmphasis(true);
 		    $printer -> text("PEMBAYARAN     : " . $PaymentMethod ."\n" );
 		    $printer -> text("TOTAL          : " . str_pad(number_format($GrandTotal ,0,".",","), 16, " ", STR_PAD_LEFT) ."\n" );
-		    $printer -> text("BAYAR          : " . str_pad(number_format($Payment ,0,".",","), 16, " ", STR_PAD_LEFT) ."\n" );
+			$printer -> text("DISKON         : " . str_pad(number_format($DiscountTotal ,0,".",","), 16, " ", STR_PAD_LEFT) ."\n" );
+			$printer -> text("BAYAR          : " . str_pad(number_format($Payment ,0,".",","), 16, " ", STR_PAD_LEFT) ."\n" );
 		    if($PaymentMethod == "Tunai") $printer -> text("KEMBALI        : " . str_pad(number_format($Change ,0,".",","), 16, " ", STR_PAD_LEFT) . "\n" );
 		    else $printer -> text("KEKURANGAN     : " . str_pad(number_format($Change ,0,".",","), 16, " ", STR_PAD_LEFT) . "\n" );
 		    $printer -> setEmphasis(false);

@@ -33,6 +33,7 @@
 						<input id="hdnPayment" name="hdnPayment" type="hidden" value=0 />
 						<input id="hdnPaymentType" name="hdnPaymentType" type="hidden" value=0 />
 						<input id="hdnDesktopPath" name="hdnDesktopPath" type="hidden" value='<?php echo $DESKTOP_PATH; ?>' />
+						<input id="hdnDiscountTotal" name="hdnDiscountTotal" type="hidden" value=0 />
 					</div>
 					<div class="col-md-2">
 						<input id="txtSaleNumber" name="txtSaleNumber" type="text" class="form-control-custom" placeholder="No. Invoice" readonly />
@@ -227,10 +228,19 @@
 			<br />
 			<div class="row col-md-12" >
 				<div class="col-md-4 labelColumn">
+					Diskon :
+				</div>
+				<div class="col-md-8">
+					<input id="txtDiscountTotal" name="txtDiscountTotal" type="text" tabindex=15 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
+				</div>
+			</div>
+			<br />
+			<div class="row col-md-12" >
+				<div class="col-md-4 labelColumn">
 					Bayar :
 				</div>
 				<div class="col-md-8">
-					<input id="txtPayment" name="txtPayment" type="text" tabindex=15 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" onchange="Change();" />
+					<input id="txtPayment" name="txtPayment" type="text" tabindex=16 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" onchange="Change();" />
 				</div>
 			</div>
 			<br />
@@ -245,19 +255,19 @@
 			<br />
 			<div class="row col-md-12" >
 				<label class="checkboxContainer" >Cetak Nota
-					<input type="checkbox" id="chkPrint" name="chkPrint" value=1 tabindex=16 checked />
+					<input type="checkbox" id="chkPrint" name="chkPrint" value=1 tabindex=17 checked />
 					<span class="checkmark"></span>
 				</label>
 			</div>
 			<br />
 			<div class="row col-md-12" >
 				<label class="checkboxContainer">Cetak Surat Pengambilan
-					<input type="checkbox" id="chkPrintShipment" name="chkPrintShipment" value=1 tabindex=17 checked />
+					<input type="checkbox" id="chkPrintShipment" name="chkPrintShipment" value=1 tabindex=18 checked />
 					<span class="checkmark"></span>
 				</label>
 			</div>
 			<br />
-			<button type="button" class="btn btn-primary btn-block" onclick="printInvoice();" tabindex=18 >Selesai</button>
+			<button type="button" class="btn btn-primary btn-block" onclick="printInvoice();" tabindex=19 >Selesai</button>
 			<!--<br />
 			<button class="btn btn-danger btn-block" tabindex=16 onclick="printShipment();" >Cetak Surat Jalan</button>-->
 		</div>
@@ -1919,7 +1929,8 @@
 				$('#toggle-retail').toggles(true);
 				$("#lblTotal").html("0");
 				$("#lblWeight").html("0");
-				$("#hdnPayment").html("0");
+				$("#hdnPayment").val("0");
+				$("#hdnDiscountTotal").val("0");
 				$("#hdnRetailPrice").val(0);
 				if( $("#ddlCustomer").has("option").length > 0 ) $("#ddlCustomer option")[0].selected = true;
 				$("#ddlUnit").find('option').remove();
@@ -2084,16 +2095,17 @@
 							//$("#divModal").show();
 							table2.keys.disable();
 							var Total = $("#lblTotal").html().replace(/\,/g, "");
+							var discountTotal = $("#hdnDiscountTotal").val();
 							var Payment = $("#hdnPayment").val();
 							var PaymentType = $("#hdnPaymentType").val();
 							var Change = 0;
 							if(parseFloat(Payment) != 0) {
 								if(PaymentType == 1) {
-									Change = parseFloat(Payment) - parseFloat(Total);
+									Change = parseFloat(Payment) - (parseFloat(Total) - parseFloat(discountTotal));
 									$("#lblChange").html("Kembali :");
 								}
 								else {
-									Change = parseFloat(Total) - parseFloat(Payment);
+									Change = (parseFloat(Total) - parseFloat(discountTotal)) - parseFloat(Payment);
 									$("#lblChange").html("Kekurangan :");
 								}
 								$("#txtChange").val(returnRupiah(Change.toString()));
@@ -2101,6 +2113,7 @@
 							if(parseFloat(PaymentType) == 0) PaymentType = 1;
 							$("#txtTotal").val($("#lblTotal").html());
 							$("#txtPayment").val(returnRupiah(Payment.toString()));
+							$("#txtDiscountTotal").val(returnRupiah(discountTotal.toString()));
 							$("#ddlPayment").val(PaymentType);
 							$("#ddlPayment").focus();
 						},
@@ -2117,11 +2130,12 @@
 							table2.keys.enable();
 							//$("#divModal").hide();
 							$("#txtPayment").val(0);
+							$("#txtDiscountTotal").val(0);
 							$("#ddlPayment").val(1);
 							$("#txtChange").val(0);
 						},
 						resizable: false,
-						height: 340,
+						height: 370,
 						width: 420,
 						modal: true /*,
 						buttons: [
@@ -2158,19 +2172,20 @@
 
 			function PaymentTypeChange() {
 				var Total = $("#txtTotal").val().replace(/\,/g, "");
+				var discountTotal = $("#txtDiscountTotal").val().replace(/\,/g, "");
 				var Payment = $("#txtPayment").val().replace(/\,/g, "");
 				var PaymentType = $("#ddlPayment").val();
 				if(PaymentType == 1) {
 					$("#lblChange").html("Kembali :");
 					if(parseFloat(Payment) != 0) {
-						if(parseFloat(Total) > parseFloat(Payment)) {
+						if((parseFloat(Total) - parseFloat(discountTotal)) > parseFloat(Payment)) {
 							$("#txtPayment").notify("Pembayaran Kurang!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 							setTimeout(function() {
 								$("#txtPayment").focus();
 							}, 0);
 						}
 						else {
-							var Change = parseFloat(Payment) - parseFloat(Total);
+							var Change = parseFloat(Payment) - (parseFloat(Total) - parseFloat(discountTotal));
 							$("#txtChange").val(returnRupiah(Change.toString()));
 						}
 					}
@@ -2180,14 +2195,14 @@
 				}
 				else {
 					$("#lblChange").html("Kekurangan :");
-					if(parseFloat(Total) < parseFloat(Payment)) {
+					if((parseFloat(Total) - parseFloat(discountTotal)) < parseFloat(Payment)) {
 						$("#txtPayment").notify("Pembayaran Lebih!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 						setTimeout(function() {
 							$("#txtPayment").focus();
 						}, 0);
 					}
 					else {
-						var Change = parseFloat(Total) - parseFloat(Payment);
+						var Change = (parseFloat(Total) - parseFloat(discountTotal)) - parseFloat(Payment);
 						$("#txtChange").val(returnRupiah(Change.toString()));
 					}
 				}
@@ -2195,6 +2210,7 @@
 
 			function Change() {
 				var Total = $("#txtTotal").val().replace(/\,/g, "");
+				var discountTotal = $("#txtDiscountTotal").val().replace(/\,/g, "");
 				var Payment = $("#txtPayment").val().replace(/\,/g, "");
 				var PaymentType = $("#ddlPayment").val();
 				if(PaymentType == 1) {
@@ -2206,28 +2222,28 @@
 						}, 0);
 					}
 					else {
-						if(parseFloat(Total) > parseFloat(Payment)) {
+						if((parseFloat(Total) - parseFloat(discountTotal)) > parseFloat(Payment)) {
 							$("#txtPayment").notify("Pembayaran Kurang!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 							setTimeout(function() {
 								$("#txtPayment").focus();
 							}, 0);
 						}
 						else {
-							var Change = parseFloat(Payment) - parseFloat(Total);
+							var Change = parseFloat(Payment) - (parseFloat(Total) - parseFloat(discountTotal));
 							$("#txtChange").val(returnRupiah(Change.toString()));
 						}
 					}
 				}
 				else {
 					$("#lblChange").html("Kekurangan :");
-					if(parseFloat(Total) < parseFloat(Payment)) {
+					if((parseFloat(Total) - parseFloat(discountTotal)) < parseFloat(Payment)) {
 						$("#txtPayment").notify("Pembayaran Lebih!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 						setTimeout(function() {
 							$("#txtPayment").focus();
 						}, 0);
 					}
 					else {
-						var Change = parseFloat(Total) - parseFloat(Payment);
+						var Change = (parseFloat(Total) - parseFloat(discountTotal)) - parseFloat(Payment);
 						$("#txtChange").val(returnRupiah(Change.toString()));
 					}
 				}
@@ -2235,6 +2251,7 @@
 
 			function printInvoice() {
 				var Total = $("#txtTotal").val().replace(/\,/g, "");
+				var discountTotal = $("#txtDiscountTotal").val().replace(/\,/g, "");
 				var Payment = $("#txtPayment").val().replace(/\,/g, "");
 				var PaymentType = $("#ddlPayment").val();
 				var PassValidate = 1;
@@ -2248,8 +2265,7 @@
 						PassValidate = 0;
 					}
 					else {
-						$("#lblChange").html("Kekurangan :");
-						if(parseFloat(Total) > parseFloat(Payment)) {
+						if((parseFloat(Total) - parseFloat(discountTotal)) > parseFloat(Payment)) {
 							$("#txtPayment").notify("Pembayaran Kurang!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 							setTimeout(function() {
 								$("#txtPayment").focus();
@@ -2257,13 +2273,14 @@
 							PassValidate = 0;
 						}
 						else {
-							var Change = parseFloat(Payment) - parseFloat(Total);
+							var Change = parseFloat(Payment) - (parseFloat(Total) - parseFloat(discountTotal));
 							$("#txtChange").val(returnRupiah(Change.toString()));
 						}
 					}
 				}
 				else {
-					if(parseFloat(Total) < parseFloat(Payment)) {
+					$("#lblChange").html("Kekurangan :");
+					if((parseFloat(Total) - parseFloat(discountTotal)) < parseFloat(Payment)) {
 						$("#txtPayment").notify("Pembayaran Lebih!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 						setTimeout(function() {
 							$("#txtPayment").focus();
@@ -2271,7 +2288,7 @@
 						PassValidate = 0;
 					}
 					else {
-						var Change = parseFloat(Total) - parseFloat(Payment);
+						var Change = (parseFloat(Total) - parseFloat(discountTotal)) - parseFloat(Payment);
 						$("#txtChange").val(returnRupiah(Change.toString()));
 					}
 				}
@@ -2290,7 +2307,7 @@
 					$.ajax({
 						url: "./Transaction/Sale/PrintInvoice.php",
 						type: "POST",
-						data: { SaleID : saleID, Payment : Payment, PaymentType : PaymentType, PrintInvoice : PrintInvoice, Change: Change, SaleNumber : SaleNumber, PaymentMethod : PaymentMethod, TransactionDate : TransactionDate },
+						data: { SaleID : saleID, Payment : Payment, PaymentType : PaymentType, PrintInvoice : PrintInvoice, Change: Change, SaleNumber : SaleNumber, PaymentMethod : PaymentMethod, TransactionDate : TransactionDate, DiscountTotal : discountTotal },
 						dataType: "json",
 						success: function(data) {
 							if(data.FailedFlag == '0') {
@@ -2302,7 +2319,7 @@
 								$("#finish-dialog").dialog("destroy");
 								//$("#FormData").dialog("destroy");
 								var paymentInfo = "<table><tr><td align='right'>Pembayaran :&nbsp;</td><td>" + $("#ddlPayment option:selected").text() + "</td></tr>";
-								paymentInfo += "<tr><td align='right'>Total :&nbsp;</td><td align='right'>" + returnRupiah(Total) + "</td></tr>";
+								paymentInfo += "<tr><td align='right'>Total :&nbsp;</td><td align='right'>" + returnRupiah((parseFloat(Total) - parseFloat(discountTotal)).toString()) + "</td></tr>";
 								paymentInfo += "<tr><td align='right'>Bayar :&nbsp;</td><td align='right'>" + returnRupiah(Payment) + "</td></tr>";
 								if(PaymentType == 1) paymentInfo += "<tr><td align='right'>Kembali :&nbsp;</td><td align='right'>" + $("#txtChange").val() + "</td></tr></table>";
 								else paymentInfo += "<tr><td align='right'>Kekurangan :&nbsp;</td><td align='right'>" + $("#txtChange").val() + "</td></tr></table>";
@@ -2310,6 +2327,7 @@
 								$("#txtPayment").val(0);
 								$("#ddlPayment").val(1);
 								$("#txtChange").val(0);
+								$("#txtDiscountTotal").val(0);
 								Lobibox.alert("success",
 								{
 									msg: paymentInfo,

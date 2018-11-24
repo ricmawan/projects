@@ -73,6 +73,7 @@
 										<th>No. Invoice</th>
 										<th>Tanggal</th>
 										<th>Nama Pelanggan</th>
+										<th>Ongkos Service</th>
 										<th>Sub Total</th>
 									</tr>
 								</thead>

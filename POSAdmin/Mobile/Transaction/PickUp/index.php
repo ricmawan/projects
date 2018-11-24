@@ -356,10 +356,11 @@
 				$("#hdnBookingID").val(0);
 				$("#txtTransactionDate").datepicker("setDate", new Date());
 				$("#txtBookingNumber").val("");
+				$("#txtCustomerName").val("");
 				$("#lblTotal").html("0");
 				table2.clear().draw();
 				$("#select_all_salereturn").prop("checked", false);
-				$("#select_all_salereturn").attr("checked", false);	
+				$("#select_all_salereturn").attr("checked", false);
 			}
 
 			function transactionList() {
@@ -488,7 +489,7 @@
 											$("#FormData").dialog("destroy");
 											$("#divModal").hide();
 											resetForm();
-											table2.destroy();
+											//table2.destroy();
 											var counter = 0;
 											Lobibox.alert("success",
 											{

@@ -21,7 +21,8 @@
 					10 => "Weight",
 					11 => "Payment",
 					12 => "Status",
-					13 => "PaymentTypeName"
+					13 => "PaymentTypeName",
+					14 => "Discount"
 				);
 
 	$where = " 1=1 ";
@@ -76,6 +77,7 @@
 		$row_array[] = $row['Status'];
 		$row_array[] = $row['PaymentTypeName'];
 		$row_array[] = $row['PaymentTypeID'];
+		$row_array[] = $row['Discount'];
 		array_push($return_arr, $row_array);
 	}
 	

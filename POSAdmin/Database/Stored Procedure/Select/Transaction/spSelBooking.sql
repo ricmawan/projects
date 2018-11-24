@@ -69,7 +69,8 @@ SET @query = CONCAT("SELECT
                             THEN 'Belum Selesai'
                             ELSE 'Selesai'
 						END Status,
-                        IFNULL(PT.PaymentTypeID, 1) PaymentTypeID
+                        IFNULL(PT.PaymentTypeID, 1) PaymentTypeID,
+						TB.Discount
 					FROM
 						transaction_booking TB
                         JOIN master_customer MC
