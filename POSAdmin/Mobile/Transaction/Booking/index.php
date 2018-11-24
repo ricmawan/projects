@@ -222,9 +222,9 @@
 								<th>Satuan</th>
 								<th>H Beli</th>
 								<th>H Ecer</th>
-								<th>Harga 1</th>
+								<th>H1</th>
 								<th>QTY1</th>
-								<th>Harga 2</th>
+								<th>H2</th>
 								<th>QTY2</th>
 								<th>Toko</th>
 								<th>Gudang</th>
