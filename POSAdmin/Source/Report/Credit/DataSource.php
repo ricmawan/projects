@@ -70,6 +70,7 @@
 			$row_array["TotalSale"] = number_format($row['TotalSale'],0,".",",");
 			$row_array["TotalPayment"] = number_format($row['TotalPayment'],0,".",",");
 			$row_array["Credit"] = number_format($row['Credit'],0,".",",");
+			$row_array["Discount"] = number_format($row['Discount'],0,".",",");
 			$row_array["SaleID"] = $row['SaleID'];
 			$row_array["TransactionType"] = $row['TransactionType'];
 			$SubTotal += $row['Credit'];

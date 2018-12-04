@@ -20,9 +20,10 @@
 		$dayName = array("Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu");
 		$monthName = array("Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des");
 
-		$connector = new DummyPrintConnector();
+		$connector = new WindowsPrintConnector("smb:".$SHARED_PRINTER_ADDRESS);
+		/*$connector = new DummyPrintConnector();
 	    $file =  "PrintInvoice.txt";  # nama file temporary yang akan dicetak
-	    $handle = fopen($file, 'w');
+	    $handle = fopen($file, 'w');*/
 
 	    $printer = new Printer($connector);
 		   
@@ -68,12 +69,12 @@
 	    $printer -> text("TANPA DISERTAI NOTA ASLI\n");
 	    $printer -> text("TERIMAKASIH ATAS KUNJUNGAN ANDA\n\n");
 
-	    $data = $connector -> getData();
-	    fwrite($handle, $data);
-	    fclose($handle);
+	    //$data = $connector -> getData();
+	    //fwrite($handle, $data);
+	    //fclose($handle);
 
 	    /* Cut the receipt and open the cash drawer */
-	    //$printer -> cut();
+	    $printer -> cut();
 	    $printer -> pulse();
 	    $printer -> close();
 

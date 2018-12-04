@@ -39,6 +39,7 @@ SET State = 1;
         '' UnitName,
         0  SalePrice,
         0 Discount,
+		0 DiscountTotal,
         FB.FirstBalanceAmount SubTotal,
         0 Payment
 	FROM
@@ -65,6 +66,7 @@ SET State = 1;
         MU.UnitName,
         SD.SalePrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
         SD.Discount,
+		IFNULL(TS.Discount, 0) DiscountTotal,
         SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount) SubTotal,
         0 Payment
     FROM
@@ -102,6 +104,7 @@ SET State = 1;
         MU.UnitName,
         BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
         BD.Discount,
+		IFNULL(TB.Discount, 0) DiscountTotal,
         BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount) SubTotal,
         0 Payment
     FROM
@@ -139,6 +142,7 @@ SET State = 1;
         MU.UnitName,
         SRD.SalePrice,
         0 Discount,
+		0 DiscountTotal,
         -(SRD.Quantity * SRD.SalePrice) SubTotal,
         0 Payment
     FROM
@@ -177,6 +181,7 @@ SET State = 1;
         MU.UnitName,
         SD.SalePrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
         SD.Discount,
+		TS.Discount DiscountTotal,
         SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount) SubTotal,
         IFNULL(TS.Payment, 0) Payment
     FROM
@@ -215,6 +220,7 @@ SET State = 1;
         MU.UnitName,
         BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
         BD.Discount,
+		TB.Discount DiscountTotal,
         BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount) SubTotal,
         IFNULL(TB.Payment, 0) Payment
     FROM
@@ -252,8 +258,8 @@ SET State = 1;
         0,
         '',
         0,
-        
         0,
+		0 DiscountTotal,
         PD.Amount,
         0 Payment
 	FROM

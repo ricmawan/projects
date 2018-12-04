@@ -69,17 +69,19 @@
 		$result2 = mysqli_use_result($dbh);
 		$return_arr = array();
 		$RowNumber = $requestData['start'];
-		$SubTotal = 0;
+		$Total = 0;
 		while ($row = mysqli_fetch_array($result2)) {
 			$row_array = array();
 			//data yang dikirim ke table
 			$row_array["SaleNumber"] = $row['SaleNumber'];
 			$row_array["TransactionDate"] = $row['TransactionDate'];
 			$row_array["CustomerName"] = $row['CustomerName'];
-			$row_array["Total"] = number_format($row['Total'],0,".",",");
+			$row_array["TotalSale"] = number_format($row['TotalSale'],0,".",",");
+			$row_array["Discount"] = number_format($row['Discount'],0,".",",");
+			$row_array["SubTotal"] = number_format($row['SubTotal'],0,".",",");
 			$row_array["SaleID"] = $row['SaleID'];
 			$row_array["TransactionType"] = $row['TransactionType'];
-			$SubTotal += $row['Total'];
+			$Total += $row['SubTotal'];
 			array_push($return_arr, $row_array);
 		}
 		
@@ -91,7 +93,7 @@
 						"recordsTotal"		=> intval( $totalData ),  // total number of records
 						"recordsFiltered"	=> intval( $totalFiltered ), // total number of records after searching, if there is no searching then totalFiltered = totalData
 						"data"				=> $return_arr,
-						"SubTotal" => number_format($SubTotal,0,".",","),
+						"Total" => number_format($Total,0,".",","),
 						"GrandTotal" => number_format($GrandTotal,0,".",",")
 					);
 	}
@@ -102,7 +104,7 @@
 						"recordsTotal"		=> 0,  // total number of records
 						"recordsFiltered"	=> 0, // total number of records after searching, if there is no searching then totalFiltered = totalData
 						"data"				=> "",
-						"SubTotal" => 0,
+						"Total" => 0,
 						"GrandTotal" => 0
 					);
 	}

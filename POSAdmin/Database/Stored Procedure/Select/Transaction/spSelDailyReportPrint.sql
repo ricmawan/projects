@@ -26,56 +26,81 @@ StoredProcedure:BEGIN
 	
 SET State = 1;
 	SELECT
-        FB.FirstBalanceAmount Amount
+		1 UnionLevel,
+		IFNULL(SFB.Amount, 0) Amount
 	FROM
-		transaction_firstbalance FB
-		JOIN master_user MUS
-			ON MUS.UserID = FB.UserID
-	WHERE
-		CAST(FB.TransactionDate AS DATE) = CAST(NOW() AS DATE)
-        AND FB.CreatedBy = pCurrentUser
+		(
+			SELECT
+				SUM(FB.FirstBalanceAmount) Amount
+			FROM
+				transaction_firstbalance FB
+				JOIN master_user MUS
+					ON MUS.UserID = FB.UserID
+			WHERE
+				CAST(FB.TransactionDate AS DATE) = CAST(NOW() AS DATE)
+				AND FB.CreatedBy = pCurrentUser
+		)SFB
 	UNION ALL
 	SELECT
+		2 UnionLevel,
 		IFNULL(S.Amount, 0) Amount
 	FROM
 		(
 			SELECT
-				SUM(TSD.Quantity * (TSD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - TSD.Discount)) Amount
+				SUM(STS.Amount) Amount
 			FROM
-				transaction_sale TS
-				LEFT JOIN transaction_saledetails TSD
-					ON TS.SaleID = TSD.SaleID
-				LEFT JOIN master_item MI
-					ON MI.ItemID = TSD.ItemID
-				LEFT JOIN master_itemdetails MID
-					ON MID.ItemDetailsID = TSD.ItemDetailsID
-			WHERE
-				DATE_FORMAT(TS.TransactionDate, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
-				AND TS.PaymentTypeID = 1
-                AND TS.CreatedBy = pCurrentUser
+				(
+					SELECT
+						SUM(TSD.Quantity * (TSD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - TSD.Discount)) - TS.Discount Amount
+					FROM
+						transaction_sale TS
+						LEFT JOIN transaction_saledetails TSD
+							ON TS.SaleID = TSD.SaleID
+						LEFT JOIN master_item MI
+							ON MI.ItemID = TSD.ItemID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = TSD.ItemDetailsID
+					WHERE
+						DATE_FORMAT(TS.TransactionDate, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
+						AND TS.PaymentTypeID = 1
+						AND TS.CreatedBy = pCurrentUser
+					GROUP BY
+						TS.SaleID,
+						TS.Discount
+				)STS
 		)S
 	UNION ALL
     SELECT
+		3 UnionLevel,
 		IFNULL(B.Amount, 0) Amount
 	FROM
 		(
 			SELECT
-				SUM(TBD.Quantity * (TBD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - TBD.Discount)) Amount
+				SUM(STB.Amount) Amount
 			FROM
-				transaction_booking TB
-				LEFT JOIN transaction_bookingdetails TBD
-					ON TB.BookingID = TBD.BookingID
-				LEFT JOIN master_item MI
-					ON MI.ItemID = TBD.ItemID
-				LEFT JOIN master_itemdetails MID
-					ON MID.ItemDetailsID = TBD.ItemDetailsID
-			WHERE
-				DATE_FORMAT(TB.TransactionDate, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
-				AND TB.PaymentTypeID = 1
-                AND TB.CreatedBy = pCurrentUser
+				(
+					SELECT
+						SUM(TBD.Quantity * (TBD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - TBD.Discount)) - TB.Discount Amount
+					FROM
+						transaction_booking TB
+						LEFT JOIN transaction_bookingdetails TBD
+							ON TB.BookingID = TBD.BookingID
+						LEFT JOIN master_item MI
+							ON MI.ItemID = TBD.ItemID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = TBD.ItemDetailsID
+					WHERE
+						DATE_FORMAT(TB.TransactionDate, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
+						AND TB.PaymentTypeID = 1
+						AND TB.CreatedBy = pCurrentUser
+					GROUP BY
+						TB.BookingID,
+						TB.Discount
+				)STB
 		)B
 	UNION ALL
     SELECT
+		4 UnionLevel,
 		-IFNULL(SR.Amount, 0)
 	FROM
 		(
@@ -95,6 +120,7 @@ SET State = 1;
 		)SR
 	UNION ALL
     SELECT
+		5 UnionLevel,
 		IFNULL(DP.Amount, 0) Amount
 	FROM
 		(
@@ -123,6 +149,7 @@ SET State = 1;
 		)DP
 	UNION ALL
     SELECT
+		6 UnionLevel,
 		IFNULL(PD.Amount, 0) Amount
 	FROM
 		(

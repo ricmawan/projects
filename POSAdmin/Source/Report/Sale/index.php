@@ -73,7 +73,8 @@
 										<th>No. Invoice</th>
 										<th>Tanggal</th>
 										<th>Nama Pelanggan</th>
-										<th>Ongkos Service</th>
+										<th>Penjualan</th>
+										<th>Diskon</th>
 										<th>Sub Total</th>
 									</tr>
 								</thead>
@@ -137,7 +138,7 @@
 					$("#loading").show();
 					$("#dvTable").show();
 					table.ajax.reload(function(json) {
-						$("#tfootTable").html("<tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Sub Total:</td><td>" + json.SubTotal + "</td></tr><tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Grand Total:</td><td>" + json.GrandTotal + "</td></tr>");
+						$("#tfootTable").html("<tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Total:</td><td>" + json.Total + "</td></tr><tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Grand Total:</td><td>" + json.GrandTotal + "</td></tr>");
 						$("#tfootTable").find("td").css({
 							"border" : "0",
 							"font-size" : "14px",
@@ -275,7 +276,9 @@
 									{ "data": "SaleNumber", className: "dt-head-center" },
 									{ "data": "TransactionDate", className: "dt-head-center" },
 									{ "data": "CustomerName", className: "dt-head-center" },
-									{ "data": "Total", "orderable": false, className: "dt-head-center dt-body-right" },
+									{ "data": "TotalSale", "orderable": false, className: "dt-head-center dt-body-right" },
+									{ "data": "Discount", "orderable": false, className: "dt-head-center dt-body-right" },
+									{ "data": "SubTotal", "orderable": false, className: "dt-head-center dt-body-right" },
 									{ "data": "SaleID", "visible": false },
 									{ "data": "TransactionType", "visible": false }
 								],
@@ -307,7 +310,7 @@
 								},
 								"drawCallback": function( settings ) {
 							        var json = table.ajax.json();
-							        $("#tfootTable").html("<tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Sub Total:</td><td>" + json.SubTotal + "</td></tr><tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Grand Total:</td><td>" + json.GrandTotal + "</td></tr>");
+							        $("#tfootTable").html("<tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Sub Total:</td><td>" + json.Total + "</td></tr><tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Grand Total:</td><td>" + json.GrandTotal + "</td></tr>");
 									$("#tfootTable").find("td").css({
 										"border" : "0",
 										"font-size" : "14px",

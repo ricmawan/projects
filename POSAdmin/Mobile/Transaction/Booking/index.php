@@ -1941,6 +1941,10 @@
 				$("#hdnBookingDetailsID").val(0);
 				$("#hdnItemID").val(0);
 				$("#txtTransactionDate").datepicker("setDate", new Date());
+				var transactionDate = new Date();
+				transactionDate = transactionDate.getFullYear() + "-" + ("0" + (transactionDate.getMonth() + 1)).slice(-2) + "-" + ("0" + transactionDate.getDate()).slice(-2);
+				today = transactionDate;
+				$("#hdnTransactionDate").val(transactionDate);
 				$("#txtBookingNumber").val("");
 				$("#hdnBookingNumber").val("");
 				$("#txtItemCode").val("");
@@ -2660,6 +2664,7 @@
 					onSelect: function(dateText, obj) {
 						transactionDate = obj.selectedYear + "-" + ("0" + (obj.selectedMonth + 1)).slice(-2) + "-" + ("0" + obj.selectedDay).slice(-2);
 						$("#hdnTransactionDate").val(transactionDate);
+						updateHeader();
 					}
 				}).datepicker("setDate", new Date());
 				

@@ -158,32 +158,70 @@
 		$GrandTotal = 0;
 		$TotalKasir = 0;
 		$Payment = 0;
+		$DiscountTotal = 0;
+		$UnionDiscountTotal = 0;
+		$KasirDiscountTotal = 0;
+		$GrandDiscountTotal = 0;
 		while ($row = mysqli_fetch_array($result)) {
 			if($Kasir != $row['UserName']) {
 				if($Kasir != "") {
 					if($SubTotal > 0 || ($UnionLevel == 3 && $SubTotal < 0)) {
-						$rowExcel++;
-						$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
-						$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+						if($UnionLevel == 1 || $UnionLevel == 2) {
+							$rowExcel++;
+							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+
+							$rowExcel++;
+							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Diskon", PHPExcel_Cell_DataType::TYPE_STRING);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $DiscountTotal);
+
+							$rowExcel++;
+							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Total", PHPExcel_Cell_DataType::TYPE_STRING);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, ($SubTotal - $DiscountTotal));
+
+							$UnionDiscountTotal += $row['DiscountTotal'];
+							$KasirDiscountTotal += $row['DiscountTotal'];
+							$GrandDiscountTotal += $row['DiscountTotal'];
+						}
+						else if($UnionLevel == 4 || $UnionLevel == 5) {
+							$rowExcel++;
+							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+
+							$rowExcel++;
+							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Diskon", PHPExcel_Cell_DataType::TYPE_STRING);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $DiscountTotal);
+
+							$rowExcel++;
+							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Total", PHPExcel_Cell_DataType::TYPE_STRING);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, ($SubTotal - $DiscountTotal));
+						}
+						else {
+							$rowExcel++;
+							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+						}
 						$SubTotal = 0;
 					} 
 					if($UnionTotal > 0 || ($UnionLevel == 3 && $UnionTotal < 0)) {
 						$rowExcel++;
 						//TransactionName
 						$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $TransactionName);
-						$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $UnionTotal);
+						$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, ($UnionTotal - $UnionDiscountTotal));
 						$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->applyFromArray($transactionNameStyle);
 						$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":F".$rowExcel)->applyFromArray($unionTotalStyle);
 						$UnionTotal = 0;
+						$UnionDiscountTotal = 0;
 						$rowExcel++;
 					}
 					$rowExcel++;
 					//TransactionName
 					$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $Kasir);
-					$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $TotalKasir);			
+					$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, ($TotalKasir - $KasirDiscountTotal));
 					$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->applyFromArray($transactionNameStyle);
 					$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel."F".$rowExcel)->applyFromArray($totalKasirStyle);
 					$TotalKasir = 0;
+					$KasirDiscountTotal = 0;
 					$rowExcel++;
 				}
 				//cashier
@@ -205,19 +243,39 @@
 				if($UnionLevel != $row['UnionLevel']) {
 					if($row['UnionLevel'] > 1) {
 						if($SubTotal > 0) {
-							$rowExcel++;
-							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
-							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+							if($UnionLevel == 1 || $UnionLevel == 2) {
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Diskon", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $DiscountTotal);
+
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Total", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, ($SubTotal - $DiscountTotal));
+
+								$UnionDiscountTotal += $row['DiscountTotal'];
+								$KasirDiscountTotal += $row['DiscountTotal'];
+								$GrandDiscountTotal += $row['DiscountTotal'];
+							}
+							else {
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+							}
 							$SubTotal = 0;
 						}
 						if($UnionTotal > 0) {
 							//TransactionName
 							$rowExcel++;
 							$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $TransactionName);
-							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $UnionTotal);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, ($UnionTotal - $UnionDiscountTotal));
 							$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->applyFromArray($transactionNameStyle);
 							$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":F".$rowExcel)->applyFromArray($unionTotalStyle);
 							$UnionTotal = 0;
+							$UnionDiscountTotal = 0;
 							$rowExcel++;
 						}
 					}
@@ -229,9 +287,28 @@
 				if($TransactionNumber != $row['TransactionNumber']) {
 					if($UnionLevel == $row['UnionLevel']) {
 						if($SubTotal > 0) { 
-							$rowExcel++;
-							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
-							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+							if($UnionLevel == 1 || $UnionLevel == 2) {
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Diskon", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $DiscountTotal);
+
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Total", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, ($SubTotal - $DiscountTotal));
+
+								$UnionDiscountTotal += $row['DiscountTotal'];
+								$KasirDiscountTotal += $row['DiscountTotal'];
+								$GrandDiscountTotal += $row['DiscountTotal'];
+							}
+							else {
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+							}
 							$SubTotal = 0;
 						}
 					}
@@ -253,9 +330,42 @@
 				if($UnionLevel != $row['UnionLevel']) {
 					if($row['UnionLevel'] > 1) {
 						if($SubTotal > 0 || ($UnionLevel == 3 && $SubTotal < 0)) { 
-							$rowExcel++;
-							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
-							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+							if($UnionLevel == 1 || $UnionLevel == 2) {
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Diskon", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $DiscountTotal);
+
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Total", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, ($SubTotal - $DiscountTotal));
+
+								$UnionDiscountTotal += $row['DiscountTotal'];
+								$KasirDiscountTotal += $row['DiscountTotal'];
+								$GrandDiscountTotal += $row['DiscountTotal'];
+							}
+							else if($UnionLevel == 4 || $UnionLevel == 5) {
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Diskon", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $DiscountTotal);
+
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Total", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, ($SubTotal - $DiscountTotal));
+							}
+							else {
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+							}
+
 							if($UnionLevel > 3) {
 								$rowExcel++;
 								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "DP", PHPExcel_Cell_DataType::TYPE_STRING);
@@ -270,10 +380,11 @@
 							//TransactionName
 							$rowExcel++;
 							$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $TransactionName);
-							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $UnionTotal);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, ($UnionTotal - $UnionDiscountTotal));
 							$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->applyFromArray($transactionNameStyle);
 							$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":F".$rowExcel)->applyFromArray($unionTotalStyle);
 							$UnionTotal = 0;
+							$UnionDiscountTotal = 0;
 							$rowExcel++;
 						}
 					}
@@ -284,9 +395,41 @@
 				}
 				if($TransactionNumber != $row['TransactionNumber']) {
 					if($UnionLevel == $row['UnionLevel'] && $SubTotal > 0) {
-						$rowExcel++;
-						$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
-						$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+						if($UnionLevel == 1 || $UnionLevel == 2) {
+							$rowExcel++;
+							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+
+							$rowExcel++;
+							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Diskon", PHPExcel_Cell_DataType::TYPE_STRING);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $DiscountTotal);
+
+							$rowExcel++;
+							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Total", PHPExcel_Cell_DataType::TYPE_STRING);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, ($SubTotal - $DiscountTotal));
+
+							$UnionDiscountTotal += $row['DiscountTotal'];
+							$KasirDiscountTotal += $row['DiscountTotal'];
+							$GrandDiscountTotal += $row['DiscountTotal'];
+						}
+						else if($UnionLevel == 4 || $UnionLevel == 5) {
+							$rowExcel++;
+							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+
+							$rowExcel++;
+							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Diskon", PHPExcel_Cell_DataType::TYPE_STRING);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $DiscountTotal);
+
+							$rowExcel++;
+							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Total", PHPExcel_Cell_DataType::TYPE_STRING);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, ($SubTotal - $DiscountTotal));
+						}
+						else {
+							$rowExcel++;
+							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+						}
 						$UnionTotal += $Payment;
 						$TotalKasir += $Payment;
 						$GrandTotal += $Payment;
@@ -310,9 +453,42 @@
 				if($UnionLevel != $row['UnionLevel']) {
 					if($row['UnionLevel'] > 1) {
 						if($SubTotal > 0) { 
-							$rowExcel++;
-							$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
-							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+							if($UnionLevel == 1 || $UnionLevel == 2) {
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Diskon", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $DiscountTotal);
+
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Total", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, ($SubTotal - $DiscountTotal));
+
+								$UnionDiscountTotal += $row['DiscountTotal'];
+								$KasirDiscountTotal += $row['DiscountTotal'];
+								$GrandDiscountTotal += $row['DiscountTotal'];
+							}
+							else if($UnionLevel == 4 || $UnionLevel == 5) {
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Diskon", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $DiscountTotal);
+
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Total", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, ($SubTotal - $DiscountTotal));
+							}
+							else {
+								$rowExcel++;
+								$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+							}
+
 							$SubTotal = 0;
 							if($UnionLevel > 3 && $UnionLevel < 6) {
 								$UnionTotal += $Payment;
@@ -327,10 +503,11 @@
 							//TransactionName
 							$rowExcel++;
 							$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $TransactionName);
-							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $UnionTotal);
+							$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, ($UnionTotal - $UnionDiscountTotal));
 							$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->applyFromArray($transactionNameStyle);
 							$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":F".$rowExcel)->applyFromArray($unionTotalStyle);
 							$UnionTotal = 0;
+							$UnionDiscountTotal = 0;
 							$rowExcel++;
 						}
 					}
@@ -351,11 +528,44 @@
 			$Kasir = $row['UserName'];
 			$TransactionNumber = $row['TransactionNumber'];
 			$TransactionName = $row['TransactionName'];
+			$DiscountTotal = $row['DiscountTotal'];
 		}
 		if($SubTotal > 0 || ($UnionLevel == 3 && $SubTotal < 0)) {
-			$rowExcel++;
-			$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
-			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+			if($UnionLevel == 1 || $UnionLevel == 2) {
+				$rowExcel++;
+				$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+				$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+
+				$rowExcel++;
+				$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Diskon", PHPExcel_Cell_DataType::TYPE_STRING);
+				$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $DiscountTotal);
+
+				$rowExcel++;
+				$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Total", PHPExcel_Cell_DataType::TYPE_STRING);
+				$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, ($SubTotal - $DiscountTotal));
+
+				$UnionDiscountTotal += $row['DiscountTotal'];
+				$KasirDiscountTotal += $row['DiscountTotal'];
+				$GrandDiscountTotal += $row['DiscountTotal'];
+			}
+			else if($UnionLevel == 4 || $UnionLevel == 5) {
+				$rowExcel++;
+				$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+				$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+
+				$rowExcel++;
+				$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Diskon", PHPExcel_Cell_DataType::TYPE_STRING);
+				$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $DiscountTotal);
+
+				$rowExcel++;
+				$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Total", PHPExcel_Cell_DataType::TYPE_STRING);
+				$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, ($SubTotal - $DiscountTotal));
+			}
+			else {
+				$rowExcel++;
+				$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, "Sub Total", PHPExcel_Cell_DataType::TYPE_STRING);
+				$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $SubTotal);
+			}
 		}
 
 		if($Payment > 0) {
@@ -367,26 +577,26 @@
 			$GrandTotal += $Payment;
 		}
 
-		if($UnionTotal > 0 || ($UnionLevel == 3 && $UnionTotal < 0)) {
+		if($UnionTotal > 0 || $UnionTotal < 0 || ($UnionLevel == 3 && $UnionTotal < 0)) {
 			$rowExcel++;
 			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $TransactionName);
 			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $UnionTotal);
 			$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->applyFromArray($transactionNameStyle);
 			$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":F".$rowExcel)->applyFromArray($unionTotalStyle);
 		}
-		if($TotalKasir > 0) {
+		if($TotalKasir > 0 || $TotalKasir < 0) {
 			//TransactionName
 			$rowExcel++;
 			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $Kasir);
-			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $TotalKasir);
+			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, ($TotalKasir - $KasirDiscountTotal));
 			$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->applyFromArray($transactionNameStyle);
 			$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":F".$rowExcel)->applyFromArray($totalKasirStyle);
 		}
-		if($GrandTotal > 0) {
+		if($GrandTotal > 0 || $GrandTotal < 0) {
 			$rowExcel++;
 			$rowExcel++;
 			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Grand Total");
-			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $GrandTotal);
+			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, ($GrandTotal - $GrandDiscountTotal));
 			$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":F".$rowExcel)->applyFromArray($grandTotalStyle);
 		}
 		$objPHPExcel->getActiveSheet()->getStyle('A2:F'.$rowExcel)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);

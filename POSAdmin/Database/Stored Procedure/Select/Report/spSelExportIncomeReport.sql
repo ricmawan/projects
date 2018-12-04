@@ -42,6 +42,7 @@ SET State = 1;
         (SD.Quantity * SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) TotalBuy,
         SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) SalePrice,
         SD.Discount,
+		IFNULL(TS.Discount, 0) DiscountTotal,
         (SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) TotalSale,
 		(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (SD.Quantity * SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) Income
     FROM
@@ -79,6 +80,7 @@ SET State = 1;
         (BD.Quantity * BD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) TotalBuy,
         BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) SalePrice,
         BD.Discount,
+		IFNULL(TB.Discount, 0) DiscountTotal,
         (BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) TotalSale,
 		(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (BD.Quantity * BD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) Income
     FROM
@@ -116,6 +118,7 @@ SET State = 1;
 		(SRD.Quantity * SRD.BuyPrice) TotalBuy,
         SRD.SalePrice,
         0 Discount,
+		0 DiscountTotal,
         (SRD.Quantity * SRD.SalePrice) TotalSale,
         -((SRD.Quantity * SRD.SalePrice) - (SRD.Quantity * SRD.BuyPrice)) Income
     FROM

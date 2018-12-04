@@ -57,9 +57,9 @@
 		$objPHPExcel->getActiveSheet()->getStyle("A1:A2")->getFont()->setBold(true);
 		$objPHPExcel->getActiveSheet()->getStyle("A1")->getFont()->setSize(16);
 		//merge title
-		$objPHPExcel->getActiveSheet()->mergeCells("A1:G2");
+		$objPHPExcel->getActiveSheet()->mergeCells("A1:H2");
 		//center title
-		$objPHPExcel->getActiveSheet()->getStyle("A1:G2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$objPHPExcel->getActiveSheet()->getStyle("A1:H2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		
 		$objPHPExcel->setActiveSheetIndex(0)
 					->setCellValue('B3', "Per Tanggal:");
@@ -68,8 +68,8 @@
 		$objPHPExcel->getActiveSheet()->getStyle("B3:C3")->getFont()->setBold(true);
 
 		//bold title
-		$objPHPExcel->getActiveSheet()->getStyle("A5:G5")->getFont()->setBold(true);
-		$objPHPExcel->getActiveSheet()->getStyle("A5:G5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');
+		$objPHPExcel->getActiveSheet()->getStyle("A5:H5")->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle("A5:H5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');
 
 		
 
@@ -82,8 +82,9 @@
 		$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, "Tanggal");
 		$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, "Nama Pelanggan");
 		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Penjualan");
-		$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, "Pembayaran");
-		$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, "Piutang");
+		$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, "Diskon");
+		$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, "Pembayaran");
+		$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, "Piutang");
 		$rowExcel++;
 		
 		$sql = "CALL spSelExportCreditReport('".$txtFromDate."', '".$_SESSION['UserLogin']."')";
@@ -100,19 +101,20 @@
 			$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['TransactionDate']);
 			$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row['CustomerName']);
 			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, $row['TotalSale']);
-			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['TotalPayment']);
-			$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, $row['Credit']); 
+			$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['Discount']);
+			$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, $row['TotalPayment']);
+			$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, $row['Credit']); 
 			$RowNumber++;
 			$rowExcel++;
 			$GrandTotal += $row['Credit'];
 		}
 
-		$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":F".$rowExcel);
+		$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":H".$rowExcel);
 		$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Grand Total");
-		$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":G".$rowExcel)->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":H".$rowExcel)->getFont()->setBold(true);
 		$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-		$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, $GrandTotal);
-		$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":G".$rowExcel)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('ff0000');
+		$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, $GrandTotal);
+		$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":H".$rowExcel)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('ff0000');
 
 		$styleArray = array(
 	    'font'  => array(
@@ -120,18 +122,18 @@
 	        'size'  => 14,
 	    ));
 
-	    $objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":G".$rowExcel)->applyFromArray($styleArray);
+	    $objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":H".$rowExcel)->applyFromArray($styleArray);
 
 		mysqli_free_result($result);
 		mysqli_next_result($dbh);
 		
 		$objPHPExcel->getActiveSheet()->getStyle("B6:D".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
-		$objPHPExcel->getActiveSheet()->getStyle("E6:G".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+		$objPHPExcel->getActiveSheet()->getStyle("E6:H".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 		$rowExcel++;
 		
 		//set all width 
 		$fromCol='A';
-		$toCol= 'H';
+		$toCol= 'I';
 		for($j = $fromCol; $j !== $toCol; $j++) {
 			//$calculatedWidth = $objPHPExcel->getActiveSheet()->getColumnDimension($i)->getWidth();
 			$objPHPExcel->getActiveSheet()->getColumnDimension($j)->setAutoSize(true);
@@ -143,7 +145,7 @@
 			  )
 			)
 		);		
-		$objPHPExcel->getActiveSheet()->getStyle("A5:G".($rowExcel-1))->applyFromArray($styleArray);
+		$objPHPExcel->getActiveSheet()->getStyle("A5:H".($rowExcel-1))->applyFromArray($styleArray);
 		$objPHPExcel->getActiveSheet()->setSelectedCells('A1');
 
 		$title = "Laporan Piutang Per Tanggal " . $period;

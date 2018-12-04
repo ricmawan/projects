@@ -15,9 +15,10 @@
     $monthName = array("Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des");
     $transactionOrder = array("SALDO AWAL", "PENJUALAN", "RETUR PENJUALAN", "DP PENJUALAN", "PEMBAYARAN PIUTANG");
 
-    $connector = new DummyPrintConnector();
+    $connector = new WindowsPrintConnector("smb:".$SHARED_PRINTER_ADDRESS);
+    /*$connector = new DummyPrintConnector();
     $file =  "PrintInvoice.txt";  # nama file temporary yang akan dicetak
-    $handle = fopen($file, 'w');
+    $handle = fopen($file, 'w');*/
 
     $printer = new Printer($connector);
        
@@ -71,12 +72,12 @@
 
     $printer -> text("Kasir : " . str_pad($_SESSION['UserLogin'], 10, " ") . "\n");
     $printer -> setJustification(Printer::JUSTIFY_CENTER);
-    $data = $connector -> getData();
+    /*$data = $connector -> getData();
     fwrite($handle, $data);
-    fclose($handle);
+    fclose($handle);*/
 
     /* Cut the receipt and open the cash drawer */
-    //$printer -> cut();
+    $printer -> cut();
     $printer -> pulse();
     $printer -> close();
 

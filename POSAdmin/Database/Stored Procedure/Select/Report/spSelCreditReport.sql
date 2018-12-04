@@ -38,7 +38,7 @@ SET @query = CONCAT("SELECT
 					FROM
 						(
 							SELECT
-								SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0)) Credit
+								SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TS.Discount, 0)) Credit
 							FROM
 								transaction_sale TS
 								JOIN transaction_saledetails SD
@@ -72,12 +72,13 @@ SET @query = CONCAT("SELECT
 								MC.CustomerID,
 								MC.CustomerName,
 								TS.Payment,
-								TP.Amount
+								TP.Amount,
+								TS.Discount
 							HAVING
-								SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0)) > 0
+								SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TS.Discount, 0)) > 0
 							UNION ALL
 		                    SELECT
-								SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0))
+								SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TB.Discount, 0))
 							FROM
 								transaction_booking TB
 								JOIN transaction_bookingdetails BD
@@ -111,9 +112,10 @@ SET @query = CONCAT("SELECT
 								MC.CustomerID,
 								MC.CustomerName,
 								TB.Payment,
-								TP.Amount
+								TP.Amount,
+								TB.Discount
 							HAVING
-								SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0)) > 0
+								SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TB.Discount, 0)) > 0
 						) TS"
 					);
                        
@@ -131,8 +133,9 @@ SET @query = CONCAT("SELECT
 						MC.CustomerID,
 						MC.CustomerName,
 						SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1)  - SD.Discount)) TotalSale,
+						IFNULL(TS.Discount, 0) Discount,
 						IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0) TotalPayment,
-					    SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0)) Credit,
+					    SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TS.Discount, 0)) Credit,
                         'Penjualan' TransactionType,
                         TS.Payment,
 					    TP.Amount
@@ -169,9 +172,10 @@ SET @query = CONCAT("SELECT
 						MC.CustomerID,
 						MC.CustomerName,
 						TS.Payment,
-					    TP.Amount
+					    TP.Amount,
+						TS.Discount
 					HAVING
-						SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0)) > 0
+						SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TS.Discount, 0)) > 0
 					UNION ALL
                     SELECT
 						TB.BookingID,
@@ -180,9 +184,10 @@ SET @query = CONCAT("SELECT
 						TB.TransactionDate PlainTransactionDate,
 						MC.CustomerID,
 						MC.CustomerName,
-						SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) Total,
+						SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) TotalSale,
+						IFNULL(TB.Discount, 0) Discount,
 						IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) TotalPayment,
-						SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0)),
+						SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TS.Discount, 0)),
                         'Pemesanan' TransactionType,
 						TB.Payment,
 					    TP.Amount
@@ -219,9 +224,10 @@ SET @query = CONCAT("SELECT
 						MC.CustomerID,
 						MC.CustomerName,
 						TB.Payment,
-					    TP.Amount
+					    TP.Amount,
+						TB.Discount
 					HAVING
-						SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0)) > 0
+						SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TB.Discount, 0)) > 0
 					ORDER BY ", pOrder,
 					" LIMIT ", pLimit_s, ", ", pLimit_l);
 	                

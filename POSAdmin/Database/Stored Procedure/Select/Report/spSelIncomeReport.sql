@@ -40,7 +40,7 @@ SET @query = CONCAT("SELECT
 					FROM
 						(
 							SELECT
-								SUM((SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (SD.Quantity * SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) Total
+								SUM((SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (SD.Quantity * SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) - IFNULL(TS.Discount, 0) Total
 							FROM
 								transaction_sale TS
 								JOIN transaction_saledetails SD
@@ -59,10 +59,11 @@ SET @query = CONCAT("SELECT
 								AND CAST(TS.TransactionDate AS DATE) <= '",pToDate,"'
 								AND ", pWhere, "
 							GROUP BY
-								TS.SaleID
+								TS.SaleID,
+								TS.Discount
 							UNION ALL
                             SELECT
-								SUM((BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (BD.Quantity * BD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) Total
+								SUM((BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (BD.Quantity * BD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) - IFNULL(TB.Discount, 0) Total
 							FROM
 								transaction_booking TB
 								JOIN transaction_bookingdetails BD
@@ -81,7 +82,8 @@ SET @query = CONCAT("SELECT
 								AND CAST(TB.TransactionDate AS DATE) <= '",pToDate,"'
 								AND ", pWhere, "
 							GROUP BY
-								TB.BookingID
+								TB.BookingID,
+								TB.Discount
 							UNION ALL
 		                    SELECT
 								-SUM(((SRD.Quantity * SRD.SalePrice * IFNULL(MID.ConversionQuantity, 1)) - (SRD.Quantity * SRD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))))
@@ -121,7 +123,9 @@ SET @query = CONCAT("SELECT
                         TS.SaleNumber,
                         DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
                         MC.CustomerName,
-                        SUM((SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (SD.Quantity * SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) Total
+                        SUM((SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (SD.Quantity * SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) Profit,
+						IFNULL(TS.Discount, 0) Discount,
+						SUM((SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (SD.Quantity * SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) - IFNULL(TS.Discount, 0) TotalProfit
 					FROM
 						transaction_sale TS
                         JOIN transaction_saledetails SD
@@ -143,7 +147,8 @@ SET @query = CONCAT("SELECT
 						TS.SaleID,
                         TS.SaleNumber,
                         TS.TransactionDate,
-                        MC.CustomerName
+                        MC.CustomerName,
+						TS.Discount
                     UNION ALL
                     SELECT
 						TB.BookingID,
@@ -151,7 +156,9 @@ SET @query = CONCAT("SELECT
                         TB.BookingNumber,
                         DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
                         MC.CustomerName,
-                        SUM((BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (BD.Quantity * BD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) Total
+                        SUM((BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (BD.Quantity * BD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) Profit,
+						IFNULL(TB.Discount, 0) Discount,
+						SUM((BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (BD.Quantity * BD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) - IFNULL(TB.Discount, 0) TotalProfit
 					FROM
 						transaction_booking TB
                         JOIN transaction_bookingdetails BD
@@ -173,7 +180,8 @@ SET @query = CONCAT("SELECT
 						TB.BookingID,
                         TB.BookingNumber,
                         TB.TransactionDate,
-                        MC.CustomerName
+                        MC.CustomerName,
+						TB.Discount
                     UNION ALL
                     SELECT
 						TSR.SaleReturnID,
@@ -181,7 +189,9 @@ SET @query = CONCAT("SELECT
                         CONCAT('R', TS.SaleNumber),
                         DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') TransactionDate,
                         MC.CustomerName,
-                        -SUM(((SRD.Quantity * SRD.SalePrice * IFNULL(MID.ConversionQuantity, 1)) - (SRD.Quantity * SRD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)))) Total
+                        -SUM(((SRD.Quantity * SRD.SalePrice * IFNULL(MID.ConversionQuantity, 1)) - (SRD.Quantity * SRD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)))) Profit,
+						0 Discount,
+						-SUM(((SRD.Quantity * SRD.SalePrice * IFNULL(MID.ConversionQuantity, 1)) - (SRD.Quantity * SRD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)))) TotalProfit
 					FROM
 						transaction_salereturn TSR
 						JOIN transaction_sale TS

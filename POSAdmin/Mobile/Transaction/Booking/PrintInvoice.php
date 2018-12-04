@@ -39,9 +39,10 @@
 		if($PrintInvoice == "true") {
 		    /* Fill in your own connector here */
 		    //$connector = new WindowsPrintConnector("smb://192.168.43.249/printer1");
-		    $connector = new DummyPrintConnector();
+		    $connector = new WindowsPrintConnector("smb:".$SHARED_PRINTER_ADDRESS);
+		    /*$connector = new DummyPrintConnector();
 		    $file =  "PrintInvoice.txt";  # nama file temporary yang akan dicetak
-		    $handle = fopen($file, 'w');
+		    $handle = fopen($file, 'w');*/
 
 		    $TransactionDate = date($_POST['TransactionDate']);
 		    $Change = mysqli_real_escape_string($dbh, $_POST['Change']);
@@ -118,12 +119,12 @@
 		    $printer -> text("TANPA DISERTAI NOTA ASLI\n");
 		    $printer -> text("TERIMAKASIH ATAS KUNJUNGAN ANDA\n\n");
 
-		    $data = $connector -> getData();
+		    /*$data = $connector -> getData();
 		    fwrite($handle, $data);
-		    fclose($handle);
+		    fclose($handle);*/
 
 		    /* Cut the receipt and open the cash drawer */
-		    //$printer -> cut();
+		    $printer -> cut();
 		    $printer -> pulse();
 		    $printer -> close();
 		}

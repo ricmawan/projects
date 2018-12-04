@@ -625,6 +625,10 @@
 				$("#hdnSaleReturnID").val(0);
 				$("#hdnSaleID").val(0);
 				$("#txtTransactionDate").datepicker("setDate", new Date());
+				var transactionDate = new Date();
+				transactionDate = transactionDate.getFullYear() + "-" + ("0" + (transactionDate.getMonth() + 1)).slice(-2) + "-" + ("0" + transactionDate.getDate()).slice(-2);
+				today = transactionDate;
+				$("#hdnTransactionDate").val(transactionDate);
 				$("#txtSaleNumber").val("");
 				$("#lblTotal").html("0");
 				table2.clear().draw();

@@ -11,15 +11,16 @@
 		$RequestedPath = str_replace($file, "", $RequestedPath);
 		include "../../GetPermission.php";
 
-		$connector = new DummyPrintConnector();
+		$connector = new WindowsPrintConnector("smb:".$SHARED_PRINTER_ADDRESS);
+		//$connector = new DummyPrintConnector();
 	    
 	    $SaleDetailsID = $_POST['SaleDetailsID'];
 		$SaleID = mysqli_real_escape_string($dbh, $_POST['SaleID']);		
 		$tanggal = date('d') . "-" . date('m') . "-" . date('Y');
 		/*$tmpdir = sys_get_temp_dir();   # ambil direktori temporary untuk simpan file.
 		$file =  tempnam($tmpdir, 'ctk');  # nama file temporary yang akan dicetak*/
-		$file =  "PrintShipment.txt";  # nama file temporary yang akan dicetak
-		$handle = fopen($file, 'w');
+		//$file =  "PrintShipment.txt";  # nama file temporary yang akan dicetak
+		//$handle = fopen($file, 'w');
 		$Message = "Nota Berhasil Dicetak";
 		$MessageDetail = "";
 		$FailedFlag = 0;
@@ -115,9 +116,9 @@
 		//exec("lp -d epson ".$file);  # Lakukan cetak
 		//unlink($file);
 
-		$data = $connector -> getData();
+		/*$data = $connector -> getData();
 	    fwrite($handle, $data);
-	    fclose($handle);
+	    fclose($handle);*/
 	    $printer -> pulse();
 		$printer -> close();
 		echo returnstate($SaleID, $Message, $MessageDetail, $FailedFlag, $State);

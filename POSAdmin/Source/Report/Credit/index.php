@@ -46,6 +46,7 @@
 										<th>Tanggal</th>
 										<th>Nama Pelanggan</th>
 										<th>Penjualan</th>
+										<th>Diskon</th>
 										<th>Pembayaran</th>
 										<th>Piutang</th>
 										<th>SaleID</th>
@@ -222,6 +223,7 @@
 									{ "data": "TransactionDate", className: "dt-head-center" },
 									{ "data": "CustomerName", className: "dt-head-center" },
 									{ "data": "TotalSale", "orderable": false, className: "dt-head-center dt-body-right" },
+									{ "data": "Discount", "orderable": false, className: "dt-head-center dt-body-right" },
 									{ "data": "TotalPayment", "orderable": false, className: "dt-head-center dt-body-right" },
 									{ "data": "Credit", "orderable": false, className: "dt-head-center dt-body-right" },
 									{ "data": "SaleID", "visible": false },

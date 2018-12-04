@@ -119,8 +119,15 @@
 		$Total = 0;
 		$DetailsCounter = 0;
 		$GrandTotal = 0;
+		$DiscountTotal = 0;
+		$Discount = 0;
 		while($row = mysqli_fetch_array($result)) {
 			if($SaleNumber != $row['SaleNumber']) {
+				if($DetailsCounter == 1) {
+					$objPHPExcel->getActiveSheet()->setCellValue("J".($rowExcel - 1), $Discount + $DiscountTotal);
+					$objPHPExcel->getActiveSheet()->setCellValue("K".($rowExcel - 1), $Total - $DiscountTotal);
+					$GrandTotal -= $DiscountTotal;
+				}
 				$DetailsCounter = 0;
 				if ($MergeStart != $rowExcel && $RowNumber != 1) {
 					//merge header
@@ -132,12 +139,14 @@
 
 					$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Total");
 					$objPHPExcel->getActiveSheet()->getStyle("E".$rowExcel.":K".$rowExcel)->getFont()->setBold(true);
-					$objPHPExcel->getActiveSheet()->mergeCells(	"E".$rowExcel.":J".$rowExcel);
+					$objPHPExcel->getActiveSheet()->mergeCells(	"E".$rowExcel.":I".$rowExcel);
 					$objPHPExcel->getActiveSheet()->getStyle("E".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
-					$objPHPExcel->getActiveSheet()->setCellValue("K".$rowExcel, $Total);
+					$objPHPExcel->getActiveSheet()->setCellValue("J".$rowExcel, $DiscountTotal);
+					$objPHPExcel->getActiveSheet()->setCellValue("K".$rowExcel, $Total - $DiscountTotal);
 					$objPHPExcel->getActiveSheet()->getStyle("E".$rowExcel.":K".$rowExcel)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('fffa00');
 					$rowExcel++;
+					$GrandTotal -= $DiscountTotal;
 				}
 				$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $RowNumber);
 				$objPHPExcel->getActiveSheet()->setCellValueExplicit("B".$rowExcel, $row['SaleNumber'], PHPExcel_Cell_DataType::TYPE_STRING);
@@ -160,6 +169,8 @@
 			$GrandTotal += $row['SubTotal'];
 			$rowExcel++;
 			$SaleNumber = $row['SaleNumber'];
+			$DiscountTotal = $row['DiscountTotal'];
+			$Discount = $row['Discount'];
 		}
 		if($DetailsCounter > 1) {
 			//merge the header
@@ -172,12 +183,20 @@
 			//merge sub total
 			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Total");
 			$objPHPExcel->getActiveSheet()->getStyle("E".$rowExcel.":J".$rowExcel)->getFont()->setBold(true);
-			$objPHPExcel->getActiveSheet()->mergeCells(	"E".$rowExcel.":J".$rowExcel);
+			$objPHPExcel->getActiveSheet()->mergeCells(	"E".$rowExcel.":I".$rowExcel);
 			$objPHPExcel->getActiveSheet()->getStyle("E".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
-			$objPHPExcel->getActiveSheet()->setCellValue("K".$rowExcel, $Total);
+			$objPHPExcel->getActiveSheet()->setCellValue("J".$rowExcel, $DiscountTotal);
+			$objPHPExcel->getActiveSheet()->setCellValue("K".$rowExcel, $Total - $DiscountTotal);
 			$objPHPExcel->getActiveSheet()->getStyle("E".$rowExcel.":K".$rowExcel)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('fffa00');
 			$rowExcel++;
+			$GrandTotal -= $DiscountTotal;
+		}
+
+		else {
+			$objPHPExcel->getActiveSheet()->setCellValue("J".($rowExcel - 1), $Discount + $DiscountTotal);
+			$objPHPExcel->getActiveSheet()->setCellValue("K".($rowExcel - 1), $Total - $DiscountTotal);
+			$GrandTotal -= $DiscountTotal;
 		}
 
 		//merge grand total

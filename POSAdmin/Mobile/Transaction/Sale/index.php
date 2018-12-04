@@ -222,9 +222,9 @@
 								<th>Satuan</th>
 								<th>H Beli</th>
 								<th>H Ecer</th>
-								<th>Harga 1</th>
+								<th>H1</th>
 								<th>QTY1</th>
-								<th>Harga 2</th>
+								<th>H2</th>
 								<th>QTY2</th>
 								<th>Toko</th>
 								<th>Gudang</th>
@@ -1924,6 +1924,10 @@
 				$("#hdnSaleDetailsID").val(0);
 				$("#hdnItemID").val(0);
 				$("#txtTransactionDate").datepicker("setDate", new Date());
+				var transactionDate = new Date();
+				transactionDate = transactionDate.getFullYear() + "-" + ("0" + (transactionDate.getMonth() + 1)).slice(-2) + "-" + ("0" + transactionDate.getDate()).slice(-2);
+				today = transactionDate;
+				$("#hdnTransactionDate").val(transactionDate);
 				$("#txtSaleNumber").val("");
 				$("#hdnSaleNumber").val("");
 				$("#txtItemCode").val("");
@@ -2647,6 +2651,7 @@
 					onSelect: function(dateText, obj) {
 						transactionDate = obj.selectedYear + "-" + ("0" + (obj.selectedMonth + 1)).slice(-2) + "-" + ("0" + obj.selectedDay).slice(-2);
 						$("#hdnTransactionDate").val(transactionDate);
+						updateHeader();
 					}
 				}).datepicker("setDate", new Date());
 				

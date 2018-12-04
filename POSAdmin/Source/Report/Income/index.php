@@ -73,7 +73,9 @@
 										<th>No. Invoice</th>
 										<th>Tanggal</th>
 										<th>Nama Pelanggan</th>
-										<th>Total</th>
+										<th>Laba</th>
+										<th>Diskon</th>
+										<th>Total Laba</th>
 									</tr>
 								</thead>
 								<tfoot id="tfootTable">
@@ -266,7 +268,9 @@
 									{ "data": "SaleNumber", className: "dt-head-center" },
 									{ "data": "TransactionDate", className: "dt-head-center" },
 									{ "data": "CustomerName", className: "dt-head-center" },
-									{ "data": "Total", "orderable": false, className: "dt-head-center dt-body-right" },
+									{ "data": "Profit", "orderable": false, className: "dt-head-center dt-body-right" },
+									{ "data": "Discount", "orderable": false, className: "dt-head-center dt-body-right" },
+									{ "data": "TotalProfit", "orderable": false, className: "dt-head-center dt-body-right" },
 									{ "data": "SaleID", "visible": false },
 									{ "data": "TransactionType", "visible": false }
 								],

@@ -1,1184 +1,5 @@
 /*=============================================================
 Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for insert sale return
-Created Date: 23 February 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spInsSaleReturn;
-
-DELIMITER $$
-CREATE PROCEDURE spInsSaleReturn (
-	pID 				BIGINT, 
-	pSaleID 			BIGINT,
-	pTransactionDate 	DATETIME,
-	pSaleReturnData 	TEXT,
-	pIsEdit				INT,
-    pCurrentUser		VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE Message VARCHAR(255);
-	DECLARE MessageDetail VARCHAR(255);
-	DECLARE FailedFlag INT;
-	DECLARE State INT;
-	DECLARE PassValidate INT;
-	
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		ROLLBACK;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spInsSaleReturn', pCurrentUser);
-		SELECT
-			pID AS 'ID',
-			'Terjadi kesalahan sistem!' AS 'Message',
-			@full_error AS 'MessageDetail',
-			1 AS 'FailedFlag',
-			State AS 'State' ;
-	END;
-	
-	SET PassValidate = 1;
-	
-	START TRANSACTION;
-	
-SET State = 1;
-		IF(pIsEdit = 0)	THEN /*Tambah baru*/
-			INSERT INTO transaction_salereturn
-			(
-				SaleID,
-				TransactionDate,
-				CreatedDate,
-				CreatedBy
-			)
-			VALUES (
-				pSaleID,
-				pTransactionDate,
-				NOW(),
-				pCurrentUser
-			);
-			
-SET State = 2;			               
-			SELECT
-				LAST_INSERT_ID()
-			INTO 
-				pID;
-			
-		ELSE
-			
-SET State = 3;
-			UPDATE
-				transaction_salereturn
-			SET
-				TransactionDate = pTransactionDate,
-				ModifiedBy = pCurrentUser
-			WHERE
-				SaleReturnID = pID;
-	
-		END IF;
-	
-SET State = 4;
-
-		DELETE 
-		FROM 
-			transaction_salereturndetails
-		WHERE
-			SaleReturnID = pID;
-					
-SET State = 5;
-		IF(pSaleReturnData <> "" ) THEN
-			SET @query = CONCAT("INSERT INTO transaction_salereturndetails
-								(
-									SaleReturnID,
-									ItemID,
-									BranchID,
-									Quantity,
-									BuyPrice,
-									SalePrice,
-									SaleDetailsID,
-									CreatedDate,
-									CreatedBy
-								)
-								VALUES", REPLACE(REPLACE(pSaleReturnData, ', UserLogin)', CONCAT(', "', pCurrentUser, '")')), '(0,', CONCAT('(', pID, ','))
-								);
-								
-			PREPARE stmt FROM @query;
-			EXECUTE stmt;
-			DEALLOCATE PREPARE stmt;
-			
-		END IF;
-
-SET State = 6;
-
-		IF(pIsEdit = 0) THEN
-			SELECT
-				pID AS 'ID',
-				'Retur Berhasil Ditambahkan' AS 'Message',
-				'' AS 'MessageDetail',
-				0 AS 'FailedFlag',
-				State AS 'State';
-		ELSE
-	
-SET State = 7;
-
-			SELECT
-				pID AS 'ID',
-				'Retur Berhasil Diubah' AS 'Message',
-				'' AS 'MessageDetail',
-				0 AS 'FailedFlag',
-				State AS 'State';
-		END IF;
-    COMMIT;
-END;
-$$
-DELIMITER ;
-DROP PROCEDURE IF EXISTS spInsStockAdjust;
-
-DELIMITER $$
-CREATE PROCEDURE spInsStockAdjust (
-	pID 						BIGINT,
-	pBranchID					INT,
-	pTransactionDate 			DATETIME,
-	pStockAdjustDetailsID		BIGINT,
-    pItemID						BIGINT,
-    pItemDetailsID				BIGINT,
-	pQuantity					DOUBLE,
-	pAdjustedQuantity			DOUBLE,
-    pUserID						BIGINT,
-    pCurrentUser				VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE Message VARCHAR(255);
-	DECLARE MessageDetail VARCHAR(255);
-	DECLARE FailedFlag INT;
-	DECLARE State INT;
-	DECLARE RowCount INT;
-
-	DECLARE PassValidate INT;
-	
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		ROLLBACK;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spInsStockAdjust', pCurrentUser);
-		SELECT
-			pID AS 'ID',
-            pStockAdjustDetailsID AS 'StockAdjustDetailsID',
-			'Terjadi kesalahan sistem!' AS 'Message',
-			@full_error AS 'MessageDetail',
-			1 AS 'FailedFlag',
-			State AS 'State' ;
-	END;
-	
-	SET PassValidate = 1;
-	
-	START TRANSACTION;
-	
-SET State = 1;
-
-		IF(pID = 0)	THEN /*Tambah baru*/
-			INSERT INTO transaction_stockadjust
-			(
-				TransactionDate,
-				CreatedDate,
-				CreatedBy
-			)
-			VALUES 
-			(
-				pTransactionDate,
-				NOW(),
-				pCurrentUser
-			);
-		
-SET State = 3;	               
-			SELECT
-				LAST_INSERT_ID()
-			INTO 
-				pID;
-				
-		ELSE
-		
-SET State = 4;
-			UPDATE
-				transaction_stockadjust
-			SET
-				TransactionDate = pTransactionDate,
-				ModifiedBy = pCurrentUser
-			WHERE
-				StockAdjustID = pID;
-				
-		END IF;
-		
-SET State = 5;
-		
-		IF(pStockAdjustDetailsID = 0) THEN
-			INSERT INTO transaction_stockadjustdetails
-			(
-				StockAdjustID,
-				BranchID,
-				ItemID,
-                ItemDetailsID,
-				Quantity,
-				AdjustedQuantity,
-				CreatedDate,
-				CreatedBy
-			)
-			VALUES
-			(
-				pID,
-				pBranchID,
-				pItemID,
-                pItemDetailsID,
-				pQuantity,
-				pAdjustedQuantity,
-				NOW(),
-				pCurrentUser
-			);
-			
-SET State = 6;
-			
-			SELECT
-				LAST_INSERT_ID()
-			INTO 
-				pStockAdjustDetailsID;
-		
-		ELSE
-				
-SET State = 7;
-			
-			UPDATE 
-				transaction_stockadjustdetails
-			SET
-				ItemID = pItemID,
-				ItemDetailsID = pItemDetailsID,
-				BranchID = pBranchID,
-				Quantity = pQuantity,
-				AdjustedQuantity = pAdjustedQuantity,
-				ModifiedBy = pCurrentUser
-			WHERE
-				StockAdjustDetailsID = pStockAdjustDetailsID;
-			
-		END IF;
-		
-SET State = 8;
-
-		SELECT
-			pID AS 'ID',
-			pStockAdjustDetailsID AS 'StockAdjustDetailsID',
-			'Transaksi Berhasil Disimpan' AS 'Message',
-			'' AS 'MessageDetail',
-			0 AS 'FailedFlag',
-			State AS 'State';
-                
-	COMMIT;
-END;
-$$
-DELIMITER ;
-DROP PROCEDURE IF EXISTS spInsStockMutation;
-
-DELIMITER $$
-CREATE PROCEDURE spInsStockMutation (
-	pID 						BIGINT,
-	pSourceID					INT,
-	pDestinationID				INT,
-	pTransactionDate 			DATETIME,
-	pStockMutationDetailsID		BIGINT,
-    pItemID						BIGINT,
-    pItemDetailsID				BIGINT,
-	pQuantity					DOUBLE,
-    pUserID						BIGINT,
-    pCurrentUser				VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE Message VARCHAR(255);
-	DECLARE MessageDetail VARCHAR(255);
-	DECLARE FailedFlag INT;
-	DECLARE State INT;
-	DECLARE RowCount INT;
-
-	DECLARE PassValidate INT;
-	
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		ROLLBACK;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spInsStockMutation', pCurrentUser);
-		SELECT
-			pID AS 'ID',
-            pStockMutationDetailsID AS 'StockMutationDetailsID',
-			'Terjadi kesalahan sistem!' AS 'Message',
-			@full_error AS 'MessageDetail',
-			1 AS 'FailedFlag',
-			State AS 'State' ;
-	END;
-	
-	SET PassValidate = 1;
-	
-	START TRANSACTION;
-	
-SET State = 1;
-
-		IF(pID = 0)	THEN /*Tambah baru*/
-			INSERT INTO transaction_stockmutation
-			(
-				TransactionDate,
-				CreatedDate,
-				CreatedBy
-			)
-			VALUES 
-			(
-				pTransactionDate,
-				NOW(),
-				pCurrentUser
-			);
-		
-SET State = 3;	               
-			SELECT
-				LAST_INSERT_ID()
-			INTO 
-				pID;
-				
-		ELSE
-		
-SET State = 4;
-			UPDATE
-				transaction_stockmutation
-			SET
-				TransactionDate = pTransactionDate,
-				ModifiedBy = pCurrentUser
-			WHERE
-				StockMutationID = pID;
-				
-		END IF;
-		
-SET State = 5;
-		
-		IF(pStockMutationDetailsID = 0) THEN
-			INSERT INTO transaction_stockmutationdetails
-			(
-				StockMutationID,
-				SourceID,
-				DestinationID,
-				ItemID,
-                ItemDetailsID,
-				Quantity,
-				CreatedDate,
-				CreatedBy
-			)
-			VALUES
-			(
-				pID,
-				pSourceID,
-				pDestinationID,
-				pItemID,
-                pItemDetailsID,
-				pQuantity,
-				NOW(),
-				pCurrentUser
-			);
-			
-SET State = 6;
-			
-			SELECT
-				LAST_INSERT_ID()
-			INTO 
-				pStockMutationDetailsID;
-		
-		ELSE
-				
-SET State = 7;
-			
-			UPDATE 
-				transaction_stockmutationdetails
-			SET
-				ItemID = pItemID,
-                ItemDetailsID = pItemDetailsID,
-				SourceID = pSourceID,
-				DestinationID = pDestinationID,
-				Quantity = pQuantity,
-				ModifiedBy = pCurrentUser
-			WHERE
-				StockMutationDetailsID = pStockMutationDetailsID;
-			
-		END IF;
-		
-SET State = 8;
-
-		SELECT
-			pID AS 'ID',
-			pStockMutationDetailsID AS 'StockMutationDetailsID',
-			'Transaksi Berhasil Disimpan' AS 'Message',
-			'' AS 'MessageDetail',
-			0 AS 'FailedFlag',
-			State AS 'State';
-                
-	COMMIT;
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for insert the supplier
-Created Date: 12 November 2017
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spInsSupplier;
-
-DELIMITER $$
-CREATE PROCEDURE spInsSupplier (
-	pID 				BIGINT, 
-    pSupplierCode		VARCHAR(100),
-	pSupplierName 		VARCHAR(255),
-    pTelephone			VARCHAR(100),
-	pAddress			TEXT,
-    pCity				VARCHAR(100),
-	pRemarks			TEXT,
-    pIsEdit				INT,
-    pCurrentUser		VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE Message VARCHAR(255);
-	DECLARE MessageDetail VARCHAR(255);
-	DECLARE FailedFlag INT;
-	DECLARE State INT;
-	DECLARE RowCount INT;
-
-	DECLARE PassValidate INT;
-	
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		ROLLBACK;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spInsSupplier', pCurrentUser);
-		SELECT
-			pID AS 'ID',
-			'Terjadi kesalahan sistem!' AS 'Message',
-			@full_error AS 'MessageDetail',
-			1 AS 'FailedFlag',
-			State AS 'State' ;
-	END;
-	
-	SET PassValidate = 1;
-	
-	START TRANSACTION;
-	
-SET State = 1;
-
-		SELECT 
-			0
-		INTO
-			PassValidate
-		FROM 
-			master_supplier
-		WHERE
-			TRIM(SupplierCode) = TRIM(pSupplierCode)
-			AND SupplierID <> pID
-		LIMIT 1;
-			
-		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
-SET State = 2;
-
-			SELECT
-				pID AS 'ID',
-				CONCAT('Kode Supplier ', pSupplierCode, ' sudah ada') AS 'Message',
-				'' AS 'MessageDetail',
-				1 AS 'FailedFlag',
-				State AS 'State' ;
-		
-			LEAVE StoredProcedure;
-			
-		END IF;
-        
-SET State = 1;
-
-		SELECT 
-			0
-		INTO
-			PassValidate
-		FROM 
-			master_supplier
-		WHERE
-			(TRIM(SupplierName) = TRIM(pSupplierName)
-            AND TRIM(Address) = TRIM(pAddress))
-			AND SupplierID <> pID
-		LIMIT 1;
-			
-		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
-SET State = 3;
-
-			SELECT
-				pID AS 'ID',
-				CONCAT('Nama Supplier ', pSupplierName, ' dengan alamat ', pAddress, ' sudah ada') AS 'Message',
-				'' AS 'MessageDetail',
-				1 AS 'FailedFlag',
-				State AS 'State' ;
-		
-			LEAVE StoredProcedure;
-			
-		ELSE /*Data yang diinput valid*/
-SET State = 4;
-
-			IF(pIsEdit = 0)	THEN /*Tambah baru*/
-				INSERT INTO master_supplier
-				(
-                    SupplierCode,
-                    SupplierName,
-					Telephone,
-					Address,
-					City,
-					Remarks,
-					CreatedDate,
-					CreatedBy
-				)
-				VALUES (
-					pSupplierCode,
-					pSupplierName,
-					pTelephone,
-					pAddress,
-					pCity,
-					pRemarks,
-					NOW(),
-					pCurrentUser
-				);
-			
-SET State = 5;			               
-
-				SELECT
-					LAST_INSERT_ID()
-				INTO 
-					pID;
-
-SET State = 6;
-
-				SELECT
-					pID AS 'ID',
-					'Supplier Berhasil Ditambahkan' AS 'Message',
-					'' AS 'MessageDetail',
-					0 AS 'FailedFlag',
-					State AS 'State';
-			ELSE
-SET State = 7;
-
-				UPDATE
-					master_supplier
-				SET
-					SupplierCode = pSupplierCode,
-                    SupplierName = pSupplierName,
-					Telephone = pTelephone,
-					Address = pAddress,
-					City = pCity,
-					Remarks = pRemarks,
-					ModifiedBy = pCurrentUser
-				WHERE
-					SupplierID = pID;
-
-SET State = 8;
-
-				SELECT
-					pID AS 'ID',
-					'Supplier Berhasil Diubah' AS 'Message',
-					'' AS 'MessageDetail',
-					0 AS 'FailedFlag',
-					State AS 'State';
-			END IF;
-		END IF;
-	COMMIT;
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for insert the supplier
-Created Date: 12 November 2017
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spInsUnit;
-
-DELIMITER $$
-CREATE PROCEDURE spInsUnit (
-	pID 			INT, 
-	pUnitName 		VARCHAR(255),
-	pIsEdit			INT,
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE Message VARCHAR(255);
-	DECLARE MessageDetail VARCHAR(255);
-	DECLARE FailedFlag INT;
-	DECLARE State INT;
-	DECLARE RowCount INT;
-
-	DECLARE PassValidate INT;
-	
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		ROLLBACK;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spInsUnit', pCurrentUser);
-        SELECT
-			pID AS 'ID',
-			'Terjadi kesalahan sistem!' AS 'Message',
-			@full_error AS 'MessageDetail',
-			1 AS 'FailedFlag',
-			State AS 'State' ;
-	END;
-	
-	SET PassValidate = 1;
-	
-	START TRANSACTION;
-	
-SET State = 1;
-
-		SELECT 
-			0
-		INTO
-			PassValidate
-		FROM 
-			master_unit
-		WHERE
-			TRIM(UnitName) = TRIM(pUnitName)
-			AND UnitID <> pID
-		LIMIT 1;
-        
-			
-		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
-SET State = 2;
-			SELECT
-				pID AS 'ID',
-				CONCAT('Nama satuan ', pUnitName, ' sudah ada') AS 'Message',
-				'' AS 'MessageDetail',
-				1 AS 'FailedFlag',
-				State AS 'State' ;
-		
-			LEAVE StoredProcedure;
-			
-		ELSE /*Data yang diinput valid*/
-SET State = 3;
-			IF(pIsEdit = 0)	THEN /*Tambah baru*/
-				INSERT INTO master_unit
-				(
-					UnitName,
-					CreatedDate,
-					CreatedBy
-				)
-				VALUES (
-					pUnitName,
-					NOW(),
-					pCurrentUser
-				);
-			
-SET State = 4;			               
-				SELECT
-					pID AS 'ID',
-					'Satuan Berhasil Ditambahkan' AS 'Message',
-					'' AS 'MessageDetail',
-					0 AS 'FailedFlag',
-					State AS 'State';
-			ELSE
-SET State = 5;
-				UPDATE
-					master_unit
-				SET
-					UnitName= pUnitName,
-					ModifiedBy = pCurrentUser
-				WHERE
-					UnitID = pID;
-
-SET State = 6;
-				SELECT
-					pID AS 'ID',
-					'Satuan Berhasil Diubah' AS 'Message',
-					'' AS 'MessageDetail',
-					0 AS 'FailedFlag',
-					State AS 'State';
-			END IF;
-		END IF;
-	COMMIT;
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for insert the user
-Created Date: 12 November 2017
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spInsUser;
-
-DELIMITER $$
-CREATE PROCEDURE spInsUser (
-	pID 			BIGINT, 
-	pUserName 		VARCHAR(255),
-	pUserTypeID		SMALLINT,
-	pUserLogin 		VARCHAR(100),
-	pPassword 		VARCHAR(255),
-	pIsActive		BIT,
-	pRoleValues		TEXT,
-	pIsEdit			INT,
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE Message VARCHAR(255);
-	DECLARE MessageDetail VARCHAR(255);
-	DECLARE FailedFlag INT;
-	DECLARE State INT;
-	DECLARE PassValidate INT;
-	
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		ROLLBACK;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spInsUser', pCurrentUser);
-		SELECT
-			pID AS 'ID',
-			'Terjadi kesalahan sistem!' AS 'Message',
-			@full_error AS 'MessageDetail',
-			1 AS 'FailedFlag',
-			State AS 'State' ;
-	END;
-	
-	SET PassValidate = 1;
-	
-	START TRANSACTION;
-	
-SET State = 1;
-
-		SELECT 
-			0
-		INTO
-			PassValidate
-		FROM 
-			master_user 
-		WHERE
-			UserLogin = pUserLogin
-			AND UserID <> pID
-		LIMIT 1;
-			
-SET State = 2;
-
-		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
-			SELECT
-				pID AS 'ID',
-				CONCAT('Username ', pUserLogin, ' sudah dipakai') AS 'Message',
-				'' AS 'MessageDetail',
-				1 AS 'FailedFlag',
-				State AS 'State' ;
-		
-			LEAVE StoredProcedure;
-			
-		ELSE /*Data yang diinput valid*/
-		
-SET State = 3;
-
-			IF(pIsEdit = 0)	THEN /*Tambah baru*/
-				INSERT INTO master_user
-				(
-					UserName,
-					UserLogin,
-					UserTypeID,
-					UserPassword,
-					IsActive,
-					CreatedDate,
-					CreatedBy
-				)
-				VALUES (
-					pUserName,
-					pUserLogin,
-					pUserTypeID,
-					pPassword,
-					pIsActive,
-					NOW(),
-					pCurrentUser
-				);
-			
-SET State = 4;			               
-				SELECT
-					LAST_INSERT_ID()
-				INTO 
-					pID;
-					
-			ELSE
-			
-SET State = 5;
-				UPDATE
-					master_user
-				SET
-					UserName = pUserName,
-					UserLogin = pUserLogin,
-					UserTypeID = pUserTypeID,
-					UserPassword = pPassword,
-					IsActive = pIsActive,
-					ModifiedBy = pCurrentUser
-				WHERE
-					UserID = pID;
-		
-			END IF;
-	
-SET State = 6;
-
-				DELETE 
-				FROM 
-					master_role
-				WHERE
-					UserID = pID;
-					
-SET State = 7;
-			IF(pRoleValues <> "" ) THEN
-				SET @query = CONCAT("INSERT INTO master_role
-									(
-										UserID,
-										MenuID,
-										EditFlag,
-										DeleteFlag
-									)
-									VALUES", REPLACE(pRoleValues, '(0,', CONCAT('(', pID, ',')));
-									
-				PREPARE stmt FROM @query;
-				EXECUTE stmt;
-				DEALLOCATE PREPARE stmt;
-				
-			END IF;
-
-		END IF;
-
-SET State = 8;
-
-	IF(pIsEdit = 0) THEN
-		SELECT
-			pID AS 'ID',
-			'User Berhasil Ditambahkan' AS 'Message',
-			'' AS 'MessageDetail',
-			0 AS 'FailedFlag',
-			State AS 'State';
-	ELSE
-	
-SET State = 9;
-
-		SELECT
-			pID AS 'ID',
-			'User Berhasil Diubah' AS 'Message',
-			'' AS 'MessageDetail',
-			0 AS 'FailedFlag',
-			State AS 'State';
-	END IF;
-	
-    COMMIT;
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select category
-Created Date: 30 Desember 2017
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelCategory;
-
-DELIMITER $$
-CREATE PROCEDURE spSelCategory (
-	pWhere 			TEXT,
-	pOrder			TEXT,
-	pLimit_s		BIGINT,
-    pLimit_l		INT,
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelUser', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-SET @query = CONCAT("SELECT
-						COUNT(1) AS nRows
-					FROM
-						master_category MC
-					WHERE ", pWhere);
-						
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-SET State = 2;
-
-SET @query = CONCAT("SELECT
-						MC.CategoryID,
-						MC.CategoryCode,
-						MC.CategoryName
-					FROM
-						master_category MC
-					WHERE ", pWhere, 
-					" ORDER BY ", pOrder,
-					" LIMIT ", pLimit_s, ", ", pLimit_l);
-					
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select item details by itemCode
-Created Date: 9 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelCategoryByName;
-
-DELIMITER $$
-CREATE PROCEDURE spSelCategoryByName (
-	pCategoryName	VARCHAR(100),
-	pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelCategoryByName', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-	SELECT
-		MC.CategoryID,
-		MC.CategoryName
-	FROM
-		master_category MC
-	WHERE
-		TRIM(MC.CategoryName) = TRIM(pCategoryName);
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select Customer
-Created Date: 3 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelCustomer;
-
-DELIMITER $$
-CREATE PROCEDURE spSelCustomer (
-	pWhere 			TEXT,
-	pOrder			TEXT,
-	pLimit_s		BIGINT,
-    pLimit_l		INT,
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelCustomer', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-SET @query = CONCAT("SELECT
-						COUNT(1) AS nRows
-					FROM
-						master_customer MC
-					WHERE ", pWhere);
-						
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-SET State = 2;
-
-SET @query = CONCAT("SELECT
-						MC.CustomerID,
-                        MC.CustomerCode,
-                        MC.CustomerName,
-                        MC.Telephone,
-                        MC.Address,
-                        MC.City,
-                        MC.Remarks
-					FROM
-						master_customer MC
-					WHERE ", pWhere, 
-					" ORDER BY ", pOrder,
-					" LIMIT ", pLimit_s, ", ", pLimit_l);
-					
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select branch from dropdown list
-Created Date: 11 january 2018
-Modified Date: 
-===============================================================*/
-
-
-DROP PROCEDURE IF EXISTS spSelDDLBranch;
-DELIMITER $$
-CREATE PROCEDURE spSelDDLBranch (
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelDDLBranch', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-	SELECT 
-		MB.BranchID,
-		MB.BranchCode,
-		MB.BranchName
-	FROM 
-		master_branch MB
-	ORDER BY 
-		MB.BranchID;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select category from dropdown list
-Created Date: 3 january 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelDDLCategory;
-
-DELIMITER $$
-CREATE PROCEDURE spSelDDLCategory (
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelDDLCategory', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-	SELECT 
-		MC.CategoryID,
-		MC.CategoryCode,
-		MC.CategoryName
-	FROM 
-		master_category MC
-	ORDER BY 
-		MC.CategoryCode;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select customer from dropdown list
-Created Date: 9 january 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelDDLCustomer;
-
-DELIMITER $$
-CREATE PROCEDURE spSelDDLCustomer (
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelDDLCustomer', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-	SELECT 
-		MC.CustomerID,
-		MC.CustomerCode,
-		MC.CustomerName
-	FROM 
-		master_customer MC
-	ORDER BY 
-		MC.CustomerCode;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
 Description: Stored Procedure for select supplier from dropdown list
 Created Date: 9 january 2018
 Modified Date: 
@@ -2370,6 +1191,2211 @@ Created Date: 3 January 2018
 Modified Date: 
 ===============================================================*/
 
+DROP PROCEDURE IF EXISTS spSelDailyReportPrint;
+
+DELIMITER $$
+CREATE PROCEDURE spSelDailyReportPrint (
+	pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelDailyReportPrint', pCurrentUser);
+	END;
+	
+SET State = 1;
+	SELECT
+		1 UnionLevel,
+		IFNULL(SFB.Amount, 0) Amount
+	FROM
+		(
+			SELECT
+				SUM(FB.FirstBalanceAmount) Amount
+			FROM
+				transaction_firstbalance FB
+				JOIN master_user MUS
+					ON MUS.UserID = FB.UserID
+			WHERE
+				CAST(FB.TransactionDate AS DATE) = CAST(NOW() AS DATE)
+				AND FB.CreatedBy = pCurrentUser
+		)SFB
+	UNION ALL
+	SELECT
+		2 UnionLevel,
+		IFNULL(S.Amount, 0) Amount
+	FROM
+		(
+			SELECT
+				SUM(STS.Amount) Amount
+			FROM
+				(
+					SELECT
+						SUM(TSD.Quantity * (TSD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - TSD.Discount)) - TS.Discount Amount
+					FROM
+						transaction_sale TS
+						LEFT JOIN transaction_saledetails TSD
+							ON TS.SaleID = TSD.SaleID
+						LEFT JOIN master_item MI
+							ON MI.ItemID = TSD.ItemID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = TSD.ItemDetailsID
+					WHERE
+						DATE_FORMAT(TS.TransactionDate, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
+						AND TS.PaymentTypeID = 1
+						AND TS.CreatedBy = pCurrentUser
+					GROUP BY
+						TS.SaleID,
+						TS.Discount
+				)STS
+		)S
+	UNION ALL
+    SELECT
+		3 UnionLevel,
+		IFNULL(B.Amount, 0) Amount
+	FROM
+		(
+			SELECT
+				SUM(STB.Amount) Amount
+			FROM
+				(
+					SELECT
+						SUM(TBD.Quantity * (TBD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - TBD.Discount)) - TB.Discount Amount
+					FROM
+						transaction_booking TB
+						LEFT JOIN transaction_bookingdetails TBD
+							ON TB.BookingID = TBD.BookingID
+						LEFT JOIN master_item MI
+							ON MI.ItemID = TBD.ItemID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = TBD.ItemDetailsID
+					WHERE
+						DATE_FORMAT(TB.TransactionDate, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
+						AND TB.PaymentTypeID = 1
+						AND TB.CreatedBy = pCurrentUser
+					GROUP BY
+						TB.BookingID,
+						TB.Discount
+				)STB
+		)B
+	UNION ALL
+    SELECT
+		4 UnionLevel,
+		-IFNULL(SR.Amount, 0)
+	FROM
+		(
+			SELECT
+				SUM(TSRD.Quantity * TSRD.SalePrice) Amount
+			FROM
+				transaction_sale TS
+				JOIN transaction_salereturn TSR
+					ON TS.SaleID = TSR.SaleID
+				LEFT JOIN transaction_salereturndetails TSRD
+					ON TSR.SaleReturnID = TSRD.SaleReturnID
+				LEFT JOIN master_item MI
+					ON MI.ItemID = TSRD.ItemID
+			WHERE
+				DATE_FORMAT(TSR.TransactionDate, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
+                AND TS.CreatedBy = pCurrentUser
+		)SR
+	UNION ALL
+    SELECT
+		5 UnionLevel,
+		IFNULL(DP.Amount, 0) Amount
+	FROM
+		(
+			SELECT
+				SUM(T.Amount) Amount
+			FROM
+				(
+					SELECT
+						SUM(TS.Payment) Amount
+					FROM
+						transaction_sale TS
+					WHERE
+						DATE_FORMAT(TS.TransactionDate, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
+						AND TS.PaymentTypeID = 2
+                        AND TS.CreatedBy = pCurrentUser
+					UNION ALL
+					SELECT
+						SUM(TB.Payment) Amount
+					FROM
+						transaction_booking TB
+					WHERE
+						DATE_FORMAT(TB.TransactionDate, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
+						AND TB.PaymentTypeID = 2
+                        AND TB.CreatedBy = pCurrentUser
+				)T
+		)DP
+	UNION ALL
+    SELECT
+		6 UnionLevel,
+		IFNULL(PD.Amount, 0) Amount
+	FROM
+		(
+			SELECT
+				SUM(PD.Amount) Amount
+			FROM
+				transaction_paymentdetails PD
+			WHERE
+				DATE_FORMAT(PD.PaymentDate, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
+				AND PD.TransactionType IN('S', 'B')
+                AND PD.CreatedBy = pCurrentUser
+		)PD;
+
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select sale transaction
+Created Date: 3 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelDailyReport;
+
+DELIMITER $$
+CREATE PROCEDURE spSelDailyReport (
+	pUserID				BIGINT,
+	pTransactionDate	DATE,
+	pCurrentUser		VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelDailyReport', pCurrentUser);
+	END;
+	
+SET State = 1;
+	SELECT
+		0 UnionLevel,
+        MUS.UserName,
+        'Saldo Awal' TransactionName,
+		'' TransactionNumber,
+        '' CustomerName,
+        '' ItemName,
+        '' ItemCode,
+        0 Quantity,
+        '' UnitName,
+        0  SalePrice,
+        0 Discount,
+		0 DiscountTotal,
+        FB.FirstBalanceAmount SubTotal,
+        0 Payment
+	FROM
+		transaction_firstbalance FB
+		JOIN master_user MUS
+			ON MUS.UserID = FB.UserID
+	WHERE
+		CAST(FB.TransactionDate AS DATE) = pTransactionDate
+        AND CASE
+			WHEN pUserID = 0
+			THEN MUS.UserID
+			ELSE pUserID
+		END = MUS.UserID
+	UNION ALL
+	SELECT
+		1 UnionLevel,
+		MUS.UserName,
+        'Penjualan Tunai' TransactionName,
+		TS.SaleNumber,
+        MC.CustomerName,
+		MI.ItemName,
+        MI.ItemCode,
+        SD.Quantity,
+        MU.UnitName,
+        SD.SalePrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
+        SD.Discount,
+		IFNULL(TS.Discount, 0) DiscountTotal,
+        SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount) SubTotal,
+        0 Payment
+    FROM
+		transaction_sale TS
+        JOIN master_user MUS
+			ON TS.CreatedBy = MUS.UserLogin
+        JOIN transaction_saledetails SD
+			ON TS.SaleID = SD.SaleID
+		JOIN master_customer MC
+			ON MC.CustomerID = TS.CustomerID
+		JOIN master_item MI
+			ON MI.ItemID = SD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SD.ItemDetailsID
+		LEFT JOIN master_unit MU
+			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
+	WHERE
+		CASE
+			WHEN pUserID = 0
+			THEN MUS.UserID
+			ELSE pUserID
+		END = MUS.UserID
+		AND CAST(TS.TransactionDate AS DATE) = pTransactionDate
+        AND IFNULL(TS.PaymentTypeID, 0) = 1
+	UNION ALL
+    SELECT
+		2 UnionLevel,
+		MUS.UserName,
+        'Pemesanan Tunai' TransactionName,
+		TB.BookingNumber,
+        MC.CustomerName,
+		MI.ItemName,
+        MI.ItemCode,
+        BD.Quantity,
+        MU.UnitName,
+        BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
+        BD.Discount,
+		IFNULL(TB.Discount, 0) DiscountTotal,
+        BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount) SubTotal,
+        0 Payment
+    FROM
+		transaction_booking TB
+		JOIN master_user MUS
+			ON TB.CreatedBy = MUS.UserLogin
+        JOIN transaction_bookingdetails BD
+			ON TB.BookingID = BD.BookingID
+		JOIN master_customer MC
+			ON MC.CustomerID = TB.CustomerID
+		JOIN master_item MI
+			ON MI.ItemID = BD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = BD.ItemDetailsID
+		LEFT JOIN master_unit MU
+			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
+	WHERE
+		CASE
+			WHEN pUserID = 0
+			THEN MUS.UserID
+			ELSE pUserID
+		END = MUS.UserID
+		AND CAST(TB.TransactionDate AS DATE) = pTransactionDate
+        AND IFNULL(TB.PaymentTypeID, 0) = 1
+	UNION ALL
+    SELECT
+		3 UnionLevel,
+		MUS.UserName,
+        'Retur Penjualan',
+		CONCAT('R', TS.SaleNumber) SaleNumber,
+        MC.CustomerName,
+		MI.ItemName,
+        MI.ItemCode,
+        SRD.Quantity,
+        MU.UnitName,
+        SRD.SalePrice,
+        0 Discount,
+		0 DiscountTotal,
+        -(SRD.Quantity * SRD.SalePrice) SubTotal,
+        0 Payment
+    FROM
+		transaction_salereturn TSR
+        JOIN master_user MUS
+			ON TSR.CreatedBy = MUS.UserLogin
+		JOIN transaction_sale TS
+			ON TSR.SaleID = TS.SaleID
+        JOIN transaction_salereturndetails SRD
+			ON TSR.SaleReturnID = SRD.SaleReturnID
+		JOIN master_customer MC
+			ON MC.CustomerID = TS.CustomerID
+		JOIN master_item MI
+			ON MI.ItemID = SRD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SRD.ItemDetailsID
+		LEFT JOIN master_unit MU
+			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
+	WHERE
+		CASE
+			WHEN pUserID = 0
+			THEN MUS.UserID
+			ELSE pUserID
+		END = MUS.UserID
+		AND CAST(TSR.TransactionDate AS DATE) = pTransactionDate
+	UNION ALL
+    SELECT
+		4 UnionLevel,
+		MUS.UserName,
+        'DP Penjualan' TransactionName,
+		TS.SaleNumber,
+        MC.CustomerName,
+		MI.ItemName,
+        MI.ItemCode,
+        SD.Quantity,
+        MU.UnitName,
+        SD.SalePrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
+        SD.Discount,
+		TS.Discount DiscountTotal,
+        SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount) SubTotal,
+        IFNULL(TS.Payment, 0) Payment
+    FROM
+		transaction_sale TS
+        JOIN master_user MUS
+			ON TS.CreatedBy = MUS.UserLogin
+        JOIN transaction_saledetails SD
+			ON TS.SaleID = SD.SaleID
+		JOIN master_customer MC
+			ON MC.CustomerID = TS.CustomerID
+		JOIN master_item MI
+			ON MI.ItemID = SD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SD.ItemDetailsID
+		LEFT JOIN master_unit MU
+			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
+	WHERE
+		CASE
+			WHEN pUserID = 0
+			THEN MUS.UserID
+			ELSE pUserID
+		END = MUS.UserID
+		AND CAST(TS.TransactionDate AS DATE) = pTransactionDate
+        AND IFNULL(TS.PaymentTypeID, 0) = 2
+        AND IFNULL(TS.Payment, 0) > 0
+	UNION ALL
+    SELECT
+		5 UnionLevel,
+		MUS.UserName,
+        'DP Pemesanan' TransactionName,
+		TB.BookingNumber,
+        MC.CustomerName,
+		MI.ItemName,
+        MI.ItemCode,
+        BD.Quantity,
+        MU.UnitName,
+        BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
+        BD.Discount,
+		TB.Discount DiscountTotal,
+        BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount) SubTotal,
+        IFNULL(TB.Payment, 0) Payment
+    FROM
+		transaction_booking TB
+		JOIN master_user MUS
+			ON TB.CreatedBy = MUS.UserLogin
+        JOIN transaction_bookingdetails BD
+			ON TB.BookingID = BD.BookingID
+		JOIN master_customer MC
+			ON MC.CustomerID = TB.CustomerID
+		JOIN master_item MI
+			ON MI.ItemID = BD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = BD.ItemDetailsID
+		LEFT JOIN master_unit MU
+			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
+	WHERE
+		CASE
+			WHEN pUserID = 0
+			THEN MUS.UserID
+			ELSE pUserID
+		END = MUS.UserID
+		AND CAST(TB.TransactionDate AS DATE) = pTransactionDate
+		AND IFNULL(TB.PaymentTypeID, 0) = 2
+        AND IFNULL(TB.Payment, 0) > 0
+	UNION ALL
+    SELECT
+		6 UnionLevel,
+		MUS.UserName,
+        'Pembayaran Piutang' TransactionName,
+		IFNULL(TS.SaleNumber, TB.BookingNumber) TransactionNumber,
+        MC.CustomerName,
+		'',
+        '',
+        0,
+        '',
+        0,
+        0,
+		0 DiscountTotal,
+        PD.Amount,
+        0 Payment
+	FROM
+		transaction_paymentdetails PD
+        JOIN master_user MUS
+			ON MUS.UserLogin = PD.CreatedBy
+		LEFT JOIN transaction_sale TS
+			ON TS.SaleID = PD.TransactionID
+            AND PD.TransactionType = 'S'
+		LEFT JOIN transaction_booking TB
+			ON TB.BookingID = PD.TransactionID
+            AND PD.TransactionType = 'B'
+		JOIN master_customer MC
+			ON MC.CustomerID = IFNULL(TS.CustomerID, TB.CustomerID)
+	WHERE
+		CASE
+			WHEN pUserID = 0
+			THEN MUS.UserID
+			ELSE pUserID
+		END = MUS.UserID
+		AND PD.TransactionType IN ('S', 'B')
+        AND CAST(PD.PaymentDate AS DATE) = pTransactionDate
+	ORDER BY
+		UserName,
+        UnionLevel;
+
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select sale transaction
+Created Date: 3 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelExportIncomeReport;
+
+DELIMITER $$
+CREATE PROCEDURE spSelExportIncomeReport (
+	pBranchID		INT,
+	pFromDate		DATE,
+	pToDate			DATE,
+	pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelExportIncomeReport', pCurrentUser);
+	END;
+	
+SET State = 1;
+	SELECT
+		TS.SaleID,
+		TS.SaleNumber,
+        DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
+        MC.CustomerName,
+		MI.ItemID,
+        MI.ItemName,
+        MI.ItemCode,
+        SD.Quantity,
+        MU.UnitName,
+        SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1) BuyPrice,
+        (SD.Quantity * SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) TotalBuy,
+        SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) SalePrice,
+        SD.Discount,
+		IFNULL(TS.Discount, 0) DiscountTotal,
+        (SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) TotalSale,
+		(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (SD.Quantity * SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) Income
+    FROM
+		transaction_sale TS
+        JOIN transaction_saledetails SD
+			ON TS.SaleID = SD.SaleID
+		JOIN master_customer MC
+			ON MC.CustomerID = TS.CustomerID
+		JOIN master_item MI
+			ON MI.ItemID = SD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SD.ItemDetailsID
+		LEFT JOIN master_unit MU
+			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
+	WHERE
+		CASE
+			WHEN pBranchID = 0
+			THEN SD.BranchID
+			ELSE pBranchID
+		END = SD.BranchID
+		AND CAST(TS.TransactionDate AS DATE) >= pFromDate
+		AND CAST(TS.TransactionDate AS DATE) <= pToDate
+	UNION ALL
+    SELECT
+		TB.BookingID SaleID,
+		TB.BookingNumber SaleNumber,
+        DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
+        MC.CustomerName,
+		MI.ItemID,
+        MI.ItemName,
+        MI.ItemCode,
+        BD.Quantity,
+        MU.UnitName,
+        BD.BuyPrice * IFNULL(MID.ConversionQuantity, 1) BuyPrice,
+        (BD.Quantity * BD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) TotalBuy,
+        BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) SalePrice,
+        BD.Discount,
+		IFNULL(TB.Discount, 0) DiscountTotal,
+        (BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) TotalSale,
+		(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (BD.Quantity * BD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) Income
+    FROM
+		transaction_booking TB
+        JOIN transaction_bookingdetails BD
+			ON TB.BookingID = BD.BookingID
+		JOIN master_customer MC
+			ON MC.CustomerID = TB.CustomerID
+		JOIN master_item MI
+			ON MI.ItemID = BD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = BD.ItemDetailsID
+		LEFT JOIN master_unit MU
+			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
+	WHERE
+		CASE
+			WHEN pBranchID = 0
+			THEN BD.BranchID
+			ELSE pBranchID
+		END = BD.BranchID
+		AND CAST(TB.TransactionDate AS DATE) >= pFromDate
+		AND CAST(TB.TransactionDate AS DATE) <= pToDate
+	UNION ALL
+    SELECT
+		TSR.SaleReturnID,
+		CONCAT('R', TS.SaleNumber) SaleNumber,
+        DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') TransactionDate,
+        MC.CustomerName,
+		MI.ItemID,
+        MI.ItemName,
+        MI.ItemCode,
+        SRD.Quantity,
+        MU.UnitName,
+        SRD.BuyPrice,
+		(SRD.Quantity * SRD.BuyPrice) TotalBuy,
+        SRD.SalePrice,
+        0 Discount,
+		0 DiscountTotal,
+        (SRD.Quantity * SRD.SalePrice) TotalSale,
+        -((SRD.Quantity * SRD.SalePrice) - (SRD.Quantity * SRD.BuyPrice)) Income
+    FROM
+		transaction_salereturn TSR
+		JOIN transaction_sale TS
+			ON TSR.SaleID = TS.SaleID
+        JOIN transaction_salereturndetails SRD
+			ON TSR.SaleReturnID = SRD.SaleReturnID
+		JOIN master_customer MC
+			ON MC.CustomerID = TS.CustomerID
+		JOIN master_item MI
+			ON MI.ItemID = SRD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SRD.ItemDetailsID
+		LEFT JOIN master_unit MU
+			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
+	WHERE
+		CASE
+			WHEN pBranchID = 0
+			THEN SRD.BranchID
+			ELSE pBranchID
+		END = SRD.BranchID
+		AND CAST(TSR.TransactionDate AS DATE) >= pFromDate
+		AND CAST(TSR.TransactionDate AS DATE) <= pToDate
+	ORDER BY
+		SaleNumber,
+        SaleID;
+
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select sale transaction
+Created Date: 3 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelIncomeReport;
+
+DELIMITER $$
+CREATE PROCEDURE spSelIncomeReport(
+	pBranchID		INT,
+	pFromDate		DATE,
+	pToDate			DATE,
+	pWhere 			TEXT,
+    pWhere2			TEXT,
+	pOrder			TEXT,
+	pLimit_s		BIGINT,
+    pLimit_l		INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelIncomeReport', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+SET @query = CONCAT("SELECT
+						COUNT(1) AS nRows,
+						SUM(Total) GrandTotal
+					FROM
+						(
+							SELECT
+								SUM((SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (SD.Quantity * SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) - IFNULL(TS.Discount, 0) Total
+							FROM
+								transaction_sale TS
+								JOIN transaction_saledetails SD
+									ON SD.SaleID = TS.SaleID
+								JOIN master_customer MC
+									ON MC.CustomerID = TS.CustomerID
+								LEFT JOIN master_itemdetails MID
+									ON MID.ItemDetailsID = SD.ItemDetailsID
+							WHERE 
+								CASE
+									WHEN ",pBranchID," = 0
+									THEN SD.BranchID
+									ELSE ",pBranchID,"
+								END = SD.BranchID
+								AND CAST(TS.TransactionDate AS DATE) >= '",pFromDate,"'
+								AND CAST(TS.TransactionDate AS DATE) <= '",pToDate,"'
+								AND ", pWhere, "
+							GROUP BY
+								TS.SaleID,
+								TS.Discount
+							UNION ALL
+                            SELECT
+								SUM((BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (BD.Quantity * BD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) - IFNULL(TB.Discount, 0) Total
+							FROM
+								transaction_booking TB
+								JOIN transaction_bookingdetails BD
+									ON TB.BookingID = BD.BookingID
+								JOIN master_customer MC
+									ON MC.CustomerID = TB.CustomerID
+								LEFT JOIN master_itemdetails MID
+									ON MID.ItemDetailsID = BD.ItemDetailsID
+							WHERE 
+								CASE
+									WHEN ",pBranchID," = 0
+									THEN BD.BranchID
+									ELSE ",pBranchID,"
+								END = BD.BranchID
+								AND CAST(TB.TransactionDate AS DATE) >= '",pFromDate,"'
+								AND CAST(TB.TransactionDate AS DATE) <= '",pToDate,"'
+								AND ", pWhere, "
+							GROUP BY
+								TB.BookingID,
+								TB.Discount
+							UNION ALL
+		                    SELECT
+								-SUM(((SRD.Quantity * SRD.SalePrice * IFNULL(MID.ConversionQuantity, 1)) - (SRD.Quantity * SRD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))))
+							FROM
+								transaction_salereturn TSR
+								JOIN transaction_sale TS
+									ON TS.SaleID = TSR.SaleID
+		                        JOIN transaction_salereturndetails SRD
+									ON SRD.SaleReturnID = TSR.SaleReturnID
+								JOIN master_customer MC
+									ON MC.CustomerID = TS.CustomerID
+								LEFT JOIN master_itemdetails MID
+									ON MID.ItemDetailsID = SRD.ItemDetailsID
+							WHERE 
+								CASE
+									WHEN ",pBranchID," = 0
+									THEN SRD.BranchID
+									ELSE ",pBranchID,"
+								END = SRD.BranchID
+								AND CAST(TSR.TransactionDate AS DATE) >= '",pFromDate,"'
+								AND CAST(TSR.TransactionDate AS DATE) <= '",pToDate,"'
+								AND ", pWhere2, "
+		                    GROUP BY
+								TSR.SaleReturnID
+						) TS"
+					);
+                       
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+SET State = 2;
+
+SET @query = CONCAT("SELECT
+						TS.SaleID,
+						'Penjualan' TransactionType,
+                        TS.SaleNumber,
+                        DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
+                        MC.CustomerName,
+                        SUM((SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (SD.Quantity * SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) Profit,
+						IFNULL(TS.Discount, 0) Discount,
+						SUM((SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (SD.Quantity * SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) - IFNULL(TS.Discount, 0) TotalProfit
+					FROM
+						transaction_sale TS
+                        JOIN transaction_saledetails SD
+							ON SD.SaleID = TS.SaleID
+						JOIN master_customer MC
+							ON MC.CustomerID = TS.CustomerID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = SD.ItemDetailsID
+					WHERE 
+						CASE
+							WHEN ",pBranchID," = 0
+							THEN SD.BranchID
+							ELSE ",pBranchID,"
+						END = SD.BranchID
+						AND CAST(TS.TransactionDate AS DATE) >= '",pFromDate,"'
+						AND CAST(TS.TransactionDate AS DATE) <= '",pToDate,"'
+						AND ", pWhere, "
+                    GROUP BY
+						TS.SaleID,
+                        TS.SaleNumber,
+                        TS.TransactionDate,
+                        MC.CustomerName,
+						TS.Discount
+                    UNION ALL
+                    SELECT
+						TB.BookingID,
+						'Pemesanan' TransactionType,
+                        TB.BookingNumber,
+                        DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
+                        MC.CustomerName,
+                        SUM((BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (BD.Quantity * BD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) Profit,
+						IFNULL(TB.Discount, 0) Discount,
+						SUM((BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (BD.Quantity * BD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) - IFNULL(TB.Discount, 0) TotalProfit
+					FROM
+						transaction_booking TB
+                        JOIN transaction_bookingdetails BD
+							ON TB.BookingID = BD.BookingID
+						JOIN master_customer MC
+							ON MC.CustomerID = TB.CustomerID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = BD.ItemDetailsID
+					WHERE 
+						CASE
+							WHEN ",pBranchID," = 0
+							THEN BD.BranchID
+							ELSE ",pBranchID,"
+						END = BD.BranchID
+						AND CAST(TB.TransactionDate AS DATE) >= '",pFromDate,"'
+						AND CAST(TB.TransactionDate AS DATE) <= '",pToDate,"'
+						AND ", pWhere, "
+                    GROUP BY
+						TB.BookingID,
+                        TB.BookingNumber,
+                        TB.TransactionDate,
+                        MC.CustomerName,
+						TB.Discount
+                    UNION ALL
+                    SELECT
+						TSR.SaleReturnID,
+						'Retur' TransactionType,
+                        CONCAT('R', TS.SaleNumber),
+                        DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') TransactionDate,
+                        MC.CustomerName,
+                        -SUM(((SRD.Quantity * SRD.SalePrice * IFNULL(MID.ConversionQuantity, 1)) - (SRD.Quantity * SRD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)))) Profit,
+						0 Discount,
+						-SUM(((SRD.Quantity * SRD.SalePrice * IFNULL(MID.ConversionQuantity, 1)) - (SRD.Quantity * SRD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)))) TotalProfit
+					FROM
+						transaction_salereturn TSR
+						JOIN transaction_sale TS
+							ON TS.SaleID = TSR.SaleID
+                        JOIN transaction_salereturndetails SRD
+							ON SRD.SaleReturnID = TSR.SaleReturnID
+						JOIN master_customer MC
+							ON MC.CustomerID = TS.CustomerID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = SRD.ItemDetailsID
+					WHERE 
+						CASE
+							WHEN ",pBranchID," = 0
+							THEN SRD.BranchID
+							ELSE ",pBranchID,"
+						END = SRD.BranchID
+						AND CAST(TSR.TransactionDate AS DATE) >= '",pFromDate,"'
+						AND CAST(TSR.TransactionDate AS DATE) <= '",pToDate,"'
+						AND ", pWhere2, "
+                    GROUP BY
+						TSR.SaleReturnID,
+                        TS.SaleNumber,
+                        TSR.TransactionDate,
+                        MC.CustomerName
+					ORDER BY ", pOrder,
+					" LIMIT ", pLimit_s, ", ", pLimit_l);
+	                
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select sale transaction
+Created Date: 3 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelExportSaleReport;
+
+DELIMITER $$
+CREATE PROCEDURE spSelExportSaleReport (
+	pBranchID		INT,
+	pFromDate		DATE,
+	pToDate			DATE,
+	pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelExportSaleReport', pCurrentUser);
+	END;
+	
+SET State = 1;
+	SELECT
+		TS.SaleID,
+		TS.SaleNumber,
+        DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
+        MC.CustomerName,
+		MI.ItemID,
+        MI.ItemName,
+        MI.ItemCode,
+        SD.Quantity,
+        MU.UnitName,
+        SD.SalePrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
+        SD.Discount,
+		IFNULL(TS.Discount, 0) DiscountTotal,
+        SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount) SubTotal
+    FROM
+		transaction_sale TS
+        JOIN transaction_saledetails SD
+			ON TS.SaleID = SD.SaleID
+		JOIN master_customer MC
+			ON MC.CustomerID = TS.CustomerID
+		JOIN master_item MI
+			ON MI.ItemID = SD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SD.ItemDetailsID
+		LEFT JOIN master_unit MU
+			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
+	WHERE
+		CASE
+			WHEN pBranchID = 0
+			THEN SD.BranchID
+			ELSE pBranchID
+		END = SD.BranchID
+		AND CAST(TS.TransactionDate AS DATE) >= pFromDate
+		AND CAST(TS.TransactionDate AS DATE) <= pToDate
+	UNION ALL
+    SELECT
+		TB.BookingID,
+		TB.BookingNumber,
+        DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
+        MC.CustomerName,
+		MI.ItemID,
+        MI.ItemName,
+        MI.ItemCode,
+        BD.Quantity,
+        MU.UnitName,
+        BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
+        BD.Discount,
+		IFNULL(TB.Discount, 0) DiscountTotal,
+        BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount) SubTotal
+    FROM
+		transaction_booking TB
+        JOIN transaction_bookingdetails BD
+			ON TB.BookingID = BD.BookingID
+		JOIN master_customer MC
+			ON MC.CustomerID = TB.CustomerID
+		JOIN master_item MI
+			ON MI.ItemID = BD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = BD.ItemDetailsID
+		LEFT JOIN master_unit MU
+			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
+	WHERE
+		CASE
+			WHEN pBranchID = 0
+			THEN BD.BranchID
+			ELSE pBranchID
+		END = BD.BranchID
+		AND CAST(TB.TransactionDate AS DATE) >= pFromDate
+		AND CAST(TB.TransactionDate AS DATE) <= pToDate
+	UNION ALL
+    SELECT
+		TSR.SaleReturnID,
+		CONCAT('R', TS.SaleNumber) SaleNumber,
+        DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') TransactionDate,
+        MC.CustomerName,
+		MI.ItemID,
+        MI.ItemName,
+        MI.ItemCode,
+        SRD.Quantity,
+        MU.UnitName,
+        SRD.SalePrice,
+        0 Discount,
+		0 DiscountTotal,
+        -(SRD.Quantity * SRD.SalePrice) SubTotal
+    FROM
+		transaction_salereturn TSR
+		JOIN transaction_sale TS
+			ON TSR.SaleID = TS.SaleID
+        JOIN transaction_salereturndetails SRD
+			ON TSR.SaleReturnID = SRD.SaleReturnID
+		JOIN master_customer MC
+			ON MC.CustomerID = TS.CustomerID
+		JOIN master_item MI
+			ON MI.ItemID = SRD.ItemID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SRD.ItemDetailsID
+		LEFT JOIN master_unit MU
+			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
+	WHERE
+		CASE
+			WHEN pBranchID = 0
+			THEN SRD.BranchID
+			ELSE pBranchID
+		END = SRD.BranchID
+		AND CAST(TSR.TransactionDate AS DATE) >= pFromDate
+		AND CAST(TSR.TransactionDate AS DATE) <= pToDate
+	ORDER BY
+		SaleNumber,
+        SaleID;
+
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select sale transaction
+Created Date: 3 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelExportCustomerPurchaseReport;
+
+DELIMITER $$
+CREATE PROCEDURE spSelExportCustomerPurchaseReport (
+	pCustomerID		INT,
+	pFromDate		DATE,
+	pToDate			DATE,
+	pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelExportCustomerPurchaseReport', pCurrentUser);
+	END;
+	
+SET State = 1;
+	SELECT
+		TS.SaleID,
+		TS.SaleNumber,
+		DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
+		SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - IFNULL(TS.Discount, 0) Total
+	FROM
+		transaction_sale TS
+		JOIN transaction_saledetails SD
+			ON SD.SaleID = TS.SaleID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SD.ItemDetailsID
+	WHERE 
+		TS.CustomerID = pCustomerID
+		AND CAST(TS.TransactionDate AS DATE) >= pFromDate
+		AND CAST(TS.TransactionDate AS DATE) <= pToDate
+	GROUP BY
+		TS.SaleID,
+		TS.SaleNumber,
+		TS.TransactionDate,
+		TS.Discount
+	UNION ALL
+    SELECT
+		TB.BookingID,
+		TB.BookingNumber,
+		DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
+		SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - IFNULL(TB.Discount, 0) Total
+	FROM
+		transaction_booking TB
+		JOIN transaction_bookingdetails BD
+			ON TB.BookingID = BD.BookingID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = BD.ItemDetailsID
+	WHERE 
+		TB.CustomerID = pCustomerID
+		AND CAST(TB.TransactionDate AS DATE) >= pFromDate
+		AND CAST(TB.TransactionDate AS DATE) <= pToDate
+	GROUP BY
+		TB.BookingID,
+		TB.BookingNumber,
+		TB.TransactionDate,
+		TB.Discount
+	UNION ALL
+	SELECT
+		TSR.SaleReturnID,
+		CONCAT('R', TS.SaleNumber),
+		DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') TransactionDate,
+		-SUM(SRD.Quantity * SRD.SalePrice) Total
+	FROM
+		transaction_salereturn TSR
+		JOIN transaction_sale TS
+			ON TS.SaleID = TSR.SaleID
+		JOIN transaction_salereturndetails SRD
+			ON SRD.SaleReturnID = TSR.SaleReturnID
+	WHERE 
+		TS.CustomerID = pCustomerID
+		AND CAST(TSR.TransactionDate AS DATE) >= pFromDate
+		AND CAST(TSR.TransactionDate AS DATE) <= pToDate
+	GROUP BY
+		TSR.SaleReturnID,
+		TS.SaleNumber,
+		TSR.TransactionDate
+	ORDER BY
+		SaleNumber,
+        SaleID;
+
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select sale transaction
+Created Date: 3 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelCustomerPurchaseReport;
+
+DELIMITER $$
+CREATE PROCEDURE spSelCustomerPurchaseReport (
+	pCustomerID		INT,
+	pFromDate		DATE,
+	pToDate			DATE,
+	pWhere 			TEXT,
+    pWhere2			TEXT,
+	pOrder			TEXT,
+	pLimit_s		BIGINT,
+    pLimit_l		INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelSaleReport', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+SET @query = CONCAT("SELECT
+						COUNT(1) AS nRows,
+						SUM(Total) GrandTotal
+					FROM
+						(
+							SELECT
+								SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - IFNULL(TS.Discount, 0) Total
+							FROM
+								transaction_sale TS
+								JOIN transaction_saledetails SD
+									ON SD.SaleID = TS.SaleID
+								LEFT JOIN master_itemdetails MID
+									ON MID.ItemDetailsID = SD.ItemDetailsID
+							WHERE 
+								TS.CustomerID = ", pCustomerID ,"
+								AND CAST(TS.TransactionDate AS DATE) >= '", pFromDate, "'
+								AND CAST(TS.TransactionDate AS DATE) <= '", pToDate, "'
+								AND ", pWhere, "
+							GROUP BY
+								TS.SaleID,
+								TS.Discount
+							UNION ALL
+                            SELECT
+								SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - IFNULL(TB.Discount, 0) Total
+							FROM
+								transaction_booking TB
+								JOIN transaction_bookingdetails BD
+									ON BD.BookingID = TB.BookingID
+								LEFT JOIN master_itemdetails MID
+									ON MID.ItemDetailsID = BD.ItemDetailsID
+							WHERE 
+								TB.CustomerID = ", pCustomerID ,"
+								AND CAST(TB.TransactionDate AS DATE) >= '", pFromDate, "'
+								AND CAST(TB.TransactionDate AS DATE) <= '", pToDate, "'
+								AND ", pWhere, "
+							GROUP BY
+								TB.BookingID,
+								TB.Discount
+							UNION ALL
+		                    SELECT
+								-SUM(SRD.Quantity * SRD.SalePrice) Total
+							FROM
+								transaction_salereturn TSR
+								JOIN transaction_sale TS
+									ON TS.SaleID = TSR.SaleID
+		                        JOIN transaction_salereturndetails SRD
+									ON SRD.SaleReturnID = TSR.SaleReturnID
+							WHERE 
+								TS.CustomerID = ", pCustomerID ,"
+								AND CAST(TSR.TransactionDate AS DATE) >= '", pFromDate, "'
+								AND CAST(TSR.TransactionDate AS DATE) <= '", pToDate, "'
+								AND ", pWhere2, "
+		                    GROUP BY
+								TSR.SaleReturnID
+						) TS"
+					);
+                       
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+SET State = 2;
+
+SET @query = CONCAT("SELECT
+						TS.SaleID,
+						'Penjualan' TransactionType,
+                        TS.SaleNumber,
+                        DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
+                        SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - IFNULL(TS.Discount, 0) Total
+					FROM
+						transaction_sale TS
+                        JOIN transaction_saledetails SD
+							ON SD.SaleID = TS.SaleID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = SD.ItemDetailsID
+					WHERE 
+						TS.CustomerID = ", pCustomerID ,"
+						AND CAST(TS.TransactionDate AS DATE) >= '",pFromDate,"'
+						AND CAST(TS.TransactionDate AS DATE) <= '",pToDate,"'
+						AND ", pWhere, "
+                    GROUP BY
+						TS.SaleID,
+                        TS.SaleNumber,
+                        TS.TransactionDate,
+						TS.Discount
+                    UNION ALL
+                    SELECT
+						TB.BookingID,
+						'Pemesanan' TransactionType,
+                        TB.BookingNumber,
+                        DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
+                        SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - IFNULL(TB.Discount, 0) Total
+					FROM
+						transaction_booking TB
+                        JOIN transaction_bookingdetails BD
+							ON BD.BookingID = TB.BookingID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = BD.ItemDetailsID
+					WHERE 
+						TB.CustomerID = ", pCustomerID ,"
+						AND CAST(TB.TransactionDate AS DATE) >= '",pFromDate,"'
+						AND CAST(TB.TransactionDate AS DATE) <= '",pToDate,"'
+						AND ", pWhere, "
+                    GROUP BY
+						TB.BookingID,
+                        TB.BookingNumber,
+                        TB.TransactionDate,
+						TB.Discount
+                    UNION ALL
+                    SELECT
+						TSR.SaleReturnID,
+						'Retur' TransactionType,
+                        CONCAT('R', TS.SaleNumber),
+                        DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') TransactionDate,
+						-SUM(SRD.Quantity * SRD.SalePrice) Total
+					FROM
+						transaction_salereturn TSR
+						JOIN transaction_sale TS
+							ON TS.SaleID = TSR.SaleID
+                        JOIN transaction_salereturndetails SRD
+							ON SRD.SaleReturnID = TSR.SaleReturnID
+					WHERE 
+						TS.CustomerID = ", pCustomerID ,"
+						AND CAST(TSR.TransactionDate AS DATE) >= '",pFromDate,"'
+						AND CAST(TSR.TransactionDate AS DATE) <= '",pToDate,"'
+						AND ", pWhere2, "
+                    GROUP BY
+						TSR.SaleReturnID,
+                        TS.SaleNumber,
+                        TSR.TransactionDate
+					ORDER BY ", pOrder,
+					" LIMIT ", pLimit_s, ", ", pLimit_l);
+	                
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select sale transaction
+Created Date: 3 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelSaleReport;
+
+DELIMITER $$
+CREATE PROCEDURE spSelSaleReport (
+	pBranchID		INT,
+	pFromDate		DATE,
+	pToDate			DATE,
+	pWhere 			TEXT,
+    pWhere2			TEXT,
+	pOrder			TEXT,
+	pLimit_s		BIGINT,
+    pLimit_l		INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelSaleReport', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+SET @query = CONCAT("SELECT
+						COUNT(1) AS nRows,
+						SUM(Total) GrandTotal
+					FROM
+						(
+							SELECT
+								SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - IFNULL(TS.Discount, 0) Total
+							FROM
+								transaction_sale TS
+								JOIN transaction_saledetails SD
+									ON SD.SaleID = TS.SaleID
+								JOIN master_customer MC
+									ON MC.CustomerID = TS.CustomerID
+								LEFT JOIN master_itemdetails MID
+									ON MID.ItemDetailsID = SD.ItemDetailsID
+							WHERE
+								CASE
+									WHEN ",pBranchID," = 0
+									THEN SD.BranchID
+									ELSE ",pBranchID,"
+								END = SD.BranchID
+								AND CAST(TS.TransactionDate AS DATE) >= '",pFromDate,"'
+								AND CAST(TS.TransactionDate AS DATE) <= '",pToDate,"'
+								AND ", pWhere, "
+							GROUP BY
+								TS.SaleID,
+								TS.Discount
+							UNION ALL
+							SELECT
+								SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - IFNULL(TB.Discount, 0) Total
+							FROM
+								transaction_booking TB
+								JOIN transaction_bookingdetails BD
+									ON TB.BookingID = BD.BookingID
+								JOIN master_customer MC
+									ON MC.CustomerID = TB.CustomerID
+								LEFT JOIN master_itemdetails MID
+									ON MID.ItemDetailsID = BD.ItemDetailsID
+							WHERE 
+								CASE
+									WHEN ",pBranchID," = 0
+									THEN BD.BranchID
+									ELSE ",pBranchID,"
+								END = BD.BranchID
+								AND CAST(TB.TransactionDate AS DATE) >= '",pFromDate,"'
+								AND CAST(TB.TransactionDate AS DATE) <= '",pToDate,"'
+								AND ", pWhere, "
+							GROUP BY
+								TB.BookingID,
+								TB.Discount
+							UNION ALL
+		                    SELECT
+								-SUM(SRD.Quantity * SRD.SalePrice) Total
+							FROM
+								transaction_salereturn TSR
+								JOIN transaction_sale TS
+									ON TS.SaleID = TSR.SaleID
+		                        JOIN transaction_salereturndetails SRD
+									ON SRD.SaleReturnID = TSR.SaleReturnID
+								JOIN master_customer MC
+									ON MC.CustomerID = TS.CustomerID
+							WHERE 
+								CASE
+									WHEN ",pBranchID," = 0
+									THEN SRD.BranchID
+									ELSE ",pBranchID,"
+								END = SRD.BranchID
+								AND CAST(TSR.TransactionDate AS DATE) >= '",pFromDate,"'
+								AND CAST(TSR.TransactionDate AS DATE) <= '",pToDate,"'
+								AND ", pWhere2, "
+		                    GROUP BY
+								TSR.SaleReturnID
+						) TS"
+					);
+                       
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+SET State = 2;
+
+SET @query = CONCAT("SELECT
+						TS.SaleID,
+						'Penjualan' TransactionType,
+                        TS.SaleNumber,
+                        DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
+                        MC.CustomerName,
+                        SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) TotalSale,
+						MIN(IFNULL(TS.Discount, 0)) Discount,
+						SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - IFNULL(TS.Discount, 0) SubTotal
+					FROM
+						transaction_sale TS
+                        JOIN transaction_saledetails SD
+							ON SD.SaleID = TS.SaleID
+						JOIN master_customer MC
+							ON MC.CustomerID = TS.CustomerID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = SD.ItemDetailsID
+					WHERE 
+						CASE
+							WHEN ",pBranchID," = 0
+							THEN SD.BranchID
+							ELSE ",pBranchID,"
+						END = SD.BranchID
+						AND CAST(TS.TransactionDate AS DATE) >= '",pFromDate,"'
+						AND CAST(TS.TransactionDate AS DATE) <= '",pToDate,"'
+						AND ", pWhere, "
+                    GROUP BY
+						TS.SaleID,
+                        TS.SaleNumber,
+                        TS.TransactionDate,
+                        MC.CustomerName,
+                        TS.Discount
+                    UNION ALL
+                    SELECT
+						TB.BookingID,
+						'Pemesanan' TransactionType,
+                        TB.BookingNumber,
+                        DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
+                        MC.CustomerName,
+                        SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) TotalSale,
+						IFNULL(TB.Discount, 0) Discount,
+						SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - IFNULL(TB.Discount, 0) SubTotal
+					FROM
+						transaction_booking TB
+                        JOIN transaction_bookingdetails BD
+							ON TB.BookingID = BD.BookingID
+						JOIN master_customer MC
+							ON MC.CustomerID = TB.CustomerID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = BD.ItemDetailsID
+					WHERE 
+						CASE
+							WHEN ",pBranchID," = 0
+							THEN BD.BranchID
+							ELSE ",pBranchID,"
+						END = BD.BranchID
+						AND CAST(TB.TransactionDate AS DATE) >= '",pFromDate,"'
+						AND CAST(TB.TransactionDate AS DATE) <= '",pToDate,"'
+						AND ", pWhere, "
+                    GROUP BY
+						TB.BookingID,
+                        TB.BookingNumber,
+                        TB.TransactionDate,
+                        MC.CustomerName,
+                        TB.Discount
+                    UNION ALL
+                    SELECT
+						TSR.SaleReturnID,
+						'Retur' TransactionType,
+                        CONCAT('R', TS.SaleNumber),
+                        DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') TransactionDate,
+                        MC.CustomerName,
+                        -SUM(SRD.Quantity * SRD.SalePrice) TotalSale,
+						0 Discount,
+						-SUM(SRD.Quantity * SRD.SalePrice) SubTotal
+					FROM
+						transaction_salereturn TSR
+						JOIN transaction_sale TS
+							ON TS.SaleID = TSR.SaleID
+                        JOIN transaction_salereturndetails SRD
+							ON SRD.SaleReturnID = TSR.SaleReturnID
+						JOIN master_customer MC
+							ON MC.CustomerID = TS.CustomerID
+					WHERE 
+						CASE
+							WHEN ",pBranchID," = 0
+							THEN SRD.BranchID
+							ELSE ",pBranchID,"
+						END = SRD.BranchID
+						AND CAST(TSR.TransactionDate AS DATE) >= '",pFromDate,"'
+						AND CAST(TSR.TransactionDate AS DATE) <= '",pToDate,"'
+						AND ", pWhere2, "
+                    GROUP BY
+						TSR.SaleReturnID,
+                        TS.SaleNumber,
+                        TSR.TransactionDate,
+                        MC.CustomerName
+					ORDER BY ", pOrder,
+					" LIMIT ", pLimit_s, ", ", pLimit_l);
+	                
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select sale transaction
+Created Date: 3 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelExportCreditReport;
+
+DELIMITER $$
+CREATE PROCEDURE spSelExportCreditReport (
+	pFromDate		DATE,
+	pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelExportCreditReport', pCurrentUser);
+	END;
+	
+SET State = 1;
+	SELECT
+		TS.SaleID,
+		TS.SaleNumber,
+		DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
+		TS.TransactionDate PlainTransactionDate,
+		MC.CustomerID,
+		MC.CustomerName,
+		SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1)  - SD.Discount)) TotalSale,
+		IFNULL(TS.Discount, 0) Discount,
+		IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0) TotalPayment,
+		SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TS.Discount, 0)) Credit,
+		'Penjualan' TransactionType,
+		TS.Payment,
+		TP.Amount
+	FROM
+		transaction_sale TS
+		JOIN transaction_saledetails SD
+			ON SD.SaleID = TS.SaleID
+		JOIN master_customer MC
+			ON MC.CustomerID = TS.CustomerID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = SD.ItemDetailsID
+		LEFT JOIN
+		(
+			SELECT
+				PD.TransactionID,
+				SUM(PD.Amount) Amount
+			FROM
+				transaction_paymentdetails PD
+			WHERE
+				PD.TransactionType = 'S'
+				AND PD.PaymentDate <= pFromDate
+			GROUP BY
+				TransactionID
+		)TP
+			ON TP.TransactionID = TS.SaleID
+	WHERE 
+		TS.PaymentTypeID = 2
+		AND TS.TransactionDate <= pFromDate
+	GROUP BY
+		TS.SaleID,
+		TS.SaleNumber,
+		TS.TransactionDate,
+		MC.CustomerID,
+		MC.CustomerName,
+		TS.Payment,
+		TP.Amount,
+		TS.Discount
+	HAVING
+		SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TS.Discount, 0)) > 0
+	UNION ALL
+	SELECT
+		TB.BookingID,
+		TB.BookingNumber,
+		DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
+		TB.TransactionDate PlainTransactionDate,
+		MC.CustomerID,
+		MC.CustomerName,
+		SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) Total,
+		IFNULL(TB.Discount, 0),
+		IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) TotalPayment,
+		SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TB.Discount, 0)),
+		'Pemesanan' TransactionType,
+		TB.Payment,
+		TP.Amount
+	FROM
+		transaction_booking TB
+		JOIN transaction_bookingdetails BD
+			ON BD.BookingID = TB.BookingID
+		JOIN master_customer MC
+			ON MC.CustomerID = TB.CustomerID
+		LEFT JOIN master_itemdetails MID
+			ON MID.ItemDetailsID = BD.ItemDetailsID
+		LEFT JOIN
+		(
+			SELECT
+				PD.TransactionID,
+				SUM(PD.Amount) Amount
+			FROM
+				transaction_paymentdetails PD
+			WHERE
+				PD.TransactionType = 'B'
+				AND PD.PaymentDate <= pFromDate
+			GROUP BY
+				TransactionID
+		)TP
+			ON TP.TransactionID = TB.BookingID
+	WHERE
+		TB.PaymentTypeID = 2
+		AND TB.TransactionDate <= pFromDate
+	GROUP BY
+		TB.BookingID,
+		TB.BookingNumber,
+		TB.TransactionDate,
+		MC.CustomerID,
+		MC.CustomerName,
+		TB.Payment,
+		TP.Amount,
+		TB.Discount
+	HAVING
+		SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TB.Discount, 0)) > 0;
+
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select sale transaction
+Created Date: 3 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelCreditReport;
+
+DELIMITER $$
+CREATE PROCEDURE spSelCreditReport (
+	pFromDate		DATE,
+	pWhere 			TEXT,
+	pWhere2			TEXT,
+	pOrder			TEXT,
+	pLimit_s		BIGINT,
+    pLimit_l		INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelCreditReport', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+SET @query = CONCAT("SELECT
+						COUNT(1) AS nRows,
+                        SUM(Credit) GrandTotal
+					FROM
+						(
+							SELECT
+								SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TS.Discount, 0)) Credit
+							FROM
+								transaction_sale TS
+								JOIN transaction_saledetails SD
+									ON SD.SaleID = TS.SaleID
+								JOIN master_customer MC
+									ON MC.CustomerID = TS.CustomerID
+								LEFT JOIN master_itemdetails MID
+									ON MID.ItemDetailsID = SD.ItemDetailsID
+								LEFT JOIN
+								(
+									SELECT
+										PD.TransactionID,
+										SUM(PD.Amount) Amount
+									FROM
+										transaction_paymentdetails PD
+									WHERE
+										PD.TransactionType = 'S'
+                                        AND PD.PaymentDate <= '", pFromDate, "'
+									GROUP BY
+										TransactionID
+								)TP
+									ON TP.TransactionID = TS.SaleID
+							WHERE 
+								TS.PaymentTypeID = 2
+                                AND TS.TransactionDate <= '", pFromDate, "'
+								AND ", pWhere, "
+							GROUP BY
+								TS.SaleID,
+								TS.SaleNumber,
+								TS.TransactionDate,
+								MC.CustomerID,
+								MC.CustomerName,
+								TS.Payment,
+								TP.Amount,
+								TS.Discount
+							HAVING
+								SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TS.Discount, 0)) > 0
+							UNION ALL
+		                    SELECT
+								SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TB.Discount, 0))
+							FROM
+								transaction_booking TB
+								JOIN transaction_bookingdetails BD
+									ON BD.BookingID = TB.BookingID
+								JOIN master_customer MC
+									ON MC.CustomerID = TB.CustomerID
+								LEFT JOIN master_itemdetails MID
+									ON MID.ItemDetailsID = BD.ItemDetailsID
+								LEFT JOIN
+								(
+									SELECT
+										PD.TransactionID,
+										SUM(PD.Amount) Amount
+									FROM
+										transaction_paymentdetails PD
+									WHERE
+										PD.TransactionType = 'B'
+                                        AND PD.PaymentDate <= '", pFromDate, "'
+									GROUP BY
+										TransactionID
+								)TP
+									ON TP.TransactionID = TB.BookingID
+							WHERE
+								TB.PaymentTypeID = 2
+                                AND TB.TransactionDate <= '", pFromDate, "'
+								AND ", pWhere2, "
+							GROUP BY
+								TB.BookingID,
+								TB.BookingNumber,
+								TB.TransactionDate,
+								MC.CustomerID,
+								MC.CustomerName,
+								TB.Payment,
+								TP.Amount,
+								TB.Discount
+							HAVING
+								SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TB.Discount, 0)) > 0
+						) TS"
+					);
+                       
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+SET State = 2;
+
+SET @query = CONCAT("SELECT
+						TS.SaleID,
+						TS.SaleNumber,
+						DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
+						TS.TransactionDate PlainTransactionDate,
+						MC.CustomerID,
+						MC.CustomerName,
+						SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1)  - SD.Discount)) TotalSale,
+						IFNULL(TS.Discount, 0) Discount,
+						IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0) TotalPayment,
+					    SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TS.Discount, 0)) Credit,
+                        'Penjualan' TransactionType,
+                        TS.Payment,
+					    TP.Amount
+					FROM
+						transaction_sale TS
+						JOIN transaction_saledetails SD
+							ON SD.SaleID = TS.SaleID
+						JOIN master_customer MC
+							ON MC.CustomerID = TS.CustomerID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = SD.ItemDetailsID
+						LEFT JOIN
+						(
+							SELECT
+								PD.TransactionID,
+								SUM(PD.Amount) Amount
+							FROM
+								transaction_paymentdetails PD
+							WHERE
+								PD.TransactionType = 'S'
+                                AND PD.PaymentDate <= '", pFromDate, "'
+							GROUP BY
+								TransactionID
+						)TP
+							ON TP.TransactionID = TS.SaleID
+					WHERE 
+						TS.PaymentTypeID = 2
+                        AND TS.TransactionDate <= '", pFromDate, "'
+						AND ", pWhere, "
+					GROUP BY
+						TS.SaleID,
+						TS.SaleNumber,
+						TS.TransactionDate,
+						MC.CustomerID,
+						MC.CustomerName,
+						TS.Payment,
+					    TP.Amount,
+						TS.Discount
+					HAVING
+						SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TS.Discount, 0)) > 0
+					UNION ALL
+                    SELECT
+						TB.BookingID,
+						TB.BookingNumber,
+						DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
+						TB.TransactionDate PlainTransactionDate,
+						MC.CustomerID,
+						MC.CustomerName,
+						SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) TotalSale,
+						IFNULL(TB.Discount, 0) Discount,
+						IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) TotalPayment,
+						SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TS.Discount, 0)),
+                        'Pemesanan' TransactionType,
+						TB.Payment,
+					    TP.Amount
+					FROM
+						transaction_booking TB
+						JOIN transaction_bookingdetails BD
+							ON BD.BookingID = TB.BookingID
+						JOIN master_customer MC
+							ON MC.CustomerID = TB.CustomerID
+						LEFT JOIN master_itemdetails MID
+							ON MID.ItemDetailsID = BD.ItemDetailsID
+						LEFT JOIN
+						(
+							SELECT
+								PD.TransactionID,
+								SUM(PD.Amount) Amount
+							FROM
+								transaction_paymentdetails PD
+							WHERE
+								PD.TransactionType = 'B'
+                                AND PD.PaymentDate <= '", pFromDate, "'
+							GROUP BY
+								TransactionID
+						)TP
+							ON TP.TransactionID = TB.BookingID
+					WHERE
+						TB.PaymentTypeID = 2
+                        AND TB.TransactionDate <= '", pFromDate, "'
+						AND ", pWhere2, "
+					GROUP BY
+						TB.BookingID,
+						TB.BookingNumber,
+						TB.TransactionDate,
+						MC.CustomerID,
+						MC.CustomerName,
+						TB.Payment,
+					    TP.Amount,
+						TB.Discount
+					HAVING
+						SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TB.Discount, 0)) > 0
+					ORDER BY ", pOrder,
+					" LIMIT ", pLimit_s, ", ", pLimit_l);
+	                
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+END;
+$$
+DELIMITER ;
+DROP PROCEDURE IF EXISTS spUpdBookingPayment;
+
+DELIMITER $$
+CREATE PROCEDURE spUpdBookingPayment (
+	pID 			BIGINT, 
+	pPayment 		DOUBLE,
+	pPaymentTypeID	SMALLINT,
+    pFinishFlag		BIT,
+	pDiscountTotal	DOUBLE,
+	pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE RowCount INT;
+
+	DECLARE PassValidate INT;
+	
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spUpdBookingPayment', pCurrentUser);
+        SELECT
+			pID AS 'ID',
+			'Terjadi kesalahan sistem!' AS 'Message',
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag',
+			State AS 'State' ;
+	END;
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+		UPDATE
+			transaction_booking
+		SET
+			Payment = pPayment,
+            FinishFlag = pFinishFlag,
+			PaymentTypeID = pPaymentTypeID,
+			ModifiedBy = pCurrentUser,
+			Discount = pDiscountTotal
+		WHERE
+			BookingID = pID;
+
+SET State = 2;
+		SELECT
+			pID AS 'ID',
+			'Pembayaran berhasil' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State';
+
+    COMMIT;
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select booking transaction
+Created Date: 3 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelBooking;
+
+DELIMITER $$
+CREATE PROCEDURE spSelBooking (
+	pWhere 			TEXT,
+	pOrder			TEXT,
+	pLimit_s		BIGINT,
+    pLimit_l		INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelBooking', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+	DELETE FROM 
+		transaction_booking
+    WHERE
+		FinishFlag = 0
+        AND DATE_FORMAT(TransactionDate, '%Y-%m-%d') <> DATE_FORMAT(NOW(), '%Y-%m-%d');
+
+SET State = 2;
+
+SET @query = CONCAT("SELECT
+						COUNT(1) AS nRows
+					FROM
+						transaction_booking TB
+                        JOIN master_customer MC
+							ON MC.CustomerID = TB.CustomerID
+					WHERE ", pWhere);
+						
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+SET State = 2;
+
+SET @query = CONCAT("SELECT
+						TB.BookingID,
+                        TB.BookingNumber,
+                        DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
+                        TB.TransactionDate PlainTransactionDate,
+                        MC.CustomerID,
+                        MC.CustomerName,
+						IFNULL(TBD.Total, 0) Total,
+						IFNULL(TBD.Weight, 0) Weight,
+						TB.RetailFlag,
+                        IFNULL(TB.Payment, 0) Payment,
+                        IFNULL(PT.PaymentTypeName, '') PaymentTypeName,
+                        CASE
+							WHEN FinishFlag = 0
+                            THEN 'Belum Selesai'
+                            ELSE 'Selesai'
+						END Status,
+                        IFNULL(PT.PaymentTypeID, 1) PaymentTypeID,
+						TB.Discount
+					FROM
+						transaction_booking TB
+                        JOIN master_customer MC
+							ON MC.CustomerID = TB.CustomerID
+						LEFT JOIN master_paymenttype PT
+							ON PT.PaymentTypeID = TB.PaymentTypeID
+						LEFT JOIN
+                        (
+							SELECT
+								TB.BookingID,
+                                SUM(TBD.Quantity * (TBD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - TBD.Discount)) Total,
+								SUM(TBD.Quantity * MI.Weight * IFNULL(MID.ConversionQuantity, 1)) Weight
+							FROM
+								transaction_booking TB
+                                JOIN master_customer MC
+									ON MC.CustomerID = TB.CustomerID
+                                LEFT JOIN transaction_bookingdetails TBD
+									ON TB.BookingID = TBD.BookingID
+								LEFT JOIN master_item MI
+									ON MI.ItemID = TBD.ItemID
+								LEFT JOIN master_itemdetails MID
+									ON MID.ItemDetailsID = TBD.ItemDetailsID
+							WHERE ", 
+								pWhere, 
+                            " GROUP BY
+								TB.BookingID
+                        )TBD
+							ON TBD.BookingID = TB.BookingID
+					WHERE ", pWhere, 
+					" ORDER BY ", pOrder,
+					" LIMIT ", pLimit_s, ", ", pLimit_l);
+					
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select sale transaction
+Created Date: 3 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelSale;
+
+DELIMITER $$
+CREATE PROCEDURE spSelSale (
+	pWhere 			TEXT,
+	pOrder			TEXT,
+	pLimit_s		BIGINT,
+    pLimit_l		INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelSale', pCurrentUser);
+	END;
+	
+SET State = 1;
+	
+    DELETE FROM 
+		transaction_sale
+    WHERE
+		FinishFlag = 0
+        AND DATE_FORMAT(TransactionDate, '%Y-%m-%d') <> DATE_FORMAT(NOW(), '%Y-%m-%d');
+    
+SET State = 2;
+
+SET @query = CONCAT("SELECT
+						COUNT(1) AS nRows
+					FROM
+						transaction_sale TS
+                        JOIN master_customer MC
+							ON MC.CustomerID = TS.CustomerID
+					WHERE ", pWhere);
+						
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+SET State = 2;
+
+SET @query = CONCAT("SELECT
+						TS.SaleID,
+                        TS.SaleNumber,
+                        DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
+                        TS.TransactionDate PlainTransactionDate,
+                        MC.CustomerID,
+                        MC.CustomerName,
+						IFNULL(TSD.Total, 0) Total,
+						IFNULL(TSD.Weight, 0) Weight,
+						TS.RetailFlag,
+						IFNULL(TS.Payment, 0) Payment,
+                        IFNULL(PT.PaymentTypeName, '') PaymentTypeName,
+                        CASE
+							WHEN FinishFlag = 0
+                            THEN 'Belum Selesai'
+                            ELSE 'Selesai'
+						END Status,
+                        IFNULL(PT.PaymentTypeID, 1) PaymentTypeID,
+						TS.Discount
+					FROM
+						transaction_sale TS
+                        JOIN master_customer MC
+							ON MC.CustomerID = TS.CustomerID
+						LEFT JOIN master_paymenttype PT
+							ON PT.PaymentTypeID = TS.PaymentTypeID
+						LEFT JOIN
+                        (
+							SELECT
+								TS.SaleID,
+                                SUM(TSD.Quantity * (TSD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - TSD.Discount)) Total,
+								SUM(TSD.Quantity * MI.Weight * IFNULL(MID.ConversionQuantity, 1)) Weight
+							FROM
+								transaction_sale TS
+                                JOIN master_customer MC
+									ON MC.CustomerID = TS.CustomerID
+                                LEFT JOIN transaction_saledetails TSD
+									ON TS.SaleID = TSD.SaleID
+								LEFT JOIN master_item MI
+									ON MI.ItemID = TSD.ItemID
+								LEFT JOIN master_itemdetails MID
+									ON MID.ItemDetailsID = TSD.ItemDetailsID
+							WHERE ", 
+								pWhere, 
+                            " GROUP BY
+								TS.SaleID
+                        )TSD
+							ON TSD.SaleID = TS.SaleID
+					WHERE ", pWhere, 
+					" ORDER BY ", pOrder,
+					" LIMIT ", pLimit_s, ", ", pLimit_l);
+					
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+END;
+$$
+DELIMITER ;
+DROP PROCEDURE IF EXISTS spUpdSalePayment;
+
+DELIMITER $$
+CREATE PROCEDURE spUpdSalePayment (
+	pID 			BIGINT, 
+	pPayment 		DOUBLE,
+	pPaymentTypeID	SMALLINT,
+    pFinishFlag		BIT,
+	pDiscountTotal	DOUBLE,
+	pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE RowCount INT;
+
+	DECLARE PassValidate INT;
+	
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spUpdSalePayment', pCurrentUser);
+        SELECT
+			pID AS 'ID',
+			'Terjadi kesalahan sistem!' AS 'Message',
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag',
+			State AS 'State' ;
+	END;
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+		UPDATE
+			transaction_sale
+		SET
+			Payment = pPayment,
+            FinishFlag = pFinishFlag,
+			PaymentTypeID = pPaymentTypeID,
+			ModifiedBy = pCurrentUser,
+			Discount = pDiscountTotal
+		WHERE
+			SaleID = pID;
+
+SET State = 2;
+		SELECT
+			pID AS 'ID',
+			'Pembayaran berhasil' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State';
+
+    COMMIT;
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select sale transaction
+Created Date: 3 January 2018
+Modified Date: 
+===============================================================*/
+
 DROP PROCEDURE IF EXISTS spSelExportPurchaseReport;
 
 DELIMITER $$
@@ -3081,432 +4107,6 @@ $$
 DELIMITER ;
 /*=============================================================
 Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select sale transaction
-Created Date: 3 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelDailyReport;
-
-DELIMITER $$
-CREATE PROCEDURE spSelDailyReport (
-	pUserID				BIGINT,
-	pTransactionDate	DATE,
-	pCurrentUser		VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelDailyReport', pCurrentUser);
-	END;
-	
-SET State = 1;
-	SELECT
-		0 UnionLevel,
-        MUS.UserName,
-        'Saldo Awal' TransactionName,
-		'' TransactionNumber,
-        '' CustomerName,
-        '' ItemName,
-        '' ItemCode,
-        0 Quantity,
-        '' UnitName,
-        0  SalePrice,
-        0 Discount,
-        FB.FirstBalanceAmount SubTotal,
-        0 Payment
-	FROM
-		transaction_firstbalance FB
-		JOIN master_user MUS
-			ON MUS.UserID = FB.UserID
-	WHERE
-		CAST(FB.TransactionDate AS DATE) = pTransactionDate
-        AND CASE
-			WHEN pUserID = 0
-			THEN MUS.UserID
-			ELSE pUserID
-		END = MUS.UserID
-	UNION ALL
-	SELECT
-		1 UnionLevel,
-		MUS.UserName,
-        'Penjualan Tunai' TransactionName,
-		TS.SaleNumber,
-        MC.CustomerName,
-		MI.ItemName,
-        MI.ItemCode,
-        SD.Quantity,
-        MU.UnitName,
-        SD.SalePrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
-        SD.Discount,
-        SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount) SubTotal,
-        0 Payment
-    FROM
-		transaction_sale TS
-        JOIN master_user MUS
-			ON TS.CreatedBy = MUS.UserLogin
-        JOIN transaction_saledetails SD
-			ON TS.SaleID = SD.SaleID
-		JOIN master_customer MC
-			ON MC.CustomerID = TS.CustomerID
-		JOIN master_item MI
-			ON MI.ItemID = SD.ItemID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = SD.ItemDetailsID
-		LEFT JOIN master_unit MU
-			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
-	WHERE
-		CASE
-			WHEN pUserID = 0
-			THEN MUS.UserID
-			ELSE pUserID
-		END = MUS.UserID
-		AND CAST(TS.TransactionDate AS DATE) = pTransactionDate
-        AND IFNULL(TS.PaymentTypeID, 0) = 1
-	UNION ALL
-    SELECT
-		2 UnionLevel,
-		MUS.UserName,
-        'Pemesanan Tunai' TransactionName,
-		TB.BookingNumber,
-        MC.CustomerName,
-		MI.ItemName,
-        MI.ItemCode,
-        BD.Quantity,
-        MU.UnitName,
-        BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
-        BD.Discount,
-        BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount) SubTotal,
-        0 Payment
-    FROM
-		transaction_booking TB
-		JOIN master_user MUS
-			ON TB.CreatedBy = MUS.UserLogin
-        JOIN transaction_bookingdetails BD
-			ON TB.BookingID = BD.BookingID
-		JOIN master_customer MC
-			ON MC.CustomerID = TB.CustomerID
-		JOIN master_item MI
-			ON MI.ItemID = BD.ItemID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = BD.ItemDetailsID
-		LEFT JOIN master_unit MU
-			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
-	WHERE
-		CASE
-			WHEN pUserID = 0
-			THEN MUS.UserID
-			ELSE pUserID
-		END = MUS.UserID
-		AND CAST(TB.TransactionDate AS DATE) = pTransactionDate
-        AND IFNULL(TB.PaymentTypeID, 0) = 1
-	UNION ALL
-    SELECT
-		3 UnionLevel,
-		MUS.UserName,
-        'Retur Penjualan',
-		CONCAT('R', TS.SaleNumber) SaleNumber,
-        MC.CustomerName,
-		MI.ItemName,
-        MI.ItemCode,
-        SRD.Quantity,
-        MU.UnitName,
-        SRD.SalePrice,
-        0 Discount,
-        -(SRD.Quantity * SRD.SalePrice) SubTotal,
-        0 Payment
-    FROM
-		transaction_salereturn TSR
-        JOIN master_user MUS
-			ON TSR.CreatedBy = MUS.UserLogin
-		JOIN transaction_sale TS
-			ON TSR.SaleID = TS.SaleID
-        JOIN transaction_salereturndetails SRD
-			ON TSR.SaleReturnID = SRD.SaleReturnID
-		JOIN master_customer MC
-			ON MC.CustomerID = TS.CustomerID
-		JOIN master_item MI
-			ON MI.ItemID = SRD.ItemID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = SRD.ItemDetailsID
-		LEFT JOIN master_unit MU
-			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
-	WHERE
-		CASE
-			WHEN pUserID = 0
-			THEN MUS.UserID
-			ELSE pUserID
-		END = MUS.UserID
-		AND CAST(TSR.TransactionDate AS DATE) = pTransactionDate
-	UNION ALL
-    SELECT
-		4 UnionLevel,
-		MUS.UserName,
-        'DP Penjualan' TransactionName,
-		TS.SaleNumber,
-        MC.CustomerName,
-		MI.ItemName,
-        MI.ItemCode,
-        SD.Quantity,
-        MU.UnitName,
-        SD.SalePrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
-        SD.Discount,
-        SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount) SubTotal,
-        IFNULL(TS.Payment, 0) Payment
-    FROM
-		transaction_sale TS
-        JOIN master_user MUS
-			ON TS.CreatedBy = MUS.UserLogin
-        JOIN transaction_saledetails SD
-			ON TS.SaleID = SD.SaleID
-		JOIN master_customer MC
-			ON MC.CustomerID = TS.CustomerID
-		JOIN master_item MI
-			ON MI.ItemID = SD.ItemID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = SD.ItemDetailsID
-		LEFT JOIN master_unit MU
-			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
-	WHERE
-		CASE
-			WHEN pUserID = 0
-			THEN MUS.UserID
-			ELSE pUserID
-		END = MUS.UserID
-		AND CAST(TS.TransactionDate AS DATE) = pTransactionDate
-        AND IFNULL(TS.PaymentTypeID, 0) = 2
-        AND IFNULL(TS.Payment, 0) > 0
-	UNION ALL
-    SELECT
-		5 UnionLevel,
-		MUS.UserName,
-        'DP Pemesanan' TransactionName,
-		TB.BookingNumber,
-        MC.CustomerName,
-		MI.ItemName,
-        MI.ItemCode,
-        BD.Quantity,
-        MU.UnitName,
-        BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
-        BD.Discount,
-        BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount) SubTotal,
-        IFNULL(TB.Payment, 0) Payment
-    FROM
-		transaction_booking TB
-		JOIN master_user MUS
-			ON TB.CreatedBy = MUS.UserLogin
-        JOIN transaction_bookingdetails BD
-			ON TB.BookingID = BD.BookingID
-		JOIN master_customer MC
-			ON MC.CustomerID = TB.CustomerID
-		JOIN master_item MI
-			ON MI.ItemID = BD.ItemID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = BD.ItemDetailsID
-		LEFT JOIN master_unit MU
-			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
-	WHERE
-		CASE
-			WHEN pUserID = 0
-			THEN MUS.UserID
-			ELSE pUserID
-		END = MUS.UserID
-		AND CAST(TB.TransactionDate AS DATE) = pTransactionDate
-		AND IFNULL(TB.PaymentTypeID, 0) = 2
-        AND IFNULL(TB.Payment, 0) > 0
-	UNION ALL
-    SELECT
-		6 UnionLevel,
-		MUS.UserName,
-        'Pembayaran Piutang' TransactionName,
-		IFNULL(TS.SaleNumber, TB.BookingNumber) TransactionNumber,
-        MC.CustomerName,
-		'',
-        '',
-        0,
-        '',
-        0,
-        
-        0,
-        PD.Amount,
-        0 Payment
-	FROM
-		transaction_paymentdetails PD
-        JOIN master_user MUS
-			ON MUS.UserLogin = PD.CreatedBy
-		LEFT JOIN transaction_sale TS
-			ON TS.SaleID = PD.TransactionID
-            AND PD.TransactionType = 'S'
-		LEFT JOIN transaction_booking TB
-			ON TB.BookingID = PD.TransactionID
-            AND PD.TransactionType = 'B'
-		JOIN master_customer MC
-			ON MC.CustomerID = IFNULL(TS.CustomerID, TB.CustomerID)
-	WHERE
-		CASE
-			WHEN pUserID = 0
-			THEN MUS.UserID
-			ELSE pUserID
-		END = MUS.UserID
-		AND PD.TransactionType IN ('S', 'B')
-        AND CAST(PD.PaymentDate AS DATE) = pTransactionDate
-	ORDER BY
-		UserName,
-        UnionLevel;
-
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select sale transaction
-Created Date: 3 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelDailyReportPrint;
-
-DELIMITER $$
-CREATE PROCEDURE spSelDailyReportPrint (
-	pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelDailyReportPrint', pCurrentUser);
-	END;
-	
-SET State = 1;
-	SELECT
-        FB.FirstBalanceAmount Amount
-	FROM
-		transaction_firstbalance FB
-		JOIN master_user MUS
-			ON MUS.UserID = FB.UserID
-	WHERE
-		CAST(FB.TransactionDate AS DATE) = CAST(NOW() AS DATE)
-        AND FB.CreatedBy = pCurrentUser
-	UNION ALL
-	SELECT
-		IFNULL(S.Amount, 0) Amount
-	FROM
-		(
-			SELECT
-				SUM(TSD.Quantity * (TSD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - TSD.Discount)) Amount
-			FROM
-				transaction_sale TS
-				LEFT JOIN transaction_saledetails TSD
-					ON TS.SaleID = TSD.SaleID
-				LEFT JOIN master_item MI
-					ON MI.ItemID = TSD.ItemID
-				LEFT JOIN master_itemdetails MID
-					ON MID.ItemDetailsID = TSD.ItemDetailsID
-			WHERE
-				DATE_FORMAT(TS.TransactionDate, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
-				AND TS.PaymentTypeID = 1
-                AND TS.CreatedBy = pCurrentUser
-		)S
-	UNION ALL
-    SELECT
-		IFNULL(B.Amount, 0) Amount
-	FROM
-		(
-			SELECT
-				SUM(TBD.Quantity * (TBD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - TBD.Discount)) Amount
-			FROM
-				transaction_booking TB
-				LEFT JOIN transaction_bookingdetails TBD
-					ON TB.BookingID = TBD.BookingID
-				LEFT JOIN master_item MI
-					ON MI.ItemID = TBD.ItemID
-				LEFT JOIN master_itemdetails MID
-					ON MID.ItemDetailsID = TBD.ItemDetailsID
-			WHERE
-				DATE_FORMAT(TB.TransactionDate, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
-				AND TB.PaymentTypeID = 1
-                AND TB.CreatedBy = pCurrentUser
-		)B
-	UNION ALL
-    SELECT
-		-IFNULL(SR.Amount, 0)
-	FROM
-		(
-			SELECT
-				SUM(TSRD.Quantity * TSRD.SalePrice) Amount
-			FROM
-				transaction_sale TS
-				JOIN transaction_salereturn TSR
-					ON TS.SaleID = TSR.SaleID
-				LEFT JOIN transaction_salereturndetails TSRD
-					ON TSR.SaleReturnID = TSRD.SaleReturnID
-				LEFT JOIN master_item MI
-					ON MI.ItemID = TSRD.ItemID
-			WHERE
-				DATE_FORMAT(TSR.TransactionDate, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
-                AND TS.CreatedBy = pCurrentUser
-		)SR
-	UNION ALL
-    SELECT
-		IFNULL(DP.Amount, 0) Amount
-	FROM
-		(
-			SELECT
-				SUM(T.Amount) Amount
-			FROM
-				(
-					SELECT
-						SUM(TS.Payment) Amount
-					FROM
-						transaction_sale TS
-					WHERE
-						DATE_FORMAT(TS.TransactionDate, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
-						AND TS.PaymentTypeID = 2
-                        AND TS.CreatedBy = pCurrentUser
-					UNION ALL
-					SELECT
-						SUM(TB.Payment) Amount
-					FROM
-						transaction_booking TB
-					WHERE
-						DATE_FORMAT(TB.TransactionDate, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
-						AND TB.PaymentTypeID = 2
-                        AND TB.CreatedBy = pCurrentUser
-				)T
-		)DP
-	UNION ALL
-    SELECT
-		IFNULL(PD.Amount, 0) Amount
-	FROM
-		(
-			SELECT
-				SUM(PD.Amount) Amount
-			FROM
-				transaction_paymentdetails PD
-			WHERE
-				DATE_FORMAT(PD.PaymentDate, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
-				AND PD.TransactionType IN('S', 'B')
-                AND PD.CreatedBy = pCurrentUser
-		)PD;
-
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
 Description: Stored Procedure for select branch from dropdown list
 Created Date: 11 january 2018
 Modified Date: 
@@ -3748,135 +4348,6 @@ Created Date: 3 January 2018
 Modified Date: 
 ===============================================================*/
 
-DROP PROCEDURE IF EXISTS spSelExportCreditReport;
-
-DELIMITER $$
-CREATE PROCEDURE spSelExportCreditReport (
-	pFromDate		DATE,
-	pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelExportCreditReport', pCurrentUser);
-	END;
-	
-SET State = 1;
-	SELECT
-		TS.SaleID,
-		TS.SaleNumber,
-		DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
-		TS.TransactionDate PlainTransactionDate,
-		MC.CustomerID,
-		MC.CustomerName,
-		SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1)  - SD.Discount)) TotalSale,
-		IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0) TotalPayment,
-		SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0)) Credit,
-		'Penjualan' TransactionType,
-		TS.Payment,
-		TP.Amount
-	FROM
-		transaction_sale TS
-		JOIN transaction_saledetails SD
-			ON SD.SaleID = TS.SaleID
-		JOIN master_customer MC
-			ON MC.CustomerID = TS.CustomerID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = SD.ItemDetailsID
-		LEFT JOIN
-		(
-			SELECT
-				PD.TransactionID,
-				SUM(PD.Amount) Amount
-			FROM
-				transaction_paymentdetails PD
-			WHERE
-				PD.TransactionType = 'S'
-				AND PD.PaymentDate <= pFromDate
-			GROUP BY
-				TransactionID
-		)TP
-			ON TP.TransactionID = TS.SaleID
-	WHERE 
-		TS.PaymentTypeID = 2
-		AND TS.TransactionDate <= pFromDate
-	GROUP BY
-		TS.SaleID,
-		TS.SaleNumber,
-		TS.TransactionDate,
-		MC.CustomerID,
-		MC.CustomerName,
-		TS.Payment,
-		TP.Amount
-	HAVING
-		SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0)) > 0
-	UNION ALL
-	SELECT
-		TB.BookingID,
-		TB.BookingNumber,
-		DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
-		TB.TransactionDate PlainTransactionDate,
-		MC.CustomerID,
-		MC.CustomerName,
-		SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) Total,
-		IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) TotalPayment,
-		SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0)),
-		'Pemesanan' TransactionType,
-		TB.Payment,
-		TP.Amount
-	FROM
-		transaction_booking TB
-		JOIN transaction_bookingdetails BD
-			ON BD.BookingID = TB.BookingID
-		JOIN master_customer MC
-			ON MC.CustomerID = TB.CustomerID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = BD.ItemDetailsID
-		LEFT JOIN
-		(
-			SELECT
-				PD.TransactionID,
-				SUM(PD.Amount) Amount
-			FROM
-				transaction_paymentdetails PD
-			WHERE
-				PD.TransactionType = 'B'
-				AND PD.PaymentDate <= pFromDate
-			GROUP BY
-				TransactionID
-		)TP
-			ON TP.TransactionID = TB.BookingID
-	WHERE
-		TB.PaymentTypeID = 2
-		AND TB.TransactionDate <= pFromDate
-	GROUP BY
-		TB.BookingID,
-		TB.BookingNumber,
-		TB.TransactionDate,
-		MC.CustomerID,
-		MC.CustomerName,
-		TB.Payment,
-		TP.Amount
-	HAVING
-		SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0)) > 0;
-
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select sale transaction
-Created Date: 3 January 2018
-Modified Date: 
-===============================================================*/
-
 DROP PROCEDURE IF EXISTS spSelExportDebtReport;
 
 DELIMITER $$
@@ -4079,240 +4550,6 @@ SET @query = CONCAT("SELECT
 						TPD.Amount
 					HAVING
 						SUM(PD.Quantity * PD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) - (IFNULL(TPD.Amount, 0)) > 0
-					ORDER BY ", pOrder,
-					" LIMIT ", pLimit_s, ", ", pLimit_l);
-	                
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select sale transaction
-Created Date: 3 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelCreditReport;
-
-DELIMITER $$
-CREATE PROCEDURE spSelCreditReport (
-	pFromDate		DATE,
-	pWhere 			TEXT,
-	pWhere2			TEXT,
-	pOrder			TEXT,
-	pLimit_s		BIGINT,
-    pLimit_l		INT,
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelCreditReport', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-SET @query = CONCAT("SELECT
-						COUNT(1) AS nRows,
-                        SUM(Credit) GrandTotal
-					FROM
-						(
-							SELECT
-								SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0)) Credit
-							FROM
-								transaction_sale TS
-								JOIN transaction_saledetails SD
-									ON SD.SaleID = TS.SaleID
-								JOIN master_customer MC
-									ON MC.CustomerID = TS.CustomerID
-								LEFT JOIN master_itemdetails MID
-									ON MID.ItemDetailsID = SD.ItemDetailsID
-								LEFT JOIN
-								(
-									SELECT
-										PD.TransactionID,
-										SUM(PD.Amount) Amount
-									FROM
-										transaction_paymentdetails PD
-									WHERE
-										PD.TransactionType = 'S'
-                                        AND PD.PaymentDate <= '", pFromDate, "'
-									GROUP BY
-										TransactionID
-								)TP
-									ON TP.TransactionID = TS.SaleID
-							WHERE 
-								TS.PaymentTypeID = 2
-                                AND TS.TransactionDate <= '", pFromDate, "'
-								AND ", pWhere, "
-							GROUP BY
-								TS.SaleID,
-								TS.SaleNumber,
-								TS.TransactionDate,
-								MC.CustomerID,
-								MC.CustomerName,
-								TS.Payment,
-								TP.Amount
-							HAVING
-								SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0)) > 0
-							UNION ALL
-		                    SELECT
-								SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0))
-							FROM
-								transaction_booking TB
-								JOIN transaction_bookingdetails BD
-									ON BD.BookingID = TB.BookingID
-								JOIN master_customer MC
-									ON MC.CustomerID = TB.CustomerID
-								LEFT JOIN master_itemdetails MID
-									ON MID.ItemDetailsID = BD.ItemDetailsID
-								LEFT JOIN
-								(
-									SELECT
-										PD.TransactionID,
-										SUM(PD.Amount) Amount
-									FROM
-										transaction_paymentdetails PD
-									WHERE
-										PD.TransactionType = 'B'
-                                        AND PD.PaymentDate <= '", pFromDate, "'
-									GROUP BY
-										TransactionID
-								)TP
-									ON TP.TransactionID = TB.BookingID
-							WHERE
-								TB.PaymentTypeID = 2
-                                AND TB.TransactionDate <= '", pFromDate, "'
-								AND ", pWhere2, "
-							GROUP BY
-								TB.BookingID,
-								TB.BookingNumber,
-								TB.TransactionDate,
-								MC.CustomerID,
-								MC.CustomerName,
-								TB.Payment,
-								TP.Amount
-							HAVING
-								SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0)) > 0
-						) TS"
-					);
-                       
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-SET State = 2;
-
-SET @query = CONCAT("SELECT
-						TS.SaleID,
-						TS.SaleNumber,
-						DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
-						TS.TransactionDate PlainTransactionDate,
-						MC.CustomerID,
-						MC.CustomerName,
-						SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1)  - SD.Discount)) TotalSale,
-						IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0) TotalPayment,
-					    SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0)) Credit,
-                        'Penjualan' TransactionType,
-                        TS.Payment,
-					    TP.Amount
-					FROM
-						transaction_sale TS
-						JOIN transaction_saledetails SD
-							ON SD.SaleID = TS.SaleID
-						JOIN master_customer MC
-							ON MC.CustomerID = TS.CustomerID
-						LEFT JOIN master_itemdetails MID
-							ON MID.ItemDetailsID = SD.ItemDetailsID
-						LEFT JOIN
-						(
-							SELECT
-								PD.TransactionID,
-								SUM(PD.Amount) Amount
-							FROM
-								transaction_paymentdetails PD
-							WHERE
-								PD.TransactionType = 'S'
-                                AND PD.PaymentDate <= '", pFromDate, "'
-							GROUP BY
-								TransactionID
-						)TP
-							ON TP.TransactionID = TS.SaleID
-					WHERE 
-						TS.PaymentTypeID = 2
-                        AND TS.TransactionDate <= '", pFromDate, "'
-						AND ", pWhere, "
-					GROUP BY
-						TS.SaleID,
-						TS.SaleNumber,
-						TS.TransactionDate,
-						MC.CustomerID,
-						MC.CustomerName,
-						TS.Payment,
-					    TP.Amount
-					HAVING
-						SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0)) > 0
-					UNION ALL
-                    SELECT
-						TB.BookingID,
-						TB.BookingNumber,
-						DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
-						TB.TransactionDate PlainTransactionDate,
-						MC.CustomerID,
-						MC.CustomerName,
-						SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) Total,
-						IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) TotalPayment,
-						SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0)),
-                        'Pemesanan' TransactionType,
-						TB.Payment,
-					    TP.Amount
-					FROM
-						transaction_booking TB
-						JOIN transaction_bookingdetails BD
-							ON BD.BookingID = TB.BookingID
-						JOIN master_customer MC
-							ON MC.CustomerID = TB.CustomerID
-						LEFT JOIN master_itemdetails MID
-							ON MID.ItemDetailsID = BD.ItemDetailsID
-						LEFT JOIN
-						(
-							SELECT
-								PD.TransactionID,
-								SUM(PD.Amount) Amount
-							FROM
-								transaction_paymentdetails PD
-							WHERE
-								PD.TransactionType = 'B'
-                                AND PD.PaymentDate <= '", pFromDate, "'
-							GROUP BY
-								TransactionID
-						)TP
-							ON TP.TransactionID = TB.BookingID
-					WHERE
-						TB.PaymentTypeID = 2
-                        AND TB.TransactionDate <= '", pFromDate, "'
-						AND ", pWhere2, "
-					GROUP BY
-						TB.BookingID,
-						TB.BookingNumber,
-						TB.TransactionDate,
-						MC.CustomerID,
-						MC.CustomerName,
-						TB.Payment,
-					    TP.Amount
-					HAVING
-						SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0)) > 0
 					ORDER BY ", pOrder,
 					" LIMIT ", pLimit_s, ", ", pLimit_l);
 	                
@@ -4679,155 +4916,6 @@ $$
 DELIMITER ;
 /*=============================================================
 Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select sale transaction
-Created Date: 3 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelExportIncomeReport;
-
-DELIMITER $$
-CREATE PROCEDURE spSelExportIncomeReport (
-	pBranchID		INT,
-	pFromDate		DATE,
-	pToDate			DATE,
-	pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelExportIncomeReport', pCurrentUser);
-	END;
-	
-SET State = 1;
-	SELECT
-		TS.SaleID,
-		TS.SaleNumber,
-        DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
-        MC.CustomerName,
-		MI.ItemID,
-        MI.ItemName,
-        MI.ItemCode,
-        SD.Quantity,
-        MU.UnitName,
-        SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1) BuyPrice,
-        (SD.Quantity * SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) TotalBuy,
-        SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) SalePrice,
-        SD.Discount,
-        (SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) TotalSale,
-		(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (SD.Quantity * SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) Income
-    FROM
-		transaction_sale TS
-        JOIN transaction_saledetails SD
-			ON TS.SaleID = SD.SaleID
-		JOIN master_customer MC
-			ON MC.CustomerID = TS.CustomerID
-		JOIN master_item MI
-			ON MI.ItemID = SD.ItemID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = SD.ItemDetailsID
-		LEFT JOIN master_unit MU
-			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
-	WHERE
-		CASE
-			WHEN pBranchID = 0
-			THEN SD.BranchID
-			ELSE pBranchID
-		END = SD.BranchID
-		AND CAST(TS.TransactionDate AS DATE) >= pFromDate
-		AND CAST(TS.TransactionDate AS DATE) <= pToDate
-	UNION ALL
-    SELECT
-		TB.BookingID SaleID,
-		TB.BookingNumber SaleNumber,
-        DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
-        MC.CustomerName,
-		MI.ItemID,
-        MI.ItemName,
-        MI.ItemCode,
-        BD.Quantity,
-        MU.UnitName,
-        BD.BuyPrice * IFNULL(MID.ConversionQuantity, 1) BuyPrice,
-        (BD.Quantity * BD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) TotalBuy,
-        BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) SalePrice,
-        BD.Discount,
-        (BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) TotalSale,
-		(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (BD.Quantity * BD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) Income
-    FROM
-		transaction_booking TB
-        JOIN transaction_bookingdetails BD
-			ON TB.BookingID = BD.BookingID
-		JOIN master_customer MC
-			ON MC.CustomerID = TB.CustomerID
-		JOIN master_item MI
-			ON MI.ItemID = BD.ItemID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = BD.ItemDetailsID
-		LEFT JOIN master_unit MU
-			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
-	WHERE
-		CASE
-			WHEN pBranchID = 0
-			THEN BD.BranchID
-			ELSE pBranchID
-		END = BD.BranchID
-		AND CAST(TB.TransactionDate AS DATE) >= pFromDate
-		AND CAST(TB.TransactionDate AS DATE) <= pToDate
-	UNION ALL
-    SELECT
-		TSR.SaleReturnID,
-		CONCAT('R', TS.SaleNumber) SaleNumber,
-        DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') TransactionDate,
-        MC.CustomerName,
-		MI.ItemID,
-        MI.ItemName,
-        MI.ItemCode,
-        SRD.Quantity,
-        MU.UnitName,
-        SRD.BuyPrice,
-		(SRD.Quantity * SRD.BuyPrice) TotalBuy,
-        SRD.SalePrice,
-        0 Discount,
-        (SRD.Quantity * SRD.SalePrice) TotalSale,
-        -((SRD.Quantity * SRD.SalePrice) - (SRD.Quantity * SRD.BuyPrice)) Income
-    FROM
-		transaction_salereturn TSR
-		JOIN transaction_sale TS
-			ON TSR.SaleID = TS.SaleID
-        JOIN transaction_salereturndetails SRD
-			ON TSR.SaleReturnID = SRD.SaleReturnID
-		JOIN master_customer MC
-			ON MC.CustomerID = TS.CustomerID
-		JOIN master_item MI
-			ON MI.ItemID = SRD.ItemID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = SRD.ItemDetailsID
-		LEFT JOIN master_unit MU
-			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
-	WHERE
-		CASE
-			WHEN pBranchID = 0
-			THEN SRD.BranchID
-			ELSE pBranchID
-		END = SRD.BranchID
-		AND CAST(TSR.TransactionDate AS DATE) >= pFromDate
-		AND CAST(TSR.TransactionDate AS DATE) <= pToDate
-	ORDER BY
-		SaleNumber,
-        SaleID;
-
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
 Description: Stored Procedure for select sale details by SaleID
 Created Date: 12 January 2018
 Modified Date: 
@@ -4948,846 +5036,6 @@ SET State = 1;
 			SRD.SaleReturnDetailsID;
             
 	END IF;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select sale transaction
-Created Date: 3 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelIncomeReport;
-
-DELIMITER $$
-CREATE PROCEDURE spSelIncomeReport(
-	pBranchID		INT,
-	pFromDate		DATE,
-	pToDate			DATE,
-	pWhere 			TEXT,
-    pWhere2			TEXT,
-	pOrder			TEXT,
-	pLimit_s		BIGINT,
-    pLimit_l		INT,
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelIncomeReport', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-SET @query = CONCAT("SELECT
-						COUNT(1) AS nRows,
-						SUM(Total) GrandTotal
-					FROM
-						(
-							SELECT
-								SUM((SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (SD.Quantity * SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) Total
-							FROM
-								transaction_sale TS
-								JOIN transaction_saledetails SD
-									ON SD.SaleID = TS.SaleID
-								JOIN master_customer MC
-									ON MC.CustomerID = TS.CustomerID
-								LEFT JOIN master_itemdetails MID
-									ON MID.ItemDetailsID = SD.ItemDetailsID
-							WHERE 
-								CASE
-									WHEN ",pBranchID," = 0
-									THEN SD.BranchID
-									ELSE ",pBranchID,"
-								END = SD.BranchID
-								AND CAST(TS.TransactionDate AS DATE) >= '",pFromDate,"'
-								AND CAST(TS.TransactionDate AS DATE) <= '",pToDate,"'
-								AND ", pWhere, "
-							GROUP BY
-								TS.SaleID
-							UNION ALL
-                            SELECT
-								SUM((BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (BD.Quantity * BD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) Total
-							FROM
-								transaction_booking TB
-								JOIN transaction_bookingdetails BD
-									ON TB.BookingID = BD.BookingID
-								JOIN master_customer MC
-									ON MC.CustomerID = TB.CustomerID
-								LEFT JOIN master_itemdetails MID
-									ON MID.ItemDetailsID = BD.ItemDetailsID
-							WHERE 
-								CASE
-									WHEN ",pBranchID," = 0
-									THEN BD.BranchID
-									ELSE ",pBranchID,"
-								END = BD.BranchID
-								AND CAST(TB.TransactionDate AS DATE) >= '",pFromDate,"'
-								AND CAST(TB.TransactionDate AS DATE) <= '",pToDate,"'
-								AND ", pWhere, "
-							GROUP BY
-								TB.BookingID
-							UNION ALL
-		                    SELECT
-								-SUM(((SRD.Quantity * SRD.SalePrice * IFNULL(MID.ConversionQuantity, 1)) - (SRD.Quantity * SRD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))))
-							FROM
-								transaction_salereturn TSR
-								JOIN transaction_sale TS
-									ON TS.SaleID = TSR.SaleID
-		                        JOIN transaction_salereturndetails SRD
-									ON SRD.SaleReturnID = TSR.SaleReturnID
-								JOIN master_customer MC
-									ON MC.CustomerID = TS.CustomerID
-								LEFT JOIN master_itemdetails MID
-									ON MID.ItemDetailsID = SRD.ItemDetailsID
-							WHERE 
-								CASE
-									WHEN ",pBranchID," = 0
-									THEN SRD.BranchID
-									ELSE ",pBranchID,"
-								END = SRD.BranchID
-								AND CAST(TSR.TransactionDate AS DATE) >= '",pFromDate,"'
-								AND CAST(TSR.TransactionDate AS DATE) <= '",pToDate,"'
-								AND ", pWhere2, "
-		                    GROUP BY
-								TSR.SaleReturnID
-						) TS"
-					);
-                       
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-SET State = 2;
-
-SET @query = CONCAT("SELECT
-						TS.SaleID,
-						'Penjualan' TransactionType,
-                        TS.SaleNumber,
-                        DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
-                        MC.CustomerName,
-                        SUM((SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (SD.Quantity * SD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) Total
-					FROM
-						transaction_sale TS
-                        JOIN transaction_saledetails SD
-							ON SD.SaleID = TS.SaleID
-						JOIN master_customer MC
-							ON MC.CustomerID = TS.CustomerID
-						LEFT JOIN master_itemdetails MID
-							ON MID.ItemDetailsID = SD.ItemDetailsID
-					WHERE 
-						CASE
-							WHEN ",pBranchID," = 0
-							THEN SD.BranchID
-							ELSE ",pBranchID,"
-						END = SD.BranchID
-						AND CAST(TS.TransactionDate AS DATE) >= '",pFromDate,"'
-						AND CAST(TS.TransactionDate AS DATE) <= '",pToDate,"'
-						AND ", pWhere, "
-                    GROUP BY
-						TS.SaleID,
-                        TS.SaleNumber,
-                        TS.TransactionDate,
-                        MC.CustomerName
-                    UNION ALL
-                    SELECT
-						TB.BookingID,
-						'Pemesanan' TransactionType,
-                        TB.BookingNumber,
-                        DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
-                        MC.CustomerName,
-                        SUM((BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (BD.Quantity * BD.BuyPrice * IFNULL(MID.ConversionQuantity, 1))) Total
-					FROM
-						transaction_booking TB
-                        JOIN transaction_bookingdetails BD
-							ON TB.BookingID = BD.BookingID
-						JOIN master_customer MC
-							ON MC.CustomerID = TB.CustomerID
-						LEFT JOIN master_itemdetails MID
-							ON MID.ItemDetailsID = BD.ItemDetailsID
-					WHERE 
-						CASE
-							WHEN ",pBranchID," = 0
-							THEN BD.BranchID
-							ELSE ",pBranchID,"
-						END = BD.BranchID
-						AND CAST(TB.TransactionDate AS DATE) >= '",pFromDate,"'
-						AND CAST(TB.TransactionDate AS DATE) <= '",pToDate,"'
-						AND ", pWhere, "
-                    GROUP BY
-						TB.BookingID,
-                        TB.BookingNumber,
-                        TB.TransactionDate,
-                        MC.CustomerName
-                    UNION ALL
-                    SELECT
-						TSR.SaleReturnID,
-						'Retur' TransactionType,
-                        CONCAT('R', TS.SaleNumber),
-                        DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') TransactionDate,
-                        MC.CustomerName,
-                        -SUM(((SRD.Quantity * SRD.SalePrice * IFNULL(MID.ConversionQuantity, 1)) - (SRD.Quantity * SRD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)))) Total
-					FROM
-						transaction_salereturn TSR
-						JOIN transaction_sale TS
-							ON TS.SaleID = TSR.SaleID
-                        JOIN transaction_salereturndetails SRD
-							ON SRD.SaleReturnID = TSR.SaleReturnID
-						JOIN master_customer MC
-							ON MC.CustomerID = TS.CustomerID
-						LEFT JOIN master_itemdetails MID
-							ON MID.ItemDetailsID = SRD.ItemDetailsID
-					WHERE 
-						CASE
-							WHEN ",pBranchID," = 0
-							THEN SRD.BranchID
-							ELSE ",pBranchID,"
-						END = SRD.BranchID
-						AND CAST(TSR.TransactionDate AS DATE) >= '",pFromDate,"'
-						AND CAST(TSR.TransactionDate AS DATE) <= '",pToDate,"'
-						AND ", pWhere2, "
-                    GROUP BY
-						TSR.SaleReturnID,
-                        TS.SaleNumber,
-                        TSR.TransactionDate,
-                        MC.CustomerName
-					ORDER BY ", pOrder,
-					" LIMIT ", pLimit_s, ", ", pLimit_l);
-	                
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select sale transaction
-Created Date: 3 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelExportSaleReport;
-
-DELIMITER $$
-CREATE PROCEDURE spSelExportSaleReport (
-	pBranchID		INT,
-	pFromDate		DATE,
-	pToDate			DATE,
-	pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelExportSaleReport', pCurrentUser);
-	END;
-	
-SET State = 1;
-	SELECT
-		TS.SaleID,
-		TS.SaleNumber,
-        DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
-        MC.CustomerName,
-		MI.ItemID,
-        MI.ItemName,
-        MI.ItemCode,
-        SD.Quantity,
-        MU.UnitName,
-        SD.SalePrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
-        SD.Discount,
-        SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount) SubTotal
-    FROM
-		transaction_sale TS
-        JOIN transaction_saledetails SD
-			ON TS.SaleID = SD.SaleID
-		JOIN master_customer MC
-			ON MC.CustomerID = TS.CustomerID
-		JOIN master_item MI
-			ON MI.ItemID = SD.ItemID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = SD.ItemDetailsID
-		LEFT JOIN master_unit MU
-			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
-	WHERE
-		CASE
-			WHEN pBranchID = 0
-			THEN SD.BranchID
-			ELSE pBranchID
-		END = SD.BranchID
-		AND CAST(TS.TransactionDate AS DATE) >= pFromDate
-		AND CAST(TS.TransactionDate AS DATE) <= pToDate
-	UNION ALL
-    SELECT
-		TB.BookingID,
-		TB.BookingNumber,
-        DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
-        MC.CustomerName,
-		MI.ItemID,
-        MI.ItemName,
-        MI.ItemCode,
-        BD.Quantity,
-        MU.UnitName,
-        BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
-        BD.Discount,
-        BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount) SubTotal
-    FROM
-		transaction_booking TB
-        JOIN transaction_bookingdetails BD
-			ON TB.BookingID = BD.BookingID
-		JOIN master_customer MC
-			ON MC.CustomerID = TB.CustomerID
-		JOIN master_item MI
-			ON MI.ItemID = BD.ItemID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = BD.ItemDetailsID
-		LEFT JOIN master_unit MU
-			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
-	WHERE
-		CASE
-			WHEN pBranchID = 0
-			THEN BD.BranchID
-			ELSE pBranchID
-		END = BD.BranchID
-		AND CAST(TB.TransactionDate AS DATE) >= pFromDate
-		AND CAST(TB.TransactionDate AS DATE) <= pToDate
-	UNION ALL
-    SELECT
-		TSR.SaleReturnID,
-		CONCAT('R', TS.SaleNumber) SaleNumber,
-        DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') TransactionDate,
-        MC.CustomerName,
-		MI.ItemID,
-        MI.ItemName,
-        MI.ItemCode,
-        SRD.Quantity,
-        MU.UnitName,
-        SRD.SalePrice,
-        0 Discount,
-        -(SRD.Quantity * SRD.SalePrice) SubTotal
-    FROM
-		transaction_salereturn TSR
-		JOIN transaction_sale TS
-			ON TSR.SaleID = TS.SaleID
-        JOIN transaction_salereturndetails SRD
-			ON TSR.SaleReturnID = SRD.SaleReturnID
-		JOIN master_customer MC
-			ON MC.CustomerID = TS.CustomerID
-		JOIN master_item MI
-			ON MI.ItemID = SRD.ItemID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = SRD.ItemDetailsID
-		LEFT JOIN master_unit MU
-			ON MU.UnitID = IFNULL(MID.UnitID, MI.UnitID)
-	WHERE
-		CASE
-			WHEN pBranchID = 0
-			THEN SRD.BranchID
-			ELSE pBranchID
-		END = SRD.BranchID
-		AND CAST(TSR.TransactionDate AS DATE) >= pFromDate
-		AND CAST(TSR.TransactionDate AS DATE) <= pToDate
-	ORDER BY
-		SaleNumber,
-        SaleID;
-
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select sale transaction
-Created Date: 3 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelSaleReport;
-
-DELIMITER $$
-CREATE PROCEDURE spSelSaleReport (
-	pBranchID		INT,
-	pFromDate		DATE,
-	pToDate			DATE,
-	pWhere 			TEXT,
-    pWhere2			TEXT,
-	pOrder			TEXT,
-	pLimit_s		BIGINT,
-    pLimit_l		INT,
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelSaleReport', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-SET @query = CONCAT("SELECT
-						COUNT(1) AS nRows,
-						SUM(Total) GrandTotal
-					FROM
-						(
-							SELECT
-								SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) Total
-							FROM
-								transaction_sale TS
-								JOIN transaction_saledetails SD
-									ON SD.SaleID = TS.SaleID
-								JOIN master_customer MC
-									ON MC.CustomerID = TS.CustomerID
-								LEFT JOIN master_itemdetails MID
-									ON MID.ItemDetailsID = SD.ItemDetailsID
-							WHERE
-								CASE
-									WHEN ",pBranchID," = 0
-									THEN SD.BranchID
-									ELSE ",pBranchID,"
-								END = SD.BranchID
-								AND CAST(TS.TransactionDate AS DATE) >= '",pFromDate,"'
-								AND CAST(TS.TransactionDate AS DATE) <= '",pToDate,"'
-								AND ", pWhere, "
-							GROUP BY
-								TS.SaleID
-							UNION ALL
-							SELECT
-								SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) Total
-							FROM
-								transaction_booking TB
-								JOIN transaction_bookingdetails BD
-									ON TB.BookingID = BD.BookingID
-								JOIN master_customer MC
-									ON MC.CustomerID = TB.CustomerID
-								LEFT JOIN master_itemdetails MID
-									ON MID.ItemDetailsID = BD.ItemDetailsID
-							WHERE 
-								CASE
-									WHEN ",pBranchID," = 0
-									THEN BD.BranchID
-									ELSE ",pBranchID,"
-								END = BD.BranchID
-								AND CAST(TB.TransactionDate AS DATE) >= '",pFromDate,"'
-								AND CAST(TB.TransactionDate AS DATE) <= '",pToDate,"'
-								AND ", pWhere, "
-							GROUP BY
-								TB.BookingID
-							UNION ALL
-		                    SELECT
-								-SUM(SRD.Quantity * SRD.SalePrice) Total
-							FROM
-								transaction_salereturn TSR
-								JOIN transaction_sale TS
-									ON TS.SaleID = TSR.SaleID
-		                        JOIN transaction_salereturndetails SRD
-									ON SRD.SaleReturnID = TSR.SaleReturnID
-								JOIN master_customer MC
-									ON MC.CustomerID = TS.CustomerID
-							WHERE 
-								CASE
-									WHEN ",pBranchID," = 0
-									THEN SRD.BranchID
-									ELSE ",pBranchID,"
-								END = SRD.BranchID
-								AND CAST(TSR.TransactionDate AS DATE) >= '",pFromDate,"'
-								AND CAST(TSR.TransactionDate AS DATE) <= '",pToDate,"'
-								AND ", pWhere2, "
-		                    GROUP BY
-								TSR.SaleReturnID
-						) TS"
-					);
-                       
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-SET State = 2;
-
-SET @query = CONCAT("SELECT
-						TS.SaleID,
-						'Penjualan' TransactionType,
-                        TS.SaleNumber,
-                        DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
-                        MC.CustomerName,
-                        SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) Total
-					FROM
-						transaction_sale TS
-                        JOIN transaction_saledetails SD
-							ON SD.SaleID = TS.SaleID
-						JOIN master_customer MC
-							ON MC.CustomerID = TS.CustomerID
-						LEFT JOIN master_itemdetails MID
-							ON MID.ItemDetailsID = SD.ItemDetailsID
-					WHERE 
-						CASE
-							WHEN ",pBranchID," = 0
-							THEN SD.BranchID
-							ELSE ",pBranchID,"
-						END = SD.BranchID
-						AND CAST(TS.TransactionDate AS DATE) >= '",pFromDate,"'
-						AND CAST(TS.TransactionDate AS DATE) <= '",pToDate,"'
-						AND ", pWhere, "
-                    GROUP BY
-						TS.SaleID,
-                        TS.SaleNumber,
-                        TS.TransactionDate,
-                        MC.CustomerName
-                    UNION ALL
-                    SELECT
-						TB.BookingID,
-						'Pemesanan' TransactionType,
-                        TB.BookingNumber,
-                        DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
-                        MC.CustomerName,
-                        SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) Total
-					FROM
-						transaction_booking TB
-                        JOIN transaction_bookingdetails BD
-							ON TB.BookingID = BD.BookingID
-						JOIN master_customer MC
-							ON MC.CustomerID = TB.CustomerID
-						LEFT JOIN master_itemdetails MID
-							ON MID.ItemDetailsID = BD.ItemDetailsID
-					WHERE 
-						CASE
-							WHEN ",pBranchID," = 0
-							THEN BD.BranchID
-							ELSE ",pBranchID,"
-						END = BD.BranchID
-						AND CAST(TB.TransactionDate AS DATE) >= '",pFromDate,"'
-						AND CAST(TB.TransactionDate AS DATE) <= '",pToDate,"'
-						AND ", pWhere, "
-                    GROUP BY
-						TB.BookingID,
-                        TB.BookingNumber,
-                        TB.TransactionDate,
-                        MC.CustomerName
-                    UNION ALL
-                    SELECT
-						TSR.SaleReturnID,
-						'Retur' TransactionType,
-                        CONCAT('R', TS.SaleNumber),
-                        DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') TransactionDate,
-                        MC.CustomerName,
-                        -SUM(SRD.Quantity * SRD.SalePrice) Total
-					FROM
-						transaction_salereturn TSR
-						JOIN transaction_sale TS
-							ON TS.SaleID = TSR.SaleID
-                        JOIN transaction_salereturndetails SRD
-							ON SRD.SaleReturnID = TSR.SaleReturnID
-						JOIN master_customer MC
-							ON MC.CustomerID = TS.CustomerID
-					WHERE 
-						CASE
-							WHEN ",pBranchID," = 0
-							THEN SRD.BranchID
-							ELSE ",pBranchID,"
-						END = SRD.BranchID
-						AND CAST(TSR.TransactionDate AS DATE) >= '",pFromDate,"'
-						AND CAST(TSR.TransactionDate AS DATE) <= '",pToDate,"'
-						AND ", pWhere2, "
-                    GROUP BY
-						TSR.SaleReturnID,
-                        TS.SaleNumber,
-                        TSR.TransactionDate,
-                        MC.CustomerName
-					ORDER BY ", pOrder,
-					" LIMIT ", pLimit_s, ", ", pLimit_l);
-	                
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select sale transaction
-Created Date: 3 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelExportCustomerPurchaseReport;
-
-DELIMITER $$
-CREATE PROCEDURE spSelExportCustomerPurchaseReport (
-	pCustomerID		INT,
-	pFromDate		DATE,
-	pToDate			DATE,
-	pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelExportCustomerPurchaseReport', pCurrentUser);
-	END;
-	
-SET State = 1;
-	SELECT
-		TS.SaleID,
-		TS.SaleNumber,
-		DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
-		SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) Total
-	FROM
-		transaction_sale TS
-		JOIN transaction_saledetails SD
-			ON SD.SaleID = TS.SaleID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = SD.ItemDetailsID
-	WHERE 
-		TS.CustomerID = pCustomerID
-		AND CAST(TS.TransactionDate AS DATE) >= pFromDate
-		AND CAST(TS.TransactionDate AS DATE) <= pToDate
-	GROUP BY
-		TS.SaleID,
-		TS.SaleNumber,
-		TS.TransactionDate
-	UNION ALL
-    SELECT
-		TB.BookingID,
-		TB.BookingNumber,
-		DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
-		SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) Total
-	FROM
-		transaction_booking TB
-		JOIN transaction_bookingdetails BD
-			ON TB.BookingID = BD.BookingID
-		LEFT JOIN master_itemdetails MID
-			ON MID.ItemDetailsID = BD.ItemDetailsID
-	WHERE 
-		TB.CustomerID = pCustomerID
-		AND CAST(TB.TransactionDate AS DATE) >= pFromDate
-		AND CAST(TB.TransactionDate AS DATE) <= pToDate
-	GROUP BY
-		TB.BookingID,
-		TB.BookingNumber,
-		TB.TransactionDate
-	UNION ALL
-	SELECT
-		TSR.SaleReturnID,
-		CONCAT('R', TS.SaleNumber),
-		DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') TransactionDate,
-		-SUM(SRD.Quantity * SRD.SalePrice) Total
-	FROM
-		transaction_salereturn TSR
-		JOIN transaction_sale TS
-			ON TS.SaleID = TSR.SaleID
-		JOIN transaction_salereturndetails SRD
-			ON SRD.SaleReturnID = TSR.SaleReturnID
-	WHERE 
-		TS.CustomerID = pCustomerID
-		AND CAST(TSR.TransactionDate AS DATE) >= pFromDate
-		AND CAST(TSR.TransactionDate AS DATE) <= pToDate
-	GROUP BY
-		TSR.SaleReturnID,
-		TS.SaleNumber,
-		TSR.TransactionDate
-	ORDER BY
-		SaleNumber,
-        SaleID;
-
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select sale transaction
-Created Date: 3 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelCustomerPurchaseReport;
-
-DELIMITER $$
-CREATE PROCEDURE spSelCustomerPurchaseReport (
-	pCustomerID		INT,
-	pFromDate		DATE,
-	pToDate			DATE,
-	pWhere 			TEXT,
-    pWhere2			TEXT,
-	pOrder			TEXT,
-	pLimit_s		BIGINT,
-    pLimit_l		INT,
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelSaleReport', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-SET @query = CONCAT("SELECT
-						COUNT(1) AS nRows,
-						SUM(Total) GrandTotal
-					FROM
-						(
-							SELECT
-								SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) Total
-							FROM
-								transaction_sale TS
-								JOIN transaction_saledetails SD
-									ON SD.SaleID = TS.SaleID
-								LEFT JOIN master_itemdetails MID
-									ON MID.ItemDetailsID = SD.ItemDetailsID
-							WHERE 
-								TS.CustomerID = ", pCustomerID ,"
-								AND CAST(TS.TransactionDate AS DATE) >= '", pFromDate, "'
-								AND CAST(TS.TransactionDate AS DATE) <= '", pToDate, "'
-								AND ", pWhere, "
-							GROUP BY
-								TS.SaleID
-							UNION ALL
-                            SELECT
-								SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) Total
-							FROM
-								transaction_booking TB
-								JOIN transaction_bookingdetails BD
-									ON BD.BookingID = TB.BookingID
-								LEFT JOIN master_itemdetails MID
-									ON MID.ItemDetailsID = BD.ItemDetailsID
-							WHERE 
-								TB.CustomerID = ", pCustomerID ,"
-								AND CAST(TB.TransactionDate AS DATE) >= '", pFromDate, "'
-								AND CAST(TB.TransactionDate AS DATE) <= '", pToDate, "'
-								AND ", pWhere, "
-							GROUP BY
-								TB.BookingID
-							UNION ALL
-		                    SELECT
-								-SUM(SRD.Quantity * SRD.SalePrice) Total
-							FROM
-								transaction_salereturn TSR
-								JOIN transaction_sale TS
-									ON TS.SaleID = TSR.SaleID
-		                        JOIN transaction_salereturndetails SRD
-									ON SRD.SaleReturnID = TSR.SaleReturnID
-							WHERE 
-								TS.CustomerID = ", pCustomerID ,"
-								AND CAST(TSR.TransactionDate AS DATE) >= '", pFromDate, "'
-								AND CAST(TSR.TransactionDate AS DATE) <= '", pToDate, "'
-								AND ", pWhere2, "
-		                    GROUP BY
-								TSR.SaleReturnID
-						) TS"
-					);
-                       
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-SET State = 2;
-
-SET @query = CONCAT("SELECT
-						TS.SaleID,
-						'Penjualan' TransactionType,
-                        TS.SaleNumber,
-                        DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
-                        SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) Total
-					FROM
-						transaction_sale TS
-                        JOIN transaction_saledetails SD
-							ON SD.SaleID = TS.SaleID
-						LEFT JOIN master_itemdetails MID
-							ON MID.ItemDetailsID = SD.ItemDetailsID
-					WHERE 
-						TS.CustomerID = ", pCustomerID ,"
-						AND CAST(TS.TransactionDate AS DATE) >= '",pFromDate,"'
-						AND CAST(TS.TransactionDate AS DATE) <= '",pToDate,"'
-						AND ", pWhere, "
-                    GROUP BY
-						TS.SaleID,
-                        TS.SaleNumber,
-                        TS.TransactionDate
-                    UNION ALL
-                    SELECT
-						TB.BookingID,
-						'Pemesanan' TransactionType,
-                        TB.BookingNumber,
-                        DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
-                        SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) Total
-					FROM
-						transaction_booking TB
-                        JOIN transaction_bookingdetails BD
-							ON BD.BookingID = TB.BookingID
-						LEFT JOIN master_itemdetails MID
-							ON MID.ItemDetailsID = BD.ItemDetailsID
-					WHERE 
-						TB.CustomerID = ", pCustomerID ,"
-						AND CAST(TB.TransactionDate AS DATE) >= '",pFromDate,"'
-						AND CAST(TB.TransactionDate AS DATE) <= '",pToDate,"'
-						AND ", pWhere, "
-                    GROUP BY
-						TB.BookingID,
-                        TB.BookingNumber,
-                        TB.TransactionDate
-                    UNION ALL
-                    SELECT
-						TSR.SaleReturnID,
-						'Retur' TransactionType,
-                        CONCAT('R', TS.SaleNumber),
-                        DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') TransactionDate,
-						-SUM(SRD.Quantity * SRD.SalePrice) Total
-					FROM
-						transaction_salereturn TSR
-						JOIN transaction_sale TS
-							ON TS.SaleID = TSR.SaleID
-                        JOIN transaction_salereturndetails SRD
-							ON SRD.SaleReturnID = TSR.SaleReturnID
-					WHERE 
-						TS.CustomerID = ", pCustomerID ,"
-						AND CAST(TSR.TransactionDate AS DATE) >= '",pFromDate,"'
-						AND CAST(TSR.TransactionDate AS DATE) <= '",pToDate,"'
-						AND ", pWhere2, "
-                    GROUP BY
-						TSR.SaleReturnID,
-                        TS.SaleNumber,
-                        TSR.TransactionDate
-					ORDER BY ", pOrder,
-					" LIMIT ", pLimit_s, ", ", pLimit_l);
-	                
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
         
 END;
 $$
@@ -7993,117 +7241,6 @@ SET @query = CONCAT("SELECT
                     " ORDER BY ", pOrder,
 					" LIMIT ", pLimit_s, ", ", pLimit_l);
                     
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select booking transaction
-Created Date: 3 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelBooking;
-
-DELIMITER $$
-CREATE PROCEDURE spSelBooking (
-	pWhere 			TEXT,
-	pOrder			TEXT,
-	pLimit_s		BIGINT,
-    pLimit_l		INT,
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelBooking', pCurrentUser);
-	END;
-	
-SET State = 1;
-
-	DELETE FROM 
-		transaction_booking
-    WHERE
-		FinishFlag = 0
-        AND DATE_FORMAT(TransactionDate, '%Y-%m-%d') <> DATE_FORMAT(NOW(), '%Y-%m-%d');
-
-SET State = 2;
-
-SET @query = CONCAT("SELECT
-						COUNT(1) AS nRows
-					FROM
-						transaction_booking TB
-                        JOIN master_customer MC
-							ON MC.CustomerID = TB.CustomerID
-					WHERE ", pWhere);
-						
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-SET State = 2;
-
-SET @query = CONCAT("SELECT
-						TB.BookingID,
-                        TB.BookingNumber,
-                        DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
-                        TB.TransactionDate PlainTransactionDate,
-                        MC.CustomerID,
-                        MC.CustomerName,
-						IFNULL(TBD.Total, 0) Total,
-						IFNULL(TBD.Weight, 0) Weight,
-						TB.RetailFlag,
-                        IFNULL(TB.Payment, 0) Payment,
-                        IFNULL(PT.PaymentTypeName, '') PaymentTypeName,
-                        CASE
-							WHEN FinishFlag = 0
-                            THEN 'Belum Selesai'
-                            ELSE 'Selesai'
-						END Status,
-                        IFNULL(PT.PaymentTypeID, 1) PaymentTypeID
-					FROM
-						transaction_booking TB
-                        JOIN master_customer MC
-							ON MC.CustomerID = TB.CustomerID
-						LEFT JOIN master_paymenttype PT
-							ON PT.PaymentTypeID = TB.PaymentTypeID
-						LEFT JOIN
-                        (
-							SELECT
-								TB.BookingID,
-                                SUM(TBD.Quantity * (TBD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - TBD.Discount)) Total,
-								SUM(TBD.Quantity * MI.Weight * IFNULL(MID.ConversionQuantity, 1)) Weight
-							FROM
-								transaction_booking TB
-                                JOIN master_customer MC
-									ON MC.CustomerID = TB.CustomerID
-                                LEFT JOIN transaction_bookingdetails TBD
-									ON TB.BookingID = TBD.BookingID
-								LEFT JOIN master_item MI
-									ON MI.ItemID = TBD.ItemID
-								LEFT JOIN master_itemdetails MID
-									ON MID.ItemDetailsID = TBD.ItemDetailsID
-							WHERE ", 
-								pWhere, 
-                            " GROUP BY
-								TB.BookingID
-                        )TBD
-							ON TBD.BookingID = TB.BookingID
-					WHERE ", pWhere, 
-					" ORDER BY ", pOrder,
-					" LIMIT ", pLimit_s, ", ", pLimit_l);
-					
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
 	DEALLOCATE PREPARE stmt;
@@ -12254,117 +11391,6 @@ $$
 DELIMITER ;
 /*=============================================================
 Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select sale transaction
-Created Date: 3 January 2018
-Modified Date: 
-===============================================================*/
-
-DROP PROCEDURE IF EXISTS spSelSale;
-
-DELIMITER $$
-CREATE PROCEDURE spSelSale (
-	pWhere 			TEXT,
-	pOrder			TEXT,
-	pLimit_s		BIGINT,
-    pLimit_l		INT,
-    pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE State INT;
-    
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelSale', pCurrentUser);
-	END;
-	
-SET State = 1;
-	
-    DELETE FROM 
-		transaction_sale
-    WHERE
-		FinishFlag = 0
-        AND DATE_FORMAT(TransactionDate, '%Y-%m-%d') <> DATE_FORMAT(NOW(), '%Y-%m-%d');
-    
-SET State = 2;
-
-SET @query = CONCAT("SELECT
-						COUNT(1) AS nRows
-					FROM
-						transaction_sale TS
-                        JOIN master_customer MC
-							ON MC.CustomerID = TS.CustomerID
-					WHERE ", pWhere);
-						
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-SET State = 2;
-
-SET @query = CONCAT("SELECT
-						TS.SaleID,
-                        TS.SaleNumber,
-                        DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
-                        TS.TransactionDate PlainTransactionDate,
-                        MC.CustomerID,
-                        MC.CustomerName,
-						IFNULL(TSD.Total, 0) Total,
-						IFNULL(TSD.Weight, 0) Weight,
-						TS.RetailFlag,
-						IFNULL(TS.Payment, 0) Payment,
-                        IFNULL(PT.PaymentTypeName, '') PaymentTypeName,
-                        CASE
-							WHEN FinishFlag = 0
-                            THEN 'Belum Selesai'
-                            ELSE 'Selesai'
-						END Status,
-                        IFNULL(PT.PaymentTypeID, 1) PaymentTypeID
-					FROM
-						transaction_sale TS
-                        JOIN master_customer MC
-							ON MC.CustomerID = TS.CustomerID
-						LEFT JOIN master_paymenttype PT
-							ON PT.PaymentTypeID = TS.PaymentTypeID
-						LEFT JOIN
-                        (
-							SELECT
-								TS.SaleID,
-                                SUM(TSD.Quantity * (TSD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - TSD.Discount)) Total,
-								SUM(TSD.Quantity * MI.Weight * IFNULL(MID.ConversionQuantity, 1)) Weight
-							FROM
-								transaction_sale TS
-                                JOIN master_customer MC
-									ON MC.CustomerID = TS.CustomerID
-                                LEFT JOIN transaction_saledetails TSD
-									ON TS.SaleID = TSD.SaleID
-								LEFT JOIN master_item MI
-									ON MI.ItemID = TSD.ItemID
-								LEFT JOIN master_itemdetails MID
-									ON MID.ItemDetailsID = TSD.ItemDetailsID
-							WHERE ", 
-								pWhere, 
-                            " GROUP BY
-								TS.SaleID
-                        )TSD
-							ON TSD.SaleID = TS.SaleID
-					WHERE ", pWhere, 
-					" ORDER BY ", pOrder,
-					" LIMIT ", pLimit_s, ", ", pLimit_l);
-					
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;
-        
-END;
-$$
-DELIMITER ;
-/*=============================================================
-Author: Ricmawan Adi Wijaya
 Description: Stored Procedure for select sale details by SaleID
 Created Date: 12 January 2018
 Modified Date: 
@@ -13403,68 +12429,6 @@ SET State = 2;
 END;
 $$
 DELIMITER ;
-DROP PROCEDURE IF EXISTS spUpdBookingPayment;
-
-DELIMITER $$
-CREATE PROCEDURE spUpdBookingPayment (
-	pID 			BIGINT, 
-	pPayment 		DOUBLE,
-	pPaymentTypeID	SMALLINT,
-    pFinishFlag		BIT,
-	pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE Message VARCHAR(255);
-	DECLARE MessageDetail VARCHAR(255);
-	DECLARE FailedFlag INT;
-	DECLARE State INT;
-	DECLARE RowCount INT;
-
-	DECLARE PassValidate INT;
-	
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spUpdBookingPayment', pCurrentUser);
-        SELECT
-			pID AS 'ID',
-			'Terjadi kesalahan sistem!' AS 'Message',
-			@full_error AS 'MessageDetail',
-			1 AS 'FailedFlag',
-			State AS 'State' ;
-	END;
-	
-	SET PassValidate = 1;
-	
-	START TRANSACTION;
-	
-SET State = 1;
-		UPDATE
-			transaction_booking
-		SET
-			Payment = pPayment,
-            FinishFlag = pFinishFlag,
-			PaymentTypeID = pPaymentTypeID,
-			ModifiedBy = pCurrentUser
-		WHERE
-			BookingID = pID;
-
-SET State = 2;
-		SELECT
-			pID AS 'ID',
-			'Pembayaran berhasil' AS 'Message',
-			'' AS 'MessageDetail',
-			0 AS 'FailedFlag',
-			State AS 'State';
-
-    COMMIT;
-END;
-$$
-DELIMITER ;
 DROP PROCEDURE IF EXISTS spUpdFirstStock;
 
 DELIMITER $$
@@ -13855,68 +12819,6 @@ SET State = 2;
 		SELECT
 			pID AS 'ID',
 			'Cabang berhasil diubah' AS 'Message',
-			'' AS 'MessageDetail',
-			0 AS 'FailedFlag',
-			State AS 'State';
-
-    COMMIT;
-END;
-$$
-DELIMITER ;
-DROP PROCEDURE IF EXISTS spUpdSalePayment;
-
-DELIMITER $$
-CREATE PROCEDURE spUpdSalePayment (
-	pID 			BIGINT, 
-	pPayment 		DOUBLE,
-	pPaymentTypeID	SMALLINT,
-    pFinishFlag		BIT,
-	pCurrentUser	VARCHAR(255)
-)
-StoredProcedure:BEGIN
-
-	DECLARE Message VARCHAR(255);
-	DECLARE MessageDetail VARCHAR(255);
-	DECLARE FailedFlag INT;
-	DECLARE State INT;
-	DECLARE RowCount INT;
-
-	DECLARE PassValidate INT;
-	
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
-		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spUpdSalePayment', pCurrentUser);
-        SELECT
-			pID AS 'ID',
-			'Terjadi kesalahan sistem!' AS 'Message',
-			@full_error AS 'MessageDetail',
-			1 AS 'FailedFlag',
-			State AS 'State' ;
-	END;
-	
-	SET PassValidate = 1;
-	
-	START TRANSACTION;
-	
-SET State = 1;
-		UPDATE
-			transaction_sale
-		SET
-			Payment = pPayment,
-            FinishFlag = pFinishFlag,
-			PaymentTypeID = pPaymentTypeID,
-			ModifiedBy = pCurrentUser
-		WHERE
-			SaleID = pID;
-
-SET State = 2;
-		SELECT
-			pID AS 'ID',
-			'Pembayaran berhasil' AS 'Message',
 			'' AS 'MessageDetail',
 			0 AS 'FailedFlag',
 			State AS 'State';
@@ -17276,6 +16178,1185 @@ SET State = 8;
 			State AS 'State';
                 
 	COMMIT;
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for insert sale return
+Created Date: 23 February 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spInsSaleReturn;
+
+DELIMITER $$
+CREATE PROCEDURE spInsSaleReturn (
+	pID 				BIGINT, 
+	pSaleID 			BIGINT,
+	pTransactionDate 	DATETIME,
+	pSaleReturnData 	TEXT,
+	pIsEdit				INT,
+    pCurrentUser		VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE PassValidate INT;
+	
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spInsSaleReturn', pCurrentUser);
+		SELECT
+			pID AS 'ID',
+			'Terjadi kesalahan sistem!' AS 'Message',
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag',
+			State AS 'State' ;
+	END;
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+		IF(pIsEdit = 0)	THEN /*Tambah baru*/
+			INSERT INTO transaction_salereturn
+			(
+				SaleID,
+				TransactionDate,
+				CreatedDate,
+				CreatedBy
+			)
+			VALUES (
+				pSaleID,
+				pTransactionDate,
+				NOW(),
+				pCurrentUser
+			);
+			
+SET State = 2;			               
+			SELECT
+				LAST_INSERT_ID()
+			INTO 
+				pID;
+			
+		ELSE
+			
+SET State = 3;
+			UPDATE
+				transaction_salereturn
+			SET
+				TransactionDate = pTransactionDate,
+				ModifiedBy = pCurrentUser
+			WHERE
+				SaleReturnID = pID;
+	
+		END IF;
+	
+SET State = 4;
+
+		DELETE 
+		FROM 
+			transaction_salereturndetails
+		WHERE
+			SaleReturnID = pID;
+					
+SET State = 5;
+		IF(pSaleReturnData <> "" ) THEN
+			SET @query = CONCAT("INSERT INTO transaction_salereturndetails
+								(
+									SaleReturnID,
+									ItemID,
+									BranchID,
+									Quantity,
+									BuyPrice,
+									SalePrice,
+									SaleDetailsID,
+									CreatedDate,
+									CreatedBy
+								)
+								VALUES", REPLACE(REPLACE(pSaleReturnData, ', UserLogin)', CONCAT(', "', pCurrentUser, '")')), '(0,', CONCAT('(', pID, ','))
+								);
+								
+			PREPARE stmt FROM @query;
+			EXECUTE stmt;
+			DEALLOCATE PREPARE stmt;
+			
+		END IF;
+
+SET State = 6;
+
+		IF(pIsEdit = 0) THEN
+			SELECT
+				pID AS 'ID',
+				'Retur Berhasil Ditambahkan' AS 'Message',
+				'' AS 'MessageDetail',
+				0 AS 'FailedFlag',
+				State AS 'State';
+		ELSE
+	
+SET State = 7;
+
+			SELECT
+				pID AS 'ID',
+				'Retur Berhasil Diubah' AS 'Message',
+				'' AS 'MessageDetail',
+				0 AS 'FailedFlag',
+				State AS 'State';
+		END IF;
+    COMMIT;
+END;
+$$
+DELIMITER ;
+DROP PROCEDURE IF EXISTS spInsStockAdjust;
+
+DELIMITER $$
+CREATE PROCEDURE spInsStockAdjust (
+	pID 						BIGINT,
+	pBranchID					INT,
+	pTransactionDate 			DATETIME,
+	pStockAdjustDetailsID		BIGINT,
+    pItemID						BIGINT,
+    pItemDetailsID				BIGINT,
+	pQuantity					DOUBLE,
+	pAdjustedQuantity			DOUBLE,
+    pUserID						BIGINT,
+    pCurrentUser				VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE RowCount INT;
+
+	DECLARE PassValidate INT;
+	
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spInsStockAdjust', pCurrentUser);
+		SELECT
+			pID AS 'ID',
+            pStockAdjustDetailsID AS 'StockAdjustDetailsID',
+			'Terjadi kesalahan sistem!' AS 'Message',
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag',
+			State AS 'State' ;
+	END;
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+
+		IF(pID = 0)	THEN /*Tambah baru*/
+			INSERT INTO transaction_stockadjust
+			(
+				TransactionDate,
+				CreatedDate,
+				CreatedBy
+			)
+			VALUES 
+			(
+				pTransactionDate,
+				NOW(),
+				pCurrentUser
+			);
+		
+SET State = 3;	               
+			SELECT
+				LAST_INSERT_ID()
+			INTO 
+				pID;
+				
+		ELSE
+		
+SET State = 4;
+			UPDATE
+				transaction_stockadjust
+			SET
+				TransactionDate = pTransactionDate,
+				ModifiedBy = pCurrentUser
+			WHERE
+				StockAdjustID = pID;
+				
+		END IF;
+		
+SET State = 5;
+		
+		IF(pStockAdjustDetailsID = 0) THEN
+			INSERT INTO transaction_stockadjustdetails
+			(
+				StockAdjustID,
+				BranchID,
+				ItemID,
+                ItemDetailsID,
+				Quantity,
+				AdjustedQuantity,
+				CreatedDate,
+				CreatedBy
+			)
+			VALUES
+			(
+				pID,
+				pBranchID,
+				pItemID,
+                pItemDetailsID,
+				pQuantity,
+				pAdjustedQuantity,
+				NOW(),
+				pCurrentUser
+			);
+			
+SET State = 6;
+			
+			SELECT
+				LAST_INSERT_ID()
+			INTO 
+				pStockAdjustDetailsID;
+		
+		ELSE
+				
+SET State = 7;
+			
+			UPDATE 
+				transaction_stockadjustdetails
+			SET
+				ItemID = pItemID,
+				ItemDetailsID = pItemDetailsID,
+				BranchID = pBranchID,
+				Quantity = pQuantity,
+				AdjustedQuantity = pAdjustedQuantity,
+				ModifiedBy = pCurrentUser
+			WHERE
+				StockAdjustDetailsID = pStockAdjustDetailsID;
+			
+		END IF;
+		
+SET State = 8;
+
+		SELECT
+			pID AS 'ID',
+			pStockAdjustDetailsID AS 'StockAdjustDetailsID',
+			'Transaksi Berhasil Disimpan' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State';
+                
+	COMMIT;
+END;
+$$
+DELIMITER ;
+DROP PROCEDURE IF EXISTS spInsStockMutation;
+
+DELIMITER $$
+CREATE PROCEDURE spInsStockMutation (
+	pID 						BIGINT,
+	pSourceID					INT,
+	pDestinationID				INT,
+	pTransactionDate 			DATETIME,
+	pStockMutationDetailsID		BIGINT,
+    pItemID						BIGINT,
+    pItemDetailsID				BIGINT,
+	pQuantity					DOUBLE,
+    pUserID						BIGINT,
+    pCurrentUser				VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE RowCount INT;
+
+	DECLARE PassValidate INT;
+	
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spInsStockMutation', pCurrentUser);
+		SELECT
+			pID AS 'ID',
+            pStockMutationDetailsID AS 'StockMutationDetailsID',
+			'Terjadi kesalahan sistem!' AS 'Message',
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag',
+			State AS 'State' ;
+	END;
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+
+		IF(pID = 0)	THEN /*Tambah baru*/
+			INSERT INTO transaction_stockmutation
+			(
+				TransactionDate,
+				CreatedDate,
+				CreatedBy
+			)
+			VALUES 
+			(
+				pTransactionDate,
+				NOW(),
+				pCurrentUser
+			);
+		
+SET State = 3;	               
+			SELECT
+				LAST_INSERT_ID()
+			INTO 
+				pID;
+				
+		ELSE
+		
+SET State = 4;
+			UPDATE
+				transaction_stockmutation
+			SET
+				TransactionDate = pTransactionDate,
+				ModifiedBy = pCurrentUser
+			WHERE
+				StockMutationID = pID;
+				
+		END IF;
+		
+SET State = 5;
+		
+		IF(pStockMutationDetailsID = 0) THEN
+			INSERT INTO transaction_stockmutationdetails
+			(
+				StockMutationID,
+				SourceID,
+				DestinationID,
+				ItemID,
+                ItemDetailsID,
+				Quantity,
+				CreatedDate,
+				CreatedBy
+			)
+			VALUES
+			(
+				pID,
+				pSourceID,
+				pDestinationID,
+				pItemID,
+                pItemDetailsID,
+				pQuantity,
+				NOW(),
+				pCurrentUser
+			);
+			
+SET State = 6;
+			
+			SELECT
+				LAST_INSERT_ID()
+			INTO 
+				pStockMutationDetailsID;
+		
+		ELSE
+				
+SET State = 7;
+			
+			UPDATE 
+				transaction_stockmutationdetails
+			SET
+				ItemID = pItemID,
+                ItemDetailsID = pItemDetailsID,
+				SourceID = pSourceID,
+				DestinationID = pDestinationID,
+				Quantity = pQuantity,
+				ModifiedBy = pCurrentUser
+			WHERE
+				StockMutationDetailsID = pStockMutationDetailsID;
+			
+		END IF;
+		
+SET State = 8;
+
+		SELECT
+			pID AS 'ID',
+			pStockMutationDetailsID AS 'StockMutationDetailsID',
+			'Transaksi Berhasil Disimpan' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State';
+                
+	COMMIT;
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for insert the supplier
+Created Date: 12 November 2017
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spInsSupplier;
+
+DELIMITER $$
+CREATE PROCEDURE spInsSupplier (
+	pID 				BIGINT, 
+    pSupplierCode		VARCHAR(100),
+	pSupplierName 		VARCHAR(255),
+    pTelephone			VARCHAR(100),
+	pAddress			TEXT,
+    pCity				VARCHAR(100),
+	pRemarks			TEXT,
+    pIsEdit				INT,
+    pCurrentUser		VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE RowCount INT;
+
+	DECLARE PassValidate INT;
+	
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spInsSupplier', pCurrentUser);
+		SELECT
+			pID AS 'ID',
+			'Terjadi kesalahan sistem!' AS 'Message',
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag',
+			State AS 'State' ;
+	END;
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+
+		SELECT 
+			0
+		INTO
+			PassValidate
+		FROM 
+			master_supplier
+		WHERE
+			TRIM(SupplierCode) = TRIM(pSupplierCode)
+			AND SupplierID <> pID
+		LIMIT 1;
+			
+		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
+SET State = 2;
+
+			SELECT
+				pID AS 'ID',
+				CONCAT('Kode Supplier ', pSupplierCode, ' sudah ada') AS 'Message',
+				'' AS 'MessageDetail',
+				1 AS 'FailedFlag',
+				State AS 'State' ;
+		
+			LEAVE StoredProcedure;
+			
+		END IF;
+        
+SET State = 1;
+
+		SELECT 
+			0
+		INTO
+			PassValidate
+		FROM 
+			master_supplier
+		WHERE
+			(TRIM(SupplierName) = TRIM(pSupplierName)
+            AND TRIM(Address) = TRIM(pAddress))
+			AND SupplierID <> pID
+		LIMIT 1;
+			
+		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
+SET State = 3;
+
+			SELECT
+				pID AS 'ID',
+				CONCAT('Nama Supplier ', pSupplierName, ' dengan alamat ', pAddress, ' sudah ada') AS 'Message',
+				'' AS 'MessageDetail',
+				1 AS 'FailedFlag',
+				State AS 'State' ;
+		
+			LEAVE StoredProcedure;
+			
+		ELSE /*Data yang diinput valid*/
+SET State = 4;
+
+			IF(pIsEdit = 0)	THEN /*Tambah baru*/
+				INSERT INTO master_supplier
+				(
+                    SupplierCode,
+                    SupplierName,
+					Telephone,
+					Address,
+					City,
+					Remarks,
+					CreatedDate,
+					CreatedBy
+				)
+				VALUES (
+					pSupplierCode,
+					pSupplierName,
+					pTelephone,
+					pAddress,
+					pCity,
+					pRemarks,
+					NOW(),
+					pCurrentUser
+				);
+			
+SET State = 5;			               
+
+				SELECT
+					LAST_INSERT_ID()
+				INTO 
+					pID;
+
+SET State = 6;
+
+				SELECT
+					pID AS 'ID',
+					'Supplier Berhasil Ditambahkan' AS 'Message',
+					'' AS 'MessageDetail',
+					0 AS 'FailedFlag',
+					State AS 'State';
+			ELSE
+SET State = 7;
+
+				UPDATE
+					master_supplier
+				SET
+					SupplierCode = pSupplierCode,
+                    SupplierName = pSupplierName,
+					Telephone = pTelephone,
+					Address = pAddress,
+					City = pCity,
+					Remarks = pRemarks,
+					ModifiedBy = pCurrentUser
+				WHERE
+					SupplierID = pID;
+
+SET State = 8;
+
+				SELECT
+					pID AS 'ID',
+					'Supplier Berhasil Diubah' AS 'Message',
+					'' AS 'MessageDetail',
+					0 AS 'FailedFlag',
+					State AS 'State';
+			END IF;
+		END IF;
+	COMMIT;
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for insert the supplier
+Created Date: 12 November 2017
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spInsUnit;
+
+DELIMITER $$
+CREATE PROCEDURE spInsUnit (
+	pID 			INT, 
+	pUnitName 		VARCHAR(255),
+	pIsEdit			INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE RowCount INT;
+
+	DECLARE PassValidate INT;
+	
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spInsUnit', pCurrentUser);
+        SELECT
+			pID AS 'ID',
+			'Terjadi kesalahan sistem!' AS 'Message',
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag',
+			State AS 'State' ;
+	END;
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+
+		SELECT 
+			0
+		INTO
+			PassValidate
+		FROM 
+			master_unit
+		WHERE
+			TRIM(UnitName) = TRIM(pUnitName)
+			AND UnitID <> pID
+		LIMIT 1;
+        
+			
+		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
+SET State = 2;
+			SELECT
+				pID AS 'ID',
+				CONCAT('Nama satuan ', pUnitName, ' sudah ada') AS 'Message',
+				'' AS 'MessageDetail',
+				1 AS 'FailedFlag',
+				State AS 'State' ;
+		
+			LEAVE StoredProcedure;
+			
+		ELSE /*Data yang diinput valid*/
+SET State = 3;
+			IF(pIsEdit = 0)	THEN /*Tambah baru*/
+				INSERT INTO master_unit
+				(
+					UnitName,
+					CreatedDate,
+					CreatedBy
+				)
+				VALUES (
+					pUnitName,
+					NOW(),
+					pCurrentUser
+				);
+			
+SET State = 4;			               
+				SELECT
+					pID AS 'ID',
+					'Satuan Berhasil Ditambahkan' AS 'Message',
+					'' AS 'MessageDetail',
+					0 AS 'FailedFlag',
+					State AS 'State';
+			ELSE
+SET State = 5;
+				UPDATE
+					master_unit
+				SET
+					UnitName= pUnitName,
+					ModifiedBy = pCurrentUser
+				WHERE
+					UnitID = pID;
+
+SET State = 6;
+				SELECT
+					pID AS 'ID',
+					'Satuan Berhasil Diubah' AS 'Message',
+					'' AS 'MessageDetail',
+					0 AS 'FailedFlag',
+					State AS 'State';
+			END IF;
+		END IF;
+	COMMIT;
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for insert the user
+Created Date: 12 November 2017
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spInsUser;
+
+DELIMITER $$
+CREATE PROCEDURE spInsUser (
+	pID 			BIGINT, 
+	pUserName 		VARCHAR(255),
+	pUserTypeID		SMALLINT,
+	pUserLogin 		VARCHAR(100),
+	pPassword 		VARCHAR(255),
+	pIsActive		BIT,
+	pRoleValues		TEXT,
+	pIsEdit			INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE Message VARCHAR(255);
+	DECLARE MessageDetail VARCHAR(255);
+	DECLARE FailedFlag INT;
+	DECLARE State INT;
+	DECLARE PassValidate INT;
+	
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		ROLLBACK;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spInsUser', pCurrentUser);
+		SELECT
+			pID AS 'ID',
+			'Terjadi kesalahan sistem!' AS 'Message',
+			@full_error AS 'MessageDetail',
+			1 AS 'FailedFlag',
+			State AS 'State' ;
+	END;
+	
+	SET PassValidate = 1;
+	
+	START TRANSACTION;
+	
+SET State = 1;
+
+		SELECT 
+			0
+		INTO
+			PassValidate
+		FROM 
+			master_user 
+		WHERE
+			UserLogin = pUserLogin
+			AND UserID <> pID
+		LIMIT 1;
+			
+SET State = 2;
+
+		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
+			SELECT
+				pID AS 'ID',
+				CONCAT('Username ', pUserLogin, ' sudah dipakai') AS 'Message',
+				'' AS 'MessageDetail',
+				1 AS 'FailedFlag',
+				State AS 'State' ;
+		
+			LEAVE StoredProcedure;
+			
+		ELSE /*Data yang diinput valid*/
+		
+SET State = 3;
+
+			IF(pIsEdit = 0)	THEN /*Tambah baru*/
+				INSERT INTO master_user
+				(
+					UserName,
+					UserLogin,
+					UserTypeID,
+					UserPassword,
+					IsActive,
+					CreatedDate,
+					CreatedBy
+				)
+				VALUES (
+					pUserName,
+					pUserLogin,
+					pUserTypeID,
+					pPassword,
+					pIsActive,
+					NOW(),
+					pCurrentUser
+				);
+			
+SET State = 4;			               
+				SELECT
+					LAST_INSERT_ID()
+				INTO 
+					pID;
+					
+			ELSE
+			
+SET State = 5;
+				UPDATE
+					master_user
+				SET
+					UserName = pUserName,
+					UserLogin = pUserLogin,
+					UserTypeID = pUserTypeID,
+					UserPassword = pPassword,
+					IsActive = pIsActive,
+					ModifiedBy = pCurrentUser
+				WHERE
+					UserID = pID;
+		
+			END IF;
+	
+SET State = 6;
+
+				DELETE 
+				FROM 
+					master_role
+				WHERE
+					UserID = pID;
+					
+SET State = 7;
+			IF(pRoleValues <> "" ) THEN
+				SET @query = CONCAT("INSERT INTO master_role
+									(
+										UserID,
+										MenuID,
+										EditFlag,
+										DeleteFlag
+									)
+									VALUES", REPLACE(pRoleValues, '(0,', CONCAT('(', pID, ',')));
+									
+				PREPARE stmt FROM @query;
+				EXECUTE stmt;
+				DEALLOCATE PREPARE stmt;
+				
+			END IF;
+
+		END IF;
+
+SET State = 8;
+
+	IF(pIsEdit = 0) THEN
+		SELECT
+			pID AS 'ID',
+			'User Berhasil Ditambahkan' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State';
+	ELSE
+	
+SET State = 9;
+
+		SELECT
+			pID AS 'ID',
+			'User Berhasil Diubah' AS 'Message',
+			'' AS 'MessageDetail',
+			0 AS 'FailedFlag',
+			State AS 'State';
+	END IF;
+	
+    COMMIT;
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select category
+Created Date: 30 Desember 2017
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelCategory;
+
+DELIMITER $$
+CREATE PROCEDURE spSelCategory (
+	pWhere 			TEXT,
+	pOrder			TEXT,
+	pLimit_s		BIGINT,
+    pLimit_l		INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelUser', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+SET @query = CONCAT("SELECT
+						COUNT(1) AS nRows
+					FROM
+						master_category MC
+					WHERE ", pWhere);
+						
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+SET State = 2;
+
+SET @query = CONCAT("SELECT
+						MC.CategoryID,
+						MC.CategoryCode,
+						MC.CategoryName
+					FROM
+						master_category MC
+					WHERE ", pWhere, 
+					" ORDER BY ", pOrder,
+					" LIMIT ", pLimit_s, ", ", pLimit_l);
+					
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select item details by itemCode
+Created Date: 9 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelCategoryByName;
+
+DELIMITER $$
+CREATE PROCEDURE spSelCategoryByName (
+	pCategoryName	VARCHAR(100),
+	pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), " SPState ", State, ") ",  IFNULL(@MessageText, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelCategoryByName', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+	SELECT
+		MC.CategoryID,
+		MC.CategoryName
+	FROM
+		master_category MC
+	WHERE
+		TRIM(MC.CategoryName) = TRIM(pCategoryName);
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select Customer
+Created Date: 3 January 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelCustomer;
+
+DELIMITER $$
+CREATE PROCEDURE spSelCustomer (
+	pWhere 			TEXT,
+	pOrder			TEXT,
+	pLimit_s		BIGINT,
+    pLimit_l		INT,
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelCustomer', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+SET @query = CONCAT("SELECT
+						COUNT(1) AS nRows
+					FROM
+						master_customer MC
+					WHERE ", pWhere);
+						
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+SET State = 2;
+
+SET @query = CONCAT("SELECT
+						MC.CustomerID,
+                        MC.CustomerCode,
+                        MC.CustomerName,
+                        MC.Telephone,
+                        MC.Address,
+                        MC.City,
+                        MC.Remarks
+					FROM
+						master_customer MC
+					WHERE ", pWhere, 
+					" ORDER BY ", pOrder,
+					" LIMIT ", pLimit_s, ", ", pLimit_l);
+					
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select branch from dropdown list
+Created Date: 11 january 2018
+Modified Date: 
+===============================================================*/
+
+
+DROP PROCEDURE IF EXISTS spSelDDLBranch;
+DELIMITER $$
+CREATE PROCEDURE spSelDDLBranch (
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelDDLBranch', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+	SELECT 
+		MB.BranchID,
+		MB.BranchCode,
+		MB.BranchName
+	FROM 
+		master_branch MB
+	ORDER BY 
+		MB.BranchID;
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select category from dropdown list
+Created Date: 3 january 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelDDLCategory;
+
+DELIMITER $$
+CREATE PROCEDURE spSelDDLCategory (
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelDDLCategory', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+	SELECT 
+		MC.CategoryID,
+		MC.CategoryCode,
+		MC.CategoryName
+	FROM 
+		master_category MC
+	ORDER BY 
+		MC.CategoryCode;
+        
+END;
+$$
+DELIMITER ;
+/*=============================================================
+Author: Ricmawan Adi Wijaya
+Description: Stored Procedure for select customer from dropdown list
+Created Date: 9 january 2018
+Modified Date: 
+===============================================================*/
+
+DROP PROCEDURE IF EXISTS spSelDDLCustomer;
+
+DELIMITER $$
+CREATE PROCEDURE spSelDDLCustomer (
+    pCurrentUser	VARCHAR(255)
+)
+StoredProcedure:BEGIN
+
+	DECLARE State INT;
+    
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN		
+		GET DIAGNOSTICS CONDITION 1
+		@MessageText = MESSAGE_TEXT, 
+		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
+		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
+		CALL spInsEventLog(@full_error, 'spSelDDLCustomer', pCurrentUser);
+	END;
+	
+SET State = 1;
+
+	SELECT 
+		MC.CustomerID,
+		MC.CustomerCode,
+		MC.CustomerName
+	FROM 
+		master_customer MC
+	ORDER BY 
+		MC.CustomerCode;
+        
 END;
 $$
 DELIMITER ;
