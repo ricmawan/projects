@@ -263,7 +263,7 @@
 					Diskon :
 				</div>
 				<div class="col-md-8 col-sm-8">
-					<input id="txtDiscountTotal" name="txtDiscountTotal" type="text" tabindex=16 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
+					<input id="txtDiscountTotal" name="txtDiscountTotal" type="tel" tabindex=16 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
 				</div>
 			</div>
 			<br />
