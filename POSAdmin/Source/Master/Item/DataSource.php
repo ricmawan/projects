@@ -72,7 +72,7 @@
 		$row_array[] = "<input type='checkbox' name='select' value='".$row['ItemID']."^".$row['ItemName']."' />";
 		$row_array[] = $RowNumber;
 		$row_array[] = $row['ItemCode'];
-		$row_array[] = $row['ItemName'];
+		$row_array[] = htmlspecialchars_decode($row['ItemName'], ENT_QUOTES);
 		$row_array[] = $row['CategoryName'];
 		$row_array[] = $row['UnitName'];
 		$row_array[] = number_format($row['BuyPrice'],0,".",",");

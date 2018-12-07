@@ -307,6 +307,13 @@
 			}
 
 			$(document).ready(function() {
+				$("#txtItemNameAdd").on("keydown", function(evt) {
+					if(evt.keyCode == 222) {
+						evt.stopImmediatePropagation();
+						return true;
+					}
+				});
+				
 				keyFunction();
 				enterLikeTab();
 				$("#ddlCategoryAdd").combobox();

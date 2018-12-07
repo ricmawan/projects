@@ -48,7 +48,7 @@
 		mysqli_next_result($dbh);
 		$ItemID = 0;
 		$ItemCode = mysqli_real_escape_string($dbh, $_POST['txtItemCodeAdd']);
-		$ItemName = mysqli_real_escape_string($dbh, $_POST['txtItemNameAdd']);
+		$ItemName = mysqli_real_escape_string($dbh, htmlspecialchars($_POST['txtItemNameAdd'], ENT_QUOTES));
 		$CategoryID = mysqli_real_escape_string($dbh, $_POST['ddlCategoryAdd']);
 		$UnitID = mysqli_real_escape_string($dbh, $_POST['ddlUnitAdd']);
 		$BuyPrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtBuyPriceAdd']));

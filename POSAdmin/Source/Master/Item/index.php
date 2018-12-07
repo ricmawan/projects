@@ -788,6 +788,13 @@
 		    })();
 			
 			$(document).ready(function() {
+				$("#txtItemName").on("keydown", function(evt) {
+					if(evt.keyCode == 222) {
+						evt.stopImmediatePropagation();
+						return true;
+					}
+				});
+
 				$( window ).resize(function() {
 					waitForFinalEvent(function () {
 		               setTimeout(function() {

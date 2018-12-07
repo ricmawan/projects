@@ -36,7 +36,7 @@
 			$row = mysqli_fetch_array($result);
 			$ItemID = $row['ItemID'];
 			$ItemDetailsID = $row['ItemDetailsID'];
-			$ItemName = $row['ItemName'];
+			$ItemName = htmlspecialchars_decode($row['ItemName'], ENT_QUOTES);
 			$BuyPrice = $row['BuyPrice'];
 			$RetailPrice = $row['RetailPrice'];
 			$Price1 = $row['Price1'];

@@ -11,6 +11,8 @@ DELIMITER $$
 CREATE PROCEDURE spSelItemListStockAdjust (
 	pBranchID		INT,
 	pCategoryID		INT,
+	pLimit_s		BIGINT,
+    pLimit_l		INT,
     pCurrentUser	VARCHAR(255)
 )
 StoredProcedure:BEGIN
@@ -27,6 +29,15 @@ StoredProcedure:BEGIN
 	END;
 	
 SET State = 1;
+
+	SELECT
+		COUNT(1) nRows
+	FROM
+		master_item MI
+	WHERE
+		MI.CategoryID = pCategoryID;
+		
+SET State = 2;
 
 	SELECT
 		MI.ItemID,
@@ -316,7 +327,9 @@ SET State = 1;
 		END = MB.BranchID
 		AND MC.CategoryID = pCategoryID
 	ORDER BY
-		MI.ItemName ASC;
+		MI.ItemName ASC
+	LIMIT
+		pLimit_s, pLimit_l;
 		
 	/* Unit selain pcs
 	UNION ALL

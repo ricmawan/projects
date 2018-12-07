@@ -6,8 +6,8 @@
 	<head>
 		<style>
 			#divTableContent {
-				min-height: 330px;
-				max-height: 330px;
+				min-height: 280px;
+				max-height: 280px;
 				overflow-y: auto;
 			}
 
@@ -107,12 +107,22 @@
 			var today;
 			var rowEdit;
 			var dataJSON = [];
+			var ddlCategory = 0;
 
 			function ReloadTable() {
-				table2.ajax.reload(function() {
-					table2.columns.adjust();
-					tableWidthAdjust();
-				});
+				if(ddlCategory == $("#ddlCategory").val()) {
+					table2.ajax.reload(function() {
+						table2.columns.adjust();
+						tableWidthAdjust();
+					}, false);
+				}
+				else {
+					table2.ajax.reload(function() {
+						table2.columns.adjust();
+						tableWidthAdjust();
+					});
+				}
+				ddlCategory = $("#ddlCategory").val();
 			}
 
 			function addData(ItemID, Quantity, AdjustedQuantity, BuyPrice, SalePrice) {
@@ -134,12 +144,14 @@
 				$("#txtSaleNumber").focus();
 				table2 = $("#grid-transaction").DataTable({
 							"keys": true,
-							"scrollY": "280px",
+							"scrollY": "176px",
 							"scrollX": false,
 							"scrollCollapse": false,
-							"paging": false,
+							"paging": true,
 							"searching": false,
 							"order": [],
+							"lengthChange": false,
+							"pageLength": 100,
 							"columns": [
 								{ "visible": false },
 								{ "width": "20%", "orderable": false, className: "dt-head-center" },
@@ -158,7 +170,7 @@
 							"processing": true,
 							"serverSide": true,
 							"language": {
-								"info": "",
+								"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
 								"infoFiltered": "",
 								"infoEmpty": "",
 								"zeroRecords": "Data tidak ditemukan",
@@ -180,6 +192,17 @@
 								}, 0);
 							}
 						});
+
+				table2.on('page', function(e) {
+					if(dataJSON.length > 0) {
+						Lobibox.alert("error",
+						{
+							msg: "Terjadi perubahan pada data. Harap simpan perubahan!",
+							width: 480
+						});
+						e.preventDefault();
+					}
+				});
 			}
 			
 			function tableWidthAdjust() {
@@ -214,8 +237,8 @@
 											width: 480,
 											delay: 2000
 										});
-										ReloadTable();
 										dataJSON = [];
+										ReloadTable();
 									}
 									else {
 										$("#loading").hide();

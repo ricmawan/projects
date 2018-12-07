@@ -6,7 +6,7 @@
 		include "../../GetPermission.php";
 		$ItemID = mysqli_real_escape_string($dbh, $_POST['hdnItemID']);
 		$ItemCode = mysqli_real_escape_string($dbh, $_POST['txtItemCode']);
-		$ItemName = mysqli_real_escape_string($dbh, $_POST['txtItemName']);
+		$ItemName = mysqli_real_escape_string($dbh, htmlspecialchars($_POST['txtItemName'], ENT_QUOTES));
 		$UnitID = mysqli_real_escape_string($dbh, $_POST['ddlUnit']);
 		$CategoryID = mysqli_real_escape_string($dbh, $_POST['ddlCategory']);
 		$BuyPrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtBuyPrice']));

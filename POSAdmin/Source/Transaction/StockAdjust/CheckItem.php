@@ -31,7 +31,7 @@
 			$row = mysqli_fetch_array($result);
 			$ItemID = $row['ItemID'];
 			$ItemDetailsID = $row['ItemDetailsID'];
-			$ItemName = $row['ItemName'];
+			$ItemName = htmlspecialchars_decode($row['ItemName'], ENT_QUOTES);
 			$Quantity = $row['Stock'];
 			$UnitID = $row['UnitID'];
 		}

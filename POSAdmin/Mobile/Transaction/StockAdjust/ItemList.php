@@ -10,21 +10,27 @@
 	$BranchID = mysqli_real_escape_string($dbh, $requestData['BranchID']);
 	$CategoryID = mysqli_real_escape_string($dbh, $requestData['CategoryID']);
 	if($CategoryID == "") $CategoryID = 0;
+	$limit_s = $requestData['start'];
+	$limit_l = 100;
 	//kolom di table
 
-	$sql = "CALL spSelItemListStockAdjust(".$BranchID.", ".$CategoryID.", '".$_SESSION['UserLogin']."')";
+	$sql = "CALL spSelItemListStockAdjust(".$BranchID.", ".$CategoryID.", ".$limit_s.", ".$limit_l.", '".$_SESSION['UserLogin']."')";
 
 	if (! $result = mysqli_query($dbh, $sql)) {
 		logEvent(mysqli_error($dbh), '/Transaction/StockAdjust/ItemList.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 		return 0;
 	}
 
-	$totalData = 20;
-	$totalFiltered = 20;
+	$row = mysqli_fetch_array($result);
+	$totalData = $row['nRows'];
+	$totalFiltered = $totalData;
+	mysqli_free_result($result);
+	mysqli_next_result($dbh);
 	
+	$result2 = mysqli_use_result($dbh);
 	$return_arr = array();
 	$RowNumber = 0;
-	while ($row = mysqli_fetch_array($result)) {
+	while ($row = mysqli_fetch_array($result2)) {
 		$row_array = array();
 		$RowNumber++;
 		//data yang dikirim ke table
@@ -37,7 +43,7 @@
 		array_push($return_arr, $row_array);
 	}
 	
-	mysqli_free_result($result);
+	mysqli_free_result($result2);
 	mysqli_next_result($dbh);
 
 	$json_data = array(

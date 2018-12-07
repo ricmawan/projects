@@ -30,7 +30,7 @@
 			$row = mysqli_fetch_array($result);
 			$ItemID = $row['ItemID'];
 			$ItemDetailsID = $row['ItemDetailsID'];
-			$ItemName = $row['ItemName'];
+			$ItemName = htmlspecialchars_decode($row['ItemName'], ENT_QUOTES);
 			$UnitID = $row['UnitID'];
 		}
 		else {
