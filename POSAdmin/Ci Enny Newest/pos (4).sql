@@ -15506,7 +15506,7 @@ INSERT INTO `master_parameter` (`ParameterID`, `ParameterName`, `ParameterValue`
 (9, 'MOBILE_PATH', '/POSAdmin/Mobile/', 'Location of the application', 0, '2016-03-12 15:01:05', 'System', '2018-09-19 14:31:20', NULL),
 (10, 'DESKTOP_PATH', '/POSAdmin/Desktop/', 'Location of the application', 0, '2016-03-12 15:01:05', 'System', '2018-09-19 14:31:15', NULL),
 (11, 'MOBILE_HOME', 'http://192.168.1.21/Projects/POSAdmin/Mobile/Home.php', 'Location of the home for mobile view', 0, '2016-03-12 15:01:05', 'System', NULL, NULL),
-(12, 'FINSH_DEFAULT', '0', 'Default value for finish flag', 0, '2016-03-12 15:01:05', 'System', NULL, NULL);
+(12, 'FINISH_DEFAULT', '0', 'Default value for finish flag', 0, '2016-03-12 15:01:05', 'System', NULL, NULL);
 
 -- --------------------------------------------------------
 

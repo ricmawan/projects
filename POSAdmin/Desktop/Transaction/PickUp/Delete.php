@@ -15,9 +15,9 @@
 				$Data = explode("^", $ArrayData[$i]);
 				$DataID = mysqli_real_escape_string($dbh, $Data[0]);
 				$DataName = $Data[1];
-				$sql = "CALL spDelPickUp($DataID, '".$_SESSION['UserLogin']."')";
+				$sql = "CALL spDelPickUp($DataID, '".$_SESSION['UserLoginKasir']."')";
 				if (!$result = mysqli_query($dbh, $sql)) {
-					logEvent(mysqli_error($dbh), '/Transaction/PickUp/Delete.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+					logEvent(mysqli_error($dbh), '/Transaction/PickUp/Delete.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 					throw new Exception($DataName);
 				}
 				$row=mysqli_fetch_array($result);

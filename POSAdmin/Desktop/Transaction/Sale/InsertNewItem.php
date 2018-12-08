@@ -10,10 +10,10 @@
 		$EditFlag = "";
 		$DeleteFlag = "";
 		
-		$sql = "CALL spSelUserMenuPermission('$DESKTOP_PATH', '$RequestedPath', '".$_SESSION['UserID']."')";
+		$sql = "CALL spSelUserMenuPermission('$DESKTOP_PATH', '$RequestedPath', '".$_SESSION['UserIDKasir']."')";
 					
 		if (!$result = mysqli_query($dbh, $sql)) {
-			logEvent(mysqli_error($dbh), $RequestedPath, mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), $RequestedPath, mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 			return 0;
 		}
 		
@@ -100,13 +100,13 @@
 								".$MinimumStock.",
 								'".implode(",", $itemDetails)."',
 								".$hdnIsEdit.",
-								'".$_SESSION['UserLogin']."'
+								'".$_SESSION['UserLoginKasir']."'
 							  )";
 		
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;
-			logEvent(mysqli_error($dbh), '/Master/Item/InsertFromPurchase.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Master/Item/InsertFromPurchase.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 			echo returnstate($CategoryID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}				

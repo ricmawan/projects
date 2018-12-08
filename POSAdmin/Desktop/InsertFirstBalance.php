@@ -1,19 +1,19 @@
 <?php
 	include "./DBConfig.php";
 	include "./GetSession.php";
-	$UserID = mysqli_real_escape_string($dbh, $_SESSION['UserID']);
+	$UserID = mysqli_real_escape_string($dbh, $_SESSION['UserIDKasir']);
 	$FirstBalanceAmount = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtFirstBalance']));
 	$Message = "Sudah diisi";
 	$MessageDetail = "";
 	$FailedFlag = 0;
 	$State = 1;
 	
-	$sql = "CALL spInsFirstBalance(".$UserID.", ".$FirstBalanceAmount.", '".$_SESSION['UserLogin']."')";
+	$sql = "CALL spInsFirstBalance(".$UserID.", ".$FirstBalanceAmount.", '".$_SESSION['UserLoginKasir']."')";
 	if (! $result=mysqli_query($dbh, $sql)) {
 		$Message = "Terjadi Kesalahan Sistem";
 		$MessageDetail = mysqli_error($dbh);
 		$FailedFlag = 1;
-		logEvent(mysqli_error($dbh), '/InsertFirstBalance.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+		logEvent(mysqli_error($dbh), '/InsertFirstBalance.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 		echo returnstate($UserID, $Message, $MessageDetail, $FailedFlag, $State);
 		return 0;
 	}

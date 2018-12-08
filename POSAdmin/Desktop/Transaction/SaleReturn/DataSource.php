@@ -34,10 +34,10 @@
 		$where .= " OR DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
 		$where .= " OR MC.CustomerName LIKE '%".$search."%' )";
 	}
-	$sql = "CALL spSelSaleReturn(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
+	$sql = "CALL spSelSaleReturn(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLoginKasir']."')";
 
 	if (! $result = mysqli_query($dbh, $sql)) {
-		logEvent(mysqli_error($dbh), '/Transaction/SaleReturn/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+		logEvent(mysqli_error($dbh), '/Transaction/SaleReturn/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 		return 0;
 	}
 	$row = mysqli_fetch_array($result);

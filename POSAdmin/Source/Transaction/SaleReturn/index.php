@@ -171,7 +171,9 @@
 								$("#btnSaveSaleReturn").focus();
 							}
 						});
-						$("#txtSaleNumber").focus();
+						setTimeout(function() {
+							$("#txtSaleNumber").focus();
+						}, 0);
 						table.keys.disable();
 						table2 = $("#grid-transaction").DataTable({
 									"keys": false,

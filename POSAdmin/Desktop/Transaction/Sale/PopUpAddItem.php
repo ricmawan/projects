@@ -9,10 +9,10 @@
 	$EditFlag = "";
 	$DeleteFlag = "";
 	
-	$sql = "CALL spSelUserMenuPermission('$DESKTOP_PATH', '$RequestedPath', '".$_SESSION['UserID']."')";
+	$sql = "CALL spSelUserMenuPermission('$DESKTOP_PATH', '$RequestedPath', '".$_SESSION['UserIDKasir']."')";
 				
 	if (!$result = mysqli_query($dbh, $sql)) {
-		logEvent(mysqli_error($dbh), $RequestedPath, mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+		logEvent(mysqli_error($dbh), $RequestedPath, mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 		return 0;
 	}
 	
@@ -102,9 +102,9 @@
 							<div class="col-md-4">
 								<select id="ddlUnitAdd" name="ddlUnitAdd" tabindex=18 class="form-control-custom" placeholder="Pilih Satuan" >
 									<?php
-										$sql = "CALL spSelDDLUnit('".$_SESSION['UserLogin']."')";
+										$sql = "CALL spSelDDLUnit('".$_SESSION['UserLoginKasir']."')";
 										if (! $result = mysqli_query($dbh, $sql)) {
-											logEvent(mysqli_error($dbh), '/Master/Item/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+											logEvent(mysqli_error($dbh), '/Master/Item/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 											return 0;
 										}
 										while($row = mysqli_fetch_array($result)) {
@@ -126,9 +126,9 @@
 									<select id="ddlCategoryAdd" name="ddlCategoryAdd" tabindex=19 class="form-control-custom" placeholder="Pilih Kategori" >
 										<option value="" selected> </option>
 										<?php
-											$sql = "CALL spSelDDLCategory('".$_SESSION['UserLogin']."')";
+											$sql = "CALL spSelDDLCategory('".$_SESSION['UserLoginKasir']."')";
 											if (! $result = mysqli_query($dbh, $sql)) {
-												logEvent(mysqli_error($dbh), '/Master/Item/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+												logEvent(mysqli_error($dbh), '/Master/Item/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 												return 0;
 											}
 											while($row = mysqli_fetch_array($result)) {
@@ -230,9 +230,9 @@
 				<div class="col-md-4">
 					<select id="ddlUnit_" name="ddlUnit_" class="form-control-custom" placeholder="Pilih Satuan" >
 						<?php
-							$sql = "CALL spSelDDLUnit('".$_SESSION['UserLogin']."')";
+							$sql = "CALL spSelDDLUnit('".$_SESSION['UserLoginKasir']."')";
 							if (! $result = mysqli_query($dbh, $sql)) {
-								logEvent(mysqli_error($dbh), '/Master/Item/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+								logEvent(mysqli_error($dbh), '/Master/Item/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 								return 0;
 							}
 							while($row = mysqli_fetch_array($result)) {

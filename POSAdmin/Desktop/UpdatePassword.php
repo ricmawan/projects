@@ -1,7 +1,7 @@
 <?php
 	include "./DBConfig.php";
 	include "./GetSession.php";
-	$UserID = mysqli_real_escape_string($dbh, $_SESSION['UserID']);
+	$UserID = mysqli_real_escape_string($dbh, $_SESSION['UserIDKasir']);
 	$CurrentPassword = mysqli_real_escape_string($dbh, $_POST['txtCurrentPassword']);
 	$NewPassword = mysqli_real_escape_string($dbh, $_POST['txtNewPassword']);		
 	$Message = "Password berhasil diubah";
@@ -19,7 +19,7 @@
 		$Message = "Terjadi Kesalahan Sistem";
 		$MessageDetail = mysqli_error($dbh);
 		$FailedFlag = 1;
-		logEvent(mysqli_error($dbh), '/UpdatePassword.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+		logEvent(mysqli_error($dbh), '/UpdatePassword.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 		echo returnstate($UserID, $Message, $MessageDetail, $FailedFlag, $State);
 		return 0;
 	}
@@ -28,20 +28,20 @@
 	mysqli_next_result($dbh);
 	
 	if($row['UserPassword'] == MD5($CurrentPassword)) {
-		$sql = "CALL spUpdUserPassword(".$UserID.", '".MD5($NewPassword)."', '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spUpdUserPassword(".$UserID.", '".MD5($NewPassword)."', '".$_SESSION['UserLoginKasir']."')";
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;
-			logEvent(mysqli_error($dbh), '/UpdatePassword.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/UpdatePassword.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 			echo returnstate($UserID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}
 		
 		$row=mysqli_fetch_array($result);
 		
-		if($row['FailedFlag'] == 0 && $_SESSION['UserID'] == $UserID) {
-			$_SESSION['UserPassword'] = MD5($NewPassword);
+		if($row['FailedFlag'] == 0 && $_SESSION['UserIDKasir'] == $UserID) {
+			$_SESSION['UserPasswordKasir'] = MD5($NewPassword);
 		}
 		
 		mysqli_free_result($result);

@@ -20,12 +20,12 @@
 		$FailedFlag = 0;
 		$State = 1;
 		
-		$sql = "CALL spUpdSalePayment(".$SaleID.", ".$Payment.", ".$PaymentType.", ".$FinishFlag.", ".$DiscountTotal.", '".$_SESSION['UserLoginKasir']."')";
+		$sql = "CALL spUpdSalePayment(".$SaleID.", ".$Payment.", ".$PaymentType.", ".$FinishFlag.", ".$DiscountTotal.", '".$_SESSION['UserLogin']."')";
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;
-			logEvent(mysqli_error($dbh), '/Transaction/Sale/UpdatePayment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
+			logEvent(mysqli_error($dbh), '/Transaction/Sale/UpdatePayment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 			echo returnstate($SaleID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}
@@ -38,31 +38,31 @@
 
 		$IPAddress = get_client_ip();
 
-	    $sql = "CALL spSelPrinterList('".$IPAddress."', '".$_SESSION['UserLogin']."')";
-	    if (! $result=mysqli_query($dbh, $sql)) {
-	        $Message = "Terjadi Kesalahan Sistem";
-	        $MessageDetail = mysqli_error($dbh);
-	        $FailedFlag = 1;
-	        logEvent(mysqli_error($dbh), '/Transaction/Sale/UpdatePayment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-	        echo returnstate($SaleID, $Message, $MessageDetail, $FailedFlag, $State);
-	        return 0;
-	    }
-	    
-	    $cek = mysqli_num_rows($result);
-	    if($cek > 0) {
-	        $row3=mysqli_fetch_array($result);
-	        $SharedPrinterName = $row3['SharedPrinterName'];
-	    }
-	    else {
-	        $SharedPrinterName = $SHARED_PRINTER_ADDRESS;
-	    }
+		$sql = "CALL spSelPrinterList('".$IPAddress."', '".$_SESSION['UserLogin']."')";
+		if (! $result=mysqli_query($dbh, $sql)) {
+			$Message = "Terjadi Kesalahan Sistem";
+			$MessageDetail = mysqli_error($dbh);
+			$FailedFlag = 1;
+			logEvent(mysqli_error($dbh), '/Transaction/Sale/UpdatePayment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			echo returnstate($SaleID, $Message, $MessageDetail, $FailedFlag, $State);
+			return 0;
+		}
+		
+		$cek = mysqli_num_rows($result);
+		if($cek > 0) {
+			$row3=mysqli_fetch_array($result);
+			$SharedPrinterName = $row3['SharedPrinterName'];
+		}
+		else {
+			$SharedPrinterName = $SHARED_PRINTER_ADDRESS;
+		}
 
-	    mysqli_free_result($result);
+		mysqli_free_result($result);
 		mysqli_next_result($dbh);
 
-	    $connector = new WindowsPrintConnector("smb:".$SharedPrinterName);
-	    $printer = new Printer($connector);
-	    $printer -> pulse();
+		$connector = new WindowsPrintConnector("smb:".$SharedPrinterName);
+		$printer = new Printer($connector);
+		//$printer -> pulse();
 
 		if($PrintInvoice == "true") {
 		    /* Fill in your own connector here */
@@ -95,11 +95,11 @@
 		    $printer -> selectPrintMode(Printer::MODE_FONT_B);
 		    $printer -> text(str_pad("", 39, "-") . "\n");
 		    
-		    $sql = "CALL spSelSaleDetails(".$SaleID.", '".$_SESSION['UserLoginKasir']."')";
+		    $sql = "CALL spSelSaleDetails(".$SaleID.", '".$_SESSION['UserLogin']."')";
 		    $FailedFlag = 0;
 
 		    if (! $result = mysqli_query($dbh, $sql)) {
-		        logEvent(mysqli_error($dbh), '/Transaction/Sale/Print.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
+		        logEvent(mysqli_error($dbh), '/Transaction/Sale/Print.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 		        $FailedFlag = 1;
 		        $json_data = array(
 		                        "FailedFlag" => $FailedFlag
@@ -113,7 +113,7 @@
 		    $rowPrice = "";
 		    while ($row = mysqli_fetch_array($result)) {
 		        $rowPrice .= number_format($row['Quantity'],0,".",",") . " " . $row['UnitName'] . " @ " . number_format($row['SalePrice'],0,".",",");
-		        if($row['Discount'] != 0) $rowPrice += " - " . number_format($row['Discount'],0,".",",");
+		        if($row['Discount'] != 0) $rowPrice .= " - " . number_format($row['Discount'],0,".",",");
 		        $printer -> text("*" . htmlspecialchars_decode($row['ItemName'], ENT_QUOTES) . "\n");
 		        $printer -> text(" " . str_pad($rowPrice , 26, " ") . " ");
 		        $printer -> text(str_pad(number_format(($row['SalePrice'] - $row['Discount']) * $row['Quantity'],0,".",","), 11, " ", STR_PAD_LEFT) . "\n");
@@ -140,7 +140,7 @@
 		    else $printer -> text("KEKURANGAN   : " . str_pad(number_format($Change ,0,".",","), 24, " ", STR_PAD_LEFT) . "\n" );
 		    $printer -> setEmphasis(false);
 
-		    $printer -> text("Kasir : " . str_pad($_SESSION['UserLoginKasir'] . ", ", 10, " ") . " No : " . str_pad($SaleNumber, 14, " ") . "\n");
+		    $printer -> text("Kasir : " . str_pad($_SESSION['UserLogin'] . ", ", 10, " ") . " No : " . str_pad($SaleNumber, 14, " ") . "\n");
 		    $printer -> text(str_pad("", 39, "-") . "\n");
 		    $printer -> setJustification(Printer::JUSTIFY_CENTER);
 		    $printer -> text("KAMI TIDAK MELAYANI PENUKARAN BARANG\n");

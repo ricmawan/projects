@@ -621,6 +621,9 @@
 														 $("#btnAddYes").focus();
 													}
 												});
+												setTimeout(function() {
+													$("#btnAddYes").focus();
+												}, 0);
 											},
 											show: {
 												effect: "fade",
@@ -1092,6 +1095,9 @@
 												 $("#btnYes").focus();
 											}
 										});
+										setTimeout(function() {
+											$("#btnYes").focus();
+										}, 0);
 									},
 									show: {
 										effect: "fade",
@@ -1274,6 +1280,9 @@
 												 $("#btnYes").focus();
 											}
 										});
+										setTimeout(function() {
+											$("#btnYes").focus();
+										}, 0);
 									},
 									show: {
 										effect: "fade",
@@ -1630,6 +1639,9 @@
 									 $("#btnYes").focus();
 								}
 							});
+							setTimeout(function() {
+								$("#btnYes").focus();
+							}, 0);
 						},
 						show: {
 							effect: "fade",

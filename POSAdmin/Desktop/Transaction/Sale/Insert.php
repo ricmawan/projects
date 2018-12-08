@@ -18,16 +18,16 @@
 		$BuyPrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['hdnBuyPrice']));
 		$SalePrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['hdnSalePrice']));
 		$Discount = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtDiscount']));
-		$FinishFlag = $FINSH_DEFAULT;
+		$FinishFlag = $FINISH_DEFAULT;
 		$Message = "Terjadi Kesalahan Sistem!";
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
-		$sql = "CALL spInsSale(".$SaleID.", '".$SaleNumber."', ".$RetailFlag.", ".$FinishFlag.", ".$CustomerID.", '".$TransactionDate."', ".$SaleDetailsID.", ".$BranchID.", ".$ItemID.", ".$ItemDetailsID.", ".$Qty.", ".$BuyPrice.", ".$SalePrice.", ".$Discount.", ".$_SESSION['UserID'].", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsSale(".$SaleID.", '".$SaleNumber."', ".$RetailFlag.", ".$FinishFlag.", ".$CustomerID.", '".$TransactionDate."', ".$SaleDetailsID.", ".$BranchID.", ".$ItemID.", ".$ItemDetailsID.", ".$Qty.", ".$BuyPrice.", ".$SalePrice.", ".$Discount.", ".$_SESSION['UserIDKasir'].", '".$_SESSION['UserLoginKasir']."')";
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;
-			logEvent(mysqli_error($dbh), '/Transaction/Sale/Insert.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Transaction/Sale/Insert.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 			echo returnstate($SaleID, $SaleDetailsID, $SaleNumber, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}

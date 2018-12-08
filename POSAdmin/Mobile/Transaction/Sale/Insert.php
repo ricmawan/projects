@@ -18,7 +18,7 @@
 		$BuyPrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['hdnBuyPrice']));
 		$SalePrice = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['hdnSalePrice']));
 		$Discount = mysqli_real_escape_string($dbh, str_replace(",", "", $_POST['txtDiscount']));
-		$FinishFlag = $FINSH_DEFAULT;
+		$FinishFlag = $FINISH_DEFAULT;
 		$Message = "Terjadi Kesalahan Sistem!";
 		$MessageDetail = "";
 		$FailedFlag = 0;

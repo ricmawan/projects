@@ -85,7 +85,8 @@ SET @query = CONCAT("SELECT
                             ELSE 'Selesai'
 						END Status,
                         IFNULL(PT.PaymentTypeID, 1) PaymentTypeID,
-                        1 TransactionType
+                        1 TransactionType,
+						TS.Discount
 					FROM
 						transaction_sale TS
                         JOIN master_customer MC
@@ -96,7 +97,7 @@ SET @query = CONCAT("SELECT
                         (
 							SELECT
 								TS.SaleID,
-                                SUM(TSD.Quantity * (TSD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - TSD.Discount)) Total,
+                                SUM(TSD.Quantity * (TSD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - TSD.Discount)) - TS.Discount Total,
 								SUM(TSD.Quantity * MI.Weight * IFNULL(MID.ConversionQuantity, 1)) Weight
 							FROM
 								transaction_sale TS
@@ -111,7 +112,8 @@ SET @query = CONCAT("SELECT
 							WHERE ", 
 								pWhere, 
                             " GROUP BY
-								TS.SaleID
+								TS.SaleID,
+								TS.Discount
                         )TSD
 							ON TSD.SaleID = TS.SaleID
 					WHERE ", pWhere, 
@@ -134,7 +136,8 @@ SET @query = CONCAT("SELECT
                             ELSE 'Selesai'
 						END Status,
                         IFNULL(PT.PaymentTypeID, 1) PaymentTypeID,
-                        2 TransactionType
+                        2 TransactionType,
+						TB.Discount
 					FROM
 						transaction_booking TB
                         JOIN master_customer MC
@@ -145,7 +148,7 @@ SET @query = CONCAT("SELECT
                         (
 							SELECT
 								TB.BookingID,
-                                SUM(TBD.Quantity * (TBD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - TBD.Discount)) Total,
+                                SUM(TBD.Quantity * (TBD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - TBD.Discount)) - TB.Discount Total,
 								SUM(TBD.Quantity * MI.Weight * IFNULL(MID.ConversionQuantity, 1)) Weight
 							FROM
 								transaction_booking TB
@@ -160,7 +163,8 @@ SET @query = CONCAT("SELECT
 							WHERE ", 
 								pWhere2, 
                             " GROUP BY
-								TB.BookingID
+								TB.BookingID,
+								TB.Discount
                         )TBD
 							ON TBD.BookingID = TB.BookingID
 					WHERE ", pWhere2, 

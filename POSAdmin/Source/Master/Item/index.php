@@ -4,6 +4,12 @@
 ?>
 <html>
 	<head>
+		<style>
+			h5 {
+				margin-top: 5px;
+				margin-bottom: 5px;
+			}
+		</style>
 	</head>
 	<body>
 		<div class="row">
@@ -933,7 +939,12 @@
 								"drawCallback": function( settings ) {
 							       setTimeout(function() {
 										adjustColumns();
-									}, 0);
+									}, 100);
+							    },
+							    "initComplete": function( settings ) {
+							       setTimeout(function() {
+										adjustColumns();
+									}, 100);
 							    }
 							});
 				

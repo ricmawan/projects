@@ -6,11 +6,11 @@
 		$RequestedPath = str_replace($file, "", $RequestedPath);
 		include "../../GetPermission.php";
 		$PickUpID = mysqli_real_escape_string($dbh, $_POST['PickUpID']);
-		$sql = "CALL spSelPickUpDetails(".$PickUpID.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spSelPickUpDetails(".$PickUpID.", '".$_SESSION['UserLoginKasir']."')";
 		$FailedFlag = 0;
 
 		if (! $result = mysqli_query($dbh, $sql)) {
-			logEvent(mysqli_error($dbh), '/Transaction/PickUp/PickUpDetails.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Transaction/PickUp/PickUpDetails.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 			$FailedFlag = 1;
 			$json_data = array(
 							"FailedFlag" => $FailedFlag

@@ -6,11 +6,11 @@
 		$RequestedPath = str_replace($file, "", $RequestedPath);
 		include "../../GetPermission.php";
 		$BookingID = mysqli_real_escape_string($dbh, $_POST['BookingID']);
-		$sql = "CALL spSelBookingDetails(".$BookingID.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spSelBookingDetails(".$BookingID.", '".$_SESSION['UserLoginKasir']."')";
 		$FailedFlag = 0;
 
 		if (! $result = mysqli_query($dbh, $sql)) {
-			logEvent(mysqli_error($dbh), '/Transaction/Booking/BookingDetails.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Transaction/Booking/BookingDetails.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 			$FailedFlag = 1;
 			$json_data = array(
 							"FailedFlag" => $FailedFlag

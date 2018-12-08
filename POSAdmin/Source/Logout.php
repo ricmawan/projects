@@ -10,8 +10,12 @@
 		
 		$cek = mysqli_num_rows($result);
 		if($cek == 1) {
-			session_unset();
-			session_destroy();
+			unset($_SESSION['UserID']);
+			unset($_SESSION['Nama']);
+			unset($_SESSION['UserLogin']);
+			unset($_SESSION['UserPassword']);
+			unset($_SESSION['UserTypeID']);
+			//session_destroy();
 			echo "<script>window.location='./'; </script>";
 		} 
 		else {	

@@ -1,7 +1,7 @@
 <?php
 	include "./DBConfig.php";
 	include "./GetSession.php";
-	$UserID = mysqli_real_escape_string($dbh, $_SESSION['UserID']);
+	$UserID = mysqli_real_escape_string($dbh, $_SESSION['UserIDKasir']);
 	$Message = "Sudah diisi";
 	$MessageDetail = "";
 	$FailedFlag = 0;
@@ -19,7 +19,7 @@
 		$Message = "Terjadi Kesalahan Sistem";
 		$MessageDetail = mysqli_error($dbh);
 		$FailedFlag = 1;
-		logEvent(mysqli_error($dbh), '/FirstBalance.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+		logEvent(mysqli_error($dbh), '/FirstBalance.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 		echo returnstate($UserID, $Message, $MessageDetail, $FailedFlag, $State, $IsFilled);
 		return 0;
 	}

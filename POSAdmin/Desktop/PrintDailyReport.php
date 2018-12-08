@@ -15,12 +15,36 @@
     $monthName = array("Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des");
     $transactionOrder = array("SALDO AWAL", "PENJUALAN TUNAI", "PEMESANAN TUNAI", "RETUR PENJUALAN", "DP PENJUALAN", "PEMBAYARAN PIUTANG");
 
-    $connector = new WindowsPrintConnector("smb:".$SHARED_PRINTER_ADDRESS);
+    $IPAddress = get_client_ip();
+
+    $sql = "CALL spSelPrinterList('".$IPAddress."', '".$_SESSION['UserLogin']."')";
+    if (! $result=mysqli_query($dbh, $sql)) {
+        $Message = "Terjadi Kesalahan Sistem";
+        $MessageDetail = mysqli_error($dbh);
+        $FailedFlag = 1;
+        logEvent(mysqli_error($dbh), '/Transaction/Sale/UpdatePayment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+        echo returnstate($SaleID, $Message, $MessageDetail, $FailedFlag, $State);
+        return 0;
+    }
+    
+    $cek = mysqli_num_rows($result);
+    if($cek > 0) {
+        $row3=mysqli_fetch_array($result);
+        $SharedPrinterName = $row3['SharedPrinterName'];
+    }
+    else {
+        $SharedPrinterName = $SHARED_PRINTER_ADDRESS;
+    }
+
+    mysqli_free_result($result);
+    mysqli_next_result($dbh);
+
+    $connector = new WindowsPrintConnector("smb:".$SharedPrinterName);
+    $printer = new Printer($connector);
+    $printer -> pulse();
     /*$connector = new DummyPrintConnector();
     $file =  "PrintInvoice.txt";  # nama file temporary yang akan dicetak
     $handle = fopen($file, 'w');*/
-
-    $printer = new Printer($connector);
        
     $printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
     $printer -> setJustification(Printer::JUSTIFY_CENTER);
@@ -39,11 +63,11 @@
     $printer -> selectPrintMode(Printer::MODE_FONT_B);
     $printer -> text(str_pad("", 39, "-") . "\n");
 
-    $sql = "CALL spSelDailyReportPrint('".$_SESSION['UserLogin']."')";
+    $sql = "CALL spSelDailyReportPrint('".$_SESSION['UserLoginKasir']."')";
     $FailedFlag = 0;
 
     if (! $result = mysqli_query($dbh, $sql)) {
-        logEvent(mysqli_error($dbh), '/Transaction/Sale/Print.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+        logEvent(mysqli_error($dbh), '/Transaction/Sale/Print.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
         $FailedFlag = 1;
         $json_data = array(
                         "FailedFlag" => $FailedFlag
@@ -70,7 +94,7 @@
 
     $printer -> setEmphasis(false);
 
-    $printer -> text("Kasir : " . str_pad($_SESSION['UserLogin'], 10, " ") . "\n");
+    $printer -> text("Kasir : " . str_pad($_SESSION['UserLoginKasir'], 10, " ") . "\n");
     $printer -> setJustification(Printer::JUSTIFY_CENTER);
     /*$data = $connector -> getData();
     fwrite($handle, $data);
@@ -78,7 +102,6 @@
 
     /* Cut the receipt and open the cash drawer */
     $printer -> cut();
-    $printer -> pulse();
     $printer -> close();
 
     $Message = "Pembayaran berhasil";
@@ -99,5 +122,24 @@
         );
         return json_encode($data);
     
+    }
+
+    function get_client_ip() {
+        $ipaddress = '';
+        if (getenv('HTTP_CLIENT_IP'))
+            $ipaddress = getenv('HTTP_CLIENT_IP');
+        else if(getenv('HTTP_X_FORWARDED_FOR'))
+            $ipaddress = getenv('HTTP_X_FORWARDED_FOR');
+        else if(getenv('HTTP_X_FORWARDED'))
+            $ipaddress = getenv('HTTP_X_FORWARDED');
+        else if(getenv('HTTP_FORWARDED_FOR'))
+            $ipaddress = getenv('HTTP_FORWARDED_FOR');
+        else if(getenv('HTTP_FORWARDED'))
+           $ipaddress = getenv('HTTP_FORWARDED');
+        else if(getenv('REMOTE_ADDR'))
+            $ipaddress = getenv('REMOTE_ADDR');
+        else
+            $ipaddress = 'UNKNOWN';
+        return $ipaddress;
     }
 ?>

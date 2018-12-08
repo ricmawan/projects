@@ -30,7 +30,7 @@ StoredProcedure:BEGIN
 	
 SET State = 1;
 
-/*SET @query = CONCAT("SELECT
+SET @query = CONCAT("SELECT
 						COUNT(1) AS nRows
 					FROM
 						(
@@ -51,12 +51,11 @@ SET State = 1;
 								JOIN master_category MC
 									ON MC.CategoryID = MI.CategoryID
 							WHERE ", pWhere, "
-						)A
-					LIMIT ", pLimit_s, ", ", pLimit_l);
+						)A");
 						
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
-	DEALLOCATE PREPARE stmt;*/
+	DEALLOCATE PREPARE stmt;
         
 SET State = 2;
 

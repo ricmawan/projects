@@ -578,6 +578,9 @@
 														 $("#btnAddYes").focus();
 													}
 												});
+												setTimeout(function() {
+													$("#btnAddYes").focus();
+												}, 0);
 											},
 											show: {
 												effect: "fade",
@@ -1033,12 +1036,15 @@
 									open: function() {
 										$(document).on('keydown', function(e) {
 											if (e.keyCode == 39) { //right arrow
-												 $("#btnNo").focus();
+												$("#btnNo").focus();
 											}
 											else if (e.keyCode == 37) { //left arrow
-												 $("#btnYes").focus();
+												$("#btnYes").focus();
 											}
 										});
+										setTimeout(function() {
+											$("#btnYes").focus();
+										}, 0);
 									},
 									show: {
 										effect: "fade",
@@ -1391,6 +1397,9 @@
 									 $("#btnYes").focus();
 								}
 							});
+							setTimeout(function() {
+								$("#btnYes").focus();
+							}, 0);
 						},
 						show: {
 							effect: "fade",

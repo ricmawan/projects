@@ -82,7 +82,7 @@
 					<div class="navbar navbar-static-top" style="float:right;">
 						<div class="navigation" style="margin-bottom: 7px;">
 							<nav>
-									Selamat Datang, <a href="#" style="color: white;font-size: 13px;" onclick="UpdatePassword();"><?php echo $_SESSION['Nama']; ?>!</a>&nbsp;&nbsp;&nbsp;<a href="#" onclick="printDailyReport();"><img src="./assets/img/logout.png" width="15px" border="0" acronym title="Logout" /></a>
+									Selamat Datang, <a href="#" style="color: white;font-size: 13px;" onclick="UpdatePassword();"><?php echo $_SESSION['NamaKasir']; ?>!</a>&nbsp;&nbsp;&nbsp;<a href="#" onclick="printDailyReport();"><img src="./assets/img/logout.png" width="15px" border="0" acronym title="Logout" /></a>
 									<input type="hidden" id="hdnLogout" class="menu" link="./Logout.php" />
 							</nav>
 						</div>
@@ -236,7 +236,10 @@
 								 $("#btnSaveFirstBalance").focus();
 							}
 						});
-						$("#txtFirstBalance").focus();
+						setTimeout(function() {
+							$("#txtFirstBalance").focus();
+						}, 0);
+						
 					},
 					
 					close: function() {

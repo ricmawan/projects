@@ -68,7 +68,7 @@
 		$row_array[] = $row['RetailFlag'];
 		$row_array[] = number_format($row['Weight'],2,".",",");
 		$row_array[] = $row['Payment'];
-		$row_array[] = '<a href="#" onclick="finish('.$row['SaleID'].', \''.$row['TransactionType'].'\', '.$row['Total'].', '.$row['Payment'].', '.$row['PaymentTypeID'].', \''.$row['PlainTransactionDate'].'\', \''.$row['SaleNumber'].'\');" ><i class="fa fa-print fa-2" acronym title="Cetak Nota" alt="Cetak Nota"></i></a>&nbsp;&nbsp;&nbsp;<a href="#" onclick="openDialog('.$row['SaleID'].', \''.$row['TransactionType'].'\', '.$row['Total'].', \''.$row['PlainTransactionDate'].'\', \''.$row['SaleNumber'].'\', \''.$row['CustomerName'].'\', '.$row['Payment'].', '.$row['PaymentTypeID'].', \''.$row['TransactionDate'].'\');" ><i class="fa fa-truck fa-2" acronym title="Cetak Surat Jalan"  alt="Cetak Surat Jalan"></i></a>';
+		$row_array[] = '<a href="#" onclick="finish('.$row['SaleID'].', \''.$row['TransactionType'].'\', '.$row['Total'].', '.$row['Discount'].', '.$row['Payment'].', '.$row['PaymentTypeID'].', \''.$row['PlainTransactionDate'].'\', \''.$row['SaleNumber'].'\');" ><i class="fa fa-print fa-2" acronym title="Cetak Nota" alt="Cetak Nota"></i></a>&nbsp;&nbsp;&nbsp;<a href="#" onclick="openDialog('.$row['SaleID'].', \''.$row['TransactionType'].'\', '.$row['Total'].', \''.$row['PlainTransactionDate'].'\', \''.$row['SaleNumber'].'\', \''.$row['CustomerName'].'\', '.$row['Payment'].', '.$row['PaymentTypeID'].', \''.$row['TransactionDate'].'\');" ><i class="fa fa-truck fa-2" acronym title="Cetak Surat Jalan"  alt="Cetak Surat Jalan"></i></a>';
 		array_push($return_arr, $row_array);
 	}
 	

@@ -21,12 +21,12 @@
 			}
 		}
 
-		$sql = "CALL spInsPickUp(".$PickUpID.", ".$BookingID.", '".$TransactionDate."', '".implode(",", $PickUpData)."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsPickUp(".$PickUpID.", ".$BookingID.", '".$TransactionDate."', '".implode(",", $PickUpData)."', ".$hdnIsEdit.", '".$_SESSION['UserLoginKasir']."')";
 
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;
-			logEvent(mysqli_error($dbh), '/Transaction/PickUp/Insert.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Transaction/PickUp/Insert.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 			echo returnstate($PickUpID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}

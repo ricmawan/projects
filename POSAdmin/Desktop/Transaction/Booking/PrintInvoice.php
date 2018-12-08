@@ -20,12 +20,12 @@
 		$FailedFlag = 0;
 		$State = 1;
 		
-		$sql = "CALL spUpdBookingPayment(".$BookingID.", ".$Payment.", ".$PaymentType.", ".$FinishFlag.", ".$DiscountTotal.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spUpdBookingPayment(".$BookingID.", ".$Payment.", ".$PaymentType.", ".$FinishFlag.", ".$DiscountTotal.", '".$_SESSION['UserLoginKasir']."')";
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;
-			logEvent(mysqli_error($dbh), '/Transaction/Booking/UpdatePayment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Transaction/Booking/UpdatePayment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 			echo returnstate($BookingID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}
@@ -36,9 +36,36 @@
 		mysqli_free_result($result);
 		mysqli_next_result($dbh);
 
+		$IPAddress = get_client_ip();
+
+	    $sql = "CALL spSelPrinterList('".$IPAddress."', '".$_SESSION['UserLogin']."')";
+	    if (! $result=mysqli_query($dbh, $sql)) {
+	        $Message = "Terjadi Kesalahan Sistem";
+	        $MessageDetail = mysqli_error($dbh);
+	        $FailedFlag = 1;
+	        logEvent(mysqli_error($dbh), '/Transaction/Sale/UpdatePayment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+	        echo returnstate($SaleID, $Message, $MessageDetail, $FailedFlag, $State);
+	        return 0;
+	    }
+	    
+	    $cek = mysqli_num_rows($result);
+	    if($cek > 0) {
+	        $row3=mysqli_fetch_array($result);
+	        $SharedPrinterName = $row3['SharedPrinterName'];
+	    }
+	    else {
+	        $SharedPrinterName = $SHARED_PRINTER_ADDRESS;
+	    }
+
+	    mysqli_free_result($result);
+		mysqli_next_result($dbh);
+
+	    $connector = new WindowsPrintConnector("smb:".$SharedPrinterName);
+	    $printer = new Printer($connector);
+	    $printer -> pulse();
+
 		if($PrintInvoice == "true") {
 		    /* Fill in your own connector here */
-		    $connector = new WindowsPrintConnector("smb:".$SHARED_PRINTER_ADDRESS);
 		    //$connector = new DummyPrintConnector();
 		    //$file =  "PrintInvoice.txt";  # nama file temporary yang akan dicetak
 		    //$handle = fopen($file, 'w');
@@ -50,8 +77,6 @@
 		    $dayName = array("Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu");
 		    $monthName = array("Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des");
 
-		    $printer = new Printer($connector);
-		   
 		    $printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
 		    $printer -> setJustification(Printer::JUSTIFY_CENTER);
 		    $printer -> text("TOKO MUDA\n");
@@ -69,11 +94,11 @@
 		    $printer -> selectPrintMode(Printer::MODE_FONT_B);
 		    $printer -> text(str_pad("", 39, "-") . "\n");
 		    
-		    $sql = "CALL spSelBookingDetails(".$BookingID.", '".$_SESSION['UserLogin']."')";
+		    $sql = "CALL spSelBookingDetails(".$BookingID.", '".$_SESSION['UserLoginKasir']."')";
 		    $FailedFlag = 0;
 
 		    if (! $result = mysqli_query($dbh, $sql)) {
-		        logEvent(mysqli_error($dbh), '/Transaction/Booking/Print.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+		        logEvent(mysqli_error($dbh), '/Transaction/Booking/Print.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 		        $FailedFlag = 1;
 		        $json_data = array(
 		                        "FailedFlag" => $FailedFlag
@@ -103,15 +128,18 @@
 
 		    //$printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
 		    $printer -> setEmphasis(true);
-		    $printer -> text("PEMBAYARAN     : " . $PaymentMethod ."\n" );
-		    $printer -> text("TOTAL          : " . str_pad(number_format($GrandTotal ,0,".",","), 16, " ", STR_PAD_LEFT) ."\n" );
-		    $printer -> text("DISKON         : " . str_pad(number_format($DiscountTotal ,0,".",","), 16, " ", STR_PAD_LEFT) ."\n" );
-		    $printer -> text("BAYAR          : " . str_pad(number_format($Payment ,0,".",","), 16, " ", STR_PAD_LEFT) ."\n" );
-		    if($PaymentMethod == "Tunai") $printer -> text("KEMBALI        : " . str_pad(number_format($Change ,0,".",","), 16, " ", STR_PAD_LEFT) . "\n" );
-		    else $printer -> text("KEKURANGAN     : " . str_pad(number_format($Change ,0,".",","), 16, " ", STR_PAD_LEFT) . "\n" );
+		    $printer -> text("PEMBAYARAN   : ");
+			$printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
+			$printer -> text($PaymentMethod ."\n" );
+		    $printer -> text("TOTAL:" . str_pad(number_format($GrandTotal ,0,".",","), 10, " ", STR_PAD_LEFT) ."\n" );
+			$printer -> selectPrintMode(Printer::MODE_FONT_B);
+		    $printer -> text("DISKON       : " . str_pad(number_format($DiscountTotal ,0,".",","), 24, " ", STR_PAD_LEFT) ."\n" );
+		    $printer -> text("BAYAR        : " . str_pad(number_format($Payment ,0,".",","), 24, " ", STR_PAD_LEFT) ."\n" );
+		    if($PaymentMethod == "Tunai") $printer -> text("KEMBALI      : " . str_pad(number_format($Change ,0,".",","), 24, " ", STR_PAD_LEFT) . "\n" );
+		    else $printer -> text("KEKURANGAN   : " . str_pad(number_format($Change ,0,".",","), 24, " ", STR_PAD_LEFT) . "\n" );
 		    $printer -> setEmphasis(false);
 
-		    $printer -> text("Kasir : " . str_pad($_SESSION['UserLogin'] . ", ", 10, " ") . " No : " . str_pad($BookingNumber, 14, " ") . "\n");
+		    $printer -> text("Kasir : " . str_pad($_SESSION['UserLoginKasir'] . ", ", 10, " ") . " No : " . str_pad($BookingNumber, 14, " ") . "\n");
 		    $printer -> text(str_pad("", 39, "-") . "\n");
 		    $printer -> setJustification(Printer::JUSTIFY_CENTER);
 		    $printer -> text("KAMI TIDAK MELAYANI PENUKARAN BARANG\n");
@@ -124,7 +152,6 @@
 
 		    /* Cut the receipt and open the cash drawer */
 		    $printer -> cut();
-		    $printer -> pulse();
 		    $printer -> close();
 		}
 
@@ -141,5 +168,24 @@
 		);
 		return json_encode($data);
 	
+	}
+
+	function get_client_ip() {
+		$ipaddress = '';
+		if (getenv('HTTP_CLIENT_IP'))
+			$ipaddress = getenv('HTTP_CLIENT_IP');
+		else if(getenv('HTTP_X_FORWARDED_FOR'))
+			$ipaddress = getenv('HTTP_X_FORWARDED_FOR');
+		else if(getenv('HTTP_X_FORWARDED'))
+			$ipaddress = getenv('HTTP_X_FORWARDED');
+		else if(getenv('HTTP_FORWARDED_FOR'))
+			$ipaddress = getenv('HTTP_FORWARDED_FOR');
+		else if(getenv('HTTP_FORWARDED'))
+		   $ipaddress = getenv('HTTP_FORWARDED');
+		else if(getenv('REMOTE_ADDR'))
+			$ipaddress = getenv('REMOTE_ADDR');
+		else
+			$ipaddress = 'UNKNOWN';
+		return $ipaddress;
 	}
 ?>

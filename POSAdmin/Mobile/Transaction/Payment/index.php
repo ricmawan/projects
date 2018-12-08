@@ -542,66 +542,74 @@
 				$("#lblTotal").html(returnRupiah(grandTotal.toString()));
 			}
 
+			var printCounter = 0;
 			function printInvoice(DPFlag, Amount, TransactionDate) {
-				var TotalPayment = $("#lblTotal").html();
-				var TotalSale = $("#lblWeight").html();
-				var TransactionNumber = $("#txtPaymentNumber").val();
-				var CustomerName = $("#txtCustomerName").val();
+				if(printCounter == 0) {
+					printCounter = 1;
+					var TotalPayment = $("#lblTotal").html();
+					var TotalSale = $("#lblWeight").html();
+					var TransactionNumber = $("#txtPaymentNumber").val();
+					var CustomerName = $("#txtCustomerName").val();
 
-				$("#loading").show();
-				$.ajax({
-					url: "./Transaction/Payment/PrintInvoice.php",
-					type: "POST",
-					data: { DPFlag : DPFlag, TransactionDate : TransactionDate, CustomerName : CustomerName, TransactionNumber : TransactionNumber, TotalPayment : TotalPayment, TotalSale : TotalSale, Amount : Amount },
-					dataType: "json",
-					success: function(data) {
-						if(data.FailedFlag == '0') {
+					$("#loading").show();
+					$.ajax({
+						url: "./Transaction/Payment/PrintInvoice.php",
+						type: "POST",
+						data: { DPFlag : DPFlag, TransactionDate : TransactionDate, CustomerName : CustomerName, TransactionNumber : TransactionNumber, TotalPayment : TotalPayment, TotalSale : TotalSale, Amount : Amount },
+						dataType: "json",
+						success: function(data) {
+							if(data.FailedFlag == '0') {
+								$("#loading").hide();
+								$("#divModal").hide();
+								//resetForm();
+								//table2.destroy();
+								//$("#FormData").dialog("destroy");
+								//openDialog(0, 0);
+								Lobibox.alert("success",
+								{
+									msg: data.Message,
+									width: 480,
+									delay: 2000
+								});
+							}
+							else {
+								$("#loading").hide();
+								$("#divModal").hide();
+								var counter = 0;
+								Lobibox.alert("error",
+								{
+									msg: data.ErrorMessage,
+									width: 480,
+									beforeClose: function() {
+										if(counter == 0) {
+											setTimeout(function() {
+												$("#txtItemCode").focus();
+											}, 0);
+											counter = 1;
+										}
+									}
+								});
+								return 0;
+							}
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
 							$("#loading").hide();
 							$("#divModal").hide();
-							//resetForm();
-							//table2.destroy();
-							//$("#FormData").dialog("destroy");
-							//openDialog(0, 0);
-							Lobibox.alert("success",
-							{
-								msg: data.Message,
-								width: 480,
-								delay: 2000
-							});
-						}
-						else {
-							$("#loading").hide();
-							$("#divModal").hide();
-							var counter = 0;
+							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+							LogEvent(errorMessage, "/Transaction/Payment/index.php");
 							Lobibox.alert("error",
 							{
-								msg: data.ErrorMessage,
-								width: 480,
-								beforeClose: function() {
-									if(counter == 0) {
-										setTimeout(function() {
-											$("#txtItemCode").focus();
-										}, 0);
-										counter = 1;
-									}
-								}
+								msg: errorMessage,
+								width: 480
 							});
 							return 0;
 						}
-					},
-					error: function(jqXHR, textStatus, errorThrown) {
-						$("#loading").hide();
-						$("#divModal").hide();
-						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-						LogEvent(errorMessage, "/Transaction/Payment/index.php");
-						Lobibox.alert("error",
-						{
-							msg: errorMessage,
-							width: 480
-						});
-						return 0;
-					}
-				});
+					});
+				}
+
+				setTimeout(function() {
+					printCounter = 0;
+				}, 1000);
 			}
 
 			var waitForFinalEvent = (function () {

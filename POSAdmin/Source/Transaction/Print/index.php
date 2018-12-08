@@ -115,7 +115,7 @@
 					Pembayaran :
 				</div>
 				<div class="col-md-8">
-					<select id="ddlPayment" name="ddlPayment" class="form-control-custom" tabindex=14 >
+					<select id="ddlPayment" name="ddlPayment" class="form-control-custom" tabindex=14 onchange="PaymentTypeChange();" >
 						<option value=1 >Tunai</option>
 						<option value=2 >Tempo</option>
 					</select>
@@ -133,10 +133,19 @@
 			<br />
 			<div class="row col-md-12" >
 				<div class="col-md-4 labelColumn">
+					Diskon :
+				</div>
+				<div class="col-md-8">
+					<input id="txtDiscountTotal" name="txtDiscountTotal" type="text" tabindex=15 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
+				</div>
+			</div>
+			<br />
+			<div class="row col-md-12" >
+				<div class="col-md-4 labelColumn">
 					Bayar :
 				</div>
 				<div class="col-md-8">
-					<input id="txtPayment" name="txtPayment" type="text" tabindex=15 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" onchange="Change();" />
+					<input id="txtPayment" name="txtPayment" type="text" tabindex=16 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" onchange="Change();" />
 				</div>
 			</div>
 			<br />
@@ -149,7 +158,7 @@
 				</div>
 			</div>
 			<br />
-			<button type="button" class="btn btn-primary btn-block" onclick="printInvoice();" tabindex=16 >Selesai</button>
+			<button type="button" class="btn btn-primary btn-block" onclick="printInvoice();" tabindex=19 >Selesai</button>
 			<!--<br />
 			<button class="btn btn-danger btn-block" tabindex=16 onclick="printShipment();" >Cetak Surat Jalan</button>-->
 		</div>
@@ -247,16 +256,8 @@
 					modal: false,
 					buttons: [
 					{
-						text: "Cetak Nota",
-						tabindex: 12,
-						id: "btnPrintInvoice",
-						click: function() {
-							finish(TransactionID, TransactionType, Total, Payment, PaymentType, TransactionDate, TransactionNumber);
-						}
-					},
-					{
 						text: "Cetak Surat Jalan",
-						tabindex: 13,
+						tabindex: 12,
 						id: "btnPrintShipment",
 						click: function() {
 							printShipment();
@@ -264,7 +265,7 @@
 					},
 					{
 						text: "Tutup",
-						tabindex: 14,
+						tabindex: 13,
 						id: "btnCancelAddSale",
 						click: function() {
 							$(this).dialog("destroy");
@@ -281,7 +282,7 @@
 				}).dialog("open");
 			}
 
-			function finish(TransactionID, TransactionType, Total, Payment, PaymentType, TransactionDate, TransactionNumber) {
+			function finish(TransactionID, TransactionType, Total, Discount, Payment, PaymentType, TransactionDate, TransactionNumber) {
 				if(TransactionID != 0) {
 					$("#hdnTransactionID").val(TransactionID);
 					$("#hdnTransactionType").val(TransactionType);
@@ -295,11 +296,11 @@
 							var Change = 0;
 							if(parseFloat(Payment) != 0) {
 								if(PaymentType == 1) {
-									Change = parseFloat(Payment) - parseFloat(Total);
+									Change = parseFloat(Payment) - (parseFloat(Total) - parseFloat(Discount));
 									$("#lblChange").html("Kembali :");
 								}
 								else {
-									Change = parseFloat(Total) - parseFloat(Payment);
+									Change = (parseFloat(Total) - parseFloat(Discount)) - parseFloat(Payment);
 									$("#lblChange").html("Kekurangan :");
 								}
 								$("#txtChange").val(returnRupiah(Change.toString()));
@@ -327,7 +328,7 @@
 							$("#txtChange").val(0);
 						},
 						resizable: false,
-						height: 260,
+						height: 300,
 						width: 420,
 						modal: true /*,
 						buttons: [
@@ -348,33 +349,37 @@
 
 			function PaymentTypeChange() {
 				var Total = $("#txtTotal").val().replace(/\,/g, "");
+				var discountTotal = $("#txtDiscountTotal").val().replace(/\,/g, "");
 				var Payment = $("#txtPayment").val().replace(/\,/g, "");
 				var PaymentType = $("#ddlPayment").val();
 				if(PaymentType == 1) {
 					$("#lblChange").html("Kembali :");
 					if(parseFloat(Payment) != 0) {
-						if(parseFloat(Total) > parseFloat(Payment)) {
+						if((parseFloat(Total) - parseFloat(discountTotal)) > parseFloat(Payment)) {
 							$("#txtPayment").notify("Pembayaran Kurang!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 							setTimeout(function() {
 								$("#txtPayment").focus();
 							}, 0);
 						}
 						else {
-							var Change = parseFloat(Payment) - parseFloat(Total);
+							var Change = parseFloat(Payment) - (parseFloat(Total) - parseFloat(discountTotal));
 							$("#txtChange").val(returnRupiah(Change.toString()));
 						}
+					}
+					else {
+						$("#txtChange").val(0);
 					}
 				}
 				else {
 					$("#lblChange").html("Kekurangan :");
-					if(parseFloat(Total) < parseFloat(Payment)) {
+					if((parseFloat(Total) - parseFloat(discountTotal)) < parseFloat(Payment)) {
 						$("#txtPayment").notify("Pembayaran Lebih!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 						setTimeout(function() {
 							$("#txtPayment").focus();
 						}, 0);
 					}
 					else {
-						var Change = parseFloat(Total) - parseFloat(Payment);
+						var Change = (parseFloat(Total) - parseFloat(discountTotal)) - parseFloat(Payment);
 						$("#txtChange").val(returnRupiah(Change.toString()));
 					}
 				}
@@ -382,6 +387,7 @@
 			
 			function Change() {
 				var Total = $("#txtTotal").val().replace(/\,/g, "");
+				var discountTotal = $("#txtDiscountTotal").val().replace(/\,/g, "");
 				var Payment = $("#txtPayment").val().replace(/\,/g, "");
 				var PaymentType = $("#ddlPayment").val();
 				if(PaymentType == 1) {
@@ -393,164 +399,174 @@
 						}, 0);
 					}
 					else {
-						if(parseFloat(Total) > parseFloat(Payment)) {
+						if((parseFloat(Total) - parseFloat(discountTotal)) > parseFloat(Payment)) {
 							$("#txtPayment").notify("Pembayaran Kurang!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 							setTimeout(function() {
 								$("#txtPayment").focus();
 							}, 0);
 						}
 						else {
-							var Change = parseFloat(Payment) - parseFloat(Total);
+							var Change = parseFloat(Payment) - (parseFloat(Total) - parseFloat(discountTotal));
 							$("#txtChange").val(returnRupiah(Change.toString()));
 						}
 					}
 				}
 				else {
 					$("#lblChange").html("Kekurangan :");
-					if(parseFloat(Total) < parseFloat(Payment)) {
+					if((parseFloat(Total) - parseFloat(discountTotal)) < parseFloat(Payment)) {
 						$("#txtPayment").notify("Pembayaran Lebih!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 						setTimeout(function() {
 							$("#txtPayment").focus();
 						}, 0);
 					}
 					else {
-						var Change = parseFloat(Total) - parseFloat(Payment);
+						var Change = (parseFloat(Total) - parseFloat(discountTotal)) - parseFloat(Payment);
 						$("#txtChange").val(returnRupiah(Change.toString()));
 					}
 				}
 			}
 
+			var printCounter = 0;
 			function printInvoice() {
-				var Total = $("#txtTotal").val().replace(/\,/g, "");
-				var Payment = $("#txtPayment").val().replace(/\,/g, "");
-				var PaymentType = $("#ddlPayment").val();
-				var PassValidate = 1;
-				if(PaymentType == 1) {
-					$("#lblChange").html("Kembali :");
-					if(parseFloat(Payment) == 0) {
-						$("#txtPayment").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						setTimeout(function() {
-							$("#txtPayment").focus();
-						}, 0);
-						PassValidate = 0;
-					}
-					else {
-						$("#lblChange").html("Kekurangan :");
-						if(parseFloat(Total) > parseFloat(Payment)) {
-							$("#txtPayment").notify("Pembayaran Kurang!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+				if(printCounter == 0) {
+					printCounter = 1;
+					var Total = $("#txtTotal").val().replace(/\,/g, "");
+					var discountTotal = $("#txtDiscountTotal").val().replace(/\,/g, "");
+					var Payment = $("#txtPayment").val().replace(/\,/g, "");
+					var PaymentType = $("#ddlPayment").val();
+					var PassValidate = 1;
+					if(PaymentType == 1) {
+						$("#lblChange").html("Kembali :");
+						if(parseFloat(Payment) == 0) {
+							$("#txtPayment").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 							setTimeout(function() {
 								$("#txtPayment").focus();
 							}, 0);
 							PassValidate = 0;
 						}
 						else {
-							var Change = parseFloat(Payment) - parseFloat(Total);
+							if((parseFloat(Total) - parseFloat(discountTotal)) > parseFloat(Payment)) {
+								$("#txtPayment").notify("Pembayaran Kurang!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+								setTimeout(function() {
+									$("#txtPayment").focus();
+								}, 0);
+								PassValidate = 0;
+							}
+							else {
+								var Change = parseFloat(Payment) - (parseFloat(Total) - parseFloat(discountTotal));
+								$("#txtChange").val(returnRupiah(Change.toString()));
+							}
+						}
+					}
+					else {
+						$("#lblChange").html("Kekurangan :");
+						if((parseFloat(Total) - parseFloat(discountTotal)) < parseFloat(Payment)) {
+							$("#txtPayment").notify("Pembayaran Lebih!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+							setTimeout(function() {
+								$("#txtPayment").focus();
+							}, 0);
+							PassValidate = 0;
+						}
+						else {
+							var Change = (parseFloat(Total) - parseFloat(discountTotal)) - parseFloat(Payment);
 							$("#txtChange").val(returnRupiah(Change.toString()));
 						}
 					}
-				}
-				else {
-					if(parseFloat(Total) < parseFloat(Payment)) {
-						$("#txtPayment").notify("Pembayaran Lebih!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						setTimeout(function() {
-							$("#txtPayment").focus();
-						}, 0);
-						PassValidate = 0;
-					}
-					else {
-						var Change = parseFloat(Total) - parseFloat(Payment);
-						$("#txtChange").val(returnRupiah(Change.toString()));
-					}
-				}
 
-				if(PassValidate == 1) {
-					var transactionID = $("#hdnTransactionID").val();
-					var transactionNumber = $("#hdnTransactionNumber").val();
-					var Payment = $("#txtPayment").val().replace(/\,/g, "");
-					var PaymentType = $("#ddlPayment").val();
-					var PrintInvoice = $("#chkPrint").prop("checked");
-					var PrintShipment = $("#chkPrintShipment").prop("checked");
-					var Change = $("#txtChange").val().replace(/\,/g, "");
-					var PaymentMethod = $("#ddlPayment option:selected").text();
-					var TransactionDate = $("#hdnTransactionDate").val();
-					var urlPrint = "";
-					if($("#hdnTransactionType").val() == 1)  urlPrint = "./Transaction/Sale/PrintInvoice.php";
-					else urlPrint = "./Transaction/Booking/PrintInvoice.php";
-					$("#loading").show();
-					$.ajax({
-						url: urlPrint,
-						type: "POST",
-						data: { BookingID : transactionID, SaleID : transactionID, Payment : Payment, PaymentType : PaymentType, PrintInvoice : PrintInvoice, Change: Change, BookingNumber : transactionNumber, SaleNumber : transactionNumber, PaymentMethod : PaymentMethod, TransactionDate : TransactionDate, PrintInvoice : true },
-						dataType: "json",
-						success: function(data) {
-							if(data.FailedFlag == '0') {
-								$("#loading").hide();
-								$("#divModal").hide();
-								if(PrintShipment == true) printShipment();
-								//resetForm();
-								//table2.destroy();
-								$("#finish-dialog").dialog("destroy");
-								//$("#FormData").dialog("destroy");
-								var paymentInfo = "<table><tr><td align='right'>Pembayaran :&nbsp;</td><td>" + $("#ddlPayment option:selected").text() + "</td></tr>";
-								paymentInfo += "<tr><td align='right'>Total :&nbsp;</td><td align='right'>" + returnRupiah(Total) + "</td></tr>";
-								paymentInfo += "<tr><td align='right'>Bayar :&nbsp;</td><td align='right'>" + returnRupiah(Payment) + "</td></tr>";
-								if(PaymentType == 1) paymentInfo += "<tr><td align='right'>Kembali :&nbsp;</td><td align='right'>" + $("#txtChange").val() + "</td></tr></table>";
-								else paymentInfo += "<tr><td align='right'>Kekurangan :&nbsp;</td><td align='right'>" + $("#txtChange").val() + "</td></tr></table>";
-								var counter = 0;
-								$("#txtPayment").val(0);
-								$("#ddlPayment").val(1);
-								$("#txtChange").val(0);
-								Lobibox.alert("success",
-								{
-									msg: paymentInfo,
-									width: 480,
-									beforeClose: function() {
-										if(counter == 0) {
-											setTimeout(function() {
-												table.ajax.reload(function() {
-													table.keys.enable();
-													if(typeof tableIndex !== 'undefined') table.cell(tableIndex).focus();
-												}, false);
-											}, 0);
-											counter = 1;
+					if(PassValidate == 1) {
+						var transactionID = $("#hdnTransactionID").val();
+						var transactionNumber = $("#hdnTransactionNumber").val();
+						var Payment = $("#txtPayment").val().replace(/\,/g, "");
+						var PaymentType = $("#ddlPayment").val();
+						//var PrintInvoice = $("#chkPrint").prop("checked");
+						//var PrintShipment = $("#chkPrintShipment").prop("checked");
+						var Change = $("#txtChange").val().replace(/\,/g, "");
+						var PaymentMethod = $("#ddlPayment option:selected").text();
+						var TransactionDate = $("#hdnTransactionDate").val();
+						var urlPrint = "";
+						if($("#hdnTransactionType").val() == 1)  urlPrint = "./Transaction/Print/PrintSaleInvoice.php";
+						else urlPrint = "./Transaction/Print/PrintBookingInvoice.php";
+						$("#loading").show();
+						$.ajax({
+							url: urlPrint,
+							type: "POST",
+							data: { BookingID : transactionID, SaleID : transactionID, Payment : Payment, PaymentType : PaymentType, Change: Change, BookingNumber : transactionNumber, SaleNumber : transactionNumber, PaymentMethod : PaymentMethod, TransactionDate : TransactionDate, PrintInvoice : true, DiscountTotal : discountTotal },
+							dataType: "json",
+							success: function(data) {
+								if(data.FailedFlag == '0') {
+									$("#loading").hide();
+									$("#divModal").hide();
+									//if(PrintShipment == true) printShipment();
+									//resetForm();
+									//table2.destroy();
+									$("#finish-dialog").dialog("destroy");
+									//$("#FormData").dialog("destroy");
+									var paymentInfo = "<table><tr><td align='right'>Pembayaran :&nbsp;</td><td>" + $("#ddlPayment option:selected").text() + "</td></tr>";
+									paymentInfo += "<tr><td align='right'>Total :&nbsp;</td><td align='right'>" + returnRupiah((parseFloat(Total) - parseFloat(discountTotal)).toString()) + "</td></tr>";
+									paymentInfo += "<tr><td align='right'>Bayar :&nbsp;</td><td align='right'>" + returnRupiah(Payment) + "</td></tr>";
+									if(PaymentType == 1) paymentInfo += "<tr><td align='right'>Kembali :&nbsp;</td><td align='right'>" + $("#txtChange").val() + "</td></tr></table>";
+									else paymentInfo += "<tr><td align='right'>Kekurangan :&nbsp;</td><td align='right'>" + $("#txtChange").val() + "</td></tr></table>";
+									var counter = 0;
+									$("#txtPayment").val(0);
+									$("#ddlPayment").val(1);
+									$("#txtChange").val(0);
+									$("#txtDiscountTotal").val(0);
+									Lobibox.alert("success",
+									{
+										msg: paymentInfo,
+										width: 480,
+										beforeClose: function() {
+											if(counter == 0) {
+												setTimeout(function() {
+													table.ajax.reload(function() {
+														table.keys.enable();
+														if(typeof tableIndex !== 'undefined') table.cell(tableIndex).focus();
+													}, false);
+												}, 0);
+												counter = 1;
+											}
 										}
-									}
-								});
-							}
-							else {
+									});
+								}
+								else {
+									$("#loading").hide();
+									$("#divModal").hide();
+									var counter = 0;
+									Lobibox.alert("error",
+									{
+										msg: data.ErrorMessage,
+										width: 480,
+										beforeClose: function() {
+											if(counter == 0) {
+												setTimeout(function() {
+													$("#txtItemCode").focus();
+												}, 0);
+												counter = 1;
+											}
+										}
+									});
+									return 0;
+								}
+							},
+							error: function(jqXHR, textStatus, errorThrown) {
 								$("#loading").hide();
 								$("#divModal").hide();
-								var counter = 0;
+								var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+								LogEvent(errorMessage, "/Transaction/Booking/index.php");
 								Lobibox.alert("error",
 								{
-									msg: data.ErrorMessage,
-									width: 480,
-									beforeClose: function() {
-										if(counter == 0) {
-											setTimeout(function() {
-												$("#txtItemCode").focus();
-											}, 0);
-											counter = 1;
-										}
-									}
+									msg: errorMessage,
+									width: 480
 								});
 								return 0;
 							}
-						},
-						error: function(jqXHR, textStatus, errorThrown) {
-							$("#loading").hide();
-							$("#divModal").hide();
-							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-							LogEvent(errorMessage, "/Transaction/Booking/index.php");
-							Lobibox.alert("error",
-							{
-								msg: errorMessage,
-								width: 480
-							});
-							return 0;
-						}
-					});
+						});
+					}
 				}
+
+				setTimeout(function() {
+					printCounter = 0;
+				}, 1000);
 			}
 
 			function printShipment() {

@@ -274,16 +274,7 @@
 					Diskon :
 				</div>
 				<div class="col-md-8">
-					<input id="txtDiscountTotal" name="txtDiscountTotal" type="text" tabindex=15 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
-				</div>
-			</div>
-			<br />
-			<div class="row col-md-12" >
-				<div class="col-md-4 labelColumn">
-					Diskon :
-				</div>
-				<div class="col-md-8">
-					<input id="txtDiscountTotal" name="txtDiscountTotal" type="text" tabindex=16 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" onchange="Change();" />
+					<input id="txtDiscountTotal" name="txtDiscountTotal" type="text" tabindex=15 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" onchange="Change();" />
 				</div>
 			</div>
 			<br />
@@ -292,7 +283,7 @@
 					Bayar :
 				</div>
 				<div class="col-md-8">
-					<input id="txtPayment" name="txtPayment" type="text" tabindex=17 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" onchange="Change();" />
+					<input id="txtPayment" name="txtPayment" type="text" tabindex=16 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" onchange="Change();" />
 				</div>
 			</div>
 			<br />
@@ -307,19 +298,19 @@
 			<br />
 			<div class="row col-md-12" >
 				<label class="checkboxContainer" >Cetak Nota
-					<input type="checkbox" id="chkPrint" name="chkPrint" value=1 tabindex=18 checked />
+					<input type="checkbox" id="chkPrint" name="chkPrint" value=1 tabindex=17 checked />
 					<span class="checkmark"></span>
 				</label>
 			</div>
 			<br />
 			<div class="row col-md-12" >
 				<label class="checkboxContainer">Cetak Surat Pengambilan
-					<input type="checkbox" id="chkPrintShipment" name="chkPrintShipment" value=1 tabindex=19 checked />
+					<input type="checkbox" id="chkPrintShipment" name="chkPrintShipment" value=1 tabindex=18 checked />
 					<span class="checkmark"></span>
 				</label>
 			</div>
 			<br />
-			<button type="button" class="btn btn-primary btn-block" onclick="printInvoice();" tabindex=20 >Selesai</button>
+			<button type="button" class="btn btn-primary btn-block" onclick="printInvoice();" tabindex=19 >Selesai</button>
 			<!--<br />
 			<button class="btn btn-danger btn-block" tabindex=16 onclick="printShipment();" >Cetak Surat Jalan</button>-->
 		</div>
@@ -359,6 +350,9 @@
 					<input id="txtCode" name="txtCode" type="number" max="999999" tabindex=60 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Kode" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="this.select();" onpaste="return false;" />
 				</div>
 			</div>
+		</div>
+		<div id="cancel-confirm" title="Konfirmasi" style="display: none;">
+			<p><span class="ui-icon ui-icon-alert" style="float:left; margin:5px 12px 20px 0;"></span>Apakah yakin ingin membatalkan transaksi?</p>
 		</div>
 		<script>
 			var table;
@@ -679,6 +673,9 @@
 														 $("#btnAddYes").focus();
 													}
 												});
+												setTimeout(function() {
+													$("#btnAddYes").focus();
+												}, 0);
 											},
 											show: {
 												effect: "fade",
@@ -865,7 +862,9 @@
 								$("#btnPromptCode").focus();
 							}
 						});
-						$("#txtCode").focus();
+						setTimeout(function() {
+							$("#txtCode").focus();
+						}, 0);
 					},
 					
 					close: function() {
@@ -1417,7 +1416,9 @@
 													$("#btnPromptCode").focus();
 												}
 											});
-											$("#txtCode").focus();
+											setTimeout(function() {
+												$("#txtCode").focus();
+											}, 0);
 										},
 										
 										close: function() {
@@ -1702,6 +1703,9 @@
 												 $("#btnYes").focus();
 											}
 										});
+										setTimeout(function() {
+											$("#btnYes").focus();
+										}, 0);
 									},
 									show: {
 										effect: "fade",
@@ -1884,6 +1888,9 @@
 												 $("#btnYes").focus();
 											}
 										});
+										setTimeout(function() {
+											$("#btnYes").focus();
+										}, 0);
 									},
 									show: {
 										effect: "fade",
@@ -2107,7 +2114,9 @@
 									"scrollY": "280px",
 									"scrollX": false,
 									"scrollCollapse": false,
-									"paging": false,
+									"paging": true,
+									"lengthChange": false,
+									"pageLength": 25,
 									"searching": true,
 									"order": [],
 									"columns": [
@@ -2132,7 +2141,7 @@
 									"processing": true,
 									"serverSide": true,
 									"language": {
-										"info": "",
+										"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
 										"infoFiltered": "",
 										"infoEmpty": "",
 										"zeroRecords": "Data tidak ditemukan",
@@ -2217,7 +2226,7 @@
 						$("#txtItemCode").focus();
 					},
 					resizable: false,
-					height: 420,
+					height: 480,
 					width: 1280,
 					modal: true /*,
 					buttons: [
@@ -2398,137 +2407,145 @@
 				}
 			}
 
+			var printCounter = 0;
 			function printInvoice() {
-				var Total = $("#txtTotal").val().replace(/\,/g, "");
-				var discountTotal = $("#txtDiscountTotal").val().replace(/\,/g, "");
-				var Payment = $("#txtPayment").val().replace(/\,/g, "");
-				var PaymentType = $("#ddlPayment").val();
-				var PassValidate = 1;
-				if(PaymentType == 1) {
-					$("#lblChange").html("Kembali :");
-					if(parseFloat(Payment) == 0) {
-						$("#txtPayment").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						setTimeout(function() {
-							$("#txtPayment").focus();
-						}, 0);
-						PassValidate = 0;
-					}
-					else {
-						if((parseFloat(Total) - parseFloat(discountTotal)) > parseFloat(Payment)) {
-							$("#txtPayment").notify("Pembayaran Kurang!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+				if(printCounter == 0) {
+					printCounter = 1;
+					var Total = $("#txtTotal").val().replace(/\,/g, "");
+					var discountTotal = $("#txtDiscountTotal").val().replace(/\,/g, "");
+					var Payment = $("#txtPayment").val().replace(/\,/g, "");
+					var PaymentType = $("#ddlPayment").val();
+					var PassValidate = 1;
+					if(PaymentType == 1) {
+						$("#lblChange").html("Kembali :");
+						if(parseFloat(Payment) == 0) {
+							$("#txtPayment").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 							setTimeout(function() {
 								$("#txtPayment").focus();
 							}, 0);
 							PassValidate = 0;
 						}
 						else {
-							var Change = parseFloat(Payment) - (parseFloat(Total) - parseFloat(discountTotal));
+							if((parseFloat(Total) - parseFloat(discountTotal)) > parseFloat(Payment)) {
+								$("#txtPayment").notify("Pembayaran Kurang!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+								setTimeout(function() {
+									$("#txtPayment").focus();
+								}, 0);
+								PassValidate = 0;
+							}
+							else {
+								var Change = parseFloat(Payment) - (parseFloat(Total) - parseFloat(discountTotal));
+								$("#txtChange").val(returnRupiah(Change.toString()));
+							}
+						}
+					}
+					else {
+						$("#lblChange").html("Kekurangan :");
+						if((parseFloat(Total) - parseFloat(discountTotal)) < parseFloat(Payment)) {
+							$("#txtPayment").notify("Pembayaran Lebih!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+							setTimeout(function() {
+								$("#txtPayment").focus();
+							}, 0);
+							PassValidate = 0;
+						}
+						else {
+							var Change = (parseFloat(Total) - parseFloat(discountTotal)) - parseFloat(Payment);
 							$("#txtChange").val(returnRupiah(Change.toString()));
 						}
 					}
-				}
-				else {
-					$("#lblChange").html("Kekurangan :");
-					if((parseFloat(Total) - parseFloat(discountTotal)) < parseFloat(Payment)) {
-						$("#txtPayment").notify("Pembayaran Lebih!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						setTimeout(function() {
-							$("#txtPayment").focus();
-						}, 0);
-						PassValidate = 0;
-					}
-					else {
-						var Change = (parseFloat(Total) - parseFloat(discountTotal)) - parseFloat(Payment);
-						$("#txtChange").val(returnRupiah(Change.toString()));
-					}
-				}
 
-				if(PassValidate == 1) {
-					var bookingID = $("#hdnBookingID").val();
-					var BookingNumber = $("#txtBookingNumber").val();
-					var Payment = $("#txtPayment").val().replace(/\,/g, "");
-					var PaymentType = $("#ddlPayment").val();
-					var PrintInvoice = $("#chkPrint").prop("checked");
-					var PrintShipment = $("#chkPrintShipment").prop("checked");
-					var Change = $("#txtChange").val().replace(/\,/g, "");
-					var PaymentMethod = $("#ddlPayment option:selected").text();
-					var TransactionDate = $("#hdnTransactionDate").val();
-					var DiscountTotal = $("#txtDiscountTotal").val();
-					$("#loading").show();
-					$.ajax({
-						url: "./Transaction/Booking/PrintInvoice.php",
-						type: "POST",
-						data: { BookingID : bookingID, Payment : Payment, PaymentType : PaymentType, PrintInvoice : PrintInvoice, Change: Change, BookingNumber : BookingNumber, PaymentMethod : PaymentMethod, TransactionDate : TransactionDate, DiscountTotal : DiscountTotal },
-						dataType: "json",
-						success: function(data) {
-							if(data.FailedFlag == '0') {
-								$("#loading").hide();
-								$("#divModal").hide();
-								if(PrintShipment == true) printShipment();
-								resetForm();
-								table2.destroy();
-								$("#finish-dialog").dialog("destroy");
-								$("#FormData").dialog("destroy");
-								var paymentInfo = "<table><tr><td align='right'>Pembayaran :&nbsp;</td><td>" + $("#ddlPayment option:selected").text() + "</td></tr>";
-								paymentInfo += "<tr><td align='right'>Total :&nbsp;</td><td align='right'>" + returnRupiah((parseFloat(Total) - parseFloat(discountTotal)).toString()) + "</td></tr>";
-								paymentInfo += "<tr><td align='right'>Bayar :&nbsp;</td><td align='right'>" + returnRupiah(Payment) + "</td></tr>";
-								if(PaymentType == 1) paymentInfo += "<tr><td align='right'>Kembali :&nbsp;</td><td align='right'>" + $("#txtChange").val() + "</td></tr></table>";
-								else paymentInfo += "<tr><td align='right'>Kekurangan :&nbsp;</td><td align='right'>" + $("#txtChange").val() + "</td></tr></table>";
-								var counter = 0;
-								$("#txtPayment").val(0);
-								$("#ddlPayment").val(1);
-								$("#txtChange").val(0);
-								$("#txtDiscountTotal").val(0);
-								Lobibox.alert("success",
-								{
-									msg: paymentInfo,
-									width: 480,
-									beforeClose: function() {
-										if(counter == 0) {
-											setTimeout(function() {
-												table.ajax.reload(function() {
-													table.keys.enable();
-													if(typeof tableIndex !== 'undefined') table.cell(tableIndex).focus();
-												}, false);
-											}, 0);
-											counter = 1;
+					if(PassValidate == 1) {
+						var bookingID = $("#hdnBookingID").val();
+						var BookingNumber = $("#txtBookingNumber").val();
+						var Payment = $("#txtPayment").val().replace(/\,/g, "");
+						var PaymentType = $("#ddlPayment").val();
+						var PrintInvoice = $("#chkPrint").prop("checked");
+						var PrintShipment = $("#chkPrintShipment").prop("checked");
+						var Change = $("#txtChange").val().replace(/\,/g, "");
+						var PaymentMethod = $("#ddlPayment option:selected").text();
+						var TransactionDate = $("#hdnTransactionDate").val();
+						var DiscountTotal = $("#txtDiscountTotal").val();
+						$("#loading").show();
+						$.ajax({
+							url: "./Transaction/Booking/PrintInvoice.php",
+							type: "POST",
+							data: { BookingID : bookingID, Payment : Payment, PaymentType : PaymentType, PrintInvoice : PrintInvoice, Change: Change, BookingNumber : BookingNumber, PaymentMethod : PaymentMethod, TransactionDate : TransactionDate, DiscountTotal : DiscountTotal },
+							dataType: "json",
+							success: function(data) {
+								if(data.FailedFlag == '0') {
+									$("#loading").hide();
+									$("#divModal").hide();
+									if(PrintShipment == true) printShipment();
+									resetForm();
+									table2.destroy();
+									$("#finish-dialog").dialog("destroy");
+									$("#FormData").dialog("destroy");
+									var paymentInfo = "<table><tr><td align='right'>Pembayaran :&nbsp;</td><td>" + $("#ddlPayment option:selected").text() + "</td></tr>";
+									paymentInfo += "<tr><td align='right'>Total :&nbsp;</td><td align='right'>" + returnRupiah((parseFloat(Total) - parseFloat(discountTotal)).toString()) + "</td></tr>";
+									paymentInfo += "<tr><td align='right'>Bayar :&nbsp;</td><td align='right'>" + returnRupiah(Payment) + "</td></tr>";
+									if(PaymentType == 1) paymentInfo += "<tr><td align='right'>Kembali :&nbsp;</td><td align='right'>" + $("#txtChange").val() + "</td></tr></table>";
+									else paymentInfo += "<tr><td align='right'>Kekurangan :&nbsp;</td><td align='right'>" + $("#txtChange").val() + "</td></tr></table>";
+									var counter = 0;
+									$("#txtPayment").val(0);
+									$("#ddlPayment").val(1);
+									$("#txtChange").val(0);
+									$("#txtDiscountTotal").val(0);
+									Lobibox.alert("success",
+									{
+										msg: paymentInfo,
+										width: 480,
+										beforeClose: function() {
+											if(counter == 0) {
+												setTimeout(function() {
+													table.ajax.reload(function() {
+														table.keys.enable();
+														if(typeof tableIndex !== 'undefined') table.cell(tableIndex).focus();
+													}, false);
+												}, 0);
+												counter = 1;
+											}
 										}
-									}
-								});
-							}
-							else {
+									});
+								}
+								else {
+									$("#loading").hide();
+									$("#divModal").hide();
+									var counter = 0;
+									Lobibox.alert("error",
+									{
+										msg: data.ErrorMessage,
+										width: 480,
+										beforeClose: function() {
+											if(counter == 0) {
+												setTimeout(function() {
+													$("#txtItemCode").focus();
+												}, 0);
+												counter = 1;
+											}
+										}
+									});
+									return 0;
+								}
+							},
+							error: function(jqXHR, textStatus, errorThrown) {
 								$("#loading").hide();
 								$("#divModal").hide();
-								var counter = 0;
+								var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+								LogEvent(errorMessage, "/Transaction/Booking/index.php");
 								Lobibox.alert("error",
 								{
-									msg: data.ErrorMessage,
-									width: 480,
-									beforeClose: function() {
-										if(counter == 0) {
-											setTimeout(function() {
-												$("#txtItemCode").focus();
-											}, 0);
-											counter = 1;
-										}
-									}
+									msg: errorMessage,
+									width: 480
 								});
 								return 0;
 							}
-						},
-						error: function(jqXHR, textStatus, errorThrown) {
-							$("#loading").hide();
-							$("#divModal").hide();
-							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-							LogEvent(errorMessage, "/Transaction/Booking/index.php");
-							Lobibox.alert("error",
-							{
-								msg: errorMessage,
-								width: 480
-							});
-							return 0;
-						}
-					});
+						});
+					}
 				}
+
+				setTimeout(function() {
+					printCounter = 0;
+				}, 1000);
 			}
 
 			function printShipment() {
@@ -2561,6 +2578,182 @@
 						}
 					});
 				}
+			}
+
+			counterDeleteDetails = 0;
+			function DeleteLastDetails() {
+				if ( table2.data().count() > 0 ) {
+					if(counterDeleteDetails == 0) {
+						counterDeleteDetails = 1;
+						table2.keys.disable();
+						var data = table2.row( table2.rows().count() - 1 ).data();
+						var deletedData = new Array();
+						deletedData.push(data[1]);
+						SingleDelete("./Transaction/Booking/DeleteDetails.php", deletedData, function(action) {
+							if(action == "success") {
+								table2.row( table2.rows().count() - 1 ).remove().draw();
+								table2.keys.enable();
+								if(typeof index !== 'undefined') {
+									try {
+										table2.cell(index).focus();
+									}
+									catch (err) {
+										$("#grid-transaction").DataTable().cell( ':eq(0)' ).focus();
+									}
+								}
+								tableWidthAdjust();
+								Calculate();
+							}
+							else {
+								table2.keys.enable();
+								return false;
+							}
+						});
+					}
+					setTimeout(function() { counterDeleteDetails = 0; } , 1000);
+				}
+				else {
+					Lobibox.alert("warning",
+					{
+						msg: "Tidak ada data barang!",
+						width: 480,
+						delay: 2000
+					});
+				}
+			}
+
+			var counterCancelTransaction = 0;
+			function CancelTransaction() {
+				if(counterCancelTransaction == 0) {
+					counterCancelTransaction = 1;
+					if($("#hdnBookingID").val() != 0) {
+						$("#cancel-confirm").dialog({
+							autoOpen: false,
+							open: function() {
+								$(document).on('keydown', function(e) {
+									if (e.keyCode == 39) { //right arrow
+										 $("#btnCancelNo").focus();
+									}
+									else if (e.keyCode == 37) { //left arrow
+										 $("#btnCancelYes").focus();
+									}
+								});
+								setTimeout(function() {
+									$("#btnCancelYes").focus();
+								}, 0);
+							},
+							show: {
+								effect: "fade",
+								duration: 0
+							},
+							hide: {
+								effect: "fade",
+								duration: 0
+							},
+							close: function() {
+								$(this).dialog("destroy");
+							},
+							resizable: false,
+							height: "auto",
+							width: 400,
+							modal: true,
+							buttons: [
+							{
+								text: "Ya",
+								id: "btnCancelYes",
+								click: function() {
+									$(this).dialog("destroy");
+
+									$("#loading").show();
+									var deletedData = new Array();
+									deletedData.push($("#hdnBookingID").val() + "^" + $("#txtBookingNumber").val());
+									$.ajax({
+										url: "./Transaction/Booking/Delete.php",
+										type: "POST",
+										data: { ID : deletedData },
+										dataType: "html",
+										success: function(data) {
+											$("#loading").hide();
+											var datadelete = data.split("+");
+											var berhasil = datadelete[0];
+											var gagal = datadelete [1];
+											var counter1 = 0;
+											var alertType;
+											var alertDelay;
+											var message = "";
+											var counterAlert = 0;
+											if(berhasil != "" && gagal == "" ) {
+												alertType = "success";
+												alertDelay = 2000;
+												message = "Transaksi berhasil dibatalkan.";
+												$("#loading").hide();
+												$("#divModal").hide();
+												resetForm();
+												table2.destroy();
+												$("#FormData").dialog("destroy");
+												$("#txtPayment").val(0);
+												$("#ddlPayment").val(1);
+												$("#txtChange").val(0);
+												$("#txtDiscountTotal").val(0);
+											}
+											else {
+												alertType = "warning";
+												alertDelay = false;
+												message = "Transaksi gagal dibatalkan. Silahkan hapus di halaman Admin!";
+											}
+											
+											Lobibox.alert(alertType,
+											{
+												msg: message,
+												width: 480,
+												delay: alertDelay,
+												beforeClose: function() {
+													if(counterAlert == 0) {
+														setTimeout(function() {
+															table.ajax.reload(function() {
+																table.keys.enable();
+																if(typeof tableIndex !== 'undefined') table.cell(tableIndex).focus();
+															}, false);
+														}, 0);
+														counterAlert = 1;
+													}
+												}
+											});
+										},
+										error: function(data) {
+											$("#loading").hide();
+											var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+											LogEvent(errorMessage, "/Transaction/Booking/index.php");
+											Lobibox.alert("error",
+											{
+												msg: errorMessage,
+												width: 480
+											});
+											return 0;
+										}
+									});
+								}
+							},
+							{
+								text: "Tidak",
+								id: "btnCancelNo",
+								click: function() {
+									$(this).dialog("destroy");
+									$("#txtItemCode").focus();
+								}
+							}]
+						}).dialog("open");
+					}
+					else {
+						Lobibox.alert("warning",
+						{
+							msg: "Tidak ada data transaksi!",
+							width: 480,
+							delay: 2000
+						});
+					}
+				}
+				setTimeout(function() { counterCancelTransaction = 0; } , 1000);
 			}
 
 			var waitForFinalEvent = (function () {
@@ -2812,6 +3005,26 @@
 						}
 					}
 					else if(evt.keyCode == 123) {
+						evt.preventDefault();
+					}
+					else if(evt.keyCode == 112 && $("#itemList-dialog").css("display") == "none" && $("#finish-dialog").css("display") == "none" && $("#FormData").css("display") == "block"  && $(".lobibox").css("display") != "block") {
+						evt.preventDefault();
+						if(counterKey == 0) {
+							CancelTransaction();
+							counterKey = 1;
+						}
+					}
+					else if(evt.keyCode == 112) {
+						evt.preventDefault();
+					}
+					else if(evt.keyCode == 113 && $("#itemList-dialog").css("display") == "none" && $("#finish-dialog").css("display") == "none" && $("#FormData").css("display") == "block"  && $(".lobibox").css("display") != "block") {
+						evt.preventDefault();
+						if(counterKey == 0) {
+							DeleteLastDetails();
+							counterKey = 1;
+						}
+					}
+					else if(evt.keyCode == 113) {
 						evt.preventDefault();
 					}
 					else if(evt.keyCode == 121 && $("#itemList-dialog").css("display") == "none"  && $("#finish-dialog").css("display") == "none" && $("#FormData").css("display") == "block"  && $(".lobibox").css("display") != "block") {

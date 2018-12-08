@@ -594,7 +594,9 @@
 								 $("#btnSaveFirstBalance").focus();
 							}
 						});
-						$("#txtFirstBalance").focus();
+						setTimeout(function() {
+							$("#txtFirstBalance").focus();
+						}, 0);
 					},
 					
 					close: function() {

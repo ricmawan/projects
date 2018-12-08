@@ -970,6 +970,9 @@
 									 $("#btnYes").focus();
 								}
 							});
+							setTimeout(function() {
+								$("#btnYes").focus();
+							}, 0);
 						},
 						show: {
 							effect: "fade",

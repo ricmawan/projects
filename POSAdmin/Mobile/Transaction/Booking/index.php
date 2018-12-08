@@ -537,6 +537,9 @@
 														 $("#btnAddYes").focus();
 													}
 												});
+												setTimeout(function() {
+													$("#btnAddYes").focus();
+												}, 0);
 											},
 											show: {
 												effect: "fade",
@@ -762,7 +765,9 @@
 								$("#btnPromptCode").focus();
 							}
 						});
-						$("#txtCode").focus();
+						setTimeout(function() {
+							$("#txtCode").focus();
+						}, 0);
 					},
 					
 					close: function() {
@@ -1331,7 +1336,9 @@
 													$("#btnPromptCode").focus();
 												}
 											});
-											$("#txtCode").focus();
+											setTimeout(function() {
+												$("#txtCode").focus();
+											}, 0);
 										},
 										
 										close: function() {
@@ -1616,6 +1623,9 @@
 												 $("#btnYes").focus();
 											}
 										});
+										setTimeout(function() {
+											$("#btnYes").focus();
+										}, 0);
 									},
 									show: {
 										effect: "fade",
@@ -1798,6 +1808,10 @@
 												 $("#btnYes").focus();
 											}
 										});
+
+										setTimeout(function() {
+											$("#btnYes").focus();
+										}, 0);
 									},
 									show: {
 										effect: "fade",
@@ -1975,6 +1989,7 @@
 				$("#hdnConversionQty").val(0);
 				$("#lblBookingNumber").html("");
 				table2.clear().draw();
+				table2.keys.enable();
 			}
 
 			function branchChange(BranchID) {
@@ -2000,7 +2015,9 @@
 										"scrollY": "280px",
 										"scrollX": false,
 										"scrollCollapse": false,
-										"paging": false,
+										"paging": true,
+										"lengthChange": false,
+										"pageLength": 25,
 										"searching": true,
 										"order": [],
 										"columns": [
@@ -2105,7 +2122,7 @@
 						$("#txtItemCode").focus();
 					},
 					resizable: false,
-					height: 420,
+					height: 480,
 					width: 840,
 					modal: true/*,
 					buttons: [
@@ -2295,134 +2312,142 @@
 				}
 			}
 
+			var printCounter = 0;
 			function printInvoice() {
-				var Total = $("#txtTotal").val().replace(/\,/g, "");
-				var discountTotal = $("#txtDiscountTotal").val().replace(/\,/g, "");
-				var Payment = $("#txtPayment").val().replace(/\,/g, "");
-				var PaymentType = $("#ddlPayment").val();
-				var PassValidate = 1;
-				if(PaymentType == 1) {
-					$("#lblChange").html("Kembali :");
-					if(parseFloat(Payment) == 0) {
-						$("#txtPayment").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						setTimeout(function() {
-							$("#txtPayment").focus();
-						}, 0);
-						PassValidate = 0;
-					}
-					else {
-						if((parseFloat(Total) - parseFloat(discountTotal)) > parseFloat(Payment)) {
-							$("#txtPayment").notify("Pembayaran Kurang!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+				if(printCounter == 0) {
+					printCounter = 1;
+					var Total = $("#txtTotal").val().replace(/\,/g, "");
+					var discountTotal = $("#txtDiscountTotal").val().replace(/\,/g, "");
+					var Payment = $("#txtPayment").val().replace(/\,/g, "");
+					var PaymentType = $("#ddlPayment").val();
+					var PassValidate = 1;
+					if(PaymentType == 1) {
+						$("#lblChange").html("Kembali :");
+						if(parseFloat(Payment) == 0) {
+							$("#txtPayment").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
 							setTimeout(function() {
 								$("#txtPayment").focus();
 							}, 0);
 							PassValidate = 0;
 						}
 						else {
-							var Change = (parseFloat(Total) - parseFloat(discountTotal)) - parseFloat(Payment);
+							if((parseFloat(Total) - parseFloat(discountTotal)) > parseFloat(Payment)) {
+								$("#txtPayment").notify("Pembayaran Kurang!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+								setTimeout(function() {
+									$("#txtPayment").focus();
+								}, 0);
+								PassValidate = 0;
+							}
+							else {
+								var Change = (parseFloat(Total) - parseFloat(discountTotal)) - parseFloat(Payment);
+								$("#txtChange").val(returnRupiah(Change.toString()));
+							}
+						}
+					}
+					else {
+						$("#lblChange").html("Kekurangan :");
+						if((parseFloat(Total) - parseFloat(discountTotal)) < parseFloat(Payment)) {
+							$("#txtPayment").notify("Pembayaran Lebih!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+							setTimeout(function() {
+								$("#txtPayment").focus();
+							}, 0);
+							PassValidate = 0;
+						}
+						else {
+							var Change = parseFloat(Total) - parseFloat(Payment);
 							$("#txtChange").val(returnRupiah(Change.toString()));
 						}
 					}
-				}
-				else {
-					$("#lblChange").html("Kekurangan :");
-					if((parseFloat(Total) - parseFloat(discountTotal)) < parseFloat(Payment)) {
-						$("#txtPayment").notify("Pembayaran Lebih!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
-						setTimeout(function() {
-							$("#txtPayment").focus();
-						}, 0);
-						PassValidate = 0;
-					}
-					else {
-						var Change = parseFloat(Total) - parseFloat(Payment);
-						$("#txtChange").val(returnRupiah(Change.toString()));
-					}
-				}
 
-				if(PassValidate == 1) {
-					var BookingID = $("#hdnBookingID").val();
-					var BookingNumber = $("#hdnBookingNumber").val();
-					var Payment = $("#txtPayment").val().replace(/\,/g, "");
-					var PaymentType = $("#ddlPayment").val();
-					var PrintInvoice = $("#chkPrint").prop("checked");
-					var PrintShipment = $("#chkPrintShipment").prop("checked");
-					var Change = $("#txtChange").val().replace(/\,/g, "");
-					var PaymentMethod = $("#ddlPayment option:selected").text();
-					var TransactionDate = $("#hdnTransactionDate").val();
-					$("#loading").show();
-					$.ajax({
-						url: "./Transaction/Booking/PrintInvoice.php",
-						type: "POST",
-						data: { BookingID : BookingID, Payment : Payment, PaymentType : PaymentType, PrintInvoice : PrintInvoice, Change: Change, BookingNumber : BookingNumber, PaymentMethod : PaymentMethod, TransactionDate : TransactionDate, DiscountTotal : discountTotal },
-						dataType: "json",
-						success: function(data) {
-							if(data.FailedFlag == '0') {
-								$("#loading").hide();
-								$("#divModal").hide();
-								if(PrintShipment == true) printShipment();
-								resetForm();
-								//table2.destroy();
-								$("#finish-dialog").dialog("destroy");
-								//$("#FormData").dialog("destroy");
-								var paymentInfo = "<table><tr><td align='right'>Pembayaran :&nbsp;</td><td>" + $("#ddlPayment option:selected").text() + "</td></tr>";
-								paymentInfo += "<tr><td align='right'>Total :&nbsp;</td><td align='right'>" + returnRupiah((parseFloat(Total) - parseFloat(discountTotal)).toString()) + "</td></tr>";
-								paymentInfo += "<tr><td align='right'>Bayar :&nbsp;</td><td align='right'>" + returnRupiah(Payment) + "</td></tr>";
-								if(PaymentType == 1) paymentInfo += "<tr><td align='right'>Kembali :&nbsp;</td><td align='right'>" + $("#txtChange").val() + "</td></tr></table>";
-								else paymentInfo += "<tr><td align='right'>Kekurangan :&nbsp;</td><td align='right'>" + $("#txtChange").val() + "</td></tr></table>";
-								var counter = 0;
-								$("#txtPayment").val(0);
-								$("#ddlPayment").val(1);
-								$("#txtChange").val(0);
-								$("#txtDiscountTotal").val(0);
-								Lobibox.alert("success",
-								{
-									msg: paymentInfo,
-									width: 480,
-									beforeClose: function() {
-										if(counter == 0) {
-											setTimeout(function() {
-												$("#txtItemCode").focus();
-												window.close();
-											}, 0);
-											counter = 1;
+					if(PassValidate == 1) {
+						var BookingID = $("#hdnBookingID").val();
+						var BookingNumber = $("#hdnBookingNumber").val();
+						var Payment = $("#txtPayment").val().replace(/\,/g, "");
+						var PaymentType = $("#ddlPayment").val();
+						var PrintInvoice = $("#chkPrint").prop("checked");
+						var PrintShipment = $("#chkPrintShipment").prop("checked");
+						var Change = $("#txtChange").val().replace(/\,/g, "");
+						var PaymentMethod = $("#ddlPayment option:selected").text();
+						var TransactionDate = $("#hdnTransactionDate").val();
+						$("#loading").show();
+						$.ajax({
+							url: "./Transaction/Booking/PrintInvoice.php",
+							type: "POST",
+							data: { BookingID : BookingID, Payment : Payment, PaymentType : PaymentType, PrintInvoice : PrintInvoice, Change: Change, BookingNumber : BookingNumber, PaymentMethod : PaymentMethod, TransactionDate : TransactionDate, DiscountTotal : discountTotal },
+							dataType: "json",
+							success: function(data) {
+								if(data.FailedFlag == '0') {
+									$("#loading").hide();
+									$("#divModal").hide();
+									if(PrintShipment == true) printShipment();
+									resetForm();
+									//table2.destroy();
+									$("#finish-dialog").dialog("destroy");
+									//$("#FormData").dialog("destroy");
+									var paymentInfo = "<table><tr><td align='right'>Pembayaran :&nbsp;</td><td>" + $("#ddlPayment option:selected").text() + "</td></tr>";
+									paymentInfo += "<tr><td align='right'>Total :&nbsp;</td><td align='right'>" + returnRupiah((parseFloat(Total) - parseFloat(discountTotal)).toString()) + "</td></tr>";
+									paymentInfo += "<tr><td align='right'>Bayar :&nbsp;</td><td align='right'>" + returnRupiah(Payment) + "</td></tr>";
+									if(PaymentType == 1) paymentInfo += "<tr><td align='right'>Kembali :&nbsp;</td><td align='right'>" + $("#txtChange").val() + "</td></tr></table>";
+									else paymentInfo += "<tr><td align='right'>Kekurangan :&nbsp;</td><td align='right'>" + $("#txtChange").val() + "</td></tr></table>";
+									var counter = 0;
+									$("#txtPayment").val(0);
+									$("#ddlPayment").val(1);
+									$("#txtChange").val(0);
+									$("#txtDiscountTotal").val(0);
+									Lobibox.alert("success",
+									{
+										msg: paymentInfo,
+										width: 480,
+										beforeClose: function() {
+											if(counter == 0) {
+												setTimeout(function() {
+													$("#txtItemCode").focus();
+													window.close();
+												}, 0);
+												counter = 1;
+											}
 										}
-									}
-								});
-							}
-							else {
+									});
+								}
+								else {
+									$("#loading").hide();
+									$("#divModal").hide();
+									var counter = 0;
+									Lobibox.alert("error",
+									{
+										msg: data.ErrorMessage,
+										width: 480,
+										beforeClose: function() {
+											if(counter == 0) {
+												setTimeout(function() {
+													$("#txtItemCode").focus();
+												}, 0);
+												counter = 1;
+											}
+										}
+									});
+									return 0;
+								}
+							},
+							error: function(jqXHR, textStatus, errorThrown) {
 								$("#loading").hide();
 								$("#divModal").hide();
-								var counter = 0;
+								var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+								LogEvent(errorMessage, "/Transaction/Booking/index.php");
 								Lobibox.alert("error",
 								{
-									msg: data.ErrorMessage,
-									width: 480,
-									beforeClose: function() {
-										if(counter == 0) {
-											setTimeout(function() {
-												$("#txtItemCode").focus();
-											}, 0);
-											counter = 1;
-										}
-									}
+									msg: errorMessage,
+									width: 480
 								});
 								return 0;
 							}
-						},
-						error: function(jqXHR, textStatus, errorThrown) {
-							$("#loading").hide();
-							$("#divModal").hide();
-							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-							LogEvent(errorMessage, "/Transaction/Booking/index.php");
-							Lobibox.alert("error",
-							{
-								msg: errorMessage,
-								width: 480
-							});
-							return 0;
-						}
-					});
+						});
+					}
 				}
+
+				setTimeout(function() {
+					printCounter = 0;
+				}, 1000);
 			}
 
 			function printShipment() {
@@ -2487,7 +2512,9 @@
 								 $("#btnSaveFirstBalance").focus();
 							}
 						});
-						$("#txtFirstBalance").focus();
+						setTimeout(function() {
+							$("#txtFirstBalance").focus();
+						}, 0);
 					},
 					
 					close: function() {

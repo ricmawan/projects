@@ -38,10 +38,10 @@
 		$italic1 = Chr(27) . Chr(52);
 		$italic0 = Chr(27) . Chr(53);*/
 		
-		$sql = "CALL spSelSaleHeader(".$SaleID.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spSelSaleHeader(".$SaleID.", '".$_SESSION['UserLoginKasir']."')";
 
 		if (! $result = mysqli_query($dbh, $sql)) {
-			logEvent(mysqli_error($dbh), '/Transaction/Sale/PrintShipment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Transaction/Sale/PrintShipment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysql_error();
 			$FailedFlag = 1;
@@ -78,10 +78,10 @@
 		$printer -> text("   Kasir   : ");
 		$printer -> text(str_pad($CreatedBy, 73, " ") . "Ph " . $Telephone . "\n");
 		
-		$sql = "CALL spSelSaleDetailsPrint('(".implode(",", $SaleDetailsID).")', '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spSelSaleDetailsPrint('(".implode(",", $SaleDetailsID).")', '".$_SESSION['UserLoginKasir']."')";
 
 		if (! $result = mysqli_query($dbh, $sql)) {
-			logEvent(mysqli_error($dbh), '/Transaction/Sale/PrintShipment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Transaction/Sale/PrintShipment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysql_error();
 			$FailedFlag = 1;
