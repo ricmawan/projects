@@ -115,7 +115,9 @@
 		    $GrandTotal = 0;
 		    $rowPrice = "";
 		    while ($row = mysqli_fetch_array($result)) {
-		        $rowPrice .= number_format($row['Quantity'],0,".",",") . " " . $row['UnitName'] . " @ " . number_format($row['SalePrice'],0,".",",");
+		    	if(strpos($row['Quantity'], ".")) $Quantity = number_format(round($row['Quantity'], 2),2,".",",");	    		
+		    	else $Quantity = number_format($row['Quantity'],0,".",",");
+		        $rowPrice .= $Quantity . " " . $row['UnitName'] . " @ " . number_format($row['SalePrice'],0,".",",");
 		        if($row['Discount'] != 0) $rowPrice .= " - " . number_format($row['Discount'],0,".",",");
 		        $printer -> text("*" . htmlspecialchars_decode($row['ItemName'], ENT_QUOTES) . "\n");
 		        $printer -> text(" " . str_pad($rowPrice , 26, " ") . " ");
@@ -156,8 +158,8 @@
 
 		    /* Cut the receipt and open the cash drawer */
 		    $printer -> cut();
-		    $printer -> close();
 		}
+		$printer -> close();
 
 		echo returnstate($row2['ID'], $row2['Message'], $row2['MessageDetail'], $row2['FailedFlag'], $row2['State']);
 	}

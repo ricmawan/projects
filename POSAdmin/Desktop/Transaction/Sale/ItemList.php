@@ -28,10 +28,10 @@
 		$where .= " OR MI.Price1 LIKE '%".$search."%'";
 		$where .= " OR MI.Qty2 LIKE '%".$search."%' )";
 	}
-	$sql = "CALL spSelItemListStock(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
+	$sql = "CALL spSelItemListStock(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLoginKasir']."')";
 
 	if (! $result = mysqli_query($dbh, $sql)) {
-		logEvent(mysqli_error($dbh), '/Transaction/Sale/ItemList.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+		logEvent(mysqli_error($dbh), '/Transaction/Sale/ItemList.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 		return 0;
 	}
 	$row = mysqli_fetch_array($result);

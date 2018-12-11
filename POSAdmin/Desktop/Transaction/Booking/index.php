@@ -174,7 +174,7 @@
 				</div>
 				<br />
 				<div class="row" >
-					<h5 style="margin: 5px 0 0 0;">F10 = Transaksi Selesai; F12 = Daftar Barang; ESC = Tutup; DELETE = Hapus; ENTER/DOUBLE KLIK = Edit;</h5>
+					<h5 style="margin: 5px 0 0 0;">F1: Batalkan Transaksi; F2 Hapus Barang Terakhir; F10 = Transaksi Selesai; F12 = Daftar Barang; ESC = Tutup; DELETE = Hapus; ENTER/DOUBLE KLIK = Edit;</h5>
 				</div>
 			</form>
 		</div>

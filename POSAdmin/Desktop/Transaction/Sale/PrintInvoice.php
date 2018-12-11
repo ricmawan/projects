@@ -38,12 +38,12 @@
 
 		$IPAddress = get_client_ip();
 
-	    $sql = "CALL spSelPrinterList('".$IPAddress."', '".$_SESSION['UserLogin']."')";
+	    $sql = "CALL spSelPrinterList('".$IPAddress."', '".$_SESSION['UserLoginKasir']."')";
 	    if (! $result=mysqli_query($dbh, $sql)) {
 	        $Message = "Terjadi Kesalahan Sistem";
 	        $MessageDetail = mysqli_error($dbh);
 	        $FailedFlag = 1;
-	        logEvent(mysqli_error($dbh), '/Transaction/Sale/UpdatePayment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+	        logEvent(mysqli_error($dbh), '/Transaction/Sale/UpdatePayment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 	        echo returnstate($SaleID, $Message, $MessageDetail, $FailedFlag, $State);
 	        return 0;
 	    }
@@ -112,8 +112,10 @@
 		    $GrandTotal = 0;
 		    $rowPrice = "";
 		    while ($row = mysqli_fetch_array($result)) {
-		        $rowPrice .= number_format($row['Quantity'],0,".",",") . " " . $row['UnitName'] . " @ " . number_format($row['SalePrice'],0,".",",");
-		        if($row['Discount'] != 0) $rowPrice += " - " . number_format($row['Discount'],0,".",",");
+		    	if(strpos($row['Quantity'], ".")) $Quantity = number_format(round($row['Quantity'], 2),2,".",",");	    		
+		    	else $Quantity = number_format($row['Quantity'],0,".",",");
+		        $rowPrice .= $Quantity . " " . $row['UnitName'] . " @ " . number_format($row['SalePrice'],0,".",",");
+		        if($row['Discount'] != 0) $rowPrice .= " - " . number_format($row['Discount'],0,".",",");
 		        $printer -> text("*" . htmlspecialchars_decode($row['ItemName'], ENT_QUOTES) . "\n");
 		        $printer -> text(" " . str_pad($rowPrice , 26, " ") . " ");
 		        $printer -> text(str_pad(number_format(($row['SalePrice'] - $row['Discount']) * $row['Quantity'],0,".",","), 11, " ", STR_PAD_LEFT) . "\n");
@@ -152,9 +154,9 @@
 		    fclose($handle);*/
 
 		    /* Cut the receipt and open the cash drawer */
-		    $printer -> cut();
-		    $printer -> close();
+			$printer -> cut();
 		}
+		$printer -> close();
 
 		echo returnstate($row2['ID'], $row2['Message'], $row2['MessageDetail'], $row2['FailedFlag'], $row2['State']);
 	}

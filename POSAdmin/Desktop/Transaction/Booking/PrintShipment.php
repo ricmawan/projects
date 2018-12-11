@@ -94,7 +94,9 @@
 		$printer -> text("|---------------|---------------------------------------------------------|-------------------------------------------------------------|\n");
 		
 		while($row = mysqli_fetch_array($result)) {
-			$printer -> text("| " . str_pad(number_format($row['Quantity'],0,".",","), 6, " ", STR_PAD_LEFT) . " ");
+			if(strpos($row['Quantity'], ".")) $Quantity = number_format(round($row['Quantity'], 2),2,".",",");	    		
+		    else $Quantity = number_format($row['Quantity'],0,".",",");
+			$printer -> text("| " . str_pad($Quantity, 6, " ", STR_PAD_LEFT) . " ");
 			$printer -> text(str_pad($row['UnitName'], 6, " ") . " | ");
 			$printer -> text(str_pad(htmlspecialchars_decode($row['ItemName'], ENT_QUOTES), 55, " ") . " | ");
 			$printer -> text(str_pad($Remarks, 59, " ") . " |\n");
