@@ -403,12 +403,14 @@
 								});
 						var counterPickTransaction = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
-							if(counterPickTransaction == 0) {
-								counterPickTransaction = 1;
-								var data = datatable.row( table3.cell({ focused: true }).index().row ).data();
-								if(key == 13 && $("#transactionList-dialog").css("display") == "block") {
+							if(key == 13 && $("#transactionList-dialog").css("display") == "block") {
+								if(counterPickTransaction == 0) {
+									counterPickTransaction = 1;
+									var data = table3.row($(table3.cell({ focused: true }).node()).parent('tr')).data();
 									$("#txtSaleNumber").val(data[0]);
-									getSaleDetails();
+									setTimeout(function() { 
+										getSaleDetails();
+									}, 0);
 									$("#transactionList-dialog").dialog("destroy");
 									table3.destroy();
 									table2.keys.enable();
@@ -755,6 +757,9 @@
 							finish();
 							counterKey = 1;
 						}
+					}
+					else if(evt.keyCode == 121) {
+						evt.preventDefault();
 					}
 					setTimeout(function() { counterKey = 0; } , 1000);
 				});

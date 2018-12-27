@@ -416,12 +416,15 @@
 						var counterPickTransaction = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
 							//var index = table3.cell({ focused: true }).index();
-							if(counterPickTransaction == 0) {
-								counterPickTransaction = 1;
-								var data = datatable.row( table3.cell({ focused: true }).index().row ).data();
-								if(key == 13 && $("#transactionList-dialog").css("display") == "block") {
+							if(key == 13 && $("#transactionList-dialog").css("display") == "block") {
+								if(counterPickTransaction == 0) {
+									counterPickTransaction = 1;
+									var data = table3.row($(table3.cell({ focused: true }).node()).parent('tr')).data();
+									console.log(data);
 									$("#txtBookingNumber").val(data[0]);
-									getBookingDetails();
+									setTimeout(function() {
+										getBookingDetails();
+									}, 0);
 									$("#transactionList-dialog").dialog("destroy");
 									table3.destroy();
 									table2.keys.enable();
@@ -684,8 +687,22 @@
 				
 				var counterKey = 0;
 				$(document).on("keydown", function (evt) {
-					if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0 && $("#FormData").css("display") == "none" && $("#delete-confirm").css("display") == "none") {
-						$("#grid-data_wrapper").find("input[type='search']").focus();
+					if(evt.keyCode == 123 && $("#transactionList-dialog").css("display") == "none" && $("#FormData").css("display") == "block") {
+						evt.preventDefault();
+						if(counterKey == 0) {
+							transactionList();
+							counterKey = 1;
+						}
+					}
+					else if(evt.keyCode == 123) {
+						evt.preventDefault();
+					}
+					else if(evt.keyCode == 121 && $("#transactionList-dialog").css("display") == "none"  && $("#FormData").css("display") == "block"  && $(".lobibox").css("display") != "block") {
+						evt.preventDefault();
+						if(counterKey == 0) {
+							finish();
+							counterKey = 1;
+						}
 					}
 					setTimeout(function() { counterKey = 0; } , 1000);
 				});

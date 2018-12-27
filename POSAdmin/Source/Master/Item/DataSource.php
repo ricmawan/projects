@@ -39,8 +39,8 @@
 	{
 		$search = mysqli_escape_string($dbh, trim($requestData['search']['value']));
 		$where .= " AND ( MI.ItemCode LIKE '%".$search."%'";
-		$where .= " OR MI.ItemName LIKE '%".$search."%'";
-		$where .= " OR MC.CategoryName LIKE '%".$search."%'";
+		$where .= " OR MI.ItemName LIKE '%".$search."%' )";
+		/*$where .= " OR MC.CategoryName LIKE '%".$search."%'";
 		$where .= " OR MI.BuyPrice LIKE '%".$search."%'";
 		$where .= " OR MI.RetailPrice LIKE '%".$search."%'";
 		$where .= " OR MI.Price1 LIKE '%".$search."%'";
@@ -49,7 +49,7 @@
 		$where .= " OR MI.Qty2 LIKE '%".$search."%'";
 		$where .= " OR MI.Weight LIKE '%".$search."%'";
 		$where .= " OR MU.UnitName LIKE '%".$search."%'";
-		$where .= " OR MI.MinimumStock LIKE '%".$search."%' )";
+		$where .= " OR MI.MinimumStock LIKE '%".$search."%' )";*/
 	}
 	$sql = "CALL spSelItem(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
 	if (! $result = mysqli_query($dbh, $sql)) {

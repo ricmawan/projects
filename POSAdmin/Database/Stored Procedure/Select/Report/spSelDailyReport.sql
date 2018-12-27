@@ -284,7 +284,8 @@ SET State = 1;
         AND CAST(PD.PaymentDate AS DATE) = pTransactionDate
 	ORDER BY
 		UserName,
-        UnionLevel;
+        UnionLevel,
+		TransactionNumber;
 
 END;
 $$

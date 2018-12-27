@@ -10,28 +10,28 @@
 	$columns = array(
 					0 => "PickID", //unorderable
 					1 => "RowNumber", //unorderable
-					2 => "TS.BookingNumber",
-					3 => "TSR.TransactionDate",
+					2 => "TB.BookingNumber",
+					3 => "TP.TransactionDate",
 					4 => "MC.CustomerName",
-					5 => "TSR.Total"
+					5 => "TPD.Total"
 				);
 
 	$where = " 1=1 ";
-	$order_by = "TSR.PickID DESC";
+	$order_by = "TP.PickID DESC";
 	$limit_s = $requestData['start'];
 	$limit_l = $requestData['length'];
 	
 	//Handles Sort querystring sent from Bootgrid
 	if(ISSET($requestData['order'])) {
 		$order_by = $columns[$requestData['order'][0]['column']]." ".$requestData['order'][0]['dir'];
-		$order_by .= ", TSR.PickID ASC";
+		$order_by .= ", TP.PickID ASC";
 	}
 	//Handles search querystring sent from Bootgrid
 	if (!empty($requestData['search']['value']))
 	{
 		$search = mysqli_real_escape_string($dbh, trim($requestData['search']['value']));
-		$where .= " AND ( TS.BookingNumber LIKE '%".$search."%'";
-		$where .= " OR DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
+		$where .= " AND ( TB.BookingNumber LIKE '%".$search."%'";
+		$where .= " OR DATE_FORMAT(TP.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
 		$where .= " OR MC.CustomerName LIKE '%".$search."%' )";
 	}
 	$sql = "CALL spSelPickUp(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLoginKasir']."')";

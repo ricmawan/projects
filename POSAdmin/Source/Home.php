@@ -59,7 +59,8 @@
 				</div>
 				<span id="Clock" style="color: white; padding: 5px 20px 0px 20px; float: left; font-size: 16px;"></span>
 				<div style="color: white; padding: 5px 20px 0px 50px; float: right; font-size: 16px;"> 
-					 Selamat Datang, <a href="#" style="color: white;font-size: 16px;" onclick="UpdatePassword();"><?php echo $_SESSION['Nama']; ?>!</a> &nbsp;&nbsp;&nbsp;<a href="#" class="menu" link="./Logout.php" ><img src="./assets/img/logout.png" width="20px" border="0" acronym title="Logout" /></a>
+					 Selamat Datang, <a href="#" style="color: white;font-size: 16px;" onclick="UpdatePassword();"><?php echo $_SESSION['Nama']; ?>!</a> &nbsp;&nbsp;&nbsp;<a href="#" class="menu" link="./Logout.php" ><img src="./assets/img/logout.png" width="20px" border="0" acronym title="Logout" /></a> &nbsp;
+					 <a href="#" onclick="tokenCode();" ><img src="./assets/img/key.png" width="18px" border="0" acronym title="Kode Akses" /></a>
 				</div>
 			</nav>   
 			<!-- /. NAV TOP  -->
@@ -199,6 +200,60 @@
 		<div id="loading"></div>
 		<iframe id='excelDownload' src='' style='display:none'></iframe>
 		<script type="text/javascript">
+			function tokenCode() {
+				$("#loading").show();
+				var code = Math.floor(100000 + Math.random() * 900000);
+				$.ajax({
+					url: "./InsertToken.php",
+					type: "POST",
+					data: { TokenCode : code },
+					dataType: "json",
+					success: function(data) {
+						if(data.FailedFlag == '0') {
+							$("#loading").hide();
+							var counter = 0;
+							Lobibox.alert("success",
+							{
+								msg: data.Message,
+								width: 480,
+								delay: false
+							});
+						}
+						else {
+							$("#loading").hide();
+							var counter = 0;
+							Lobibox.alert("warning",
+							{
+								msg: data.Message,
+								width: 480,
+								delay: false
+							});
+							return 0;
+						}
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						$("#loading").hide();
+						var counter = 0;
+						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+						LogEvent(errorMessage, "/Home.php");
+						Lobibox.alert("error",
+						{
+							msg: errorMessage,
+							width: 480,
+							beforeClose: function() {
+								if(counter == 0) {
+									setTimeout(function() {
+										$("#txtItemCode").focus();
+									}, 0);
+									counter = 1;
+								}
+							}
+						});
+						return 0;
+					}
+				});
+			}
+
 			$(document).ready(function() {
 				var windowHeight = $( window ).height() - 55;
 				$("#page-inner").css ({

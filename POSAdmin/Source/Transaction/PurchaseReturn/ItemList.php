@@ -7,43 +7,43 @@
 
 	$requestData= $_REQUEST;
 
-	$BranchID = mysqli_real_escape_string($dbh, $requestData['BranchID']);
+	//$BranchID = mysqli_real_escape_string($dbh, $requestData['BranchID']);
 	//kolom di table
 
 	$where = " 1=1 ";
 	$order_by = "ItemID, ItemDetailsID";
-	$limit_s = 0;
-	$limit_l = 20;
+	$limit_s = $requestData['start'];
+	$limit_l = $requestData['length'];
 	
 	//Handles search querystring sent from Bootgrid
 	if (!empty($requestData['search']['value']))
 	{
 		$search = mysqli_real_escape_string($dbh, trim($requestData['search']['value']));
 		$where .= " AND ( MI.ItemCode LIKE '%".$search."%'";
-		$where .= " OR MI.ItemName LIKE '%".$search."%'";
-		$where .= " OR MI.BuyPrice LIKE '%".$search."%'";
+		$where .= " OR MI.ItemName LIKE '%".$search."%' )";
+		/*$where .= " OR MI.BuyPrice LIKE '%".$search."%'";
 		$where .= " OR MI.RetailPrice LIKE '%".$search."%'";
 		$where .= " OR MI.Price1 LIKE '%".$search."%'";
 		$where .= " OR MI.Qty1 LIKE '%".$search."%'";
 		$where .= " OR MI.Price1 LIKE '%".$search."%'";
-		$where .= " OR MI.Qty2 LIKE '%".$search."%' )";
+		$where .= " OR MI.Qty2 LIKE '%".$search."%' )";*/
 	}
-	$sql = "CALL spSelItemListBranch(".$BranchID.", \"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
+	$sql = "CALL spSelItemListStock(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
 
 	if (! $result = mysqli_query($dbh, $sql)) {
 		logEvent(mysqli_error($dbh), '/Transaction/PurchaseReturn/ItemList.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 		return 0;
 	}
-	//$row = mysqli_fetch_array($result);
-	$totalData = 20;
-	$totalFiltered = 20;
-	//mysqli_free_result($result);
-	//mysqli_next_result($dbh);
+	$row = mysqli_fetch_array($result);
+	$totalData = $row['nRows'];
+	$totalFiltered = $totalData;
+	mysqli_free_result($result);
+	mysqli_next_result($dbh);
 	
-	//$result2 = mysqli_use_result($dbh);
+	$result2 = mysqli_use_result($dbh);
 	$return_arr = array();
 	$RowNumber = $requestData['start'];
-	while ($row = mysqli_fetch_array($result)) {
+	while ($row = mysqli_fetch_array($result2)) {
 		$row_array = array();
 		$RowNumber++;
 		//data yang dikirim ke table
@@ -56,12 +56,12 @@
 		$row_array[] = $row['Qty1'];
 		$row_array[] = number_format($row['Price2'],0,".",",");
 		$row_array[] = $row['Qty2'];
-		$row_array[] = number_format($row['Stock'],2,".",",");
-		$row_array[] = number_format($row['PhysicalStock'],2,".",",");
+		$row_array[] = number_format($row['Toko'],2,".",",");
+		$row_array[] = number_format($row['Gudang'],2,".",",");
 		array_push($return_arr, $row_array);
 	}
 	
-	mysqli_free_result($result);
+	mysqli_free_result($result2);
 	mysqli_next_result($dbh);
 
 	$json_data = array(

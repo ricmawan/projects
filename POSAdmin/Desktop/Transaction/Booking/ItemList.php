@@ -19,14 +19,13 @@
 	if (!empty($requestData['search']['value']))
 	{
 		$search = mysqli_real_escape_string($dbh, trim($requestData['search']['value']));
-		$where .= " AND ( MI.ItemCode LIKE '%".$search."%'";
-		$where .= " OR MI.ItemName LIKE '%".$search."%'";
-		$where .= " OR MI.BuyPrice LIKE '%".$search."%'";
+		$where .= " AND ( MI.ItemName LIKE '%".$search."%' )";
+		/*$where .= " OR MI.BuyPrice LIKE '%".$search."%'";
 		$where .= " OR MI.RetailPrice LIKE '%".$search."%'";
 		$where .= " OR MI.Price1 LIKE '%".$search."%'";
 		$where .= " OR MI.Qty1 LIKE '%".$search."%'";
 		$where .= " OR MI.Price1 LIKE '%".$search."%'";
-		$where .= " OR MI.Qty2 LIKE '%".$search."%' )";
+		$where .= " OR MI.Qty2 LIKE '%".$search."%' )";*/
 	}
 	$sql = "CALL spSelItemListStock(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLoginKasir']."')";
 

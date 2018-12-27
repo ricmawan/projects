@@ -318,7 +318,9 @@
 				$rowExcel++;
 				$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['ItemName']);
 				$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['SalePrice']);
-				$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, number_format($row['Quantity'],0,".",",") . " ". $row['UnitName']);
+				if(strpos($row['Quantity'], ".")) $Quantity = number_format(round($row['Quantity'], 2),2,".",",");	    		
+		    	else $Quantity = number_format($row['Quantity'],0,".",",");
+				$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $Quantity . " ". $row['UnitName']);
 				$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, number_format($row['Discount'],0,".",","));
 				$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['SubTotal']);
 				$UnionTotal += $row['SubTotal'];
@@ -444,7 +446,9 @@
 				$rowExcel++;
 				$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['ItemName']);
 				$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['SalePrice']);
-				$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, number_format($row['Quantity'],0,".",",") . " ". $row['UnitName']);
+				if(strpos($row['Quantity'], ".")) $Quantity = number_format(round($row['Quantity'], 2),2,".",",");	    		
+		    	else $Quantity = number_format($row['Quantity'],0,".",",");
+				$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $Quantity . " ". $row['UnitName']);
 				$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, number_format($row['Discount'],0,".",","));
 				$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['SubTotal']);
 				$SubTotal += $row['SubTotal'];

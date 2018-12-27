@@ -11,6 +11,7 @@ DELIMITER $$
 CREATE PROCEDURE spSelItemListStockAdjust (
 	pBranchID		INT,
 	pCategoryID		INT,
+    pItemName		VARCHAR(50),
 	pLimit_s		BIGINT,
     pLimit_l		INT,
     pCurrentUser	VARCHAR(255)
@@ -35,7 +36,12 @@ SET State = 1;
 	FROM
 		master_item MI
 	WHERE
-		MI.CategoryID = pCategoryID;
+		CASE
+			WHEN pCategoryID = 0
+			THEN MI.CategoryID 
+			ELSE pCategoryID 
+		END = MI.CategoryID
+		AND MI.ItemName LIKE CONCAT('%', pItemName, '%');
 		
 SET State = 2;
 
@@ -325,7 +331,13 @@ SET State = 2;
 			THEN MB.BranchID
 			ELSE pBranchID
 		END = MB.BranchID
-		AND MC.CategoryID = pCategoryID
+		AND CASE
+				WHEN pCategoryID = 0
+                THEN MC.CategoryID 
+				ELSE pCategoryID 
+			END = MC.CategoryID
+		AND MI.ItemName LIKE CONCAT('%', pItemName, '%')
+        
 	ORDER BY
 		MI.ItemName ASC
 	LIMIT

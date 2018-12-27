@@ -203,6 +203,8 @@
 		<script src="assets/js/dataTables.bootstrap.js"></script>
 		<script src="assets/js/dataTables.keyTable.js"></script>
 		<script src="assets/js/toggles.js"></script>
+		<script src="assets/js/mousetrap.min.js"></script>
+		<script src="assets/js/jquery.simulate.js"></script>
 		<!--<a href="#Top" class="scrollup" onclick="return false;">Scroll</a>-->
 		<!--<a href="#Bottom" class="scrolldown" onclick="return false;">Scroll</a>-->
 		<div id="loading"></div>

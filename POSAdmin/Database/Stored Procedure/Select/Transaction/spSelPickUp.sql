@@ -47,42 +47,42 @@ SET @query = CONCAT("SELECT
 SET State = 2;
 
 SET @query = CONCAT("SELECT
-						TSR.PickID,
-                        TS.BookingNumber,
-                        DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') TransactionDate,
-                        TSR.TransactionDate PlainTransactionDate,
+						TP.PickID,
+                        TB.BookingNumber,
+                        DATE_FORMAT(TP.TransactionDate, '%d-%m-%Y') TransactionDate,
+                        TP.TransactionDate PlainTransactionDate,
                         MC.CustomerID,
                         MC.CustomerName,
-						IFNULL(TSRD.Total, 0) Total
+						IFNULL(TPD.Total, 0) Total
 					FROM
-						transaction_pick TSR
-						JOIN transaction_booking TS
-							ON TS.BookingID = TSR.BookingID
+						transaction_pick TP
+						JOIN transaction_booking TB
+							ON TB.BookingID = TP.BookingID
                         JOIN master_customer MC
-							ON MC.CustomerID = TS.CustomerID
+							ON MC.CustomerID = TB.CustomerID
 						LEFT JOIN
                         (
 							SELECT
-								TSR.PickID,
-                                SUM(TSRD.Quantity * (TSRD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - IFNULL(TSRD.Discount, 0))) Total
+								TP.PickID,
+                                SUM(TPD.Quantity * (TPD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - IFNULL(TPD.Discount, 0))) Total
 							FROM
-								transaction_booking TS
+								transaction_booking TB
                                 JOIN master_customer MC
-									ON MC.CustomerID = TS.CustomerID
-								JOIN transaction_pick TSR
-									ON TS.BookingID = TSR.BookingID
-                                LEFT JOIN transaction_pickdetails TSRD
-									ON TSR.PickID = TSRD.PickID
+									ON MC.CustomerID = TB.CustomerID
+								JOIN transaction_pick TP
+									ON TB.BookingID = TP.BookingID
+                                LEFT JOIN transaction_pickdetails TPD
+									ON TP.PickID = TPD.PickID
 								LEFT JOIN master_item MI
-									ON MI.ItemID = TSRD.ItemID
+									ON MI.ItemID = TPD.ItemID
 								LEFT JOIN master_itemdetails MID
-									ON MID.ItemDetailsID = TSRD.ItemDetailsID
+									ON MID.ItemDetailsID = TPD.ItemDetailsID
 							WHERE ", 
 								pWhere, 
                             " GROUP BY
-								TSR.PickID
-                        )TSRD
-							ON TSRD.PickID = TSR.PickID
+								TP.PickID
+                        )TPD
+							ON TPD.PickID = TP.PickID
 					WHERE ", pWhere, 
 					" ORDER BY ", pOrder,
 					" LIMIT ", pLimit_s, ", ", pLimit_l);

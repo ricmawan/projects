@@ -21,7 +21,7 @@
 		$where .= " OR DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
 		$where .= " OR MC.CustomerName LIKE '%".$search."%')";
 	}
-	$sql = "CALL spSelBooking(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLoginKasir']."')";
+	$sql = "CALL spSelBookingPickUp(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLoginKasir']."')";
 
 	if (! $result = mysqli_query($dbh, $sql)) {
 		logEvent(mysqli_error($dbh), '/Transaction/PickUp/TransactionList.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));

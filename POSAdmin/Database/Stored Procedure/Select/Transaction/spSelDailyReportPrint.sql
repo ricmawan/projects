@@ -116,7 +116,7 @@ SET State = 1;
 					ON MI.ItemID = TSRD.ItemID
 			WHERE
 				DATE_FORMAT(TSR.TransactionDate, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
-                AND TS.CreatedBy = pCurrentUser
+                AND TSR.CreatedBy = pCurrentUser
 		)SR
 	UNION ALL
     SELECT

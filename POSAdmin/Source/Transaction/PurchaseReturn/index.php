@@ -213,8 +213,8 @@
 								<th>QTY1</th>
 								<th>H Grosir 2</th>
 								<th>QTY2</th>
-								<th>Stok</th>
-								<th>Fisik</th>
+								<th>Toko</th>
+								<th>Gudang</th>
 							</tr>
 						</thead>
 					</table>
@@ -1027,14 +1027,16 @@
 									"scrollY": "280px",
 									"scrollX": false,
 									"scrollCollapse": false,
-									"paging": false,
+									"paging": true,
+									"lengthChange": false,
+									"pageLength": 25,
 									"searching": true,
 									"order": [],
 									"columns": [
 										{ "width": "15%", "orderable": false, className: "dt-head-center" },
 										{ "width": "20%", "orderable": false, className: "dt-head-center" },
 										{ "width": "5%", "orderable": false, className: "dt-head-center" },
-										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "visible": false, "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
@@ -1044,15 +1046,15 @@
 										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" }
 									],
 									"ajax": {
-										"url": "./Transaction/PurchaseReturn/ItemList.php",
+										"url": "./Transaction/Sale/ItemList.php" /*,
 										"data": function ( d ) {
-											d.BranchID = $("#ddlBranch").val()
-										}
+											d.BranchID = $("#hdnBranchID").val()
+										}*/
 									},
 									"processing": true,
 									"serverSide": true,
 									"language": {
-										"info": "",
+										"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
 										"infoFiltered": "",
 										"infoEmpty": "",
 										"zeroRecords": "Data tidak ditemukan",
@@ -1069,25 +1071,24 @@
 									"initComplete": function(settings, json) {
 										table3.columns.adjust();
 										$("#grid-item").DataTable().cell( ':eq(0)' ).focus();
-									},
-									"sDom": '<"toolbar">frtip'
+									} /*,
+									"sDom": '<"toolbar">frtip' */
 								});
 
-						$(".toolbar").css({
+						/*$(".toolbar").css({
 							"display" : "inline-block"
 						});
 
-						$("div.toolbar").html($("#divBranch").html());
-						$("div.toolbar").find("select").val($("#ddlBranch").val());
+						$("div.toolbar").html($("#divBranch").html());*/
 
 						var counterPickItem = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
 							if(key == 13 && $("#itemList-dialog").css("display") == "block") {
 								if(counterPickItem == 0) {
 									counterPickItem = 1;
-									var data = datatable.row( table3.cell({ focused: true }).index().row ).data();
+									var data = table3.row($(table3.cell({ focused: true }).node()).parent('tr')).data();
 									$("#txtItemCode").val(data[0]);
-									getItemDetails();
+									getItemDetails(0);
 									$("#itemList-dialog").dialog("destroy");
 									table3.destroy();
 									//table.keys.enable();
@@ -1101,7 +1102,7 @@
 							if( $("#itemList-dialog").css("display") == "block") {
 								var data = table3.row(this).data();
 								$("#txtItemCode").val(data[0]);
-								getItemDetails();
+								getItemDetails(0);
 								$("#itemList-dialog").dialog("destroy");
 								table3.destroy();
 								//table.keys.enable();
@@ -1138,18 +1139,18 @@
 						$("#txtItemCode").focus();
 					},
 					resizable: false,
-					height: 420,
+					height: 480,
 					width: 1280,
 					modal: true /*,
 					buttons: [
 					{
 						text: "Tutup",
-						tabindex: 15,
+						tabindex: 18,
 						id: "btnCancelPickItem",
 						click: function() {
 							$(this).dialog("destroy");
 							table3.destroy();
-							//table.keys.enable();
+						//	table.keys.enable();
 							table2.keys.enable();
 							return false;
 						}

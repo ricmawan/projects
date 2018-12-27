@@ -40,7 +40,7 @@
 						<form class="col-md-12 col-sm-12" id="PostForm" method="POST" action="" >
 							<div class="row">
 								<div class="col-md-3 col-sm-3 has-float-label" >
-									<select id="ddlBranch" name="ddlBranch" tabindex=8 class="form-control-custom" placeholder="Pilih Cabang" onchange="ReloadTable()" >
+									<select id="ddlBranch" name="ddlBranch" tabindex=8 class="form-control-custom" placeholder="Pilih Cabang" onchange="ReloadTable(0)" >
 										<?php
 											$sql = "CALL spSelDDLBranch('".$_SESSION['UserLogin']."')";
 											if (! $result = mysqli_query($dbh, $sql)) {
@@ -61,7 +61,7 @@
 								</div>
 								<div class="col-md-3 col-sm-3 has-float-label">
 									<div class="ui-widget" style="width: 100%;">
-										<select id="ddlCategory" name="ddlCategory" onchange="ReloadTable();" tabindex=8 class="form-control-custom" placeholder="Pilih Kategori" >
+										<select id="ddlCategory" name="ddlCategory" onchange="ReloadTable(1);" tabindex=8 class="form-control-custom" placeholder="Pilih Kategori" >
 											<option value=0 selected>-- Pilih Kategori -- </option>
 											<?php
 												$sql = "CALL spSelDDLCategory('".$_SESSION['UserLogin']."')";
@@ -78,6 +78,10 @@
 										</select>
 										<label for="ddlCategory" class="lblInput" >Kategori</label>
 									</div>
+								</div>
+								<div class="col-md-3 col-sm-3 has-float-label">
+									<input id="txtSearch" name="txtSearch" type="text" class="form-control-custom" onfocus="this.select();" autocomplete=off />
+									<label for="txtSearch" class="lblInput" >Cari</label>
 								</div>
 							</div>
 							<hr style="margin: 5px 0 0 0;" />
@@ -109,20 +113,33 @@
 			var dataJSON = [];
 			var ddlCategory = 0;
 
-			function ReloadTable() {
+			function ReloadTable(FromDDLCategory) {
+				$("#loading").show();
+				if(FromDDLCategory == 1) $("#txtSearch").val("");
+
 				if(ddlCategory == $("#ddlCategory").val()) {
 					table2.ajax.reload(function() {
 						table2.columns.adjust();
 						tableWidthAdjust();
+						$("#loading").hide();
 					}, false);
 				}
 				else {
 					table2.ajax.reload(function() {
 						table2.columns.adjust();
 						tableWidthAdjust();
+						$("#loading").hide();
 					});
 				}
 				ddlCategory = $("#ddlCategory").val();
+			}
+
+			function getItemDetails() {
+				if($("#txtSearch").val() != "" ) {
+					$("#ddlCategory").val(0);
+				}
+
+				ReloadTable(0);
 			}
 
 			function addData(ItemID, Quantity, AdjustedQuantity, BuyPrice, SalePrice) {
@@ -164,7 +181,8 @@
 								"url": "./Transaction/StockAdjust/ItemList.php",
 								"data": function ( d ) {
 									d.BranchID = $("#ddlBranch").val(),
-									d.CategoryID = $("#ddlCategory").val()
+									d.CategoryID = $("#ddlCategory").val(),
+									d.ItemName = $("#txtSearch").val()
 								}
 							},
 							"processing": true,
@@ -238,7 +256,7 @@
 											delay: 2000
 										});
 										dataJSON = [];
-										ReloadTable();
+										ReloadTable(0);
 									}
 									else {
 										$("#loading").hide();
@@ -341,8 +359,13 @@
 				var counterSaleReturn = 0;
 				
 				var counterKey = 0;
-				$(document).on("keydown", function (evt) {
-					
+				$("#txtSearch").on("keydown", function (evt) {
+					if(evt.keyCode == 13) {
+						if(counterKey == 0) {
+							getItemDetails();
+							counterKey = 1;
+						}
+					}
 					setTimeout(function() { counterKey = 0; } , 1000);
 				});
 				

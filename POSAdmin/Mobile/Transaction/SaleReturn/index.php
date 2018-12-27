@@ -163,6 +163,16 @@
 				table2.columns.adjust();
 			}
 
+			function newWindow() {
+				var mobilePath = $("#hdnMobilePath").val();
+				window.open(mobilePath, "", "width=1000");
+				document.documentElement.webkitRequestFullscreen();
+			}
+
+			function closeWindow() {
+				window.close();
+			}
+
 			function updateBranch(SaleDetailsID) {
 				setTimeout(function() {
 					var BranchID = 1;
@@ -407,12 +417,14 @@
 								});
 						var counterPickTransaction = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
-							if(counterPickTransaction == 0) {
-								counterPickTransaction = 1;
-								var data = datatable.row( table3.cell({ focused: true }).index().row ).data();
-								if(key == 13 && $("#transactionList-dialog").css("display") == "block") {
+							if(key == 13 && $("#transactionList-dialog").css("display") == "block") {
+								if(counterPickTransaction == 0) {
+									counterPickTransaction = 1;
+									var data = table3.row($(table3.cell({ focused: true }).node()).parent('tr')).data();
 									$("#txtSaleNumber").val(data[0]);
-									getSaleDetails();
+									setTimeout(function() { 
+										getSaleDetails();
+									}, 0);
 									$("#transactionList-dialog").dialog("destroy");
 									table3.destroy();
 									table2.keys.enable();
@@ -656,13 +668,78 @@
 				
 				var counterKey = 0;
 				$(document).on("keydown", function (evt) {
-					if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0 && $("#FormData").css("display") == "none" && $("#delete-confirm").css("display") == "none") {
-						$("#grid-data_wrapper").find("input[type='search']").focus();
+					if(evt.keyCode == 123 && $("#transactionList-dialog").css("display") == "none" ) {
+						evt.preventDefault();
+						if(counterKey == 0) {
+							transactionList();
+							counterKey = 1;
+						}
+					}
+					else if(evt.keyCode == 123) {
+						evt.preventDefault();
+					}
+					else if(evt.keyCode == 121 && $("#transactionList-dialog").css("display") == "none" && $(".lobibox").css("display") != "block") {
+						evt.preventDefault();
+						if(counterKey == 0) {
+							finish();
+							counterKey = 1;
+						}
+					}
+					else if(evt.keyCode == 121) {
+						evt.preventDefault();
 					}
 					setTimeout(function() { counterKey = 0; } , 1000);
 				});
+
+				var path = $("#hdnDesktopPath").val();	
+				Mousetrap.bind('ctrl+n', function(e) {
+					// your function here...
+					e.preventDefault();
+					newWindow();
+				});
 				
 				openDialog(0, 0);
+
+				$.ajax({
+					url: "./FirstBalance.php",
+					type: "POST",
+					data: { },
+					dataType: "json",
+					success: function(Data) {
+						if(Data.FailedFlag == '0') {
+							if(Data.IsFilled == 0) firstBalance();
+							else $("#txtBookingNumber").focus();
+						}
+						else {
+							var counter = 0;
+							Lobibox.alert("error",
+							{
+								msg: "Gagal memuat data",
+								width: 480,
+								beforeClose: function() {
+									if(counter == 0) {
+										setTimeout(function() {
+											//$("#txtItemCode").focus();
+										}, 0);
+										counter = 1;
+									}
+								}
+							});
+							return 0;
+						}
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						$("#loading").hide();
+						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+						LogEvent(errorMessage, "/Home.php");
+						Lobibox.alert("error",
+						{
+							msg: errorMessage,
+							width: 480
+						});
+						return 0;
+					}
+				});
 			});
 		</script>
 	</body>

@@ -22,7 +22,7 @@
         $Message = "Terjadi Kesalahan Sistem";
         $MessageDetail = mysqli_error($dbh);
         $FailedFlag = 1;
-        logEvent(mysqli_error($dbh), '/Transaction/Sale/UpdatePayment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+        logEvent(mysqli_error($dbh), '/PrintDailyReport.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
         echo returnstate($SaleID, $Message, $MessageDetail, $FailedFlag, $State);
         return 0;
     }
@@ -58,9 +58,9 @@
 
     $printer -> setJustification(Printer::JUSTIFY_LEFT);
 
+    $printer -> selectPrintMode(Printer::MODE_FONT_B);
     $printer -> text($dayName[date("w", strtotime($TransactionDate))] . ", " . date("d", strtotime($TransactionDate)) . " " . $monthName[date("n", strtotime($TransactionDate)) - 1] . " " . date("Y", strtotime($TransactionDate)) . "/" . date("H") . ":" . date("i") . "\n");
 
-    $printer -> selectPrintMode(Printer::MODE_FONT_B);
     $printer -> text(str_pad("", 39, "-") . "\n");
 
     $sql = "CALL spSelDailyReportPrint('".$_SESSION['UserLogin']."')";
@@ -90,12 +90,11 @@
     $printer -> text(str_pad("", 39, "-") . "\n");
 
     $printer -> setEmphasis(true);
-    $printer -> text("TOTAL          : " . str_pad(number_format($GrandTotal,0,".",","), 16, " ", STR_PAD_LEFT) ."\n" );
+    $printer -> text("TOTAL          : " . str_pad(number_format($GrandTotal,0,".",","), 22, " ", STR_PAD_LEFT) ."\n" );
 
     $printer -> setEmphasis(false);
 
-    $printer -> text("Kasir : " . str_pad($_SESSION['UserLogin'], 10, " ") . "\n");
-    $printer -> setJustification(Printer::JUSTIFY_CENTER);
+    $printer -> text("Kasir          : " . str_pad($_SESSION['UserLogin'], 22, " ") . "\n");
     /*$data = $connector -> getData();
     fwrite($handle, $data);
     fclose($handle);*/

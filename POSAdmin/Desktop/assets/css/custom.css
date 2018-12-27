@@ -889,3 +889,7 @@ input::-webkit-inner-spin-button {
 .ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited {
 	color: white !important;
 }
+
+.ui-datepicker {
+	z-index: 100 !important;
+}

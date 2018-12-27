@@ -724,15 +724,17 @@
 						var counterPickTransaction = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
 							//var index = table3.cell({ focused: true }).index();
-							if(counterPickTransaction == 0) {
-								counterPickTransaction = 1;
-								var data = datatable.row( table3.cell({ focused: true }).index().row ).data();
-								if(key == 13 && $("#transactionList-dialog").css("display") == "block") {
+							if(key == 13 && $("#transactionList-dialog").css("display") == "block") {
+								if(counterPickTransaction == 0) {
+									counterPickTransaction = 1;
+									var data = table3.row($(table3.cell({ focused: true }).node()).parent('tr')).data();
+									console.log(data);
 									$("#txtBookingNumber").val(data[0]);
-									getBookingDetails();
+									setTimeout(function() {
+										getBookingDetails();
+									}, 0);
 									$("#transactionList-dialog").dialog("destroy");
 									table3.destroy();
-									table.keys.enable();
 									table2.keys.enable();
 								}
 								setTimeout(function() { counterPickTransaction = 0; } , 1000);

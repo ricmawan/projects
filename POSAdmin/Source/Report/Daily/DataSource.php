@@ -117,7 +117,9 @@
 					$Data .= "<tr><td></td><td>". $row['CustomerName'] . " (". $row['TransactionNumber'] .")</td><td colspan=4></td></tr>";					
 				}
 				$Data .= "<tr><td></td><td>". $row['ItemName'] ."</td><td class='text-right'>". number_format($row['SalePrice'],0,".",",") ."</td>";
-				$Data .= "<td class='text-right'>". number_format($row['Quantity'],0,".",",") . " ". $row['UnitName'] ."</td>";
+				if(strpos($row['Quantity'], ".")) $Quantity = number_format(round($row['Quantity'], 2),2,".",",");	    		
+		    	else $Quantity = number_format($row['Quantity'],0,".",",");
+				$Data .= "<td class='text-right'>". $Quantity . " ". $row['UnitName'] ."</td>";
 				$Data .= "<td class='text-right'>(". number_format($row['Discount'],0,".",",") . ")</td><td class='text-right'>". number_format($row['SubTotal'],0,".",",") ."</td></tr>";
 				$UnionTotal += $row['SubTotal'];
 				$SubTotal += $row['SubTotal'];
@@ -191,7 +193,9 @@
 					$Data .= "<tr><td></td><td>". $row['CustomerName'] . " (". $row['TransactionNumber'] .")</td><td colspan=4></td></tr>";
 				}
 				$Data .= "<tr><td></td><td>". $row['ItemName'] ."</td><td class='text-right'>". number_format($row['SalePrice'],0,".",",") ."</td>";
-				$Data .= "<td class='text-right'>". number_format($row['Quantity'],0,".",",") . " ". $row['UnitName'] ."</td>";
+				if(strpos($row['Quantity'], ".")) $Quantity = number_format(round($row['Quantity'], 2),2,".",",");	    		
+		    	else $Quantity = number_format($row['Quantity'],0,".",",");
+				$Data .= "<td class='text-right'>". $Quantity . " ". $row['UnitName'] ."</td>";
 				$Data .= "<td class='text-right'>(". number_format($row['Discount'],0,".",",") . ")</td><td class='text-right'>". number_format($row['SubTotal'],0,".",",") ."</td></tr>";
 				$SubTotal += $row['SubTotal'];
 			}
