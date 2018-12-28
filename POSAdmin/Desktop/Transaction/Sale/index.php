@@ -390,7 +390,7 @@
 			
 			function openDialog(Data, EditFlag) {
 				$("#hdnIsEdit").val(EditFlag);
-				$("#txtTransactionDate").focus();
+				//$("#txtTransactionDate").focus();
 				table2 = $("#grid-transaction").DataTable({
 							"keys": true,
 							"scrollY": "280px",

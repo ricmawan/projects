@@ -525,7 +525,7 @@
 				if(counterGetItem == 0) {
 					counterGetItem = 1;
 					var itemCode = $("#txtItemCode").val();
-					if(itemCode == "") $("#txtItemCode").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+					if(itemCode == "") finish();
 					else if(EditFlag == 1 || (EditFlag == 0 && itemCode != itemCodeTemp)) {
 						$("#loading").show();
 						$.ajax({
@@ -2356,88 +2356,82 @@
 					},
 					open: function() {
 						table2.keys.disable();
-						if ( $.fn.dataTable.isDataTable( '#grid-item' ) ) {
-							table3 = $('#grid-item').DataTable();
-						}
-						else {
-							table3 = $("#grid-item").DataTable({
-										"keys": true,
-										"scrollY": "280px",
-										"scrollX": false,
-										"scrollCollapse": false,
-										"paging": true,
-										"lengthChange": false,
-										"pageLength": 25,
-										"searching": true,
-										"order": [],
-										"columns": [
-											{ "width": "15%", "orderable": false, className: "dt-head-center" },
-											{ "width": "20%", "orderable": false, className: "dt-head-center" },
-											{ "width": "5%", "orderable": false, className: "dt-head-center" },
-											{ "width": "7.5%", "visible": false, "orderable": false, className: "dt-head-center dt-body-right" },
-											{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
-											{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
-											{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
-											{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
-											{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
-											{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
-											{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" }
-										],
-										"ajax": "./Transaction/Sale/ItemList.php",
-										"processing": true,
-										"serverSide": true,
-										"language": {
-											"info": "",
-											"infoFiltered": "",
-											"infoEmpty": "",
-											"zeroRecords": "Data tidak ditemukan",
-											"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
-											"search": "Cari",
-											"processing": "",
-											"paginate": {
-												"next": ">",
-												"previous": "<",
-												"last": "»",
-												"first": "«"
-											}
-										},
-										"initComplete": function(settings, json) {
-											table3.columns.adjust();
-											$("#grid-item").DataTable().cell( ':eq(0)' ).focus();
+						table3 = $("#grid-item").DataTable({
+									"keys": true,
+									"scrollY": "280px",
+									"scrollX": false,
+									"scrollCollapse": false,
+									"paging": true,
+									"lengthChange": false,
+									"pageLength": 25,
+									"searching": true,
+									"order": [],
+									"columns": [
+										{ "width": "15%", "orderable": false, className: "dt-head-center" },
+										{ "width": "20%", "orderable": false, className: "dt-head-center" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center" },
+										{ "width": "7.5%", "visible": false, "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" }
+									],
+									"ajax": {
+										"url": "./Transaction/Sale/ItemList.php" /*,
+										"data": function ( d ) {
+											d.BranchID = $("#hdnBranchID").val()
+										}*/
+									},
+									"processing": true,
+									"serverSide": true,
+									"language": {
+										"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+										"infoFiltered": "",
+										"infoEmpty": "",
+										"zeroRecords": "Data tidak ditemukan",
+										"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
+										"search": "Cari",
+										"processing": "",
+										"paginate": {
+											"next": ">",
+											"previous": "<",
+											"last": "»",
+											"first": "«"
 										}
-									});
-						}
+									},
+									"initComplete": function(settings, json) {
+										table3.columns.adjust();
+										$("#grid-item").DataTable().cell( ':eq(0)' ).focus();
+									} /*,
+									"sDom": '<"toolbar">frtip' */
+								});
+
+						/*$(".toolbar").css({
+							"display" : "inline-block"
+						});
+
+						$("div.toolbar").html($("#divBranch").html());*/
+
 						var counterPickItem = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
-							//var index = table3.cell({ focused: true }).index();
-							if(counterPickItem == 0) {
-								counterPickItem = 1;
-								var data = table3.row($(table3.cell({ focused: true }).node()).parent('tr')).data();
-								if(key == 13 && $("#itemList-dialog").css("display") == "block") {
+							if(key == 13 && $("#itemList-dialog").css("display") == "block") {
+								if(counterPickItem == 0) {
+									counterPickItem = 1;
+									var data = table3.row($(table3.cell({ focused: true }).node()).parent('tr')).data();
 									$("#txtItemCode").val(data[0]);
 									getItemDetails(0);
 									$("#itemList-dialog").dialog("destroy");
 									table3.destroy();
+									//table.keys.enable();
 									table2.keys.enable();
+									setTimeout(function() { counterPickItem = 0; } , 1000);
 								}
-								setTimeout(function() { counterPickItem = 0; } , 1000);
 							}
 						});
 						
-						/*var index = 0;
-						$("#grid-item tbody").on("click", 'tr', function(e) {
-							if(index == $(e.currentTarget).index()) {
-								if( $("#itemList-dialog").css("display") == "block") {
-									var data = table3.row(this).data();
-									$("#txtItemCode").val(data[0]);
-									getItemDetails();
-									$("#itemList-dialog").dialog("destroy");
-									table3.destroy();
-									table2.keys.enable();
-								}
-							}
-							index = table3.cell({ focused: true }).index().row;
-						});*/
 						$('#grid-item tbody').on('dblclick', 'tr', function () {
 							if( $("#itemList-dialog").css("display") == "block") {
 								var data = table3.row(this).data();
@@ -2445,12 +2439,13 @@
 								getItemDetails(0);
 								$("#itemList-dialog").dialog("destroy");
 								table3.destroy();
+								//table.keys.enable();
 								table2.keys.enable();
 							}
 						});
 						
 						table3.on( 'search.dt', function () {
-							setTimeout(function() { $("#grid-item").DataTable().cell( ':eq(0)' ).focus(); }, 1000 );
+							setTimeout(function() { $("#grid-item").DataTable().cell( ':eq(0)' ).focus(); }, 100 );
 						});
 						
 						var counterKeyItem = 0;
@@ -2459,6 +2454,11 @@
 								counterKeyItem = 1;
 								if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0) {
 									$("#itemList-dialog").find("input[type='search']").focus();
+								}
+								else if(evt.keyCode == 27 && $("#itemList-dialog").css("display") == "block") {
+									$("#itemList-dialog").dialog("destroy");
+									table3.destroy();
+									table2.keys.enable();
 								}
 							}
 							setTimeout(function() { counterKeyItem = 0; } , 1000);

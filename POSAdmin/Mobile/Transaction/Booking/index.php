@@ -541,7 +541,7 @@
 				if(counterGetItem == 0) {
 					counterGetItem = 1;
 					var itemCode = $("#txtItemCode").val();
-					if(itemCode == "") $("#txtItemCode").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+					if(itemCode == "") finish();
 					else if(EditFlag == 1 || (EditFlag == 0 && itemCode != itemCodeTemp)) {
 						$("#loading").show();
 						$.ajax({
@@ -2427,10 +2427,10 @@
 						var counterPickItem = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
 							//var index = table3.cell({ focused: true }).index();
-							if(counterPickItem == 0) {
-								counterPickItem = 1;
-								var data = table3.row($(table3.cell({ focused: true }).node()).parent('tr')).data();
-								if(key == 13 && $("#itemList-dialog").css("display") == "block") {
+							if(key == 13 && $("#itemList-dialog").css("display") == "block") {
+								if(counterPickItem == 0) {
+									counterPickItem = 1;
+									var data = table3.row($(table3.cell({ focused: true }).node()).parent('tr')).data();
 									$("#txtItemCode").val(data[0]);
 									getItemDetails(0);
 									$("#itemList-dialog").dialog("destroy");
@@ -2476,6 +2476,11 @@
 								counterKeyItem = 1;
 								if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0) {
 									$("#itemList-dialog").find("input[type='search']").focus();
+								}
+								else if(evt.keyCode == 27 && $("#itemList-dialog").css("display") == "block") {
+									$("#itemList-dialog").dialog("destroy");
+									table3.destroy();
+									table2.keys.enable();
 								}
 							}
 							setTimeout(function() { counterKeyItem = 0; } , 1000);
