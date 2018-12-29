@@ -126,6 +126,7 @@
 		    }
 
 		    //$printer -> text("DISKON" . str_pad("", 22, " ") . str_pad("(" . number_format($Discount ,0,".",",") . ")" , 11, " ", STR_PAD_LEFT) . "\n");
+			$printer -> text("DISKON        " . str_pad("(". number_format($DiscountTotal ,0,".",",") .")", 25, " ", STR_PAD_LEFT) ."\n" );
 
 		    $printer -> text(str_pad("", 39, "-") . "\n");
 
@@ -134,9 +135,9 @@
 		    $printer -> text("PEMBAYARAN   : ");
 			$printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
 			$printer -> text($PaymentMethod ."\n" );
-		    $printer -> text("TOTAL:" . str_pad(number_format($GrandTotal ,0,".",","), 10, " ", STR_PAD_LEFT) ."\n" );
+		    $printer -> text("TOTAL:" . str_pad(number_format($GrandTotal - $DiscountTotal ,0,".",","), 10, " ", STR_PAD_LEFT) ."\n" );
 			$printer -> selectPrintMode(Printer::MODE_FONT_B);
-		    $printer -> text("DISKON       : " . str_pad(number_format($DiscountTotal ,0,".",","), 24, " ", STR_PAD_LEFT) ."\n" );
+		    //$printer -> text("DISKON       : " . str_pad(number_format($DiscountTotal ,0,".",","), 24, " ", STR_PAD_LEFT) ."\n" );
 		    $printer -> text("BAYAR        : " . str_pad(number_format($Payment ,0,".",","), 24, " ", STR_PAD_LEFT) ."\n" );
 		    if($PaymentMethod == "Tunai") $printer -> text("KEMBALI      : " . str_pad(number_format($Change ,0,".",","), 24, " ", STR_PAD_LEFT) . "\n" );
 		    else $printer -> text("KEKURANGAN   : " . str_pad(number_format($Change ,0,".",","), 24, " ", STR_PAD_LEFT) . "\n" );

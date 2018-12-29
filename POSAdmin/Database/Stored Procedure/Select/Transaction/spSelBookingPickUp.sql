@@ -54,9 +54,25 @@ SET @query = CONCAT("SELECT
 									ON MI.ItemID = TBD.ItemID
 								LEFT JOIN master_itemdetails MID
 									ON MID.ItemDetailsID = TBD.ItemDetailsID
-								LEFT JOIN transaction_pickdetails TPD
-									ON TPD.ItemID = TBD.ItemID
-                                    AND TPD.ItemDetailsID = TBD.ItemDetailsID
+								LEFT JOIN 
+                                (
+									SELECT
+										TP.BookingID,
+                                        TPD.ItemID,
+                                        TPD.ItemDetailsID,
+										SUM(TPD.Quantity) Quantity
+									FROM
+										transaction_pick TP
+										JOIN transaction_pickdetails TPD
+											ON TPD.PickID = TP.PickID
+									GROUP BY
+										TP.BookingID,
+                                        TPD.ItemID,
+                                        TPD.ItemDetailsID
+                                )TPD
+									ON TPD.BookingID = TB.BookingID
+                                    AND TPD.ItemID = TBD.ItemID
+                                    AND IFNULL(TPD.ItemDetailsID, '') = IFNULL(TBD.ItemDetailsID, '')
 							WHERE ", 
 								pWhere, 
                             " GROUP BY
@@ -118,8 +134,25 @@ SET @query = CONCAT("SELECT
 									ON MI.ItemID = TBD.ItemID
 								LEFT JOIN master_itemdetails MID
 									ON MID.ItemDetailsID = TBD.ItemDetailsID
-								LEFT JOIN transaction_pickdetails TPD
-									ON TPD.ItemID = TBD.ItemID
+								LEFT JOIN 
+                                (
+									SELECT
+										TP.BookingID,
+                                        TPD.ItemID,
+                                        TPD.ItemDetailsID,
+										SUM(TPD.Quantity) Quantity
+									FROM
+										transaction_pick TP
+										JOIN transaction_pickdetails TPD
+											ON TPD.PickID = TP.PickID
+									GROUP BY
+										TP.BookingID,
+                                        TPD.ItemID,
+                                        TPD.ItemDetailsID
+                                )TPD
+									ON TPD.BookingID = TB.BookingID
+                                    AND TPD.ItemID = TBD.ItemID
+                                    AND IFNULL(TPD.ItemDetailsID, '') = IFNULL(TBD.ItemDetailsID, '')
 							WHERE ", 
 								pWhere, 
                             " GROUP BY
@@ -128,7 +161,7 @@ SET @query = CONCAT("SELECT
 							ON TBD.BookingID = TB.BookingID
 					WHERE 
 						TBD.PickQuantity < TBD.BookingQuantity
-					AND ", pWhere, 
+						AND ", pWhere, 
 					" ORDER BY ", pOrder,
 					" LIMIT ", pLimit_s, ", ", pLimit_l);
 					

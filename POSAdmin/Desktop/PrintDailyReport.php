@@ -94,7 +94,7 @@
 
     $printer -> setEmphasis(false);
 
-    $printer -> text("Kasir          : " . str_pad($_SESSION['UserLoginKasir'], 22, " ") . "\n");Kasir
+    $printer -> text("Kasir          : " . str_pad($_SESSION['UserLoginKasir'], 22, " ") . "\n");
     /*$data = $connector -> getData();
     fwrite($handle, $data);
     fclose($handle);*/
