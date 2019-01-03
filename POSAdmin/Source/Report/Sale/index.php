@@ -261,67 +261,68 @@
 				});
 
 				table = $("#grid-data").DataTable({
-								"keys": true,
-								"scrollY": "285px",
-								"rowId": "ItemID",
-								"scrollCollapse": true,
-								"order": [2, "asc"],
-								"columns": [
-									 {
-						                "className": 'details-control',
-						                "orderable": false,
-						                "data": null,
-						                "defaultContent": ''
-						            },
-									{ "data": "SaleNumber", className: "dt-head-center" },
-									{ "data": "TransactionDate", className: "dt-head-center" },
-									{ "data": "CustomerName", className: "dt-head-center" },
-									{ "data": "TotalSale", "orderable": false, className: "dt-head-center dt-body-right" },
-									{ "data": "Discount", "orderable": false, className: "dt-head-center dt-body-right" },
-									{ "data": "SubTotal", "orderable": false, className: "dt-head-center dt-body-right" },
-									{ "data": "SaleID", "visible": false },
-									{ "data": "TransactionType", "visible": false }
-								],
-								"processing": true,
-								"serverSide": true,
-								"ajax": {
-									"url": "./Report/Sale/DataSource.php",
-									"data": function ( d ) {
-										d.FromDate = $("#txtFromDate").val(),
-										d.ToDate = $("#txtToDate").val(),
-										d.BranchID = $("#ddlBranch").val(),
-										d.FirstPass = FirstPass
-									}
-								},
-								"language": {
-									"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-									"infoFiltered": "",
-									"infoEmpty": "",
-									"zeroRecords": "Data tidak ditemukan",
-									"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
-									"search": "Cari",
-									"processing": "Memproses",
-									"paginate": {
-										"next": ">",
-										"previous": "<",
-										"last": "»",
-										"first": "«"
-									}
-								},
-								"drawCallback": function( settings ) {
-							        var json = table.ajax.json();
-							        $("#tfootTable").html("<tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Sub Total:</td><td>" + json.Total + "</td></tr><tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Grand Total:</td><td>" + json.GrandTotal + "</td></tr>");
-									$("#tfootTable").find("td").css({
-										"border" : "0",
-										"font-size" : "14px",
-										"font-weight" : "bold",
-										"padding-right" : "10px",
-										"padding-top" : "5px",
-										"padding-bottom" : "5px",
-										"text-align" : "right"
-									});
-							    }
-							});
+							"destroy": true,
+							"keys": true,
+							"scrollY": "285px",
+							"rowId": "ItemID",
+							"scrollCollapse": true,
+							"order": [2, "asc"],
+							"columns": [
+								 {
+					                "className": 'details-control',
+					                "orderable": false,
+					                "data": null,
+					                "defaultContent": ''
+					            },
+								{ "data": "SaleNumber", className: "dt-head-center" },
+								{ "data": "TransactionDate", className: "dt-head-center" },
+								{ "data": "CustomerName", className: "dt-head-center" },
+								{ "data": "TotalSale", "orderable": false, className: "dt-head-center dt-body-right" },
+								{ "data": "Discount", "orderable": false, className: "dt-head-center dt-body-right" },
+								{ "data": "SubTotal", "orderable": false, className: "dt-head-center dt-body-right" },
+								{ "data": "SaleID", "visible": false },
+								{ "data": "TransactionType", "visible": false }
+							],
+							"processing": true,
+							"serverSide": true,
+							"ajax": {
+								"url": "./Report/Sale/DataSource.php",
+								"data": function ( d ) {
+									d.FromDate = $("#txtFromDate").val(),
+									d.ToDate = $("#txtToDate").val(),
+									d.BranchID = $("#ddlBranch").val(),
+									d.FirstPass = FirstPass
+								}
+							},
+							"language": {
+								"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+								"infoFiltered": "",
+								"infoEmpty": "",
+								"zeroRecords": "Data tidak ditemukan",
+								"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
+								"search": "Cari",
+								"processing": "Memproses",
+								"paginate": {
+									"next": ">",
+									"previous": "<",
+									"last": "»",
+									"first": "«"
+								}
+							},
+							"drawCallback": function( settings ) {
+						        var json = table.ajax.json();
+						        $("#tfootTable").html("<tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Sub Total:</td><td>" + json.Total + "</td></tr><tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Grand Total:</td><td>" + json.GrandTotal + "</td></tr>");
+								$("#tfootTable").find("td").css({
+									"border" : "0",
+									"font-size" : "14px",
+									"font-weight" : "bold",
+									"padding-right" : "10px",
+									"padding-top" : "5px",
+									"padding-bottom" : "5px",
+									"text-align" : "right"
+								});
+						    }
+						});
 			});
 
 			$('#grid-data tbody').on('click', 'td.details-control', function () {

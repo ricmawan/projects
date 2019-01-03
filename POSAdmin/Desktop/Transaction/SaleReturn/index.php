@@ -115,6 +115,7 @@
 				$("#txtSaleNumber").prop("readonly", false);
 				$("#txtSaleNumber").focus();
 				table2 = $("#grid-transaction").DataTable({
+							"destroy": true,
 							"keys": false,
 							"scrollY": "330px",
 							"scrollX": false,
@@ -159,6 +160,7 @@
 								}, 0);
 							}
 						});
+
 				table2.columns.adjust();
 				tableWidthAdjust();
 			}
@@ -365,6 +367,7 @@
 					open: function() {
 						table2.keys.disable();
 						table3 = $("#grid-sale").DataTable({
+									"destroy": true,
 									"keys": true,
 									"scrollY": "280px",
 									"scrollX": false,
@@ -401,6 +404,7 @@
 										$("#grid-sale").DataTable().cell( ':eq(0)' ).focus();
 									}
 								});
+
 						var counterPickTransaction = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
 							if(key == 13 && $("#transactionList-dialog").css("display") == "block") {

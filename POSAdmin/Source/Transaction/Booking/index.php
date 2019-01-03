@@ -233,7 +233,7 @@
 								<th>Kode Barang</th>
 								<th>Nama Barang</th>
 								<th>Satuan</th>
-								<th>H Beli</th>
+								<!--<th>H Beli</th>-->
 								<th>H Ecer</th>
 								<th>H Grosir 1</th>
 								<th>QTY1</th>
@@ -465,6 +465,7 @@
 						$("#txtTransactionDate").focus();
 						table.keys.disable();
 						table2 = $("#grid-transaction").DataTable({
+									"destroy": true,
 									"keys": true,
 									"scrollY": "280px",
 									"scrollX": false,
@@ -520,6 +521,7 @@
 										}, 0);
 									}
 								});
+
 						table2.columns.adjust();
 						var counterBookingDetails = 0;
 						table2.on( 'key', function (e, datatable, key, cell, originalEvent) {
@@ -2424,6 +2426,7 @@
 						table.keys.disable();
 						table2.keys.disable();
 						table3 = $("#grid-item").DataTable({
+									"destroy": true,
 									"keys": true,
 									"scrollY": "280px",
 									"scrollX": false,
@@ -2437,7 +2440,7 @@
 										{ "width": "15%", "orderable": false, className: "dt-head-center" },
 										{ "width": "20%", "orderable": false, className: "dt-head-center" },
 										{ "width": "5%", "orderable": false, className: "dt-head-center" },
-										{ "width": "7.5%", "visible": false, "orderable": false, className: "dt-head-center dt-body-right" },
+										/*{ "width": "7.5%", "visible": false, "orderable": false, className: "dt-head-center dt-body-right" },*/
 										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
@@ -2565,6 +2568,7 @@
 					open: function() {
 						table2.keys.disable();
 						table4 = $("#grid-customer").DataTable({
+									"destroy": true,
 									"keys": true,
 									"scrollY": "280px",
 									"scrollX": false,
@@ -3321,48 +3325,49 @@
 				enterLikeTab();
 				var counterBooking = 0;
 				table = $("#grid-data").DataTable({
-								"keys": true,
-								"scrollY": "330px",
-								"rowId": "BookingID",
-								"scrollCollapse": true,
-								"order": [],
-								"columns": [
-									{ "width": "20px", "orderable": false, className: "dt-head-center dt-body-center" },
-									{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ "orderable": false, className: "dt-head-center dt-body-right" },
-									{ "visible": false },
-									{ "visible": false },
-									{ "visible": false },
-									{ "visible": false },
-									{ "visible": false },
-									{ "visible": false },
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ "visible": false },
-									{ "visible": false }
-								],
-								"processing": true,
-								"serverSide": true,
-								"ajax": "./Transaction/Booking/DataSource.php",
-								"language": {
-									"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-									"infoFiltered": "",
-									"infoEmpty": "",
-									"zeroRecords": "Data tidak ditemukan",
-									"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
-									"search": "Cari",
-									"processing": "Memproses",
-									"paginate": {
-										"next": ">",
-										"previous": "<",
-										"last": "»",
-										"first": "«"
-									}
+							"destroy": true,
+							"keys": true,
+							"scrollY": "330px",
+							"rowId": "BookingID",
+							"scrollCollapse": true,
+							"order": [],
+							"columns": [
+								{ "width": "20px", "orderable": false, className: "dt-head-center dt-body-center" },
+								{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
+								{ className: "dt-head-center" },
+								{ className: "dt-head-center" },
+								{ className: "dt-head-center" },
+								{ "orderable": false, className: "dt-head-center dt-body-right" },
+								{ "visible": false },
+								{ "visible": false },
+								{ "visible": false },
+								{ "visible": false },
+								{ "visible": false },
+								{ "visible": false },
+								{ className: "dt-head-center" },
+								{ className: "dt-head-center" },
+								{ "visible": false },
+								{ "visible": false }
+							],
+							"processing": true,
+							"serverSide": true,
+							"ajax": "./Transaction/Booking/DataSource.php",
+							"language": {
+								"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+								"infoFiltered": "",
+								"infoEmpty": "",
+								"zeroRecords": "Data tidak ditemukan",
+								"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
+								"search": "Cari",
+								"processing": "Memproses",
+								"paginate": {
+									"next": ">",
+									"previous": "<",
+									"last": "»",
+									"first": "«"
 								}
-							});
+							}
+						});
 				
 				table.on( 'key', function (e, datatable, key, cell, originalEvent) {
 					var index = table.cell({ focused: true }).index();

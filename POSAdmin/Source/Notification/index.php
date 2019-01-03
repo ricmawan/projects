@@ -116,6 +116,7 @@
 				
 				var counterItem = 0;
 				table = $("#grid-data").DataTable({
+								"destroy": true,
 								"keys": true,
 								"scrollX":  false,
 								"scrollY": "330px",
@@ -154,6 +155,7 @@
 						});
 
 				table2 = $("#grid-debt").DataTable({
+								"destroy": true,
 								"keys": true,
 								"scrollX":  false,
 								"scrollY": "330px",

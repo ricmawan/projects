@@ -160,6 +160,7 @@
 				$("#hdnIsEdit").val(EditFlag);
 				$("#txtSaleNumber").focus();
 				table2 = $("#grid-transaction").DataTable({
+							"destroy": true,
 							"keys": true,
 							"scrollY": "176px",
 							"scrollX": false,

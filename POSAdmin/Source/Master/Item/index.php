@@ -893,60 +893,61 @@
 				var visible = false;
 				if(UserTypeID == "1") visible = true;
 				table = $("#grid-data").DataTable({
-								"keys": true,
-								"scrollX":  true,
-								"scrollY": "330px",
-								"rowId": "ItemID",
-								"scrollCollapse": true,
-								"order": [],
-								"columns": [
-									{ "width": "12px", "orderable": false, className: "dt-head-center dt-body-center" },
-									{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center dt-body-right" },
-									{ className: "dt-head-center dt-body-right" },
-									{ className: "dt-head-center dt-body-right" },
-									{ className: "dt-head-center dt-body-right" },
-									{ className: "dt-head-center dt-body-right" },
-									{ className: "dt-head-center dt-body-right" },
-									{ className: "dt-head-center dt-body-right" },
-									{ className: "dt-head-center dt-body-right" },
-									{ className: "dt-head-center dt-body-right", "visible": false },
-									{ className: "dt-head-center dt-body-right", "visible": false },
-									{ className: "dt-head-center dt-body-right", "visible": false }
-								],
-								"processing": true,
-								"serverSide": true,
-								"ajax": "./Master/Item/DataSource.php",
-								"language": {
-									"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-									"infoFiltered": "",
-									"infoEmpty": "",
-									"zeroRecords": "Data tidak ditemukan",
-									"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
-									"search": "Cari",
-									"processing": "Memproses",
-									"paginate": {
-										"next": ">",
-										"previous": "<",
-										"last": "»",
-										"first": "«"
-									}
-								},
-								"drawCallback": function( settings ) {
-							       setTimeout(function() {
-										adjustColumns();
-									}, 100);
-							    },
-							    "initComplete": function( settings ) {
-							       setTimeout(function() {
-										adjustColumns();
-									}, 100);
-							    }
-							});
+							"destroy": true,
+							"keys": true,
+							"scrollX":  true,
+							"scrollY": "330px",
+							"rowId": "ItemID",
+							"scrollCollapse": true,
+							"order": [],
+							"columns": [
+								{ "width": "12px", "orderable": false, className: "dt-head-center dt-body-center" },
+								{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
+								{ className: "dt-head-center" },
+								{ className: "dt-head-center" },
+								{ className: "dt-head-center" },
+								{ className: "dt-head-center" },
+								{ className: "dt-head-center dt-body-right" },
+								{ className: "dt-head-center dt-body-right" },
+								{ className: "dt-head-center dt-body-right" },
+								{ className: "dt-head-center dt-body-right" },
+								{ className: "dt-head-center dt-body-right" },
+								{ className: "dt-head-center dt-body-right" },
+								{ className: "dt-head-center dt-body-right" },
+								{ className: "dt-head-center dt-body-right" },
+								{ className: "dt-head-center dt-body-right", "visible": false },
+								{ className: "dt-head-center dt-body-right", "visible": false },
+								{ className: "dt-head-center dt-body-right", "visible": false }
+							],
+							"processing": true,
+							"serverSide": true,
+							"ajax": "./Master/Item/DataSource.php",
+							"language": {
+								"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+								"infoFiltered": "",
+								"infoEmpty": "",
+								"zeroRecords": "Data tidak ditemukan",
+								"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
+								"search": "Cari",
+								"processing": "Memproses",
+								"paginate": {
+									"next": ">",
+									"previous": "<",
+									"last": "»",
+									"first": "«"
+								}
+							},
+							"drawCallback": function( settings ) {
+						       setTimeout(function() {
+									adjustColumns();
+								}, 100);
+						    },
+						    "initComplete": function( settings ) {
+						       setTimeout(function() {
+									adjustColumns();
+								}, 100);
+						    }
+						});
 				
 				table.on( 'key', function (e, datatable, key, cell, originalEvent) {
 					var index = table.cell({ focused: true }).index();

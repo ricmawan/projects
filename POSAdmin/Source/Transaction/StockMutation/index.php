@@ -342,6 +342,7 @@
 						$("#txtTransactionDate").focus();
 						table.keys.disable();
 						table2 = $("#grid-transaction").DataTable({
+									"destroy": true,
 									"keys": true,
 									"scrollY": "280px",
 									"scrollX": false,
@@ -822,6 +823,7 @@
 						table.keys.disable();
 						table2.keys.disable();
 						table3 = $("#grid-item").DataTable({
+									"destroy": true,
 									"keys": true,
 									"scrollY": "280px",
 									"scrollX": false,
@@ -1125,6 +1127,7 @@
 				enterLikeTab();
 				var counterStockMutation = 0;
 				table = $("#grid-data").DataTable({
+								"destroy": true,
 								"keys": true,
 								"scrollY": "330px",
 								"rowId": "StockMutationID",

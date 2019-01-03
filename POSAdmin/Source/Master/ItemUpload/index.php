@@ -147,6 +147,7 @@
 					autoOpen: false,
 					open: function() {
 						table = $("#grid-item").DataTable({
+									"destroy": true,
 									"keys": false,
 									"scrollY": "280px",
 									"scrollX": true,

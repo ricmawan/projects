@@ -226,7 +226,7 @@
 								<th>Kode</th>
 								<th>Nama Barang</th>
 								<th>Satuan</th>
-								<th>H Beli</th>
+								<!--<th>H Beli</th>-->
 								<th>H Ecer</th>
 								<th>H1</th>
 								<th>QTY1</th>
@@ -408,6 +408,7 @@
 				$("#hdnIsEdit").val(EditFlag);
 				//$("#txtTransactionDate").focus();
 				table2 = $("#grid-transaction").DataTable({
+							"destroy": true,
 							"keys": true,
 							"scrollY": "280px",
 							"scrollX": false,
@@ -2357,6 +2358,7 @@
 					open: function() {
 						table2.keys.disable();
 						table3 = $("#grid-item").DataTable({
+									"destroy": true,
 									"keys": true,
 									"scrollY": "280px",
 									"scrollX": false,
@@ -2370,7 +2372,7 @@
 										{ "width": "15%", "orderable": false, className: "dt-head-center" },
 										{ "width": "20%", "orderable": false, className: "dt-head-center" },
 										{ "width": "5%", "orderable": false, className: "dt-head-center" },
-										{ "width": "7.5%", "visible": false, "orderable": false, className: "dt-head-center dt-body-right" },
+										/*{ "width": "7.5%", "visible": false, "orderable": false, className: "dt-head-center dt-body-right" },*/
 										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
@@ -2408,7 +2410,6 @@
 									} /*,
 									"sDom": '<"toolbar">frtip' */
 								});
-
 						/*$(".toolbar").css({
 							"display" : "inline-block"
 						});
@@ -2496,6 +2497,7 @@
 					open: function() {
 						table2.keys.disable();
 						table4 = $("#grid-customer").DataTable({
+									"destroy": true,
 									"keys": true,
 									"scrollY": "280px",
 									"scrollX": false,

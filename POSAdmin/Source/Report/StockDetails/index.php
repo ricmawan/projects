@@ -112,14 +112,14 @@
 								<th>Kode Barang</th>
 								<th>Nama Barang</th>
 								<th>Satuan</th>
-								<th>H Beli</th>
+								<!--<th>H Beli</th>-->
 								<th>H Ecer</th>
 								<th>H Grosir 1</th>
 								<th>QTY1</th>
 								<th>H Grosir 2</th>
 								<th>QTY2</th>
-								<th>Stok</th>
-								<th>Fisik</th>
+								<th>Toko</th>
+								<th>Gudang</th>
 							</tr>
 						</thead>
 					</table>
@@ -457,19 +457,23 @@
 					autoOpen: false,
 					open: function() {
 						table.keys.disable();
+						table2.keys.disable();
 						table3 = $("#grid-item").DataTable({
+									"destroy": true,
 									"keys": true,
-									"scrollY": "295px",
+									"scrollY": "280px",
 									"scrollX": false,
 									"scrollCollapse": false,
-									"paging": false,
+									"paging": true,
+									"lengthChange": false,
+									"pageLength": 25,
 									"searching": true,
 									"order": [],
 									"columns": [
 										{ "width": "15%", "orderable": false, className: "dt-head-center" },
 										{ "width": "20%", "orderable": false, className: "dt-head-center" },
 										{ "width": "5%", "orderable": false, className: "dt-head-center" },
-										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+										/*{ "width": "7.5%", "visible": false, "orderable": false, className: "dt-head-center dt-body-right" },*/
 										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
 										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" },
@@ -479,15 +483,15 @@
 										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" }
 									],
 									"ajax": {
-										"url": "./Transaction/Purchase/ItemList.php",
+										"url": "./Report/StockDetails/ItemList.php" /*,
 										"data": function ( d ) {
-											d.BranchID = $("#ddlBranch").val()
-										}
+											d.BranchID = $("#hdnBranchID").val()
+										}*/
 									},
 									"processing": true,
 									"serverSide": true,
 									"language": {
-										"info": "",
+										"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
 										"infoFiltered": "",
 										"infoEmpty": "",
 										"zeroRecords": "Data tidak ditemukan",
@@ -504,32 +508,30 @@
 									"initComplete": function(settings, json) {
 										table3.columns.adjust();
 										$("#grid-item").DataTable().cell( ':eq(0)' ).focus();
-									},
-									"sDom": '<"toolbar">frtip'
+									} /*,
+									"sDom": '<"toolbar">frtip' */
 								});
 
-						$(".toolbar").css({
+						/*$(".toolbar").css({
 							"display" : "inline-block"
 						});
 
-						$("div.toolbar").html($("#divBranch").html());
-
-						$("div.toolbar").find("select").val($("#ddlBranch").val());
+						$("div.toolbar").html($("#divBranch").html());*/
 
 						var counterPickItem = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
-							//var index = table3.cell({ focused: true }).index();
-							if(counterPickItem == 0) {
-								counterPickItem = 1;
-								var data = datatable.row( table3.cell({ focused: true }).index().row ).data();
-								if(key == 13 && $("#itemList-dialog").css("display") == "block") {
+							if(key == 13 && $("#itemList-dialog").css("display") == "block") {
+								if(counterPickItem == 0) {
+									counterPickItem = 1;
+									var data = table3.row($(table3.cell({ focused: true }).node()).parent('tr')).data();
 									$("#txtItemCode").val(data[0]);
 									validateItemCode();
 									$("#itemList-dialog").dialog("destroy");
-									table.keys.enable();
 									table3.destroy();
+									//table.keys.enable();
+									table2.keys.enable();
+									setTimeout(function() { counterPickItem = 0; } , 1000);
 								}
-								setTimeout(function() { counterPickItem = 0; } , 1000);
 							}
 						});
 						
@@ -537,11 +539,11 @@
 							if( $("#itemList-dialog").css("display") == "block") {
 								var data = table3.row(this).data();
 								$("#txtItemCode").val(data[0]);
-								//$("#txtItemName").val(data[1]);
 								validateItemCode();
 								$("#itemList-dialog").dialog("destroy");
-								table.keys.enable();
 								table3.destroy();
+								//table.keys.enable();
+								table2.keys.enable();
 							}
 						});
 						
@@ -556,6 +558,11 @@
 								if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0) {
 									$("#itemList-dialog").find("input[type='search']").focus();
 								}
+								else if(evt.keyCode == 27 && $("#itemList-dialog").css("display") == "block") {
+									$("#itemList-dialog").dialog("destroy");
+									table3.destroy();
+									table2.keys.enable();
+								}
 							}
 							setTimeout(function() { counterKeyItem = 0; } , 1000);
 						});
@@ -564,21 +571,24 @@
 					close: function() {
 						$(this).dialog("destroy");
 						table3.destroy();
-						table.keys.enable();
+						//table.keys.enable();
+						table2.keys.enable();
+						$("#txtItemCode").focus();
 					},
 					resizable: false,
-					height: 420,
+					height: 480,
 					width: 1280,
 					modal: true /*,
 					buttons: [
 					{
 						text: "Tutup",
-						tabindex: 13,
+						tabindex: 18,
 						id: "btnCancelPickItem",
 						click: function() {
 							$(this).dialog("destroy");
 							table3.destroy();
-							table.keys.enable();
+						//	table.keys.enable();
+							table2.keys.enable();
 							return false;
 						}
 					}]*/
@@ -615,49 +625,50 @@
 				};
 
 				table = $("#grid-data").DataTable({
-								"keys": true,
-								"scrollY": "280px",
-								"scrollX": false,
-								"scrollCollapse": false,
-								"paging": false,
-								"searching": false,
-								"order": [],
-								"columns": [
-									{ "orderable": false, className: "dt-head-center" },
-									{ "orderable": false, className: "dt-head-center" },
-									{ "orderable": false, className: "dt-head-center" },
-									{ "orderable": false, className: "dt-head-center dt-body-right" },
-									{ "orderable": false, className: "dt-head-center dt-body-right" }						
-								],
-								"processing": true,
-								"serverSide": true,
-								"ajax": {
-									"url": "./Report/StockDetails/DataSource.php",
-									"data": function ( d ) {
-										d.BranchID = $("#ddlBranch").val(),
-										d.ItemID = $("#hdnItemID").val(),
-										d.FirstPass = FirstPass,
-										d.FromDate = $("#txtFromDate").val(),
-										d.ToDate = $("#txtToDate").val(),
-										d.conversionQuantity = $("#ddlUnit option:selected").attr("conversionQuantity")
-									}
-								},
-								"language": {
-									"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-									"infoFiltered": "",
-									"infoEmpty": "",
-									"zeroRecords": "Data tidak ditemukan",
-									"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
-									"search": "Cari",
-									"processing": "Memproses",
-									"paginate": {
-										"next": ">",
-										"previous": "<",
-										"last": "»",
-										"first": "«"
-									}
+							"destroy": true,
+							"keys": true,
+							"scrollY": "280px",
+							"scrollX": false,
+							"scrollCollapse": false,
+							"paging": false,
+							"searching": false,
+							"order": [],
+							"columns": [
+								{ "orderable": false, className: "dt-head-center" },
+								{ "orderable": false, className: "dt-head-center" },
+								{ "orderable": false, className: "dt-head-center" },
+								{ "orderable": false, className: "dt-head-center dt-body-right" },
+								{ "orderable": false, className: "dt-head-center dt-body-right" }						
+							],
+							"processing": true,
+							"serverSide": true,
+							"ajax": {
+								"url": "./Report/StockDetails/DataSource.php",
+								"data": function ( d ) {
+									d.BranchID = $("#ddlBranch").val(),
+									d.ItemID = $("#hdnItemID").val(),
+									d.FirstPass = FirstPass,
+									d.FromDate = $("#txtFromDate").val(),
+									d.ToDate = $("#txtToDate").val(),
+									d.conversionQuantity = $("#ddlUnit option:selected").attr("conversionQuantity")
 								}
-							});
+							},
+							"language": {
+								"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+								"infoFiltered": "",
+								"infoEmpty": "",
+								"zeroRecords": "Data tidak ditemukan",
+								"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
+								"search": "Cari",
+								"processing": "Memproses",
+								"paginate": {
+									"next": ">",
+									"previous": "<",
+									"last": "»",
+									"first": "«"
+								}
+							}
+						});
 			});
 
 			var counterKey = 0;

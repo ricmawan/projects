@@ -237,6 +237,7 @@
 				};
 
 				table = $("#grid-data").DataTable({
+							"destroy": true,
 							"keys": true,
 							"scrollY": "285px",
 							"rowId": "ItemID",

@@ -113,8 +113,9 @@
 				$("#FormData").attr("title", "Tambah Pengambilan");
 				$("#txtBookingNumber").prop("readonly", false);
 			
-				$("#txtBookingNumber").focus(); 
+				$("#txtBookingNumber").focus();
 				table2 = $("#grid-transaction").DataTable({
+							"destroy": true,
 							"keys": false,
 							"scrollY": "330px",
 							"scrollX": false,
@@ -159,6 +160,7 @@
 								}, 0);
 							}
 						});
+
 				table2.columns.adjust();
 				tableWidthAdjust();
 			}
@@ -375,6 +377,7 @@
 					open: function() {
 						table2.keys.disable();
 						table3 = $("#grid-sale").DataTable({
+									"destroy": true,
 									"keys": true,
 									"scrollY": "280px",
 									"scrollX": false,
@@ -411,7 +414,7 @@
 										$("#grid-sale").DataTable().cell( ':eq(0)' ).focus();
 									}
 								});
-
+						
 						var counterPickTransaction = 0;
 						table3.on( 'key', function (e, datatable, key, cell, originalEvent) {
 							//var index = table3.cell({ focused: true }).index();
@@ -419,7 +422,6 @@
 								if(counterPickTransaction == 0) {
 									counterPickTransaction = 1;
 									var data = table3.row($(table3.cell({ focused: true }).node()).parent('tr')).data();
-									console.log(data);
 									$("#txtBookingNumber").val(data[0]);
 									setTimeout(function() {
 										getBookingDetails();

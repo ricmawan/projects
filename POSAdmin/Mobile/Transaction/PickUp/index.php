@@ -114,6 +114,7 @@
 				$("#hdnIsEdit").val(EditFlag);
 				$("#txtBookingNumber").focus();
 				table2 = $("#grid-transaction").DataTable({
+							"destroy": true,
 							"keys": false,
 							"scrollY": "252px",
 							"scrollX": false,
@@ -158,6 +159,7 @@
 								}, 0);
 							}
 						});
+
 				table2.columns.adjust();
 			}
 
@@ -741,38 +743,39 @@
 				enterLikeTab();
 				var counterPickUp = 0;
 				table = $("#grid-data").DataTable({
-								"keys": true,
-								"scrollY": "330px",
-								"rowId": "PickUpID",
-								"scrollCollapse": true,
-								"order": [],
-								"columns": [
-									{ "width": "20px", "orderable": false, className: "dt-head-center dt-body-center" },
-									{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ "orderable": false, className: "dt-head-center dt-body-right" }
-								],
-								"processing": true,
-								"serverSide": true,
-								"ajax": "./Transaction/PickUp/DataSource.php",
-								"language": {
-									"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-									"infoFiltered": "",
-									"infoEmpty": "",
-									"zeroRecords": "Data tidak ditemukan",
-									"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
-									"search": "Cari",
-									"processing": "Memproses",
-									"paginate": {
-										"next": ">",
-										"previous": "<",
-										"last": "»",
-										"first": "«"
-									}
+							"destroy": true,
+							"keys": true,
+							"scrollY": "330px",
+							"rowId": "PickUpID",
+							"scrollCollapse": true,
+							"order": [],
+							"columns": [
+								{ "width": "20px", "orderable": false, className: "dt-head-center dt-body-center" },
+								{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
+								{ className: "dt-head-center" },
+								{ className: "dt-head-center" },
+								{ className: "dt-head-center" },
+								{ "orderable": false, className: "dt-head-center dt-body-right" }
+							],
+							"processing": true,
+							"serverSide": true,
+							"ajax": "./Transaction/PickUp/DataSource.php",
+							"language": {
+								"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+								"infoFiltered": "",
+								"infoEmpty": "",
+								"zeroRecords": "Data tidak ditemukan",
+								"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
+								"search": "Cari",
+								"processing": "Memproses",
+								"paginate": {
+									"next": ">",
+									"previous": "<",
+									"last": "»",
+									"first": "«"
 								}
-							});
+							}
+						});
 				
 				var counterKey = 0;
 				$(document).on("keydown", function (evt) {

@@ -236,6 +236,7 @@
 						$("#txtPaymentDate").focus();
 						table.keys.disable();
 						table2 = $("#grid-transaction").DataTable({
+									"destroy": true,
 									"keys": true,
 									"scrollY": "280px",
 									"scrollX": false,
@@ -732,6 +733,7 @@
 				enterLikeTab();
 				var counterPayment = 0;
 				table = $("#grid-data").DataTable({
+								"destroy": true,
 								"keys": true,
 								"scrollY": "330px",
 								"rowId": "TransactionID",

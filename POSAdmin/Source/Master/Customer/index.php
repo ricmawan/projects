@@ -348,40 +348,41 @@
 				enterLikeTab();
 				var counterCustomer = 0;
 				table = $("#grid-data").DataTable({
-								"keys": true,
-								"scrollY": "330px",
-								"rowId": "CustomerID",
-								"scrollCollapse": true,
-								"order": [],
-								"columns": [
-									{ "width": "20px", "orderable": false, className: "dt-head-center dt-body-center" },
-									{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" }
-								],
-								"processing": true,
-								"serverSide": true,
-								"ajax": "./Master/Customer/DataSource.php",
-								"language": {
-									"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-									"infoFiltered": "",
-									"infoEmpty": "",
-									"zeroRecords": "Data tidak ditemukan",
-									"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
-									"search": "Cari",
-									"processing": "Memproses",
-									"paginate": {
-										"next": ">",
-										"previous": "<",
-										"last": "»",
-										"first": "«"
-									}
+							"destroy": true,
+							"keys": true,
+							"scrollY": "330px",
+							"rowId": "CustomerID",
+							"scrollCollapse": true,
+							"order": [],
+							"columns": [
+								{ "width": "20px", "orderable": false, className: "dt-head-center dt-body-center" },
+								{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
+								{ className: "dt-head-center" },
+								{ className: "dt-head-center" },
+								{ className: "dt-head-center" },
+								{ className: "dt-head-center" },
+								{ className: "dt-head-center" },
+								{ className: "dt-head-center" }
+							],
+							"processing": true,
+							"serverSide": true,
+							"ajax": "./Master/Customer/DataSource.php",
+							"language": {
+								"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+								"infoFiltered": "",
+								"infoEmpty": "",
+								"zeroRecords": "Data tidak ditemukan",
+								"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
+								"search": "Cari",
+								"processing": "Memproses",
+								"paginate": {
+									"next": ">",
+									"previous": "<",
+									"last": "»",
+									"first": "«"
 								}
-							});
+							}
+						});
 				
 				table.on( 'key', function (e, datatable, key, cell, originalEvent) {
 					var index = table.cell({ focused: true }).index();

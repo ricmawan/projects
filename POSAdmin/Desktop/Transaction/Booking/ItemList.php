@@ -49,7 +49,7 @@
 		$row_array[] = $row['ItemCode'];
 		$row_array[] = $row['ItemName'];
 		$row_array[] = $row['UnitName'];
-		$row_array[] = number_format($row['BuyPrice'],0,".",",");
+		//$row_array[] = number_format($row['BuyPrice'],0,".",",");
 		$row_array[] = number_format($row['RetailPrice'],0,".",",");
 		$row_array[] = number_format($row['Price1'],0,".",",");
 		$row_array[] = $row['Qty1'];

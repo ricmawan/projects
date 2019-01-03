@@ -35,8 +35,8 @@
 		if (!empty($requestData['search']['value']))
 		{
 			$search = mysqli_escape_string($dbh, trim($requestData['search']['value']));
-			$where .= " AND ( TS.PurchaseNumber LIKE '%".$search."%'";
-			$where .= " OR DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
+			$where .= " AND ( TP.PurchaseNumber LIKE '%".$search."%'";
+			$where .= " OR DATE_FORMAT(TP.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
 			$where .= " OR MS.SupplierName LIKE '%".$search."%' )";
 		}
 		$sql = "CALL spSelDebtReport('".$txtFromDate."', \"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";

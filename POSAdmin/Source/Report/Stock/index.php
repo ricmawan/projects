@@ -196,45 +196,47 @@
 				};
 
 				table = $("#grid-data").DataTable({
-								"keys": true,
-								"scrollY": "330px",
-								"scrollCollapse": true,
-								"order": [],
-								"columns": [
-									{ "width": "10%", className: "dt-head-center" },
-									{ "width": "25%", className: "dt-head-center" },
-									{ "width": "30%", className: "dt-head-center" },
-									{ "width": "10%", className: "dt-head-center" },
-									{ "width": "10%", className: "dt-head-center" },
-									{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
-									{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" }
-								],
-								"processing": true,
-								"serverSide": true,
-								"ajax": {
-									"url": "./Report/Stock/DataSource.php",
-									"data": function ( d ) {
-										d.BranchID = $("#ddlBranch").val(),
-										d.CategoryID = $("#ddlCategory").val(),
-										d.FirstPass = FirstPass
-									}
-								},
-								"language": {
-									"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-									"infoFiltered": "",
-									"infoEmpty": "",
-									"zeroRecords": "Data tidak ditemukan",
-									"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
-									"search": "Cari",
-									"processing": "Memproses",
-									"paginate": {
-										"next": ">",
-										"previous": "<",
-										"last": "»",
-										"first": "«"
-									}
+							"destroy": true,
+							"keys": true,
+							"scrollY": "330px",
+							"scrollCollapse": true,
+							"order": [],
+							"columns": [
+								{ "width": "10%", className: "dt-head-center" },
+								{ "width": "25%", className: "dt-head-center" },
+								{ "width": "30%", className: "dt-head-center" },
+								{ "width": "10%", className: "dt-head-center" },
+								{ "width": "10%", className: "dt-head-center" },
+								{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
+								{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" }
+							],
+							"processing": true,
+							"serverSide": true,
+							"ajax": {
+								"url": "./Report/Stock/DataSource.php",
+								"data": function ( d ) {
+									d.BranchID = $("#ddlBranch").val(),
+									d.CategoryID = $("#ddlCategory").val(),
+									d.FirstPass = FirstPass
 								}
-							});
+							},
+							"language": {
+								"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+								"infoFiltered": "",
+								"infoEmpty": "",
+								"zeroRecords": "Data tidak ditemukan",
+								"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
+								"search": "Cari",
+								"processing": "Memproses",
+								"paginate": {
+									"next": ">",
+									"previous": "<",
+									"last": "»",
+									"first": "«"
+								}
+							}
+						});
+				}
 			});
 		</script>
 	</body>

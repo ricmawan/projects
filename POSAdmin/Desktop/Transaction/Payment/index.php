@@ -231,6 +231,7 @@
 						$("#txtPaymentDate").focus();
 						table.keys.disable();
 						table2 = $("#grid-transaction").DataTable({
+									"destroy": true,
 									"keys": true,
 									"scrollY": "280px",
 									"scrollX": false,
@@ -263,6 +264,7 @@
 										}
 									}
 								});
+
 						table2.columns.adjust();
 						var counterPaymentDetails = 0;
 						table2.on( 'key', function (e, datatable, key, cell, originalEvent) {
@@ -845,41 +847,43 @@
 				keyFunction();
 				enterLikeTab();
 				var counterPayment = 0;
+
 				table = $("#grid-data").DataTable({
-								"keys": true,
-								"scrollY": "330px",
-								"rowId": "TransactionID",
-								"scrollCollapse": true,
-								"order": [],
-								"columns": [
-									{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ className: "dt-head-center" },
-									{ "orderable": false, className: "dt-head-center dt-body-right" },
-									{ "orderable": false, className: "dt-head-center dt-body-right" },
-									{ "orderable": false, className: "dt-head-center dt-body-right" }
-								],
-								"processing": true,
-								"serverSide": true,
-								"ajax": "./Transaction/Payment/DataSource.php",
-								"language": {
-									"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-									"infoFiltered": "",
-									"infoEmpty": "",
-									"zeroRecords": "Data tidak ditemukan",
-									"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
-									"search": "Cari",
-									"processing": "Memproses",
-									"paginate": {
-										"next": ">",
-										"previous": "<",
-										"last": "»",
-										"first": "«"
-									}
+							"destroy": true,
+							"keys": true,
+							"scrollY": "330px",
+							"rowId": "TransactionID",
+							"scrollCollapse": true,
+							"order": [],
+							"columns": [
+								{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
+								{ className: "dt-head-center" },
+								{ className: "dt-head-center" },
+								{ className: "dt-head-center" },
+								{ "orderable": false, className: "dt-head-center dt-body-right" },
+								{ "orderable": false, className: "dt-head-center dt-body-right" },
+								{ "orderable": false, className: "dt-head-center dt-body-right" }
+							],
+							"processing": true,
+							"serverSide": true,
+							"ajax": "./Transaction/Payment/DataSource.php",
+							"language": {
+								"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+								"infoFiltered": "",
+								"infoEmpty": "",
+								"zeroRecords": "Data tidak ditemukan",
+								"lengthMenu": "&nbsp;&nbsp;_MENU_ data",
+								"search": "Cari",
+								"processing": "Memproses",
+								"paginate": {
+									"next": ">",
+									"previous": "<",
+									"last": "»",
+									"first": "«"
 								}
-							});
-				
+							}
+						});
+
 				table.on( 'key', function (e, datatable, key, cell, originalEvent) {
 					var index = table.cell({ focused: true }).index();
 					if(key == 32) { //space
