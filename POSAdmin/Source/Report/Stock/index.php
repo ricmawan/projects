@@ -203,10 +203,10 @@
 							"order": [],
 							"columns": [
 								{ "width": "10%", className: "dt-head-center" },
-								{ "width": "25%", className: "dt-head-center" },
+								{ "width": "20%", className: "dt-head-center" },
 								{ "width": "30%", className: "dt-head-center" },
 								{ "width": "10%", className: "dt-head-center" },
-								{ "width": "10%", className: "dt-head-center" },
+								{ "width": "15%", className: "dt-head-center" },
 								{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" },
 								{ "width": "7.5%", "orderable": false, className: "dt-head-center dt-body-right" }
 							],
@@ -236,7 +236,6 @@
 								}
 							}
 						});
-				}
 			});
 		</script>
 	</body>
