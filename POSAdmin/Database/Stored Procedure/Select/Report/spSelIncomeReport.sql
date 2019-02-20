@@ -14,6 +14,7 @@ CREATE PROCEDURE spSelIncomeReport(
 	pToDate			DATE,
 	pWhere 			TEXT,
     pWhere2			TEXT,
+    pWhere3			TEXT,
 	pOrder			TEXT,
 	pLimit_s		BIGINT,
     pLimit_l		INT,
@@ -80,7 +81,7 @@ SET @query = CONCAT("SELECT
 								END = BD.BranchID
 								AND CAST(TB.TransactionDate AS DATE) >= '",pFromDate,"'
 								AND CAST(TB.TransactionDate AS DATE) <= '",pToDate,"'
-								AND ", pWhere, "
+								AND ", pWhere3, "
 							GROUP BY
 								TB.BookingID,
 								TB.Discount
@@ -175,7 +176,7 @@ SET @query = CONCAT("SELECT
 						END = BD.BranchID
 						AND CAST(TB.TransactionDate AS DATE) >= '",pFromDate,"'
 						AND CAST(TB.TransactionDate AS DATE) <= '",pToDate,"'
-						AND ", pWhere, "
+						AND ", pWhere3, "
                     GROUP BY
 						TB.BookingID,
                         TB.BookingNumber,

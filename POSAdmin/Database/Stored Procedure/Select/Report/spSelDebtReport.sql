@@ -71,8 +71,8 @@ SET @query = CONCAT("SELECT
 								MS.SupplierID,
 								MS.SupplierName,
 								TPD.Amount
-							HAVING
-								SUM(PD.Quantity * PD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) - (IFNULL(TPD.Amount, 0)) > 0
+							/*HAVING
+								SUM(PD.Quantity * PD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) - (IFNULL(TPD.Amount, 0)) > 0*/
 						) TP"
 					);
                        
@@ -93,7 +93,12 @@ SET @query = CONCAT("SELECT
 						IFNULL(TPD.Amount, 0) TotalPayment,
 					    SUM(PD.Quantity * PD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) - (IFNULL(TPD.Amount, 0)) Debt,
                         'Pembelian' TransactionType,
-					    TPD.Amount
+					    TPD.Amount,
+						CASE
+							WHEN SUM(PD.Quantity * PD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) - (IFNULL(TPD.Amount, 0)) > 0
+							THEN 'BELUM LUNAS'
+							ELSE 'LUNAS'
+						END Status
 					FROM
 						transaction_purchase TP
 						JOIN transaction_purchasedetails PD
@@ -127,8 +132,8 @@ SET @query = CONCAT("SELECT
 						MS.SupplierID,
 						MS.SupplierName,
 						TPD.Amount
-					HAVING
-						SUM(PD.Quantity * PD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) - (IFNULL(TPD.Amount, 0)) > 0
+					/*HAVING
+						SUM(PD.Quantity * PD.BuyPrice * IFNULL(MID.ConversionQuantity, 1)) - (IFNULL(TPD.Amount, 0)) > 0*/
 					ORDER BY ", pOrder,
 					" LIMIT ", pLimit_s, ", ", pLimit_l);
 	                

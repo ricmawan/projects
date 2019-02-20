@@ -97,7 +97,7 @@ SET @query = CONCAT("SELECT
                         (
 							SELECT
 								TS.SaleID,
-                                SUM(TSD.Quantity * (TSD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - TSD.Discount)) - TS.Discount Total,
+                                SUM(TSD.Quantity * (TSD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - TSD.Discount)) Total,
 								SUM(TSD.Quantity * MI.Weight * IFNULL(MID.ConversionQuantity, 1)) Weight
 							FROM
 								transaction_sale TS
@@ -148,7 +148,7 @@ SET @query = CONCAT("SELECT
                         (
 							SELECT
 								TB.BookingID,
-                                SUM(TBD.Quantity * (TBD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - TBD.Discount)) - TB.Discount Total,
+                                SUM(TBD.Quantity * (TBD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - TBD.Discount)) Total,
 								SUM(TBD.Quantity * MI.Weight * IFNULL(MID.ConversionQuantity, 1)) Weight
 							FROM
 								transaction_booking TB

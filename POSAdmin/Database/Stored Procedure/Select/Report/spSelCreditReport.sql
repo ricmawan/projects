@@ -74,8 +74,8 @@ SET @query = CONCAT("SELECT
 								TS.Payment,
 								TP.Amount,
 								TS.Discount
-							HAVING
-								SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TS.Discount, 0)) > 0
+							/*HAVING
+								SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TS.Discount, 0)) > 0*/
 							UNION ALL
 		                    SELECT
 								SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TB.Discount, 0))
@@ -114,8 +114,8 @@ SET @query = CONCAT("SELECT
 								TB.Payment,
 								TP.Amount,
 								TB.Discount
-							HAVING
-								SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TB.Discount, 0)) > 0
+							/*HAVING
+								SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TB.Discount, 0)) > 0*/
 						) TS"
 					);
                        
@@ -138,7 +138,12 @@ SET @query = CONCAT("SELECT
 					    SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TS.Discount, 0)) Credit,
                         'Penjualan' TransactionType,
                         TS.Payment,
-					    TP.Amount
+					    TP.Amount,
+						CASE
+							WHEN SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TS.Discount, 0)) > 0
+							THEN 'BELUM LUNAS'
+							ELSE 'LUNAS'
+						END Status
 					FROM
 						transaction_sale TS
 						JOIN transaction_saledetails SD
@@ -174,8 +179,8 @@ SET @query = CONCAT("SELECT
 						TS.Payment,
 					    TP.Amount,
 						TS.Discount
-					HAVING
-						SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TS.Discount, 0)) > 0
+					/*HAVING
+						SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) - (IFNULL(TS.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TS.Discount, 0)) > 0*/
 					UNION ALL
                     SELECT
 						TB.BookingID,
@@ -190,7 +195,12 @@ SET @query = CONCAT("SELECT
 						SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TB.Discount, 0)),
                         'Pemesanan' TransactionType,
 						TB.Payment,
-					    TP.Amount
+					    TP.Amount,
+						CASE
+							WHEN SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TB.Discount, 0)) > 0
+							THEN 'BELUM LUNAS'
+							ELSE 'LUNAS'
+						END Status
 					FROM
 						transaction_booking TB
 						JOIN transaction_bookingdetails BD
@@ -226,8 +236,8 @@ SET @query = CONCAT("SELECT
 						TB.Payment,
 					    TP.Amount,
 						TB.Discount
-					HAVING
-						SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TB.Discount, 0)) > 0
+					/*HAVING
+						SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) - (IFNULL(TB.Payment, 0) + IFNULL(TP.Amount, 0) + IFNULL(TB.Discount, 0)) > 0*/
 					ORDER BY ", pOrder,
 					" LIMIT ", pLimit_s, ", ", pLimit_l);
 	                
