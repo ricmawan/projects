@@ -51,6 +51,7 @@
 										<th>Piutang</th>
 										<th>SaleID</th>
 										<th>TransactionType</th>
+										<th>Status</th>
 									</tr>
 								</thead>
 								<tfoot id="tfootTable">
@@ -228,7 +229,8 @@
 								{ "data": "TotalPayment", "orderable": false, className: "dt-head-center dt-body-right" },
 								{ "data": "Credit", "orderable": false, className: "dt-head-center dt-body-right" },
 								{ "data": "SaleID", "visible": false },
-								{ "data": "TransactionType", "visible": false }
+								{ "data": "TransactionType", "visible": false },
+								{ "data": "Status", className: "dt-head-center" }
 							],
 							"processing": true,
 							"serverSide": true,

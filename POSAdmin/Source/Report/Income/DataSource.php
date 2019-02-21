@@ -34,6 +34,7 @@
 
 		$where = " 1=1 ";
 		$where2 = " 1=1 ";
+		$where3 = " 1=1 ";
 		$order_by = "SaleNumber";
 		$limit_s = $requestData['start'];
 		$limit_l = $requestData['length'];
@@ -52,8 +53,12 @@
 			$where2 .= " AND ( CONCAT('R', TS.SaleNumber) LIKE '%".$search."%'";
 			$where2 .= " OR DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
 			$where2 .= " OR MC.CustomerName LIKE '%".$search."%' )";
+			
+			$where3 .= " AND ( TB.BookingNumber LIKE '%".$search."%'";
+			$where3 .= " OR DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
+			$where3 .= " OR MC.CustomerName LIKE '%".$search."%' )";
 		}
-		$sql = "CALL spSelIncomeReport(".$BranchID.", '".$txtFromDate."', '".$txtToDate."', \"$where\", \"$where2\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spSelIncomeReport(".$BranchID.", '".$txtFromDate."', '".$txtToDate."', \"$where\", \"$where2\", \"$where3\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
 
 		if (! $result = mysqli_query($dbh, $sql)) {
 			logEvent(mysqli_error($dbh), '/Report/Sale/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));

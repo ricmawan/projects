@@ -289,6 +289,7 @@
 					$("#hdnTransactionType").val(TransactionType);
 					$("#hdnTransactionDate").val(TransactionDate);
 					$("#hdnTransactionNumber").val(TransactionNumber);
+					$("#txtDiscountTotal").val(returnRupiah(Discount.toString()));
 					$("#finish-dialog").dialog({
 						autoOpen: false,
 						open: function() {

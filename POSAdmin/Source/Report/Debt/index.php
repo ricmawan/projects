@@ -47,9 +47,10 @@
 										<th>Nama Supplier</th>
 										<th>Penjualan</th>
 										<th>Pembayaran</th>
-										<th>Piutang</th>
+										<th>Hutang</th>
 										<th>PurchaseID</th>
 										<th>TransactionType</th>
+										<th>Status</th>
 									</tr>
 								</thead>
 								<tfoot id="tfootTable">
@@ -226,7 +227,8 @@
 								{ "data": "TotalPayment", "orderable": false, className: "dt-head-center dt-body-right" },
 								{ "data": "Debt", "orderable": false, className: "dt-head-center dt-body-right" },
 								{ "data": "PurchaseID", "visible": false },
-								{ "data": "TransactionType", "visible": false }
+								{ "data": "TransactionType", "visible": false },
+								{ "data": "Status", className: "dt-head-center" }
 							],
 							"processing": true,
 							"serverSide": true,

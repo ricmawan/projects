@@ -40,7 +40,7 @@
 						<form class="col-md-12 col-sm-12" id="PostForm" method="POST" action="" >
 							<div class="row">
 								<div class="col-md-3 col-sm-3 has-float-label" >
-									<select id="ddlBranch" name="ddlBranch" tabindex=8 class="form-control-custom" placeholder="Pilih Cabang" onchange="ReloadTable(0)" >
+									<select id="ddlBranch" name="ddlBranch" tabindex=7 class="form-control-custom" placeholder="Pilih Cabang" onchange="ReloadTable(0)" >
 										<?php
 											$sql = "CALL spSelDDLBranch('".$_SESSION['UserLogin']."')";
 											if (! $result = mysqli_query($dbh, $sql)) {
@@ -80,9 +80,10 @@
 									</div>
 								</div>
 								<div class="col-md-3 col-sm-3 has-float-label">
-									<input id="txtSearch" name="txtSearch" type="text" class="form-control-custom" onfocus="this.select();" autocomplete=off />
+									<input id="txtSearch" name="txtSearch" type="text" class="form-control-custom" onfocus="this.select();" tabindex=9 autocomplete=off />
 									<label for="txtSearch" class="lblInput" >Cari</label>
 								</div>
+								<input type="text" tabindex=10 onfocus="getItemDetails();" style="height:0; width: 0;opacity:0;" />
 							</div>
 							<hr style="margin: 5px 0 0 0;" />
 							<div class="row" >

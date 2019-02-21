@@ -448,7 +448,7 @@
 					$("#hdnSaleID").val(Data[6]);
 					$("#ddlCustomer").val(Data[7]);
 					$("#txtSaleNumber").val(Data[2]);
-					$("#lblTotal").html(Data[5]);
+					$("#lblTotal").html(returnRupiah((parseFloat(Data[5].replace(/\,/g, "")) + parseFloat(Data[15].replace(/\,/g, ""))).toString()));
 					$("#txtTransactionDate").datepicker("setDate", new Date(Data[8]));
 					$("#hdnTransactionDate").val(Data[8]);
 					getSaleDetails(Data[6]);
@@ -3539,9 +3539,11 @@
 				});
 				
 				$('#grid-data tbody').on('dblclick', 'tr', function () {
-					var data = table.row(this).data();
-					tableIndex = table.row(this).index();
-					openDialog(data, 1);
+					if($("#hdnEditFlag").val() == "1" ) {
+						var data = table.row(this).data();
+						tableIndex = table.row(this).index();
+						openDialog(data, 1);
+					}
 				});
 			});
 		</script>

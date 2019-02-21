@@ -904,7 +904,3 @@ input::-webkit-inner-spin-button {
 	font-weight: bold;
 	color: #111111;
 }
-
-.ui-datepicker {
-	z-index: 100 !important;
-}

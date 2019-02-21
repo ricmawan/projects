@@ -34,7 +34,7 @@
 		$where .= " OR DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
 		$where .= " OR MC.CustomerName LIKE '%".$search."%' )";
 
-		$where2 .= " AND ( TB.SaleNumber LIKE '%".$search."%'";
+		$where2 .= " AND ( TB.BookingNumber LIKE '%".$search."%'";
 		$where2 .= " OR DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
 		$where2 .= " OR MC.CustomerName LIKE '%".$search."%' )";
 	}
@@ -61,7 +61,7 @@
 		$row_array[] = $row['SaleNumber'];
 		$row_array[] = $row['TransactionDate'];
 		$row_array[] = $row['CustomerName'];
-		$row_array[] = number_format($row['Total'],0,".",",");
+		$row_array[] = number_format($row['Total'] - $row['Discount'],0,".",",");
 		$row_array[] = $row['SaleID'];
 		$row_array[] = $row['CustomerID'];
 		$row_array[] = $row['PlainTransactionDate'];

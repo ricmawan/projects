@@ -20,7 +20,14 @@
 						0 => "Plus",
 						1 => "SaleNumber", //unorderable
 						2 => "TransactionDate", //unorderable
-						3 => "CustomerName"
+						3 => "CustomerName",
+						4 => "Penjualan",
+						5 => "Diskon",
+						6 => "Pembayaran",
+						7 => "Piutang",
+						8 => "SaleID",
+						9 => "TransactionType",
+						10 => "Status"
 					);
 
 		$where = " 1=1 ";
@@ -40,8 +47,8 @@
 			$where .= " OR DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
 			$where .= " OR MC.CustomerName LIKE '%".$search."%' )";
 
-			$where2 .= " AND ( CONCAT('R', TS.SaleNumber) LIKE '%".$search."%'";
-			$where2 .= " OR DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
+			$where2 .= " AND ( TB.BookingNumber LIKE '%".$search."%'";
+			$where2 .= " OR DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
 			$where2 .= " OR MC.CustomerName LIKE '%".$search."%' )";
 		}
 		$sql = "CALL spSelCreditReport('".$txtFromDate."', \"$where\", \"$where2\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
@@ -73,6 +80,8 @@
 			$row_array["Discount"] = number_format($row['Discount'],0,".",",");
 			$row_array["SaleID"] = $row['SaleID'];
 			$row_array["TransactionType"] = $row['TransactionType'];
+			$row_array["Status"] = $row['Status'];
+			
 			$SubTotal += $row['Credit'];
 			array_push($return_arr, $row_array);
 		}

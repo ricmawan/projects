@@ -53,10 +53,10 @@
 
 	    $printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
 	    $printer -> setJustification(Printer::JUSTIFY_CENTER);
-	    $printer -> text("TOKO MUDA\n");
-	    $printer -> selectPrintMode(Printer::MODE_FONT_A);
-	    $printer -> text("Jl. Raya Bojong\n");
-	    $printer -> feed();
+	    //$printer -> text("TOKO MUDA\n");
+	    //$printer -> selectPrintMode(Printer::MODE_FONT_A);
+	    //$printer -> text("Jl. Raya Bojong\n");
+	    //$printer -> feed();
 	    $printer -> setEmphasis(true);
 	    $printer -> text("BUKTI PEMBAYARAN\n");
 	    $printer -> setEmphasis(false);

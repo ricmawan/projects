@@ -67,7 +67,7 @@
 		$row_array[] = $row['SaleNumber'];
 		$row_array[] = $row['TransactionDate'];
 		$row_array[] = $row['CustomerName'];
-		$row_array[] = number_format($row['Total'],0,".",",");
+		$row_array[] = number_format($row['Total'] - $row['Discount'],0,".",",");
 		$row_array[] = $row['SaleID'];
 		$row_array[] = $row['CustomerID'];
 		$row_array[] = $row['PlainTransactionDate'];

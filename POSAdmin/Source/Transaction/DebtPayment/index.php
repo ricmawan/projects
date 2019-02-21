@@ -722,8 +722,10 @@
 				});
 
 				$('#grid-data tbody').on('dblclick', 'tr', function () {
-					var data = table.row(this).data();
-					openDialog(data, 1);
+					if($("#hdnEditFlag").val() == "1" ) {
+						var data = table.row(this).data();
+						openDialog(data, 1);
+					}
 				});
 			});
 		</script>

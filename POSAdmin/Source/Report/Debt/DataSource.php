@@ -20,7 +20,13 @@
 						0 => "Plus",
 						1 => "PurchaseNumber", //unorderable
 						2 => "TransactionDate", //unorderable
-						3 => "SupplierName"
+						3 => "SupplierName",
+						4 => "Penjualan",
+						5 => "Pembayaran",
+						6 => "Piutang",
+						7 => "PurchaseID",
+						8 => "TransactionType",
+						9 => "Status"
 					);
 
 		$where = " 1=1 ";
@@ -67,6 +73,7 @@
 			$row_array["Debt"] = number_format($row['Debt'],0,".",",");
 			$row_array["PurchaseID"] = $row['PurchaseID'];
 			$row_array["TransactionType"] = $row['TransactionType'];
+			$row_array["Status"] = $row['Status'];
 			$SubTotal += $row['Debt'];
 			array_push($return_arr, $row_array);
 		}
