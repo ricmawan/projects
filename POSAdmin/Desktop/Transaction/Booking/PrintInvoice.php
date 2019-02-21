@@ -88,10 +88,8 @@
 		    $printer -> setEmphasis(false);
 		    
 		    $printer -> setJustification(Printer::JUSTIFY_LEFT);
-
-		    $printer -> text($dayName[date("w", strtotime($TransactionDate))] . ", " . date("d", strtotime($TransactionDate)) . " " . $monthName[date("n", strtotime($TransactionDate)) - 1] . " " . date("Y", strtotime($TransactionDate)) . "/" . date("H") . ":" . date("i") . "\n");
-
 		    $printer -> selectPrintMode(Printer::MODE_FONT_B);
+		    $printer -> text($dayName[date("w", strtotime($TransactionDate))] . ", " . date("d", strtotime($TransactionDate)) . " " . $monthName[date("n", strtotime($TransactionDate)) - 1] . " " . date("Y", strtotime($TransactionDate)) . "/" . date("H") . ":" . date("i") . "\n");
 		    $printer -> text(str_pad("", 39, "-") . "\n");
 		    
 		    $sql = "CALL spSelBookingDetails(".$BookingID.", '".$_SESSION['UserLoginKasir']."')";
