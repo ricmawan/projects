@@ -16,7 +16,7 @@
 				FROM
 					transaction_invoicenumber
 				WHERE
-					DATE_FORMAT(TransactionDate, '%d-%m-%Y') = DATE_FORMAT(ADDTIME(NOW(), '07:00:00'), '%d-%m-%Y')";
+					DATE_FORMAT(TransactionDate, '%d-%m-%Y') = DATE_FORMAT(NOW(), '%d-%m-%Y')";
 		
 		if (! $result = mysql_query($sql, $dbh)) {
 			$Message = "Terjadi Kesalahan Sistem";
@@ -34,7 +34,7 @@
 				FROM
 					transaction_medication
 				WHERE
-					DATE_FORMAT(TransactionDate, '%d-%m-%Y') = DATE_FORMAT(ADDTIME(NOW(), '07:00:00'), '%d-%m-%Y')
+					DATE_FORMAT(TransactionDate, '%d-%m-%Y') = DATE_FORMAT(NOW(), '%d-%m-%Y')
 					AND PatientID = $PatientID
 					AND IsDone = 0
 					AND IsCancelled = 0";
