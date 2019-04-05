@@ -6,7 +6,8 @@
 				UserID,
 				UserName,
 				UserLogin,
-				UserPassword
+				UserPassword,
+				UserTypeID
 			FROM
 				master_user 
 			WHERE 
@@ -25,6 +26,7 @@
 			$_SESSION['Nama'] = $row['UserName'];
 			$_SESSION['UserLogin'] = $row['UserLogin'];
 			$_SESSION['UserPassword'] = $row['UserPassword'];
+			$_SESSION['UserTypeID'] = $row['UserTypeID'];
 			echo "Success";				
 		}
 		else echo "Username & Password tidak cocok";

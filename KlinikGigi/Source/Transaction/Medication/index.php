@@ -22,6 +22,9 @@
 					</div>
 					<div class="panel-body">
 						<div class="table-responsive">
+							<?php
+								echo '<input id="hdnUserTypeID" name="hdnUserTypeID" type="hidden" value="'.$_SESSION['UserTypeID'].'" />';
+							?>
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
@@ -797,7 +800,10 @@
 							formatters: {
 								"commands": function(column, row)
 								{
-									return "<i style='cursor:pointer;' data-row-id=\"" + row.MedicationID + "\" data-patient-name=\"" + row.PatientName + "\" class=\"fa fa-medkit\" acronym title=\"Tambah Tindakan\"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i style='cursor:pointer;' data-patient-name=\"" + row.PatientName + "\" data-row-id=\"" + row.MedicationID + "\" class=\"fa fa-check-square-o\" acronym title=\"Selesai\"></i>";
+									var hdnUserTypeID = $("#hdnUserTypeID").val();
+									if(hdnUserTypeID == 2) finishIcon = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i style='cursor:pointer;' data-patient-name=\"" + row.PatientName + "\" data-row-id=\"" + row.MedicationID + "\" class=\"fa fa-check-square-o\" acronym title=\"Selesai\"></i>";
+									else finishIcon = "";
+									return "<i style='cursor:pointer;' data-row-id=\"" + row.MedicationID + "\" data-patient-name=\"" + row.PatientName + "\" class=\"fa fa-medkit\" acronym title=\"Tambah Tindakan\"></i>" + finishIcon;
 								}
 							}
 						}).on("loaded.rs.jquery.bootgrid", function()
