@@ -184,6 +184,15 @@ VALUES
 	NULL,
 	0,
 	7
+),
+(
+	19,
+	4,
+	'Tindakan Dokter',
+	'Report/Medication/',
+	NULL,
+	0,
+	5
 );
 
 CREATE UNIQUE INDEX MENU_INDEX
