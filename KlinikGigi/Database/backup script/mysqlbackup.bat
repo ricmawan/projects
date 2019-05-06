@@ -28,11 +28,11 @@
 :: If the time is less than two digits insert a zero so there is no space to break the filename
 
 :: If you have any regional date/time issues call this include: getdate.cmd  credit: Simon Sheppard for this cmd - untested
-:: call getdate.cmd
+call getdate.cmd
 
-set year=%DATE:~10,4%
-set day=%DATE:~7,2%
-set mnt=%DATE:~4,2%
+set year=%DATE:~6,4%
+set day=%DATE:~0,2%
+set mnt=%DATE:~3,2%
 set hr=%TIME:~0,2%
 set min=%TIME:~3,2%
 
