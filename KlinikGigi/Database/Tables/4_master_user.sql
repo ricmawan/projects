@@ -28,6 +28,18 @@ VALUES
 	'System',
 	NULL,
 	NULL
+),
+(
+	0,
+	2,
+	'drg. Dimar P.',
+	'dimar',
+	MD5('abcdef'),
+	1,
+	NOW(),
+	'System',
+	NULL,
+	NULL
 );
 
 CREATE UNIQUE INDEX USER_INDEX

@@ -7,7 +7,8 @@
 	
 	$StartDate = $_GET['start'];
 	$EndDate = $_GET['end'];
-	$ddlBranch = $_GET['ddlBranch'];
+	$BranchID = $_GET['BranchID'];
+	$DoctorID = $_GET['DoctorID'];
 	$sql = "SELECT
 				CSO.ScheduleID,
 				CSO.PatientName,
@@ -35,7 +36,8 @@
 							ON OS.BranchID = MB.BranchID
 					WHERE
 						OS.ScheduledDate BETWEEN '".$StartDate."' AND '".$EndDate."'
-						AND OS.BranchID = $ddlBranch
+						AND OS.BranchID = ".$BranchID."
+						AND OS.DoctorID = ".$DoctorID."
 					UNION ALL
 					SELECT
 						CS.CheckScheduleID,
@@ -48,7 +50,7 @@
 							ON MP.PatientID = CS.PatientID
 					WHERE
 						CS.ScheduledDate BETWEEN '".$StartDate."' AND '".$EndDate."'
-						AND $ddlBranch = 1
+						AND $BranchID = 1
 				)CSO
 				LEFT JOIN
 				(
@@ -59,7 +61,7 @@
 						transaction_checkschedule
 					WHERE
 						ScheduledDate BETWEEN '".$StartDate."' AND '".$EndDate."'
-						AND $ddlBranch = 1
+						AND $BranchID = 1
 					GROUP BY
 						DATE_FORMAT(ScheduledDate, '%Y-%m-%d')
 				)CN
@@ -73,7 +75,8 @@
 						transaction_onlineschedule
 					WHERE
 						ScheduledDate BETWEEN '".$StartDate."' AND '".$EndDate."'
-						AND BranchID = $ddlBranch
+						AND BranchID = ".$BranchID."
+						AND DoctorID = ".$DoctorID."
 					GROUP BY
 						DATE_FORMAT(ScheduledDate, '%Y-%m-%d')
 				)CNT

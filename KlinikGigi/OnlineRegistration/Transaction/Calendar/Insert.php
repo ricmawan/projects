@@ -8,7 +8,8 @@
 		$txtPhone = mysql_real_escape_string($_POST['txtPhone']);
 		$ddlTime = mysql_real_escape_string($_POST['ddlTime']);
 		$txtEmail = mysql_real_escape_string($_POST['txtEmail']);
-		$ddlBranch = mysql_real_escape_string($_POST['hdnDDLBranch']);
+		$BranchID = mysql_real_escape_string($_POST['hdnBranchID']);
+		$ddlDoctor = mysql_real_escape_string($_POST['hdnDDLDoctor']);
 		$ScheduledDate = $_POST['hdnStartDate'] . " " . $ddlTime;
 		//echo $ScheduledDate;
 		$State = 1;
@@ -84,7 +85,8 @@
 				WHERE
 					PatientName = '".$txtPatientName."'
 					AND PhoneNumber = '".$txtPhone."'
-					AND BranchID = ".$ddlBranch."
+					AND BranchID = ".$BranchID."
+					AND DoctorID = ".$ddlDoctor."
 					AND DATE_FORMAT(ScheduledDate, '%Y-%m-%d') = DATE_FORMAT('".$ScheduledDate."', '%Y-%m-%d')";
 		
 		if (! $result = mysql_query($sql, $dbh)) {
@@ -115,6 +117,7 @@
 						PhoneNumber,
 						Email,
 						BranchID,
+						DoctorID,
 						CreatedDate,
 						CreatedBy
 					)
@@ -124,7 +127,8 @@
 						'".$txtPatientName."',
 						'".$txtPhone."',
 						'".$txtEmail."',
-						".$ddlBranch.",
+						".$BranchID.",
+						".$ddlDoctor.",
 						NOW(),
 						''
 					)";

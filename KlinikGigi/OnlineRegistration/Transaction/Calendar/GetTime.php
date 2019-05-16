@@ -8,6 +8,7 @@
 		$Content = "";
 		$BranchID = mysql_real_escape_string($_POST['BranchID']);
 		$DayOfWeek = mysql_real_escape_string($_POST['dayOfWeek']);
+		$DoctorID = mysql_real_escape_string($_POST['DoctorID']);
 		$Message = "";
 		$ScheduleDetails = "";
 		$MessageDetail = "";
@@ -15,16 +16,16 @@
 		$State = 1;
 		
 		$sql = "SELECT
-					StartHour,
-					EndHour
+					BusinessHour
 				FROM
-					master_schedule
+					master_doctorschedule
 				WHERE
 					BranchID = ".$BranchID."
+					AND DoctorID = ".$DoctorID."
 					AND DayOfWeek = ".$DayOfWeek."
 					AND IsAdmin = 0
 				ORDER BY
-					StartHour";
+					BusinessHour";
 
 		if (! $result = mysql_query($sql, $dbh)) {
 			echo mysql_error();
@@ -32,8 +33,7 @@
 		}
 		$return_arr = array();
 		while ($row = mysql_fetch_array($result)) {
-			$row_array['StartHour']= $row['StartHour'];
-			$row_array['EndHour']= $row['EndHour'];
+			$row_array['BusinessHour']= $row['BusinessHour'];
 			array_push($return_arr, $row_array);
 		}
 		$json = json_encode($return_arr);

@@ -7,6 +7,8 @@
 		//echo $_SERVER['REQUEST_URI'];
 		$Content = "";
 		$StartDate = $_POST['StartDate'];
+		$BranchID = mysql_real_escape_string($_POST['BranchID']);
+		$DoctorID = mysql_real_escape_string($_POST['DoctorID']);
 		$Message = "";
 		$ScheduleDetails = "";
 		$MessageDetail = "";
@@ -41,6 +43,8 @@
 							ON OS.BranchID = MB.BranchID
 					WHERE
 						DATE_FORMAT(OS.ScheduledDate, '%Y-%m-%d') = '".$StartDate."'
+						AND OS.BranchID = ".$BranchID."
+						AND OS.DoctorID = ".$DoctorID."
 					UNION ALL
 					SELECT
 						CS.CheckScheduleID,

@@ -76,8 +76,8 @@
 			<h1>Welcome, please click "Schedule" to arrange your dental examination.
 			<br />
 			<!--<button class="btn btn-primary" onclick="Schedule();" link="./Transaction/Calendar/"><i class="fa fa-list-alt "></i> Schedule</button>&nbsp;-->
-			<button class="btn btn-primary" onclick="Schedule();" link="./Transaction/Calendar/index.php?BranchID=1"><i class="fa fa-list-alt "></i> Kawi&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>&nbsp;
-			<button class="btn btn-primary" onclick="Schedule();" link="./Transaction/Calendar/index.php?BranchID=2"><i class="fa fa-list-alt "></i> Indraprasta</button>&nbsp;
+			<button class="btn btn-primary" onclick="Schedule(1);" style='text-align:center;'><i class="fa fa-list-alt "></i> Kawi&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>&nbsp;
+			<button class="btn btn-primary" onclick="Schedule(2);" style='text-align:center;'><i class="fa fa-list-alt "></i> Indraprasta</button>&nbsp;
 		</div>
 		<script src="assets/js/jquery-1.10.2.js"></script>
 		<script src="assets/js/jquery-ui-1.10.3.custom.js"></script>
@@ -96,11 +96,11 @@
 		<div id="loading"></div>
 		<iframe id='excelDownload' src='' style='display:none'></iframe>
 		<script type="text/javascript">
-			function Schedule() {
+			function Schedule(BranchID) {
 				$.ajax({
 					url: "./Transaction/Calendar/",
 					type: "POST",
-					data: { },
+					data: { BranchID : BranchID },
 					dataType: "html",
 					success: function(data) {
 						$("#page-inner").html(data);

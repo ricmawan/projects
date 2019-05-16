@@ -7,6 +7,7 @@
 		//echo $_SERVER['REQUEST_URI'];
 		$Content = "";
 		$BranchID = mysql_real_escape_string($_POST['BranchID']);
+		$DoctorID = mysql_real_escape_string($_POST['DoctorID']);
 		$Message = "";
 		$ScheduleDetails = "";
 		$MessageDetail = "";
@@ -16,9 +17,10 @@
 		$sql = "SELECT
 					GROUP_CONCAT(DISTINCT DayOfWeek SEPARATOR ', ') AS dow
 				FROM
-					master_schedule
+					master_doctorschedule
 				WHERE
 					BranchID = ".$BranchID."
+					AND DoctorID = ".$DoctorID."
 					AND IsAdmin = 0
 				GROUP BY
 					BranchID";

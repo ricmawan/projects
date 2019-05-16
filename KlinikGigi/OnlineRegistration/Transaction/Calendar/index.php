@@ -20,23 +20,33 @@
 					<div class="panel-body">
 						<div class="row col-md-12">
 							<div class="col-md-1 labelColumn" >
-								Location:
+								Dokter:
 							</div>
-							<div class="col-md-2" >
-								<select id="ddlBranch" name="ddlBranch" class="form-control-custom" onchange="reloadEvent();">
+							<div class="col-md-3" >
+								<select id="ddlDoctor" name="ddlDoctor" class="form-control-custom" onchange="reloadEvent();">
 									<?php
-										$sql = "SELECT BranchID, BranchName, StartHour, EndHour FROM master_branch";
-										if(!$result = mysql_query($sql, $dbh)) {
+										$sql = "SELECT
+													MDS.DoctorID,
+													MU.UserName
+												FROM
+													master_doctorschedule MDS
+													JOIN master_user MU
+														ON MU.UserID = MDS.DoctorID
+												WHERE
+													MDS.BranchID = ".$_POST['BranchID']." 
+												GROUP BY 
+													DoctorID";
+									if(!$result = mysql_query($sql, $dbh)) {
 											echo mysql_error();
 											return 0;
 										}
 										while($row = mysql_fetch_array($result)) {
-											echo "<option value='".$row['BranchID']."' startHour=".$row['StartHour']." endHour=".$row['EndHour']." >".$row['BranchName']."</option>";
+											echo "<option value='".$row['DoctorID']."' >".$row['UserName']."</option>";
 										}
 									?>
 								</select>
 							</div>
-							<div class="col-md-7">
+							<div class="col-md-6">
 							</div>
 							<div class="col-md-2">
 								<img src="./assets/img/logo.png" style="width:150px;" />
@@ -53,7 +63,10 @@
 			<div id="dialog-schedule" title="Registration" style="display: none;">
 				<form class="col-md-12" id="ScheduleForm" method="POST" action="" >
 					<input type="hidden" id="hdnStartDate" name="hdnStartDate" value=0 autofocus="autofocus" />
-					<input type="hidden" id="hdnDDLBranch" name="hdnDDLBranch" value=1 autofocus="autofocus" />
+					<input type="hidden" id="hdnDDLDoctor" name="hdnDDLDoctor" value=1 autofocus="autofocus" />
+					<?php
+						echo '<input id="hdnBranchID" name="hdnBranchID" type="hidden" value="'.$_POST['BranchID'].'" />';
+					?>
 					<div class="row" >
 						<div class="col-md-3 labelColumn" >
 							Date:
@@ -143,7 +156,7 @@
 		</div>
 		<script>
 			var businessHours;
-			function hideUnavailableTime(dayOfWeek) {
+			/*function hideUnavailableTime(dayOfWeek) {
 				var startDate = $("#hdnStartDate").val();
 				$("#ddlTime option").each(function() {
 					$(this).show();
@@ -170,13 +183,14 @@
 						$.notify("Something went wrong!", "error");
 					}
 				});
-			}
+			}*/
+
 			function loadSchedule(startDate) {
 				$("#loading").show();
 				$.ajax({
 					url: "./Transaction/Calendar/Detail.php",
 					type: "POST",
-					data: { StartDate : startDate },
+					data: { StartDate : startDate, BranchID : $("#hdnBranchID"), DoctorID : $("#ddlDoctor").val() },
 					dataType: "json",
 					success: function(data) {
 						$("#loading").hide();
@@ -218,7 +232,7 @@
 			}
 
 			function reloadEvent() {
-				$("#hdnDDLBranch").val($("#ddlBranch").val());
+				$("#hdnDDLDoctor").val($("#ddlDoctor").val());
 				$('#calendar').fullCalendar('refetchEvents');
 				getDayOfWeek();
 			}
@@ -227,7 +241,7 @@
 				$.ajax({
 					url: "./Transaction/Calendar/GetDayOfWeek.php",
 					type: "POST",
-					data: { BranchID : $("#ddlBranch").val() },
+					data: { BranchID : $("#hdnBranchID").val(), DoctorID : $("#ddlDoctor").val() },
 					dataType: "json",
 					success: function(data) {
 						$("#loading").hide();
@@ -254,21 +268,22 @@
 				$.ajax({
 					url: "./Transaction/Calendar/GetTime.php",
 					type: "POST",
-					data: { dayOfWeek : dayOfWeek, BranchID : $("#ddlBranch").val() },
+					data: { dayOfWeek : dayOfWeek, BranchID : $("#hdnBranchID").val(), DoctorID : $("#ddlDoctor").val() },
 					dataType: "json",
 					success: function(data) {
 						$("#loading").hide();
 						for(var i=0;i<data.length;i++) {
-							for(var j=parseInt(data[i].StartHour);j<=parseInt(data[i].EndHour);j++) {
+							$("#ddlTime").append("<option value='" + data[i].BusinessHour + "' >" + data[i].BusinessHour + "</option>");
+							/*for(var j=parseInt(data[i].StartHour);j<=parseInt(data[i].EndHour);j++) {
 								$("#ddlTime").append("<option value='" + j + ":00' >" + j + ":00</option>");
 								if(j!=data[i].EndHour) {
 									$("#ddlTime").append("<option value='" + j + ":15' >" + j + ":15</option>");
 									$("#ddlTime").append("<option value='" + j + ":30' >" + j + ":30</option>");
 									$("#ddlTime").append("<option value='" + j + ":45' >" + j + ":45</option>");
 								}
-							}
+							}*/
 						}
-						hideUnavailableTime(dayOfWeek);
+						//hideUnavailableTime(dayOfWeek);
 					},
 					error: function(data) {
 						$("#loading").hide();
@@ -493,7 +508,8 @@
 						url: "./Transaction/Calendar/DataSource.php",
 						 data: function () { // a function that returns an object
 							return {
-								ddlBranch: $('#ddlBranch').val(),
+								BranchID : $('#hdnBranchID').val(),
+								DoctorID : $("#ddlDoctor").val()
 							};
 
 						},
@@ -513,6 +529,7 @@
 						//loadSchedule(date.format('YYYY-MM-DD'));
 					}
 				});
+				$("#hdnDDLDoctor").val($("#ddlDoctor").val());
 				getDayOfWeek();
 			});
 		</script>
