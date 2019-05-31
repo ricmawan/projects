@@ -1048,7 +1048,7 @@
 										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-right" }
 									],
 									"ajax": {
-										"url": "./Transaction/Sale/ItemList.php" /*,
+										"url": "./Transaction/PurchaseReturn/ItemList.php" /*,
 										"data": function ( d ) {
 											d.BranchID = $("#hdnBranchID").val()
 										}*/

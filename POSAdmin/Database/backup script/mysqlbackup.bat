@@ -28,7 +28,7 @@
 :: If the time is less than two digits insert a zero so there is no space to break the filename
 
 :: If you have any regional date/time issues call this include: getdate.cmd  credit: Simon Sheppard for this cmd - untested
-call getdate.cmd
+::call getdate.cmd
 
 set year=%DATE:~6,4%
 set day=%DATE:~0,2%
@@ -51,7 +51,7 @@ echo %backuptime%
 set dbuser=root
 
 :: Name of the database
-set dbname="klinik_gigi"
+set dbname="pos"
 
 :: Password for the database user
 set dbpass=
