@@ -1,1 +1,0 @@
-INSERT INTO `klinik_gigi`.`master_menu` (`MenuID`, `GroupMenuID`, `MenuName`, `Url`, `Icon`, `IsReport`, `OrderNo`) VALUES ('13', '4', 'Foto Pemeriksaan', 'Report/Photos', 'NULL', '0', '4');
