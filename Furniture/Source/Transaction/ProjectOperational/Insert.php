@@ -80,7 +80,7 @@
 				}
 
 				if (! $result = mysql_query($sql, $dbh)) {
-					$Message = "Terjadi Kesalahan Sistem";
+					$Message = "Terjadi Kesalahan Sistem".$j;
 					$MessageDetail = mysql_error();
 					$FailedFlag = 1;
 					echo returnstate($ID, $Message, $MessageDetail, $FailedFlag, $State);
