@@ -1,4 +1,5 @@
 <?php
+	date_default_timezone_set("Asia/Bangkok");
 	$DBUser = "root";
 	$DBPass = "";
 	$DBName = "klinik_gigi";

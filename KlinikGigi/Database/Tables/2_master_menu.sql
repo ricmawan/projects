@@ -193,6 +193,15 @@ VALUES
 	NULL,
 	0,
 	5
+),
+(
+	20,
+	3,
+	'Rujukan',
+	'Transaction/Referral/',
+	NULL,
+	0,
+	7
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

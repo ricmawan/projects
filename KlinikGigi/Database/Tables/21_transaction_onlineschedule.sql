@@ -12,6 +12,7 @@ CREATE TABLE transaction_onlineschedule
 	EmailStatus			TEXT,
 	EmailMessage		TEXT,
 	DeliveredDate		DATETIME,
+	Medication			VARCHAR(255),
 	CreatedDate 		DATETIME NOT NULL,
 	CreatedBy 			VARCHAR(255) NOT NULL,
 	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,

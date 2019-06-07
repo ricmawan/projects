@@ -1,0 +1,1 @@
+ALTER TABLE `transaction_onlineschedule` ADD `Medication` VARCHAR(255) NOT NULL AFTER `DeliveredDate`;
