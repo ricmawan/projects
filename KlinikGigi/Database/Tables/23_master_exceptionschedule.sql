@@ -1,0 +1,228 @@
+DROP TABLE IF EXISTS master_exceptionschedule;
+
+CREATE TABLE master_exceptionschedule
+(
+	ExceptionScheduleID	INT PRIMARY KEY AUTO_INCREMENT,
+	BranchID			SMALLINT,
+	DayOfWeek			SMALLINT,
+	BusinessHour		VARCHAR(10),
+	IsAdmin				SMALLINT,
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy			VARCHAR(255) NULL
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX EXCEPTIONSCHEDULE_INDEX
+ON master_exceptionschedule (ExceptionScheduleID);
+
+INSERT INTO master_exceptionschedule
+(
+	ExceptionScheduleID,
+	BranchID,
+	DayOfWeek,
+	BusinessHour,
+	CreatedDate,
+	CreatedBy
+)
+VALUES
+(
+	0,
+	1,
+	2,
+	'9:00',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	2,
+	'9:45',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	2,
+	'10:00',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	3,
+	'16:00',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	3,
+	'16:30',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	3,
+	'17:00',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	4,
+	'9:00',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	4,
+	'9:45',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	4,
+	'10:00',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	4,
+	'16:00',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	4,
+	'16:30',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	4,
+	'17:00',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	5,
+	'16:00',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	5,
+	'16:30',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	5,
+	'17:00',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	1,
+	'17:00',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	1,
+	'17:15',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	1,
+	'17:30',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	1,
+	'18:45',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	1,
+	'19:00',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	2,
+	'17:00',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	2,
+	'17:15',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	2,
+	'17:30',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	2,
+	'18:45',
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	2,
+	'19:00',
+	'Admin',
+	NOW()
+);

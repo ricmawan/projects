@@ -1,0 +1,553 @@
+DROP TABLE IF EXISTS master_doctorschedule;
+
+CREATE TABLE master_doctorschedule
+(
+	DoctorScheduleID	INT PRIMARY KEY AUTO_INCREMENT,
+	DoctorID			BIGINT,
+	BranchID			SMALLINT,
+	DayOfWeek			SMALLINT,
+	BusinessHour		VARCHAR(10),
+	IsAdmin				SMALLINT,
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy			VARCHAR(255) NULL,
+	FOREIGN KEY (DoctorID) REFERENCES master_user(UserID) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY (BranchID) REFERENCES master_branch(BranchID) ON UPDATE CASCADE ON DELETE CASCADE
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX DOCTORSCHEDULE_INDEX
+ON master_doctorschedule (DoctorScheduleID, DoctorID, BranchID);
+
+INSERT INTO master_doctorschedule
+(
+	DoctorScheduleID,
+	BranchID,
+	DoctorID,
+	DayOfWeek,
+	BusinessHour,
+	IsAdmin,
+	CreatedDate,
+	CreatedBy
+)
+VALUES
+(
+	0,
+	1,
+	6,
+	3,
+	'17:45',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	6,
+	3,
+	'18:15',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	6,
+	3,
+	'18:45',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	6,
+	4,
+	'17:45',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	6,
+	4,
+	'18:15',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	6,
+	4,
+	'18:45',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	6,
+	5,
+	'17:45',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	6,
+	5,
+	'18:15',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	6,
+	5,
+	'18:45',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	6,
+	1,
+	'17:45',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	6,
+	1,
+	'18:15',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	6,
+	1,
+	'18:45',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	6,
+	1,
+	'20:00',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	6,
+	1,
+	'21:00',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	6,
+	2,
+	'17:45',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	6,
+	2,
+	'18:15',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	6,
+	2,
+	'18:45',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	6,
+	2,
+	'20:00',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	6,
+	2,
+	'21:00',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	4,
+	1,
+	'18:00',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	4,
+	1,
+	'19:00',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	4,
+	1,
+	'20:00',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	9,
+	4,
+	'17:30',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	9,
+	4,
+	'18:30',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	9,
+	4,
+	'19:30',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	9,
+	4,
+	'20:30',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	9,
+	6,
+	'12:30',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	9,
+	6,
+	'13:30',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	9,
+	6,
+	'14:30',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	9,
+	6,
+	'15:30',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	9,
+	6,
+	'16:30',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	9,
+	6,
+	'17:30',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	9,
+	6,
+	'18:30',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	9,
+	3,
+	'17:00',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	9,
+	3,
+	'18:00',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	9,
+	3,
+	'19:00',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	9,
+	3,
+	'20:00',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	3,
+	4,
+	'18:00',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	3,
+	4,
+	'19:00',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	3,
+	2,
+	'13:30',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	3,
+	4,
+	'20:00',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	4,
+	1,
+	'09:30',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	4,
+	1,
+	'10:30',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	4,
+	1,
+	'11:00',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	4,
+	3,
+	'10:30',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	4,
+	3,
+	'11:30',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	4,
+	3,
+	'12:30',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	4,
+	3,
+	'13:30',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	4,
+	3,
+	'14:30',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	3,
+	2,
+	'12:30',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	1,
+	8,
+	5,
+	'11:30',
+	0,
+	'Admin',
+	NOW()
+),
+(
+	0,
+	2,
+	4,
+	1,
+	'17:00',
+	0,
+	'Admin',
+	NOW()
+);
