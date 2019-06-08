@@ -130,6 +130,7 @@
 				</div>
 			</div>
 		</div>
+		<div id="loading"></div>
 		<script src="../../assets/js/jquery-1.10.2.js"></script>
 		<script src="../../assets/js/jquery-ui-1.10.3.custom.js"></script>
 		<script src="../../assets/js/bootstrap.min.js"></script>
@@ -197,7 +198,7 @@
 										}
 										else {
 											//$.notify(data.Message, "error");
-											parent.postMessage("Error", "*");
+											parent.postMessage(data.Message, "*");
 										}
 									},
 									error: function(data) {

@@ -121,12 +121,12 @@
 					$("#scheduleFrame").css({ "width": (parseFloat($("#scheduleFrame").css("width")) + 1) });
 					$("#scheduleFrame").css({ "width": (parseFloat($("#scheduleFrame").css("width")) - 1) });
 				}
-				else if(event.data == "Error") {
-					$.notify(data.Message, "error");
-				}
-				else {
+				else if(event.data == "Data has been saved!") {
 					$.notify(event.data, "success");
 					reloadSchedule();
+				}
+				else {
+					$.notify(event.data, "error");
 				}
 			});
 			
