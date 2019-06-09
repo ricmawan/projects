@@ -177,7 +177,7 @@
 			$MessageSent = str_replace("[ScheduledDate]", date("d", strtotime($ScheduledDate)) . " " . $monthName[date("m", strtotime($ScheduledDate)) - 1] . " " . date("Y", strtotime($ScheduledDate)), $MessageSent);
 			$MessageSent = str_replace("[ScheduledDate2]", $monthName2[date("m", strtotime($ScheduledDate)) - 1] . " " . date("d", strtotime($ScheduledDate)) . ", " . date("Y", strtotime($ScheduledDate)), $MessageSent);
 			$mail->addAddress($txtEmail, $txtPatientName);     // Add a recipient
-			$mail->Subject = 'Dental Examination Reminder';
+			$mail->Subject = 'Dental Examination Registration';
 			$mail->Body    = str_replace('[Patient_Name]', $txtPatientName, $MessageSent);
 			//$mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 

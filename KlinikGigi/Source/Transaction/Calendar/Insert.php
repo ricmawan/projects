@@ -10,7 +10,7 @@
 		$txtEmail = mysql_real_escape_string($_POST['txtEmail']);
 		$ddlBranch = mysql_real_escape_string($_POST['hdnDDLBranch']);
 		$ScheduledDate = $_POST['hdnStartDate'] . " " . $ddlTime;
-		$DayOfWeek = date("w", strtotime($_POST['hdnStartDate']));
+		//$DayOfWeek = date("w", strtotime($_POST['hdnStartDate']));
 		//echo $ScheduledDate;
 		$State = 1;
 		mysql_query("START TRANSACTION", $dbh);
@@ -110,7 +110,7 @@
 
 			mysql_query("COMMIT", $dbh);
 			
-			require '../../assets/lib/PHPMailer/PHPMailerAutoload.php';
+			/*require '../../assets/lib/PHPMailer/PHPMailerAutoload.php';
 			$MessageBody = file_get_contents( __DIR__ . "/NotificationEmailTemplate.html");
 			
 			$mail = new PHPMailer;
@@ -148,7 +148,7 @@
 						SET
 							EmailStatus = '".$mail->ErrorInfo."'
 						WHERE
-							OnlineScheduleID = ".$row['OnlineScheduleID'];*/
+							OnlineScheduleID = ".$row['OnlineScheduleID'];
 			} else {
 				/*$sql2 = 'UPDATE transaction_onlineschedule
 						SET
@@ -161,7 +161,7 @@
 			/*if (! $result2 = mysql_query($sql2, $dbh)) {
 				echo mysql_error();
 			}*/
-			$mail->clearAddresses();
+			//$mail->clearAddresses();
 
 			echo returnstate($Message, $MessageDetail, $FailedFlag, $State);
 			return 0;

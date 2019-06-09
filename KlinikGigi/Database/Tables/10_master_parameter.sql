@@ -23,4 +23,6 @@ INSERT INTO `master_parameter` (`ParameterID`, `ParameterName`, `ParameterValue`
 (7, 'UPLOAD_PATH', 'C:\\xampp\\htdocs\\Projects\\KlinikGigi\\Source\\UploadedFiles\\', 'Upload Path', 0, '2016-03-12 00:00:00', 'Admin', NULL, NULL),
 (8, 'SHARED_PRINTER_ADDRESS', '//localhost/EPSON', 'For shared printer', 0, '2016-03-20 00:00:00', 'Admin', NULL, NULL),
 (9, 'DAILY_SCHEDULE_LIMIT', 30, 'Daily Limit for Indraprasta', 0, '2016-03-20 00:00:00', 'Admin', NULL, NULL),
-(10, 'MINUTE_SCHEDULE_LIMIT', 3, 'Schedule Limit per 15 minute', 0, '2016-03-20 00:00:00', 'Admin', NULL, NULL);
+(10, 'MINUTE_SCHEDULE_LIMIT', 3, 'Schedule Limit per 15 minute', 0, '2016-03-20 00:00:00', 'Admin', NULL, NULL),
+(11, 'NURSE_MAIL_ADDRESS1', 'dentalklinik116@gmail.com', 'Nurse Email Address 1', 0, '2016-03-20 00:00:00', 'Admin', NULL, NULL),
+(12, 'NURSE_MAIL_ADDRESS2', 'imdentalspecialist@gmail.com', 'Nurse Email Address 1', 0, '2016-03-20 00:00:00', 'Admin', NULL, NULL);
