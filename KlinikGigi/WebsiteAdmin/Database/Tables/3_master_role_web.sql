@@ -1,0 +1,25 @@
+DROP TABLE IF EXISTS master_role_web;
+
+CREATE TABLE master_role_web
+(
+	RoleID 		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	UserID 		BIGINT,
+	MenuID 		BIGINT,
+	EditFlag 	BOOLEAN,
+	DeleteFlag 	BOOLEAN,
+	FOREIGN KEY(UserID) REFERENCES master_user(UserID) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY(MenuID) REFERENCES master_menu_web(MenuID) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB;
+
+INSERT INTO master_role_web
+VALUES
+(
+	0,
+	1,
+	1,
+	1,
+	1
+);
+
+CREATE UNIQUE INDEX ROLEWEB_INDEX
+ON master_role_web (RoleID, UserID, MenuID);

@@ -2,26 +2,28 @@
 	<head>
 		<style>
 			table {
-				font-size: 1.2em !important;
+				font-size: 1em !important;
+			}
+			.ui-widget {
+				font-size: 0.9em !important;
 			}
 		</style>
 		<link href="../../assets/css/bootstrap.css" rel="stylesheet" />
 		<link href="../../assets/css/font-awesome.css" rel="stylesheet" />
 		<link href="../../assets/css/jquery-ui-1.10.3.custom.min.css" rel="stylesheet" />
-		<link href="../../assets/js/morris/morris-0.4.3.min.css" rel="stylesheet" />
 		<link href="../../assets/css/custom.css" rel="stylesheet" />
 		<link href="../../assets/css/jquery.bootgrid.css" rel="stylesheet" />
 	</head>
-	<body style="background: #eee">
+	<body>
 		<?php
 			if(isset($_GET["BranchID"])) {
 				include "../../DBConfig.php";
 				$Content = "";
 				$BranchID = mysql_real_escape_string($_GET["BranchID"]);
 				$ScheduledDate = mysql_real_escape_string($_GET["ScheduledDate"]);
-				$PatientName = mysql_real_escape_string($_GET["PatientName"]);
-				$Phone = mysql_real_escape_string($_GET["Phone"]);
-				$Email = mysql_real_escape_string($_GET["Email"]);
+				//$PatientName = mysql_real_escape_string($_GET["PatientName"]);
+				//$Phone = mysql_real_escape_string($_GET["Phone"]);
+				//$Email = mysql_real_escape_string($_GET["Email"]);
 
 				$DayOfWeek = date("w", strtotime($ScheduledDate));
 				$dayNames = [ "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu" ];
@@ -45,7 +47,8 @@
 							MDS.BranchID = ". $BranchID ."
 							AND MDS.DayOfWeek = ". $DayOfWeek ."
 						ORDER BY
-							MU.UserName";
+							MU.UserName,
+							MDS.BusinessHour";
 							
 				if (! $result = mysql_query($sql, $dbh)) {
 					$MessageDetail = mysql_error();
@@ -113,14 +116,41 @@
 				<br />
 				<div class="row" >
 					<div class="col-md-4 labelColumn" >
+						Name:
+					</div>
+					<div class="col-md-8">
+						<input type="text" placeholder="Name" required id="txtPatientName" name="txtPatientName" class="form-control-custom" />
+					</div>
+				</div>
+				<br />
+				<div class="row" >
+					<div class="col-md-4 labelColumn" >
+						Phone:
+					</div>
+					<div class="col-md-8">
+						<input type="text" placeholder="Phone" required id="txtPhone" name="txtPhone" class="form-control-custom" />
+					</div>
+				</div>
+				<br />
+				<div class="row" >
+					<div class="col-md-4 labelColumn" >
+						Email:
+					</div>
+					<div class="col-md-8">
+						<input type="text" placeholder="Email" id="txtEmail" name="txtEmail" class="form-control-custom" />
+					</div>
+				</div>
+				<br />
+				<div class="row" >
+					<div class="col-md-4 labelColumn" >
 						Tindakan:
 					</div>
 					<div class="col-md-8">
 						<input type="text" placeholder="Tindakan" required id="txtMedication" name="txtMedication" class="form-control-custom" />
 						<?php
-							echo '<input id="hdnPatientName2" name="hdnPatientName2" type="hidden" value="'.$PatientName.'" />';
-							echo '<input id="hdnPhone2" name="hdnPhone2" type="hidden" value="'.$Phone.'" />';
-							echo '<input id="hdnEmail2" name="hdnEmail2" type="hidden" value="'.$Email.'" />';
+							//echo '<input id="hdnPatientName2" name="hdnPatientName2" type="hidden" value="'.$PatientName.'" />';
+							//echo '<input id="hdnPhone2" name="hdnPhone2" type="hidden" value="'.$Phone.'" />';
+							//echo '<input id="hdnEmail2" name="hdnEmail2" type="hidden" value="'.$Email.'" />';
 							echo '<input id="hdnRawDate" name="hdnRawDate" type="hidden" value="'.$RawDate.'" />';
 							echo '<input id="hdnBranchID" name="hdnBranchID" type="hidden" value="'.$BranchID.'" />';
 						?>
@@ -134,12 +164,9 @@
 		<script src="../../assets/js/jquery-1.10.2.js"></script>
 		<script src="../../assets/js/jquery-ui-1.10.3.custom.js"></script>
 		<script src="../../assets/js/bootstrap.min.js"></script>
-		<script src="../../assets/js/jquery.metisMenu.js"></script>
-		<script src="../../assets/js/custom.js"></script>
 		<script src="../../assets/js/notify.js"></script>
 		<script src="../../assets/js/global.js"></script>
 		<script src="../../assets/js/jquery.bootgrid.js"></script>
-		<script type="text/javascript" src="assets/js/jquery.fancybox.js"></script>
 		<script>
 			$(document).ready(function() {
 				parent.postMessage("loaded", "*");
@@ -161,7 +188,7 @@
 						duration: 500
 					},
 					resizable: false,
-					height: 240,
+					height: 340,
 					width: 450,
 					modal: true,
 					close: function() {
@@ -189,9 +216,9 @@
 											$("#txtMedication").val("");
 											$("#doctorName").html("");
 											$("#ScheduledDate").html("");
-											$("#hdnPatientName2").val("");
-											$("#hdnEmail2").val("");
-											$("#hdnPhone2").val("");
+											//$("#hdnPatientName2").val("");
+											//$("#hdnEmail2").val("");
+											//$("#hdnPhone2").val("");
 											$("#hdnBusinessHour").val();
 											$("#hdnUserID").val("");
 											$("#dialog-submit-referral").dialog("destroy");

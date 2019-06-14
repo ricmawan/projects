@@ -212,6 +212,8 @@
 				$("#5").prop("checked", true);
 				$("#9").attr("checked", true);
 				$("#9").prop("checked", true);
+				$("#20").attr("checked", true);
+				$("#20").prop("checked", true);
 				var MenuID = $("#hdnMenuID").val().split(", ");
 				var EditMenuID = $("#hdnEditMenuID").val().split(", ");
 				var DeleteMenuID = $("#hdnDeleteMenuID").val().split(", ");

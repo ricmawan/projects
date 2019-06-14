@@ -111,7 +111,7 @@
 										Icon,
 										Url
 									FROM
-										master_groupmenu
+										master_groupmenu_web
 									ORDER BY 
 										OrderNo ASC";
 							if (! $result=mysql_query($sql, $dbh)) {
@@ -128,8 +128,8 @@
 										MM.Url,
 										MM.Icon
 									 FROM
-										master_menu MM
-										JOIN master_role MR
+										master_menu_web MM
+										JOIN master_role_web MR
 											ON MR.MenuID = MM.MenuID
 									WHERE 
 										GroupMenuID = ".$row['GroupMenuID']."
@@ -213,6 +213,7 @@
 						"width" : "calc(100% - 5px)"
 					});
 				});
+			});
 		</script>
 	</body>
 </html>

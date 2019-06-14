@@ -115,18 +115,33 @@
 				$("#scheduleFrame").attr("src", "http://imdentalspecialist.com/Transaction/Referral/Schedule.php?BranchID=" + BranchID + "&ScheduledDate=" + ScheduledDate + "&PatientName=" + PatientName + "&Phone=" + Phone + "&Email=" + Email );
 			}
 
+			var counterLoaded = 0;
+			var counterSuccess = 0;
+			var counterFailed = 0;
 			window.addEventListener("message", function(event) {
 				if(event.data == "loaded") {
-					$("#loading").hide();
-					$("#scheduleFrame").css({ "width": (parseFloat($("#scheduleFrame").css("width")) + 1) });
-					$("#scheduleFrame").css({ "width": (parseFloat($("#scheduleFrame").css("width")) - 1) });
+					if(counterLoaded == 0) {
+						counterLoaded = 1;
+						$("#loading").hide();
+						$("#scheduleFrame").css({ "width": (parseFloat($("#scheduleFrame").css("width")) + 1) });
+						$("#scheduleFrame").css({ "width": (parseFloat($("#scheduleFrame").css("width")) - 1) });
+					}
+					setTimeout(function() { counterLoaded = 0; }, 1000);
 				}
 				else if(event.data == "Data has been saved!") {
-					$.notify(event.data, "success");
-					reloadSchedule();
+					if(counterSuccess == 0) {
+						counterSuccess = 1;
+						$.notify(event.data, "success");
+						reloadSchedule();
+					}
+					setTimeout(function() { counterSuccess = 0; }, 1000);
 				}
 				else {
-					$.notify(event.data, "error");
+					if(counterFailed == 0) {
+						counterFailed = 1;
+						$.notify(event.data, "error");
+					}
+					setTimeout(function() { counterFailed = 0; }, 1000);
 				}
 			});
 			

@@ -89,7 +89,8 @@
 	$return_arr = array();
 	while ($row = mysql_fetch_array($result)) {
 		$row_array['checkscheduleid']= $row['ScheduleID'];
-		$row_array['title']= $row['PatientName'];
+		//$row_array['title']= $row['PatientName'];
+		$row_array['title']= "Booked!";
 		$row_array['start'] = $row['ScheduledDate'];
 		$row_array['end'] = $row['ScheduledDate'];
 		$row_array['backgroundColor'] = $row['BackgroundColor'];

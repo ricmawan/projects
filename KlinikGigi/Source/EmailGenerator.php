@@ -82,7 +82,7 @@
 		$mail->clearAddresses();
 
 		$MessageSent2 = $MessageBody_Nurse;
-		$MessageSent2 = str_replace("[ScheduledDate]", date("d", strtotime($row['ScheduledDate'])) . " " . $monthName[date("m", strtotime($row['ScheduledDate'])) - 1] . " " . date("Y", strtotime($row['ScheduledDate'])), $MessageSent2);
+		$MessageSent2 = str_replace("[ScheduledDate]", date("d", strtotime($row['ScheduledDate'])) . " " . $monthName[date("m", strtotime($row['ScheduledDate'])) - 1] . " " . date("Y", strtotime($row['ScheduledDate'])) . " " . date("H", strtotime($row['ScheduledDate'])) . ":" . date("i", strtotime($row['ScheduledDate'])), $MessageSent2);
 		$MessageSent2 = str_replace("[Day_Name]", $dayName[$row['DayCount']], $MessageSent2);
 
 		$mail->addAddress($NURSE_MAIL_ADDRESS1, 'imdentalspecialist');     // Add a recipient

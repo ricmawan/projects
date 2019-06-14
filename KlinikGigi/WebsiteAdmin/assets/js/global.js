@@ -121,53 +121,55 @@ $(document).ready(function () {
 	$(document).on("click", ".menu", function() {
 		//alert($(this).attr("link"));
 		var MenuClicked = $(this).attr("link");
-		PrevMenu = CurrentMenu;
-		CurrentMenu = MenuClicked;
-		if( $(this).is("a")) $(".menu").removeClass("active-menu");
-		$("#loading").show();
-		$("#page-inner").html("");
-		if(MenuClicked != "./Home.php") {
-			$.ajax({
-				url: MenuClicked,
-				type: "POST",
-				data: { },
-				dataType: "html",
-				success: function(data) {
-					$("#page-inner").html(data);
-					$("html, body").animate({
-						scrollTop: 0
-					}, "slow");
-					$("#loading").hide();
-				},
-				error: function(data) {
-					$("#loading").hide();
-					$.notify("Koneksi gagal", "error");
-				}
-			});
-		}
-		else {
+		if(MenuClicked !== null && MenuClicked !== "") {
+			PrevMenu = CurrentMenu;
+			CurrentMenu = MenuClicked;
+			if( $(this).is("a")) $(".menu").removeClass("active-menu");
 			$("#loading").show();
-			/*$.ajax({
-				url: "./Master/Notification/",
-				type: "POST",
-				data: { },
-				dataType: "html",
-				success: function(data) {
-					$("#page-inner").html(data);
-					$("html, body").animate({
-						scrollTop: 0
-					}, "slow");
-					$("#loading").hide();
-				},
-				error: function(data) {
-					$("#loading").hide();
-					$.notify("Koneksi gagal", "error");
-				}
-			});*/
-			$("#page-inner").html('<img src="./assets/img/logo.png" style="width:100%;"/>');
-			$("#loading").hide();
+			$("#page-inner").html("");
+			if(MenuClicked != "./Home.php") {
+				$.ajax({
+					url: MenuClicked,
+					type: "POST",
+					data: { },
+					dataType: "html",
+					success: function(data) {
+						$("#page-inner").html(data);
+						$("html, body").animate({
+							scrollTop: 0
+						}, "slow");
+						$("#loading").hide();
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Koneksi gagal", "error");
+					}
+				});
+			}
+			else {
+				$("#loading").show();
+				/*$.ajax({
+					url: "./Master/Notification/",
+					type: "POST",
+					data: { },
+					dataType: "html",
+					success: function(data) {
+						$("#page-inner").html(data);
+						$("html, body").animate({
+							scrollTop: 0
+						}, "slow");
+						$("#loading").hide();
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Koneksi gagal", "error");
+					}
+				});*/
+				$("#page-inner").html('<img src="./assets/img/logo.png" style="width:100%;"/>');
+				$("#loading").hide();
+			}
+			$(this).addClass("active-menu");
 		}
-		$(this).addClass("active-menu");
 	});
 });
 function Redirect(link) {

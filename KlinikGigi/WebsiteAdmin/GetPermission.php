@@ -9,11 +9,11 @@
 			MR.EditFlag,
 			MR.DeleteFlag
 		FROM
-			master_role MR
-			JOIN master_menu MM
+			master_role_web MR
+			JOIN master_menu_web MM
 				ON MM.MenuID = MR.MenuID
 		WHERE
-			CONCAT('".$APPLICATION_PATH."', MM.Url) = '".$RequestPath."'
+			CONCAT('".$WEBADMIN_PATH."', MM.Url) = '".$RequestPath."'
 			AND MR.UserID = '".$_SESSION['UserID']."'";
 				
 	if (! $result = mysql_query($sql, $dbh)) {
@@ -22,7 +22,7 @@
 	}
 	$cek = mysql_num_rows($result);
 	if($cek == 0) {
-		header($APPLICATION_PATH.'Home.php', true, 200);
+		header($WEBADMIN_PATH.'Home.php', true, 200);
 		echo "<script>$('#Menu1').click();</script>";
 		die();
 	}
