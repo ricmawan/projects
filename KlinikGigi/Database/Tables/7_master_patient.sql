@@ -11,6 +11,7 @@ CREATE TABLE master_patient
 	Address 		TEXT,
 	City			VARCHAR(100),
 	Allergy			TEXT,
+	Info			VARCHAR(255),
 	CreatedDate 	DATETIME NOT NULL,
 	CreatedBy 		VARCHAR(255) NOT NULL,
 	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,

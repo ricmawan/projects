@@ -154,7 +154,7 @@
 
 			$mail->isSMTP();                                      // Set mailer to use SMTP
 			$mail->SMTPAuth = true;                               // Enable SMTP authentication
-			$mail->Host = 'mx1.hostinger.co.id';  // Specify main and backup SMTP servers
+			$mail->Host = 'smtp.hostinger.co.id';  // Specify main and backup SMTP servers
 			$mail->Username = 'cs@imdentalspecialist.com';                 // SMTP username
 			$mail->Password = 'imdentalspecialist';                           // SMTP password
 			$mail->Port = 587;                                    // TCP port to connect to

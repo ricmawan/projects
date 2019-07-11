@@ -12,7 +12,8 @@ CREATE PROCEDURE spInsPatient (
 	pTelephone		VARCHAR(255),
 	pEmail			VARCHAR(255),
 	pIsEdit			INT,
-    pCurrentUser	VARCHAR(255)
+    pCurrentUser	VARCHAR(255),
+	pInfo			VARCHAR(255)
 )
 StoredProcedure:BEGIN
 
@@ -24,20 +25,7 @@ StoredProcedure:BEGIN
 
 	DECLARE PassValidate INT;
 	
-	/*DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN		
-		GET DIAGNOSTICS CONDITION 1
-		@MessageText = MESSAGE_TEXT, 
-		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
-		ROLLBACK;
-		SET @full_error = CONVERT(CONCAT("ERROR ", IFNULL(@ErrNo, ''), " (", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		SELECT 
-			pId AS 'ID', 
-			'Terjadi Kesalahan Sistem' AS 'Message', 
-			@full_error AS 'MessageDetail',
-			1 AS 'FailedFlag', 
-			State AS 'State';
-	END;*/
+	
 	
 	SET PassValidate = 1;
 	
@@ -60,7 +48,7 @@ SET State = 1;
 			AND PatientID <> pID)
 		LIMIT 1;
 			
-		IF PassValidate = 0 THEN /*Data yang diinput tidak valid*/
+		IF PassValidate = 0 THEN 
 SET State = 2;
 			SELECT
 				pID AS 'ID',
@@ -71,9 +59,9 @@ SET State = 2;
 		
 			LEAVE StoredProcedure;
 			
-		ELSE /*Data yang diinput valid*/
+		ELSE 
 SET State = 3;
-			IF(pIsEdit = 0)	THEN /*Tambah baru*/
+			IF(pIsEdit = 0)	THEN 
 				INSERT INTO master_patient
 				(
 					PatientNumber,
@@ -85,7 +73,8 @@ SET State = 3;
 					Telephone,
 					Email,
 					CreatedDate,
-					CreatedBy
+					CreatedBy,
+                    Info
 				)
 				VALUES (
 					pPatientNumber,
@@ -97,7 +86,8 @@ SET State = 3;
 					pTelephone,
 					pEmail,
 					NOW(),
-					pCurrentUser
+					pCurrentUser,
+                    pInfo
 				);
 			
 SET State = 4;			               
@@ -123,7 +113,8 @@ SET State = 5;
 					City = pCity,
 					Telephone = pTelephone,
 					Email = pEmail,
-					ModifiedBy = pCurrentUser
+					ModifiedBy = pCurrentUser,
+                    Info = pInfo
 				WHERE
 					PatientID = pID;
 					
@@ -138,6 +129,6 @@ SET State = 6;
 			END IF;	
 		END IF;
 	COMMIT;
-END;
+END
 $$
 DELIMITER ;

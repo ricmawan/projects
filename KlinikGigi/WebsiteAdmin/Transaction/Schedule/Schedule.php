@@ -31,24 +31,19 @@
 				$sql = "SELECT
 							MU.UserID,
 							MU.UserName,
-							MDS.BusinessHour,
+							DATE_FORMAT(TOS.ScheduledDate, '%H:%i') BusinessHour,
 							TOS.PatientName,
 							TOS.Medication
 						FROM
-							master_referralschedule MDS
-							JOIN master_user MU
-								ON MU.UserID = MDS.DoctorID
+							master_user MU
 							LEFT JOIN transaction_onlineschedule TOS
-								ON MDS.BranchID = TOS.BranchID
-								AND MDS.DoctorID = TOS.DoctorID
-								AND DATE_FORMAT(TOS.ScheduledDate, '%Y-%m-%d') = '". $ScheduledDate ."'
-								AND DATE_FORMAT(TOS.ScheduledDate, '%H:%i') = MDS.BusinessHour
+								ON MU.UserID = TOS.DoctorID
 						WHERE
-							MDS.BranchID = ". $BranchID ."
-							AND MDS.DayOfWeek = ". $DayOfWeek ."
+							TOS.BranchID = ". $BranchID ."
+							AND DATE_FORMAT(TOS.ScheduledDate, '%Y-%m-%d') = '". $ScheduledDate ."'
 						ORDER BY
 							MU.UserName,
-							MDS.BusinessHour";
+							DATE_FORMAT(TOS.ScheduledDate, '%H:%i')";
 							
 				if (! $result = mysql_query($sql, $dbh)) {
 					$MessageDetail = mysql_error();
@@ -64,8 +59,8 @@
 				$Content .= "<td align='center' style='width: 300px;' >Dokter</td>";
 				$Content .= "<td align='center' style='width: 100px;' >Jam Praktek</td>";
 				$Content .= "<td align='center' style='width: 250px;' >Pasien</td>";
-				$Content .= "<td align='center' style='width: 250px;' >Tindakan</td>";
-				$Content .= "<td align='center' style='vertical-align:middle;width: 90px;'>Opsi</td>";
+				$Content .= "<td align='center' style='width: 340px;' >Tindakan</td>";
+				//$Content .= "<td align='center' style='vertical-align:middle;width: 90px;'>Opsi</td>";
 				$Content .= "</thead>";
 				$Content .= "<tbody style='display:block;max-height:284px;height:100%;overflow-y:auto;'>";
 
@@ -73,16 +68,18 @@
 
 				$RawDate = date("Y-m-d", strtotime($ScheduledDate));
 
+				if(mysql_num_rows($result) == 0) $Content .= "<tr><td align='center' style='width: 1030px;' colspan='5'>Data tidak ditemukan!</td></tr>";
+
 				while ($row = mysql_fetch_array($result)) {
 					$Content .= "<tr>";
 					$Content .= "<td align='center' style='width: 40px;' >$RowNumber</td>";
 					$Content .= "<td align='left' style='width: 300px;' >".$row['UserName']."</td>";
 					$Content .= "<td align='center' style='width: 100px;' >".$row['BusinessHour']."</td>";
 					$Content .= "<td align='left' style='width: 250px;' >".$row['PatientName']."</td>";
-					$Content .= "<td align='left' style='width: 250px;' >".$row['Medication']."</td>";
-					$Content .= '<td align="center" style="vertical-align:middle;width: 90px;">
-												<i style="cursor:pointer;" class="fa fa-edit" onclick="SubmitReferral(\''.$row['BusinessHour'].'\', \''.$Date.'\', \''.$row['UserName'].'\', '.$row['UserID'].');" acronym title="Jadwalkan Rujukan"></i>
-											</td>';
+					$Content .= "<td align='left' style='width: 340px;' >".$row['Medication']."</td>";
+					//$Content .= '<td align="center" style="vertical-align:middle;width: 90px;">
+												//<i style="cursor:pointer;" class="fa fa-edit" onclick="SubmitReferral(\''.$row['BusinessHour'].'\', ''.$Date.'\', \''.$row['UserName'].'\', '.$row['UserID'].');" acronym title="Jadwalkan Rujukan"></i>
+											//</td>';
 					$Content .= "</tr>";
 					$RowNumber++;
 				}

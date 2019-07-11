@@ -12,6 +12,7 @@
 		$Email = mysql_real_escape_string($_POST['txtEmail']);
 		$City = mysql_real_escape_string($_POST['txtCity']);
 		$Allergy = mysql_real_escape_string($_POST['txtAllergy']);
+		$Info = mysql_real_escape_string($_POST['txtInfo']);
 		$hdnIsEdit = mysql_real_escape_string($_POST['hdnIsEdit']);
 		$BirthDate = explode('-', mysql_real_escape_string($_POST['txtBirthDate']));
 		$BirthDate = "$BirthDate[2]-$BirthDate[1]-$BirthDate[0]";
@@ -19,7 +20,7 @@
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
-		$sql = "CALL spInsPatient(".$PatientID.", '".$PatientNumber."', '".$PatientName."', '".$BirthDate."', '".$Address."', '".$Allergy."', '".$City."', '".$Telephone."', '".$Email."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsPatient(".$PatientID.", '".$PatientNumber."', '".$PatientName."', '".$BirthDate."', '".$Address."', '".$Allergy."', '".$City."', '".$Telephone."', '".$Email."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."', '".$Info."')";
 		
 		if (! $result=mysql_query($sql, $dbh)) {
 			$Message = "Terjadi Kesalahan Sistem";

@@ -27,7 +27,8 @@
 						City,
 						Telephone,
 						Email,
-						Allergy
+						Allergy,
+						Info
 					FROM
 						master_patient
 					WHERE
@@ -47,6 +48,7 @@
 			$Telephone = $row['Telephone'];
 			$Email = $row['Email'];
 			$Allergy = $row['Allergy'];
+			$info = $row['Info'];
 		}
 	}
 ?>
@@ -141,6 +143,22 @@
 								</div>
 							</div>
 							<br />
+							<!-- NIKO -->
+							<div class="row">
+								<div class="col-md-2 labelColumn">
+									Info :
+								</div>
+								<div class="col-md-3">
+									<select id="txtInfo" name="txtInfo" class="form-control-custom" placeholder="Info">
+										<option value="Google / Internet">Google / Internet</option>
+										<option value="Sosial Media">Sosial Media</option>
+										<option value="Teman / Saudara">Teman / Saudara</option>
+										<option value="Sering Lewat / Dekat">Sering Lewat / Dekat</option>
+									</select>
+								</div>
+							</div>
+							<br />
+							<!-- NIKO -->
 							<button type="button" class="btn btn-default" value="Simpan" onclick="SubmitValidate();" ><i class="fa fa-save"></i> Simpan</button>&nbsp;&nbsp;
 							<button type="button" class="btn btn-default" value="Kembali" onclick='Back();' ><i class="fa fa-arrow-circle-left"></i> Kembali</button>
 						</form>
