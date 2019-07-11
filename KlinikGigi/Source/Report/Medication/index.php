@@ -92,7 +92,7 @@
 										<th data-column-id="TransactionDate">Tanggal</th>
 										<th data-column-id="PatientName">Nama Pasien</th>
 										<th data-column-id="ExaminationName">Tindakan</th>
-										<th data-column-id="Quantity" data-align="right">Jumlah</th>
+										<!--<th data-column-id="Quantity" data-align="right">Jumlah</th>-->
 									</tr>
 								</thead>
 							</table>

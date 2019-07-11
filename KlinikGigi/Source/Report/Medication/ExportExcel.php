@@ -62,7 +62,7 @@
 		$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, "Tanggal");
 		$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, "Nama Pasien");
 		$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, "Tindakan");
-		$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Jumlah");
+		//$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, "Jumlah");
 		$rowExcel++;
 		
 		$sql = "SELECT
@@ -97,7 +97,7 @@
 			$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['TransactionDate']);
 			$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['PatientName']);
 			$objPHPExcel->getActiveSheet()->setCellValue("D".$rowExcel, $row['ExaminationName']);
-			$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, $row['Quantity']);
+			//$objPHPExcel->getActiveSheet()->setCellValue("E".$rowExcel, $row['Quantity']);
 			$RowNumber++;
 			$rowExcel++;
 		}
@@ -119,11 +119,11 @@
 					JOIN master_examination ME
 						ON ME.ExaminationID = TMD.ExaminationID
 				WHERE
-					MONTH(TM.TransactionDate) = 1
-					AND YEAR(TM.TransactionDate) = 2017
+					MONTH(TM.TransactionDate) = ".$ddlMonth."
+					AND YEAR(TM.TransactionDate) = ".$ddlYear."
 					AND TM.IsCancelled = 0
 					AND TM.IsDone = 1
-					AND TMD.DoctorID = 3
+					AND TMD.DoctorID = ".$ddlDoctor."
 				GROUP BY
 					SUBSTRING_INDEX( ME.ExaminationName , ' ', 1 )
 				ORDER BY	
@@ -140,17 +140,17 @@
 			$rowExcel++;
 		}
 		
-		$objPHPExcel->getActiveSheet()->getStyle("E6:E".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-		$objPHPExcel->getActiveSheet()->getStyle("B".$rowExcelTemp.":E".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+		//$objPHPExcel->getActiveSheet()->getStyle("E6:E".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+		//$objPHPExcel->getActiveSheet()->getStyle("B".$rowExcelTemp.":E".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2);
 		//merge title
-		$objPHPExcel->getActiveSheet()->mergeCells("A1:E2");
-		$objPHPExcel->getActiveSheet()->getStyle("A5:E5")->getFont()->setBold(true);
-		$objPHPExcel->getActiveSheet()->getStyle("A1:E2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-		$objPHPExcel->getActiveSheet()->getStyle("A5:E5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');
+		$objPHPExcel->getActiveSheet()->mergeCells("A1:D2");
+		$objPHPExcel->getActiveSheet()->getStyle("A5:D5")->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle("A1:D2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$objPHPExcel->getActiveSheet()->getStyle("A5:D5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('d8d8d8');
 
 		//set all width 
 		$fromCol='A';
-		$toCol= 'F';
+		$toCol= 'E';
 		for($j = $fromCol; $j !== $toCol; $j++) {
 			//$calculatedWidth = $objPHPExcel->getActiveSheet()->getColumnDimension($i)->getWidth();
 			$objPHPExcel->getActiveSheet()->getColumnDimension($j)->setAutoSize(true);
@@ -165,7 +165,7 @@
 			  )
 			)
 		);		
-		$objPHPExcel->getActiveSheet()->getStyle("A5:E".($rowExcelTemp-3))->applyFromArray($styleArray);
+		$objPHPExcel->getActiveSheet()->getStyle("A5:D".($rowExcelTemp-3))->applyFromArray($styleArray);
 		$objPHPExcel->getActiveSheet()->getStyle("B".$rowExcelTemp.":C".($rowExcel-1))->applyFromArray($styleArray);
 
 		$title = "Laporan Tindakan Dokter - ".$monthName[$ddlMonth - 1]." ".$ddlYear;

@@ -12,7 +12,7 @@
 		<link href="../../assets/css/custom.css" rel="stylesheet" />
 		<link href="../../assets/css/jquery.bootgrid.css" rel="stylesheet" />
 	</head>
-	<body style="background: #eee">
+	<body style="background: #eee;overflow: hidden;">
 		<?php
 			if(isset($_GET["BranchID"])) {
 				include "../../DBConfig.php";
@@ -45,7 +45,8 @@
 							MDS.BranchID = ". $BranchID ."
 							AND MDS.DayOfWeek = ". $DayOfWeek ."
 						ORDER BY
-							MU.UserName";
+							MU.UserName,
+							MDS.BusinessHour";
 							
 				if (! $result = mysql_query($sql, $dbh)) {
 					$MessageDetail = mysql_error();
@@ -139,7 +140,7 @@
 		<script src="../../assets/js/notify.js"></script>
 		<script src="../../assets/js/global.js"></script>
 		<script src="../../assets/js/jquery.bootgrid.js"></script>
-		<script type="text/javascript" src="assets/js/jquery.fancybox.js"></script>
+		<script type="text/javascript" src="../../assets/js/jquery.fancybox.js"></script>
 		<script>
 			$(document).ready(function() {
 				parent.postMessage("loaded", "*");

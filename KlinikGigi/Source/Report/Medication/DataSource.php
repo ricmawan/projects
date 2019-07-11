@@ -60,11 +60,11 @@
 					JOIN master_examination ME
 						ON ME.ExaminationID = TMD.ExaminationID
 				WHERE
-					MONTH(TM.TransactionDate) = 1
-					AND YEAR(TM.TransactionDate) = 2017
+					MONTH(TM.TransactionDate) = ".$ddlMonth."
+					AND YEAR(TM.TransactionDate) = ".$ddlYear."
 					AND TM.IsCancelled = 0
 					AND TM.IsDone = 1
-					AND TMD.DoctorID = 3
+					AND TMD.DoctorID = ".$ddlDoctor."
 				GROUP BY
 					SUBSTRING_INDEX( ME.ExaminationName , ' ', 1 )
 				ORDER BY	

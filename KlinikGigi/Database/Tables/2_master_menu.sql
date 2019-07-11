@@ -202,6 +202,15 @@ VALUES
 	NULL,
 	0,
 	7
+),
+(
+	21,
+	3,
+	'Kirim Model',
+	'Transaction/OutgoingDummy/',
+	NULL,
+	0,
+	8
 );
 
 CREATE UNIQUE INDEX MENU_INDEX
