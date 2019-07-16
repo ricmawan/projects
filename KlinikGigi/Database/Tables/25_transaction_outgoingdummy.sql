@@ -1,8 +1,8 @@
-DROP TABLE IF EXISTS transaction_outgoingdummy;
+DROP TABLE IF EXISTS transaction_outgoingmodel;
 
-CREATE TABLE transaction_outgoingdummy
+CREATE TABLE transaction_outgoingmodel
 (
-	OutgoingDummyID		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	OutgoingModelID		BIGINT PRIMARY KEY AUTO_INCREMENT,
 	TransactionDate		DATETIME,
 	ReceiptNumber		VARCHAR(255),
 	CreatedDate 		DATETIME NOT NULL,
@@ -11,5 +11,5 @@ CREATE TABLE transaction_outgoingdummy
 	ModifiedBy			VARCHAR(255) NULL
 )ENGINE=InnoDB;
 
-CREATE UNIQUE INDEX OUTGOINGDUMMY_INDEX
-ON transaction_outgoingdummy (OutgoingDummyID);
+CREATE UNIQUE INDEX OUTGOINGMODEL_INDEX
+ON transaction_outgoingmodel (OutgoingModelID);

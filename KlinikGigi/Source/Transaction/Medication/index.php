@@ -210,8 +210,8 @@
 								<textarea id="txtRemarks" name="txtRemarks" class="form-control-custom" ></textarea>
 							</div>
 						</div>
-					</div>
-				</form>
+					</form>
+				</div>
 				<div style=" width:1px; background-color:#000; position:absolute; top:0; bottom:0; left:calc(30% - 10px);float:left;">
 				</div>
 				<div style=" width:1px; background-color:#000; position:absolute; top:0; bottom:0; left:calc(30% - 12px);float:left;">
@@ -307,8 +307,8 @@
 								<textarea id="txtMaterialRemarks" name="txtMaterialRemarks" class="form-control-custom" ></textarea>
 							</div>
 						</div>
-					</div>
-				</form>
+					</form>
+				</div>
 				<div style=" width:1px; background-color:#000; position:absolute; top:0; bottom:0; left:calc(30% - 10px);float:left;">
 				</div>
 				<div style=" width:1px; background-color:#000; position:absolute; top:0; bottom:0; left:calc(30% - 12px);float:left;">
