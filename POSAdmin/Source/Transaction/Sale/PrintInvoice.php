@@ -115,8 +115,8 @@
 		    while ($row = mysqli_fetch_array($result)) {
 		    	if(strpos($row['Quantity'], ".")) $Quantity = number_format(round($row['Quantity'], 2),2,".",",");	    		
 		    	else $Quantity = number_format($row['Quantity'],0,".",",");
-		        $rowPrice .= $Quantity . " " . $row['UnitName'] . " @ " . number_format($row['SalePrice'],0,".",",");
-		        if($row['Discount'] != 0) $rowPrice .= " - " . number_format($row['Discount'],0,".",",");
+		        $rowPrice .= $Quantity . " " . $row['UnitName'] . " @ " . number_format($row['SalePrice'] - $row['Discount'],0,".",",");
+		        //if($row['Discount'] != 0) $rowPrice .= " - " . number_format($row['Discount'],0,".",",");
 		        $printer -> text("*" . htmlspecialchars_decode($row['ItemName'], ENT_QUOTES) . "\n");
 		        $printer -> text(" " . str_pad($rowPrice , 26, " ") . " ");
 		        $printer -> text(str_pad(number_format(($row['SalePrice'] - $row['Discount']) * $row['Quantity'],0,".",","), 11, " ", STR_PAD_LEFT) . "\n");
