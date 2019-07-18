@@ -55,6 +55,7 @@
 					PatientID,
 					ExaminationName,
 					Remarks,
+					IsReceived,
 					CreatedDate,
 					CreatedBy
 				)
@@ -65,6 +66,7 @@
 					".$PatientID.",
 					'".$ExaminationName."',
 					'".$Remarks."',
+					0,
 					NOW(),
 					'".$_SESSION['UserLogin']."'
 				)";

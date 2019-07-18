@@ -159,6 +159,20 @@ VALUES
 	21,
 	1,
 	1
+),
+(
+	0,
+	1,
+	22,
+	1,
+	1
+),
+(
+	0,
+	1,
+	23,
+	1,
+	1
 );
 
 CREATE UNIQUE INDEX ROLE_INDEX

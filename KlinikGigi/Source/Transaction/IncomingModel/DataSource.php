@@ -5,7 +5,7 @@
 	$RequestPath = str_replace($file, "", $RequestPath);
 	include "../../GetPermission.php";
 
-	$where = " 1=1 ";
+	$where = " 1=1 AND OMD.IsReceived = 0 ";
 	$order_by = "OM.TransactionDate DESC";
 	$rows = 10;
 	$current = 1;
@@ -24,7 +24,7 @@
 	if (ISSET($_REQUEST['searchPhrase']) )
 	{
 		$search = trim($_REQUEST['searchPhrase']);
-		$where .= " AND ( DATE_FORMAT(OM.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' OR OM.ReceiptNumber LIKE '%".$search."%' ) ";
+		$where .= " AND ( DATE_FORMAT(OM.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' OR OM.ReceiptNumber LIKE '%".$search."%' OR MP.PatientName LIKE '%".$search."%' OR MD.UserName LIKE '%".$search."%' OR OMD.ExaminationName LIKE '%".$search."%' OR OMD.Remarks LIKE '%".$search."%' ) ";
 	}
 	//Handles determines where in the paging count this result set falls in
 	if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];
@@ -41,6 +41,12 @@
 				COUNT(*) AS nRows
 			FROM
 				transaction_outgoingmodel OM
+				JOIN transaction_outgoingmodeldetails OMD
+					ON OMD.OutgoingModelID = OM.OutgoingModelID
+				JOIN master_user MD
+					ON OMD.DoctorID = MD.UserID
+				JOIN master_patient MP
+					ON MP.PatientID = OMD.PatientID
 			WHERE
 				$where";
 	
@@ -52,10 +58,23 @@
 	$nRows = $row['nRows'];
 	$sql = "SELECT
 				OM.OutgoingModelID,
+				OMD.OutgoingModelDetailsID,
 				DATE_FORMAT(OM.TransactionDate, '%d-%m-%Y') TransactionDate,
-				OM.ReceiptNumber
+				OM.ReceiptNumber,
+				MD.UserName AS DoctorName,
+				MP.PatientName,
+				OMD.ExaminationName,
+				OMD.Remarks,
+				DATE_FORMAT(OMD.ReceivedDate, '%d-%m-%Y') ReceivedDate,
+				OMD.IncomingReceiptNumber
 			FROM
 				transaction_outgoingmodel OM
+				JOIN transaction_outgoingmodeldetails OMD
+					ON OMD.OutgoingModelID = OM.OutgoingModelID
+				JOIN master_user MD
+					ON OMD.DoctorID = MD.UserID
+				JOIN master_patient MP
+					ON MP.PatientID = OMD.PatientID
 			WHERE
 				$where
 			ORDER BY 
@@ -67,10 +86,16 @@
 	}
 	$return_arr = array();
 	while ($row = mysql_fetch_array($result)) {
-		$row_array['OutgoingModelIDReceiptNumber'] = $row['OutgoingModelID']."^".$row['ReceiptNumber'];
+		$row_array['OutgoingModelDetailsID'] = $row['OutgoingModelDetailsID'];
 		$row_array['OutgoingModelID'] = $row['OutgoingModelID'];
 		$row_array['TransactionDate'] = $row['TransactionDate'];
 		$row_array['ReceiptNumber'] = $row['ReceiptNumber'];
+		$row_array['DoctorName'] = $row['DoctorName'];
+		$row_array['PatientName'] = $row['PatientName'];
+		$row_array['ExaminationName'] = $row['ExaminationName'];
+		$row_array['Remarks'] = $row['Remarks'];
+		$row_array['ReceivedDate'] = "<input type='text' class='form-control-custom ReceivedDate' style='width: 80%; display: inline-block;margin-right: 5px;' id='txtReceivedDate".$row['OutgoingModelDetailsID']."' name='txtReceivedDate".$row['OutgoingModelDetailsID']."' readonly />";
+		$row_array['IncomingReceiptNumber'] = "<input type='text' class='form-control-custom' id='txtIncomingReceiptNumber".$row['OutgoingModelDetailsID']."' name='txtIncomingReceiptNumber".$row['OutgoingModelDetailsID']."' />";
 		
 		array_push($return_arr, $row_array);
 	}

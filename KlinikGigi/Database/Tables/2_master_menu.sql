@@ -207,10 +207,28 @@ VALUES
 	21,
 	3,
 	'Kirim Model',
-	'Transaction/OutgoingDummy/',
+	'Transaction/OutgoingModel/',
 	NULL,
 	0,
 	8
+),
+(
+	22,
+	3,
+	'Terima Model',
+	'Transaction/IncomingModel/',
+	NULL,
+	0,
+	9
+),
+(
+	23,
+	4,
+	'Status Model',
+	'Report/ModelStatus/',
+	NULL,
+	0,
+	10
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

@@ -140,7 +140,7 @@
 		return 0;
 	}
 	$return_arr = array();
-	$RowNumber = 0;
+	$RowNumber = $limit_l;
 	while ($row = mysql_fetch_array($result)) {
 		$RowNumber++;
 		$row_array['RowNumber'] = $RowNumber;

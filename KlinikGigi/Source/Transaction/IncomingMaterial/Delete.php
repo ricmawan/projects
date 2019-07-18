@@ -17,7 +17,7 @@
 				if (! $result=mysql_query($sql, $dbh)) {
 					throw new Exception($IncomingDetailsID);
 				}
-				$MessageSuccessDelete .= "$IncomingDetailsID";
+				$MessageSuccessDelete .= "$IncomingDetailsID, ";
 			}
 			catch (Exception $e)
 			{
