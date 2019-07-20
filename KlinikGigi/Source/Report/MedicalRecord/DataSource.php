@@ -7,7 +7,7 @@
 		date_default_timezone_set("Asia/Jakarta");
 		include "../../GetPermission.php";
 		$PatientID = mysql_real_escape_string($_GET['PatientID']);
-		$where = " 1=1 AND MP.PatientID = ".$PatientID." AND TM.IsCancelled = 0 ";
+		$where = " 1=1 AND MP.PatientID = ".$PatientID."";
 		$order_by = "DateNoFormat";
 		$rows = 10;
 		$current = 1;
@@ -26,7 +26,7 @@
 		if (ISSET($_REQUEST['searchPhrase']) )
 		{
 			$search = trim($_REQUEST['searchPhrase']);
-			$where .= " AND ( ME.ExaminationName LIKE '%".$search."%' OR TMD.Remarks LIKE '%".$search."%' OR DATE_FORMAT(TM.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' )";
+			$where .= " AND ( TMR.ExaminationName LIKE '%".$search."%' OR TMR.Remarks LIKE '%".$search."%' OR DATE_FORMAT(TMR.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%' )";
 		}
 		//Handles determines where in the paging count this result set falls in
 		if (ISSET($_REQUEST['rowCount']) ) $rows = $_REQUEST['rowCount'];
@@ -43,13 +43,9 @@
 		$sql = "SELECT
 					COUNT(1) AS nRows
 				FROM
-					transaction_medication TM
-					JOIN transaction_medicationdetails TMD
-						ON TM.MedicationID = TMD.MedicationID
+					transaction_medicalrecord TMR
 					JOIN master_patient MP
-						ON MP.PatientID = TM.PatientID
-					JOIN master_examination ME
-						ON ME.ExaminationID = TMD.ExaminationID
+						ON MP.PatientID = TMR.PatientID
 				WHERE
 					$where";
 		if (! $result = mysql_query($sql, $dbh)) {
@@ -61,18 +57,14 @@
 		
 		$sql = "SELECT
 					MP.PatientName,
-					DATE_FORMAT(TM.TransactionDate, '%d-%m-%Y') TransactionDate,
-					TM.TransactionDate DateNoFormat,
-					ME.ExaminationName,
-					TMD.Remarks
+					DATE_FORMAT(TMR.TransactionDate, '%d-%m-%Y') TransactionDate,
+					TMR.TransactionDate DateNoFormat,
+					TMR.ExaminationName,
+					TMR.Remarks
 				FROM
-					transaction_medication TM
-					JOIN transaction_medicationdetails TMD
-						ON TM.MedicationID = TMD.MedicationID
+					transaction_medicalrecord TMR
 					JOIN master_patient MP
-						ON MP.PatientID = TM.PatientID
-					JOIN master_examination ME
-						ON ME.ExaminationID = TMD.ExaminationID
+						ON MP.PatientID = TMR.PatientID
 				WHERE
 					$where
 				ORDER BY 

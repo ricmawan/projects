@@ -26,4 +26,5 @@ INSERT INTO `master_parameter` (`ParameterID`, `ParameterName`, `ParameterValue`
 (10, 'MINUTE_SCHEDULE_LIMIT', 3, 'Schedule Limit per 15 minute', 0, '2016-03-20 00:00:00', 'Admin', NULL, NULL),
 (11, 'NURSE_MAIL_ADDRESS1', 'dentalklinik116@gmail.com', 'Nurse Email Address 1', 0, '2016-03-20 00:00:00', 'Admin', NULL, NULL),
 (12, 'NURSE_MAIL_ADDRESS2', 'imdentalspecialist@gmail.com', 'Nurse Email Address 1', 0, '2016-03-20 00:00:00', 'Admin', NULL, NULL),
-(13, 'WEBADMIN_PATH', '/Projects/KlinikGigi/WebsiteAdmin/', 'Location of the website admin', 0, '2016-03-20 00:00:00', 'Admin', NULL, NULL);
+(13, 'WEBADMIN_PATH', '/Projects/KlinikGigi/WebsiteAdmin/', 'Location of the website admin', 0, '2016-03-20 00:00:00', 'Admin', NULL, NULL),
+(14, 'BRANCH_ID', 1, 'Active Branch', 0, '2019-07-20 00:00:00', 'Admin', NULL, NULL);

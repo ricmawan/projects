@@ -9,6 +9,7 @@ CREATE TABLE transaction_medicationdetails
 	Remarks				TEXT,
 	Price				DOUBLE,
 	Quantity			DOUBLE,
+	Synchronized		BIT,
 	CreatedDate 		DATETIME NOT NULL,
 	CreatedBy 			VARCHAR(255) NOT NULL,
 	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,

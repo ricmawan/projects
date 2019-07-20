@@ -1,0 +1,10 @@
+- table medication, medication details, pasien yg indraprasta di geser idnya
+- populate data medication, medication details, pasien ke hosting
+- parameter cabang disesuaiin
+- cuma bisa insert, perubahan belum bisa deteksi update
+- yang disync cuma data yang sudah diklik finish
+- spInsPatient_Hosting
+- 27_transaction_medicalrecord
+- spInsMedicalRecord_Hosting
+- ada eventlog
+- auto increment diubah yg indraprasta

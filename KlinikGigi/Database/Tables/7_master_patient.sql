@@ -12,6 +12,7 @@ CREATE TABLE master_patient
 	City			VARCHAR(100),
 	Allergy			TEXT,
 	Info			VARCHAR(255),
+	Synchronized	BIT,
 	CreatedDate 	DATETIME NOT NULL,
 	CreatedBy 		VARCHAR(255) NOT NULL,
 	ModifiedDate 	TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,

@@ -63,19 +63,15 @@
 		$rowExcel++;
 		
 		$sql = "SELECT
-					MP.PatientNumber,
 					MP.PatientName,
-					DATE_FORMAT(TM.TransactionDate, '%d-%m-%Y') TransactionDate,
-					ME.ExaminationName,
-					TMD.Remarks
+					DATE_FORMAT(TMR.TransactionDate, '%d-%m-%Y') TransactionDate,
+					TMR.TransactionDate DateNoFormat,
+					TMR.ExaminationName,
+					TMR.Remarks
 				FROM
-					transaction_medication TM
-					JOIN transaction_medicationdetails TMD
-						ON TM.MedicationID = TMD.MedicationID
+					transaction_medicalrecord TMR
 					JOIN master_patient MP
-						ON MP.PatientID = TM.PatientID
-					JOIN master_examination ME
-						ON ME.ExaminationID = TMD.ExaminationID
+						ON MP.PatientID = TMR.PatientID
 				WHERE
 					MP.PatientID = ".$PatientID."
 				ORDER BY	
