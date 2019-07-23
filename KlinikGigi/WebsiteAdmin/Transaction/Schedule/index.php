@@ -49,11 +49,22 @@
 							<br />
 							<div class="row" >
 								<div class="col-md-2 labelColumn" >
-									Tanggal:
+									<input type="radio" style="vertical-align: top;" id="rbTransactionDate" name="rbFilter" value=1 onclick="reloadSchedule();" checked /> Tanggal:
 								</div>
 								<div class="col-md-4">
 									<div class="ui-widget" style="width: 100%;">
 										<input id="txtScheduledDate" name="txtScheduledDate" type="text" class="form-control-custom" placeholder="Tanggal Rujukan" />
+									</div>
+								</div>
+							</div>
+							<br />
+							<div class="row" >
+								<div class="col-md-2 labelColumn" >
+									<input type="radio" style="vertical-align: top;" id="rbPatientName" name="rbFilter" value=2 onclick="reloadSchedule();" /> Pasien:
+								</div>
+								<div class="col-md-4">
+									<div class="ui-widget" style="width: 100%;">
+										<input id="txtPatientName" name="txtPatientName" type="text" class="form-control-custom" placeholder="Nama Pasien" onfocus="$('#rbPatientName').prop('checked', true);" onchange="reloadSchedule();" />
 									</div>
 								</div>
 							</div>
@@ -76,8 +87,10 @@
 			function reloadSchedule() {
 				var BranchID = $("#ddlBranch").val();
 				var ScheduledDate = $("#hdnScheduledDate").val();
+				var PatientName = $("#txtPatientName").val();
+				var rbFilter = $("input[name=rbFilter]:checked").val();
 				$("#loading").show();
-				$("#scheduleFrame").attr("src", "./Transaction/Schedule/Schedule.php?BranchID=" + BranchID + "&ScheduledDate=" + ScheduledDate );
+				$("#scheduleFrame").attr("src", "./Transaction/Schedule/Schedule.php?BranchID=" + BranchID + "&ScheduledDate=" + ScheduledDate + "&PatientName=" + PatientName + "&rbFilter=" + rbFilter );
 			}
 
 			var counterLoaded = 0;
@@ -119,6 +132,8 @@
 					onSelect: function(dateText, obj) {
 						var ScheduledDate = obj.selectedYear + "-" + ("0" + (obj.selectedMonth + 1)).slice(-2) + "-" + ("0" + obj.selectedDay).slice(-2);
 						$("#hdnScheduledDate").val(ScheduledDate);
+						$("#rbTransactionDate").prop("checked", true);
+						$("#rbTransactionDate").attr("checked", "checked");
 						reloadSchedule();
 					}
 				});

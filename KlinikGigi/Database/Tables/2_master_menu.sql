@@ -229,6 +229,15 @@ VALUES
 	NULL,
 	0,
 	10
+),
+(
+	24,
+	3,
+	'Penjadwalan Rujukan',
+	'Transaction/ReferralNoRegistration/',
+	NULL,
+	0,
+	10
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

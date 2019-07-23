@@ -45,7 +45,7 @@ SET State = 1;
 			AND TRIM(City) = TRIM(pCity)
 			AND PatientID <> pID)
 			OR (TRIM(PatientNumber) = TRIM(pPatientNumber)
-			OR PatientID = pID)
+			AND PatientID <> pID)
 		LIMIT 1;
 			
 		IF PassValidate = 0 THEN 

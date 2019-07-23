@@ -21,9 +21,16 @@
 				$Content = "";
 				$BranchID = mysql_real_escape_string($_GET["BranchID"]);
 				$ScheduledDate = mysql_real_escape_string($_GET["ScheduledDate"]);
-				//$PatientName = mysql_real_escape_string($_GET["PatientName"]);
-				//$Phone = mysql_real_escape_string($_GET["Phone"]);
-				//$Email = mysql_real_escape_string($_GET["Email"]);
+				$PatientName = mysql_real_escape_string($_GET["PatientName"]);
+				$rbFilter = mysql_real_escape_string($_GET["rbFilter"]);
+				$Where = "";
+				if($rbFilter == 1) {
+					$Where = " AND DATE_FORMAT(TOS.ScheduledDate, '%Y-%m-%d') = '". $ScheduledDate ."'";
+				}
+
+				else {
+					$Where = " AND TOS.PatientName LIKE '%".$PatientName."%' AND DATE_FORMAT(TOS.ScheduledDate, '%Y-%m-%d') >= DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 7 HOUR), '%Y-%m-%d')";
+				}
 
 				$DayOfWeek = date("w", strtotime($ScheduledDate));
 				$dayNames = [ "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu" ];
@@ -31,7 +38,7 @@
 				$sql = "SELECT
 							MU.UserID,
 							MU.UserName,
-							DATE_FORMAT(TOS.ScheduledDate, '%H:%i') BusinessHour,
+							DATE_FORMAT(TOS.ScheduledDate, '%e-%c-%y %H:%i') BusinessHour,
 							TOS.PatientName,
 							TOS.Medication
 						FROM
@@ -40,7 +47,7 @@
 								ON MU.UserID = TOS.DoctorID
 						WHERE
 							TOS.BranchID = ". $BranchID ."
-							AND DATE_FORMAT(TOS.ScheduledDate, '%Y-%m-%d') = '". $ScheduledDate ."'
+							$Where
 						ORDER BY
 							MU.UserName,
 							DATE_FORMAT(TOS.ScheduledDate, '%H:%i')";
@@ -56,8 +63,8 @@
 				$Content = "<table class='table table-striped table-bordered table-hover' style='width:auto;padding-right:17px;' >";
 				$Content .= "<thead style='background-color: black;color:white;height:25px;display:block;width:1030px;'>";
 				$Content .= "<td align='center' style='width: 40px;' >No</td>";
-				$Content .= "<td align='center' style='width: 300px;' >Dokter</td>";
-				$Content .= "<td align='center' style='width: 100px;' >Jam Praktek</td>";
+				$Content .= "<td align='center' style='width: 280px;' >Dokter</td>";
+				$Content .= "<td align='center' style='width: 120px;' >Jadwal</td>";
 				$Content .= "<td align='center' style='width: 250px;' >Pasien</td>";
 				$Content .= "<td align='center' style='width: 340px;' >Tindakan</td>";
 				//$Content .= "<td align='center' style='vertical-align:middle;width: 90px;'>Opsi</td>";
@@ -73,8 +80,8 @@
 				while ($row = mysql_fetch_array($result)) {
 					$Content .= "<tr>";
 					$Content .= "<td align='center' style='width: 40px;' >$RowNumber</td>";
-					$Content .= "<td align='left' style='width: 300px;' >".$row['UserName']."</td>";
-					$Content .= "<td align='center' style='width: 100px;' >".$row['BusinessHour']."</td>";
+					$Content .= "<td align='left' style='width: 280px;' >".$row['UserName']."</td>";
+					$Content .= "<td align='center' style='width: 120px;' >".$row['BusinessHour']."</td>";
 					$Content .= "<td align='left' style='width: 250px;' >".$row['PatientName']."</td>";
 					$Content .= "<td align='left' style='width: 340px;' >".$row['Medication']."</td>";
 					//$Content .= '<td align="center" style="vertical-align:middle;width: 90px;">

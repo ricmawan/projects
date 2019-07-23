@@ -18,9 +18,7 @@
 			FROM
 				master_patient
 			WHERE
-				DATE_FORMAT(DATE_ADD(CreatedDate, INTERVAL 7 HOUR), '%d-%m-%Y') = DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 7 HOUR), '%d-%m-%Y')
-			LIMIT
-			 	100";
+				DATE_FORMAT(DATE_ADD(CreatedDate, INTERVAL 7 HOUR), '%d-%m-%Y') = DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 7 HOUR), '%d-%m-%Y')";
 
 	if (! $result = mysqli_query($dbh2, $sql)) {
 		file_put_contents('./sync.log', date("d-m-Y H:i:s") . " ReceiveMedicalRecord.php State " . $State . "(". mysqli_error($dbh2) . ")\n", FILE_APPEND);
@@ -60,9 +58,7 @@
 			FROM
 				transaction_medicalrecord TMR
 			WHERE
-				DATE_FORMAT(DATE_ADD(TMR.CreatedDate, INTERVAL 7 HOUR), '%d-%m-%Y') = DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 7 HOUR), '%d-%m-%Y')
-			LIMIT
-				100";
+				DATE_FORMAT(DATE_ADD(TMR.CreatedDate, INTERVAL 7 HOUR), '%d-%m-%Y') = DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 7 HOUR), '%d-%m-%Y')";
 
 	if (! $result3 = mysqli_query($dbh2, $sql3)) {
 		file_put_contents('./sync.log', date("d-m-Y H:i:s") . " ReceiveMedicalRecord.php State " . $State . "(". mysqli_error($dbh2) . ")\n", FILE_APPEND);

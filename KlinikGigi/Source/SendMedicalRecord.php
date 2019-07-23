@@ -1,7 +1,7 @@
 <?php
 	date_default_timezone_set("Asia/Bangkok");
 	require  __DIR__ . '/DBConfig_Host.php';
-	require  __DIR__ . '/DBConfig.php';
+	require  __DIR__ . '/DBConfig_Sync.php';
 
 	$State = 1;
 	$sql = "SELECT
@@ -18,9 +18,7 @@
 			FROM
 				master_patient
 			WHERE
-				Synchronized = 0
-			 LIMIT
-			 	100";
+				Synchronized = 0";
 
 	if (! $result = mysqli_query($dbh3, $sql)) {
 		file_put_contents('./sync.log', date("d-m-Y H:i:s") . " SendMedicalRecord.php State " . $State . "(". mysqli_error($dbh3) . ")\n", FILE_APPEND);
@@ -80,9 +78,7 @@
 			WHERE
 				TMD.Synchronized = 0
 				AND TM.IsDone = 1
-				AND TM.IsCancelled = 0
-			LIMIT
-				100";
+				AND TM.IsCancelled = 0";
 
 	if (! $result4 = mysqli_query($dbh3, $sql4)) {
 		file_put_contents('./sync.log', date("d-m-Y H:i:s") . " SendMedicalRecord.php State " . $State . "(". mysqli_error($dbh3) . ")\n", FILE_APPEND);
