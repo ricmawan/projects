@@ -86,4 +86,5 @@
 			file_put_contents('./sync.log', date("d-m-Y H:i:s") . " ReceiveMedicalRecord.php State " . $State . " MedicationDetailsID : " . $row3['MedicationDetailsID'] . "(Success)\n", FILE_APPEND);
 		}
 	}
+	return 0;
 ?>

@@ -46,4 +46,6 @@
 			file_put_contents('./sync.log', date("d-m-Y H:i:s") . " ReceivePatientUpdate.php State " . $State . " PatientID : " . $row['PatientID'] . "(Success)\n", FILE_APPEND);
 		}
 	}
+	
+	return 0;
 ?>

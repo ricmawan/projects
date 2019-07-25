@@ -118,4 +118,6 @@
 			file_put_contents('./sync.log', date("d-m-Y H:i:s") . " SendMedicalRecord.php State " . $State . " MedicationDetailsID : " . $row4['MedicationDetailsID'] . "(Success)\n", FILE_APPEND);
 		}
 	}
+	
+	return 0;
 ?>
