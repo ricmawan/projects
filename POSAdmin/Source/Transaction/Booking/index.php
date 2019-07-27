@@ -889,7 +889,7 @@
 				$("#token-code-dialog").dialog({
 					autoOpen: false,
 					open: function() {
-						$("#divModal").show();
+						//$("#divModal").show();
 						$(document).on('keydown', function(e) {
 							if (e.keyCode == 39 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //right arrow
 								$("#btnCancelPromptTokenCode").focus();
@@ -905,13 +905,13 @@
 					
 					close: function() {
 						$(this).dialog("destroy");
-						$("#divModal").hide();
+						//$("#divModal").hide();
 						$("#txtItemCode").focus();
 					},
 					resizable: false,
 					height: 250,
 					width: 500,
-					modal: false,
+					modal: true,
 					buttons: [
 					{
 						text: "Konfirmasi Kode",
@@ -928,7 +928,7 @@
 									if(data.FailedFlag == '0') {
 										$("#loading").hide();
 										$("#token-code-dialog").dialog("destroy");
-										$("#divModal").hide();
+										//$("#divModal").hide();
 										$("#txtCode").val("");
 										var itemID = $("#hdnItemID").val();
 										var itemCode = $("#txtItemCode").val();
@@ -1115,7 +1115,7 @@
 												}
 											},
 											error: function(jqXHR, textStatus, errorThrown) {
-												$("#divModal").hide();
+												//$("#divModal").hide();
 												var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
 												LogEvent(errorMessage, "/Transaction/Booking/index.php");
 												Lobibox.alert("error",
@@ -1153,7 +1153,7 @@
 						id: "btnCancelPromptTokenCode",
 						click: function() {
 							$(this).dialog("destroy");
-							$("#divModal").hide();
+							//$("#divModal").hide();
 							$("#txtItemCode").focus();
 							return false;
 						}
@@ -1168,7 +1168,7 @@
 				$("#code-dialog").dialog({
 					autoOpen: false,
 					open: function() {
-						$("#divModal").show();
+						//$("#divModal").show();
 						$(document).on('keydown', function(e) {
 							if (e.keyCode == 39 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //right arrow
 								$("#btnCancelPromptCode").focus();
@@ -1184,13 +1184,13 @@
 					
 					close: function() {
 						$(this).dialog("destroy");
-						$("#divModal").hide();
+						//$("#divModal").hide();
 						$("#txtItemCode").focus();
 					},
 					resizable: false,
 					height: 250,
 					width: 450,
-					modal: false,
+					modal: true,
 					buttons: [
 					{
 						text: "Konfirmasi Kode",
@@ -1200,7 +1200,7 @@
 							var txtCode = $("#txtCode").val();
 							if(txtCode == code) {
 								$(this).dialog("destroy");
-								$("#divModal").hide();
+								//$("#divModal").hide();
 								$("#txtCode").val("");
 								var itemID = $("#hdnItemID").val();
 								var itemCode = $("#txtItemCode").val();
@@ -1387,7 +1387,7 @@
 										}
 									},
 									error: function(jqXHR, textStatus, errorThrown) {
-										$("#divModal").hide();
+										//$("#divModal").hide();
 										var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
 										LogEvent(errorMessage, "/Transaction/Booking/index.php");
 										Lobibox.alert("error",
@@ -1410,7 +1410,7 @@
 						id: "btnCancelPromptCode",
 						click: function() {
 							$(this).dialog("destroy");
-							$("#divModal").hide();
+							//$("#divModal").hide();
 							$("#txtItemCode").focus();
 							return false;
 						}
@@ -1723,7 +1723,7 @@
 									$("#code-dialog").dialog({
 										autoOpen: false,
 										open: function() {
-											$("#divModal").show();
+											//$("#divModal").show();
 											$(document).on('keydown', function(e) {
 												if (e.keyCode == 39 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //right arrow
 													$("#btnCancelPromptCode").focus();
@@ -1739,7 +1739,7 @@
 										
 										close: function() {
 											$(this).dialog("destroy");
-											$("#divModal").hide();
+											//$("#divModal").hide();
 											if(BranchID == 1) {
 												$("#toggle-branch-" + str[2]).toggles(false);
 											}
@@ -1751,7 +1751,7 @@
 										resizable: false,
 										height: 250,
 										width: 450,
-										modal: false,
+										modal: true,
 										buttons: [
 										{
 											text: "Konfirmasi Kode",
@@ -1761,7 +1761,7 @@
 												var txtCode = $("#txtCode").val();
 												if(txtCode == code) {
 													$(this).dialog("destroy");
-													$("#divModal").hide();
+													//$("#divModal").hide();
 													$("#txtCode").val("");
 													$("#loading").show();
 													$.ajax({
@@ -1811,7 +1811,7 @@
 											id: "btnCancelPromptCode",
 											click: function() {
 												$(this).dialog("destroy");
-												$("#divModal").hide();
+												//$("#divModal").hide();
 												if(BranchID == 1) {
 													$("#toggle-branch-" + str[2]).toggles(false);
 												}
