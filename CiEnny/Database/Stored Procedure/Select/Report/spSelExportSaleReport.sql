@@ -40,7 +40,8 @@ SET State = 1;
         MU.UnitName,
         SD.SalePrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
         SD.Discount,
-        SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount) SubTotal
+        SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount) SubTotal,
+		TS.ServiceCost
     FROM
 		transaction_sale TS
         JOIN transaction_saledetails SD
@@ -74,7 +75,8 @@ SET State = 1;
         MU.UnitName,
         BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1)  SalePrice,
         BD.Discount,
-        BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount) SubTotal
+        BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount) SubTotal,
+		0
     FROM
 		transaction_booking TB
         JOIN transaction_bookingdetails BD
@@ -108,7 +110,8 @@ SET State = 1;
         MU.UnitName,
         SRD.SalePrice,
         0 Discount,
-        -(SRD.Quantity * SRD.SalePrice) SubTotal
+        -(SRD.Quantity * SRD.SalePrice) SubTotal,
+		0
     FROM
 		transaction_salereturn TSR
 		JOIN transaction_sale TS

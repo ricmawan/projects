@@ -40,7 +40,7 @@ SET @query = CONCAT("SELECT
 					FROM
 						(
 							SELECT
-								SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) Total
+								MIN(TS.ServiceCost) + SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) Total
 							FROM
 								transaction_sale TS
 								JOIN transaction_saledetails SD
@@ -119,7 +119,8 @@ SET @query = CONCAT("SELECT
                         TS.SaleNumber,
                         DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
                         MC.CustomerName,
-                        SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) Total
+                        SUM(SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount)) Total,
+						TS.ServiceCost
 					FROM
 						transaction_sale TS
                         JOIN transaction_saledetails SD
@@ -141,7 +142,8 @@ SET @query = CONCAT("SELECT
 						TS.SaleID,
                         TS.SaleNumber,
                         TS.TransactionDate,
-                        MC.CustomerName
+                        MC.CustomerName,
+						TS.ServiceCost
                     UNION ALL
                     SELECT
 						TB.BookingID,
@@ -149,7 +151,8 @@ SET @query = CONCAT("SELECT
                         TB.BookingNumber,
                         DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
                         MC.CustomerName,
-                        SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) Total
+                        SUM(BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount)) Total,
+						0 ServiceCost
 					FROM
 						transaction_booking TB
                         JOIN transaction_bookingdetails BD
@@ -179,7 +182,8 @@ SET @query = CONCAT("SELECT
                         CONCAT('R', TS.SaleNumber),
                         DATE_FORMAT(TSR.TransactionDate, '%d-%m-%Y') TransactionDate,
                         MC.CustomerName,
-                        -SUM(SRD.Quantity * SRD.SalePrice) Total
+                        -SUM(SRD.Quantity * SRD.SalePrice) Total,
+						0 ServiceCost
 					FROM
 						transaction_salereturn TSR
 						JOIN transaction_sale TS

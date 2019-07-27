@@ -76,10 +76,11 @@
 			$row_array["SaleNumber"] = $row['SaleNumber'];
 			$row_array["TransactionDate"] = $row['TransactionDate'];
 			$row_array["CustomerName"] = $row['CustomerName'];
-			$row_array["Total"] = number_format($row['Total'],0,".",",");
+			$row_array["Total"] = number_format($row['Total'] + $row['ServiceCost'],0,".",",");
+			$row_array["ServiceCost"] = number_format($row['ServiceCost'],0,".",",");
 			$row_array["SaleID"] = $row['SaleID'];
 			$row_array["TransactionType"] = $row['TransactionType'];
-			$SubTotal += $row['Total'];
+			$SubTotal += $row['Total']  + $row['ServiceCost'];
 			array_push($return_arr, $row_array);
 		}
 		

@@ -73,6 +73,7 @@
 										<th>No. Invoice</th>
 										<th>Tanggal</th>
 										<th>Nama Pelanggan</th>
+										<th>Ongkos</th>
 										<th>Sub Total</th>
 									</tr>
 								</thead>
@@ -274,6 +275,7 @@
 									{ "data": "SaleNumber", className: "dt-head-center" },
 									{ "data": "TransactionDate", className: "dt-head-center" },
 									{ "data": "CustomerName", className: "dt-head-center" },
+									{ "data": "ServiceCost", "orderable": false, className: "dt-head-center dt-body-right" },
 									{ "data": "Total", "orderable": false, className: "dt-head-center dt-body-right" },
 									{ "data": "SaleID", "visible": false },
 									{ "data": "TransactionType", "visible": false }
