@@ -9,6 +9,7 @@ CREATE TABLE transaction_sale
 	TransactionDate DATETIME NOT NULL,
 	PaymentTypeID	SMALLINT,
 	Payment			DOUBLE,
+	ServiceCost		DOUBLE,
 	PrintCount		SMALLINT,
 	PrintedDate		DATETIME,
     FinishFlag		BIT,
