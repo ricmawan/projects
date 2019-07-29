@@ -6,13 +6,16 @@
 	
 	$mail = new PHPMailer;
 
-	//$mail->SMTPDebug = 3;                               // Enable verbose debug output
+	$mail->SMTPDebug = 2;                               // Enable verbose debug output
+	//Ask for HTML-friendly debug output
+	$mail->Debugoutput = 'html';
 
 	$mail->isSMTP();                                      // Set mailer to use SMTP
 	$mail->SMTPAuth = true;                               // Enable SMTP authentication
-	$mail->Host = 'smtp.hostinger.co.id';  // Specify main and backup SMTP servers
-	$mail->Username = 'cs@imdentalspecialist.com';                 // SMTP username
-	$mail->Password = 'imdentalspecialist';                           // SMTP password
+	$mail->Host = 'smtp.gmail.com';  // Specify main and backup SMTP servers
+	$mail->Username = 'nikotrikusuma@imdentalspecialist.com';                 // SMTP username
+	//$mail->From = 'cs@imdentalspecialist.com';
+	$mail->Password = 'imdental41';                           // SMTP password
 	$mail->Port = 587;                                    // TCP port to connect to
 	$mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
 
@@ -43,7 +46,9 @@
 			WHERE
 				DATE_FORMAT(DATE_ADD(CS.ScheduledDate, INTERVAL -1 DAY), '%Y-%m-%d') = DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 7 HOUR), '%Y-%m-%d')
 				AND DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 7 HOUR), '%Y-%m-%d 10:00:00') <= DATE_ADD(NOW(), INTERVAL 7 HOUR)
-				AND IFNULL(CS.EmailStatus, '') <> 'Sent'";
+				AND IFNULL(CS.EmailStatus, '') <> 'Sent'
+			LIMIT
+				20";
 				
 	if (! $result = mysql_query($sql, $dbh)) {
 		echo mysql_error();
@@ -92,9 +97,10 @@
 
 		$mail->send();
 		$mail->clearAddresses();
+		$mail->clearCCs();
 	}
 	
-	$sql = "SELECT
+	$sql3 = "SELECT
 				OS.OnlineScheduleID,
 				OS.ScheduledDate,
 				DATE_FORMAT(OS.ScheduledDate, '%w') DayCount,
@@ -105,53 +111,56 @@
 			WHERE
 				DATE_FORMAT(DATE_ADD(OS.ScheduledDate, INTERVAL -1 DAY), '%Y-%m-%d') = DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 7 HOUR), '%Y-%m-%d')
 				AND DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 7 HOUR), '%Y-%m-%d 10:00:00') <= DATE_ADD(NOW(), INTERVAL 7 HOUR)
-				AND IFNULL(OS.EmailStatus, '') <> 'Sent'";
+				AND IFNULL(OS.EmailStatus, '') <> 'Sent'
+			LIMIT
+				20";
 				
-	if (! $result = mysql_query($sql, $dbh)) {
+	if (! $result3 = mysql_query($sql3, $dbh)) {
 		echo mysql_error();
 	}
 		
-	while ($row = mysql_fetch_array($result)) {
+	while ($row3 = mysql_fetch_array($result3)) {
 		$MessageSent = $MessageBody;
-		$MessageSent = str_replace("[Day_Name]", $dayName[$row['DayCount']], $MessageSent);
-		$MessageSent = str_replace("[Day_Name2]", $dayName2[$row['DayCount']], $MessageSent);
-		$MessageSent = str_replace("[ScheduledDate]", date("d", strtotime($row['ScheduledDate'])) . " " . $monthName[date("m", strtotime($row['ScheduledDate'])) - 1] . " " . date("Y", strtotime($row['ScheduledDate'])), $MessageSent);
-		$MessageSent = str_replace("[ScheduledDate2]", $monthName2[date("m", strtotime($row['ScheduledDate'])) - 1] . " " . date("d", strtotime($row['ScheduledDate'])) . ", " . date("Y", strtotime($row['ScheduledDate'])), $MessageSent);
-		$mail->addAddress($row['Email'], $row['PatientName']);     // Add a recipient
+		$MessageSent = str_replace("[Day_Name]", $dayName[$row3['DayCount']], $MessageSent);
+		$MessageSent = str_replace("[Day_Name2]", $dayName2[$row3['DayCount']], $MessageSent);
+		$MessageSent = str_replace("[ScheduledDate]", date("d", strtotime($row3['ScheduledDate'])) . " " . $monthName[date("m", strtotime($row3['ScheduledDate'])) - 1] . " " . date("Y", strtotime($row3['ScheduledDate'])), $MessageSent);
+		$MessageSent = str_replace("[ScheduledDate2]", $monthName2[date("m", strtotime($row3['ScheduledDate'])) - 1] . " " . date("d", strtotime($row3['ScheduledDate'])) . ", " . date("Y", strtotime($row3['ScheduledDate'])), $MessageSent);
+		$mail->addAddress($row3['Email'], $row3['PatientName']);     // Add a recipient
 		$mail->Subject = 'Dental Examination Reminder';
-		$mail->Body    = str_replace('[Patient_Name]', $row['PatientName'], $MessageSent);
+		$mail->Body    = str_replace('[Patient_Name]', $row3['PatientName'], $MessageSent);
 		//$mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 	
 		if(!$mail->send()) {
-			$sql2 = "UPDATE transaction_onlineschedule
+			$sql4 = "UPDATE transaction_onlineschedule
 					SET
 						EmailStatus = '".$mail->ErrorInfo."'
 					WHERE
-						OnlineScheduleID = ".$row['OnlineScheduleID'];
+						OnlineScheduleID = ".$row3['OnlineScheduleID'];
 		} else {
-			$sql2 = 'UPDATE transaction_onlineschedule
+			$sql4 = 'UPDATE transaction_onlineschedule
 					SET
 						EmailStatus = "Sent",
 						DeliveredDate = DATE_ADD(NOW(), INTERVAL 7 HOUR)
 					WHERE
-						OnlineScheduleID = '.$row['OnlineScheduleID'];
+						OnlineScheduleID = '.$row3['OnlineScheduleID'];
 		}
 		
-		if (! $result2 = mysql_query($sql2, $dbh)) {
+		if (! $result4 = mysql_query($sql4, $dbh)) {
 			echo mysql_error();
 		}
 		$mail->clearAddresses();
 
 		$MessageSent2 = $MessageBody_Nurse;
-		$MessageSent2 = str_replace("[ScheduledDate]", date("d", strtotime($row['ScheduledDate'])) . " " . $monthName[date("m", strtotime($row['ScheduledDate'])) - 1] . " " . date("Y", strtotime($row['ScheduledDate'])), $MessageSent2);
-		$MessageSent2 = str_replace("[Day_Name]", $dayName[$row['DayCount']], $MessageSent2);
+		$MessageSent2 = str_replace("[ScheduledDate]", date("d", strtotime($row3['ScheduledDate'])) . " " . $monthName[date("m", strtotime($row3['ScheduledDate'])) - 1] . " " . date("Y", strtotime($row3['ScheduledDate'])), $MessageSent2);
+		$MessageSent2 = str_replace("[Day_Name]", $dayName[$row3['DayCount']], $MessageSent2);
 
 		$mail->addAddress($NURSE_MAIL_ADDRESS1, 'imdentalspecialist');     // Add a recipient
 		$mail->addCC($NURSE_MAIL_ADDRESS2, 'imdentalspecialist');     // Add a recipient
 		$mail->Subject = 'Dental Examination Reminder';
-		$mail->Body    = str_replace('[Patient_Name]', $row['PatientName'], $MessageSent2);
+		$mail->Body    = str_replace('[Patient_Name]', $row3['PatientName'], $MessageSent2);
 
 		$mail->send();
 		$mail->clearAddresses();
+		$mail->clearCCs();
 	}
 ?>

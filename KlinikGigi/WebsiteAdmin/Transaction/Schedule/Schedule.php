@@ -38,7 +38,7 @@
 				$sql = "SELECT
 							MU.UserID,
 							MU.UserName,
-							DATE_FORMAT(TOS.ScheduledDate, '%e-%c-%y %H:%i') BusinessHour,
+							DATE_FORMAT(TOS.ScheduledDate, '%e-%c-%Y %H:%i') BusinessHour,
 							TOS.PatientName,
 							TOS.Medication
 						FROM
@@ -63,8 +63,8 @@
 				$Content = "<table class='table table-striped table-bordered table-hover' style='width:auto;padding-right:17px;' >";
 				$Content .= "<thead style='background-color: black;color:white;height:25px;display:block;width:1030px;'>";
 				$Content .= "<td align='center' style='width: 40px;' >No</td>";
-				$Content .= "<td align='center' style='width: 280px;' >Dokter</td>";
-				$Content .= "<td align='center' style='width: 120px;' >Jadwal</td>";
+				$Content .= "<td align='center' style='width: 270px;' >Dokter</td>";
+				$Content .= "<td align='center' style='width: 130px;' >Jadwal</td>";
 				$Content .= "<td align='center' style='width: 250px;' >Pasien</td>";
 				$Content .= "<td align='center' style='width: 340px;' >Tindakan</td>";
 				//$Content .= "<td align='center' style='vertical-align:middle;width: 90px;'>Opsi</td>";
@@ -80,8 +80,8 @@
 				while ($row = mysql_fetch_array($result)) {
 					$Content .= "<tr>";
 					$Content .= "<td align='center' style='width: 40px;' >$RowNumber</td>";
-					$Content .= "<td align='left' style='width: 280px;' >".$row['UserName']."</td>";
-					$Content .= "<td align='center' style='width: 120px;' >".$row['BusinessHour']."</td>";
+					$Content .= "<td align='left' style='width: 270px;' >".$row['UserName']."</td>";
+					$Content .= "<td align='center' style='width: 130px;' >".$row['BusinessHour']."</td>";
 					$Content .= "<td align='left' style='width: 250px;' >".$row['PatientName']."</td>";
 					$Content .= "<td align='left' style='width: 340px;' >".$row['Medication']."</td>";
 					//$Content .= '<td align="center" style="vertical-align:middle;width: 90px;">
