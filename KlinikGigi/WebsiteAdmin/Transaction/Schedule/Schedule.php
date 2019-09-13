@@ -41,7 +41,7 @@
 							DATE_FORMAT(TOS.ScheduledDate, '%e-%c-%Y %H:%i') BusinessHour,
 							TOS.PatientName,
 							TOS.Medication,
-							TOS.ScheduledDate,
+							DATE_FORMAT(TOS.ScheduledDate, '%Y-%m-%d') ScheduledDate,
 							DATE_FORMAT(TOS.ScheduledDate, '%H:%i') HourMinute
 						FROM
 							master_user MU
@@ -59,7 +59,6 @@
 					echo $MessageDetail;
 					return 0;
 				}
-				$DayOfWeek = date("w", strtotime($row['ScheduledDate']));
 
 				$RowNumber = 1;
 
@@ -74,13 +73,13 @@
 				$Content .= "</thead>";
 				$Content .= "<tbody style='display:block;max-height:284px;height:100%;overflow-y:auto;'>";
 
-				$Date = $dayNames[$DayOfWeek] ."," . date("d", strtotime($row['ScheduledDate'])) . " " . $monthNames[date("n", strtotime($row['ScheduledDate'])) - 1] . " " . date("Y", strtotime($row['ScheduledDate']));
-
 				$RawDate = date("Y-m-d", strtotime($row['ScheduledDate']));
 
 				if(mysql_num_rows($result) == 0) $Content .= "<tr><td align='center' style='width: 1030px;' colspan='5'>Data tidak ditemukan!</td></tr>";
 
 				while ($row = mysql_fetch_array($result)) {
+					$DayOfWeek = date("w", strtotime($row['ScheduledDate']));
+					$Date = $dayNames[$DayOfWeek] ."," . date("d", strtotime($row['ScheduledDate'])) . " " . $monthNames[date("n", strtotime($row['ScheduledDate'])) - 1] . " " . date("Y", strtotime($row['ScheduledDate']));
 					$Content .= "<tr>";
 					$Content .= "<td align='center' style='width: 40px;' >$RowNumber</td>";
 					$Content .= "<td align='left' style='width: 270px;' >".$row['UserName']."</td>";
@@ -190,7 +189,7 @@
 				<br />
 				<div class="row" >
 					<div class="col-md-4 labelColumn" >
-						Dokter:
+						Pasien:
 					</div>
 					<div class="col-md-8">
 						<span id="PatientName" style="font-weight: bold; font-size: 15px; color: red;"></span>
