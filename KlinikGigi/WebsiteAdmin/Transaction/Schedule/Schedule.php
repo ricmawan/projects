@@ -32,15 +32,17 @@
 					$Where = " AND TOS.PatientName LIKE '%".$PatientName."%' AND DATE_FORMAT(TOS.ScheduledDate, '%Y-%m-%d') >= DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 7 HOUR), '%Y-%m-%d')";
 				}
 
-				$DayOfWeek = date("w", strtotime($ScheduledDate));
 				$dayNames = [ "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu" ];
 				$monthNames = [ "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember" ];
 				$sql = "SELECT
+							TOS.OnlineScheduleID,
 							MU.UserID,
 							MU.UserName,
 							DATE_FORMAT(TOS.ScheduledDate, '%e-%c-%Y %H:%i') BusinessHour,
 							TOS.PatientName,
-							TOS.Medication
+							TOS.Medication,
+							TOS.ScheduledDate,
+							DATE_FORMAT(TOS.ScheduledDate, '%H:%i') HourMinute
 						FROM
 							master_user MU
 							LEFT JOIN transaction_onlineschedule TOS
@@ -57,6 +59,7 @@
 					echo $MessageDetail;
 					return 0;
 				}
+				$DayOfWeek = date("w", strtotime($row['ScheduledDate']));
 
 				$RowNumber = 1;
 
@@ -65,15 +68,15 @@
 				$Content .= "<td align='center' style='width: 40px;' >No</td>";
 				$Content .= "<td align='center' style='width: 270px;' >Dokter</td>";
 				$Content .= "<td align='center' style='width: 130px;' >Jadwal</td>";
-				$Content .= "<td align='center' style='width: 250px;' >Pasien</td>";
-				$Content .= "<td align='center' style='width: 340px;' >Tindakan</td>";
-				//$Content .= "<td align='center' style='vertical-align:middle;width: 90px;'>Opsi</td>";
+				$Content .= "<td align='center' style='width: 200px;' >Pasien</td>";
+				$Content .= "<td align='center' style='width: 300px;' >Tindakan</td>";
+				$Content .= "<td align='center' style='vertical-align:middle;width: 90px;'>Opsi</td>";
 				$Content .= "</thead>";
 				$Content .= "<tbody style='display:block;max-height:284px;height:100%;overflow-y:auto;'>";
 
-				$Date = $dayNames[$DayOfWeek] ."," . date("d", strtotime($ScheduledDate)) . " " . $monthNames[date("n", strtotime($ScheduledDate)) - 1] . " " . date("Y", strtotime($ScheduledDate));
+				$Date = $dayNames[$DayOfWeek] ."," . date("d", strtotime($row['ScheduledDate'])) . " " . $monthNames[date("n", strtotime($row['ScheduledDate'])) - 1] . " " . date("Y", strtotime($row['ScheduledDate']));
 
-				$RawDate = date("Y-m-d", strtotime($ScheduledDate));
+				$RawDate = date("Y-m-d", strtotime($row['ScheduledDate']));
 
 				if(mysql_num_rows($result) == 0) $Content .= "<tr><td align='center' style='width: 1030px;' colspan='5'>Data tidak ditemukan!</td></tr>";
 
@@ -82,11 +85,11 @@
 					$Content .= "<td align='center' style='width: 40px;' >$RowNumber</td>";
 					$Content .= "<td align='left' style='width: 270px;' >".$row['UserName']."</td>";
 					$Content .= "<td align='center' style='width: 130px;' >".$row['BusinessHour']."</td>";
-					$Content .= "<td align='left' style='width: 250px;' >".$row['PatientName']."</td>";
-					$Content .= "<td align='left' style='width: 340px;' >".$row['Medication']."</td>";
-					//$Content .= '<td align="center" style="vertical-align:middle;width: 90px;">
-												//<i style="cursor:pointer;" class="fa fa-edit" onclick="SubmitReferral(\''.$row['BusinessHour'].'\', ''.$Date.'\', \''.$row['UserName'].'\', '.$row['UserID'].');" acronym title="Jadwalkan Rujukan"></i>
-											//</td>';
+					$Content .= "<td align='left' style='width: 200px;' >".$row['PatientName']."</td>";
+					$Content .= "<td align='left' style='width: 300px;' >".$row['Medication']."</td>";
+					$Content .= '<td align="center" style="vertical-align:middle;width: 90px;">
+												<i style="cursor:pointer;" class="fa fa-edit" onclick="EditMedication(\''.$row['UserName'].'\', \''.$Date.'\', \''.$row['HourMinute'].'\', \''.$row['PatientName'].'\', '.$row['OnlineScheduleID'].', \''.$row['Medication'].'\');" acronym title="Ubah Tindakan"></i>
+											</td>';
 					$Content .= "</tr>";
 					$RowNumber++;
 				}
@@ -98,7 +101,7 @@
 			}
 
 		?>
-		<div id="dialog-submit-referral" title="Jadwalkan Rujukan" style="display: none;">
+		<!--<div id="dialog-submit-referral" title="Jadwalkan Rujukan" style="display: none;">
 			<form class="col-md-12" id="ReferralForm" method="POST" action=""  >
 				<div class="row" >
 					<div class="col-md-4 labelColumn" >
@@ -163,7 +166,49 @@
 					</div>
 				</div>
 			</div>
+		</div>-->
+
+		<div id="dialog-edit-medication" title="Ubah Tindakan" style="display: none;">
+			<form class="col-md-12" id="EditForm" method="POST" action=""  >
+				<div class="row" >
+					<div class="col-md-4 labelColumn" >
+						Dokter:
+					</div>
+					<div class="col-md-8">
+						<span id="doctorName" style="font-weight: bold; font-size: 15px; color: red;"></span>
+					</div>
+				</div>
+				<br />
+				<div class="row" >
+					<div class="col-md-4 labelColumn" >
+						Waktu:
+					</div>
+					<div class="col-md-8">
+						<span id="ScheduledDate" style="font-weight: bold; font-size: 15px; color: red;"></span>
+					</div>
+				</div>
+				<br />
+				<div class="row" >
+					<div class="col-md-4 labelColumn" >
+						Dokter:
+					</div>
+					<div class="col-md-8">
+						<span id="PatientName" style="font-weight: bold; font-size: 15px; color: red;"></span>
+					</div>
+				</div>
+				<br />
+				<div class="row" >
+					<div class="col-md-4 labelColumn" >
+						Tindakan:
+					</div>
+					<div class="col-md-8">
+						<input type="text" placeholder="Tindakan" required id="txtMedication" name="txtMedication" class="form-control-custom" />
+						<input id="hdnOnlineScheduleID" name="hdnOnlineScheduleID" type="hidden" />
+					</div>
+				</div>
+			</div>
 		</div>
+
 		<div id="loading"></div>
 		<script src="../../assets/js/jquery-1.10.2.js"></script>
 		<script src="../../assets/js/jquery-ui-1.10.3.custom.js"></script>
@@ -175,6 +220,76 @@
 			$(document).ready(function() {
 				parent.postMessage("loaded", "*");
 			});
+
+			function EditMedication(UserName, ScheduledDate, HourMinute, PatientName, OnlineScheduleID, Medication) {
+				$("#doctorName").html(UserName);
+				$("#PatientName").html(PatientName);
+				$("#ScheduledDate").html(ScheduledDate + " " + HourMinute);
+				$("#hdnOnlineScheduleID").val(OnlineScheduleID);
+				$("#txtMedication").val(Medication);
+				$("#dialog-edit-medication").dialog({
+					autoOpen: false,
+					show: {
+						effect: "fade",
+						duration: 500
+					},
+					hide: {
+						effect: "fade",
+						duration: 500
+					},
+					resizable: false,
+					height: 300,
+					width: 450,
+					modal: true,
+					close: function() {
+						$(this).dialog("destroy");
+					},
+					buttons: {
+						"Save": function() {
+							if($("#txtMedication").val() == "") {
+								$("#txtMedication").notify("Harus diisi!", { position:"bottom left", className:"warn", autoHideDelay: 2000 });
+								$("#txtMedication").focus();
+							}
+
+							else {
+								$("#loading").show();
+								$.ajax({
+									url: "./UpdateMedication.php",
+									type: "POST",
+									data: $("#EditForm").serialize(),
+									dataType: "json",
+									success: function(data) {
+										$("#loading").hide();
+										if(data.FailedFlag == '0') {
+											//$.notify(data.Message, "success");
+											parent.postMessage(data.Message, "*");
+											$("#txtMedication").val("");
+											$("#doctorName").html("");
+											$("#PatientName").html("");
+											$("#ScheduledDate").html("");
+											$("#hdnOnlineScheduleID").val(0);
+											$("#dialog-edit-medication").dialog("destroy");
+											//reloadSchedule();
+										}
+										else {
+											//$.notify(data.Message, "error");
+											parent.postMessage(data.Message, "*");
+										}
+									},
+									error: function(data) {
+										$("#loading").hide();
+										$.notify("Terjadi kesalahan sistem!", "error");
+									}
+								
+								});
+							}
+						},
+						"Close": function() {
+							$(this).dialog("destroy");
+						}
+					}
+				}).dialog("open");
+			}
 
 			function SubmitReferral(BusinessHour, ScheduledDate, UserName, UserID) {
 				$("#doctorName").html(UserName);
