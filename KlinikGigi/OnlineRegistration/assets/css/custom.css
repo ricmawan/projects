@@ -13,7 +13,8 @@
     GENERAL  STYLES    
     =============================================*/
 body {
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Open Sans', sans-serifff;
+    font-size: 12px !important;
 }
 #loading {
     position: fixed;
