@@ -124,7 +124,7 @@
 					var Phone = $("#hdnPhone").val();
 					var Email = $("#hdnEmail").val();
 					$("#loading").show();
-					$("#scheduleFrame").attr("src", "https://imdentalspecialist.com/Transaction/Referral/Schedule.php?BranchID=" + BranchID + "&ScheduledDate=" + ScheduledDate + "&PatientName=" + PatientName + "&Phone=" + Phone + "&Email=" + Email + "$rbFilter=1" );
+					$("#scheduleFrame").attr("src", "https://imdentalspecialist.com/old/Transaction/Referral/Schedule.php?BranchID=" + BranchID + "&ScheduledDate=" + ScheduledDate + "&PatientName=" + PatientName + "&Phone=" + Phone + "&Email=" + Email + "$rbFilter=1" );
 				}
 			}
 

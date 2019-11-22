@@ -25,7 +25,7 @@
 		<iframe id="OnlineFrame" style="border: 0;overflow: hidden;width: 100%;height: auto;" scrolling="none"></iframe>
 		<script>
 			$(document).ready(function() {
-				$("#OnlineFrame").attr("src", "https://imdentalspecialist.com/Report/ModelStatus/");
+				$("#OnlineFrame").attr("src", "https://imdentalspecialist.com/old/Report/ModelStatus/");
 				var windowHeight = $( window ).height() - 59;
 				$("#OnlineFrame").css ({
 					"min-height" : windowHeight,

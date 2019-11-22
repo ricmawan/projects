@@ -34,7 +34,7 @@
 		<iframe id="OnlineFrame" style="border: 0;overflow: hidden;width: 100%;height: auto;" scrolling="none"></iframe>
 		<script>
 			$(document).ready(function() {
-				$("#OnlineFrame").attr("src", "https://imdentalspecialist.com/Transaction/IncomingModel/");
+				$("#OnlineFrame").attr("src", "https://imdentalspecialist.com/old/Transaction/IncomingModel/");
 				var windowHeight = $( window ).height() - 59;
 				$("#OnlineFrame").css ({
 					"min-height" : windowHeight,
