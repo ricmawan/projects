@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS master_patient;
 CREATE TABLE master_patient
 (
 	PatientID		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	NIK				VARCHAR(100),
 	PatientNumber	VARCHAR(100) NOT NULL,
 	PatientName		VARCHAR(255) NOT NULL,
 	BirthDate		DATE NOT NULL,

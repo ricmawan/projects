@@ -3,6 +3,7 @@ DROP PROCEDURE IF EXISTS spInsPatient;
 DELIMITER $$
 CREATE PROCEDURE spInsPatient (
 	pID 			BIGINT,
+	pNIK			VARCHAR(100),
 	pPatientNumber	VARCHAR(100),
 	pPatientName 	VARCHAR(255),
 	pBirthDate		DATE,
@@ -65,6 +66,7 @@ SET State = 3;
 				INSERT INTO master_patient
 				(
 					PatientNumber,
+					NIK,
 					PatientName,
 					BirthDate,
 					Address,
@@ -78,6 +80,7 @@ SET State = 3;
 				)
 				VALUES (
 					pPatientNumber,
+					pNIK,
 					pPatientName,
 					pBirthDate,
 					pAddress,
@@ -106,6 +109,7 @@ SET State = 5;
 					master_patient
 				SET
 					PatientNumber = pPatientNumber,
+					NIK = pNIK,
 					PatientName = pPatientName,
 					BirthDate = pBirthDate,
 					Address = pAddress,
