@@ -25,4 +25,7 @@ INSERT INTO `master_parameter` (`ParameterID`, `ParameterName`, `ParameterValue`
 (9, 'MOBILE_PATH', '/Projects/POSAdmin/Mobile/', 'Location of the application', 0, '2016-03-12 15:01:05', 'System', NULL, NULL),
 (10, 'DESKTOP_PATH', '/Projects/POSAdmin/Desktop/', 'Location of the application', 0, '2016-03-12 15:01:05', 'System', NULL, NULL),
 (11, 'MOBILE_HOME', 'http://192.168.1.21/Projects/POSAdmin/Mobile/Home.php', 'Location of the home for mobile view', 0, '2016-03-12 15:01:05', 'System', NULL, NULL),
-(12, 'FINISH_DEFAULT', '0', 'Default value for finish flag', 0, '2016-03-12 15:01:05', 'System', NULL, NULL);
+(12, 'FINISH_DEFAULT', '0', 'Default value for finish flag', 0, '2016-03-12 15:01:05', 'System', NULL, NULL),
+(13, 'SHIPMENT_PRINTER', '0', 'Shipment Printer Location', 0, '2016-03-12 15:01:05', 'System', NULL, NULL),
+(14, 'PRINTER_INSTALLED', 'N', 'Parameter for printer is installed or not', 0, '2020-03-06 15:01:05', 'System', NULL, NULL),
+(15, 'SHIPMENT_PRINTER_INSTALLED', 'N', 'Parameter for shipment printer is installed or not', 0, '2020-03-06 15:01:05', 'System', NULL, NULL);

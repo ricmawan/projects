@@ -683,7 +683,10 @@ INSERT INTO `master_parameter` (`ParameterID`, `ParameterName`, `ParameterValue`
 (9, 'MOBILE_PATH', '/Projects/POSAdmin/Mobile/', 'Location of the application', 0, '2016-03-12 15:01:05', 'System', NULL, NULL),
 (10, 'DESKTOP_PATH', '/Projects/POSAdmin/Desktop/', 'Location of the application', 0, '2016-03-12 15:01:05', 'System', NULL, NULL),
 (11, 'MOBILE_HOME', 'http://192.168.1.21/Projects/POSAdmin/Mobile/Home.php', 'Location of the home for mobile view', 0, '2016-03-12 15:01:05', 'System', NULL, NULL),
-(12, 'FINISH_DEFAULT', '0', 'Default value for finish flag', 0, '2016-03-12 15:01:05', 'System', NULL, NULL);DROP TABLE IF EXISTS master_eventlog;
+(12, 'FINISH_DEFAULT', '0', 'Default value for finish flag', 0, '2016-03-12 15:01:05', 'System', NULL, NULL),
+(13, 'SHIPMENT_PRINTER', '0', 'Shipment Printer Location', 0, '2016-03-12 15:01:05', 'System', NULL, NULL),
+(14, 'PRINTER_INSTALLED', 'N', 'Parameter for printer is installed or not', 0, '2020-03-06 15:01:05', 'System', NULL, NULL),
+(15, 'SHIPMENT_PRINTER_INSTALLED', 'N', 'Parameter for shipment printer is installed or not', 0, '2020-03-06 15:01:05', 'System', NULL, NULL);DROP TABLE IF EXISTS master_eventlog;
 
 CREATE TABLE master_eventlog
 (
@@ -1336,6 +1339,7 @@ CREATE TABLE transaction_printerlist
 	PrinterListID			INT PRIMARY KEY AUTO_INCREMENT,
 	IPAddress				VARCHAR(100),
 	SharedPrinterName		VARCHAR(100),
+	IsAttached				VARCHAR(1),
 	CreatedDate 			DATETIME NOT NULL,
 	CreatedBy 				VARCHAR(255) NOT NULL,
 	ModifiedDate 			TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
@@ -1350,6 +1354,7 @@ INSERT INTO transaction_printerlist
 (
 	IPAddress,
 	SharedPrinterName,
+	IsAttached,
 	CreatedDate,
 	CreatedBy
 )
@@ -1357,12 +1362,14 @@ VALUES
 (
 	'192.168.1.100',
 	'//192.168.1.100/EPSON2',
+	'N',
 	'2018-12-08',
 	'Admin1'
 ),
 (
 	'::1',
 	'//192.168.1.2/EPSON',
+	'N',
 	'2018-12-08',
 	'Admin1'
 );DROP TABLE IF EXISTS transaction_tokencode;
