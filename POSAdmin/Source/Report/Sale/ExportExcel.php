@@ -159,7 +159,7 @@
 			}
 			$DetailsCounter++;
 			$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, $row['ItemCode'], PHPExcel_Cell_DataType::TYPE_STRING);
-			$objPHPExcel->getActiveSheet()->setCellValueExplicit("F".$rowExcel, $row['ItemName'], PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->getActiveSheet()->setCellValueExplicit("F".$rowExcel, htmlspecialchars_decode($row['ItemName'], ENT_QUOTES), PHPExcel_Cell_DataType::TYPE_STRING);
 			$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, $row['Quantity']);
 			$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, $row['UnitName']);
 			$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, $row['SalePrice']);

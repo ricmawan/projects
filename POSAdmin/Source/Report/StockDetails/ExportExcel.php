@@ -6,7 +6,7 @@
 		include "../../GetPermission.php";
 		//echo $_SERVER['REQUEST_URI'];
 		$ItemID = $_GET['ItemID'];
-		$ItemName = $_GET['ItemName'];
+		$ItemName = htmlspecialchars_decode($_GET['ItemName'], ENT_QUOTES);
 		$BranchID = $_GET['BranchID'];
 		$BranchName = $_GET['BranchName'];
 		$ConversionQuantity = $_GET['conversionQuantity'];

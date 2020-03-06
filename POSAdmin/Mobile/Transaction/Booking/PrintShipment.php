@@ -11,7 +11,7 @@
 		$RequestedPath = str_replace($file, "", $RequestedPath);
 		include "../../GetPermission.php";
 
-		$connector = new WindowsPrintConnector("smb:".$SHARED_PRINTER_ADDRESS);
+		$connector = new WindowsPrintConnector("smb:".$SHIPMENT_PRINTER);
 		//$connector = new DummyPrintConnector();
 	    
 	    $BookingDetailsID = $_POST['BookingDetailsID'];
@@ -61,68 +61,76 @@
 		mysqli_free_result($result);
 		mysqli_next_result($dbh);
 
-		$printer = new Printer($connector);
-		$printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
-		$printer -> setJustification(Printer::JUSTIFY_CENTER);
-		$printer -> text("SURAT JALAN");
-		$printer -> text(str_pad("", 40, " "));
-		$printer -> text("No : ". $BookingNumber ."\n");
-		$printer -> text(str_pad("", 137, "_") . "\n");
-		$printer -> text(str_pad("", 73, " ") . "Kepada Yth.  ");
-		$printer -> selectPrintMode(Printer::MODE_FONT_A);
-		$printer -> text($CustomerName ."\n");
-		$printer -> text(str_pad("", 86, " ") . $Address);
-		//if($Address != "") $printer -> text(str_pad("", 86, " ") . $Address);
-		$printer -> text("\n   Tanggal : " . $TransactionDate);
-		$printer -> text(str_pad("", 63, " ") . $City . "\n");
-		$printer -> text("   Kasir   : ");
-		$printer -> text(str_pad($CreatedBy, 73, " ") . "Ph " . $Telephone . "\n");
-		
-		$sql = "CALL spSelBookingDetailsPrint('(".implode(",", $BookingDetailsID).")', '".$_SESSION['UserLogin']."')";
+		if($SHIPMENT_PRINTER_INSTALLED == 'Y') {
 
-		if (! $result = mysqli_query($dbh, $sql)) {
-			logEvent(mysqli_error($dbh), '/Transaction/Booking/PrintShipment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
-			$Message = "Terjadi Kesalahan Sistem";
-			$MessageDetail = mysql_error();
-			$FailedFlag = 1;
-			echo returnstate($BookingID, $Message, $MessageDetail, $FailedFlag, $State);
-			return 0;
+			$printer = new Printer($connector);
+			$printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
+			$printer -> setJustification(Printer::JUSTIFY_CENTER);
+			$printer -> text("SURAT JALAN\n");
+			//$printer -> text(str_pad("", 40, " "));
+			$printer -> setJustification(Printer::JUSTIFY_LEFT);
+			$printer -> selectPrintMode(Printer::MODE_FONT_A);
+			$printer -> text("No : ". $BookingNumber ."\n");
+			$printer -> text(str_pad("", 80, "_") . "\n");
+			$printer -> text("   Tanggal : " );
+			$printer -> text(str_pad($TransactionDate, 37, " ") . "Kepada Yth.\n");
+			
+			$printer -> text("   Kasir   : ");
+			$printer -> text(str_pad($CreatedBy, 37, " ") . $CustomerName ."\n");
+			if($Address != "") $printer -> text(str_pad("", 50, " ") . $Address ."\n");
+			if($City != "") $printer -> text(str_pad("", 50, " ") . $City ."\n");
+			if($Telephone != "") $printer -> text(str_pad("", 50, " ") . "HP " . $City ."\n");
+			//if($Address != "") $printer -> text(str_pad("", 86, " ") . $Address);
+			
+			$sql = "CALL spSelBookingDetailsPrint('(".implode(",", $BookingDetailsID).")', '".$_SESSION['UserLogin']."')";
+
+			if (! $result = mysqli_query($dbh, $sql)) {
+				logEvent(mysqli_error($dbh), '/Transaction/Booking/PrintShipment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+				$Message = "Terjadi Kesalahan Sistem";
+				$MessageDetail = mysql_error();
+				$FailedFlag = 1;
+				echo returnstate($BookingID, $Message, $MessageDetail, $FailedFlag, $State);
+				return 0;
+			}
+
+			$printer -> selectPrintMode(Printer::MODE_FONT_B);
+			$printer -> text("|" . str_pad("", 94, "-") . "|\n");
+			$printer -> text("|        Qty        |                 Nama Barang              |          Keterangan           |\n");
+			$printer -> text("|-------------------|------------------------------------------|-------------------------------|\n");
+			
+			while($row = mysqli_fetch_array($result)) {
+				if(strpos($row['Quantity'], ".")) $Quantity = number_format(round($row['Quantity'], 2),2,".",",");	    		
+				else $Quantity = number_format($row['Quantity'],0,".",",");
+				$printer -> text("| " . str_pad($Quantity, 8, " ", STR_PAD_LEFT) . " ");
+				$printer -> text(str_pad($row['UnitName'], 8, " ") . " | ");
+				$printer -> text(str_pad(htmlspecialchars_decode($row['ItemName'], ENT_QUOTES), 40, " ") . " | ");
+				$printer -> text(str_pad($Remarks, 29, " ") . " |\n");
+			}
+			
+			$printer -> text("|" . str_pad("", 94, "-") . "|\n");
+			$printer -> text("   Catatan   : " . $Remarks . "\n");
+			$printer -> text(str_pad("", 15, " ") . "Barang yang sudah dibeli tidak dapat ditukar/dikembalikan\n");
+			$printer -> text(str_pad("", 96, "_") . "\n");
+			
+			$printer -> selectPrintMode(Printer::MODE_FONT_A);
+			$printer -> text("   Penerima," . str_pad("", 20, " ") ."Checker,". str_pad("", 20, " ") ."Hormat Kami,\n\n\n");
+			$printer -> text("_______________" . str_pad("", 13, " "));
+			$printer -> text("_______________" . str_pad("", 17, " "));
+			$printer -> text(str_pad($CreatedBy, 12, " ", STR_PAD_BOTH));
+			
+			mysqli_free_result($result);
+			mysqli_next_result($dbh);
+			
+			//copy($file, $SHARED_PRINTER_ADDRESS); 
+			//exec("lp -d epson ".$file);  # Lakukan cetak
+			//unlink($file);
+
+			/*$data = $connector -> getData();
+		    fwrite($handle, $data);
+		    fclose($handle);*/
+		    $printer -> feedForm();
+			$printer -> close();
 		}
-
-		$printer -> text("|" . str_pad("", 135, "-") . "|\n");
-		$printer -> text("|      Qty      |                Nama Barang                              |                          Keterangan                         |\n");
-		$printer -> text("|---------------|---------------------------------------------------------|-------------------------------------------------------------|\n");
-		
-		while($row = mysqli_fetch_array($result)) {
-			if(strpos($row['Quantity'], ".")) $Quantity = number_format(round($row['Quantity'], 2),2,".",",");	    		
-		    else $Quantity = number_format($row['Quantity'],0,".",",");
-			$printer -> text("| " . str_pad($Quantity, 6, " ", STR_PAD_LEFT) . " ");
-			$printer -> text(str_pad($row['UnitName'], 6, " ") . " | ");
-			$printer -> text(str_pad(htmlspecialchars_decode($row['ItemName'], ENT_QUOTES), 55, " ") . " | ");
-			$printer -> text(str_pad($Remarks, 59, " ") . " |\n");
-		}
-		
-		$printer -> text("|" . str_pad("", 135, "-") . "|\n");
-		$printer -> text("   Catatan   : " . $Remarks . "\n");
-		$printer -> text(str_pad("", 15, " ") . "Barang yang sudah dibeli tidak dapat ditukar/dikembalikan\n");
-		$printer -> text(str_pad("", 137, "_") . "\n");
-		$printer -> text("   Penerima," . str_pad("", 50, " ") ."Checker,". str_pad("", 50, " ") ."Hormat Kami,\n\n\n");
-		$printer -> text("_______________" . str_pad("", 44, " "));
-		$printer -> text("_______________" . str_pad("", 46, " "));
-		$printer -> text(str_pad($CreatedBy, 12, " ", STR_PAD_BOTH));
-		
-		mysqli_free_result($result);
-		mysqli_next_result($dbh);
-		
-		//copy($file, $SHARED_PRINTER_ADDRESS); 
-		//exec("lp -d epson ".$file);  # Lakukan cetak
-		//unlink($file);
-
-		/*$data = $connector -> getData();
-	    fwrite($handle, $data);
-	    fclose($handle);*/
-	    $printer -> pulse();
-		$printer -> close();
 		echo returnstate($BookingID, $Message, $MessageDetail, $FailedFlag, $State);
 	}
 	

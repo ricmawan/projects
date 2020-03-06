@@ -433,8 +433,7 @@
 										beforeClose: function() {
 											if(counter == 0) {
 												setTimeout(function() {
-													if(data.Message == "No. Invoice sudah ada") $("#txtPaymentNumber").focus();
-													else $("#txtItemCode").focus();
+													$("#txtAmount").focus();
 												}, 0);
 												counter = 1;
 											}
@@ -491,67 +490,83 @@
 				$("#lblTotal").html(returnRupiah(grandTotal.toString()));
 			}
 
-			function printInvoice() {
-				var paymentID = $("#hdnTransactionID").val();
-				var Payment = $("#txtPayment").val().replace(/\,/g, "");
-				var PaymentType = $("#ddlPayment").val();
-				var PrintInvoice = $("#chkPrint").prop("checked");
-				var PrintShipment = $("#chkPrintShipment").prop("checked");
-				$("#loading").show();
-				$.ajax({
-					url: "./Transaction/Payment/PrintInvoice.php",
-					type: "POST",
-					data: { TransactionID : paymentID, Payment : Payment, PaymentType : PaymentType, PrintInvoice : PrintInvoice },
-					dataType: "json",
-					success: function(data) {
-						if(data.FailedFlag == '0') {
-							$("#loading").hide();
-							$("#divModal").hide();
-							if(PrintShipment == true) printShipment();
-							resetForm();
-							table2.destroy();
-							$("#finish-dialog").dialog("destroy");
-							openDialog(0, 0);
-							Lobibox.alert("success",
-							{
-								msg: data.Message,
-								width: 480,
-								delay: 2000
-							});
-						}
-						else {
-							$("#loading").hide();
-							$("#divModal").hide();
-							var counter = 0;
-							Lobibox.alert("error",
-							{
-								msg: data.ErrorMessage,
-								width: 480,
-								beforeClose: function() {
-									if(counter == 0) {
-										setTimeout(function() {
-											$("#txtItemCode").focus();
-										}, 0);
-										counter = 1;
-									}
+			function finish() {
+				if(table2.data().count()) {
+					$("#save-confirm").dialog({
+						autoOpen: false,
+						open: function() {
+							$(document).on('keydown', function(e) {
+								if (e.keyCode == 39) { //right arrow
+									 $("#btnNo").focus();
+								}
+								else if (e.keyCode == 37) { //left arrow
+									 $("#btnYes").focus();
 								}
 							});
-							return 0;
-						}
-					},
-					error: function(jqXHR, textStatus, errorThrown) {
-						$("#loading").hide();
-						$("#divModal").hide();
-						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-						LogEvent(errorMessage, "/Transaction/Payment/index.php");
-						Lobibox.alert("error",
+							setTimeout(function() {
+								$("#btnYes").focus();
+							}, 0);
+						},
+						show: {
+							effect: "fade",
+							duration: 0
+						},
+						hide: {
+							effect: "fade",
+							duration: 0
+						},
+						close: function() {
+							$(this).dialog("destroy");
+							//callback("Tidak");
+						},
+						resizable: false,
+						height: "auto",
+						width: 400,
+						modal: true,
+						buttons: [
 						{
-							msg: errorMessage,
-							width: 480
-						});
-						return 0;
-					}
-				});
+							text: "Ya",
+							id: "btnYes",
+							click: function() {
+								$(this).dialog("destroy");
+								$("#FormData").dialog("destroy");
+								$("#divModal").hide();
+								table.ajax.reload(function() {
+									table.keys.enable();
+									if(typeof index !== 'undefined') table.cell(index).focus();
+								}, false);
+								resetForm();
+								table2.destroy();
+								//$(this).dialog("destroy");
+								//callback("Ya");
+							}
+						},
+						{
+							text: "Tidak",
+							id: "btnNo",
+							click: function() {
+								$(this).dialog("destroy");
+								//callback("Tidak");
+							}
+						}]
+					}).dialog("open");
+				}
+				else {
+					var counter = 0;
+					Lobibox.alert("error",
+					{
+						msg: "Silahkan tambahkan pembayaran terlebih dahulu!",
+						width: 480,
+						beforeClose: function() {
+							if(counter == 0) {
+								setTimeout(function() {
+									$("#txtItemCode").focus();
+								}, 0);
+								counter = 1;
+							}
+						}
+					});
+				}
 			}
 
 			var waitForFinalEvent = (function () {
@@ -717,6 +732,13 @@
 					var index = table.cell({ focused: true }).index();
 					if(((evt.keyCode >= 48 && evt.keyCode <= 57) || (evt.keyCode >= 65 && evt.keyCode <= 90)) && $("input:focus").length == 0 && $("#FormData").css("display") == "none" && $("#delete-confirm").css("display") == "none") {
 						$("#grid-data_wrapper").find("input[type='search']").focus();
+					}
+					else if(evt.keyCode == 121 && $("#save-confirm").css("display") == "none" && $("#FormData").css("display") == "block"  && $(".lobibox").css("display") != "block") {
+						evt.preventDefault();
+						if(counterKey == 0) {
+							finish();
+							counterKey = 1;
+						}
 					}
 					setTimeout(function() { counterKey = 0; } , 1000);
 				});

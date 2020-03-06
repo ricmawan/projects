@@ -102,7 +102,7 @@
 		while($row = mysqli_fetch_array($result)) {
 			$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, $RowNumber);
 			$objPHPExcel->getActiveSheet()->setCellValueExplicit("B".$rowExcel, $row['ItemCode'], PHPExcel_Cell_DataType::TYPE_STRING);
-			$objPHPExcel->getActiveSheet()->setCellValueExplicit("C".$rowExcel, $row['ItemName'], PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->getActiveSheet()->setCellValueExplicit("C".$rowExcel, htmlspecialchars_decode($row['ItemName'], ENT_QUOTES), PHPExcel_Cell_DataType::TYPE_STRING);
 			$objPHPExcel->getActiveSheet()->setCellValueExplicit("D".$rowExcel, $row['UnitName'], PHPExcel_Cell_DataType::TYPE_STRING);
 			$objPHPExcel->getActiveSheet()->setCellValueExplicit("E".$rowExcel, $row['CategoryName'], PHPExcel_Cell_DataType::TYPE_STRING);
 			$objPHPExcel->getActiveSheet()->setCellValueExplicit("F".$rowExcel, $row['BranchName'], PHPExcel_Cell_DataType::TYPE_STRING);

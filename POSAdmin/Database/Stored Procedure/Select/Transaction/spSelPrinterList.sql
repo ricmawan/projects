@@ -29,7 +29,8 @@ SET State = 1;
 	
     SELECT
 		IPAddress,
-		SharedPrinterName
+		SharedPrinterName,
+		IsAttached
 	FROM
 		transaction_printerlist
 	WHERE

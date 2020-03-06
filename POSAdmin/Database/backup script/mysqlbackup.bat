@@ -30,9 +30,9 @@
 :: If you have any regional date/time issues call this include: getdate.cmd  credit: Simon Sheppard for this cmd - untested
 ::call getdate.cmd
 
-set year=%DATE:~6,4%
-set day=%DATE:~0,2%
-set mnt=%DATE:~3,2%
+set year=%DATE:~10,4%
+set day=%DATE:~4,2%
+set mnt=%DATE:~7,2%
 set hr=%TIME:~0,2%
 set min=%TIME:~3,2%
 
@@ -41,7 +41,7 @@ IF %mnt% LSS 10 SET mnt=0%mnt:~1,1%
 IF %hr% LSS 10 SET hr=0%hr:~1,1%
 IF %min% LSS 10 SET min=0%min:~1,1%
 
-set backuptime=%year%-%day%-%mnt%-%hr%-%min%
+set backuptime=%day%-%mnt%-%year%-%hr%-%min%
 echo %backuptime%
 
 :: SETTINGS AND PATHS
@@ -54,19 +54,19 @@ set dbuser=root
 set dbname="pos"
 
 :: Password for the database user
-set dbpass=
+set dbpass="TOKOMUDAKAKAKEKE"
 
 :: Error log path - Important in debugging your issues
-set errorLogPath="C:\MySQLBackups\backupfiles\dumperrors.txt"
+set errorLogPath="D:\dbckp\backupfiles\dumperrors.txt"
 
 :: MySQL EXE Path
-set mysqldumpexe="C:\xampp\mysql\bin\mysqldump.exe"
+set mysqldumpexe="D:\xampp\mysql\bin\mysqldump.exe"
 
 :: Error log path
-set backupfldr="C:\MySQLBackups\backupfiles\"
+set backupfldr="D:\dbckp\backupfiles\"
 
 :: Path to data folder which may differ from install dir
-set datafldr="C:\xampp\mysql\data"
+set datafldr="D:\xampp\mysql\data"
 
 :: Path to zip executable
 set zipper="C:\Program Files\7-Zip\7z.exe"
@@ -89,7 +89,7 @@ echo "Pass each name to mysqldump.exe and output an individual .sql file for eac
 :: turn on if you are debugging
 @echo off
 
-	%mysqldumpexe% --user=%dbuser% --password=%dbpass% --databases --routines --log-error=%errorLogPath% %dbname% > "%backupfldr%%dbname%.%backuptime%.sql"
+	%mysqldumpexe% --user=%dbuser% --password=%dbpass% --databases --log-error=%errorLogPath% %dbname% > "%backupfldr%%dbname%.%backuptime%.sql"
 
 echo "Zipping all files ending in .sql in the folder"
 

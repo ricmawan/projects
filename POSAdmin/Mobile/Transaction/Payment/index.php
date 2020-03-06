@@ -846,7 +846,7 @@
 						counterPayment = 1;
 						var data = datatable.row( cell.index().row ).data();
 						if(key == 13) {
-							if(($(".ui-dialog").css("display") == "none" || $("#delete-confirm").css("display") == "none") && $("#hdnEditFlag").val() == "1" ) {
+							if(($(".ui-dialog").css("display") == "none" || $("#delete-confirm").css("display") == "none") /*&& $("#hdnEditFlag").val() == "1" */) {
 								openDialog(data, 1);
 							}
 						}

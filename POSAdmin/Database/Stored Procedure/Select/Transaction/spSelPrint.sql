@@ -40,7 +40,7 @@ SET State = 1;
 SET State = 2;
 
 SET @query = CONCAT("SELECT
-						COUNT(1) AS nRows
+						SUM(nRows) AS nRows
 					FROM
 						(
 							SELECT

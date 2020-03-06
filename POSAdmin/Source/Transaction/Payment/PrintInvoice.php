@@ -16,6 +16,7 @@
 		$TransactionNumber = mysqli_real_escape_string($dbh, $_POST['TransactionNumber']);
 		$TotalPayment = mysqli_real_escape_string($dbh, $_POST['TotalPayment']);
 		$Amount = mysqli_real_escape_string($dbh, $_POST['Amount']);
+		$IsAttached = 'N';
 
 		$dayName = array("Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu");
 		$monthName = array("Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des");
@@ -36,69 +37,74 @@
 		if($cek > 0) {
 			$row3=mysqli_fetch_array($result);
 			$SharedPrinterName = $row3['SharedPrinterName'];
+			$IsAttached = $row3['IsAttached'];
 		}
 		else {
 			$SharedPrinterName = $SHARED_PRINTER_ADDRESS;
+			$IsAttached = $PRINTER_INSTALLED;
 		}
 
 		mysqli_free_result($result);
 		mysqli_next_result($dbh);
 
-		$connector = new WindowsPrintConnector("smb:".$SharedPrinterName);
-		$printer = new Printer($connector);
-		$printer -> pulse();
+		if($IsAttached == 'Y') {
 
-		/*$connector = new DummyPrintConnector();
-	    $file =  "PrintInvoice.txt";  # nama file temporary yang akan dicetak
-	    $handle = fopen($file, 'w');*/
+			$connector = new WindowsPrintConnector("smb:".$SharedPrinterName);
+			$printer = new Printer($connector);
+			$printer -> pulse();
 
-	    $printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
-	    $printer -> setJustification(Printer::JUSTIFY_CENTER);
-	    //$printer -> text("TOKO MUDA\n");
-	    //$printer -> selectPrintMode(Printer::MODE_FONT_A);
-	    //$printer -> text("Jl. Raya Bojong\n");
-	    //$printer -> feed();
-	    $printer -> setEmphasis(true);
-	    $printer -> text("BUKTI PEMBAYARAN\n");
-	    $printer -> setEmphasis(false);
+			/*$connector = new DummyPrintConnector();
+		    $file =  "PrintInvoice.txt";  # nama file temporary yang akan dicetak
+		    $handle = fopen($file, 'w');*/
 
-     	$printer -> setJustification(Printer::JUSTIFY_LEFT);
-	    $printer -> selectPrintMode(Printer::MODE_FONT_B);
-	    $printer -> text($dayName[date("w", strtotime($TransactionDate))] . ", " . date("d", strtotime($TransactionDate)) . " " . $monthName[date("n", strtotime($TransactionDate)) - 1] . " " . date("Y", strtotime($TransactionDate)) . "/" . date("H") . ":" . date("i") . "\n");
-	    $printer -> text(str_pad("", 39, "-") . "\n");
+		    $printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
+		    $printer -> setJustification(Printer::JUSTIFY_CENTER);
+		    //$printer -> text("TOKO MUDA\n");
+		    //$printer -> selectPrintMode(Printer::MODE_FONT_A);
+		    //$printer -> text("Jl. Raya Bojong\n");
+		    //$printer -> feed();
+		    $printer -> setEmphasis(true);
+		    $printer -> text("BUKTI PEMBAYARAN\n");
+		    $printer -> setEmphasis(false);
 
-	    if($DPFlag == 1) {
-	    	$printer -> text(" " . str_pad("DP" , 10, " "));
-	    }
-	    else {
-	    	$printer -> text(" " . str_pad("PEMBAYARAN" , 10, " "));
-	    }
-	    $printer -> text(" " . str_pad(number_format($Amount,0,".",",") , 27, " ", STR_PAD_LEFT) . "\n");
+	     	$printer -> setJustification(Printer::JUSTIFY_LEFT);
+		    $printer -> selectPrintMode(Printer::MODE_FONT_B);
+		    $printer -> text($dayName[date("w", strtotime($TransactionDate))] . ", " . date("d", strtotime($TransactionDate)) . " " . $monthName[date("n", strtotime($TransactionDate)) - 1] . " " . date("Y", strtotime($TransactionDate)) . "/" . date("H") . ":" . date("i") . "\n");
+		    $printer -> text(str_pad("", 39, "-") . "\n");
 
-	    $printer -> text(str_pad("", 39, "-") . "\n");
+		    if($DPFlag == 1) {
+		    	$printer -> text(" " . str_pad("DP" , 10, " "));
+		    }
+		    else {
+		    	$printer -> text(" " . str_pad("PEMBAYARAN" , 10, " "));
+		    }
+		    $printer -> text(" " . str_pad(number_format($Amount,0,".",",") , 27, " ", STR_PAD_LEFT) . "\n");
 
-	    $Credit = str_replace(",", "", $TotalSale) - str_replace(",", "", $TotalPayment);
-	    $printer -> setEmphasis(true);
-	    $printer -> text("TOTAL          : " . str_pad($TotalSale, 22, " ", STR_PAD_LEFT) ."\n" );
-	    $printer -> text("TOTAL BAYAR    : " . str_pad($TotalPayment, 22, " ", STR_PAD_LEFT) ."\n" );
-	    $printer -> text("KEKURANGAN     : " . str_pad(number_format($Credit ,0,".",","), 22, " ", STR_PAD_LEFT) ."\n" );
+		    $printer -> text(str_pad("", 39, "-") . "\n");
 
-	    $printer -> setEmphasis(false);
+		    $Credit = str_replace(",", "", $TotalSale) - str_replace(",", "", $TotalPayment);
+		    $printer -> setEmphasis(true);
+		    $printer -> text("TOTAL          : " . str_pad($TotalSale, 22, " ", STR_PAD_LEFT) ."\n" );
+		    $printer -> text("TOTAL BAYAR    : " . str_pad($TotalPayment, 22, " ", STR_PAD_LEFT) ."\n" );
+		    $printer -> text("KEKURANGAN     : " . str_pad(number_format($Credit ,0,".",","), 22, " ", STR_PAD_LEFT) ."\n" );
 
-	    $printer -> text("Kasir : " . str_pad($_SESSION['UserLogin'] . ", ", 10, " ") . " No : " . str_pad($TransactionNumber, 14, " ") . "\n");
-	    $printer -> text(str_pad("", 39, "-") . "\n");
-	    $printer -> setJustification(Printer::JUSTIFY_CENTER);
-	    $printer -> text("KAMI TIDAK MELAYANI PENUKARAN BARANG\n");
-	    $printer -> text("TANPA DISERTAI NOTA ASLI\n");
-	    $printer -> text("TERIMAKASIH ATAS KUNJUNGAN ANDA\n\n");
+		    $printer -> setEmphasis(false);
 
-	    /*$data = $connector -> getData();
-	    fwrite($handle, $data);
-	    fclose($handle);*/
+		    $printer -> text("Kasir : " . str_pad($_SESSION['UserLogin'] . ", ", 10, " ") . " No : " . str_pad($TransactionNumber, 14, " ") . "\n");
+		    $printer -> text(str_pad("", 39, "-") . "\n");
+		    $printer -> setJustification(Printer::JUSTIFY_CENTER);
+		    $printer -> text("KAMI TIDAK MELAYANI PENUKARAN BARANG\n");
+		    $printer -> text("TANPA DISERTAI NOTA ASLI\n");
+		    $printer -> text("TERIMAKASIH ATAS KUNJUNGAN ANDA\n\n");
 
-	    /* Cut the receipt and open the cash drawer */
-	    $printer -> cut();
-	    $printer -> close();
+		    /*$data = $connector -> getData();
+		    fwrite($handle, $data);
+		    fclose($handle);*/
+
+		    /* Cut the receipt and open the cash drawer */
+		    $printer -> cut();
+		    $printer -> close();
+		}
 
 		$Message = "Pembayaran berhasil";
 		$FinishFlag = 1;

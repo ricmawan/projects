@@ -28,6 +28,8 @@
 						<input id="hdnItemID" name="hdnItemID" type="hidden" value=0 />
 						<input id="hdnItemDetailsID" name="hdnItemDetailsID" type="hidden" value=0 />
 						<input id="hdnTransactionDate" name="hdnTransactionDate" type="hidden" />
+						<input id="hdnGrandTotalBuyPrice" name="hdnGrandTotalBuyPrice" type="hidden" />
+						<input id="hdnGrandTotal" name="hdnGrandTotal" type="hidden" />
 						<input id="hdnAvailableUnit" name="hdnAvailableUnit" type="hidden" />
 						<input id="hdnIsEdit" name="hdnIsEdit" type="hidden" />
 						<input id="hdnPayment" name="hdnPayment" type="hidden" value=0 />
@@ -250,7 +252,7 @@
 					Diskon :
 				</div>
 				<div class="col-md-8">
-					<input id="txtDiscountTotal" name="txtDiscountTotal" type="text" tabindex=15 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onkeypress="return isNumberKey(event, this.id, this.value)" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
+					<input id="txtDiscountTotal" name="txtDiscountTotal" type="text" tabindex=15 class="form-control-custom text-right" value="0" autocomplete=off placeholder="Bayar" onkeypress="return isNumberKey(event, this.id, this.value)" onchange="validateDiscount(this.value);" onfocus="clearFormat(this.id, this.value);this.select();" onblur="convertRupiah(this.id, this.value);" onpaste="return false;" />
 				</div>
 			</div>
 			<br />
@@ -280,7 +282,7 @@
 			</div>
 			<br />
 			<div class="row col-md-12" >
-				<label class="checkboxContainer">Cetak Surat Pengambilan
+				<label class="checkboxContainer">Cetak Surat Jalan
 					<input type="checkbox" id="chkPrintShipment" name="chkPrintShipment" value=1 tabindex=18 checked />
 					<span class="checkmark"></span>
 				</label>
@@ -457,14 +459,14 @@
 						counterSaleDetails = 1;
 						var data = datatable.row( cell.index().row ).data();
 						if(key == 13) {
-							if(($("#delete-confirm").css("display") == "none") && $("#hdnEditFlag").val() == "1" ) {
+							if(($("#delete-confirm").css("display") == "none") /*&& $("#hdnEditFlag").val() == "1"*/ ) {
 								table2.cell.blur();
 								table2.keys.disable();
 								rowEdit = datatable.row( cell.index().row );
 								openDialogEdit(data);
 							}
 						}
-						else if(key == 46 && $("#hdnDeleteFlag").val() == "1") {
+						else if(key == 46 /*&& $("#hdnDeleteFlag").val() == "1"*/) {
 							table2.keys.disable();
 							var deletedData = new Array();
 							deletedData.push(data[1]);
@@ -2220,13 +2222,18 @@
 			
 			function Calculate() {
 				var grandTotal = 0;
+				var grandTotalBuyPrice = 0;
 				var weight = 0;
 				table2.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
 					var data = this.data();
 					grandTotal += (parseFloat(data[9].replace(/\,/g, "")) - parseFloat(data[10].replace(/\,/g, ""))) * parseFloat(data[7]);
 					weight += (parseFloat(data[17]) * parseFloat(data[7]) * parseFloat(data[22]));
+					grandTotalBuyPrice += parseFloat(data[12].replace(/\,/g, "")) * parseFloat(data[7]);
+
 				});
+				$("#hdnGrandTotal").val(grandTotal);
 				$("#lblTotal").html(returnRupiah(grandTotal.toString()));
+				$("#hdnGrandTotalBuyPrice").val(grandTotalBuyPrice);
 				$("#lblWeight").html(returnWeight(weight.toFixed(2).toString()));
 			}
 			
@@ -2275,6 +2282,8 @@
 				$("#txtSubTotal").val(0);
 				$("#hdnStock").val(0);
 				$("#hdnConversionQty").val(0);
+				$("#hdnGrandTotalBuyPrice").val(0);
+				$("#hdnGrandTotal").val(0);
 				table2.clear().draw();
 				table2.keys.enable();
 			}
@@ -2565,7 +2574,7 @@
 					$("#finish-dialog").dialog({
 						autoOpen: false,
 						open: function() {
-							//$("#divModal").show();
+							$("#divModal").show();
 							table2.keys.disable();
 							var Total = $("#lblTotal").html().replace(/\,/g, "");
 							var discountTotal = $("#hdnDiscountTotal").val();
@@ -2601,7 +2610,7 @@
 						close: function() {
 							$(this).dialog("destroy");
 							table2.keys.enable();
-							//$("#divModal").hide();
+							$("#divModal").hide();
 							$("#txtPayment").val(0);
 							$("#txtDiscountTotal").val(0);
 							$("#ddlPayment").val(1);
@@ -2610,7 +2619,7 @@
 						resizable: false,
 						height: 370,
 						width: 420,
-						modal: true /*,
+						modal: false /*,
 						buttons: [
 						{
 							text: "Tutup",
@@ -3167,6 +3176,91 @@
 						}
 					}]
 				}).dialog("open");
+			}
+
+			function validateDiscount(Discount) {
+				var grandTotalBuyPrice = $("#hdnGrandTotalBuyPrice").val();
+				var grandTotal = $("#hdnGrandTotal").val();
+
+				if((grandTotal - Discount) < grandTotalBuyPrice) {
+					$("#token-code-dialog").dialog({
+						autoOpen: false,
+						open: function() {
+							//$("#divModal").show();
+							$(document).on('keydown', function(e) {
+								if (e.keyCode == 39 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //right arrow
+									$("#btnCancelPromptTokenCode").focus();
+								}
+								else if(e.keyCode == 37 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //left arrow
+									$("#btnPromptTokenCode").focus();
+								}
+							});
+							setTimeout(function() {
+								$("#txtTokenCode").focus();
+							}, 0);
+						},
+						
+						close: function() {
+							$(this).dialog("destroy");
+							//$("#divModal").hide();
+							$("#txtDiscountTotal").val(0);
+						},
+						resizable: false,
+						height: 250,
+						width: 500,
+						modal: true,
+						buttons: [
+						{
+							text: "Konfirmasi Kode",
+							id: "btnPromptTokenCode",
+							tabindex: 71,
+							click: function() {
+								var txtTokenCode = $("#txtTokenCode").val();
+								$.ajax({
+									url: "./Transaction/Sale/CheckToken.php",
+									type: "POST",
+									data: { TokenCode : txtTokenCode },
+									dataType: "json",
+									success: function(data) {
+										if(data.FailedFlag == '0') {
+											$("#loading").hide();
+											$("#token-code-dialog").dialog("destroy");
+											//$("#divModal").hide();
+											$("#txtCode").val("");
+										}
+										else {
+											//add new item
+											//$("#loading").hide();
+											$("#txtTokenCode").notify("Kode salah!", { position:"right", className:"warn", autoHideDelay: 2000 });
+											$("#txtTokenCode").focus();
+										}
+									},
+									error: function(jqXHR, textStatus, errorThrown) {
+										$("#loading").hide();
+										var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+										LogEvent(errorMessage, "/Transaction/Sale/index.php");
+										Lobibox.alert("error",
+										{
+											msg: errorMessage,
+											width: 480
+										});
+										return 0;
+									}
+								});
+							}
+						},
+						{
+							text: "Batal",
+							id: "btnCancelPromptTokenCode",
+							click: function() {
+								$(this).dialog("destroy");
+								//$("#divModal").hide();
+								$("#txtDiscountTotal").val(0);
+								return false;
+							}
+						}]
+					}).dialog("open");
+				}
 			}
 			
 			$(document).ready(function() {

@@ -322,7 +322,7 @@
 			<br />
 			<br />
 			<div class="row col-md-12 col-sm-12" >
-				<label class="checkboxContainer">Cetak Surat Pengambilan
+				<label class="checkboxContainer">Cetak Surat Jalan
 					<input type="checkbox" id="chkPrintShipment" name="chkPrintShipment" value=1 tabindex=19 checked />
 					<span class="checkmark"></span>
 				</label>
@@ -474,7 +474,7 @@
 						counterSaleDetails = 1;
 						var data = datatable.row( cell.index().row ).data();
 						if(key == 13) {
-							if(($("#delete-confirm").css("display") == "none") && $("#hdnEditFlag").val() == "1" ) {
+							if(($("#delete-confirm").css("display") == "none") /*&& $("#hdnEditFlag").val() == "1"*/ ) {
 								table2.cell.blur();
 								table2.keys.disable();
 								rowEdit = datatable.row( cell.index().row );

@@ -219,7 +219,7 @@
 					$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Total ". $Kasir);
 					$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, ($TotalKasir - $KasirDiscountTotal));
 					$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->applyFromArray($transactionNameStyle);
-					$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel."F".$rowExcel)->applyFromArray($totalKasirStyle);
+					$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":F".$rowExcel)->applyFromArray($totalKasirStyle);
 					$TotalKasir = 0;
 					$KasirDiscountTotal = 0;
 					$rowExcel++;
@@ -313,10 +313,10 @@
 						}
 					}
 					$rowExcel++;
-					$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['CustomerName'] . " (". $row['TransactionNumber'] .")");
+					$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['CustomerName'] . " (". $row['TransactionNumber'] .") " . date("H", strtotime($row['CreatedDate'])) . ":" . date("i", strtotime($row['CreatedDate'])));
 				}
 				$rowExcel++;
-				$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['ItemName']);
+				$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, htmlspecialchars_decode($row['ItemName'], ENT_QUOTES));
 				$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['SalePrice']);
 				if(strpos($row['Quantity'], ".")) $Quantity = number_format(round($row['Quantity'], 2),2,".",",");	    		
 		    	else $Quantity = number_format($row['Quantity'],0,".",",");
@@ -441,10 +441,10 @@
 						$SubTotal = 0;
 					}
 					$rowExcel++;
-					$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['CustomerName'] . " (". $row['TransactionNumber'] .")");
+					$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['CustomerName'] . " (". $row['TransactionNumber'] .") " . date("H", strtotime($row['CreatedDate'])) . ":" . date("i", strtotime($row['CreatedDate'])));
 				}
 				$rowExcel++;
-				$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['ItemName']);
+				$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, htmlspecialchars_decode($row['ItemName'], ENT_QUOTES));
 				$objPHPExcel->getActiveSheet()->setCellValue("C".$rowExcel, $row['SalePrice']);
 				if(strpos($row['Quantity'], ".")) $Quantity = number_format(round($row['Quantity'], 2),2,".",",");	    		
 		    	else $Quantity = number_format($row['Quantity'],0,".",",");
@@ -521,7 +521,7 @@
 					$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->applyFromArray($transactionNameStyle);
 				}
 				$rowExcel++;
-				$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['CustomerName'] . " (". $row['TransactionNumber'] .")");
+				$objPHPExcel->getActiveSheet()->setCellValue("B".$rowExcel, $row['CustomerName'] . " (". $row['TransactionNumber'] .") " . date("H", strtotime($row['CreatedDate'])) . ":" . date("i", strtotime($row['CreatedDate'])));
 				$objPHPExcel->getActiveSheet()->setCellValue("F".$rowExcel, $row['SubTotal']);
 				$UnionTotal += $row['SubTotal'];
 				$TotalKasir += $row['SubTotal'];

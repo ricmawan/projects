@@ -114,7 +114,7 @@
 							$SubTotal = 0;
 						}
 					}
-					$Data .= "<tr><td></td><td>". $row['CustomerName'] . " (". $row['TransactionNumber'] .")</td><td colspan=4></td></tr>";					
+					$Data .= "<tr><td></td><td>". $row['CustomerName'] . " (". $row['TransactionNumber'] .")  ".date("H", strtotime($row['CreatedDate'])) . ":" . date("i", strtotime($row['CreatedDate'])) . " </td><td colspan=4></td></tr>";					
 				}
 				$Data .= "<tr><td></td><td>". $row['ItemName'] ."</td><td class='text-right'>". number_format($row['SalePrice'],0,".",",") ."</td>";
 				if(strpos($row['Quantity'], ".")) $Quantity = number_format(round($row['Quantity'], 2),2,".",",");	    		
@@ -190,7 +190,7 @@
 						$Data .= "<tr><td colspan=4></td><td>DP</td><td class='text-right'>". number_format($Payment,0,".",",") ."</td></tr>";
 						$SubTotal = 0;
 					}
-					$Data .= "<tr><td></td><td>". $row['CustomerName'] . " (". $row['TransactionNumber'] .")</td><td colspan=4></td></tr>";
+					$Data .= "<tr><td></td><td>". $row['CustomerName'] . " (". $row['TransactionNumber'] .") ".date("H", strtotime($row['CreatedDate'])) . ":" . date("i", strtotime($row['CreatedDate'])) . " </td><td colspan=4></td></tr>";
 				}
 				$Data .= "<tr><td></td><td>". $row['ItemName'] ."</td><td class='text-right'>". number_format($row['SalePrice'],0,".",",") ."</td>";
 				if(strpos($row['Quantity'], ".")) $Quantity = number_format(round($row['Quantity'], 2),2,".",",");	    		
@@ -235,7 +235,7 @@
 					}
 					$Data .= "<tr><td colspan=6 class='TransactionName'>". $row['TransactionName'] ."</td></tr>";
 				}
-				$Data .= "<tr><td></td><td>". $row['CustomerName'] . " (". $row['TransactionNumber'] .")</td><td colspan=3></td><td class='text-right'>". number_format($row['SubTotal'],0,".",",") ."</td></tr>";
+				$Data .= "<tr><td></td><td>". $row['CustomerName'] . " (". $row['TransactionNumber'] .")  ".date("H", strtotime($row['CreatedDate'])) . ":" . date("i", strtotime($row['CreatedDate'])) . " </td><td colspan=3></td><td class='text-right'>". number_format($row['SubTotal'],0,".",",") ."</td></tr>";
 				$UnionTotal += $row['SubTotal'];
 				$TotalKasir += $row['SubTotal'];
 				$GrandTotal += $row['SubTotal'];

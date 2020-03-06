@@ -323,7 +323,7 @@
 			</div>
 			<br />
 			<div class="row col-md-12" >
-				<label class="checkboxContainer">Cetak Surat Pengambilan
+				<label class="checkboxContainer">Cetak Surat Jalan
 					<input type="checkbox" id="chkPrintShipment" name="chkPrintShipment" value=1 tabindex=18 checked />
 					<span class="checkmark"></span>
 				</label>

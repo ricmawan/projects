@@ -109,7 +109,7 @@
 			$GrandTotal += $row['Credit'];
 		}
 
-		$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":H".$rowExcel);
+		$objPHPExcel->getActiveSheet()->mergeCells("A".$rowExcel.":G".$rowExcel);
 		$objPHPExcel->getActiveSheet()->setCellValue("A".$rowExcel, "Grand Total");
 		$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel.":H".$rowExcel)->getFont()->setBold(true);
 		$objPHPExcel->getActiveSheet()->getStyle("A".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
