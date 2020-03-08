@@ -6,6 +6,7 @@
 		include "../../GetPermission.php";
 		$PatientID = mysql_real_escape_string($_POST['hdnPatientID']);
 		$Telephone = mysql_real_escape_string($_POST['txtTelephone']);
+		$NIK = mysql_real_escape_string($_POST['txtNIK']);
 		$PatientName = mysql_real_escape_string($_POST['txtPatientName']);
 		$PatientNumber = mysql_real_escape_string($_POST['txtPatientNumber']);
 		$Address = mysql_real_escape_string($_POST['txtAddress']);
@@ -20,7 +21,7 @@
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
-		$sql = "CALL spInsPatient(".$PatientID.", '".$PatientNumber."', '".$PatientName."', '".$BirthDate."', '".$Address."', '".$Allergy."', '".$City."', '".$Telephone."', '".$Email."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."', '".$Info."')";
+		$sql = "CALL spInsPatient(".$PatientID.", '".$NIK."', '".$PatientNumber."', '".$PatientName."', '".$BirthDate."', '".$Address."', '".$Allergy."', '".$City."', '".$Telephone."', '".$Email."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."', '".$Info."')";
 		
 		if (! $result=mysql_query($sql, $dbh)) {
 			$Message = "Terjadi Kesalahan Sistem";

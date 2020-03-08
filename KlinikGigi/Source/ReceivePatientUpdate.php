@@ -14,7 +14,8 @@
 				Telephone,
 				Allergy,
 				Email,
-				Info
+				Info,
+				NIK
 			FROM
 				master_patient
 			WHERE
@@ -27,7 +28,7 @@
 
 	while ($row = mysqli_fetch_array($result)) {
 		$State = 2;
-		$sql2 = "CALL spInsPatient(".$row['PatientID'].", '".$row['PatientNumber']."', '".$row['PatientName']."', '".$row['BirthDate']."', '".$row['Address']."', '".$row['Allergy']."', '".$row['City']."', '".$row['Telephone']."', '".$row['Email']."', 1, 'BatchSync', '".$row['Info']."')";
+		$sql2 = "CALL spInsPatient(".$row['PatientID'].", '".$row['NIK']."', '".$row['PatientNumber']."', '".$row['PatientName']."', '".$row['BirthDate']."', '".$row['Address']."', '".$row['Allergy']."', '".$row['City']."', '".$row['Telephone']."', '".$row['Email']."', 1, 'BatchSync', '".$row['Info']."')";
 
 		if (! $result2=mysqli_query($dbh3, $sql2)) {
 			file_put_contents('./sync.log',  date("d-m-Y H:i:s") . " ReceivePatientUpdate.php State " . $State . " PatientID : " . $row['PatientID'] . "(". mysqli_error($dbh3) . ")\n", FILE_APPEND);

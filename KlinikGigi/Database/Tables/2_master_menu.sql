@@ -238,6 +238,15 @@ VALUES
 	NULL,
 	0,
 	10
+),
+(
+	25,
+	4,
+	'Konfirmasi Pelanggan',
+	'Report/CustomerConfirmation/',
+	NULL,
+	0,
+	7
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

@@ -15,11 +15,13 @@
 		$IsEdit = 0;
 		$SalesID = 0;
 		$Allergy = "";
+		$NIK = "";
 		if($PatientID != 0) {
 			$IsEdit = 1;
 			//$Content = "Place the content here";
 			$sql = "SELECT
 						PatientID,
+						NIK,
 						PatientName,
 						DATE_FORMAT(BirthDate, '%d-%m-%Y') BirthDate,
 						PatientNumber,
@@ -40,6 +42,7 @@
 			}				
 			$row=mysql_fetch_array($result);
 			$PatientID = $row['PatientID'];
+			$NIK = $row['NIK'];
 			$PatientName = $row['PatientName'];
 			$PatientNumber = $row['PatientNumber'];
 			$BirthDate = $row['BirthDate'];
@@ -75,6 +78,15 @@
 								</div>
 								<div class="col-md-3">
 									<input id="txtPatientNumber" name="txtPatientNumber" type="text" class="form-control-custom" placeholder="ID Pasien" required   <?php echo 'value="'.$PatientNumber.'"'; ?> />
+								</div>
+							</div>
+							<br />
+							<div class="row">
+								<div class="col-md-2 labelColumn">
+									NIK :
+								</div>
+								<div class="col-md-3">
+									<input id="txtNIK" name="txtNIK" type="text" class="form-control-custom" placeholder="NIK" required   <?php echo 'value="'.$NIK.'"'; ?> />
 								</div>
 							</div>
 							<br />
