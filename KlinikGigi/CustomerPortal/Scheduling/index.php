@@ -72,6 +72,7 @@
 					<input type="hidden" id="hdnStartDate" name="hdnStartDate" value=0 autofocus="autofocus" />
 					<input type="hidden" id="hdnDDLBranch" name="hdnDDLBranch" value=1 autofocus="autofocus" />
 					<input type="hidden" id="hdnDDLDoctor" name="hdnDDLDoctor" value=1 autofocus="autofocus" />
+					<input type="hidden" id="hdnPatientName" name="hdnPatientName" <?php echo "value='".$_SESSION['Nama']."'" ?>  autofocus="autofocus" />
 					<div class="row" >
 						<div class="col-md-3 labelColumn" >
 							Tanggal:
@@ -148,6 +149,8 @@
 		<script>
 			var businessHours;
 			var startDateGlobal;
+			var cancelledDate;
+			var lastBlockedDate;
 			function hideUnavailableTime(dayOfWeek) {
 				var startDate = $("#hdnStartDate").val();
 				$("#ddlTime option").each(function() {
@@ -359,10 +362,30 @@
 				});
 			}
 
+			function getLastCancelledSchedule() {
+				$.ajax({
+					url: "./Scheduling/GetLastBlockedDate.php",
+					type: "POST",
+					data: { PatientName : $("#hdnPatientName").val() },
+					dataType: "json",
+					success: function(data) {
+						$("#loading").hide();
+						lastBlockedDate = data[0].LastBlockedDate;
+						cancelledDate = data[0].CancelledDate;
+						//alert(lastBlockedDate);
+					},
+					error: function(data) {
+						$("#loading").hide();
+						$.notify("Terjadi kesalahan sistem!", "error");
+					}
+				});
+			}
+
 			$(document).ready(function() {
 				//ddlTime();
 				$("#loading").show();
 				loadDoctor();
+				getLastCancelledSchedule();
 				var currentDate = new Date();
 				currentDate.setDate(currentDate.getDate() + 15);
 				var currentMonth;
@@ -476,9 +499,15 @@
 							var count = 0;
 							if(businessHours.indexOf(parseInt(date.format('e')) ) >= 0) {
 								$('#calendar').fullCalendar('clientEvents', function(event) {
+									//console.log(moment(date).format('YYYY-MM-DD'));
+									//console.log(moment(event.start._i).format('YYYY-MM-DD'));
+									//console.log(moment(lastBlockedDate).format('YYYY-MM-DD'));
 									if(moment(date).format('YYYY-MM-DD') == moment(event.start._i).format('YYYY-MM-DD') && count == 0) {
 										count++;
-										if(event.isAvailable == "0") {
+										if(moment(date).format('YYYY-MM-DD') < moment(lastBlockedDate).format('YYYY-MM-DD') && moment(cancelledDate).format('YYYY-MM-DD') != moment(lastBlockedDate).format('YYYY-MM-DD')) {
+											$.notify("Your account has been suspended due to a cancellation of the previous schedule!", "error");
+										}
+										else if(event.isAvailable == "0") {
 											$.notify("Full Schedule!", "error");
 											return false;
 										}
@@ -493,12 +522,17 @@
 									}
 								});
 								if(count == 0) {
-									var startDate = new Date(date);
-									var scheduledDate = startDate.getFullYear().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getDate().toString();
-									$("#lblStartDate").html(startDate.getDate().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getFullYear().toString());
-									$("#hdnStartDate").val(scheduledDate);
-									dialogSchedule();
-									ddlTime(parseInt(date.format('e')));
+									if(moment(date).format('YYYY-MM-DD') < moment(lastBlockedDate).format('YYYY-MM-DD') && moment(cancelledDate).format('YYYY-MM-DD') != moment(lastBlockedDate).format('YYYY-MM-DD')) {
+											$.notify("Your account has been suspended due to a cancellation of the previous schedule!", "error");
+									}
+									else {
+										var startDate = new Date(date);
+										var scheduledDate = startDate.getFullYear().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getDate().toString();
+										$("#lblStartDate").html(startDate.getDate().toString() + "-" + (startDate.getMonth() + 1).toString() + "-" + startDate.getFullYear().toString());
+										$("#hdnStartDate").val(scheduledDate);
+										dialogSchedule();
+										ddlTime(parseInt(date.format('e')));
+									}
 								}
 							}
 						},
