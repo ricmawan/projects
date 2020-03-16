@@ -12,10 +12,10 @@
 
 	$mail->isSMTP();                                      // Set mailer to use SMTP
 	$mail->SMTPAuth = true;                               // Enable SMTP authentication
-	$mail->Host = 'smtp.hostinger.co.id';  // Specify main and backup SMTP servers
-	$mail->Username = 'cs@imdentalspecialist.com';                 // SMTP username
+	$mail->Host = 'smtp.gmail.com';  // Specify main and backup SMTP servers
+	$mail->Username = '****@gmail.com';                 // SMTP username
 	//$mail->From = 'cs@imdentalspecialist.com';
-	$mail->Password = 'imdentalspecialist';                           // SMTP password
+	$mail->Password = '****';                           // SMTP password
 	$mail->Port = 587;                                    // TCP port to connect to
 	$mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
 
@@ -38,9 +38,15 @@
 				OS.ScheduledDate,
 				DATE_FORMAT(OS.ScheduledDate, '%w') DayCount,
 				OS.PatientName,
-				OS.Email
+				OS.Email,
+				MU.Username DoctorName,
+				MB.BranchName
 			FROM
 				transaction_onlineschedule OS
+				JOIN master_user MU
+					ON OS.DoctorID = MU.UserID
+				JOIN master_branch MB
+					ON MB.BranchID = OS.BranchID
 			WHERE
 				IFNULL(OS.EmailStatus, '') <> 'Sent'
 				AND CustomerSelfRegFlag = 1
@@ -61,12 +67,12 @@
 
 		$MessageSent = $MessageBody;
 
-		$MessageSent = str_replace("[URLY1]", $url . base64_url_encode('Y'), $MessageSent);
-		$MessageSent = str_replace("[URLY2]", $url . base64_url_encode('Y'), $MessageSent);
-		$MessageSent = str_replace("[URLN1]", $url . base64_url_encode('N'), $MessageSent);
-		$MessageSent = str_replace("[URLN2]", $url . base64_url_encode('N'), $MessageSent);
+		$MessageSent = str_replace("[URLY]", $url . base64_url_encode('Y'), $MessageSent);
+		$MessageSent = str_replace("[URLN]", $url . base64_url_encode('N'), $MessageSent);
 
-
+		$MessageSent = str_replace("[BranchName]", $row3['BranchName'], $MessageSent);
+		$MessageSent = str_replace("[DoctorName]", $row3['DoctorName'], $MessageSent);
+		
 		$MessageSent = str_replace("[Day_Name]", $dayName[$row3['DayCount']], $MessageSent);
 		$MessageSent = str_replace("[Day_Name2]", $dayName2[$row3['DayCount']], $MessageSent);
 		$MessageSent = str_replace("[ScheduledDate]", date("d", strtotime($row3['ScheduledDate'])) . " " . $monthName[date("m", strtotime($row3['ScheduledDate'])) - 1] . " " . date("Y", strtotime($row3['ScheduledDate'])), $MessageSent);
