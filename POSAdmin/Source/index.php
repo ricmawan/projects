@@ -6,7 +6,7 @@
 		if(ISSET($_SESSION['UserLogin']) && ISSET($_SESSION['UserPassword'])) {
 			$sql = "CALL spSelUserLogin('".mysqli_real_escape_string($dbh, $_SESSION['UserLogin'])."', '".mysqli_real_escape_string($dbh, $_SESSION['UserPassword'])."', 1, '".mysqli_real_escape_string($dbh, $_SESSION['UserLogin'])."')";
 			if (!$result = mysqli_query($dbh, $sql)) {
-				logEvent(mysqli_error($dbh), '/index.php', mysqli_real_escape_string($_SESSION['UserLogin']));
+				logEvent(mysqli_error($dbh), '/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 				return 0;
 			}
 			
