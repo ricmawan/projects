@@ -30,6 +30,8 @@ SET State = 1;
 	SELECT
 		MI.ItemCode,
 		MI.ItemName,
+		MI.BuyPrice,
+		MI.RetailPrice,
         MC.CategoryID,
 		MC.CategoryName,
 		MB.BranchName,
@@ -376,6 +378,8 @@ SET State = 1;
 	SELECT
 		MID.ItemDetailsCode,
 		MI.ItemName,
+		MI.BuyPrice,
+		MI.RetailPrice,
         MC.CategoryID,
 		MC.CategoryName,
 		MB.BranchName,

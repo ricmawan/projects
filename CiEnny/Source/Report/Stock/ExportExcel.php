@@ -108,6 +108,8 @@
 			$objPHPExcel->getActiveSheet()->setCellValueExplicit("F".$rowExcel, $row['BranchName'], PHPExcel_Cell_DataType::TYPE_STRING);
 			$objPHPExcel->getActiveSheet()->setCellValue("G".$rowExcel, $row['Stock']);
 			$objPHPExcel->getActiveSheet()->setCellValue("H".$rowExcel, $row['PhysicalStock']);
+			$objPHPExcel->getActiveSheet()->setCellValue("I".$rowExcel, $row['BuyPrice']);
+			$objPHPExcel->getActiveSheet()->setCellValue("J".$rowExcel, $row['RetailPrice']);
 			$RowNumber++;
 			$rowExcel++;
 		}
@@ -116,7 +118,7 @@
 		
 		$objPHPExcel->getActiveSheet()->getStyle("B7:F".$rowExcel)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
 
-		$objPHPExcel->getActiveSheet()->getStyle("G6:H".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+		$objPHPExcel->getActiveSheet()->getStyle("G6:J".$rowExcel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 		
 		//set all width 
 		$fromCol='A';

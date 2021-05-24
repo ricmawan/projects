@@ -90,6 +90,8 @@ SET State = 2;
 SET @query = CONCAT("SELECT
 						MI.ItemCode,
 						MI.ItemName,
+						MI.BuyPrice,
+						MI.RetailPrice,
 						MC.CategoryName,
 						MB.BranchName,
 						ROUND((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0) - IFNULL(BN.Quantity, 0)), 2) Stock,
@@ -435,6 +437,8 @@ SET @query = CONCAT("SELECT
                     SELECT
 						MID.ItemDetailsCode,
 						MI.ItemName,
+						MI.BuyPrice,
+						MI.RetailPrice,
 						MC.CategoryName,
 						MB.BranchName,
 						ROUND((IFNULL(FS.Quantity, 0) + IFNULL(TP.Quantity, 0) + IFNULL(SR.Quantity, 0) - IFNULL(S.Quantity, 0) - IFNULL(PR.Quantity, 0) + IFNULL(SM.Quantity, 0) - IFNULL(SMM.Quantity, 0) + IFNULL(SA.Quantity, 0) - IFNULL(B.Quantity, 0) - IFNULL(BN.Quantity, 0)) / MID.ConversionQuantity, 2) Stock,
