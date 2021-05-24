@@ -27,7 +27,7 @@
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;
-			logEvent(mysqli_error($dbh), '/Transaction/Sale/UpdatePayment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Transaction/Sale/PrintInvoice.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 			echo returnstate($SaleID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}
@@ -45,7 +45,7 @@
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;
-			logEvent(mysqli_error($dbh), '/Transaction/Sale/UpdatePayment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Transaction/Sale/PrintInvoice.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 			echo returnstate($SaleID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}
@@ -101,6 +101,7 @@
 			    $sql = "CALL spSelSaleHeader(".$SaleID.", '".$_SESSION['UserLogin']."')";
 
 				if (! $result = mysqli_query($dbh, $sql)) {
+					$printer -> close();
 					logEvent(mysqli_error($dbh), '/Transaction/Sale/PrintInvoice.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 					$Message = "Terjadi Kesalahan Sistem";
 					$MessageDetail = mysql_error();
@@ -125,7 +126,8 @@
 			    $FailedFlag = 0;
 
 			    if (! $result = mysqli_query($dbh, $sql)) {
-			        logEvent(mysqli_error($dbh), '/Transaction/Sale/Print.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			    	$printer -> close();
+			        logEvent(mysqli_error($dbh), '/Transaction/Sale/PrintInvoice.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 			        $FailedFlag = 1;
 			        $json_data = array(
 			                        "FailedFlag" => $FailedFlag

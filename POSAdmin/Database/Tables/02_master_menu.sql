@@ -310,6 +310,15 @@ VALUES
 	NULL,
 	1,
 	10
+),
+(
+	33,
+	4,
+	'Stok Kosong',
+	'Report/NoStock/',
+	NULL,
+	1,
+	11
 );
 
 CREATE UNIQUE INDEX MENU_INDEX

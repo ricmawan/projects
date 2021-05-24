@@ -99,6 +99,7 @@
 			    $sql = "CALL spSelSaleHeader(".$SaleID.", '".$_SESSION['UserLogin']."')";
 
 				if (! $result = mysqli_query($dbh, $sql)) {
+					$printer -> close();
 					logEvent(mysqli_error($dbh), '/Transaction/Sale/PrintInvoice.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 					$Message = "Terjadi Kesalahan Sistem";
 					$MessageDetail = mysql_error();
@@ -123,6 +124,7 @@
 			    $FailedFlag = 0;
 
 			    if (! $result = mysqli_query($dbh, $sql)) {
+			    	$printer -> close();
 			        logEvent(mysqli_error($dbh), '/Transaction/Sale/Print.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 			        $FailedFlag = 1;
 			        $json_data = array(

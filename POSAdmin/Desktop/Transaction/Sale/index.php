@@ -2833,7 +2833,7 @@
 									var counter = 0;
 									Lobibox.alert("error",
 									{
-										msg: data.ErrorMessage,
+										msg: data.Message,
 										width: 480,
 										beforeClose: function() {
 											if(counter == 0) {
@@ -2861,6 +2861,64 @@
 							}
 						});
 					}
+				}
+
+				setTimeout(function() {
+					printCounter = 0;
+				}, 1000);
+			}
+
+			function printLastTransaction() {
+				if(printCounter == 0) {
+					printCounter = 1;
+					$("#loading").show();
+					$.ajax({
+						url: "./Transaction/Sale/PrintLastTransaction.php",
+						type: "POST",
+						data: {  },
+						dataType: "json",
+						success: function(data) {
+							if(data.FailedFlag == '0') {
+								$("#loading").hide();
+								Lobibox.alert("success",
+								{
+									msg: data.Message,
+									width: 480
+								});
+							}
+							else {
+								$("#loading").hide();
+								$("#divModal").hide();
+								var counter = 0;
+								Lobibox.alert("error",
+								{
+									msg: data.Message,
+									width: 480,
+									beforeClose: function() {
+										if(counter == 0) {
+											setTimeout(function() {
+												$("#txtItemCode").focus();
+											}, 0);
+											counter = 1;
+										}
+									}
+								});
+								return 0;
+							}
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+							$("#loading").hide();
+							$("#divModal").hide();
+							var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+							LogEvent(errorMessage, "/Transaction/Sale/index.php");
+							Lobibox.alert("error",
+							{
+								msg: errorMessage,
+								width: 480
+							});
+							return 0;
+						}
+					});
 				}
 
 				setTimeout(function() {
@@ -3407,6 +3465,13 @@
 					}
 					else if(evt.keyCode == 121) {
 						evt.preventDefault();
+					}
+					else if(evt.keyCode == 119) {
+						evt.preventDefault();
+						if(counterKey == 0) {
+							printLastTransaction();
+							counterKey = 1;
+						}
 					}
 					else if(evt.keyCode == 122 && $("#customerList-dialog").css("display") == "none" && $("#itemList-dialog").css("display") == "none"  && $("#finish-dialog").css("display") == "none" && $("#code-dialog").css("display") == "none" && $("#add-confirm").css("display") == "none" && $(".lobibox").css("display") != "block" && $("#save-confirm").css("display") == "none" && $("#delete-confirm").css("display") == "none" ) {
 						evt.preventDefault();
