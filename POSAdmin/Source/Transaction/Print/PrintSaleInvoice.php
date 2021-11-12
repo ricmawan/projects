@@ -110,6 +110,7 @@
 
 				$row = mysqli_fetch_array($result);
 				$CreatedDate = $row['CreatedDate'];
+				$CreatedBy = $row['CreatedBy'];
 				$CustomerName = $row['CustomerName'];
 				$Address = $row['Address'];
 				mysqli_free_result($result);
@@ -168,7 +169,7 @@
 			    else $printer -> text("KEKURANGAN   : " . str_pad(number_format($Change ,0,".",","), 24, " ", STR_PAD_LEFT) . "\n" );
 			    $printer -> setEmphasis(false);
 
-			    $printer -> text("Kasir : " . str_pad($_SESSION['UserLogin'] . ", ", 10, " ") . " No : " . str_pad($SaleNumber, 14, " ") . "\n");
+			    $printer -> text("Kasir : " . str_pad($CreatedBy . ", ", 10, " ") . " No : " . str_pad($SaleNumber, 14, " ") . "\n");
 			    $printer -> text(str_pad("", 39, "-") . "\n");
 			    $printer -> setJustification(Printer::JUSTIFY_CENTER);
 			    $printer -> text("KAMI TIDAK MELAYANI PENUKARAN BARANG\n");

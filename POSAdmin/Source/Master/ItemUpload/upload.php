@@ -136,6 +136,7 @@
 			$table .= "<td>".$rows['J']."</td>";
 			$table .= "<td>".$rows['K']."</td>";
 			$table .= "<td>".$rows['L']."</td>";
+			$table .= "<td>".$rows['M']."</td>";
 			$table .= "<td>".$remarks."</td>";
 			$table .= "</tr>";
 		}

@@ -39,7 +39,8 @@ SET State = 1;
 		MP.PaymentTypeName,
 		TS.Payment,
 		TS.Discount,
-		TS.CreatedDate
+		TS.CreatedDate,
+		TS.CreatedBy
 	FROM
 		transaction_sale TS
 		JOIN master_customer MC

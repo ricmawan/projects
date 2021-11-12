@@ -96,11 +96,11 @@
 			    $printer -> setJustification(Printer::JUSTIFY_LEFT);
 			    $printer -> selectPrintMode(Printer::MODE_FONT_B);
 
-			    $sql = "CALL spSelSaleHeader(".$SaleID.", '".$_SESSION['UserLogin']."')";
+			    $sql = "CALL spSelSaleHeader(".$SaleID.", '".$_SESSION['UserLoginKasir']."')";
 
 				if (! $result = mysqli_query($dbh, $sql)) {
 					$printer -> close();
-					logEvent(mysqli_error($dbh), '/Transaction/Sale/PrintInvoice.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+					logEvent(mysqli_error($dbh), '/Transaction/Sale/PrintInvoice.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginKasir']));
 					$Message = "Terjadi Kesalahan Sistem";
 					$MessageDetail = mysql_error();
 					$FailedFlag = 1;

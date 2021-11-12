@@ -63,6 +63,7 @@
 			$CustomerName = $row['CustomerName'];
 			$Address = $row['Address'];
 			$CreatedDate = $row['CreatedDate'];
+			$CreatedBy = $row['CreatedBy'];
 			$TransactionDate = date($row['PlainTransactionDate']);
 		    //$Change = mysqli_real_escape_string($dbh, $_POST['Change']);
 		    $SaleNumber = $row['SaleNumber'];
@@ -90,6 +91,7 @@
 		   
 		    $printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
 		    $printer -> setJustification(Printer::JUSTIFY_CENTER);
+			$printer -> text("REPRINT\n\n");
 		    //$printer -> text("TOKO MUDA\n");
 		    //$printer -> selectPrintMode(Printer::MODE_FONT_A);
 		    //$printer -> text("Jl. Raya Bojong\n");
@@ -161,7 +163,7 @@
 		    } 
 		    $printer -> setEmphasis(false);
 
-		    $printer -> text("Kasir : " . str_pad($_SESSION['UserLogin'] . ", ", 10, " ") . " No : " . str_pad($SaleNumber, 14, " ") . "\n");
+		    $printer -> text("Kasir : " . str_pad($CreatedBy . ", ", 10, " ") . " No : " . str_pad($SaleNumber, 14, " ") . "\n");
 		    $printer -> text(str_pad("", 39, "-") . "\n");
 		    $printer -> setJustification(Printer::JUSTIFY_CENTER);
 		    $printer -> text("KAMI TIDAK MELAYANI PENUKARAN BARANG\n");

@@ -63,6 +63,7 @@
 								<th>Kode</th>
 								<th>Nama</th>
 								<th>Kategori</th>
+								<th>Satuan</th>
 								<th>Harga Beli</th>
 								<th>Harga Ecer</th>
 								<th>Harga 1</th>
