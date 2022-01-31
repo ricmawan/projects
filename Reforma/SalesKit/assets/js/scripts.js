@@ -28,9 +28,14 @@
     ==================================*/
     var e = function() {
         var e = (window.innerHeight > 0 ? window.innerHeight : this.screen.height) - 5;
-        (e -= 67) < 1 && (e = 1), e > 67 && $(".main-content").css("min-height", e + "px")
+        (e -= 88) < 1 && (e = 1), e > 88 && $(".main-content").css("min-height", e + "px")
     };
     $(window).ready(e), $(window).on("resize", e);
+    $( window ).resize(function() {
+        $('.menu-inner').slimScroll({
+            height: 'auto'
+        });
+    });
 
     /*================================
     sidebar menu
@@ -43,6 +48,7 @@
     $('.menu-inner').slimScroll({
         height: 'auto'
     });
+    
     $('.nofity-list').slimScroll({
         height: '435px'
     });
@@ -223,5 +229,26 @@
             $('body').removeClass('expanded');
         });
     }
+
+    var previousOrientation = window.orientation;
+    var checkOrientation = function(){
+        if(window.orientation !== previousOrientation){
+            previousOrientation = window.orientation;
+            // orientation changed, do your magic here
+            
+            setTimeout(function() {
+                //alert($( window ).height());
+                $('.menu-inner').slimScroll({
+                    height: ($( window ).height() - 120)
+                });
+            }, 0);
+        }
+    };
+
+    window.addEventListener("resize", checkOrientation, false);
+    window.addEventListener("orientationchange", checkOrientation, false);
+
+    // (optional) Android doesn't always fire orientationChange on 180 degree turns
+    setInterval(checkOrientation, 2000);
 
 })(jQuery);

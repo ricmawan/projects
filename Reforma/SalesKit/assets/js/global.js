@@ -26,6 +26,7 @@ $(document).ready(function () {
 						scrollTop: 0
 					}, "slow");
 					$('.page-container').toggleClass('sbar_collapsed');
+					$("#breadcrumbsContainer").html($("#breadcrumbsContent").html());
 					//$("#loading").hide();
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
@@ -43,6 +44,16 @@ $(document).ready(function () {
 		}
 		$(this).parent().addClass("active");
 	});
+
+	$(document).on("click", ".zoom", function() {
+        $("#img-modal").show();
+        $("#img-content").attr("src", $(this).attr("src"));
+        $("#img-caption").html($(this).attr("alt"));
+    });
+
+    $(document).on("click", ".close, #img-modal", function() {
+        $("#img-modal").hide();
+    });
 });
 
 function Redirect(link) {
@@ -190,7 +201,7 @@ function convertRupiah(id, angka){
 		angka = angka.replace(/\,/g, "");		
 		var rupiah = '';
 		var angkarev = angka.toString().split('').reverse().join('');
-		for(var i = 0; i < angkarev.length; i++) if(i%3 == 0) rupiah += angkarev.substr(i,3)+',';
+		for(var i = 0; i < angkarev.length; i++) if(i%3 == 0) rupiah += angkarev.substr(i,3)+'.';
 		
 		if(angkarev.length > 3) {
 			angka = rupiah.split('',rupiah.length-1).reverse().join('');
@@ -219,7 +230,7 @@ function returnRupiah(angka) {
 		angka = angka.replace(/\,/g, "");
 		var rupiah = '';
 		var angkarev = angka.toString().split('').reverse().join('');
-		for(var i = 0; i < angkarev.length; i++) if(i%3 == 0) rupiah += angkarev.substr(i,3)+',';
+		for(var i = 0; i < angkarev.length; i++) if(i%3 == 0) rupiah += angkarev.substr(i,3)+'.';
 		if(angkarev.length > 3) {
 			angka = rupiah.split('',rupiah.length-1).reverse().join('');
 			if(flag == 1) angka = angka;
@@ -239,7 +250,7 @@ function returnRupiah(angka) {
 function clearFormat(id, angka) {
 	if($("#" + id).val() == "0.00") $("#" + id).val(".00");
 	else {
-		var angka1 = angka.replace(/\,/g, "");
+		var angka1 = angka.replace(/\./g, "");
 		$("#" + id).val(angka1);
 	}
 }

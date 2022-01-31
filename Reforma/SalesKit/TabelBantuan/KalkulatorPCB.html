@@ -1,0 +1,351 @@
+<div class="row" style="margin-right: -2px;margin-left: -2px;">
+     <div class="col-lg-12 mt-5">
+        <div class="card">
+            <div class="card-body">
+            	<div class="form-group">
+	            	<label class="text-muted mb-3 d-block">Jenis Kelamin:</label>
+	                <div class="custom-control custom-radio custom-control-inline">
+	                    <input type="radio" checked id="customRadio1" name="optGender" value="Pria"  class="custom-control-input">
+	                    <label class="custom-control-label" for="customRadio1">Pria</label>
+	                </div>
+	                <div class="custom-control custom-radio custom-control-inline">
+	                    <input type="radio" id="customRadio2" name="optGender" value="Wanita" class="custom-control-input">
+	                    <label class="custom-control-label" for="customRadio2">Wanita</label>
+	                </div>
+	            </div>
+                <div class="form-group">
+	                <label for="txtBirthDate" class="col-form-label">Tanggal Lahir:</label>
+	                <div class="input-group mb-3">
+						<input type="text" class="form-control" id="txtBirthDate" name="txtBirthDate" placeholder="Pilih Tanggal" aria-label="Pilih Tanggal" readonly="readonly" aria-describedby="basic-addon2" value="" required autocomplete=off >
+						
+						<div class="input-group-append">
+							<span class="input-group-text" id="basic-addon2"><i class="fa fa-calendar"></i></span>
+						</div>
+	                </div>
+	            </div>
+				<div class="form-group">
+					<label for="txtAge" class="col-form-label">Usia:</label>
+                    <input id="txtAge" name="txtAge" class="form-control" type="text" value=0 readonly="readonly">
+				</div>
+				<div class="form-group">
+					<label class="text-muted mb-3 d-block">Masa Bayar:</label>
+	                <div class="custom-control custom-radio custom-control-inline">
+	                    <input type="radio" checked id="optTerm1" name="optTerm" class="custom-control-input" value=5 checked >
+	                    <label class="custom-control-label" for="optTerm1">5 Th</label>
+	                </div>
+	                <div class="custom-control custom-radio custom-control-inline">
+	                    <input type="radio" id="optTerm2" name="optTerm" value=10 class="custom-control-input">
+	                    <label class="custom-control-label" for="optTerm2">10 Th</label>
+	                </div>
+	                <div class="custom-control custom-radio custom-control-inline">
+	                    <input type="radio" id="optTerm3" name="optTerm" value=15 class="custom-control-input">
+	                    <label class="custom-control-label" for="optTerm3">15 Th</label>
+	                </div>
+
+				</div>
+				<br />
+				<ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="premium-tab" data-toggle="tab" href="#by-premium" role="tab" aria-controls="by-premium" aria-selected="true">Hitung Premi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="up-tab" data-toggle="tab" href="#by-up" role="tab" aria-controls="by-up" aria-selected="false">Hitung UP</a>
+                    </li>
+                </ul>
+
+                 <div class="tab-content mt-3" id="myTabContent">
+                    <div class="tab-pane fade show active" id="by-premium" role="tabpanel" aria-labelledby="premium-tab">
+                    	<div class="form-group">
+							<label for="txtUP" class="col-form-label" >Uang Pertanggungan:</label>
+							<input id="txtUP" name="txtUP" type="tel" class="form-control text-right" value="0" autocomplete=off onfocus="clearFormat(this.id, this.value);this.select();" onpaste="return false;" onblur="convertRupiah(this.id, this.value);" />
+						</div>
+						<button type="button" class="btn btn-primary btn-lg btn-block" onclick="calculatePremium();" >HITUNG <i class="fa fa-calculator"></i></button>
+                        <div class="form-group">
+							<label for="txtPremium" class="col-form-label" >Premi Bulanan:</label>
+							<input id="txtPremium" name="txtPremium" type="text" class="form-control text-right" readonly="readonly" />
+						</div>
+						<div class="form-group">
+							<label for="txtAnnualPremium" class="col-form-label" >Premi Tahunan:</label>
+							<input id="txtAnnualPremium" name="txtAnnualPremium" type="text" class="form-control text-right" readonly="readonly" />
+						</div>
+                    </div>
+                    <div class="tab-pane fade" id="by-up" role="tabpanel" aria-labelledby="up-tab">
+	                	<div class="form-group">
+							<label for="txtPremium2" class="col-form-label" >Premi Bulanan:</label>
+							<input id="txtPremium2" name="txtPremium2" type="tel" class="form-control text-right" value="0" autocomplete=off onfocus="clearFormat(this.id, this.value);this.select();" onpaste="return false;" onblur="convertRupiah(this.id, this.value);" />
+						</div>
+
+						<div class="form-group">
+							<label for="txtAnnualPremium2" class="col-form-label" >Premi Tahunan:</label>
+							<input id="txtAnnualPremium2" name="txtAnnualPremium2" type="text" class="form-control text-right" readonly="readonly" />
+						</div>
+
+						<div class="form-group">
+							<button type="button" class="btn btn-primary btn-lg btn-block" onclick="calculateUP();" >HITUNG <i class="fa fa-calculator"></i></button>
+						</div>
+						<div class="form-group">
+							<label for="txtUP2" class="col-form-label" >Uang Pertanggungan:</label>
+							<input id="txtUP2" name="txtUP2" type="text" class="form-control text-right" readonly="readonly" />
+						</div>
+                    </div>
+                </div>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="breadcrumbsContent" style="display: none;" >
+    <h4 class="page-title pull-left">Kalkulator PCB</h4>
+    <!--<ul class="breadcrumbs pull-left">
+        <li><a href="index.html">Home</a></li>
+        <li><span>Profil Perusahaan</span></li>
+    </ul>-->
+</div>
+
+<script type="text/javascript" src="./TabelBantuan/dataPCB.json"></script>
+<script type="text/javascript" src="./assets/js/rolldate.min.js"></script>
+<script type="text/javascript">
+
+	
+	function Refresh() {
+		$("#txtBirthDate").val("");
+		$("#txtAge").val(0);
+		$("#txtUP").val(0);
+		$("#txtPremium").val("");
+		$("#txtPremium2").val(0);
+		$("#txtUP2").val("");
+	}
+	
+	function isLeapYear(year) {
+		var d = new Date(year, 1, 28);
+		d.setDate(d.getDate() + 1);
+		return d.getMonth() == 1;
+	}
+
+	function getAge(birthDate) {
+		//var d = new Date(date),
+		now = new Date();
+		var years = now.getFullYear() - birthDate.getFullYear();
+		birthDate.setFullYear(birthDate.getFullYear() + years);
+		if (birthDate > now) {
+			years--;
+			birthDate.setFullYear(birthDate.getFullYear() - 1);
+		}
+		var days = (now.getTime() - birthDate.getTime()) / (3600 * 24 * 1000);
+		return years + days / (isLeapYear(now.getFullYear()) ? 366 : 365);
+	}
+
+	function calculatePremium() {
+		if($("#txtAge").val() == 0) {
+			Lobibox.alert("error",
+			{
+				msg: "Isi Tanggal Lahir!",
+				width: 320
+			});
+			return 0;
+		}
+
+		if($("#txtUP").val() == 0) {
+			Lobibox.alert("error",
+			{
+				msg: "Isi Uang Pertanggungan!",
+				width: 320
+			});
+			return 0;
+		}
+
+		if($("#txtUP").val().replace(/\./g, "") < 20000000) {
+			Lobibox.alert("error",
+			{
+				msg: "Minimal UP 20 Juta!",
+				width: 320
+			});
+			return 0;
+		}
+
+		if($("#txtUP").val().replace(/\./g, "") > 12000000000) {
+			Lobibox.alert("error",
+			{
+				msg: "Maksimal UP 12 Miliar!",
+				width: 320
+			});
+			return 0;
+		}
+
+		if($("#txtUP").val().replace(/\./g, "") % 1000000 > 0) {
+			Lobibox.alert("error",
+			{
+				msg: "UP Harus Kelipatan 1 Juta!",
+				width: 320
+			});
+			return 0;
+		}
+
+		var Gender = $("input[name='optGender']:checked"). val();
+		var Age = $("#txtAge").val();
+		var Term = $("input[name='optTerm']:checked"). val();
+		var UP = $("#txtUP").val().replace(/\./g, "");		
+		for (var i = 0; i < dataPCB.length; i++){
+			if (dataPCB[i].Gender == Gender && dataPCB[i].Age == Age && dataPCB[i].Term == Term) {
+				var Premium = UP/1000000 * dataPCB[i].Factor;
+				if(Premium < 300000) { 
+					Lobibox.alert("error",
+					{
+						msg: "Premi Tidak Mencapai Minimal, Tingkatkan UP!",
+						width: 350,
+						beforeClose: function() {
+							setTimeout(function() {
+								$("#txtUP").focus();
+							}, 0);
+						}
+					});
+					
+				}
+				$("#txtPremium").val(returnRupiah(Premium.toString()));
+				$("#txtAnnualPremium").val(returnRupiah((Premium * 11).toString()));
+				break;
+			}
+		}
+	}
+
+	function calculateUP() {
+		if($("#txtAge").val() == 0) {
+			Lobibox.alert("error",
+			{
+				msg: "Isi Tanggal Lahir!",
+				width: 320
+			});
+			return 0;
+		}
+
+		if($("#txtPremium2").val().replace(/\./g, "") == 0) {
+			Lobibox.alert("error",
+			{
+				msg: "Isi Premi!",
+				width: 320
+			});
+			return 0;
+		}
+
+		if($("#txtPremium2").val().replace(/\./g, "") < 300000) {
+			Lobibox.alert("error",
+			{
+				msg: "Minimal Premi 300rb!",
+				width: 320
+			});
+			return 0;
+		}
+
+		var Gender = $("input[name='optGender']:checked"). val();
+		var Age = $("#txtAge").val();
+		var Term = $("input[name='optTerm']:checked"). val();
+		var Premium = $("#txtPremium2").val().replace(/\./g, "");
+
+		for (var i = 0; i < dataPCB.length; i++){
+			if (dataPCB[i].Gender == Gender && dataPCB[i].Age == Age && dataPCB[i].Term == Term) {
+				var UP = Premium/dataPCB[i].Factor * 1000000;
+
+				var UPRound = Math.floor(UP / 1000000) * 1000000;
+				Premium = UPRound/1000000 * dataPCB[i].Factor;
+				if(UP > 12000000000) { 
+					Lobibox.alert("error",
+					{
+						msg: "UP Lebih Dari 12 Miliar, Turunkan Premi!",
+						width: 350,
+						beforeClose: function() {
+							setTimeout(function() {
+								$("#txtPremium2").focus();
+							}, 0);
+						}
+					});
+					
+				}
+				if(Premium < 300000) {
+					Lobibox.alert("error",
+					{
+						msg: "Premi Mengalami Penyesuaian, Karena Tidak Memenuhi Kriteria!",
+						width: 320
+					});
+
+					UPRound += 1000000;
+					Premium = UPRound/1000000 * dataPCB[i].Factor;
+					//return 0;
+				}
+				$("#txtPremium2").val(returnRupiah(Premium.toString()));
+				$("#txtAnnualPremium2").val(returnRupiah((Premium * 11).toString()));
+				$("#txtUP2").val(returnRupiah(UPRound.toString()));
+				break;
+			}
+		}
+	}
+
+	$(document).ready(function() {
+		var startDate = new Date(); 
+		startDate.setFullYear(startDate.getFullYear() - 60);
+		startDate.setDate(startDate.getDate() + 1);
+		startDate.setHours(0, 0, 0, 0);
+		//console.log(startDate);
+
+		var endDate = new Date(); 
+		endDate.setMonth(endDate.getMonth() - 6);
+		endDate.setHours(0, 0, 0, 0);
+		//console.log(endDate);
+
+		new Rolldate({
+			el: '#txtBirthDate',
+			beginYear: startDate.getFullYear(),
+			endYear: endDate.getFullYear(),
+			trigger: 'click',
+			format: 'DD-MM-YYYY',
+			lang:{
+				title:'Pilih Tanggal',
+				cancel:'Batal',
+				confirm:'Pilih',
+				year:'',
+				month:'',
+				day:''
+			},
+			confirm: function(pickedDate) {
+				//console.log(pickedDate);
+				var arrDate = pickedDate.split("-")
+				selectedDate = new Date(arrDate[2] + '/' + arrDate[1] + '/' + arrDate[0]);
+				selectedDate.setHours(0, 0, 0, 0);
+
+				/*console.log(selectedDate);
+				console.log(startDate);
+				console.log(selectedDate.valueOf());
+				console.log(startDate.valueOf());*/
+
+				if(selectedDate < startDate) {
+					Lobibox.alert("error",
+					{
+						msg: "Maksimal Usia Masuk 60 Tahun!",
+						width: 320
+					});
+					return false;
+				}
+
+				else if(selectedDate > endDate) {
+					Lobibox.alert("error",
+					{
+						msg: "Minimal Usia Masuk 6 Bulan!",
+						width: 320
+					});
+					return false;
+				}
+				else {
+					var age = getAge(selectedDate);
+					//console.log(Math.floor(age));
+					$("#txtAge").val(Math.floor(age) + 1);
+					if(age > 50) {
+						$("#optTerm3").attr("disabled", true);
+						$("#optTerm1").attr("checked", true);
+						$("#optTerm1").prop("checked", true);
+					}
+					else {
+						$("#optTerm3").attr("disabled", false);
+					}
+				}
+			}
+		});
+	});
+</script>

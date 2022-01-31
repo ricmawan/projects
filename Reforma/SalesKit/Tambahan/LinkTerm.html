@@ -1,0 +1,110 @@
+<div class="row" style="margin-right: -2px;margin-left: -2px;">
+     <div class="col-lg-12 mt-5">
+        <div class="card">
+            <div class="card-body">
+				<p>PRUlink term memberikan manfaat tambahan yang diberikan jika Tertanggung meninggal dunia sebelum berakhirnya masa asuransi PRUlink term.</p>
+                <br/><br/>
+                <div id="accordion1" class="according accordion-s2">
+                    <div class="card">
+                        <div class="card-header">
+                            <a class="collapsed card-link" data-toggle="collapse" href="#accordion11">Ringkasan Manfaat</a>
+                        </div>
+                        <div id="accordion11" class="collapse" data-parent="#accordion1">
+                            <div class="card-body">
+                                <div class="list-bullet">
+									<ul>
+										<li>
+											Uang pertanggungan lebih besar dengan biaya lebih terjangkau.
+										</li>
+										<li>
+											Usia perlindungan sampai dengan 99 tahun.
+										</li>
+									</ul>
+								</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <a class="collapsed card-link" data-toggle="collapse" href="#accordion12">Syarat Kepesertaan</a>
+                        </div>
+                        <div id="accordion12" class="collapse" data-parent="#accordion1">
+                            <div class="card-body">
+                                <div class="list-bullet">
+                                    <ul>
+                                	   <li>Usia masuk tertanggung 16 tahun - 70 tahun (ulang tahun berikutnya).</li>
+                                        <li>Usia maksimum pertanggungan sampai dengan usia Tertanggung 55, 65, 70, 75, 80, 85 atau 99 tahun (ulang tahun sebenarnya).</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <a class="collapsed card-link" data-toggle="collapse" href="#accordion13">Pengecualian Umum</a>
+                        </div>
+                        <div id="accordion13" class="collapse" data-parent="#accordion1">
+                            <div class="card-body">
+								<div class="list-bullet">
+									<ul>
+										<li>Tindakan bunuh diri, percobaan bunuh diri, atau pencederaan diri oleh Tertanggung yang terjadi sebelum Polis berusia 12 bulan (<b>TIDAK BERLAKU UNTUK PRODUK SYARIAH</b>).</li>
+                                        <li>
+                                            Tindak kejahatan atau percobaan tindak kejahatan oleh pihak yang berkepentingan atas Polis
+                                        </li>
+										<li>Tindak kejahatan, percobaan tindak kejahatan, pelanggaran hukum, dan peraturan perundang-undangan, atau</li>
+										<li>Hukuman mati berdasarkan putusan badan peradilan</li>
+										<li>Ketentuan yang rinci mengacu pada Polis</li>
+									</ul>
+								</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <a class="collapsed card-link" data-toggle="collapse" href="#accordion15">Klausul Polis</a>
+                        </div>
+                        <div id="accordion15" class="collapse" data-parent="#accordion1">
+                            <div class="card-body">
+								<div>
+									<ul>
+										<li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="./Tambahan/viewerPDFLINKTERM.html" >Ketentuan Khusus PRULink Term</li>
+									</ul>
+								</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="breadcrumbsContent" style="display: none;" >
+    <h4 class="page-title pull-left">PRULink Term</h4>
+    <!--<ul class="breadcrumbs pull-left">
+        <li><a href="index.html">Home</a></li>
+        <li><a><span>Produk Dasar</span></a></li>
+        <li><span>PRULink (Syariah) Generasi Baru</span></li>
+    </ul>-->
+</div>
+
+<script>
+	//var openedAccordionGenerasiBaru = null;
+    $(".collapse").on("shown.bs.collapse", function(e) {
+        var $card = $(this).closest(".card");
+        //if(!openedAccordionGenerasiBaru) {
+            $("html,body").animate({
+                scrollTop: ($card.offset().top - 80)
+            }, 500);
+        //}
+        //openedAccordionGenerasiBaru = $card;
+    });
+
+    /*$(".collapse").on("hidden.bs.collapse", function(e) {
+        //e.preventDefault();
+        setTimeout(function() {
+            $("html,body").animate({
+                scrollTop: (openedAccordionGenerasiBaru.offset().top - 80)
+            }, 500);
+        }, 100);
+    });*/
+</script>
