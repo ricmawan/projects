@@ -1,0 +1,179 @@
+<style type="text/css">
+    thead {
+        background: red;
+        color: white;
+    }
+    .dataTables_filter {
+        display: none;
+    }
+</style>
+<link href="./assets/css/dataTables.bootstrap.css" rel="stylesheet" />
+<link href="./assets/css/jquery.dataTables.css" rel="stylesheet" />
+
+
+<div class="row" style="margin-right: -2px;margin-left: -2px;">
+     <div class="col-lg-12 mt-5">
+        <div class="card">
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="text-muted mb-3 d-block">Jenis Kelamin:</label>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" checked id="customRadio1" name="optGender" value="Pria" class="custom-control-input">
+                        <label class="custom-control-label" for="customRadio1">Pria</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" id="customRadio2" name="optGender" value="Wanita" class="custom-control-input">
+                        <label class="custom-control-label" for="customRadio2">Wanita</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <select class="form-control" id="ddlPlan">
+                        <option value=0>Pilih Plan</option>
+                        <option value=1>Bronze</option>
+                        <option value=2>Silver</option>
+                        <option value=3>Gold</option>
+                        <option value=4>Platinum & Diamond</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn btn-primary btn-lg btn-block" onclick="showTable();" >TAMPILKAN <i class="fa fa-eye"></i></button>
+                </div>
+                <div class="list-bullet">
+                    <ul>
+                        <li>Ilustrasi premi bulanan batas kamar Opsi 1 dan tanpa menggunakan prusehat saver.</li>
+                        <li>Untuk Premi 3 bulanan dikalikan 0,29</li>
+                        <li>Untuk Premi 6 bulanan dikalikan 0,57</li>
+                        <li>Untuk Premi tahunan dikalikan 11</li>
+                    </ul>
+                </div>
+                <span id="tableInfo" class="font-weight-bold"></span>
+                <div class="data-tables responsive">
+                    <table id="tabel-pss" class="table table-hover table-bordered table-striped" style="display: none;" width="100%">
+                        <thead >
+                            <tr>
+                                <th scope="col">Usia</th>
+                                <th scope="col">Bronze A (500Ribu)</th>
+                                <th scope="col">Bronze B (1Juta)</th>
+                                <th scope="col">Silver A (500Ribu)</th>
+                                <th scope="col">Silver B (1Juta)</th>
+                                <th scope="col">Gold A (1Juta)</th>
+                                <th scope="col">Gold B (1.5Juta)</th>
+                                <th scope="col">Platinum (1.5Juta)</th>
+                                <th scope="col">Diamond (1.5Juta)</th>
+                                <th scope="col">Jenis Kelamin</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="breadcrumbsContent" style="display: none;" >
+    <h4 class="page-title pull-left">Premi PRUSolusi Sehat</h4>
+    <!--<ul class="breadcrumbs pull-left">
+        <li><a href="index.html">Home</a></li>
+        <li><span>Profil Perusahaan</span></li>
+    </ul>-->
+</div>
+<script type="text/javascript" src="./TabelBantuan/dataPSS.json"></script>
+<script src="assets/js/jquery.dataTables.js"></script>
+<script>
+   //var openedAccordionCompanyProfile = null;
+   var table;
+    $(".collapse").on("shown.bs.collapse", function(e) {
+        var $card = $(this).closest(".card");
+        //if(!openedAccordionCompanyProfile) {
+            $("html,body").animate({
+                scrollTop: ($card.offset().top - 80)
+            }, 500);
+        //}
+        //openedAccordionCompanyProfile = $card;
+    });
+
+    function showTable() {
+        var Gender = $("input[name='optGender']:checked"). val();
+        var selectedGender = $.grep(dataPSS, function(v) {
+            return v.JenisKelamin == Gender;
+        });
+
+        if($("#ddlPlan").val() == 0) {
+            $("#tabel-pss").hide();
+            $("#tableInfo").hide();
+            Lobibox.alert("error",
+            {
+                msg: "Pilih Plan!",
+                width: 320
+            });
+            return 0;
+        }
+        else {
+            $("#tableInfo").show();
+            $("#tableInfo").html("Tabel untuk " + Gender + " dengan Plan " + $("#ddlPlan option:selected").text());
+            $("#tabel-pss").show();
+            
+            table.columns( 9 ).search( Gender ).draw();
+
+            if($("#ddlPlan").val() == 1) {
+                table.columns( [1,2] ).visible( true );
+                table.columns( [3,4,5,6,7,8] ).visible( false );
+                
+            }
+            else if($("#ddlPlan").val() == 2) {
+                table.columns( [3,4] ).visible( true );
+                table.columns( [1,2,5,6,7,8] ).visible( false);
+            }
+            else if($("#ddlPlan").val() == 3) {
+                table.columns( [5,6] ).visible( true );
+                table.columns( [1,2,3,4,7,8] ).visible( false );
+            }
+            else if($("#ddlPlan").val() == 4) {
+                table.columns( [7,8] ).visible( true );
+                table.columns( [1,2,3,4,5,6] ).visible( false );
+            }
+            $("#tabel-pss").width("100%");
+            //table.columns.adjust().draw(false);
+        }
+    }
+    
+    table = $("#tabel-pss").DataTable({
+        destroy: true,
+        order: [],
+        responsive: true,
+        paging: false,
+        searching: true,
+        bFilter: false,
+        "language": {
+            "info": "",
+            "infoFiltered": "",
+            "infoEmpty": "",
+            "zeroRecords": "Data tidak ditemukan",
+            "lengthMenu": "&nbsp;&nbsp;_MENU_ data",
+            "search": "",
+            "processing": "Memproses"
+        },
+        ordering: false,
+        columns: [
+            {data: "Usia", className: "dt-head-center dt-body-center"},
+            {data: "BronzeA", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
+            {data: "BronzeB", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
+            {data: "SilverA", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
+            {data: "SilverB", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
+            {data: "GoldA", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
+            {data: "GoldB", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
+            {data: "Platinum", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
+            {data: "Diamond", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
+            {data: "JenisKelamin", visible: false}
+        ],
+        processing: true,
+        data: dataPSS
+    });
+    /*$(".collapse").on("hidden.bs.collapse", function(e) {
+        //e.preventDefault();
+        setTimeout(function() {
+            $("html,body").animate({
+                scrollTop: (openedAccordionCompanyProfile.offset().top - 80)
+            }, 500);
+        }, 100);
+    });*/
+</script>
