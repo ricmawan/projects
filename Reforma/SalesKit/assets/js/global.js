@@ -6,13 +6,21 @@ var CurrentMenu = "./index.html";
 var PrevMenu;
 
 $(document).ready(function () {
+	window.onscroll = function() {scrollFunction()};
+
+	$('.scrollup').click(function () {
+		$("html").animate({
+			scrollTop: 0
+		}, "slow");
+		return false;
+	});
 	
 	$(document).on("click", ".menu", function() {
 		var MenuClicked = $(this).attr("link");
 		PrevMenu = CurrentMenu;
 		CurrentMenu = MenuClicked;
 		if( $(this).is("a")) $(".menu").parent().removeClass("active");
-		//$("#loading").show();
+		$("#loading").show();
 		$("#main-content-inner").html("");
 		if(MenuClicked != "./Home.php") {
 			$.ajax({
@@ -27,10 +35,10 @@ $(document).ready(function () {
 					}, "slow");
 					$('.page-container').toggleClass('sbar_collapsed');
 					$("#breadcrumbsContainer").html($("#breadcrumbsContent").html());
-					//$("#loading").hide();
+					$("#loading").hide();
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					//$("#loading").hide();
+					$("#loading").hide();
 					var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
 					//LogEvent(errorMessage, "global.js (fnMenuClick)");
 					//Lobibox.alert("error",
@@ -55,6 +63,13 @@ $(document).ready(function () {
         $("#img-modal").hide();
     });
 });
+function scrollFunction() {
+	if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+		$('.scrollup').fadeIn();
+	} else {
+		$('.scrollup').fadeOut();
+	}
+}
 
 function Redirect(link) {
 	var MenuClicked = link;
