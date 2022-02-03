@@ -122,7 +122,7 @@
                             <div class="card-body">
                                 <div>
                                     <ul>
-                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="./Tradisional/viewerPDFPSS.html"  download">Ketentuan Polis PRUSolusi Sehat</a></li>
+                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="#" class="pdfViewer" link="./Tradisional/viewerPDFPSS.html" >Ketentuan Polis PRUSolusi Sehat</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -406,21 +406,8 @@
 
 <div id="breadcrumbsContent" style="display: none;" >
     <h4 class="page-title pull-left">PRUSolusi Sehat</h4>
-    <!--<ul class="breadcrumbs pull-left">
-        <li><a href="index.html">Home</a></li>
-        <li><a><span>Produk Dasar</span></a></li>
-        <li><span>PRULink (Syariah) Generasi Baru</span></li>
-    </ul>-->
 </div>
-
-<!-- Start datatable js -->
-    <script src="assets/js/jquery.dataTables.js"></script>
-    <!--<script src="assets/js/jquery.dataTables.min.js"></script>
-    <script src="assets/js/dataTables.bootstrap4.min.js"></script>
-    <script src="assets/js/dataTables.responsive.min.js"></script>
-    <script src="assets/js/responsive.bootstrap.min.js"></script>-->
 <script>
-
     var arrPlan = [
                     { 
                         ID: 1,
@@ -681,28 +668,13 @@
         "drawCallback": function( settings ) {
             $("#tabel-pph thead").remove();
             $("#tabel-pph").hide();
-            //console.log("test");
         }
     });
 
-
-    //var openedAccordionGenerasiBaru = null;
     $(".collapse").on("shown.bs.collapse", function(e) {
         var $card = $(this).closest(".card");
-        //if(!openedAccordionGenerasiBaru) {
-            $("html,body").animate({
-                scrollTop: ($card.offset().top - 80)
-            }, 500);
-        //}
-        //openedAccordionGenerasiBaru = $card;
+        $("html,body").animate({
+            scrollTop: ($card.offset().top - 80)
+        }, 500);
     });
-
-    /*$(".collapse").on("hidden.bs.collapse", function(e) {
-        //e.preventDefault();
-        setTimeout(function() {
-            $("html,body").animate({
-                scrollTop: (openedAccordionGenerasiBaru.offset().top - 80)
-            }, 500);
-        }, 100);
-    });*/
 </script>

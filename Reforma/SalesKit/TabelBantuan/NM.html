@@ -1,0 +1,698 @@
+<style type="text/css">
+    thead {
+        background: red;
+        color: white;
+    }
+    .dataTables_filter {
+        display: none;
+    }
+    
+    .MED {
+        cursor: pointer;
+    }
+    .list-bullet ul li:before {
+        top: 0.4rem;
+    }
+    .modal .popover,.modal .twipsy{z-index:12000;}
+</style>
+<div class="row" style="margin-right: -2px;margin-left: -2px;">
+     <div class="col-lg-12 mt-5">
+        <div class="card">
+            <div class="card-body">
+                <div class="form-group">
+                    <select class="form-control" id="ddlProduk" onchange="loadAgentType(this.value);">
+                        <option value=0>Pilih Produk</option>
+                        <option value=1>Jiwa</option>
+                        <option value=2>Kesehatan</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select class="form-control" id="ddlAgentType" onchange="showTable();">
+                        <option value=0>Pilih Tipe Agen</option>
+                    </select>
+                </div>
+               <span id="tableInfo" class="font-weight-bold"></span>
+                <div class="data-tables responsive">
+                    <table id="tabel-nm-pph" class="table table-hover table-bordered table-striped" style="display: none;" width="100%">
+                        <thead >
+                            <tr>
+                                <th scope="col">Usia</th>
+                                <th scope="col">Cermat 1 300Ribu</th>
+                                <th scope="col">Cermat 2 550Ribu</th>
+                                <th scope="col">Cermat 3 650Ribu</th>
+                                <th scope="col">Bronze A 500Ribu</th>
+                                <th scope="col">Bronze A 1Juta</th>
+                                <th scope="col">Bronze B 1Juta</th>
+                                <th scope="col">Bronze B 3Juta</th>
+                                <th scope="col">Silver A 500Ribu</th>
+                                <th scope="col">Silver A 1Juta</th>
+                                <th scope="col">Silver B 1Juta</th>
+                                <th scope="col">Silver B 3Juta</th>
+                                <th scope="col">Gold A 1Juta</th>
+                                <th scope="col">Gold A 3Juta</th>
+                                <th scope="col">Gold B 1.5Juta</th>
+                                <th scope="col">Gold B 5Juta</th>
+                                <th scope="col">Platinum 1.5Juta</th>
+                                <th scope="col">Platinum 10Juta</th>
+                                <th scope="col">Diamond 1.5Juta</th>
+                                <th scope="col">Diamond 10Juta</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="data-tables responsive">
+                    <table id="tabel-nm-jiwa" class="table table-hover table-bordered table-striped" style="display: none;" width="100%">
+                        <thead >
+                            <tr>
+                                <th scope="col">Usia</th>
+                                <th scope="col">Cermat 1 300Ribu</th>
+                                <th scope="col">Cermat 2 550Ribu</th>
+                                <th scope="col">Cermat 3 650Ribu</th>
+                                <th scope="col">Bronze A 500Ribu</th>
+                                <th scope="col">Bronze A 1Juta</th>
+                                <th scope="col">Bronze B 1Juta</th>
+                                <th scope="col">Bronze B 3Juta</th>
+                                <th scope="col">Silver A 500Ribu</th>
+                                <th scope="col">Silver A 1Juta</th>
+                                <th scope="col">Silver B 1Juta</th>
+                                <th scope="col">Silver B 3Juta</th>
+                                <th scope="col">Gold A 1Juta</th>
+                                <th scope="col">Gold A 3Juta</th>
+                                <th scope="col">Gold B 1.5Juta</th>
+                                <th scope="col">Gold B 5Juta</th>
+                                <th scope="col">Platinum 1.5Juta</th>
+                                <th scope="col">Platinum 10Juta</th>
+                                <th scope="col">Diamond 1.5Juta</th>
+                                <th scope="col">Diamond 10Juta</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="breadcrumbsContent" style="display: none;" >
+    <h4 class="page-title pull-left">Batas Non-Medical</h4>
+</div>
+<div class="modal fade" id="ModalNM">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle" class="modal-title"></h5>
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div id="ModalBody" class="list-bullet">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="./TabelBantuan/dataNM_PPH.json"></script>
+<script type="text/javascript" src="./TabelBantuan/dataNM_Jiwa.json"></script>
+<script>
+    var previousAgentType = "";
+    function loadAgentType(Produk) {
+        if(Produk == 1) {
+            $('#ddlAgentType option').each(function () {
+                $(this).remove();
+            });
+
+            $('#ddlAgentType').append($('<option>').val(0).text("Pilih Tipe Agen"));
+            $('#ddlAgentType').append($('<option>').val(1).text("Regular Agent"));
+            $('#ddlAgentType').append($('<option>').val(2).text("PEC Regular"));
+            $('#ddlAgentType').append($('<option>').val(3).text("PEC Executive"));
+            $('#ddlAgentType').append($('<option>').val(4).text("PEC Ultimate"));
+        }
+
+        else if(Produk == 2) {
+            $('#ddlAgentType option').each(function () {
+                $(this).remove();
+            });
+
+            $('#ddlAgentType').append($('<option>').val(0).text("Pilih Tipe Agen"));
+            $('#ddlAgentType').append($('<option>').val(1).text("Regular Agent"));
+            $('#ddlAgentType').append($('<option>').val(2).text("PRUElites Club"));
+        }
+        return false;
+    }
+
+    function showTooltip(el, MED) {
+        $("#ModalNM").modal();
+        $("#ModalTitle").html("MED " + MED);
+        var ModalBody = "";
+        var AnalisaUrineRutin = "Warna, Kejernihan, PH, Berat Jenis, Protein, Glukosa/Reduksi/, Urobilinogen, Keton, Darah Samar, Sedimen/Mikroskopik (eritrosit, leukosit, epitel, silinder, kristal, bakteri), Nitrit.";
+        var LemakDarah = "Kolestrol Total, HDL Kolestrol, LDL Kolestrol, Tligliserida.";
+        var AnalisaDarahRutin = "Hemoglobin (Hb), Eritrosit (RBC), Lekosit (WBC), Hitung Jenis Lekosit, Laju Endap Darah, Trombosit, MCH, MCV, MCHC.";
+        var AnalisaDarahLengkap = "Hemoglobin (Hb), Eritrosit (RBC), Lekosit (WBC), Hitung Jenis Lekosit, Laju Endap Darah, Trombosit, MCH, MCV, MCHC, Kolestrol Total, HDL Kolestrol, LDL Kolestrol, Tligliserida, Gula Darah Puasa, HbA1c, SGPT, SGOT, Gamma GT, Bilirubin Direk, Bilirubin Indirek, Albumin, Globulin, Alkali Fosfatase, Ureum, Kreatinin, Asam Urat, HbsAg, VDRL, AFP."
+        switch (parseInt(MED)) {
+            case 1: 
+                ModalBody = "<ul>" +
+                                "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
+                            "</ul>";
+                break;
+            case 2:
+                ModalBody = "<ul>" +
+                                "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
+                                "<li>HIV Test</li>"+
+                            "</ul>";
+                break;
+            case 3:
+                ModalBody = "<ul>" +
+                                "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                        "Analisa Urine Rutin"+
+                                    "</a>"+
+                                "</li>"+
+                            "</ul>";
+                break;
+            case 4:
+                ModalBody = "<ul>" +
+                                "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                        "Analisa Urine Rutin"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li>EKG dengan Interpretasi oleh dokter spesialis jantung</li>"+
+                            "</ul>";
+                break;
+            case 5:
+                ModalBody = "<ul>" +
+                                "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                        "Analisa Urine Rutin"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
+                                        "Analisa Darah Lengkap"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li>HIV Test</li>"+
+                            "</ul>";
+                break;
+            case 6:
+                ModalBody = "<ul>" +
+                                "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                        "Analisa Urine Rutin"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li>EKG dengan Interpretasi oleh dokter spesialis jantung</li>"+
+                                "<li>Rontgen Dada dengan Interpretasi oleh dokter spesialis radiologi/ dokter spesialis paru/ dokter spesialis penyakit dalam</li>"+
+                            "</ul>";
+                break;
+            case 7:
+                ModalBody = "<ul>" +
+                                "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                        "Analisa Urine Rutin"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li>Rontgen Dada dengan Interpretasi oleh dokter spesialis radiologi/ dokter spesialis paru/ dokter spesialis penyakit dalam</li>"+
+                                "<li>HIV Test</li>"+
+                            "</ul>";
+                break;
+            case 8:
+                ModalBody = "<ul>" +
+                                "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                        "Analisa Urine Rutin"+
+                                    "</a>"+
+                                "</li>"+                                
+                                "<li>EKG dengan Interpretasi oleh dokter spesialis jantung</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
+                                        "Analisa Darah Lengkap"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li>Rontgen Dada dengan Interpretasi oleh dokter spesialis radiologi/ dokter spesialis paru/ dokter spesialis penyakit dalam</li>"+
+                                "<li>HIV Test</li>"+
+                            "</ul>";
+                break;
+            case 9:
+                ModalBody = "<ul>" +
+                                "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                        "Analisa Urine Rutin"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li><i>Treadmill Test</i> dengan Interpretasi oleh dokter spesialis jantung</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
+                                        "Analisa Darah Lengkap"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li>Rontgen Dada dengan Interpretasi oleh dokter spesialis radiologi/ dokter spesialis paru/ dokter spesialis penyakit dalam</li>"+
+                                "<li>HIV Test</li>"+
+                            "</ul>";
+                break;
+            case 10:
+                ModalBody = "<ul>" +
+                                "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                        "Analisa Urine Rutin"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
+                                        "Analisa Darah Lengkap"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li>EKG dengan Interpretasi oleh dokter spesialis jantung</li>"+
+                            "</ul>";
+                break;
+            case 11:
+                ModalBody = "<ul>" +
+                                "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                        "Analisa Urine Rutin"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
+                                        "Analisa Darah Lengkap"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li>EKG dengan Interpretasi oleh dokter spesialis jantung</li>"+
+                                "<li>Rontgen Dada dengan Interpretasi oleh dokter spesialis radiologi/ dokter spesialis paru/ dokter spesialis penyakit dalam</li>"+
+                            "</ul>";
+                break;
+            case 12:
+                ModalBody = "<ul>" +
+                                "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                        "Analisa Urine Rutin"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li>HIV Test</li>"+
+                            "</ul>";
+                break;
+            case 13:
+                ModalBody = "<ul>" +
+                                "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                        "Analisa Urine Rutin"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
+                                        "Analisa Darah Lengkap"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li>EKG dengan Interpretasi oleh dokter spesialis jantung</li>"+
+                                "<li>HIV Test</li>"+
+                            "</ul>";
+                break;
+            case 14:
+                ModalBody = "<ul>" +
+                                "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                        "Analisa Urine Rutin"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
+                                        "Analisa Darah Lengkap"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li><i>Treadmill Test</i> dengan Interpretasi oleh dokter spesialis jantung</li>"+
+                                "<li>HIV Test</li>"+
+                            "</ul>";
+                break;
+            case 15:
+                ModalBody = "<ul>" +
+                                "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                        "Analisa Urine Rutin"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+LemakDarah+'" data-original-title="Lemak Darah">'+
+                                        "Lemak Darah"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li>Gula darah Puasa dan HbA1c</li>"+
+                                "<li>EKG dengan Interpretasi oleh dokter spesialis jantung</li>"+
+                            "</ul>";
+                break;
+            case 16:
+                ModalBody = "<ul>" +
+                                "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                        "Analisa Urine Rutin"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+LemakDarah+'" data-original-title="Lemak Darah">'+
+                                        "Lemak Darah"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li>Gula darah Puasa dan HbA1c</li>"+
+                                "<li><i>Treadmill Test</i> dengan Interpretasi oleh dokter spesialis jantung</li>"+
+                                "<li>Rontgen Dada dengan Interpretasi oleh dokter spesialis radiologi/ dokter spesialis paru/ dokter spesialis penyakit dalam</li>"+
+                            "</ul>";
+                break;
+            case 17:
+                ModalBody = "<ul>" +
+                                "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                        "Analisa Urine Rutin"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
+                                        "Analisa Darah Lengkap"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li><i>Treadmill Test</i> dengan Interpretasi oleh dokter spesialis jantung</li>"+
+                            "</ul>";
+                break;
+            case 18:
+                ModalBody = "<ul>" +
+                                "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                        "Analisa Urine Rutin"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li>"+
+                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
+                                        "Analisa Darah Lengkap"+
+                                    "</a>"+
+                                "</li>"+
+                                "<li><i>Treadmill Test</i> dengan Interpretasi oleh dokter spesialis jantung</li>"+
+                                "<li>Rontgen Dada dengan Interpretasi oleh dokter spesialis radiologi/ dokter spesialis paru/ dokter spesialis penyakit dalam</li>"+
+                            "</ul>";
+        }
+
+        $("#ModalBody").html(ModalBody);
+        $('[data-toggle="popover"]').popover({
+            container: '#ModalNM',
+            trigger: "focus"
+        });
+    }
+
+    function showTable() {
+        if($("#ddlAgentType").val() == 0) {
+            $("#tabel-nm-pph").hide();
+            $("#tabel-nm-jiwa").hide();
+            $("#tableInfo").hide();
+            $("#ddlAgentType").focus().click();
+            return 0;
+        }
+        else {
+            var Produk = $("#ddlProduk"). val();
+            var agentType = $("#ddlAgentType").val();
+            if(previousAgentType !== agentType) {         
+                if(Produk == 1) { //produk jiwa
+
+                }
+                else {
+                    var selectedData = $.grep(dataNM_PPH, function(v) {
+                        return v.AgentType == agentType;
+                    });
+                    table = $("#tabel-nm-pph").DataTable({
+                        destroy: true,
+                        order: [],
+                        responsive: {
+                            details: {
+                                renderer: function ( api, rowIdx, columns ) {
+                                    var data = $.map( columns, function ( col, i ) {
+                                        return col.hidden ?
+                                            '<tr data-dt-row="'+col.rowIndex+'" data-dt-column="'+col.columnIndex+'">'+
+                                                '<td>'+col.title+':'+'</td> '+
+                                                '<td>'+col.data+'</td>'+
+                                            '</tr>' :
+                                            '';
+                                    } ).join('');
+                 
+                                    return data ?
+                                        $('<table/>').append( data ) :
+                                        false;
+                                }
+                            }
+                        },
+                        paging: false,
+                        searching: false,
+                        bFilter: false,
+                        fixedHeader: {
+                            headerOffset: $('.header-area').outerHeight()
+                        },
+                        "language": {
+                            "info": "",
+                            "infoFiltered": "",
+                            "infoEmpty": "",
+                            "zeroRecords": "Data tidak ditemukan",
+                            "lengthMenu": "&nbsp;&nbsp;_MENU_ data",
+                            "search": "",
+                            "processing": "Memproses"
+                        },
+                        ordering: false,
+                        columns: [
+                            {
+                                data: "Usia",
+                                className: "dt-head-center dt-body-center dt-nowrap",
+                            },
+                            {
+                                data: "C1",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "C2",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "C3",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "BA1",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "BA2",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "BB1",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "BB2",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "SA1",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "SA2",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "SB1",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "SB2",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "GA1",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "GA2",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "GB1",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "GB2",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "P1",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "P2",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "D1",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "D2",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            }
+                        ],
+                        processing: true,
+                        data: selectedData
+                    });
+                    $("#tabel-nm-pph").show();
+                    $("#tabel-nm-jiwa").hide();
+                    $("#tabel-nm-pph").width("100%");
+                }
+                previousAgentType = agentType;
+            }
+            $("#tableInfo").show();
+            $("#tableInfo").html("Tabel Non Medical untuk Produk " + $("#ddlProduk option:selected").text() + " dengan Tipe Agen adalah " + $("#ddlAgentType option:selected").text());
+            table.columns.adjust().draw(false);
+        }
+    }
+</script>

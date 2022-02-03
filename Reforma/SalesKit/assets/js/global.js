@@ -2,11 +2,17 @@ $.fn.hasAttr = function(name) {
 	return this.attr(name) !== undefined;
 };
 
-var CurrentMenu = "./index.html";
-var PrevMenu;
+var GLOBAL_STATE_COUNTER = 0;
+var historyJs = window.History;
+var pdfView = 0;
+var xDown = null;                                                        
+var yDown = null;
+var table;
 
 $(document).ready(function () {
 	window.onscroll = function() {scrollFunction()};
+	document.addEventListener('touchstart', handleTouchStart, false);        
+	document.addEventListener('touchmove', handleTouchMove, false);
 
 	$('.scrollup').click(function () {
 		$("html").animate({
@@ -14,28 +20,60 @@ $(document).ready(function () {
 		}, "slow");
 		return false;
 	});
-	
-	$(document).on("click", ".menu", function() {
+
+	// Bind the adapter to listen 'statechange' event.
+    historyJs.Adapter.bind(window, "statechange", function() {
+ 
+        // Get state object.
+        var state = historyJs.getState();
+ 		if(typeof state.data.counter == 'undefined') {
+			Redirect("./index.html");
+			return false;
+		}
+        // Check whether back button is pressed.
+        if (state.data.counter < GLOBAL_STATE_COUNTER) {
+			// Reload the content.
+			Redirect(state.data.url);
+        	historyJs.back();
+        }
+    });
+
+    $(document).on("click", ".pdfViewer", function() {
 		var MenuClicked = $(this).attr("link");
-		PrevMenu = CurrentMenu;
-		CurrentMenu = MenuClicked;
 		if( $(this).is("a")) $(".menu").parent().removeClass("active");
 		$("#loading").show();
 		$("#main-content-inner").html("");
-		if(MenuClicked != "./Home.php") {
+		//if(MenuClicked != "./Home.php") {
 			$.ajax({
 				url: MenuClicked,
 				type: "POST",
 				data: { },
 				dataType: "html",
 				success: function(data) {
+					if(pdfView == 0) {
+						$(".page-title-area").css("cssText", "display: none !important;");
+						$(".header-area").css("cssText", "display: none !important;");
+						$(".footer-area").css("cssText", "display: none !important;");
+						pdfView = 1;
+					}
 					$("#main-content-inner").html(data);
 					$("html, body").animate({
 						scrollTop: 0
 					}, "slow");
-					$('.page-container').toggleClass('sbar_collapsed');
-					$("#breadcrumbsContainer").html($("#breadcrumbsContent").html());
+					//$('.page-container').toggleClass('sbar_collapsed');
+					//$("#breadcrumbsContainer").html($("#breadcrumbsContent").html());
 					$("#loading").hide();
+					//window.history.pushState({href: MenuClicked}, '', MenuClicked);
+					historyJs.pushState(
+		               {
+		                   counter: GLOBAL_STATE_COUNTER,
+		                   url: MenuClicked
+		               },
+		               'R-Force', // It should be filled with document title, but just ignore it for now.
+		               "?state=" + GLOBAL_STATE_COUNTER
+		            );
+		            // Increment global state counter.
+            		GLOBAL_STATE_COUNTER++;
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$("#loading").hide();
@@ -49,7 +87,63 @@ $(document).ready(function () {
 					return 0;
 				}
 			});
-		}
+		//}
+		//$(this).parent().addClass("active");
+	});
+	
+	$(document).on("click", ".menu", function() {
+		var MenuClicked = $(this).attr("link");
+		if( $(this).is("a")) $(".menu").parent().removeClass("active");
+		$("#loading").show();
+		if ( $.fn.DataTable.isDataTable( table ) ) {
+            table.fixedHeader.disable();
+        }
+		$("#main-content-inner").html("");
+		//if(MenuClicked != "./Home.php") {
+			$.ajax({
+				url: MenuClicked,
+				type: "POST",
+				data: { },
+				dataType: "html",
+				success: function(data) {
+					if(pdfView == 1) {
+						$(".page-title-area").css("cssText", "");
+						$(".header-area").css("cssText", "");
+						$(".footer-area").css("cssText", "");
+						pdfView = 0;
+					}
+					$("#main-content-inner").html(data);
+					$("html, body").animate({
+						scrollTop: 0
+					}, "slow");
+					$('.page-container').addClass('sbar_collapsed');
+					$("#breadcrumbsContainer").html($("#breadcrumbsContent").html());
+					$("#loading").hide();
+					//window.history.pushState({href: MenuClicked}, '', MenuClicked);
+					historyJs.pushState(
+		               {
+		                   counter: GLOBAL_STATE_COUNTER,
+		                   url: MenuClicked
+		               },
+		               'R-Force', // It should be filled with document title, but just ignore it for now.
+		               "?state=" + GLOBAL_STATE_COUNTER
+		            );
+		            // Increment global state counter.
+            		GLOBAL_STATE_COUNTER++;
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					$("#loading").hide();
+					var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+					//LogEvent(errorMessage, "global.js (fnMenuClick)");
+					//Lobibox.alert("error",
+					//{
+					//	msg: errorMessage,
+					//	width: 480
+					//});
+					return 0;
+				}
+			});
+		//}
 		$(this).parent().addClass("active");
 	});
 
@@ -61,8 +155,52 @@ $(document).ready(function () {
 
     $(document).on("click", ".close, #img-modal", function() {
         $("#img-modal").hide();
-    });
+    });    
 });
+
+function getTouches(evt) {
+  return evt.touches ||             // browser API
+         evt.originalEvent.touches; // jQuery
+}                                                     
+                                                                         
+function handleTouchStart(evt) {
+    const firstTouch = getTouches(evt)[0];                                      
+    xDown = firstTouch.clientX;                                      
+    yDown = firstTouch.clientY;                                      
+};                                                
+                                                                         
+function handleTouchMove(evt) {
+    if ( ! xDown || ! yDown ) {
+        return;
+    }
+
+    var xUp = evt.touches[0].clientX;                                    
+    var yUp = evt.touches[0].clientY;
+
+    var xDiff = xDown - xUp;
+    var yDiff = yDown - yUp;
+                                                                         
+    if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {/*most significant*/
+        if ( xDiff > 0 ) {
+            /* right swipe */ 
+            //$('.page-container').toggleClass('sbar_collapsed');
+            $('.page-container').addClass('sbar_collapsed');
+        } else {
+            /* left swipe */
+            $('.page-container').removeClass('sbar_collapsed');
+        }                       
+    } else {
+        if ( yDiff > 0 ) {
+            /* down swipe */ 
+        } else { 
+            /* up swipe */
+        }                                                                 
+    }
+    /* reset values */
+    xDown = null;
+    yDown = null;                                             
+};
+
 function scrollFunction() {
 	if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
 		$('.scrollup').fadeIn();
@@ -73,11 +211,12 @@ function scrollFunction() {
 
 function Redirect(link) {
 	var MenuClicked = link;
-	PrevMenu = CurrentMenu;
-	CurrentMenu = MenuClicked;
-	//$("#loading").show();
+	$("#loading").show();
+	if ( $.fn.DataTable.isDataTable( table ) ) {
+        table.fixedHeader.disable();
+    }
 	$("#main-content-inner").html("");
-	if(MenuClicked != "./Home.php") {
+	//if(MenuClicked != "./Home.php") {
 		$.ajax({
 			url: MenuClicked,
 			type: "POST",
@@ -85,15 +224,22 @@ function Redirect(link) {
 			dataType: "html",
 			async : true,
 			success: function(data) {
+				if(pdfView == 1) {
+					$(".page-title-area").css("cssText", "");
+					$(".header-area").css("cssText", "");
+					$(".footer-area").css("cssText", "");
+					pdfView = 0;
+				}
 				$("#main-content-inner").html(data);
 				$("html, body").animate({
 					scrollTop: 0
 				}, "slow");
-				$('.page-container').toggleClass('sbar_collapsed');
-				//$("#loading").hide();
+				//$('.page-container').toggleClass('sbar_collapsed');
+				$("#breadcrumbsContainer").html($("#breadcrumbsContent").html());
+				$("#loading").hide();
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				//$("#loading").hide();
+				$("#loading").hide();
 				var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
 				//LogEvent(errorMessage, "global.js (fnRedirect)");
 				//Lobibox.alert("error",
@@ -104,7 +250,7 @@ function Redirect(link) {
 				return 0;
 			}
 		});
-	}
+	//}
 }
 
 function Reload() {

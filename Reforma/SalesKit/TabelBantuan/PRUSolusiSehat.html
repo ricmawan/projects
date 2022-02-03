@@ -7,11 +7,6 @@
         display: none;
     }
 </style>
-<!--<link href="./assets/css/dataTables.bootstrap.css" rel="stylesheet" />-->
-<link href="./assets/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
-<link href="./assets/css/fixedHeader.bootstrap4.css" rel="stylesheet" />
-<link href="./assets/css/responsive.bootstrap4.css" rel="stylesheet" />
-
 <div class="row" style="margin-right: -2px;margin-left: -2px;">
      <div class="col-lg-12 mt-5">
         <div class="card">
@@ -36,9 +31,6 @@
                         <option value=4>Platinum & Diamond</option>
                     </select>
                 </div>
-                <!--<div class="form-group">
-                    <button type="button" class="btn btn-primary btn-lg btn-block" onclick="showTable();" >TAMPILKAN <i class="fa fa-eye"></i></button>
-                </div>-->
                 <div class="list-bullet">
                     <ul>
                         <li>Ilustrasi premi bulanan batas kamar Opsi 1 dan tanpa menggunakan prusehat saver.</li>
@@ -72,48 +64,70 @@
 </div>
 <div id="breadcrumbsContent" style="display: none;" >
     <h4 class="page-title pull-left">Premi PRUSolusi Sehat</h4>
-    <!--<ul class="breadcrumbs pull-left">
-        <li><a href="index.html">Home</a></li>
-        <li><span>Profil Perusahaan</span></li>
-    </ul>-->
 </div>
 <script type="text/javascript" src="./TabelBantuan/dataPSS.min.json"></script>
-<script src="assets/js/jquery.dataTables.min.js"></script>
-<script src="assets/js/dataTables.bootstrap4.min.js"></script>
-<script src="assets/js/dataTables.fixedHeader.min.js"></script>
-<script src="assets/js/fixedHeader.bootstrap4.min.js"></script>
-<script src="assets/js/dataTables.responsive.min.js"></script>
-<script src="assets/js/responsive.bootstrap4.min.js"></script>
-
-
 <script>
-   //var openedAccordionCompanyProfile = null;
-    var table;
+    var previousGender = "";
     $('input[type=radio][name=optGender]').change(function() {
         showTable();
     });
+
     function showTable() {
         if($("#ddlPlan").val() == 0) {
             $("#tabel-premi-pss").hide();
             $("#tableInfo").hide();
-            /*Lobibox.alert("error",
-            {
-                msg: "Pilih Plan!",
-                width: 320
-            });*/
             $("#ddlPlan").focus().click();
             return 0;
         }
         else {
             var Gender = $("input[name='optGender']:checked"). val();
-            var selectedGender = $.grep(dataPSS, function(v) {
-                return v.JenisKelamin == Gender;
-            });
+            if(previousGender !== Gender) {
+                var selectedGender = $.grep(dataPSS, function(v) {
+                    return v.JenisKelamin == Gender;
+                });
+                
+                table = $("#tabel-premi-pss").DataTable({
+                    destroy: true,
+                    order: [],
+                    responsive: true,
+                    paging: false,
+                    searching: true,
+                    responsive: true,
+                    bFilter: false,
+                    fixedHeader: {
+                        headerOffset: $('.header-area').outerHeight()
+                    },
+                    "language": {
+                        "info": "",
+                        "infoFiltered": "",
+                        "infoEmpty": "",
+                        "zeroRecords": "Data tidak ditemukan",
+                        "lengthMenu": "&nbsp;&nbsp;_MENU_ data",
+                        "search": "",
+                        "processing": "Memproses"
+                    },
+                    ordering: false,
+                    columns: [
+                        {data: "Usia", className: "dt-head-center dt-body-center"},
+                        {data: "BronzeA", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
+                        {data: "BronzeB", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
+                        {data: "SilverA", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
+                        {data: "SilverB", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
+                        {data: "GoldA", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
+                        {data: "GoldB", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
+                        {data: "Platinum", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
+                        {data: "Diamond", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
+                        {data: "JenisKelamin", visible: false}
+                    ],
+                    processing: true,
+                    data: selectedGender
+                });
+                previousGender = Gender;
+            }
+
             $("#tableInfo").show();
             $("#tableInfo").html("Tabel untuk " + Gender + " dengan Plan " + $("#ddlPlan option:selected").text());
             $("#tabel-premi-pss").show();
-            
-            table.columns( 9 ).search( Gender ).draw();
 
             if($("#ddlPlan").val() == 1) {
                 table.columns( [1,2] ).visible( true );
@@ -133,60 +147,7 @@
                 table.columns( [1,2,3,4,5,6] ).visible( false );
             }
             $("#tabel-premi-pss").width("100%");
-            //table.columns.adjust().draw(false);
+            table.columns.adjust().draw(false);
         }
     }
-
-    $(document).ready(function() {
-        table = $("#tabel-premi-pss").DataTable({
-            destroy: true,
-            order: [],
-            responsive: true,
-            paging: false,
-            searching: true,
-            responsive: true,
-            bFilter: false,
-            fixedHeader: {
-                headerOffset: $('.header-area').outerHeight()
-            },
-            "language": {
-                "info": "",
-                "infoFiltered": "",
-                "infoEmpty": "",
-                "zeroRecords": "Data tidak ditemukan",
-                "lengthMenu": "&nbsp;&nbsp;_MENU_ data",
-                "search": "",
-                "processing": "Memproses"
-            },
-            ordering: false,
-            columns: [
-                {data: "Usia", className: "dt-head-center dt-body-center"},
-                {data: "BronzeA", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
-                {data: "BronzeB", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
-                {data: "SilverA", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
-                {data: "SilverB", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
-                {data: "GoldA", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
-                {data: "GoldB", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
-                {data: "Platinum", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
-                {data: "Diamond", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
-                {data: "JenisKelamin", visible: false}
-            ],
-            processing: true,
-            data: dataPSS
-        });
-    });
-    
-    
-
-    $(document).on("click", ".menu", function() {
-        table.fixedHeader.disable();
-    });
-    /*$(".collapse").on("hidden.bs.collapse", function(e) {
-        //e.preventDefault();
-        setTimeout(function() {
-            $("html,body").animate({
-                scrollTop: (openedAccordionCompanyProfile.offset().top - 80)
-            }, 500);
-        }, 100);
-    });*/
 </script>

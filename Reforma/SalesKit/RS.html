@@ -1,0 +1,231 @@
+<style type="text/css">
+    thead {
+        background: red;
+        color: white;
+    }
+    .dataTables_filter {
+        display: none;
+    }
+</style>
+<link rel="stylesheet" href="./assets/css/bootstrap-select.min.css">
+
+<div class="row" style="margin-right: -2px;margin-left: -2px;">
+     <div class="col-lg-12 mt-5">
+        <div class="card">
+            <div class="card-body">
+                <div class="form-group">
+                    <select class="form-control selectpicker" id="ddlCity" data-live-search="true" multiple title="Pilih Kota">
+                        <!--<option value=0>Pilih Kota</option>-->
+                    </select>
+                </div>
+                <div class="data-tables responsive">
+                    <table id="tabel-rs-pmn" class="table table-hover table-bordered table-striped" style="display: none;" width="100%">
+                        <thead >
+                            <tr>
+                                <th></th>
+                                <th scope="col">Nama</th>
+                                <th scope="col">Alamat</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="breadcrumbsContent" style="display: none;" >
+    <h4 class="page-title pull-left">RS Rekanan PMN</h4>
+</div>
+<script type="text/javascript" src="./dataCity.min.json"></script>
+<script type="text/javascript" src="./dataPMN.min.json"></script>
+<script src="./assets/js/bootstrap-select.min.js"></script>
+<script>
+   //var openedAccordionCompanyProfile = null;
+    var table;
+    var previousProvince = "";
+    var arrSelectedProvince = [];
+    var prevSelection = [];
+    var counter = 0;
+
+    $(document).ready(function() {
+        $.each(dataCity, function(key, value) {
+            if(value.Province !== previousProvince) {
+                $("#ddlCity").append($("<option data-tokens='" + value.Province + "' style='font-weight: bold' ></option>").attr("value", "100" + value.CityID).text(value.Province));
+                $("#ddlCity").append($("<option data-tokens='" + value.Province + "' style='padding-left: 2.5em' ></option>").attr("value", value.CityID).text(value.City));
+            }
+            else {
+                $("#ddlCity").append($("<option data-tokens='" + value.Province + "' style='padding-left: 2.5em' ></option>").attr("value", value.CityID).text(value.City));
+            }
+            previousProvince = value.Province;
+        });
+
+        $("#ddlCity").selectpicker();
+
+        $('#ddlCity').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+            // do something...
+            if(parseInt($('#ddlCity option:eq(' + clickedIndex + ')').val()) > 1000 ) { //if province then 
+                $.each(dataCity, function(key, value) { //find city with same province
+                    if($('#ddlCity option:eq(' + clickedIndex + ')').text() === value.Province) {
+                        arrSelectedProvince.push(value.CityID);
+                        //for(var i=0; i<a.length; ++i) {
+
+                        //}
+                    }
+                });
+
+                if(isSelected) { //checked selected city
+                    var currentSelection = $("#ddlCity").val();
+                    if(currentSelection != null) {
+                        arrSelectedProvince = arrayUnique(currentSelection.concat(arrSelectedProvince));
+                    }
+                    $("#ddlCity").selectpicker("val", arrSelectedProvince);
+                }
+                else { //uncheck city
+                    var currentSelection = $("#ddlCity").val();
+                    if(currentSelection != null) {
+                        for(var i=0; i<currentSelection.length; i++) {
+                            for(var j=0; j<arrSelectedProvince.length; j++) {
+                                if(currentSelection[i] === arrSelectedProvince[j])
+                                    currentSelection.splice(i, 1);
+                            }
+                        }
+                    }
+                    $("#ddlCity").selectpicker("val", currentSelection);
+                }
+                arrSelectedProvince = [];
+            }
+        });
+
+        $('#ddlCity').on('hidden.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+            if($("#ddlCity").val() == null) {
+                $("#tabel-rs-pmn").hide();
+                /*Lobibox.alert("error",
+                {
+                    msg: "Pilih Plan!",
+                    width: 320
+                });*/
+                $("#ddlCity").focus().click();
+                return 0;
+            }
+            else {
+                var currentSelection =  $("#ddlCity").val();
+                var joinedCurrentSelection = currentSelection.join();
+                var joinedPrevSelection = prevSelection.join();
+                if($("#ddlCity").val() == null) {
+                    $("#tabel-rs-pmn").hide();
+                    /*Lobibox.alert("error",
+                    {
+                        msg: "Pilih Plan!",
+                        width: 320
+                    });*/
+                    //$("#ddlCity").focus().click();
+                    return 0;
+                }
+                else if(joinedCurrentSelection !== joinedPrevSelection) {
+                    var selectedCity = [];
+                    var cityDataSet = [];
+                    for(var i=0; i<currentSelection.length; i++) {
+                        if(currentSelection[i] < 1000) {
+                            for(var j=0; j<dataPMN.length; j++) {
+                                if(parseInt(dataPMN[j].CityID) === parseInt(currentSelection[i])) {
+                                    cityDataSet.push(dataPMN[j]);
+                                }
+                            }
+                            //selectedCity = $.grep(dataPMN, function(v) {
+                              //  return v.CityID == currentSelection[i];
+                            //});
+                            //cityDataSet.push(selectedCity);
+                        }
+                    }
+                    //table.columns( 9 ).search( Gender ).draw();
+                    table = $("#tabel-rs-pmn").DataTable({
+                        destroy: true,
+                        order: [],
+                        responsive: false,
+                        paging: false,
+                        searching: true,
+                        bFilter: false,
+                        fixedHeader: {
+                            headerOffset: $('.header-area').outerHeight()
+                        },
+                        "language": {
+                            "info": "",
+                            "infoFiltered": "",
+                            "infoEmpty": "",
+                            "zeroRecords": "Data tidak ditemukan",
+                            "lengthMenu": "&nbsp;&nbsp;_MENU_ data",
+                            "search": "",
+                            "processing": "Memproses"
+                        },
+                        ordering: false,
+                        columns: [
+                            {
+                                "className": 'dt-control',
+                                "orderable": false,
+                                "data": null,
+                                "defaultContent": ''
+                            },
+                            {data: "Nama", className: "dt-head-center"},
+                            {data: "Alamat", className: "dt-head-center"}
+                        ],
+                        processing: true,
+                        data: cityDataSet,
+                        drawCallback: function(settings) {
+                            if(counter == 0) {
+                                $('#tabel-rs-pmn tbody').on('click', 'td.dt-control', function () {
+                                    var tr = $(this).closest('tr');
+                                    var row = table.row( tr );
+                                    if ( row.child.isShown() ) {
+                                        // This row is already open - close it
+                                        row.child.hide();
+                                        tr.removeClass('shown');
+                                    }
+                                    else {
+                                        // Open this row
+                                        row.child( format(row.data()) ).show();
+                                        tr.addClass('shown');
+                                    }
+                                });
+                                counter = 1;
+                            }
+                        }
+                    });
+                    prevSelection = cityDataSet;
+                }
+
+                $("#tabel-rs-pmn").show();
+                $("#tabel-rs-pmn").width("100%");
+                table.columns.adjust().draw(false);
+            }
+        });
+    });
+
+    function format ( d ) {
+        // `d` is the original data object for the row
+        return '<table class="table table-borderless" cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
+            '<tr>'+
+                '<td>Telepon:</td>'+
+                '<td>'+d.Telepon+'</td>'+
+            '</tr>'+
+            '<tr>'+
+                '<td>Fasilitas:</td>'+
+                '<td>'+d.Fasilitas+'</td>'+
+            '</tr>'+
+            '<tr>'+
+                '<td>Catatan:</td>'+
+                '<td>'+d.Catatan+'</td>'+
+            '</tr>'+
+        '</table>';
+    }
+
+    function arrayUnique(array) {
+        var a = array.concat();
+        for(var i=0; i<a.length; ++i) {
+            for(var j=i+1; j<a.length; ++j) {
+                if(a[i] === a[j])
+                    a.splice(j--, 1);
+            }
+        }
+        return a;
+    }
+</script>

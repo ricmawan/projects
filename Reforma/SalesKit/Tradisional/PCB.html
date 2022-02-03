@@ -378,7 +378,7 @@
                             <div class="card-body">
 								<div>
 									<ul>
-										<li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="./Tradisional/viewerPDFPCB.html">Ketentuan Polis PRUCritical Benefit 88</a></li>
+										<li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="#" class="pdfViewer" link="./Tradisional/viewerPDFPCB.html">Ketentuan Polis PRUCritical Benefit 88</a></li>
 									</ul>
 								</div>
                             </div>
@@ -391,23 +391,13 @@
 </div>
 <div id="breadcrumbsContent" style="display: none;" >
     <h4 class="page-title pull-left">PRUCritical Benefit 88</h4>
-    <!--<ul class="breadcrumbs pull-left">
-        <li><a href="index.html">Home</a></li>
-        <li><a><span>Produk Dasar</span></a></li>
-        <li><span>PRULink (Syariah) Generasi Baru</span></li>
-    </ul>-->
 </div>
-<script src="assets/js/jquery.dataTables.js"></script>
 <script>
-	//var openedAccordionGenerasiBaru = null;
     $(".collapse").on("shown.bs.collapse", function(e) {
         var $card = $(this).closest(".card");
-        //if(!openedAccordionGenerasiBaru) {
-            $("html,body").animate({
-                scrollTop: ($card.offset().top - 80)
-            }, 500);
-        //}
-        //openedAccordionGenerasiBaru = $card;
+        $("html,body").animate({
+            scrollTop: ($card.offset().top - 80)
+        }, 500);
     });
 
     $('#tabel-pcb').DataTable({
@@ -420,17 +410,6 @@
         },
         "drawCallback": function( settings ) {
             $("#tabel-pcb thead").remove();
-            //$("#tabel-pph").hide();
-            //console.log("test");
         }
     });
-
-    /*$(".collapse").on("hidden.bs.collapse", function(e) {
-        //e.preventDefault();
-        setTimeout(function() {
-            $("html,body").animate({
-                scrollTop: (openedAccordionGenerasiBaru.offset().top - 80)
-            }, 500);
-        }, 100);
-    });*/
 </script>
