@@ -1,4 +1,4 @@
-var dataCinta [
+var dataCinta = [
         {
             "Usia": "25",
             "JenisKelamin": "Pria",
@@ -254,7 +254,7 @@ var dataCinta [
         {
             "Usia": "25",
             "JenisKelamin": "Wanita",
-            "UP1": "-",
+            "UP1": "297000",
             "UP2": "528000",
             "UP3": "1155000"
         },

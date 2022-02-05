@@ -8,11 +8,31 @@ var pdfView = 0;
 var xDown = null;                                                        
 var yDown = null;
 var table;
+var previousOrientation = window.orientation;
+var checkOrientation = function(){
+    if(window.orientation !== previousOrientation){
+        previousOrientation = window.orientation;
+        // orientation changed, do your magic here
+        $('.menu-inner').slimScroll({
+            height: ($( window ).height() - 120)
+        });
+    }
+    else {
+        $('.menu-inner').slimScroll({
+            height: 'auto'
+        });
+    }
+};
 
 $(document).ready(function () {
 	window.onscroll = function() {scrollFunction()};
-	document.addEventListener('touchstart', handleTouchStart, false);        
-	document.addEventListener('touchmove', handleTouchMove, false);
+	//document.addEventListener('touchstart', handleTouchStart, false);        
+	//document.addEventListener('touchmove', handleTouchMove, false);
+	window.addEventListener("resize", checkOrientation, false);
+	window.addEventListener("orientationchange", checkOrientation, false);
+
+	// (optional) Android doesn't always fire orientationChange on 180 degree turns
+	setInterval(checkOrientation, 2000);
 
 	$('.scrollup').click(function () {
 		$("html").animate({
@@ -27,26 +47,26 @@ $(document).ready(function () {
         // Get state object.
         var state = historyJs.getState();
  		if(typeof state.data.counter == 'undefined') {
-			Redirect("./index.html");
+			Redirect("./Dashboard.html");
 			return false;
 		}
         // Check whether back button is pressed.
         if (state.data.counter < GLOBAL_STATE_COUNTER) {
 			// Reload the content.
 			Redirect(state.data.url);
-        	historyJs.back();
+        	//historyJs.back();
         }
     });
 
-    $(document).on("click", ".pdfViewer", function() {
+    $(document).on("click", ".pdfMenu", function() {
 		var MenuClicked = $(this).attr("link");
-		if( $(this).is("a")) $(".menu").parent().removeClass("active");
+		//if( $(this).is("a")) $(".menu").parent().removeClass("active");
 		$("#loading").show();
 		$("#main-content-inner").html("");
 		//if(MenuClicked != "./Home.php") {
 			$.ajax({
-				url: MenuClicked,
-				type: "POST",
+				url: "./pdfjs-dist/web/viewer.html",
+				type: "GET",
 				data: { },
 				dataType: "html",
 				success: function(data) {
@@ -70,7 +90,7 @@ $(document).ready(function () {
 		                   url: MenuClicked
 		               },
 		               'R-Force', // It should be filled with document title, but just ignore it for now.
-		               "?state=" + GLOBAL_STATE_COUNTER
+		               "?file=" + MenuClicked
 		            );
 		            // Increment global state counter.
             		GLOBAL_STATE_COUNTER++;
@@ -110,6 +130,7 @@ $(document).ready(function () {
 						$(".page-title-area").css("cssText", "");
 						$(".header-area").css("cssText", "");
 						$(".footer-area").css("cssText", "");
+						$(".fileInput").remove();
 						pdfView = 0;
 					}
 					$("#main-content-inner").html(data);
@@ -158,7 +179,7 @@ $(document).ready(function () {
     });    
 });
 
-function getTouches(evt) {
+/*function getTouches(evt) {
   return evt.touches ||             // browser API
          evt.originalEvent.touches; // jQuery
 }                                                     
@@ -180,26 +201,26 @@ function handleTouchMove(evt) {
     var xDiff = xDown - xUp;
     var yDiff = yDown - yUp;
                                                                          
-    if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {/*most significant*/
+    if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {/*most significant
         if ( xDiff > 0 ) {
-            /* right swipe */ 
+            /* right swipe 
             //$('.page-container').toggleClass('sbar_collapsed');
             $('.page-container').addClass('sbar_collapsed');
         } else {
-            /* left swipe */
+            /* left swipe 
             $('.page-container').removeClass('sbar_collapsed');
         }                       
     } else {
         if ( yDiff > 0 ) {
-            /* down swipe */ 
+            /* down swipe/ 
         } else { 
-            /* up swipe */
+            /* up swipe 
         }                                                                 
     }
-    /* reset values */
+    /* reset values 
     xDown = null;
     yDown = null;                                             
-};
+};*/
 
 function scrollFunction() {
 	if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
@@ -228,6 +249,7 @@ function Redirect(link) {
 					$(".page-title-area").css("cssText", "");
 					$(".header-area").css("cssText", "");
 					$(".footer-area").css("cssText", "");
+					$(".fileInput").remove();
 					pdfView = 0;
 				}
 				$("#main-content-inner").html(data);

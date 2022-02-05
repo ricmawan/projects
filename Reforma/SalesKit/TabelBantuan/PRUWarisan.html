@@ -37,13 +37,14 @@
                 </div>
                 <span id="tableInfo" class="font-weight-bold"></span><span id="ageInfo" class="font-weight-bold"></span>
                 <div class="data-tables responsive">
-                    <table id="tabel-premi-cinta" class="table table-hover table-bordered table-striped" style="display: none;" width="100%">
+                    <table id="tabel-premi-warisan" class="table table-hover table-bordered table-striped" style="display: none;" width="100%">
                         <thead >
                             <tr>
-                                <th scope="col">Usia</th>
+                                <th scope="col">Masa Setor</th>
                                 <th scope="col">500 Juta</th>
                                 <th scope="col">1 Milyar</th>
                                 <th scope="col">2,5 Milyar</th>
+                                <th scope="col">Usia</th>
                             </tr>
                         </thead>
                     </table>
@@ -53,9 +54,9 @@
     </div>
 </div>
 <div id="breadcrumbsContent" style="display: none;" >
-    <h4 class="page-title pull-left">Premi PRUCinta</h4>
+    <h4 class="page-title pull-left">Premi PRUWarisan</h4>
 </div>
-<script type="text/javascript" src="./TabelBantuan/dataCinta.min.json"></script>
+<script type="text/javascript" src="./TabelBantuan/dataWarisan.min.json"></script>
 <script type="text/javascript" src="./assets/js/rolldate.min.js"></script>
 <script>
     var previousGender = "";
@@ -66,10 +67,10 @@
     function showTable() {
         var Gender = $("input[name='optGender']:checked").val();
         if(previousGender !== Gender) {
-            var selectedGender = $.grep(dataCinta, function(v) {
+            var selectedGender = $.grep(dataWarisan, function(v) {
                 return v.JenisKelamin == Gender;
             });            
-            table = $("#tabel-premi-cinta").DataTable({
+            table = $("#tabel-premi-warisan").DataTable({
                 destroy: true,
                 order: [],
                 paging: false,
@@ -105,10 +106,37 @@
                 },
                 ordering: false,
                 columns: [
-                    {data: "Usia", className: "dt-head-center dt-body-center"},
+                    {data: "MasaSetor", className: "dt-head-center dt-body-center"},
                     {data: "UP1", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
                     {data: "UP2", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
-                    {data: "UP3", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')}
+                    {data: "UP3", className: "dt-head-center dt-body-right", render: $.fn.dataTable.render.number('.', '.', 0, '')},
+                    {data: "Usia", visible: false}
+                ],
+                columnDefs: [
+                    {
+                        targets: 1,
+                        createdCell: function (td, cellData, rowData, row, col) {
+                            if ( cellData < 300000 ) {
+                                $(td).css('color', 'red')
+                            }
+                        }
+                    },
+                    {
+                        targets: 2,
+                        createdCell: function (td, cellData, rowData, row, col) {
+                            if ( cellData < 300000 ) {
+                                $(td).css('color', 'red')
+                            }
+                        }
+                    },
+                    {
+                        targets: 3,
+                        createdCell: function (td, cellData, rowData, row, col) {
+                            if ( cellData < 300000 ) {
+                                $(td).css('color', 'red')
+                            }
+                        }
+                    }
                 ],
                 processing: true,
                 data: selectedGender
@@ -118,13 +146,13 @@
 
         $("#tableInfo").show();
         $("#tableInfo").html("Tabel untuk " + Gender );
-        $("#tabel-premi-cinta").show();
-        $("#tabel-premi-cinta").width("100%");
-        var age = ($("#txtAge").val() == "") ? 0 : parseInt($("#txtAge").val());
+        $("#tabel-premi-warisan").show();
+        $("#tabel-premi-warisan").width("100%");
+        var age = parseInt($("#txtAge").val());
         if( age != 0) {
-            table.columns( 0 ).search( "^"+age+"$", true, false );
+            table.columns( 4 ).search( "^"+age+"$", true, false );
         }
-        table.columns.adjust().draw(false);
+        table.columns.adjust().draw();
     }   
 
     function isLeapYear(year) {
@@ -149,8 +177,7 @@
     /*$.fn.dataTable.ext.search.push(
         function( settings, data, dataIndex ) {
             var searchAge = parseInt($('#txtAge').val());
-            var age = parseInt(data[0]); // use data for the age column
-            console.log(age);
+            var age = parseInt(data[4]); // use data for the age column
             if ( ( age ==  searchAge) || isNaN( searchAge ))
             {
                 return true;
@@ -184,7 +211,6 @@
                 day:''
             },
             confirm: function(pickedDate) {
-                //console.log(pickedDate);
                 var arrDate = pickedDate.split("-")
                 selectedDate = new Date(arrDate[2] + '/' + arrDate[1] + '/' + arrDate[0]);
                 selectedDate.setHours(0, 0, 0, 0);
@@ -215,6 +241,5 @@
                 }
             }
         });
-        showTable();
     });
 </script>

@@ -31,7 +31,7 @@
                         <option value=0>Pilih Tipe Agen</option>
                     </select>
                 </div>
-               <span id="tableInfo" class="font-weight-bold"></span>
+                <span id="tableInfo" class="font-weight-bold"></span>
                 <div class="data-tables responsive">
                     <table id="tabel-nm-pph" class="table table-hover table-bordered table-striped" style="display: none;" width="100%">
                         <thead >
@@ -64,29 +64,26 @@
                     <table id="tabel-nm-jiwa" class="table table-hover table-bordered table-striped" style="display: none;" width="100%">
                         <thead >
                             <tr>
-                                <th scope="col">Usia</th>
-                                <th scope="col">Cermat 1 300Ribu</th>
-                                <th scope="col">Cermat 2 550Ribu</th>
-                                <th scope="col">Cermat 3 650Ribu</th>
-                                <th scope="col">Bronze A 500Ribu</th>
-                                <th scope="col">Bronze A 1Juta</th>
-                                <th scope="col">Bronze B 1Juta</th>
-                                <th scope="col">Bronze B 3Juta</th>
-                                <th scope="col">Silver A 500Ribu</th>
-                                <th scope="col">Silver A 1Juta</th>
-                                <th scope="col">Silver B 1Juta</th>
-                                <th scope="col">Silver B 3Juta</th>
-                                <th scope="col">Gold A 1Juta</th>
-                                <th scope="col">Gold A 3Juta</th>
-                                <th scope="col">Gold B 1.5Juta</th>
-                                <th scope="col">Gold B 5Juta</th>
-                                <th scope="col">Platinum 1.5Juta</th>
-                                <th scope="col">Platinum 10Juta</th>
-                                <th scope="col">Diamond 1.5Juta</th>
-                                <th scope="col">Diamond 10Juta</th>
+                                <th scope="col">US$</th>
+                                <th scope="col">RUPIAH</th>
+                                <th scope="col">1-15 th</th>
+                                <th scope="col">16-17 th</th>
+                                <th scope="col">18-35 th</th>
+                                <th scope="col">31-35 th</th> <!--for PEC Ultimate, show if selected and change header before this to 18-30 th -->
+                                <th scope="col">36-40 th</th>
+                                <th scope="col">41-45 th</th>
+                                <th scope="col">46-50 th</th>
+                                <th scope="col">51-55 th</th>
+                                <th scope="col">56-60 th</th>
+                                <th scope="col">61-65 th</th>
+                                <th scope="col">66-70 th</th>
                             </tr>
                         </thead>
                     </table>
+                    <span id="tableInfoESCC" class="font-weight-bold" style="display: none;">
+                        * Jika mengambil manfaat PRUEarly Stage Crisis Cover Plus dan/atau PRUHospital & Surgical Cover Plus maka dikenakan pemeriksaan kesehatan <a onclick="showTooltip(10);" >Med 10</a>.<br />
+                        ** Jika mengambil manfaat PRUEarly Stage Crisis Cover Plus dan/atau PRUHospital & Surgical Cover Plus maka dikenakan pemeriksaan kesehatan <a onclick="showTooltip(11);" >Med 11</a>.
+                    </span>
                 </div>
             </div>
         </div>
@@ -110,11 +107,16 @@
         </div>
     </div>
 </div>
-<script type="text/javascript" src="./TabelBantuan/dataNM_PPH.json"></script>
-<script type="text/javascript" src="./TabelBantuan/dataNM_Jiwa.json"></script>
+<script type="text/javascript" src="./TabelBantuan/dataNM_PPH.min.json"></script>
+<script type="text/javascript" src="./TabelBantuan/dataNM_Jiwa.min.json"></script>
 <script>
     var previousAgentType = "";
+    var previousProduct = "";
     function loadAgentType(Produk) {
+        $("#tabel-nm-pph").hide();
+        $("#tabel-nm-jiwa").hide();
+        $("#tableInfo").hide();
+        $("#tableInfoESCC").hide();
         if(Produk == 1) {
             $('#ddlAgentType option').each(function () {
                 $(this).remove();
@@ -139,14 +141,13 @@
         return false;
     }
 
-    function showTooltip(el, MED) {
-        $("#ModalNM").modal();
+    function showTooltip(MED) {
         $("#ModalTitle").html("MED " + MED);
         var ModalBody = "";
         var AnalisaUrineRutin = "Warna, Kejernihan, PH, Berat Jenis, Protein, Glukosa/Reduksi/, Urobilinogen, Keton, Darah Samar, Sedimen/Mikroskopik (eritrosit, leukosit, epitel, silinder, kristal, bakteri), Nitrit.";
         var LemakDarah = "Kolestrol Total, HDL Kolestrol, LDL Kolestrol, Tligliserida.";
         var AnalisaDarahRutin = "Hemoglobin (Hb), Eritrosit (RBC), Lekosit (WBC), Hitung Jenis Lekosit, Laju Endap Darah, Trombosit, MCH, MCV, MCHC.";
-        var AnalisaDarahLengkap = "Hemoglobin (Hb), Eritrosit (RBC), Lekosit (WBC), Hitung Jenis Lekosit, Laju Endap Darah, Trombosit, MCH, MCV, MCHC, Kolestrol Total, HDL Kolestrol, LDL Kolestrol, Tligliserida, Gula Darah Puasa, HbA1c, SGPT, SGOT, Gamma GT, Bilirubin Direk, Bilirubin Indirek, Albumin, Globulin, Alkali Fosfatase, Ureum, Kreatinin, Asam Urat, HbsAg, VDRL, AFP."
+        var AnalisaDarahLengkap = "Hemoglobin (Hb), Eritrosit (RBC), Lekosit (WBC), Hitung Jenis Lekosit, Laju Endap Darah, Trombosit, MCH, MCV, MCHC, Kolestrol Total, HDL, LDL, Tligliserida, Gula Darah Puasa, HbA1c, SGPT, SGOT, Gamma GT, Bilirubin Direk & Indirek, Albumin, Globulin, Alkali Fosfatase, Ureum, Kreatinin, Asam Urat, HbsAg, VDRL, AFP."
         switch (parseInt(MED)) {
             case 1: 
                 ModalBody = "<ul>" +
@@ -163,7 +164,7 @@
                 ModalBody = "<ul>" +
                                 "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
                                         "Analisa Urine Rutin"+
                                     "</a>"+
                                 "</li>"+
@@ -173,7 +174,7 @@
                 ModalBody = "<ul>" +
                                 "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
                                         "Analisa Urine Rutin"+
                                     "</a>"+
                                 "</li>"+
@@ -184,12 +185,12 @@
                 ModalBody = "<ul>" +
                                 "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
                                         "Analisa Urine Rutin"+
                                     "</a>"+
                                 "</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
                                         "Analisa Darah Lengkap"+
                                     "</a>"+
                                 "</li>"+
@@ -200,7 +201,7 @@
                 ModalBody = "<ul>" +
                                 "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
                                         "Analisa Urine Rutin"+
                                     "</a>"+
                                 "</li>"+
@@ -212,7 +213,7 @@
                 ModalBody = "<ul>" +
                                 "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
                                         "Analisa Urine Rutin"+
                                     "</a>"+
                                 "</li>"+
@@ -224,13 +225,13 @@
                 ModalBody = "<ul>" +
                                 "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
                                         "Analisa Urine Rutin"+
                                     "</a>"+
                                 "</li>"+                                
                                 "<li>EKG dengan Interpretasi oleh dokter spesialis jantung</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
                                         "Analisa Darah Lengkap"+
                                     "</a>"+
                                 "</li>"+
@@ -242,13 +243,13 @@
                 ModalBody = "<ul>" +
                                 "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
                                         "Analisa Urine Rutin"+
                                     "</a>"+
                                 "</li>"+
                                 "<li><i>Treadmill Test</i> dengan Interpretasi oleh dokter spesialis jantung</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
                                         "Analisa Darah Lengkap"+
                                     "</a>"+
                                 "</li>"+
@@ -260,12 +261,12 @@
                 ModalBody = "<ul>" +
                                 "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
                                         "Analisa Urine Rutin"+
                                     "</a>"+
                                 "</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
                                         "Analisa Darah Lengkap"+
                                     "</a>"+
                                 "</li>"+
@@ -276,12 +277,12 @@
                 ModalBody = "<ul>" +
                                 "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
                                         "Analisa Urine Rutin"+
                                     "</a>"+
                                 "</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
                                         "Analisa Darah Lengkap"+
                                     "</a>"+
                                 "</li>"+
@@ -293,7 +294,7 @@
                 ModalBody = "<ul>" +
                                 "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
                                         "Analisa Urine Rutin"+
                                     "</a>"+
                                 "</li>"+
@@ -304,12 +305,12 @@
                 ModalBody = "<ul>" +
                                 "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
                                         "Analisa Urine Rutin"+
                                     "</a>"+
                                 "</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
                                         "Analisa Darah Lengkap"+
                                     "</a>"+
                                 "</li>"+
@@ -321,12 +322,12 @@
                 ModalBody = "<ul>" +
                                 "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
                                         "Analisa Urine Rutin"+
                                     "</a>"+
                                 "</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
                                         "Analisa Darah Lengkap"+
                                     "</a>"+
                                 "</li>"+
@@ -338,12 +339,12 @@
                 ModalBody = "<ul>" +
                                 "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
                                         "Analisa Urine Rutin"+
                                     "</a>"+
                                 "</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+LemakDarah+'" data-original-title="Lemak Darah">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+LemakDarah+'" data-original-title="Lemak Darah">'+
                                         "Lemak Darah"+
                                     "</a>"+
                                 "</li>"+
@@ -355,12 +356,12 @@
                 ModalBody = "<ul>" +
                                 "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
                                         "Analisa Urine Rutin"+
                                     "</a>"+
                                 "</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+LemakDarah+'" data-original-title="Lemak Darah">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+LemakDarah+'" data-original-title="Lemak Darah">'+
                                         "Lemak Darah"+
                                     "</a>"+
                                 "</li>"+
@@ -373,12 +374,12 @@
                 ModalBody = "<ul>" +
                                 "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
                                         "Analisa Urine Rutin"+
                                     "</a>"+
                                 "</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
                                         "Analisa Darah Lengkap"+
                                     "</a>"+
                                 "</li>"+
@@ -389,12 +390,12 @@
                 ModalBody = "<ul>" +
                                 "<li>Laporan Pemeriksaan Kesehatan (LPK)</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaUrineRutin+'" data-original-title="Analisa Urine Rutin">'+
                                         "Analisa Urine Rutin"+
                                     "</a>"+
                                 "</li>"+
                                 "<li>"+
-                                    '<a href="#" role="button" title="" data-placement="top" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
+                                    '<a href="javascript:void(0);" role="button" title="" data-toggle="popover" data-content="'+AnalisaDarahLengkap+'" data-original-title="Analisa Darah Lengkap">'+
                                         "Analisa Darah Lengkap"+
                                     "</a>"+
                                 "</li>"+
@@ -404,28 +405,220 @@
         }
 
         $("#ModalBody").html(ModalBody);
+        $("#ModalNM").modal();
         $('[data-toggle="popover"]').popover({
             container: '#ModalNM',
-            trigger: "focus"
+            trigger: "focus",
+            placement: function (context, source) {
+                if(window.orientation == 0) return "top"
+                else return "right";
+            }
         });
     }
 
     function showTable() {
-        if($("#ddlAgentType").val() == 0) {
+        if($("#ddlAgentType").val() == 0 && $("#ddlProduk").val()) {
             $("#tabel-nm-pph").hide();
             $("#tabel-nm-jiwa").hide();
             $("#tableInfo").hide();
-            $("#ddlAgentType").focus().click();
+            $("#tableInfoESCC").hide();
+            $("#ddlProduk").focus().click();
             return 0;
         }
         else {
             var Produk = $("#ddlProduk"). val();
             var agentType = $("#ddlAgentType").val();
-            if(previousAgentType !== agentType) {         
+            if(previousAgentType !== agentType || previousProduct !== Produk) {
                 if(Produk == 1) { //produk jiwa
+                    var selectedDataJiwa = $.grep(dataNM_Jiwa, function(v) {
+                        return v.AgentType == agentType;
+                    });
+                    table = $("#tabel-nm-jiwa").DataTable({
+                        destroy: true,
+                        order: [],
+                        responsive: {
+                            details: {
+                                renderer: function ( api, rowIdx, columns ) {
+                                    var data = $.map( columns, function ( col, i ) {
+                                        return col.hidden ?
+                                            '<tr data-dt-row="'+col.rowIndex+'" data-dt-column="'+col.columnIndex+'">'+
+                                                '<td>'+col.title+':'+'</td> '+
+                                                '<td>'+col.data+'</td>'+
+                                            '</tr>' :
+                                            '';
+                                    } ).join('');
+                 
+                                    return data ?
+                                        $('<table/>').append( data ) :
+                                        false;
+                                }
+                            }
+                        },
+                        paging: false,
+                        searching: false,
+                        bFilter: false,
+                        fixedHeader: {
+                            headerOffset: $('.header-area').outerHeight()
+                        },
+                        "language": {
+                            "info": "",
+                            "infoFiltered": "",
+                            "infoEmpty": "",
+                            "zeroRecords": "Data tidak ditemukan",
+                            "lengthMenu": "&nbsp;&nbsp;_MENU_ data",
+                            "search": "",
+                            "processing": "Memproses"
+                        },
+                        ordering: false,
+                        columns: [
+                            {
+                                data: "USD",
+                                className: "dt-head-center dt-body-center dt-nowrap",
+                            },
+                            {
+                                data: "RP",
+                                className: "dt-head-center dt-body-center dt-nowrap",
+                            },
+                            {
+                                data: "KU1",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "KU2",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "KU3",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            { //for PEC Ultimate
+                                data: "KU11",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "KU4",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "KU5",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "KU6",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "KU7",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "KU8",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "KU9",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            },
+                            {
+                                data: "KU10",
+                                className: "dt-head-center dt-body-center",
+                                render: function ( data, type, row, meta ) {
+                                            var str = data.toString();
+                                            if(str.includes("MED")) {
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                            }
+                                            return str;
+                                        }
+                            }
+                        ],
+                        processing: true,
+                        data: selectedDataJiwa
+                    });
+                    $("#tabel-nm-pph").hide();
+                    $("#tabel-nm-jiwa").show();
+                    $("#tabel-nm-jiwa").width("100%");
+                    $("#tableInfoESCC").show();
 
+                    if(agentType == 4) {
+                        table.columns(5).visible(true);
+                        $(table.column(4).header()).text( '18-30 th' );
+                    }
+                    else {
+                        table.columns(5).visible(false);
+                        $(table.column(4).header()).text( '18-35 th' );
+                    }
                 }
-                else {
+                else { //produk PPH
                     var selectedData = $.grep(dataNM_PPH, function(v) {
                         return v.AgentType == agentType;
                     });
@@ -477,7 +670,7 @@
                                 render: function ( data, type, row, meta ) {
                                             var str = data.toString();
                                             if(str.includes("MED")) {
-                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
                                             }
                                             return str;
                                         }
@@ -488,7 +681,7 @@
                                 render: function ( data, type, row, meta ) {
                                             var str = data.toString();
                                             if(str.includes("MED")) {
-                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
                                             }
                                             return str;
                                         }
@@ -499,7 +692,7 @@
                                 render: function ( data, type, row, meta ) {
                                             var str = data.toString();
                                             if(str.includes("MED")) {
-                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
                                             }
                                             return str;
                                         }
@@ -510,7 +703,7 @@
                                 render: function ( data, type, row, meta ) {
                                             var str = data.toString();
                                             if(str.includes("MED")) {
-                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
                                             }
                                             return str;
                                         }
@@ -521,7 +714,7 @@
                                 render: function ( data, type, row, meta ) {
                                             var str = data.toString();
                                             if(str.includes("MED")) {
-                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
                                             }
                                             return str;
                                         }
@@ -532,7 +725,7 @@
                                 render: function ( data, type, row, meta ) {
                                             var str = data.toString();
                                             if(str.includes("MED")) {
-                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
                                             }
                                             return str;
                                         }
@@ -543,7 +736,7 @@
                                 render: function ( data, type, row, meta ) {
                                             var str = data.toString();
                                             if(str.includes("MED")) {
-                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
                                             }
                                             return str;
                                         }
@@ -554,7 +747,7 @@
                                 render: function ( data, type, row, meta ) {
                                             var str = data.toString();
                                             if(str.includes("MED")) {
-                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
                                             }
                                             return str;
                                         }
@@ -565,7 +758,7 @@
                                 render: function ( data, type, row, meta ) {
                                             var str = data.toString();
                                             if(str.includes("MED")) {
-                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
                                             }
                                             return str;
                                         }
@@ -576,7 +769,7 @@
                                 render: function ( data, type, row, meta ) {
                                             var str = data.toString();
                                             if(str.includes("MED")) {
-                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
                                             }
                                             return str;
                                         }
@@ -587,7 +780,7 @@
                                 render: function ( data, type, row, meta ) {
                                             var str = data.toString();
                                             if(str.includes("MED")) {
-                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
                                             }
                                             return str;
                                         }
@@ -598,7 +791,7 @@
                                 render: function ( data, type, row, meta ) {
                                             var str = data.toString();
                                             if(str.includes("MED")) {
-                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
                                             }
                                             return str;
                                         }
@@ -609,7 +802,7 @@
                                 render: function ( data, type, row, meta ) {
                                             var str = data.toString();
                                             if(str.includes("MED")) {
-                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
                                             }
                                             return str;
                                         }
@@ -620,7 +813,7 @@
                                 render: function ( data, type, row, meta ) {
                                             var str = data.toString();
                                             if(str.includes("MED")) {
-                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
                                             }
                                             return str;
                                         }
@@ -631,7 +824,7 @@
                                 render: function ( data, type, row, meta ) {
                                             var str = data.toString();
                                             if(str.includes("MED")) {
-                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
                                             }
                                             return str;
                                         }
@@ -642,7 +835,7 @@
                                 render: function ( data, type, row, meta ) {
                                             var str = data.toString();
                                             if(str.includes("MED")) {
-                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
                                             }
                                             return str;
                                         }
@@ -653,7 +846,7 @@
                                 render: function ( data, type, row, meta ) {
                                             var str = data.toString();
                                             if(str.includes("MED")) {
-                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
                                             }
                                             return str;
                                         }
@@ -664,7 +857,7 @@
                                 render: function ( data, type, row, meta ) {
                                             var str = data.toString();
                                             if(str.includes("MED")) {
-                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
                                             }
                                             return str;
                                         }
@@ -675,7 +868,7 @@
                                 render: function ( data, type, row, meta ) {
                                             var str = data.toString();
                                             if(str.includes("MED")) {
-                                                str = '<a onclick="showTooltip(this, \'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
+                                                str = '<a onclick="showTooltip(\'' + str.replace("MED ", "") + '\');" >'+str+'</a>';
                                             }
                                             return str;
                                         }
@@ -687,12 +880,14 @@
                     $("#tabel-nm-pph").show();
                     $("#tabel-nm-jiwa").hide();
                     $("#tabel-nm-pph").width("100%");
+                    $("#tableInfoESCC").hide();
                 }
                 previousAgentType = agentType;
+                previousProduct = Produk;
+                $("#tableInfo").show();
+                $("#tableInfo").html("Tabel Non Medical untuk Produk " + $("#ddlProduk option:selected").text() + " dengan Tipe Agen adalah " + $("#ddlAgentType option:selected").text());
+                table.columns.adjust().draw(false);
             }
-            $("#tableInfo").show();
-            $("#tableInfo").html("Tabel Non Medical untuk Produk " + $("#ddlProduk option:selected").text() + " dengan Tipe Agen adalah " + $("#ddlAgentType option:selected").text());
-            table.columns.adjust().draw(false);
         }
     }
 </script>

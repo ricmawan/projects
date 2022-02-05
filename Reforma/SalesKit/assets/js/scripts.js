@@ -66,26 +66,4 @@
     $('ul#nav_menu').slicknav({
         prependTo: "#mobile_menu"
     });
-
-    var previousOrientation = window.orientation;
-    var checkOrientation = function(){
-        if(window.orientation !== previousOrientation){
-            previousOrientation = window.orientation;
-            // orientation changed, do your magic here
-            $('.menu-inner').slimScroll({
-                height: ($( window ).height() - 120)
-            });
-        }
-        else {
-            $('.menu-inner').slimScroll({
-                height: 'auto'
-            });
-        }
-    };
-
-    window.addEventListener("resize", checkOrientation, false);
-    window.addEventListener("orientationchange", checkOrientation, false);
-
-    // (optional) Android doesn't always fire orientationChange on 180 degree turns
-    setInterval(checkOrientation, 2000);
 })(jQuery);
