@@ -436,8 +436,10 @@
                             <div class="card-body">
                                 <div>
                                     <ul>
-                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" class="pdfMenu" link="./assets/files/Ketentuan_Khusus_Asuransi_Tambahan_Pru_ESCC_Plus.pdf" >Ketentuan Khusus PRUEarly Stage Crisis Cover+</a></li>
-                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" class="pdfMenu" link="./assets/files/Tabel_Pertanggungan_112_Kondisi_Kritis_dan_Manfaat_Tambahan.pdf" >Ketentuan 112 Kondisi Kritis PRUEarly Stage Crisis Cover+</a></li>
+                                        <!--<li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" class="pdfMenu" link="./assets/files/Ketentuan_Khusus_Asuransi_Tambahan_Pru_ESCC_Plus.pdf" >Ketentuan Khusus PRUEarly Stage Crisis Cover+</a></li>
+                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" class="pdfMenu" link="./assets/files/Tabel_Pertanggungan_112_Kondisi_Kritis_dan_Manfaat_Tambahan.pdf" >Ketentuan 112 Kondisi Kritis PRUEarly Stage Crisis Cover+</a></li>-->
+                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" onclick="openExternal('https://drive.google.com/file/d/1dmRK9pf-pmD41YXEH_082ufKJSZemd8-/view?usp=sharing');" >Ketentuan Khusus PRUEarly Stage Crisis Cover+</a></li>
+                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" onclick="openExternal('https://drive.google.com/file/d/1_PlJh6MlwHBaI28ys0qcJelODlY-_kKj/view?usp=sharing');" >Ketentuan 112 Kondisi Kritis PRUEarly Stage Crisis Cover+</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -453,6 +455,9 @@
     <h4 class="page-title pull-left">PRUEarly Stage Crisis Cover+</h4>
 </div>
 <script>
+    function openExternal(link) {
+        Website2APK.openExternal(link);
+    }
     $(".collapse").on("shown.bs.collapse", function(e) {
         var $card = $(this).closest(".card");
         $("html,body").animate({

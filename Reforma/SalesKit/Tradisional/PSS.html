@@ -122,7 +122,8 @@
                             <div class="card-body">
                                 <div>
                                     <ul>
-                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" class="pdfMenu" link="./assets/files/Polis_PSS.pdf" >Ketentuan Polis PRUSolusi Sehat</a></li>
+                                        <!--<li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" class="pdfMenu" link="./assets/files/Polis_PSS.pdf" >Ketentuan Polis PRUSolusi Sehat</a></li>-->
+                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" onclick="openExternal('https://drive.google.com/file/d/1iSn6mLohHTz8i7ZAiYM0ejK8t7ySYZbp/view?usp=sharing');" >Ketentuan Polis PRUSolusi Sehat</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -408,6 +409,9 @@
     <h4 class="page-title pull-left">PRUSolusi Sehat</h4>
 </div>
 <script>
+    function openExternal(link) {
+        Website2APK.openExternal(link);
+    }
     var arrPlan = [
                     { 
                         ID: 1,

@@ -27,8 +27,10 @@
     Start Footer resizer
     ==================================*/
     var e = function() {
-        var e = (window.innerHeight > 0 ? window.innerHeight : this.screen.height) - 5;
-        (e -= 88) < 1 && (e = 1), e > 88 && $(".main-content").css("min-height", e + "px")
+        setTimeout(function() {
+            var e = (window.innerHeight > 0 ? window.innerHeight : this.screen.height) - 5;
+            (e -= 62) < 1 && (e = 1), e > 62 && $(".main-content").css("min-height", e + "px");
+        }, 0);
     };
     $(window).ready(e), $(window).on("resize", e);
     /*================================

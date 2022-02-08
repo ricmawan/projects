@@ -378,7 +378,8 @@
                             <div class="card-body">
 								<div>
 									<ul>
-										<li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" class="pdfMenu" link="./assets/files/Polis_Pru_Critical_Benefit_88.pdf">Ketentuan Polis PRUCritical Benefit 88</a></li>
+										<!--<li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" class="pdfMenu" link="./assets/files/Polis_Pru_Critical_Benefit_88.pdf">Ketentuan Polis PRUCritical Benefit 88</a></li>-->
+                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" onclick="openExternal('https://drive.google.com/file/d/1bADbOQ4M0r8Hc7ti5hIhHoMUnykuSLCh/view?usp=sharing');">Ketentuan Polis PRUCritical Benefit 88</a></li>
 									</ul>
 								</div>
                             </div>
@@ -393,6 +394,9 @@
     <h4 class="page-title pull-left">PRUCritical Benefit 88</h4>
 </div>
 <script>
+    function openExternal(link) {
+        Website2APK.openExternal(link);
+    }
     $(".collapse").on("shown.bs.collapse", function(e) {
         var $card = $(this).closest(".card");
         $("html,body").animate({

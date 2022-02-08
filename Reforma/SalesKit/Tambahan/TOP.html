@@ -143,7 +143,8 @@
                             <div class="card-body">
 								<div>
 									<ul>
-										<li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" class="pdfMenu" link="./assets/files/Ketentuan_Khusus_Asuransi_Tambahan_PRUTOP_Plan_2.pdf" >Ketentuan Khusus PRUTotal Critical Protection (PRUTOP)</a></li>
+										<!--<li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" class="pdfMenu" link="./assets/files/Ketentuan_Khusus_Asuransi_Tambahan_PRUTOP_Plan_2.pdf" >Ketentuan Khusus PRUTotal Critical Protection (PRUTOP)</a></li>-->
+                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" onclick="openExternal('https://drive.google.com/file/d/1KbMakKiMkWybzJ2WxDYB3DVZ5zSLUOU0/view?usp=sharing');" >Ketentuan Khusus PRUTotal Critical Protection (PRUTOP)</a></li>
 									</ul>
 								</div>
                             </div>
@@ -159,6 +160,9 @@
 </div>
 
 <script>
+    function openExternal(link) {
+        Website2APK.openExternal(link);
+    }
 	$(".collapse").on("shown.bs.collapse", function(e) {
         var $card = $(this).closest(".card");
         $("html,body").animate({

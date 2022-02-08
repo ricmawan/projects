@@ -127,8 +127,10 @@
                             <div class="card-body">
                                 <div>
                                     <ul>
-                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" class="pdfMenu" link="./assets/files/Ketentuan_Umum_Polis_PruWarisan.pdf" >Ketentuan Umum Polis PRUWarisan</a></li>
-                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" class="pdfMenu" link="./assets/files/Ketentuan_Khusus_Polis_PruWarisan.pdf" >Ketentuan Khusus Polis PRUWarisan</a></li>
+                                        <!--<li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" class="pdfMenu" link="./assets/files/Ketentuan_Umum_Polis_PruWarisan.pdf" >Ketentuan Umum Polis PRUWarisan</a></li>
+                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" class="pdfMenu" link="./assets/files/Ketentuan_Khusus_Polis_PruWarisan.pdf" >Ketentuan Khusus Polis PRUWarisan</a></li>-->
+                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" onclick="openExternal('https://drive.google.com/file/d/1drO7ZWrm8pXWliUU82y0QpKTyM82gXT_/view?usp=sharing');" >Ketentuan Umum Polis PRUWarisan</a></li>
+                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" onclick="openExternal('https://drive.google.com/file/d/1sOXeNebuuewh19SyzBmiDPVSYPddLVKf/view?usp=sharing');" >Ketentuan Khusus Polis PRUWarisan</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -144,6 +146,9 @@
 </div>
 
 <script>
+    function openExternal(link) {
+        Website2APK.openExternal(link);
+    }
     $(".collapse").on("shown.bs.collapse", function(e) {
         var $card = $(this).closest(".card");
         $("html,body").animate({

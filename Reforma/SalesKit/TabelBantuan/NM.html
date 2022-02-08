@@ -15,6 +15,21 @@
     }
     .modal .popover,.modal .twipsy{z-index:12000;}
 </style>
+<div class="modal fade" id="ModalNM">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle" class="modal-title"></h5>
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div id="ModalBody" class="list-bullet">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row" style="margin-right: -2px;margin-left: -2px;">
      <div class="col-lg-12 mt-5">
         <div class="card">
@@ -32,58 +47,62 @@
                     </select>
                 </div>
                 <span id="tableInfo" class="font-weight-bold"></span>
-                <div class="data-tables responsive">
-                    <table id="tabel-nm-pph" class="table table-hover table-bordered table-striped" style="display: none;" width="100%">
-                        <thead >
-                            <tr>
-                                <th scope="col">Usia</th>
-                                <th scope="col">Cermat 1 300Ribu</th>
-                                <th scope="col">Cermat 2 550Ribu</th>
-                                <th scope="col">Cermat 3 650Ribu</th>
-                                <th scope="col">Bronze A 500Ribu</th>
-                                <th scope="col">Bronze A 1Juta</th>
-                                <th scope="col">Bronze B 1Juta</th>
-                                <th scope="col">Bronze B 3Juta</th>
-                                <th scope="col">Silver A 500Ribu</th>
-                                <th scope="col">Silver A 1Juta</th>
-                                <th scope="col">Silver B 1Juta</th>
-                                <th scope="col">Silver B 3Juta</th>
-                                <th scope="col">Gold A 1Juta</th>
-                                <th scope="col">Gold A 3Juta</th>
-                                <th scope="col">Gold B 1.5Juta</th>
-                                <th scope="col">Gold B 5Juta</th>
-                                <th scope="col">Platinum 1.5Juta</th>
-                                <th scope="col">Platinum 10Juta</th>
-                                <th scope="col">Diamond 1.5Juta</th>
-                                <th scope="col">Diamond 10Juta</th>
-                            </tr>
-                        </thead>
-                    </table>
+                <div class="single-table">
+                    <div class="data-tables responsive">
+                        <table id="tabel-nm-pph" class="table table-hover table-bordered table-striped" style="display: none;" width="100%">
+                            <thead >
+                                <tr>
+                                    <th scope="col">Usia</th>
+                                    <th scope="col">Cermat 1 300Ribu</th>
+                                    <th scope="col">Cermat 2 550Ribu</th>
+                                    <th scope="col">Cermat 3 650Ribu</th>
+                                    <th scope="col">Bronze A 500Ribu</th>
+                                    <th scope="col">Bronze A 1Juta</th>
+                                    <th scope="col">Bronze B 1Juta</th>
+                                    <th scope="col">Bronze B 3Juta</th>
+                                    <th scope="col">Silver A 500Ribu</th>
+                                    <th scope="col">Silver A 1Juta</th>
+                                    <th scope="col">Silver B 1Juta</th>
+                                    <th scope="col">Silver B 3Juta</th>
+                                    <th scope="col">Gold A 1Juta</th>
+                                    <th scope="col">Gold A 3Juta</th>
+                                    <th scope="col">Gold B 1.5Juta</th>
+                                    <th scope="col">Gold B 5Juta</th>
+                                    <th scope="col">Platinum 1.5Juta</th>
+                                    <th scope="col">Platinum 10Juta</th>
+                                    <th scope="col">Diamond 1.5Juta</th>
+                                    <th scope="col">Diamond 10Juta</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
                 </div>
-                <div class="data-tables responsive">
-                    <table id="tabel-nm-jiwa" class="table table-hover table-bordered table-striped" style="display: none;" width="100%">
-                        <thead >
-                            <tr>
-                                <th scope="col">US$</th>
-                                <th scope="col">RUPIAH</th>
-                                <th scope="col">1-15 th</th>
-                                <th scope="col">16-17 th</th>
-                                <th scope="col">18-35 th</th>
-                                <th scope="col">31-35 th</th> <!--for PEC Ultimate, show if selected and change header before this to 18-30 th -->
-                                <th scope="col">36-40 th</th>
-                                <th scope="col">41-45 th</th>
-                                <th scope="col">46-50 th</th>
-                                <th scope="col">51-55 th</th>
-                                <th scope="col">56-60 th</th>
-                                <th scope="col">61-65 th</th>
-                                <th scope="col">66-70 th</th>
-                            </tr>
-                        </thead>
-                    </table>
-                    <span id="tableInfoESCC" class="font-weight-bold" style="display: none;">
-                        * Jika mengambil manfaat PRUEarly Stage Crisis Cover Plus dan/atau PRUHospital & Surgical Cover Plus maka dikenakan pemeriksaan kesehatan <a onclick="showTooltip(10);" >Med 10</a>.<br />
-                        ** Jika mengambil manfaat PRUEarly Stage Crisis Cover Plus dan/atau PRUHospital & Surgical Cover Plus maka dikenakan pemeriksaan kesehatan <a onclick="showTooltip(11);" >Med 11</a>.
-                    </span>
+                <div class="single-table">
+                    <div class="data-tables responsive">
+                        <table id="tabel-nm-jiwa" class="table table-hover table-bordered table-striped" style="display: none;" width="100%">
+                            <thead >
+                                <tr>
+                                    <th scope="col">US$</th>
+                                    <th scope="col">RUPIAH</th>
+                                    <th scope="col">1-15 th</th>
+                                    <th scope="col">16-17 th</th>
+                                    <th scope="col">18-35 th</th>
+                                    <th scope="col">31-35 th</th> <!--for PEC Ultimate, show if selected and change header before this to 18-30 th -->
+                                    <th scope="col">36-40 th</th>
+                                    <th scope="col">41-45 th</th>
+                                    <th scope="col">46-50 th</th>
+                                    <th scope="col">51-55 th</th>
+                                    <th scope="col">56-60 th</th>
+                                    <th scope="col">61-65 th</th>
+                                    <th scope="col">66-70 th</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <span id="tableInfoESCC" class="font-weight-bold" style="display: none;">
+                            * Jika mengambil manfaat PRUEarly Stage Crisis Cover Plus dan/atau PRUHospital & Surgical Cover Plus maka dikenakan pemeriksaan kesehatan <a onclick="showTooltip(10);" >Med 10</a>.<br />
+                            ** Jika mengambil manfaat PRUEarly Stage Crisis Cover Plus dan/atau PRUHospital & Surgical Cover Plus maka dikenakan pemeriksaan kesehatan <a onclick="showTooltip(11);" >Med 11</a>.
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -91,21 +110,6 @@
 </div>
 <div id="breadcrumbsContent" style="display: none;" >
     <h4 class="page-title pull-left">Batas Non-Medical</h4>
-</div>
-<div class="modal fade" id="ModalNM">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 id="ModalTitle" class="modal-title"></h5>
-                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-            </div>
-            <div class="modal-body">
-                <div id="ModalBody" class="list-bullet">
-
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 <script type="text/javascript" src="./TabelBantuan/dataNM_PPH.min.json"></script>
 <script type="text/javascript" src="./TabelBantuan/dataNM_Jiwa.min.json"></script>

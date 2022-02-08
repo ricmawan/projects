@@ -334,8 +334,11 @@
                             <div class="card-body">
                                 <div>
                                     <ul>
-                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" class="pdfMenu" link="./assets/files/Ketentuan_Khusus_Asuransi_Tambahan_CCB61.pdf" >Ketentuan Khusus PRUCrisis Cover Benefit+ 61</a></li>
-                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" class="pdfMenu" link="./assets/files/Tabel_Pertanggungan_61_Kondisi_Kritis.pdf" >Ketentuan 61 Kondisi Kritis PRUCrisis Cover Benefit+ 61</a></li>
+                                        <!--<li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" class="pdfMenu" link="./assets/files/Ketentuan_Khusus_Asuransi_Tambahan_CCB61.pdf" >Ketentuan Khusus PRUCrisis Cover Benefit+ 61</a></li>
+                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" class="pdfMenu" link="./assets/files/Tabel_Pertanggungan_61_Kondisi_Kritis.pdf" >Ketentuan 61 Kondisi Kritis PRUCrisis Cover Benefit+ 61</a></li>-->
+
+                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" onclick="openExternal('https://drive.google.com/file/d/1uJpYy5Xmb0RZOe9mgcP0mlBe9Qyx9oDn/view?usp=sharing');" >Ketentuan Khusus PRUCrisis Cover Benefit+ 61</a></li>
+                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" onclick="openExternal('https://drive.google.com/file/d/1k3kZNOZnl-9cLAr3Tg21cHZpPtd7tcrv/view?usp=sharing');" >Ketentuan 61 Kondisi Kritis PRUCrisis Cover Benefit+ 61</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -351,6 +354,9 @@
     <h4 class="page-title pull-left">PRUCrisis Cover Benefit+ 61</h4>
 </div>
 <script>
+    function openExternal(link) {
+        Website2APK.openExternal(link);
+    }
     $(".collapse").on("shown.bs.collapse", function(e) {
         var $card = $(this).closest(".card");
         $("html,body").animate({

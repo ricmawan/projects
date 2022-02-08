@@ -6,13 +6,17 @@
     .dataTables_filter {
         display: none;
     }
+    .dt-control {
+        width: 18px !important;
+    }
 </style>
-<link rel="stylesheet" href="./assets/css/bootstrap-select.min.css">
+<link rel="stylesheet" href="./assets/css/bootstrap-select.min.css" />
 
 <div class="row" style="margin-right: -2px;margin-left: -2px;">
      <div class="col-lg-12 mt-5">
         <div class="card">
             <div class="card-body">
+                <p>Diperbaharui Tanggal 18 Januari 2022</p>
                 <div class="form-group">
                     <select class="form-control selectpicker" id="ddlCity" data-live-search="true" multiple title="Pilih Kota">
                         <!--<option value=0>Pilih Kota</option>-->
@@ -60,6 +64,12 @@
         });
 
         $("#ddlCity").selectpicker();
+
+        $('#ddlCity').on('show.bs.select', function (e, clickedIndex, isSelected, previousValue) { //select from beginning 
+            // do something...
+            $("#ddlCity").selectpicker('deselectAll');
+        });
+
 
         $('#ddlCity').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
             // do something...

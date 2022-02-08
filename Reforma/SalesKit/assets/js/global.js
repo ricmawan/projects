@@ -90,7 +90,7 @@ $(document).ready(function () {
 		                   url: MenuClicked
 		               },
 		               'R-Force', // It should be filled with document title, but just ignore it for now.
-		               "?file=" + MenuClicked
+		               "?file=" + MenuClicked + "#page=1&zoom=page-width"
 		            );
 		            // Increment global state counter.
             		GLOBAL_STATE_COUNTER++;

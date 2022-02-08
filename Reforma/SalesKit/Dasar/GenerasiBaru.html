@@ -237,8 +237,10 @@
                             <div class="card-body">
                                 <div>
                                     <ul>
-                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" class="pdfMenu" link="./assets/files/Ketentuan_Umum_PRULink_Generasi_Baru.pdf" >Ketentuan Umum PRULink Generasi Baru</a></li>
-                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" class="pdfMenu" link="./assets/files/Ketentuan_Khusus_PRULink_Generasi_Baru.pdf" >Ketentuan Khusus PRULink Generasi Baru</li>
+                                        <!--<li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" class="pdfMenu" link="./assets/files/Ketentuan_Umum_PRULink_Generasi_Baru.pdf" >Ketentuan Umum PRULink Generasi Baru</a></li>
+                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" class="pdfMenu" link="./assets/files/Ketentuan_Khusus_PRULink_Generasi_Baru.pdf" >Ketentuan Khusus PRULink Generasi Baru</li>-->
+                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" onclick="openExternal('https://drive.google.com/file/d/1s43EGANO38zoiblyix28j7bPk9WDFJMs/view?usp=sharing');" >Ketentuan Umum PRULink Generasi Baru</a></li>
+                                        <li><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<a href="javascript:void(0)" onclick="openExternal('https://drive.google.com/file/d/1Tx_FUllbL3GWRxhwvkjC_CQN3b9igfSK/view?usp=sharing');" >Ketentuan Khusus PRULink Generasi Baru</li>
                                     </ul>
                                 </div>
                             </div>
@@ -254,6 +256,9 @@
 </div>
 
 <script>
+    function openExternal(link) {
+        Website2APK.openExternal(link);
+    }
     $(".collapse").on("shown.bs.collapse", function(e) {
         var $card = $(this).closest(".card");
         $("html,body").animate({
