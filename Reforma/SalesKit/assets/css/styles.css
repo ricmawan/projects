@@ -53,6 +53,10 @@
 
 
 /*------------------------- 1. Core Css -------------------*/
+ol, ul.square, ul.circle, ul.disc {
+    margin-left: 15px;
+}
+    
 .fileInput {
     display: none;
 }
@@ -2525,7 +2529,7 @@ table.dataTable thead td {
     left: -42%;
     z-index: -1;
     top: -47%;
-    box-shadow: inset 0 0 51px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 0 51px rgba(21, 18, 65, 0.1);
 }
 
 .login-s2 .login-form-head,

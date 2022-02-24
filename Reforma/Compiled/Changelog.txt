@@ -1,0 +1,9 @@
+1.0.0
+Beta version
+
+1.0.1 21FEB2022
+- Add password for first time use
+
+1.0.2 24FEB2022
+- Fixed PCB table
+- Fixed PRUCinta table for dynamic fixed header

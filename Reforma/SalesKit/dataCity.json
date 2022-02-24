@@ -540,11 +540,6 @@ var dataCity = [
         "CityID": "108"
     },
     {
-        "City": "Banda Aceh",
-        "Province": "Nanggroe Aceh Darussalam",
-        "CityID": "109"
-    },
-    {
         "City": "Lhokseumawe",
         "Province": "Nanggroe Aceh Darussalam",
         "CityID": "110"

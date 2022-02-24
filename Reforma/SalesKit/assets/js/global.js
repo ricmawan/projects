@@ -237,6 +237,8 @@ function Redirect(link) {
         table.fixedHeader.disable();
     }
 	$("#main-content-inner").html("");
+	$(".menu").parent().removeClass("active");
+	$(".menu[link|='" + link + "']").parent().addClass("active");
 	//if(MenuClicked != "./Home.php") {
 		$.ajax({
 			url: MenuClicked,
@@ -278,7 +280,7 @@ function Redirect(link) {
 function Reload() {
 	//$("#loading").show();
 	$("#page-inner").html("");
-	if(CurrentMenu != "./Home.php") {
+	if(CurrentMenu != "./Home.html") {
 		$.ajax({
 			url: CurrentMenu,
 			type: "POST",

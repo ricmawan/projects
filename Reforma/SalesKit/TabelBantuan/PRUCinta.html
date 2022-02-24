@@ -209,12 +209,18 @@
 
                 else {
                     var age = getAge(selectedDate);
-                    $("#txtAge").val(Math.floor(age) + 1);
+                    var today = new Date();
+                    var date = today.getDate();
+                    var month = today.getMonth();
+                    if(date == selectedDate.getDate() && month == selectedDate.getMonth()) $("#txtAge").val(Math.floor(age));
+                    else $("#txtAge").val(Math.floor(age) + 1);
                     showTable();
-                    $("#ageInfo").html(" dengan usia " + (Math.floor(age) + 1) + " tahun.");
+                    $("#ageInfo").html(" dengan usia " + $("#txtAge").val() + " tahun.");
                 }
             }
         });
-        showTable();
+        setTimeout(function() {
+            showTable();
+        }, 400);
     });
 </script>
