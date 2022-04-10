@@ -1,0 +1,15 @@
+DROP TABLE IF EXISTS reset_history;
+
+CREATE TABLE reset_history
+(
+	ResetHistoryID		BIGINT PRIMARY KEY AUTO_INCREMENT,
+	ResetDate			DATE,	
+	CreatedDate 		DATETIME NOT NULL,
+	CreatedBy 			VARCHAR(255) NOT NULL,
+	ModifiedDate 		TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NULL,
+	ModifiedBy			VARCHAR(255) NULL
+	
+)ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX RESETHISTORY_INDEX
+ON reset_history (ResetHistoryID);
