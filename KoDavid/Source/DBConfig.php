@@ -1,7 +1,7 @@
 <?php
 	$DBUser = "root";
 	$DBPass = "";
-	$DBName = "pos_utang";
+	$DBName = "pos_david";
 	$Host = "localhost";
 	GLOBAL $dbh;
 	$dbh = mysqli_connect($Host, $DBUser, $DBPass, $DBName);

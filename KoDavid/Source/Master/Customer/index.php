@@ -143,7 +143,7 @@
 					$("#txtAddress").val(Data[5].toString());
 					$("#txtCity").val(Data[6].toString());
 					$("#txtRemarks").val(Data[7].toString());
-					$("#ddlCustomerPrice").val(Data[8]);
+					$("#ddlCustomerPrice").val(Data[10]);
 				}
 				else $("#FormData").attr("title", "Tambah Pelanggan");
 				var index = table.cell({ focused: true }).index();

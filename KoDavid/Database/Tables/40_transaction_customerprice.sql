@@ -1,4 +1,4 @@
-DROP TABLE IF master_customerprice;
+DROP TABLE IF EXISTS master_customerprice;
 
 CREATE TABLE master_customerprice
 (
@@ -22,7 +22,7 @@ VALUES
 	NOW(),
 	'Admin',
 	NULL,
-	NULL,
+	NULL
 ),
 (
 	2,
@@ -30,7 +30,7 @@ VALUES
 	NOW(),
 	'Admin',
 	NULL,
-	NULL,
+	NULL
 ),
 (
 	3,
@@ -38,5 +38,5 @@ VALUES
 	NOW(),
 	'Admin',
 	NULL,
-	NULL,
-),
+	NULL
+);

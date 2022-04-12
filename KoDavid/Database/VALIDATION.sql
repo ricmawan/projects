@@ -1,14 +1,15 @@
 /*=============================================================
 Author: Ricmawan Adi Wijaya
-Description: Stored Procedure for select customer from dropdown list
-Created Date: 9 january 2018
+Description: Stored Procedure for select item
+Created Date: 2 January 2018
 Modified Date: 
 ===============================================================*/
 
-DROP PROCEDURE IF EXISTS spSelDDLCustomer;
+DROP PROCEDURE IF EXISTS spValItem;
 
 DELIMITER $$
-CREATE PROCEDURE spSelDDLCustomer (
+CREATE PROCEDURE spValItem (
+	pID				BIGINT,
     pCurrentUser	VARCHAR(255)
 )
 StoredProcedure:BEGIN
@@ -21,21 +22,18 @@ StoredProcedure:BEGIN
 		@MessageText = MESSAGE_TEXT, 
 		@State = RETURNED_SQLSTATE, @ErrNo = MYSQL_ERRNO, @DBName = SCHEMA_NAME, @TBLName = TABLE_NAME;
 		SET @full_error = CONVERT(CONCAT("ERROR No: ", IFNULL(@ErrNo, ''), " (SQLState ", IFNULL(@State, ''), "): ", IFNULL(@MessageText, ''), ', ', IFNULL(@DBName, ''), ', ', IFNULL(@TableName, '')) USING utf8);
-		CALL spInsEventLog(@full_error, 'spSelDDLCustomer', pCurrentUser);
+		CALL spInsEventLog(@full_error, 'spValItem', pCurrentUser);
 	END;
 	
 SET State = 1;
 
-	SELECT 
-		MC.CustomerID,
-		MC.CustomerCode,
-		MC.CustomerName,
-		MC.CustomerPriceID
-	FROM 
-		master_customer MC
-	ORDER BY 
-		MC.CustomerCode;
-        
+	SELECT
+		1
+	FROM
+		master_item MI
+	WHERE
+		MI.ItemID = pID;
+
 END;
 $$
 DELIMITER ;

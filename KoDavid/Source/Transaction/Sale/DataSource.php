@@ -78,6 +78,7 @@
 		$row_array[] = $row['PaymentTypeName'];
 		$row_array[] = $row['PaymentTypeID'];
 		$row_array[] = $row['Discount'];
+		$row_array[] = $row['CustomerPriceID'];
 		array_push($return_arr, $row_array);
 	}
 	

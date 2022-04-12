@@ -50,10 +50,12 @@ SET @query = CONCAT("SELECT
                         MC.Address,
                         MC.City,
                         MC.Remarks,
+						CP.CustomerPriceID,
                         CP.CustomerPriceName
 					FROM
 						master_customer MC
 						JOIN master_customerprice CP
+							ON MC.CustomerPriceID = CP.CustomerPriceID
 					WHERE ", pWhere, 
 					" ORDER BY ", pOrder,
 					" LIMIT ", pLimit_s, ", ", pLimit_l);

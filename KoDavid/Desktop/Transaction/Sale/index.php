@@ -23,6 +23,8 @@
 				<div class="row">
 					<div class="col-md-1 labelColumn">
 						No. Invoice :
+						<input id="hdnCustomerPriceID" name="hdnCustomerPriceID" type="hidden" value=0 />
+						<input id="hdnCustomerID" name="hdnCustomerID" type="hidden" value=1 />
 						<input id="hdnSaleID" name="hdnSaleID" type="hidden" value=0 />
 						<input id="hdnSaleDetailsID" name="hdnSaleDetailsID" type="hidden" value=0 />
 						<input id="hdnItemID" name="hdnItemID" type="hidden" value=0 />
@@ -60,7 +62,7 @@
 										return 0;
 									}
 									while($row = mysqli_fetch_array($result)) {
-										echo "<option value='".$row['CustomerID']."' >".$row['CustomerCode']." - ".$row['CustomerName']."</option>";
+										echo "<option CustomerPriceID=".$row['CustomerPriceID']." value='".$row['CustomerID']."' >".$row['CustomerCode']." - ".$row['CustomerName']."</option>";
 									}
 									mysqli_free_result($result);
 									mysqli_next_result($dbh);
@@ -558,7 +560,7 @@
 										}
 										$("#hdnItemID").val(data.ItemID);
 										$("#txtItemName").val(data.ItemName);
-										$("#txtSalePrice").val(returnRupiah(data.RetailPrice));
+										$("#txtSalePrice").val(returnRupiah(data.RetailPrice));	
 										$("#hdnSalePrice").val(data.RetailPrice);
 										$("#hdnBuyPrice").val(data.BuyPrice);
 										$("#hdnRetailPrice").val(data.RetailPrice);
@@ -705,6 +707,18 @@
 					else {
 						$("#txtSalePrice").val(returnRupiah((retailPrice * conversionQuantity).toString()));
 						$("#hdnSalePrice").val(retailPrice);
+					}
+
+					if(parseFloat($("#hdnCustomerPriceID").val()) == 2) {
+						//$("#hdnRetailPrice").val(data.Price1);
+						$("#hdnSalePrice").val($("#hdnPrice1").val());
+						$("#txtSalePrice").val(returnRupiah((parseFloat($("#hdnPrice1").val()) * conversionQuantity).toString()));
+					}
+
+					if(parseFloat($("#hdnCustomerPriceID").val()) == 3) {
+						//$("#hdnRetailPrice").val(data.Price2);
+						$("#hdnSalePrice").val($("#hdnPrice2").val());
+						$("#txtSalePrice").val(returnRupiah((parseFloat($("#hdnPrice2").val()) * conversionQuantity).toString()));
 					}
 					CalculateSubTotal();
 				}
@@ -858,6 +872,7 @@
 													if($("#hdnSaleDetailsID").val() == 0) {
 														//$("#toggle-retail").toggleClass('disabled', true);
 														$("#txtSaleNumber").val(data.SaleNumber);
+														$("#ddlCustomer").attr('disabled', true);
 														var toggleBranch = "<div id='toggle-branch-" + data.SaleDetailsID + "' onclick=\"updateBranch(this.id, " + Qty + ", '" + itemCode + "')\" class='div-center toggle-modern' ></div>";
 														var checkboxData = "<input type='checkbox' class='chkSaleDetails' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
 														table2.row.add([
@@ -1130,6 +1145,7 @@
 											if($("#hdnSaleDetailsID").val() == 0) {
 												//$("#toggle-retail").toggleClass('disabled', true);
 												$("#txtSaleNumber").val(data.SaleNumber);
+												$("#ddlCustomer").attr('disabled', true);
 												var toggleBranch = "<div id='toggle-branch-" + data.SaleDetailsID + "' onclick=\"updateBranch(this.id, " + Qty + ", '" + itemCode + "')\" class='div-center toggle-modern' ></div>";
 												var checkboxData = "<input type='checkbox' class='chkSaleDetails' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
 												table2.row.add([
@@ -1393,6 +1409,7 @@
 										if($("#hdnSaleDetailsID").val() == 0) {
 											//$("#toggle-retail").toggleClass('disabled', true);
 											$("#txtSaleNumber").val(data.SaleNumber);
+											$("#ddlCustomer").attr('disabled', true);
 											var toggleBranch = "<div id='toggle-branch-" + data.SaleDetailsID + "' onclick=\"updateBranch(this.id, " + Qty + ", '" + itemCode + "')\" class='div-center toggle-modern' ></div>";
 											var checkboxData = "<input type='checkbox' class='chkSaleDetails' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
 											table2.row.add([
@@ -1564,6 +1581,9 @@
 			}
 
 			function updateHeader() {
+				$("#hdnCustomerPriceID").val($("#ddlCustomer").find(':selected').attr('CustomerPriceID'));
+				$("#hdnCustomerID").val($("#ddlCustomer").val());
+				Grosir($("#txtQTY").val());
 				if($("#hdnSaleID").val() != 0) {
 					var SaleID = $("#hdnSaleID").val();
 					var TransactionDate = $("#hdnTransactionDate").val();
@@ -2284,6 +2304,7 @@
 				$("#hdnConversionQty").val(0);
 				$("#hdnGrandTotalBuyPrice").val(0);
 				$("#hdnGrandTotal").val(0);
+				$("#ddlCustomer").attr('disabled', false);
 				table2.clear().draw();
 				table2.keys.enable();
 			}

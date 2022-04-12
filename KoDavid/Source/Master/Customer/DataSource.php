@@ -70,6 +70,7 @@
 		$row_array[] = $row['Remarks'];
 		$row_array[] = $row['CustomerPriceName'];
 		$row_array[] = $row['CustomerID'];
+		$row_array[] = $row['CustomerPriceID'];
 		array_push($return_arr, $row_array);
 	}
 	

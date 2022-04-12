@@ -10,7 +10,7 @@
 		$TransactionDate = mysqli_real_escape_string($dbh, $_POST['hdnTransactionDate']);
 		$BranchID = mysqli_real_escape_string($dbh, $_POST['hdnBranchID']);
 		$RetailFlag = mysqli_real_escape_string($dbh, $_POST['hdnIsRetail']);
-		$CustomerID = mysqli_real_escape_string($dbh, $_POST['ddlCustomer']);
+		$CustomerID = mysqli_real_escape_string($dbh, $_POST['hdnCustomerID']);
 		$ItemID = mysqli_real_escape_string($dbh, $_POST['hdnItemID']);
 		$ItemDetailsID = mysqli_real_escape_string($dbh, $_POST['hdnItemDetailsID']);
 		if($ItemDetailsID == "") $ItemDetailsID = "NULL";
