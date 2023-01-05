@@ -41,7 +41,8 @@ SET State = 1;
         0 Discount,
 		0 DiscountTotal,
         FB.FirstBalanceAmount SubTotal,
-        0 Payment
+        0 Payment,
+        FB.CreatedDate
 	FROM
 		transaction_firstbalance FB
 		JOIN master_user MUS
@@ -68,7 +69,8 @@ SET State = 1;
         SD.Discount,
 		IFNULL(TS.Discount, 0) DiscountTotal,
         SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount) SubTotal,
-        0 Payment
+        0 Payment,
+        TS.CreatedDate
     FROM
 		transaction_sale TS
         JOIN master_user MUS
@@ -106,7 +108,8 @@ SET State = 1;
         BD.Discount,
 		IFNULL(TB.Discount, 0) DiscountTotal,
         BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount) SubTotal,
-        0 Payment
+        0 Payment,
+        TB.CreatedDate
     FROM
 		transaction_booking TB
 		JOIN master_user MUS
@@ -144,7 +147,8 @@ SET State = 1;
         0 Discount,
 		0 DiscountTotal,
         -(SRD.Quantity * SRD.SalePrice) SubTotal,
-        0 Payment
+        0 Payment,
+        TSR.CreatedDate
     FROM
 		transaction_salereturn TSR
         JOIN master_user MUS
@@ -183,7 +187,8 @@ SET State = 1;
         SD.Discount,
 		TS.Discount DiscountTotal,
         SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount) SubTotal,
-        IFNULL(TS.Payment, 0) Payment
+        IFNULL(TS.Payment, 0) Payment,
+        TS.CreatedDate
     FROM
 		transaction_sale TS
         JOIN master_user MUS
@@ -222,7 +227,8 @@ SET State = 1;
         BD.Discount,
 		TB.Discount DiscountTotal,
         BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount) SubTotal,
-        IFNULL(TB.Payment, 0) Payment
+        IFNULL(TB.Payment, 0) Payment,
+        TB.CreatedDate
     FROM
 		transaction_booking TB
 		JOIN master_user MUS
@@ -261,7 +267,8 @@ SET State = 1;
         0,
 		0 DiscountTotal,
         PD.Amount,
-        0 Payment
+        0 Payment,
+        PD.CreatedDate
 	FROM
 		transaction_paymentdetails PD
         JOIN master_user MUS
