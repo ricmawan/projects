@@ -828,9 +828,10 @@ function chkAll() {
 
 var enterCounter = 0;
 function enterLikeTab() {
-	$(document).not($(":submit, :button")).on("keypress", "input", function (evt) {	
+	$(document).not($(":submit, :button, textarea")).on("keypress", "input", function (evt) {	
 		if (evt.keyCode == 13) {
 			evt.preventDefault();
+			//alert();
 			var next = $('[tabindex="'+(this.tabIndex+1)+'"]');
 			var nextTabIndex = this.tabIndex+1;
 			if(next.length) {

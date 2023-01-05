@@ -54,7 +54,8 @@
 						Pelanggan :
 					</div>
 					<div class="col-md-2">
-						<select id="ddlCustomer" name="ddlCustomer" tabindex=7 class="form-control-custom mousetrap" style="width: 80%; display: inline-block;margin-right: 5px;" placeholder="Pilih Pelanggan" onchange="updateHeader();" >
+						<div class="ui-widget" style="width: 80%; display: inline-block;margin-right: 5px;" >
+							<select id="ddlCustomer" name="ddlCustomer" tabindex=7 class="form-control-custom mousetrap" placeholder="Pilih Pelanggan" onchange="updateHeader();" >
 								<?php
 									$sql = "CALL spSelDDLCustomer('".$_SESSION['UserLoginKasir']."')";
 									if (! $result = mysqli_query($dbh, $sql)) {
@@ -68,7 +69,8 @@
 									mysqli_next_result($dbh);
 								?>
 							</select>
-							<i class="fa fa-user-plus" style="font-size: 14px;cursor: pointer;" onclick="addNewCustomer();"></i>
+						</div>
+						<i class="fa fa-user-plus" style="font-size: 14px;cursor: pointer;" onclick="addNewCustomer();"></i>
 					</div>
 					<div class="col-md-1">
 						<div id="toggle-retail" class="toggle-modern" ></div>
@@ -2057,7 +2059,7 @@
 					title: 'Tambah Pelanggan',
 					url: 'Transaction/Sale/PopUpAddCustomer.php',
 					width: 680,
-					height: 400,
+					height: 425,
 					buttons: {
 						Simpan: {
 							'class': 'ui-button ui-corner-all ui-widget',
@@ -2074,7 +2076,7 @@
 						setTimeout(function() {
 							if($("#hdnPermission").length == 0) {
 								$("#txtCustomerCodeAdd").focus();
-								$("#btnSimpan").attr("tabindex", 76);
+								$("#btnSimpan").attr("tabindex", 77);
 								$(document).on('keydown', function(e) {
 									if (e.keyCode == 39 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //right arrow
 										$("#btnBatal").focus();
@@ -3566,6 +3568,11 @@
 						});
 						return 0;
 					}
+				});
+
+				$("#ddlCustomer").combobox();
+				$("#ddlCustomer").next().find("input").click(function() {
+					$(this).val("");
 				});
 			});
 		</script>
