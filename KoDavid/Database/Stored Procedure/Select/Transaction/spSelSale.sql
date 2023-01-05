@@ -70,7 +70,8 @@ SET @query = CONCAT("SELECT
                             ELSE 'Selesai'
 						END Status,
                         IFNULL(PT.PaymentTypeID, 1) PaymentTypeID,
-						IFNULL(TS.Discount, 0) Discount
+						IFNULL(TS.Discount, 0) Discount,
+						MC.CustomerPriceID
 					FROM
 						transaction_sale TS
                         JOIN master_customer MC

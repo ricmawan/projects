@@ -151,7 +151,8 @@ SET State = 1;
 	SELECT 
 		MC.CustomerID,
 		MC.CustomerCode,
-		MC.CustomerName
+		MC.CustomerName,
+		MC.CustomerPriceID
 	FROM 
 		master_customer MC
 	ORDER BY 
@@ -746,10 +747,12 @@ SET @query = CONCAT("SELECT
                         MC.Address,
                         MC.City,
                         MC.Remarks,
+						CP.CustomerPriceID,
                         CP.CustomerPriceName
 					FROM
 						master_customer MC
 						JOIN master_customerprice CP
+							ON MC.CustomerPriceID = CP.CustomerPriceID
 					WHERE ", pWhere, 
 					" ORDER BY ", pOrder,
 					" LIMIT ", pLimit_s, ", ", pLimit_l);
@@ -1674,7 +1677,8 @@ SET State = 1;
         0 Discount,
 		0 DiscountTotal,
         FB.FirstBalanceAmount SubTotal,
-        0 Payment
+        0 Payment,
+        FB.CreatedDate
 	FROM
 		transaction_firstbalance FB
 		JOIN master_user MUS
@@ -1701,7 +1705,8 @@ SET State = 1;
         SD.Discount,
 		IFNULL(TS.Discount, 0) DiscountTotal,
         SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount) SubTotal,
-        0 Payment
+        0 Payment,
+        TS.CreatedDate
     FROM
 		transaction_sale TS
         JOIN master_user MUS
@@ -1739,7 +1744,8 @@ SET State = 1;
         BD.Discount,
 		IFNULL(TB.Discount, 0) DiscountTotal,
         BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount) SubTotal,
-        0 Payment
+        0 Payment,
+        TB.CreatedDate
     FROM
 		transaction_booking TB
 		JOIN master_user MUS
@@ -1777,7 +1783,8 @@ SET State = 1;
         0 Discount,
 		0 DiscountTotal,
         -(SRD.Quantity * SRD.SalePrice) SubTotal,
-        0 Payment
+        0 Payment,
+        TSR.CreatedDate
     FROM
 		transaction_salereturn TSR
         JOIN master_user MUS
@@ -1816,7 +1823,8 @@ SET State = 1;
         SD.Discount,
 		TS.Discount DiscountTotal,
         SD.Quantity * (SD.SalePrice * IFNULL(MID.ConversionQuantity, 1) - SD.Discount) SubTotal,
-        IFNULL(TS.Payment, 0) Payment
+        IFNULL(TS.Payment, 0) Payment,
+        TS.CreatedDate
     FROM
 		transaction_sale TS
         JOIN master_user MUS
@@ -1855,7 +1863,8 @@ SET State = 1;
         BD.Discount,
 		TB.Discount DiscountTotal,
         BD.Quantity * (BD.BookingPrice * IFNULL(MID.ConversionQuantity, 1) - BD.Discount) SubTotal,
-        IFNULL(TB.Payment, 0) Payment
+        IFNULL(TB.Payment, 0) Payment,
+        TB.CreatedDate
     FROM
 		transaction_booking TB
 		JOIN master_user MUS
@@ -1894,7 +1903,8 @@ SET State = 1;
         0,
 		0 DiscountTotal,
         PD.Amount,
-        0 Payment
+        0 Payment,
+        PD.CreatedDate
 	FROM
 		transaction_paymentdetails PD
         JOIN master_user MUS
@@ -7376,7 +7386,7 @@ SET @query = CONCAT("SELECT
                             ELSE 'Selesai'
 						END Status,
                         IFNULL(PT.PaymentTypeID, 1) PaymentTypeID,
-						TB.Discount
+						IFNULL(TB.Discount, 0) Discount
 					FROM
 						transaction_booking TB
                         JOIN master_customer MC
@@ -13552,7 +13562,8 @@ SET @query = CONCAT("SELECT
                             ELSE 'Selesai'
 						END Status,
                         IFNULL(PT.PaymentTypeID, 1) PaymentTypeID,
-						TS.Discount
+						IFNULL(TS.Discount, 0) Discount,
+						MC.CustomerPriceID
 					FROM
 						transaction_sale TS
                         JOIN master_customer MC
