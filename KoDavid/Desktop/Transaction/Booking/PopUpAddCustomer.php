@@ -123,7 +123,7 @@
 							<?php
 								$sql = "CALL spSelDDLCustomerPrice('".$_SESSION['UserLogin']."')";
 								if (! $result = mysqli_query($dbh, $sql)) {
-									logEvent(mysqli_error($dbh), '/Transaction/Booking/PopUpAddCustomer.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+									logEvent(mysqli_error($dbh), '/Transaction/Sale/PopUpAddCustomer.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
 									return 0;
 								}
 								while($row = mysqli_fetch_array($result)) {
@@ -141,7 +141,7 @@
 						Keterangan :
 					</div>
 					<div class="col-md-7">
-						<textarea id="txtRemarksAdd" name="txtRemarksAdd" tabindex=76 class="form-control-custom" onfocus="this.select();" autocomplete=off placeholder="Keterangan"></textarea>
+						<textarea id="txtRemarksAdd" name="txtRemarksAdd" tabindex=76 class="form-control-custom" onkeydown="nextTabIndex(event, this);" onfocus="this.select();" autocomplete=off placeholder="Keterangan"></textarea>
 					</div>
 				</div>
 				<br />
@@ -156,6 +156,56 @@
 				keyFunction();
 				enterLikeTab();
 			});
+
+			function pasteIntoInput(el, text) {
+				//alert();
+				el.focus();
+				if (typeof el.selectionStart == "number" && typeof el.selectionEnd == "number") {
+					var val = el.value;
+					var selStart = el.selectionStart;
+					el.value = val.slice(0, selStart) + text + val.slice(el.selectionEnd);
+					el.selectionEnd = el.selectionStart = selStart + text.length;
+				}
+				else if (typeof document.selection != "undefined") {
+					var textRange = document.selection.createRange();
+					textRange.text = text;
+					textRange.collapse(false);
+					textRange.select();
+				}
+			}
+
+			function nextTabIndex(evt, el) {
+				//alert(evt.keyCode);
+				if (evt.keyCode == 13 && evt.shiftKey) {
+					//alert(evt.type);
+					evt.preventDefault();
+					if (evt.type == "keydown") {
+						pasteIntoInput(el, "\n");
+					}
+			    }
+				else if (evt.keyCode == 13  && !evt.shiftKey) {
+					//alert();
+					evt.preventDefault();
+					//console.log(evt);
+					var next = $('[tabindex="'+(el.tabIndex+1)+'"]');
+					var nextTabIndex = el.tabIndex+1;
+					if(next.length) {
+						if(next.attr("disabled") == "disabled") {
+							$(document).find(":focusable").each(function() {
+								if(parseInt($(this)[0].tabIndex) > nextTabIndex) {
+									$(this).focus();
+									return false;
+								}
+							});
+						}
+						else {
+							if(next.prop("type") == "select-one") next.simulate('mousedown');
+							next.focus();
+						}
+					}
+					else $('[tabindex="1"]').focus();
+				}
+			}
 		</script>
 	</body>
 </html>

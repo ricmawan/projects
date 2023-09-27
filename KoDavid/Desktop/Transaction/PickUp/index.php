@@ -6,8 +6,8 @@
 	<head>
 		<style>
 			#divTableContent {
-				min-height: 380px;
-				max-height: 380px;
+				min-height: 390px;
+				max-height: 390px;
 				overflow-y: auto;
 			}
 
@@ -16,6 +16,9 @@
 			}
 			.ui-spinner {
 				width: 100%;
+			}
+			.dataTables_scrollBody {
+				overflow-x: hidden !important;
 			}
 		</style>
 	</head>
@@ -162,7 +165,6 @@
 						});
 
 				table2.columns.adjust();
-				tableWidthAdjust();
 			}
 
 			function updateBranch(BookingDetailsID) {
@@ -213,11 +215,11 @@
 											$("#hdnBookingID").val(Data.data[i][13]);
 											$("#txtCustomerName").val(Data.data[i][12]);
 										}
-										table2.row.add(Data.data[i]);
+										table2.row.add(Data.data[i]).draw();
 									}
 									$("#btnSavePickUp").attr("tabindex", Data.tabindex);
 									$("#btnCancelAddPickUp").attr("tabindex", (parseFloat(Data.tabindex) + 1));
-									table2.draw();
+									//table2.draw();
 									tableWidthAdjust();
 									setTimeout(function() {
 										$("#grid-transaction").find("#select_all_salereturn").first().remove()
@@ -347,12 +349,13 @@
 			}
 			
 			function tableWidthAdjust() {
-				var tableWidth = $("#divTableContent").find("table").width();
+				/*var tableWidth = $("#divTableContent").find("table").width();
 				var barWidth = table2.settings()[0].oScroll.iBarWidth;
 				var newWidth = tableWidth - barWidth + 2;
 				$("#divTableContent").find("table").css({
 					"width": newWidth + "px"
-				});
+				});*/
+				table2.columns.adjust().draw();	
 			}
 			
 			function resetForm() {
@@ -410,8 +413,10 @@
 										}
 									},
 									"initComplete": function(settings, json) {
-										table3.columns.adjust();
 										$("#grid-sale").DataTable().cell( ':eq(0)' ).focus();
+									},
+									"drawCallback": function() {
+										setTimeout(function() { table3.columns.adjust(); } , 0);
 									}
 								});
 						

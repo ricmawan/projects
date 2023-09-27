@@ -322,9 +322,9 @@
 					success: function(Data) {
 						if(Data.FailedFlag == '0') {
 							for(var i=0;i<Data.data.length;i++) {
-								table2.row.add(Data.data[i]);
+								table2.row.add(Data.data[i]).draw();
 							}
-							table2.draw();
+							//table2.draw();
 							tableWidthAdjust();
 							
 							for(var i=0;i<Data.data.length;i++) {
