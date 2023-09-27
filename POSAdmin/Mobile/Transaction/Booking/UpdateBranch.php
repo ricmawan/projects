@@ -11,12 +11,12 @@
 		$FailedFlag = 0;
 		$State = 1;
 		
-		$sql = "CALL spUpdBookingDetailsBranch(".$BookingDetailsID.", ".$BranchID.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spUpdBookingDetailsBranch(".$BookingDetailsID.", ".$BranchID.", '".$_SESSION['UserLoginMobile']."')";
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;
-			logEvent(mysqli_error($dbh), '/Transaction/Booking/UpdateBranch.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Transaction/Booking/UpdateBranch.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
 			echo returnstate($BookingDetailsID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}

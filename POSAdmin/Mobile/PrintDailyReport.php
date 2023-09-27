@@ -17,12 +17,12 @@
 
     $IPAddress = get_client_ip();
 
-    $sql = "CALL spSelPrinterList('".$IPAddress."', '".$_SESSION['UserLogin']."')";
+    $sql = "CALL spSelPrinterList('".$IPAddress."', '".$_SESSION['UserLoginMobile']."')";
     if (! $result=mysqli_query($dbh, $sql)) {
         $Message = "Terjadi Kesalahan Sistem";
         $MessageDetail = mysqli_error($dbh);
         $FailedFlag = 1;
-        logEvent(mysqli_error($dbh), '/PrintDailyReport.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+        logEvent(mysqli_error($dbh), '/PrintDailyReport.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
         echo returnstate($SaleID, $Message, $MessageDetail, $FailedFlag, $State);
         return 0;
     }
@@ -61,11 +61,11 @@
     $printer -> text($dayName[date("w", strtotime($TransactionDate))] . ", " . date("d", strtotime($TransactionDate)) . " " . $monthName[date("n", strtotime($TransactionDate)) - 1] . " " . date("Y", strtotime($TransactionDate)) . "/" . date("H") . ":" . date("i") . "\n");
     $printer -> text(str_pad("", 39, "-") . "\n");
 
-    $sql = "CALL spSelDailyReportPrint('".$_SESSION['UserLogin']."')";
+    $sql = "CALL spSelDailyReportPrint('".$_SESSION['UserLoginMobile']."')";
     $FailedFlag = 0;
 
     if (! $result = mysqli_query($dbh, $sql)) {
-        logEvent(mysqli_error($dbh), '/Transaction/Sale/Print.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+        logEvent(mysqli_error($dbh), '/Transaction/Sale/Print.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
         $FailedFlag = 1;
         $json_data = array(
                         "FailedFlag" => $FailedFlag
@@ -92,7 +92,7 @@
 
     $printer -> setEmphasis(false);
 
-    $printer -> text("Kasir          : " . str_pad($_SESSION['UserLogin'], 22, " ") . "\n");
+    $printer -> text("Kasir          : " . str_pad($_SESSION['UserLoginMobile'], 22, " ") . "\n");
     /*$data = $connector -> getData();
     fwrite($handle, $data);
     fclose($handle);*/

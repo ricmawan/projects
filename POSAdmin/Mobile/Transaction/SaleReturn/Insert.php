@@ -19,12 +19,12 @@
 			}
 		}
 
-		$sql = "CALL spInsSaleReturn(".$SaleReturnID.", ".$SaleID.", '".$TransactionDate."', '".implode(",", $SaleReturnData)."', ".$hdnIsEdit.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsSaleReturn(".$SaleReturnID.", ".$SaleID.", '".$TransactionDate."', '".implode(",", $SaleReturnData)."', ".$hdnIsEdit.", '".$_SESSION['UserLoginMobile']."')";
 
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;
-			logEvent(mysqli_error($dbh), '/Transaction/SaleReturn/Insert.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Transaction/SaleReturn/Insert.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
 			echo returnstate($SaleReturnID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}

@@ -12,7 +12,7 @@
 	$sql = "CALL spSelUserMenuPermission('$MOBILE_PATH', '$RequestedPath', '".$_SESSION['UserID']."')";
 				
 	if (!$result = mysqli_query($dbh, $sql)) {
-		logEvent(mysqli_error($dbh), $RequestedPath, mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+		logEvent(mysqli_error($dbh), $RequestedPath, mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
 		return 0;
 	}
 	

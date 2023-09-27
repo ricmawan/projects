@@ -1,7 +1,7 @@
 <?php
 	$DBUser = "root";
 	$DBPass = "";
-	$DBName = "pos";
+	$DBName = "karya_motor";
 	$Host = "localhost";
 	GLOBAL $dbh;
 	$dbh = mysqli_connect($Host, $DBUser, $DBPass, $DBName);
@@ -9,7 +9,7 @@
 		echo "Failed to connect to MySQL: " . mysqli_connect_error();
 	}
 	$currentUser = "user";
-	if(ISSET($_SESSION['UserLogin'])) $currentUser = $_SESSION['UserLogin'];
+	if(ISSET($_SESSION['UserLoginMobile'])) $currentUser = $_SESSION['UserLoginMobile'];
 	$sql = "CALL spSelParameter('$currentUser')";
 	if(!$result = mysqli_query($dbh, $sql)) {
 		logEvent(mysqli_error($dbh), '/DBConfig.php', mysqli_real_escape_string($dbh, $currentUser));

@@ -12,7 +12,7 @@
 	$sql = "CALL spSelUserMenuPermission('$MOBILE_PATH', '$RequestedPath', '".$_SESSION['UserID']."')";
 				
 	if (!$result = mysqli_query($dbh, $sql)) {
-		logEvent(mysqli_error($dbh), $RequestedPath, mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+		logEvent(mysqli_error($dbh), $RequestedPath, mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
 		return 0;
 	}
 	
@@ -89,9 +89,9 @@
 							<div class="col-md-3 col-sm-3 has-float-label">
 								<select id="ddlUnitAdd" name="ddlUnitAdd" tabindex=18 class="form-control-custom" placeholder="Pilih Satuan" >
 									<?php
-										$sql = "CALL spSelDDLUnit('".$_SESSION['UserLogin']."')";
+										$sql = "CALL spSelDDLUnit('".$_SESSION['UserLoginMobile']."')";
 										if (! $result = mysqli_query($dbh, $sql)) {
-											logEvent(mysqli_error($dbh), '/Master/Item/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+											logEvent(mysqli_error($dbh), '/Master/Item/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
 											return 0;
 										}
 										while($row = mysqli_fetch_array($result)) {
@@ -108,9 +108,9 @@
 									<select id="ddlCategoryAdd" name="ddlCategoryAdd" tabindex=19 class="form-control-custom" placeholder="Pilih Kategori" >
 										<option value="" selected> </option>
 										<?php
-											$sql = "CALL spSelDDLCategory('".$_SESSION['UserLogin']."')";
+											$sql = "CALL spSelDDLCategory('".$_SESSION['UserLoginMobile']."')";
 											if (! $result = mysqli_query($dbh, $sql)) {
-												logEvent(mysqli_error($dbh), '/Master/Item/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+												logEvent(mysqli_error($dbh), '/Master/Item/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
 												return 0;
 											}
 											while($row = mysqli_fetch_array($result)) {
@@ -183,9 +183,9 @@
 				<div class="col-md-4 col-sm-4 has-float-label">
 					<select id="ddlUnit_" name="ddlUnit_" class="form-control-custom" placeholder="Pilih Satuan" >
 						<?php
-							$sql = "CALL spSelDDLUnit('".$_SESSION['UserLogin']."')";
+							$sql = "CALL spSelDDLUnit('".$_SESSION['UserLoginMobile']."')";
 							if (! $result = mysqli_query($dbh, $sql)) {
-								logEvent(mysqli_error($dbh), '/Master/Item/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+								logEvent(mysqli_error($dbh), '/Master/Item/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
 								return 0;
 							}
 							while($row = mysqli_fetch_array($result)) {

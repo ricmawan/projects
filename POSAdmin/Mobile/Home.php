@@ -18,7 +18,7 @@
 		<link href="assets/css/custom.css" rel="stylesheet" />
 		<link href="assets/css/bootstrap-float-label.min.css" rel="stylesheet" />
 		<link href="assets/css/dataTables.bootstrap.css" rel="stylesheet" />
-		<link href="assets/css/jquery.dataTables.css" rel="stylesheet" />
+		<!--<link href="assets/css/jquery.dataTables.css" rel="stylesheet" />-->
 		<link href="assets/css/keyTable.bootstrap.css" rel="stylesheet" />
 		<link href="assets/css/lobibox.css" rel="stylesheet" />
 		<link href="assets/css/toggles.css" rel="stylesheet" />

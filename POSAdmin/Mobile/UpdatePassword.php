@@ -19,7 +19,7 @@
 		$Message = "Terjadi Kesalahan Sistem";
 		$MessageDetail = mysqli_error($dbh);
 		$FailedFlag = 1;
-		logEvent(mysqli_error($dbh), '/UpdatePassword.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+		logEvent(mysqli_error($dbh), '/UpdatePassword.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
 		echo returnstate($UserID, $Message, $MessageDetail, $FailedFlag, $State);
 		return 0;
 	}
@@ -28,12 +28,12 @@
 	mysqli_next_result($dbh);
 	
 	if($row['UserPassword'] == MD5($CurrentPassword)) {
-		$sql = "CALL spUpdUserPassword(".$UserID.", '".MD5($NewPassword)."', '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spUpdUserPassword(".$UserID.", '".MD5($NewPassword)."', '".$_SESSION['UserLoginMobile']."')";
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;
-			logEvent(mysqli_error($dbh), '/UpdatePassword.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/UpdatePassword.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
 			echo returnstate($UserID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}

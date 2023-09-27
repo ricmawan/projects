@@ -14,11 +14,11 @@
 		$MessageDetail = "";
 		$FailedFlag = 0;
 		$State = 1;
-		$sql = "CALL spInsPayment(".$TransactionID.", '".$PaymentDate."', '".$TransactionType."', ".$PaymentDetailsID.", ".$Amount.", '".$Remarks."', '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsPayment(".$TransactionID.", '".$PaymentDate."', '".$TransactionType."', ".$PaymentDetailsID.", ".$Amount.", '".$Remarks."', '".$_SESSION['UserLoginMobile']."')";
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;
-			logEvent(mysqli_error($dbh), '/Transaction/Payment/Insert.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Transaction/Payment/Insert.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
 			echo returnstate($PaymentID, $PaymentDetailsID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}

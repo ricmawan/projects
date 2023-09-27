@@ -21,12 +21,12 @@
 			}
 		}
 
-		$sql = "CALL spInsStockAdjustMobile(".$BranchID.", '".$TransactionDate."', '".implode(",", $StockAdjustData)."', '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spInsStockAdjustMobile(".$BranchID.", '".$TransactionDate."', '".implode(",", $StockAdjustData)."', '".$_SESSION['UserLoginMobile']."')";
 
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;
-			logEvent(mysqli_error($dbh), '/Transaction/SaleReturn/Insert.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Transaction/SaleReturn/Insert.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
 			echo returnstate($StockAdjustID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}

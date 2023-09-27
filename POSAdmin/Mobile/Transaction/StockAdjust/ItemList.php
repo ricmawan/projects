@@ -25,10 +25,10 @@
 		$limit_l = 100;
 		//kolom di table
 
-		$sql = "CALL spSelItemListStockAdjust(".$BranchID.", ".$CategoryID.", '".$ItemName."', ".$limit_s.", ".$limit_l.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spSelItemListStockAdjust(".$BranchID.", ".$CategoryID.", '".$ItemName."', ".$limit_s.", ".$limit_l.", '".$_SESSION['UserLoginMobile']."')";
 
 		if (! $result = mysqli_query($dbh, $sql)) {
-			logEvent(mysqli_error($dbh), '/Transaction/StockAdjust/ItemList.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Transaction/StockAdjust/ItemList.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
 			return 0;
 		}
 

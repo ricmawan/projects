@@ -2,10 +2,10 @@
 	$requestFile = basename("$_SERVER[SCRIPT_NAME]");
 	SESSION_START();
 	try {
-		if(ISSET($_SESSION['UserLogin']) && ISSET($_SESSION['UserPassword'])) {
-			$sql = "CALL spSelUserLogin('".mysqli_real_escape_string($dbh, $_SESSION['UserLogin'])."', '".mysqli_real_escape_string($dbh, $_SESSION['UserPassword'])."', 1, '".mysqli_real_escape_string($dbh, $_SESSION['UserLogin'])."')";
+		if(ISSET($_SESSION['UserLoginMobile']) && ISSET($_SESSION['UserPassword'])) {
+			$sql = "CALL spSelUserLogin('".mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile'])."', '".mysqli_real_escape_string($dbh, $_SESSION['UserPassword'])."', 1, '".mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile'])."')";
 			if (! $result = mysqli_query($dbh, $sql)) {
-				logEvent(mysqli_error($dbh), '/Login.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+				logEvent(mysqli_error($dbh), '/Login.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
 				return 0;
 			}
 			$cek = mysqli_num_rows($result);
@@ -67,6 +67,6 @@
 	}
 	catch (Exception $e)
 	{
-		logEvent($e->getMessage(), '/GetSession.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+		logEvent($e->getMessage(), '/GetSession.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
 	}
 ?>

@@ -263,7 +263,6 @@
 							openDialogEdit(data);
 						});
 						
-						tableWidthAdjust();
 						$("#divModal").show();
 					},
 					
@@ -325,9 +324,9 @@
 					success: function(Data) {
 						if(Data.FailedFlag == '0') {
 							for(var i=0;i<Data.data.length;i++) {
-								table2.row.add(Data.data[i]);
+								table2.row.add(Data.data[i]).draw();
 							}
-							table2.draw();
+							//table2.draw();
 							tableWidthAdjust();
 						}
 						else {
@@ -515,12 +514,13 @@
 
 			
 			function tableWidthAdjust() {
-				var tableWidth = $("#divTableContent").find("table").width();
+				/*var tableWidth = $("#divTableContent").find("table").width();
 				var barWidth = table2.settings()[0].oScroll.iBarWidth;
 				var newWidth = tableWidth - barWidth + 2;
 				$("#divTableContent").find("table").css({
 					"width": newWidth + "px"
-				});
+				});*/
+				table2.columns.adjust().draw();
 			}
 			
 			function resetForm() {
@@ -837,6 +837,9 @@
 									"last": "»",
 									"first": "«"
 								}
+							},
+							"drawCallback": function() {
+								setTimeout(function() { table.columns.adjust(); } , 0);
 							}
 						});
 				

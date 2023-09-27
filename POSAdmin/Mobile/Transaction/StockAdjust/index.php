@@ -42,9 +42,9 @@
 								<div class="col-md-3 col-sm-3 has-float-label" >
 									<select id="ddlBranch" name="ddlBranch" tabindex=7 class="form-control-custom" placeholder="Pilih Cabang" onchange="ReloadTable(0)" >
 										<?php
-											$sql = "CALL spSelDDLBranch('".$_SESSION['UserLogin']."')";
+											$sql = "CALL spSelDDLBranch('".$_SESSION['UserLoginMobile']."')";
 											if (! $result = mysqli_query($dbh, $sql)) {
-												logEvent(mysqli_error($dbh), '/Master/FirstStock/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+												logEvent(mysqli_error($dbh), '/Master/FirstStock/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
 												return 0;
 											}
 											while($row = mysqli_fetch_array($result)) {
@@ -64,9 +64,9 @@
 										<select id="ddlCategory" name="ddlCategory" onchange="ReloadTable(1);" tabindex=8 class="form-control-custom" placeholder="Pilih Kategori" >
 											<option value=0 selected>-- Pilih Kategori -- </option>
 											<?php
-												$sql = "CALL spSelDDLCategory('".$_SESSION['UserLogin']."')";
+												$sql = "CALL spSelDDLCategory('".$_SESSION['UserLoginMobile']."')";
 												if (! $result = mysqli_query($dbh, $sql)) {
-													logEvent(mysqli_error($dbh), '/Master/Item/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+													logEvent(mysqli_error($dbh), '/Master/Item/index.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
 													return 0;
 												}
 												while($row = mysqli_fetch_array($result)) {
@@ -207,9 +207,10 @@
 							"initComplete": function(settings, json) {
 								setTimeout(function() {
 									$("#grid-transaction").find("#select_all_salereturn").first().remove();
-									table2.columns.adjust();
-									tableWidthAdjust();
 								}, 0);
+							},
+							"drawCallback": function() {
+								setTimeout(function() { table2.columns.adjust(); } , 0);
 							}
 						});
 
@@ -226,12 +227,13 @@
 			}
 			
 			function tableWidthAdjust() {
-				var tableWidth = $("#divTableContent").find("table").width();
+				/*var tableWidth = $("#divTableContent").find("table").width();
 				var barWidth = table2.settings()[0].oScroll.iBarWidth;
 				var newWidth = tableWidth - barWidth + 2;
 				$("#divTableContent").find("table").css({
 					"width": newWidth + "px"
-				});
+				});*/
+				table2.columns.adjust().draw();
 			}
 			
 			function finish() {

@@ -26,12 +26,12 @@
 		$ErrorMessage = "";
 		$State = 1;
 		
-		$sql = "CALL spSelItemQtyDetails('".$ItemCode."', ".$BranchID.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spSelItemQtyDetails('".$ItemCode."', ".$BranchID.", '".$_SESSION['UserLoginMobile']."')";
 
 		if (! $result = mysqli_query($dbh, $sql)) {
 			$FailedFlag = 1;
 			$ErrorMessage = "Terjadi kesalahan sistem.";
-			logEvent(mysqli_error($dbh), '/Transaction/Sale/CheckItem.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Transaction/Sale/CheckItem.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
 			echo returnstate($ItemID, $ItemDetailsID, $ItemName, $BuyPrice, $RetailPrice, $Price1, $Qty1, $Price2, $Qty2, $UnitID, $AvailableUnit, $Weight, $Stock, $StockNoConversion, $ConversionQty, $FailedFlag, $ErrorMessage);
 			return 0;
 		}

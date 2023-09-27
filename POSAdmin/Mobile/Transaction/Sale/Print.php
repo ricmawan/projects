@@ -42,11 +42,11 @@
     $printer -> selectPrintMode(Printer::MODE_FONT_B);
     $printer -> text(str_pad("", 39, "-") . "\n");
     
-    $sql = "CALL spSelSaleDetails(".$SaleID.", '".$_SESSION['UserLogin']."')";
+    $sql = "CALL spSelSaleDetails(".$SaleID.", '".$_SESSION['UserLoginMobile']."')";
     $FailedFlag = 0;
 
     if (! $result = mysqli_query($dbh, $sql)) {
-        logEvent(mysqli_error($dbh), '/Transaction/Sale/Print.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+        logEvent(mysqli_error($dbh), '/Transaction/Sale/Print.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
         $FailedFlag = 1;
         $json_data = array(
                         "FailedFlag" => $FailedFlag
@@ -83,7 +83,7 @@
     else $printer -> text("KEKURANGAN     : " . str_pad(number_format($Change ,0,".",","), 16, " ", STR_PAD_LEFT) . "\n" );
     $printer -> setEmphasis(false);
 
-    $printer -> text("Kasir : " . str_pad($_SESSION['UserLogin'] . ", ", 10, " ") . " No : " . str_pad($SaleNumber, 14, " ") . "\n");
+    $printer -> text("Kasir : " . str_pad($_SESSION['UserLoginMobile'] . ", ", 10, " ") . " No : " . str_pad($SaleNumber, 14, " ") . "\n");
     $printer -> text(str_pad("", 39, "-") . "\n");
     $printer -> setJustification(Printer::JUSTIFY_CENTER);
     $printer -> text("KAMI TIDAK MELAYANI PENUKARAN BARANG\n");

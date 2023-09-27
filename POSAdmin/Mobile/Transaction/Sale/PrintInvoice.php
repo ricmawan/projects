@@ -21,12 +21,12 @@
 		$State = 1;
 		$IsAttached = 'N';
 
-		$sql = "CALL spUpdSalePayment(".$SaleID.", ".$Payment.", ".$PaymentType.", ".$FinishFlag.", ".$DiscountTotal.", '".$_SESSION['UserLogin']."')";
+		$sql = "CALL spUpdSalePayment(".$SaleID.", ".$Payment.", ".$PaymentType.", ".$FinishFlag.", ".$DiscountTotal.", '".$_SESSION['UserLoginMobile']."')";
 		if (! $result=mysqli_query($dbh, $sql)) {
 			$Message = "Terjadi Kesalahan Sistem";
 			$MessageDetail = mysqli_error($dbh);
 			$FailedFlag = 1;
-			logEvent(mysqli_error($dbh), '/Transaction/Sale/UpdatePayment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			logEvent(mysqli_error($dbh), '/Transaction/Sale/UpdatePayment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
 			echo returnstate($SaleID, $Message, $MessageDetail, $FailedFlag, $State);
 			return 0;
 		}
@@ -39,12 +39,12 @@
 
 		$IPAddress = get_client_ip();
 
-	    $sql = "CALL spSelPrinterList('".$IPAddress."', '".$_SESSION['UserLogin']."')";
+	    $sql = "CALL spSelPrinterList('".$IPAddress."', '".$_SESSION['UserLoginMobile']."')";
 	    if (! $result=mysqli_query($dbh, $sql)) {
 	        $Message = "Terjadi Kesalahan Sistem";
 	        $MessageDetail = mysqli_error($dbh);
 	        $FailedFlag = 1;
-	        logEvent(mysqli_error($dbh), '/Transaction/Sale/UpdatePayment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+	        logEvent(mysqli_error($dbh), '/Transaction/Sale/UpdatePayment.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
 	        echo returnstate($SaleID, $Message, $MessageDetail, $FailedFlag, $State);
 	        return 0;
 	    }
@@ -96,10 +96,10 @@
 			    $printer -> setJustification(Printer::JUSTIFY_LEFT);
 			    $printer -> selectPrintMode(Printer::MODE_FONT_B);
 
-			    $sql = "CALL spSelSaleHeader(".$SaleID.", '".$_SESSION['UserLogin']."')";
+			    $sql = "CALL spSelSaleHeader(".$SaleID.", '".$_SESSION['UserLoginMobile']."')";
 
 				if (! $result = mysqli_query($dbh, $sql)) {
-					logEvent(mysqli_error($dbh), '/Transaction/Sale/PrintInvoice.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+					logEvent(mysqli_error($dbh), '/Transaction/Sale/PrintInvoice.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
 					$Message = "Terjadi Kesalahan Sistem";
 					$MessageDetail = mysql_error();
 					$FailedFlag = 1;
@@ -119,11 +119,11 @@
 				$printer -> text($Address . "\n");
 			    $printer -> text(str_pad("", 39, "-") . "\n");
 			    
-			    $sql = "CALL spSelSaleDetails(".$SaleID.", '".$_SESSION['UserLogin']."')";
+			    $sql = "CALL spSelSaleDetails(".$SaleID.", '".$_SESSION['UserLoginMobile']."')";
 			    $FailedFlag = 0;
 
 			    if (! $result = mysqli_query($dbh, $sql)) {
-			        logEvent(mysqli_error($dbh), '/Transaction/Sale/Print.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+			        logEvent(mysqli_error($dbh), '/Transaction/Sale/Print.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
 			        $FailedFlag = 1;
 			        $json_data = array(
 			                        "FailedFlag" => $FailedFlag
@@ -167,7 +167,7 @@
 			    else $printer -> text("KEKURANGAN   : " . str_pad(number_format($Change ,0,".",","), 24, " ", STR_PAD_LEFT) . "\n" );
 			    $printer -> setEmphasis(false);
 
-			    $printer -> text("Kasir : " . str_pad($_SESSION['UserLogin'] . ", ", 10, " ") . " No : " . str_pad($SaleNumber, 14, " ") . "\n");
+			    $printer -> text("Kasir : " . str_pad($_SESSION['UserLoginMobile'] . ", ", 10, " ") . " No : " . str_pad($SaleNumber, 14, " ") . "\n");
 			    $printer -> text(str_pad("", 39, "-") . "\n");
 			    $printer -> setJustification(Printer::JUSTIFY_CENTER);
 			    $printer -> text("KAMI TIDAK MELAYANI PENUKARAN BARANG\n");

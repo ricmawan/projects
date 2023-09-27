@@ -21,10 +21,10 @@
 		$where .= " OR DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
 		$where .= " OR MC.CustomerName LIKE '%".$search."%')";
 	}
-	$sql = "CALL spSelBookingPickUp(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
+	$sql = "CALL spSelBookingPickUp(\"$where\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLoginMobile']."')";
 
 	if (! $result = mysqli_query($dbh, $sql)) {
-		logEvent(mysqli_error($dbh), '/Transaction/PickUp/TransactionList.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+		logEvent(mysqli_error($dbh), '/Transaction/PickUp/TransactionList.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
 		return 0;
 	}
 	$row = mysqli_fetch_array($result);

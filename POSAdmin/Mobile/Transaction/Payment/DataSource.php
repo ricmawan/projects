@@ -38,10 +38,10 @@
 		$where2 .= " OR DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') LIKE '%".$search."%'";
 		$where2 .= " OR MC.CustomerName LIKE '%".$search."%' )";
 	}
-	$sql = "CALL spSelPayment(\"$where\", \"$where2\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLogin']."')";
+	$sql = "CALL spSelPayment(\"$where\", \"$where2\", '$order_by', $limit_s, $limit_l, '".$_SESSION['UserLoginMobile']."')";
 
 	if (! $result = mysqli_query($dbh, $sql)) {
-		logEvent(mysqli_error($dbh), '/Transaction/Payment/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLogin']));
+		logEvent(mysqli_error($dbh), '/Transaction/Payment/DataSource.php', mysqli_real_escape_string($dbh, $_SESSION['UserLoginMobile']));
 		return 0;
 	}
 	$row = mysqli_fetch_array($result);
