@@ -667,6 +667,9 @@
 									"last": "»",
 									"first": "«"
 								}
+							},
+							"drawCallback": function() {
+								setTimeout(function() { table.columns.adjust(); } , 0);
 							}
 						});
 			});

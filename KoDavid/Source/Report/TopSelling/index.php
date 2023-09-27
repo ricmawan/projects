@@ -156,6 +156,13 @@
 														return returnRupiah(value.toString());
 													}
 												}
+											}],
+											xAxes: [{
+												ticks: {
+													autoSkip: false,
+													maxRotation: 90,
+													minRotation: 90
+												}
 											}]
 										},
 										tooltips: {
