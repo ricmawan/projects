@@ -1036,6 +1036,7 @@
 									"lengthChange": false,
 									"pageLength": 25,
 									"searching": true,
+									"searchDelay": 1000,
 									"order": [],
 									"columns": [
 										{ "width": "15%", "orderable": false, className: "dt-head-center" },
