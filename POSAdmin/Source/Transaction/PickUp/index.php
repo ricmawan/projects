@@ -212,7 +212,6 @@
 									}
 								});
 						table2.columns.adjust();
-						tableWidthAdjust();
 						$("#divModal").show();
 					},
 					
@@ -399,9 +398,8 @@
 					success: function(Data) {
 						if(Data.FailedFlag == '0') {
 							for(var i=0;i<Data.data.length;i++) {
-								table2.row.add(Data.data[i]);
+								table2.row.add(Data.data[i]).draw();
 							}
-							table2.draw();
 							tableWidthAdjust();
 							$("#btnSavePickUp").attr("tabindex", Data.tabindex);
 							$("#btnCancelAddPickUp").attr("tabindex", (parseFloat(Data.tabindex) + 1));
@@ -492,11 +490,10 @@
 											$("#hdnBookingID").val(Data.data[i][13]);
 											$("#txtCustomerName").val(Data.data[i][12]);
 										}
-										table2.row.add(Data.data[i]);
+										table2.row.add(Data.data[i]).draw();
 									}
 									$("#btnSavePickUp").attr("tabindex", Data.tabindex);
 									$("#btnCancelAddPickUp").attr("tabindex", (parseFloat(Data.tabindex) + 1));
-									table2.draw();
 									tableWidthAdjust();
 
 									$(".txtQTY").spinner({
@@ -626,12 +623,13 @@
 			}
 			
 			function tableWidthAdjust() {
-				var tableWidth = $("#divTableContent").find("table").width();
+				/*var tableWidth = $("#divTableContent").find("table").width();
 				var barWidth = table2.settings()[0].oScroll.iBarWidth;
 				var newWidth = tableWidth - barWidth + 2;
 				$("#divTableContent").find("table").css({
 					"width": newWidth + "px"
-				});
+				});*/
+				table2.columns.adjust().draw();
 			}
 			
 			function resetForm() {
@@ -719,8 +717,10 @@
 										}
 									},
 									"initComplete": function(settings, json) {
-										table3.columns.adjust();
 										$("#grid-sale").DataTable().cell( ':eq(0)' ).focus();
+									},
+									"drawCallback": function() {
+										setTimeout(function() { table3.columns.adjust(); } , 0);
 									}
 								});
 						var counterPickTransaction = 0;
@@ -1024,6 +1024,9 @@
 										"last": "»",
 										"first": "«"
 									}
+								},
+								"drawCallback": function() {
+									setTimeout(function() { table.columns.adjust(); } , 0);
 								}
 							});
 				

@@ -30,7 +30,7 @@
 						</span>
 					</div>
 					<div class="panel-body">
-						<div class="table-responsive" style="overflow-x:hidden;">
+						<div class="table-responsive" >
 							<table id="grid-data" class="table table-striped table-bordered table-hover" >
 								<thead>				
 									<tr>
@@ -180,13 +180,13 @@
 				</div>
 				<div class="row" >
 					<div id="divTableContent" class="table-responsive" style="overflow-x:hidden;">
-						<table id="grid-transaction" style="width: 100% !important;" class="table table-striped table-bordered table-hover" >
+						<table id="grid-transaction" class="table table-striped table-bordered table-hover" >
 							<thead>
 								<tr>
 									<th><input id="select_all_sale" name="select_all_sale" type="checkbox" onclick="chkAllSale();" style="margin: 0;" /></th>
-									<th>SaleDetailsID</th>
+									<!--<th>SaleDetailsID</th>
 									<th>ItemID</th>
-									<th>BranchID</th>
+									<th>BranchID</th>-->
 									<th>Cabang</th>
 									<th>Kode Barang</th>
 									<th>Nama Barang</th>
@@ -195,7 +195,7 @@
 									<th>Harga Jual</th>
 									<th>Diskon</th>
 									<th>Sub Total</th>
-									<th>BuyPrice</th>
+									<!--<th>BuyPrice</th>
 									<th>Price1</th>
 									<th>Qty1</th>
 									<th>Price2</th>
@@ -205,7 +205,7 @@
 									<th>AvailableUnit</th>
 									<th>UnitID</th>
 									<th>ItemDetailsID</th>
-									<th>ConversionQty</th>
+									<th>ConversionQty</th>-->
 								</tr>
 							</thead>
 						</table>
@@ -474,29 +474,29 @@
 									"searching": false,
 									"order": [],
 									"columns": [
-										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-center" },
+										{ "width": "5%", "orderable": false, className: "dt-head-center dt-body-center", "data": [0] },
+										/*{ "visible": false },
 										{ "visible": false },
-										{ "visible": false },
-										{ "visible": false },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-center" },
-										{ "width": "15%", "orderable": false, className: "dt-head-center" },
-										{ "width": "20%", "orderable": false, className: "dt-head-center" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "visible": false },
-										{ "visible": false },
-										{ "visible": false },
-										{ "visible": false },
+										{ "visible": false },*/
+										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-center", "data": [4] },
+										{ "width": "15%", "orderable": false, className: "dt-head-center", "data": [5] },
+										{ "width": "20%", "orderable": false, className: "dt-head-center", "data": [6] },
+										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right", "data": [7] },
+										{ "width": "10%", "orderable": false, className: "dt-head-center", "data": [8] },
+										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right", "data": [9] },
+										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right", "data": [10] },
+										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right", "data": [11] } /*,
 										{ "visible": false },
 										{ "visible": false },
 										{ "visible": false },
 										{ "visible": false },
 										{ "visible": false },
 										{ "visible": false },
-										{ "visible": false }
+										{ "visible": false },
+										{ "visible": false },
+										{ "visible": false },
+										{ "visible": false },
+										{ "visible": false }*/
 									],
 									"processing": false,
 									"serverSide": false,
@@ -517,7 +517,7 @@
 									},
 									"initComplete": function(settings, json) {
 										setTimeout(function() {
-											$("#grid-transaction").find("input:checkbox").first().remove()
+											$("#grid-transaction").find("input:checkbox").first().remove();
 										}, 0);
 									}
 								});
@@ -552,7 +552,7 @@
 													$("#grid-transaction").DataTable().cell( ':eq(0)' ).focus();
 												}
 											}
-											tableWidthAdjust();
+											tableWidthAdjust("delete row");
 											Calculate();
 										}
 										else {
@@ -573,7 +573,7 @@
 							openDialogEdit(data);
 						});
 						
-						tableWidthAdjust();
+						
 						$("#divModal").show();
 					},
 					
@@ -825,10 +825,11 @@
 					success: function(Data) {
 						if(Data.FailedFlag == '0') {
 							for(var i=0;i<Data.data.length;i++) {
-								table2.row.add(Data.data[i]);
+								table2.row.add(Data.data[i]).draw();
 							}
-							table2.draw();
-							tableWidthAdjust();
+							//console.log(table2.data());
+							//table2.draw();
+							tableWidthAdjust("getsaledetails");
 							
 							for(var i=0;i<Data.data.length;i++) {
 								$("#toggle-branch-" + Data.data[i][1]).toggles({
@@ -885,6 +886,212 @@
 				});
 			}
 
+			function addSaleDetailsRow() {
+				$("#txtCode").val("");
+				var itemID = $("#hdnItemID").val();
+				var itemCode = $("#txtItemCode").val();
+				var itemName = $("#txtItemName").val();
+				var unitID = $("#ddlUnit").val();
+				var unitName = $("#ddlUnit option:selected").text();
+				var Qty = $("#txtQTY").val();
+				var salePrice = $("#txtSalePrice").val();
+				var buyPrice = $("#hdnBuyPrice").val();
+				var price1 = $("#hdnPrice1").val();
+				var qty1 = $("#hdnQty1").val();
+				var price2 = $("#hdnPrice2").val();
+				var qty2 = $("#hdnQty2").val();
+				var discount = $("#txtDiscount").val();
+				var branchID = $("#hdnBranchID").val();
+				var weight = $("#hdnWeight").val();
+				var retailPrice = $("#hdnRetailPrice").val();
+				var availableUnit = $("#hdnAvailableUnit").val();
+				var unitID = $("#ddlUnit").val();
+				var itemDetailsID = $("#hdnItemDetailsID").val();
+				$("#txtDiscount").blur();
+				var PassValidate = 1;
+				var FirstFocus = 0;
+				var ConversionQty = $("#hdnConversionQty").val();
+				var Stock = $("#hdnStock").val();
+
+				var subTotal = returnRupiah(((parseFloat(salePrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, "")) ) * parseFloat(Qty)).toString());
+				//discount = returnRupiah(discount.toString());
+
+				$.ajax({
+					url: "./Transaction/Sale/Insert.php",
+					type: "POST",
+					data: $("#PostForm").serialize(),
+					dataType: "json",
+					success: function(data) {
+						if(data.FailedFlag == '0') {
+							if($("#hdnSaleDetailsID").val() == 0) {
+								//$("#toggle-retail").toggleClass('disabled', true);
+								$("#txtSaleNumber").val(data.SaleNumber);
+								var toggleBranch = "<div id='toggle-branch-" + data.SaleDetailsID + "' onclick=\"updateBranch(this.id, " + Qty + ", '" + itemCode + "')\" class='div-center toggle-modern' ></div>";
+								var checkboxData = "<input type='checkbox' class='chkSaleDetails' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />";
+
+								table2.row.add([
+									checkboxData,
+									data.SaleDetailsID,
+									itemID,
+									branchID,
+									toggleBranch,
+									itemCode,
+									itemName,
+									Qty,
+									unitName,
+									salePrice,
+									discount,
+									subTotal,
+									buyPrice,
+									price1,
+									qty1,
+									price2,
+									qty2,
+									weight,
+									retailPrice,
+									availableUnit,
+									unitID,
+									"",
+									ConversionQty
+								]).draw();
+								
+								$("#toggle-branch-" + data.SaleDetailsID).toggles({
+									drag: true, // allow dragging the toggle between positions
+									click: true, // allow clicking on the toggle
+									text: {
+										on: 'Toko', // text for the ON position
+										off: 'Gudang' // and off
+									},
+									on: true, // is the toggle ON on init
+									animate: 250, // animation time (ms)
+									easing: 'swing', // animation transition easing function
+									checkbox: null, // the checkbox to toggle (for use in forms)
+									clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
+									width: 80, // width used if not set in css
+									height: 18, // height if not set in css
+									type: 'compact' // if this is set to 'select' then the select style toggle will be used
+								});
+								if($("#hdnBranchID").val() == 1) {
+									$("#toggle-branch-" + data.SaleDetailsID).toggles(true);
+								}
+								else {
+									$("#toggle-branch-" + data.SaleDetailsID).toggles(false);
+								}
+								
+								itemCodeTemp = "";
+							}
+							else {
+								var toggles = $('#toggle-branch-' + data.SaleDetailsID).data('toggles').active;
+								var checkboxData = "<input type='checkbox' class='chkSaleDetails' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />";
+								table2.row(rowEdit).data([
+									checkboxData,
+									data.SaleDetailsID,
+									itemID,
+									branchID,
+									table2.row( rowEdit ).data()[4],
+									itemCode,
+									itemName,
+									Qty,
+									unitName,
+									salePrice,
+									discount,
+									subTotal,
+									buyPrice,
+									price1,
+									qty1,
+									price2,
+									qty2,
+									weight,
+									retailPrice,
+									availableUnit,
+									unitID,
+									itemDetailsID,
+									ConversionQty
+								]).draw();
+								
+								$("#toggle-branch-" + data.SaleDetailsID).toggles({
+									drag: true, // allow dragging the toggle between positions
+									click: true, // allow clicking on the toggle
+									text: {
+										on: 'Toko', // text for the ON position
+										off: 'Gudang' // and off
+									},
+									on: true, // is the toggle ON on init
+									animate: 250, // animation time (ms)
+									easing: 'swing', // animation transition easing function
+									checkbox: null, // the checkbox to toggle (for use in forms)
+									clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
+									width: 80, // width used if not set in css
+									height: 18, // height if not set in css
+									type: 'compact' // if this is set to 'select' then the select style toggle will be used
+								});
+								
+								$("#toggle-branch-" + data.SaleDetailsID).toggles(toggles);
+								
+								table2.keys.enable();
+								itemCodeTemp = "";
+							}
+							$("#txtItemCode").val("");
+							$("#txtItemName").val("");
+							$("#txtQTY").val(1);
+							$("#txtSalePrice").val(0);
+							$("#txtDiscount").val(0);
+							$("#hdnBuyPrice").val(0);
+							$("#hdnSalePrice").val(0);
+							$("#hdnPrice1").val(0);
+							$("#hdnQty1").val(0);
+							$("#hdnPrice2").val(0);
+							$("#hdnQty2").val(0);
+							$("#hdnBranchID").val(1);
+							$("#txtItemCode").focus();
+							$("#hdnSaleID").val(data.ID);
+							$("#hdnSaleDetailsID").val(0);
+							$("#hdnItemID").val(0);
+							$("#hdnWeight").val(0);
+							$("#hdnRetailPrice").val(0);
+							$("#txtSubTotal").val(0);
+							$("#hdnStock").val(0);
+							$("#ddlUnit").find('option').remove();
+							$("#ddlUnit").append("<option>--</option>");
+							$("#hdnAvailableUnit").val("");
+							$("#hdnItemDetailsID").val(0);
+							$("#hdnConversionQty").val(0);
+							tableWidthAdjust("add saledetails row");
+							Calculate();
+						}
+						else {
+							var counter = 0;
+							Lobibox.alert("error",
+							{
+								msg: data.Message,
+								width: 480,
+								beforeClose: function() {
+									if(counter == 0) {
+										setTimeout(function() {
+											if(data.Message == "No. Invoice sudah ada") $("#txtSaleNumber").focus();
+											else $("#txtItemCode").focus();
+										}, 0);
+										counter = 1;
+									}
+								}
+							});
+							return 0;
+						}
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						//$("#divModal").hide();
+						var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
+						LogEvent(errorMessage, "/Transaction/Sale/index.php");
+						Lobibox.alert("error",
+						{
+							msg: errorMessage,
+							width: 480
+						});
+						return 0;
+					}
+				});
+			}
+
 			function promptTokenCode() {
 				$("#token-code-dialog").dialog({
 					autoOpen: false,
@@ -928,204 +1135,7 @@
 										$("#loading").hide();
 										$("#token-code-dialog").dialog("destroy");
 										//$("#divModal").hide();
-										$("#txtCode").val("");
-										var itemID = $("#hdnItemID").val();
-										var itemCode = $("#txtItemCode").val();
-										var itemName = $("#txtItemName").val();
-										var unitID = $("#ddlUnit").val();
-										var unitName = $("#ddlUnit option:selected").text();
-										var Qty = $("#txtQTY").val();
-										var salePrice = $("#txtSalePrice").val();
-										var buyPrice = $("#hdnBuyPrice").val();
-										var price1 = $("#hdnPrice1").val();
-										var qty1 = $("#hdnQty1").val();
-										var price2 = $("#hdnPrice2").val();
-										var qty2 = $("#hdnQty2").val();
-										var discount = $("#txtDiscount").val();
-										var branchID = $("#hdnBranchID").val();
-										var weight = $("#hdnWeight").val();
-										var retailPrice = $("#hdnRetailPrice").val();
-										var availableUnit = $("#hdnAvailableUnit").val();
-										var unitID = $("#ddlUnit").val();
-										var itemDetailsID = $("#hdnItemDetailsID").val();
-										$("#txtDiscount").blur();
-										var PassValidate = 1;
-										var FirstFocus = 0;
-										var ConversionQty = $("#hdnConversionQty").val();
-										var Stock = $("#hdnStock").val();
-										$.ajax({
-											url: "./Transaction/Sale/Insert.php",
-											type: "POST",
-											data: $("#PostForm").serialize(),
-											dataType: "json",
-											success: function(data) {
-												if(data.FailedFlag == '0') {
-													if($("#hdnSaleDetailsID").val() == 0) {
-														//$("#toggle-retail").toggleClass('disabled', true);
-														$("#txtSaleNumber").val(data.SaleNumber);
-														var toggleBranch = "<div id='toggle-branch-" + data.SaleDetailsID + "' onclick=\"updateBranch(this.id, " + Qty + ", '" + itemCode + "')\" class='div-center toggle-modern' ></div>";
-														var checkboxData = "<input type='checkbox' class='chkSaleDetails' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
-														table2.row.add([
-															checkboxData,
-															data.SaleDetailsID,
-															itemID,
-															branchID,
-															toggleBranch,
-															itemCode,
-															itemName,
-															Qty,
-															unitName,
-															salePrice,
-															returnRupiah(discount.toString()),
-															returnRupiah(((parseFloat(salePrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, "")) ) * parseFloat(Qty)).toString()),
-															buyPrice,
-															price1,
-															qty1,
-															price2,
-															qty2,
-															weight,
-															retailPrice,
-															availableUnit,
-															unitID,
-															itemDetailsID,
-															ConversionQty
-														]).draw();
-														
-														$("#toggle-branch-" + data.SaleDetailsID).toggles({
-															drag: true, // allow dragging the toggle between positions
-															click: true, // allow clicking on the toggle
-															text: {
-																on: 'Toko', // text for the ON position
-																off: 'Gudang' // and off
-															},
-															on: true, // is the toggle ON on init
-															animate: 250, // animation time (ms)
-															easing: 'swing', // animation transition easing function
-															checkbox: null, // the checkbox to toggle (for use in forms)
-															clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
-															width: 80, // width used if not set in css
-															height: 18, // height if not set in css
-															type: 'compact' // if this is set to 'select' then the select style toggle will be used
-														});
-														if($("#hdnBranchID").val() == 1) {
-															$("#toggle-branch-" + data.SaleDetailsID).toggles(true);
-														}
-														else {
-															$("#toggle-branch-" + data.SaleDetailsID).toggles(false);
-														}
-														
-														itemCodeTemp = "";
-													}
-													else {
-														var toggles = $('#toggle-branch-' + data.SaleDetailsID).data('toggles').active;
-														var checkboxData = "<input type='checkbox' class='chkSaleDetails' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
-														table2.row(rowEdit).data([
-															checkboxData,
-															data.SaleDetailsID,
-															itemID,
-															branchID,
-															table2.row( rowEdit ).data()[4],
-															itemCode,
-															itemName,
-															Qty,
-															unitName,
-															salePrice,
-															returnRupiah(discount.toString()),
-															returnRupiah(((parseFloat(salePrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, "")) ) * parseFloat(Qty)).toString()),
-															buyPrice,
-															price1,
-															qty1,
-															price2,
-															qty2,
-															weight,
-															retailPrice,
-															availableUnit,
-															unitID,
-															itemDetailsID,
-															ConversionQty
-														]).draw();
-														
-														$("#toggle-branch-" + data.SaleDetailsID).toggles({
-															drag: true, // allow dragging the toggle between positions
-															click: true, // allow clicking on the toggle
-															text: {
-																on: 'Toko', // text for the ON position
-																off: 'Gudang' // and off
-															},
-															on: true, // is the toggle ON on init
-															animate: 250, // animation time (ms)
-															easing: 'swing', // animation transition easing function
-															checkbox: null, // the checkbox to toggle (for use in forms)
-															clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
-															width: 80, // width used if not set in css
-															height: 18, // height if not set in css
-															type: 'compact' // if this is set to 'select' then the select style toggle will be used
-														});
-														
-														$("#toggle-branch-" + data.SaleDetailsID).toggles(toggles);
-														
-														table2.keys.enable();
-														itemCodeTemp = "";
-													}
-													$("#txtItemCode").val("");
-													$("#txtItemName").val("");
-													$("#txtQTY").val(1);
-													$("#txtSalePrice").val(0);
-													$("#txtDiscount").val(0);
-													$("#hdnBuyPrice").val(0);
-													$("#hdnSalePrice").val(0);
-													$("#hdnPrice1").val(0);
-													$("#hdnQty1").val(0);
-													$("#hdnPrice2").val(0);
-													$("#hdnQty2").val(0);
-													$("#hdnBranchID").val(1);
-													$("#txtItemCode").focus();
-													$("#hdnSaleID").val(data.ID);
-													$("#hdnSaleDetailsID").val(0);
-													$("#hdnItemID").val(0);
-													$("#hdnWeight").val(0);
-													$("#hdnRetailPrice").val(0);
-													$("#txtSubTotal").val(0);
-													$("#hdnStock").val(0);
-													$("#ddlUnit").find('option').remove();
-													$("#ddlUnit").append("<option>--</option>");
-													$("#hdnAvailableUnit").val("");
-													$("#hdnItemDetailsID").val(0);
-													$("#hdnConversionQty").val(0);
-													tableWidthAdjust();
-													Calculate();
-												}
-												else {
-													var counter = 0;
-													Lobibox.alert("error",
-													{
-														msg: data.Message,
-														width: 480,
-														beforeClose: function() {
-															if(counter == 0) {
-																setTimeout(function() {
-																	if(data.Message == "No. Invoice sudah ada") $("#txtSaleNumber").focus();
-																	else $("#txtItemCode").focus();
-																}, 0);
-																counter = 1;
-															}
-														}
-													});
-													return 0;
-												}
-											},
-											error: function(jqXHR, textStatus, errorThrown) {
-												//$("#divModal").hide();
-												var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-												LogEvent(errorMessage, "/Transaction/Sale/index.php");
-												Lobibox.alert("error",
-												{
-													msg: errorMessage,
-													width: 480
-												});
-												return 0;
-											}
-										});
+										addSaleDetailsRow();
 									}
 									else {
 										//add new item
@@ -1198,204 +1208,7 @@
 							if(txtCode == code) {
 								$(this).dialog("destroy");
 								//$("#divModal").hide();
-								$("#txtCode").val("");
-								var itemID = $("#hdnItemID").val();
-								var itemCode = $("#txtItemCode").val();
-								var itemName = $("#txtItemName").val();
-								var unitID = $("#ddlUnit").val();
-								var unitName = $("#ddlUnit option:selected").text();
-								var Qty = $("#txtQTY").val();
-								var salePrice = $("#txtSalePrice").val();
-								var buyPrice = $("#hdnBuyPrice").val();
-								var price1 = $("#hdnPrice1").val();
-								var qty1 = $("#hdnQty1").val();
-								var price2 = $("#hdnPrice2").val();
-								var qty2 = $("#hdnQty2").val();
-								var discount = $("#txtDiscount").val();
-								var branchID = $("#hdnBranchID").val();
-								var weight = $("#hdnWeight").val();
-								var retailPrice = $("#hdnRetailPrice").val();
-								var availableUnit = $("#hdnAvailableUnit").val();
-								var unitID = $("#ddlUnit").val();
-								var itemDetailsID = $("#hdnItemDetailsID").val();
-								$("#txtDiscount").blur();
-								var PassValidate = 1;
-								var FirstFocus = 0;
-								var ConversionQty = $("#hdnConversionQty").val();
-								var Stock = $("#hdnStock").val();
-								$.ajax({
-									url: "./Transaction/Sale/Insert.php",
-									type: "POST",
-									data: $("#PostForm").serialize(),
-									dataType: "json",
-									success: function(data) {
-										if(data.FailedFlag == '0') {
-											if($("#hdnSaleDetailsID").val() == 0) {
-												//$("#toggle-retail").toggleClass('disabled', true);
-												$("#txtSaleNumber").val(data.SaleNumber);
-												var toggleBranch = "<div id='toggle-branch-" + data.SaleDetailsID + "' onclick=\"updateBranch(this.id, " + Qty + ", '" + itemCode + "')\" class='div-center toggle-modern' ></div>";
-												var checkboxData = "<input type='checkbox' class='chkSaleDetails' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
-												table2.row.add([
-													checkboxData,
-													data.SaleDetailsID,
-													itemID,
-													branchID,
-													toggleBranch,
-													itemCode,
-													itemName,
-													Qty,
-													unitName,
-													salePrice,
-													returnRupiah(discount.toString()),
-													returnRupiah(((parseFloat(salePrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, "")) ) * parseFloat(Qty)).toString()),
-													buyPrice,
-													price1,
-													qty1,
-													price2,
-													qty2,
-													weight,
-													retailPrice,
-													availableUnit,
-													unitID,
-													itemDetailsID,
-													ConversionQty
-												]).draw();
-												
-												$("#toggle-branch-" + data.SaleDetailsID).toggles({
-													drag: true, // allow dragging the toggle between positions
-													click: true, // allow clicking on the toggle
-													text: {
-														on: 'Toko', // text for the ON position
-														off: 'Gudang' // and off
-													},
-													on: true, // is the toggle ON on init
-													animate: 250, // animation time (ms)
-													easing: 'swing', // animation transition easing function
-													checkbox: null, // the checkbox to toggle (for use in forms)
-													clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
-													width: 80, // width used if not set in css
-													height: 18, // height if not set in css
-													type: 'compact' // if this is set to 'select' then the select style toggle will be used
-												});
-												if($("#hdnBranchID").val() == 1) {
-													$("#toggle-branch-" + data.SaleDetailsID).toggles(true);
-												}
-												else {
-													$("#toggle-branch-" + data.SaleDetailsID).toggles(false);
-												}
-												
-												itemCodeTemp = "";
-											}
-											else {
-												var toggles = $('#toggle-branch-' + data.SaleDetailsID).data('toggles').active;
-												var checkboxData = "<input type='checkbox' class='chkSaleDetails' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
-												table2.row(rowEdit).data([
-													checkboxData,
-													data.SaleDetailsID,
-													itemID,
-													branchID,
-													table2.row( rowEdit ).data()[4],
-													itemCode,
-													itemName,
-													Qty,
-													unitName,
-													salePrice,
-													returnRupiah(discount.toString()),
-													returnRupiah(((parseFloat(salePrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, "")) ) * parseFloat(Qty)).toString()),
-													buyPrice,
-													price1,
-													qty1,
-													price2,
-													qty2,
-													weight,
-													retailPrice,
-													availableUnit,
-													unitID,
-													itemDetailsID,
-													ConversionQty
-												]).draw();
-												
-												$("#toggle-branch-" + data.SaleDetailsID).toggles({
-													drag: true, // allow dragging the toggle between positions
-													click: true, // allow clicking on the toggle
-													text: {
-														on: 'Toko', // text for the ON position
-														off: 'Gudang' // and off
-													},
-													on: true, // is the toggle ON on init
-													animate: 250, // animation time (ms)
-													easing: 'swing', // animation transition easing function
-													checkbox: null, // the checkbox to toggle (for use in forms)
-													clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
-													width: 80, // width used if not set in css
-													height: 18, // height if not set in css
-													type: 'compact' // if this is set to 'select' then the select style toggle will be used
-												});
-												
-												$("#toggle-branch-" + data.SaleDetailsID).toggles(toggles);
-												
-												table2.keys.enable();
-												itemCodeTemp = "";
-											}
-											$("#txtItemCode").val("");
-											$("#txtItemName").val("");
-											$("#txtQTY").val(1);
-											$("#txtSalePrice").val(0);
-											$("#txtDiscount").val(0);
-											$("#hdnBuyPrice").val(0);
-											$("#hdnSalePrice").val(0);
-											$("#hdnPrice1").val(0);
-											$("#hdnQty1").val(0);
-											$("#hdnPrice2").val(0);
-											$("#hdnQty2").val(0);
-											$("#hdnBranchID").val(1);
-											$("#txtItemCode").focus();
-											$("#hdnSaleID").val(data.ID);
-											$("#hdnSaleDetailsID").val(0);
-											$("#hdnItemID").val(0);
-											$("#hdnWeight").val(0);
-											$("#hdnRetailPrice").val(0);
-											$("#txtSubTotal").val(0);
-											$("#hdnStock").val(0);
-											$("#ddlUnit").find('option').remove();
-											$("#ddlUnit").append("<option>--</option>");
-											$("#hdnAvailableUnit").val("");
-											$("#hdnItemDetailsID").val(0);
-											$("#hdnConversionQty").val(0);
-											tableWidthAdjust();
-											Calculate();
-										}
-										else {
-											var counter = 0;
-											Lobibox.alert("error",
-											{
-												msg: data.Message,
-												width: 480,
-												beforeClose: function() {
-													if(counter == 0) {
-														setTimeout(function() {
-															if(data.Message == "No. Invoice sudah ada") $("#txtSaleNumber").focus();
-															else $("#txtItemCode").focus();
-														}, 0);
-														counter = 1;
-													}
-												}
-											});
-											return 0;
-										}
-									},
-									error: function(jqXHR, textStatus, errorThrown) {
-										//$("#divModal").hide();
-										var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-										LogEvent(errorMessage, "/Transaction/Sale/index.php");
-										Lobibox.alert("error",
-										{
-											msg: errorMessage,
-											width: 480
-										});
-										return 0;
-									}
-								});
+								addSaleDetailsRow();
 							}
 							else {
 								$("#txtCode").notify("Kode salah!", { position:"right", className:"warn", autoHideDelay: 2000 });
@@ -1487,180 +1300,7 @@
 							promptCode();
 						}
 						else {
-							$.ajax({
-								url: "./Transaction/Sale/Insert.php",
-								type: "POST",
-								data: $("#PostForm").serialize(),
-								dataType: "json",
-								success: function(data) {
-									if(data.FailedFlag == '0') {
-										if($("#hdnSaleDetailsID").val() == 0) {
-											//$("#toggle-retail").toggleClass('disabled', true);
-											$("#txtSaleNumber").val(data.SaleNumber);
-											var toggleBranch = "<div id='toggle-branch-" + data.SaleDetailsID + "' onclick=\"updateBranch(this.id, " + Qty + ", '" + itemCode + "')\" class='div-center toggle-modern' ></div>";
-											var checkboxData = "<input type='checkbox' class='chkSaleDetails' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
-											table2.row.add([
-												checkboxData,
-												data.SaleDetailsID,
-												itemID,
-												branchID,
-												toggleBranch,
-												itemCode,
-												itemName,
-												Qty,
-												unitName,
-												salePrice,
-												returnRupiah(discount.toString()),
-												returnRupiah(((parseFloat(salePrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, "")) ) * parseFloat(Qty)).toString()),
-												buyPrice,
-												price1,
-												qty1,
-												price2,
-												qty2,
-												weight,
-												retailPrice,
-												availableUnit,
-												unitID,
-												itemDetailsID,
-												ConversionQty
-											]).draw();
-											
-											$("#toggle-branch-" + data.SaleDetailsID).toggles({
-												drag: true, // allow dragging the toggle between positions
-												click: true, // allow clicking on the toggle
-												text: {
-													on: 'Toko', // text for the ON position
-													off: 'Gudang' // and off
-												},
-												on: true, // is the toggle ON on init
-												animate: 250, // animation time (ms)
-												easing: 'swing', // animation transition easing function
-												checkbox: null, // the checkbox to toggle (for use in forms)
-												clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
-												width: 80, // width used if not set in css
-												height: 18, // height if not set in css
-												type: 'compact' // if this is set to 'select' then the select style toggle will be used
-											});
-
-											if($("#hdnBranchID").val() == 1) {
-												$("#toggle-branch-" + data.SaleDetailsID).toggles(true);
-											}
-											else {
-												$("#toggle-branch-" + data.SaleDetailsID).toggles(false);
-											}
-											
-											itemCodeTemp = "";
-										}
-										else {
-											var toggles = $('#toggle-branch-' + data.SaleDetailsID).data('toggles').active;
-											var checkboxData = "<input type='checkbox' class='chkSaleDetails' name='select' value='" + data.SaleDetailsID + "' style='margin:0;' />"
-											table2.row(rowEdit).data([
-												checkboxData,
-												data.SaleDetailsID,
-												itemID,
-												branchID,
-												table2.row( rowEdit ).data()[4],
-												itemCode,
-												itemName,
-												Qty,
-												unitName,
-												salePrice,
-												returnRupiah(discount.toString()),
-												returnRupiah(((parseFloat(salePrice.replace(/\,/g, "")) - parseFloat(discount.replace(/\,/g, "")) ) * parseFloat(Qty)).toString()),
-												buyPrice,
-												price1,
-												qty1,
-												price2,
-												qty2,
-												weight,
-												retailPrice,
-												availableUnit,
-												unitID,
-												itemDetailsID,
-												ConversionQty
-											]).draw();
-											
-											$("#toggle-branch-" + data.SaleDetailsID).toggles({
-												drag: true, // allow dragging the toggle between positions
-												click: true, // allow clicking on the toggle
-												text: {
-													on: 'Toko', // text for the ON position
-													off: 'Gudang' // and off
-												},
-												on: true, // is the toggle ON on init
-												animate: 250, // animation time (ms)
-												easing: 'swing', // animation transition easing function
-												checkbox: null, // the checkbox to toggle (for use in forms)
-												clicker: null, // element that can be clicked on to toggle. removes binding from the toggle itself (use nesting)
-												width: 80, // width used if not set in css
-												height: 18, // height if not set in css
-												type: 'compact' // if this is set to 'select' then the select style toggle will be used
-											});
-											
-											$("#toggle-branch-" + data.SaleDetailsID).toggles(toggles);
-											
-											table2.keys.enable();
-											itemCodeTemp = "";
-										}
-										$("#txtItemCode").val("");
-										$("#txtItemName").val("");
-										$("#txtQTY").val(1);
-										$("#txtSalePrice").val(0);
-										$("#txtDiscount").val(0);
-										$("#hdnBuyPrice").val(0);
-										$("#hdnSalePrice").val(0);
-										$("#hdnPrice1").val(0);
-										$("#hdnQty1").val(0);
-										$("#hdnPrice2").val(0);
-										$("#hdnQty2").val(0);
-										$("#hdnBranchID").val(1);
-										$("#txtItemCode").focus();
-										$("#hdnSaleID").val(data.ID);
-										$("#hdnSaleDetailsID").val(0);
-										$("#hdnItemID").val(0);
-										$("#hdnWeight").val(0);
-										$("#hdnRetailPrice").val(0);
-										$("#txtSubTotal").val(0);
-										$("#hdnStock").val(0);
-										$("#ddlUnit").find('option').remove();
-										$("#ddlUnit").append("<option>--</option>");
-										$("#hdnAvailableUnit").val("");
-										$("#hdnItemDetailsID").val(0);
-										$("#hdnConversionQty").val(0);
-										tableWidthAdjust();
-										Calculate();
-									}
-									else {
-										var counter = 0;
-										Lobibox.alert("error",
-										{
-											msg: data.Message,
-											width: 480,
-											beforeClose: function() {
-												if(counter == 0) {
-													setTimeout(function() {
-														if(data.Message == "No. Invoice sudah ada") $("#txtSaleNumber").focus();
-														else $("#txtItemCode").focus();
-													}, 0);
-													counter = 1;
-												}
-											}
-										});
-										return 0;
-									}
-								},
-								error: function(jqXHR, textStatus, errorThrown) {
-									$("#loading").hide();
-									var errorMessage = "Error : (" + jqXHR.status + " " + errorThrown + ")";
-									LogEvent(errorMessage, "/Transaction/Sale/index.php");
-									Lobibox.alert("error",
-									{
-										msg: errorMessage,
-										width: 480
-									});
-									return 0;
-								}
-							});
+							addSaleDetailsRow();
 						}
 					}
 				}
@@ -2334,13 +1974,20 @@
 				$("#lblWeight").html(returnWeight(weight.toFixed(2).toString()));
 			}
 			
-			function tableWidthAdjust() {
-				var tableWidth = $("#divTableContent").find("table").width();
+			function tableWidthAdjust(caller) {
+				/*var tableWidth = $("#divTableContent").find("table").width();
+				//console.log(tableWidth);
 				var barWidth = table2.settings()[0].oScroll.iBarWidth;
+				//console.log(barWidth);
 				var newWidth = tableWidth - barWidth + 2;
+				newWidth = newWidth.toString();
+				//console.log(newWidth);
 				$("#divTableContent").find("table").css({
-					"width": newWidth + "px"
-				});
+					"width": newWidth
+				});*/
+				table2.columns.adjust().draw();
+				//console.log($("#divTableContent").find("table"));
+				//alert(caller);
 			}
 			
 			function resetForm() {
@@ -2379,6 +2026,7 @@
 				$("#txtSubTotal").val(0);
 				$("#hdnStock").val(0);
 				$("#hdnConversionQty").val(0);
+				itemCodeTemp = "";
 				table2.clear().draw();
 			}
 			
@@ -2433,6 +2081,7 @@
 									"lengthChange": false,
 									"pageLength": 25,
 									"searching": true,
+									"searchDelay": 1000,
 									"order": [],
 									"columns": [
 										{ "width": "15%", "orderable": false, className: "dt-head-center" },
@@ -2471,8 +2120,10 @@
 										}
 									},
 									"initComplete": function(settings, json) {
-										table3.columns.adjust();
 										$("#grid-item").DataTable().cell( ':eq(0)' ).focus();
+									},
+									"drawCallback": function() {
+										setTimeout(function() { table3.columns.adjust(); } , 0);
 									} /*,
 									"sDom": '<"toolbar">frtip' */
 								});
@@ -2606,8 +2257,10 @@
 										}
 									},
 									"initComplete": function(settings, json) {
-										table4.columns.adjust();
 										$("#grid-customer").DataTable().cell( ':eq(0)' ).focus();
+									},
+									"drawCallback": function() {
+										setTimeout(function() { table4.columns.adjust(); } , 0);
 									}
 								});
 
@@ -3107,7 +2760,7 @@
 										$("#grid-transaction").DataTable().cell( ':eq(0)' ).focus();
 									}
 								}
-								tableWidthAdjust();
+								tableWidthAdjust("DeleteLastDetails");
 								Calculate();
 							}
 							else {
@@ -3281,7 +2934,7 @@
 		               	setTimeout(function() {
 							table.columns.adjust().draw();
 							if ( $.fn.DataTable.isDataTable( '#grid-transaction' ) ) {
-								tableWidthAdjust();
+								tableWidthAdjust("window resize");
 							}
 							if ( $.fn.DataTable.isDataTable( '#grid-item' ) ) {
 								table3.columns.adjust().draw();
@@ -3422,6 +3075,9 @@
 										"last": "»",
 										"first": "«"
 									}
+								},
+								"drawCallback": function() {
+									setTimeout(function() { table.columns.adjust(); } , 0);
 								}
 							});
 				

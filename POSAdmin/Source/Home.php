@@ -263,7 +263,7 @@
 				$(".panel-default").css ({
 					"min-height" : windowHeight
 				});
-				$("head").append("<style> .panel-default { min-height : " + windowHeight + "px; } .panel-body { overflow-y:auto;min-height : " + (windowHeight - 60) + "px; max-height : " + (windowHeight - 60) + "px } </style>");
+				$("head").append("<style> .panel-default { min-height : " + windowHeight + "px; } .panel-body { overflow-y:auto;min-height : " + (windowHeight - 45) + "px; max-height : " + (windowHeight - 45) + "px } </style>");
 				$("#wrapper").css ({
 					"width" : "calc(100% - 5px)"
 				});

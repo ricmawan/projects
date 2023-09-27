@@ -436,7 +436,6 @@
 							openDialogEdit(data);
 						});
 						
-						tableWidthAdjust();
 						$("#divModal").show();
 					},
 					
@@ -554,9 +553,8 @@
 					success: function(Data) {
 						if(Data.FailedFlag == '0') {
 							for(var i=0;i<Data.data.length;i++) {
-								table2.row.add(Data.data[i]);
+								table2.row.add(Data.data[i]).draw();
 							}
-							table2.draw();
 							tableWidthAdjust();
 							rowEdit = table2.rows().eq( 0 ).filter( function (rowIdx) {
 							    return table2.cell( rowIdx, 1 ).data() == StockMutationDetailsID ? true : false;
@@ -756,12 +754,13 @@
 			}
 			
 			function tableWidthAdjust() {
-				var tableWidth = $("#divTableContent").find("table").width();
+				/*var tableWidth = $("#divTableContent").find("table").width();
 				var barWidth = table2.settings()[0].oScroll.iBarWidth;
 				var newWidth = tableWidth - barWidth + 2;
 				$("#divTableContent").find("table").css({
 					"width": newWidth + "px"
-				});
+				});*/
+				table2.columns.adjust().draw();
 			}
 			
 			function resetForm() {
@@ -832,6 +831,7 @@
 									"lengthChange": false,
 									"pageLength": 25,
 									"searching": true,
+									"searchDelay": 1000,
 									"order": [],
 									"columns": [
 										{ "width": "15%", "orderable": false, className: "dt-head-center" },
@@ -870,8 +870,10 @@
 										}
 									},
 									"initComplete": function(settings, json) {
-										table3.columns.adjust();
 										$("#grid-item").DataTable().cell( ':eq(0)' ).focus();
+									},
+									"drawCallback": function() {
+										setTimeout(function() { table3.columns.adjust(); } , 0);
 									} /*,
 									"sDom": '<"toolbar">frtip' */
 								});
@@ -1162,6 +1164,9 @@
 										"last": "»",
 										"first": "«"
 									}
+								},
+								"drawCallback": function() {
+									setTimeout(function() { table.columns.adjust(); } , 0);
 								}
 							});
 				
