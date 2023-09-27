@@ -59,8 +59,8 @@ SET State = 1;
 			FROM
 				transaction_booking TS
 			WHERE
-				MONTH(TS.TransactionDate) = MONTH(NOW())
-				AND YEAR(TS.TransactionDate) = YEAR(NOW())
+				MONTH(TS.TransactionDate) = MONTH(pTransactionDate)
+				AND YEAR(TS.TransactionDate) = YEAR(pTransactionDate)
 			INTO 
 				pBookingNumber;
 				
