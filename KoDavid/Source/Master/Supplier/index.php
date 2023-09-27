@@ -130,15 +130,15 @@
 				//alert(evt.keyCode);
 				if (evt.keyCode == 13 && evt.shiftKey) {
 					//alert(evt.type);
+					evt.preventDefault();
 					if (evt.type == "keydown") {
 						pasteIntoInput(el, "\n");
 					}
-					evt.preventDefault();
 			    }
 				else if (evt.keyCode == 13  && !evt.shiftKey) {
 					//alert();
 					evt.preventDefault();
-					console.log(evt);
+					//console.log(evt);
 					var next = $('[tabindex="'+(el.tabIndex+1)+'"]');
 					var nextTabIndex = el.tabIndex+1;
 					if(next.length) {
@@ -431,6 +431,11 @@
 									"last": "»",
 									"first": "«"
 								}
+							},
+							"drawCallback": function( settings ) {
+								setTimeout(function() {
+									table.columns.adjust();
+								}, 100);
 							}
 						});
 				
