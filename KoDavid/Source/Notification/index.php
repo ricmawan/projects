@@ -193,6 +193,9 @@
 										"first": "«"
 									}
 								},
+								"drawCallback": function() {
+									setTimeout(function() { table2.columns.adjust(); } , 0);
+								},
 								"sDom": '<"toolbar">frtip'
 						});
 
