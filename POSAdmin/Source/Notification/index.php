@@ -151,6 +151,9 @@
 										"first": "«"
 									}
 								},
+								"drawCallback": function() {
+									setTimeout(function() { table.columns.adjust(); } , 0);
+								},
 								"sDom": '<"toolbar">frtip'
 						});
 
@@ -189,6 +192,9 @@
 										"last": "»",
 										"first": "«"
 									}
+								},
+								"drawCallback": function() {
+									setTimeout(function() { table2.columns.adjust(); } , 0);
 								},
 								"sDom": '<"toolbar">frtip'
 						});

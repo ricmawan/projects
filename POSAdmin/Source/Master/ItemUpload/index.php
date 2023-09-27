@@ -190,7 +190,7 @@
 									},
 									"initComplete": function(settings, json) {
 										setTimeout(function() {
-											adjustColumns();
+											table.columns.adjust();
 										}, 0);
 									}
 								});

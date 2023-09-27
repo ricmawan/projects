@@ -48,9 +48,9 @@
 										<th>QTY2</th>
 										<th>Berat</th>
 										<th>Stok Min</th>
-										<th>ItemID</th>
+										<!--<th>ItemID</th>
 										<th>CategoryID</th>
-										<th>UnitID</th>
+										<th>UnitID</th>-->
 									</tr>
 								</thead>
 							</table>
@@ -901,26 +901,29 @@
 							"scrollCollapse": true,
 							"order": [],
 							"columns": [
-								{ "width": "12px", "orderable": false, className: "dt-head-center dt-body-center" },
-								{ "width": "25px", "orderable": false, className: "dt-head-center dt-body-right" },
+								{ "width": "12px", "searchable": false, "orderable": false, className: "dt-head-center dt-body-center" },
+								{ "width": "25px", "searchable": false, "orderable": false, className: "dt-head-center dt-body-right" },
 								{ className: "dt-head-center" },
 								{ className: "dt-head-center" },
 								{ className: "dt-head-center" },
 								{ className: "dt-head-center" },
-								{ className: "dt-head-center dt-body-right" },
-								{ className: "dt-head-center dt-body-right" },
-								{ className: "dt-head-center dt-body-right" },
-								{ className: "dt-head-center dt-body-right" },
-								{ className: "dt-head-center dt-body-right" },
-								{ className: "dt-head-center dt-body-right" },
-								{ className: "dt-head-center dt-body-right" },
-								{ className: "dt-head-center dt-body-right" },
+								{ "searchable": false, className: "dt-head-center dt-body-right" },
+								{ "searchable": false, className: "dt-head-center dt-body-right" },
+								{ "searchable": false, className: "dt-head-center dt-body-right" },
+								{ "searchable": false, className: "dt-head-center dt-body-right" },
+								{ "searchable": false, className: "dt-head-center dt-body-right" },
+								{ "searchable": false, className: "dt-head-center dt-body-right" },
+								{ "searchable": false, className: "dt-head-center dt-body-right" },
+								{ "searchable": false, className: "dt-head-center dt-body-right" }/*,
 								{ className: "dt-head-center dt-body-right", "visible": false },
 								{ className: "dt-head-center dt-body-right", "visible": false },
-								{ className: "dt-head-center dt-body-right", "visible": false }
+								{ className: "dt-head-center dt-body-right", "visible": false }*/
 							],
 							"processing": true,
 							"serverSide": true,
+							"search": {
+								return: true
+							},
 							"ajax": "./Master/Item/DataSource.php",
 							"language": {
 								"info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
@@ -939,12 +942,7 @@
 							},
 							"drawCallback": function( settings ) {
 						       setTimeout(function() {
-									adjustColumns();
-								}, 100);
-						    },
-						    "initComplete": function( settings ) {
-						       setTimeout(function() {
-									adjustColumns();
+									table.columns.adjust();
 								}, 100);
 						    }
 						});
