@@ -275,6 +275,7 @@
 								}
 							},
 							"drawCallback": function( settings ) {
+						        setTimeout(function() { table.columns.adjust(); } , 0);
 						        var json = table.ajax.json();
 						        $("#tfootTable").html("<tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Sub Total:</td><td>" + json.SubTotal + "</td></tr><tr><td colspan='2'>&nbsp;</td><td>&nbsp;</td><td>Grand Total:</td><td>" + json.GrandTotal + "</td></tr>");
 								$("#tfootTable").find("td").css({
