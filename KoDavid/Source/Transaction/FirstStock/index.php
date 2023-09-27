@@ -169,9 +169,9 @@
 						<table id="grid-transaction" style="width: 100% !important;" class="table table-striped table-bordered table-hover" >
 							<thead>
 								<tr>
-									<th>FirstStockDetailsID</th>
+									<!--<th>FirstStockDetailsID</th>
 									<th>ItemID</th>
-									<th>BranchID</th>
+									<th>BranchID</th>-->
 									<th>Cabang</th>
 									<th>Kode Barang</th>
 									<th>Nama Barang</th>
@@ -182,9 +182,9 @@
 									<th>Harga Grosir 1</th>
 									<th>Harga Grosir 2</th>
 									<th>Sub Total</th>
-									<th>AvailableUnit</th>
+									<!--<th>AvailableUnit</th>
 									<th>UnitID</th>
-									<th>ItemDetailsID</th>
+									<th>ItemDetailsID</th>-->
 								</tr>
 							</thead>
 						</table>
@@ -377,22 +377,22 @@
 									"searching": false,
 									"order": [],
 									"columns": [
+										/*{ "visible": false },
+										{ "visible": false },
+										{ "visible": false },*/
+										{ "width": "10%", data: [3], "orderable": false, className: "dt-head-center" },
+										{ "width": "11%", data: [4], "orderable": false, className: "dt-head-center" },
+										{ "width": "15%", data: [5], "orderable": false, className: "dt-head-center" },
+										{ "width": "7%", data: [6], "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "7%", data: [7], "orderable": false, className: "dt-head-center" },
+										{ "width": "10%", data: [8], "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "10%", data: [9], "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "10%", data: [10], "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "10%", data: [11], "orderable": false, className: "dt-head-center dt-body-right" },
+										{ "width": "10%", data: [12], "orderable": false, className: "dt-head-center dt-body-right" }/*,
 										{ "visible": false },
 										{ "visible": false },
-										{ "visible": false },
-										{ "width": "10%", "orderable": false, className: "dt-head-center" },
-										{ "width": "11%", "orderable": false, className: "dt-head-center" },
-										{ "width": "15%", "orderable": false, className: "dt-head-center" },
-										{ "width": "7%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "7%", "orderable": false, className: "dt-head-center" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "width": "10%", "orderable": false, className: "dt-head-center dt-body-right" },
-										{ "visible": false },
-										{ "visible": false },
-										{ "visible": false }
+										{ "visible": false }*/
 									],
 									"processing": false,
 									"serverSide": false,
@@ -464,7 +464,6 @@
 							openDialogEdit(data);
 						});
 						
-						tableWidthAdjust();
 						$("#divModal").show();
 						$(document).on('keydown', function(e) {
 							if (e.keyCode == 39 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //right arrow
@@ -662,9 +661,9 @@
 					success: function(Data) {
 						if(Data.FailedFlag == '0') {
 							for(var i=0;i<Data.data.length;i++) {
-								table2.row.add(Data.data[i]);
+								table2.row.add(Data.data[i]).draw();
 							}
-							table2.draw();
+							//table2.draw();
 							tableWidthAdjust();
 						}
 						else {
@@ -1170,12 +1169,13 @@
 			}
 			
 			function tableWidthAdjust() {
-				var tableWidth = parseFloat($("#divTableContent").find("table").width());
+				/*var tableWidth = parseFloat($("#divTableContent").find("table").width());
 				var barWidth = parseFloat(table2.settings()[0].oScroll.iBarWidth);
 				var newWidth = tableWidth - barWidth + 2;
 				$("#divTableContent").find("table").css({
 					"width": newWidth + "px"
-				});
+				});*/
+				table2.columns.adjust().draw();
 			}
 			
 			function resetForm() {
@@ -1298,9 +1298,12 @@
 										}
 									},
 									"initComplete": function(settings, json) {
-										table3.columns.adjust();
+										
 										$("#grid-item").DataTable().cell( ':eq(0)' ).focus();
-									} /*,
+									},
+									"drawCallback": function() {
+										setTimeout(function() { table3.columns.adjust(); } , 0);
+									}/*,
 									"sDom": '<"toolbar">frtip' */
 								});
 
@@ -1582,6 +1585,9 @@
 										"last": "»",
 										"first": "«"
 									}
+								},
+								"drawCallback": function() {
+									setTimeout(function() { table.columns.adjust(); } , 0);
 								}
 							});
 				

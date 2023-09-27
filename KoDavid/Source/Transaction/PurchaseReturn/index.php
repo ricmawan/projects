@@ -356,6 +356,9 @@
 											"last": "»",
 											"first": "«"
 										}
+									},
+									"drawCallback": function() {
+										setTimeout(function() { table.columns.adjust(); } , 0);
 									}
 								});
 						table2.columns.adjust();
@@ -410,7 +413,6 @@
 							openDialogEdit(data);
 						});
 						
-						tableWidthAdjust();
 						$("#divModal").show();
 						$(document).on('keydown', function(e) {
 							if (e.keyCode == 39 && $("input:focus").length == 0 && $("#btnOK:focus").length == 0) { //right arrow
@@ -538,9 +540,9 @@
 					success: function(Data) {
 						if(Data.FailedFlag == '0') {
 							for(var i=0;i<Data.data.length;i++) {
-								table2.row.add(Data.data[i]);
+								table2.row.add(Data.data[i]).draw();
 							}
-							table2.draw();
+							//table2.draw();
 							tableWidthAdjust();
 						}
 						else {
@@ -948,12 +950,13 @@
 			}
 			
 			function tableWidthAdjust() {
-				var tableWidth = $("#divTableContent").find("table").width();
+				/*var tableWidth = $("#divTableContent").find("table").width();
 				var barWidth = table2.settings()[0].oScroll.iBarWidth;
 				var newWidth = tableWidth - barWidth + 2;
 				$("#divTableContent").find("table").css({
 					"width": newWidth + "px"
-				});
+				});*/
+				table2.columns.adjust().draw();
 			}
 			
 			function resetForm() {
@@ -1071,8 +1074,10 @@
 										}
 									},
 									"initComplete": function(settings, json) {
-										table3.columns.adjust();
 										$("#grid-item").DataTable().cell( ':eq(0)' ).focus();
+									},
+									"drawCallback": function() {
+										setTimeout(function() { table3.columns.adjust(); } , 0);
 									} /*,
 									"sDom": '<"toolbar">frtip' */
 								});
@@ -1359,6 +1364,9 @@
 										"last": "»",
 										"first": "«"
 									}
+								},
+								"drawCallback": function() {
+									setTimeout(function() { table.columns.adjust(); } , 0);
 								}
 							});
 				
