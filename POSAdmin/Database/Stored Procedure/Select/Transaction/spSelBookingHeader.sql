@@ -30,6 +30,7 @@ SET State = 1;
 	SELECT
 		TB.BookingNumber,
 		DATE_FORMAT(TB.TransactionDate, '%d-%m-%Y') TransactionDate,
+		TB.CreatedDate,
 		TB.CreatedBy,
 		MC.CustomerName,
 		MC.Address,

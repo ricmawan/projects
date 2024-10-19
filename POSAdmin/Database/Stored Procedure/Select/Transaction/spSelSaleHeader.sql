@@ -30,6 +30,7 @@ SET State = 1;
 	SELECT
 		TS.SaleNumber,
 		DATE_FORMAT(TS.TransactionDate, '%d-%m-%Y') TransactionDate,
+		TS.CreatedDate,
 		TS.CreatedBy,
 		MC.CustomerName,
 		MC.Address,
