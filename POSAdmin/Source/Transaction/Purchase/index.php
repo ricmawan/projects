@@ -1416,7 +1416,7 @@
 				$("#divTableContent").find("table").css({
 					"width": newWidth + "px"
 				});*/
-				table2.width.columns.adjust().draw();
+				table2.columns.adjust().draw();
 			}
 			
 			function resetForm() {
